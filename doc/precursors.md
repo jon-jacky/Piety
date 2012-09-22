@@ -15,5 +15,16 @@ Here are some examples.
 | Lisp Machines | 1970s, 80s | Lisp | Bare machine | Symbolics, LMI, ...<br>(purpose-built)| Artificial Intelligence |
 | Oberon | late 1980s | Oberon | Bare machine | ETH Ceres, ...<br>(NS32032 processor) | Programming<br>Document preparation|
 | [Plan 9](http://plan9.bell-labs.com/sys/doc/9.html), also [here](http://doc.cat-v.org/plan_9/) | late 1980s -- | C, Alef | Bare machine | various | Programming<br>Electronics CAD |
+| Squeak | | Smalltalk | Conventional OS | various ||
+| hOp, House | | Haskell | Bare Machine | x86 || 
+| HaLVM, HaNS | | Haskell | Virtual Machine | Xen hypervisor | Cloud computing |
+| Mirage | | O'Caml | Virtual Machine | Xen hypervisor | Cloud computing |
+| STEPS | | several DSLs | Bare machine |  various | Education<br>Document preparation | 
+| Lively Kernel || Javascript | Sandbox | Web browser ||
+| Kahn Academy || Javascript | Sandbox |Web browser | Education |
+| Sugar | | Python | Conventional OS | OLPC laptop<br>Linux + Gtk | Education |
+| [Cleese](https://github.com/jtauber/cleese/) | 2003 --| Python | Bare machine |||
+| [Pycorn](http://www.pycorn.org/home) | | Python | Bare machine | ARM processor ||
+
 
 More to come ...
