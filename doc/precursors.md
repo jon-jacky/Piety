@@ -24,7 +24,7 @@ Here are some examples.
 | Kahn Academy || Javascript | Sandbox |Web browser | Education |
 | Sugar | | Python | Conventional OS | OLPC laptop<br>Linux + Gtk | Education |
 | [Cleese](https://github.com/jtauber/cleese/) | 2003 --| Python | Bare machine |||
-| [Pycorn](http://www.pycorn.org/home) | | Python | Bare machine | ARM processor ||
+| [Pycorn](http://www.pycorn.org/home) | | Python | Bare machine | Gumstix Verdex board<br>(ARM processor) ||
 
 
 More to come ...
