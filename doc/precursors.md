@@ -21,7 +21,7 @@ Here are some examples.
 | Mirage | | O'Caml | Virtual Machine | Xen hypervisor | Cloud computing |
 | STEPS | | several DSLs | Bare machine |  various | Education<br>Document preparation | 
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/) also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser ||
-| Kahn Academy || Javascript | Sandbox |Web browser | Education |
+| [Kahn Academy CS](http://ejohn.org/blog/introducing-khan-cs/)| 2012 -- | Javascript | Sandbox |Web browser | Education |
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) | 2007 -- | Python | Conventional OS | OLPC laptop<br>Linux + Gtk | Education |
 | [Cleese](https://github.com/jtauber/cleese/) | 2003 --| Python | Bare machine |||
 | [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board<br>(ARM processor) | Education |
