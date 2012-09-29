@@ -11,7 +11,9 @@ Robert Strandh, December 23, 2004
 1 Introduction
 
 This document describes what we call a "development and deployment
-environment" that we would like to implement. ...  we are planning to implement this environment on top of Linux, as an ordinary Linux process. 
+environment" that we would like to implement. ...  we are planning to
+implement this environment on top of Linux, as an ordinary Linux
+process.
 
 Gracle differs in two important ways from ordinary operating systems
 ... in that it does not have files, and that it does not have
@@ -33,7 +35,8 @@ memory are all persistent.
 
 1.2 Gracle does not have processes
 
-... In Gracle, all threads of execution are *light-weight processes*, commonly known as *threads*. ...
+... In Gracle, all threads of execution are *light-weight processes*,
+commonly known as *threads*. ...
 
 1.3 Objects are not organized in a heirarchy
 
@@ -56,7 +59,9 @@ perhaps a number of *tags* that serve the same purpose as directory
 names in traditional hierarchical systems. ...
 
 In a traditional hierarchy, the *current directory* serves two
-different purposes.  The first is to serve as the current collection of objects... the second purpose is to give newly created objects this prefix so that such objects become members of the same collection.
+different purposes.  The first is to serve as the current collection
+of objects... the second purpose is to give newly created objects this
+prefix so that such objects become members of the same collection.
 
 For Gracle, we suggest using a set of *current properties* defining
 the current collection of objects, and a set of *assigned properties*
