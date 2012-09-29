@@ -1,4 +1,74 @@
 
-The Gracle paper can no longer be found on the web. 
+I can no longer find the Gracle paper on the web.  It is sufficiently
+interesting that I typed in a few excerpts here.
 
-I will type in some excerpts here.
+---
+
+Gracle: A development and deployment environment for Common Lisp
+
+Robert Strandh, December 23, 2004
+
+1 Introduction
+
+This document describes what we call a "development and deployment
+environment" that we would like to implement. ...  we are planning to implement this environment on top of Linux, as an ordinary Linux process. 
+
+Gracle differs in two important ways from ordinary operating systems
+... in that it does not have files, and that it does not have
+processes.
+
+1.1  Gracle does not have files
+
+Gracle ... does not make a distinction between primary and secondary
+storage. ... Gracle has a *single-level store*.
+
+EROS (Extremely Reliable Operating System) is an operating system
+witha a crash-proof single level store.  We are planning to use the
+EROS model for Gracle, except that we do not plan to use the naked
+disk and instead implement the permanent store as a (single) Linux
+file.
+
+The great advantage of not having files ... Structured objects in main
+memory are all persistent.
+
+1.2 Gracle does not have processes
+
+... In Gracle, all threads of execution are *light-weight processes*, commonly known as *threads*. ...
+
+1.3 Objects are not organized in a heirarchy
+
+We would like to eliminate the heirarchy of objects (files) ... Most
+often, the order of the directories in the path of an object in such a
+heirarchy is not meaningful to the user ...
+
+Also, we would like to be able to construct collections of objects on
+the fly, and not be limited to the collections that the directories in
+a hierarchy imposes ...
+
+While we could settle with ... Common Lisp (special variables), it
+seems useful to have some kind of "data base" of objects that are
+accessible by queries ... We distinguish between objects that are
+*archived* and objects that are not.  The concept of archived objects
+is different from that of *persistent objects*.  ... Archiving an
+object just means giving it certain properties and making it
+accessible by queries ... Such properties include creation dates and
+perhaps a number of *tags* that serve the same purpose as directory
+names in traditional hierarchical systems. ...
+
+In a traditional hierarchy, the *current directory* serves two
+different purposes.  The first is to serve as the current collection of objects... the second purpose is to give newly created objects this prefix so that such objects become members of the same collection.
+
+For Gracle, we suggest using a set of *current properties* defining
+the current collection of objects, and a set of *assigned properties*
+that define what proprities newly archived objects will inherit.  They
+are not the same, since the current properties might incude
+restrictions on date of creation and any other arbitrary filter ...
+
+2. How Linux memory management works
+...
+
+3. How the EROS single-level store works
+...
+
+4. Implementing the single-level store
+...
