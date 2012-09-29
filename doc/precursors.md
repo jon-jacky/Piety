@@ -8,12 +8,12 @@ has inspired some interesting experiments and a few influential
 systems.  Alan Kay explained the rationale
 [here](http://www.vpri.org/pdf/m2004001_power.pdf):
 
-> * ... in programming there is a widespread first order theory that one
+> *... in programming there is a widespread first order theory that one
 > shouldn't build one's own tools, languages, and especially operating
 > systems.  This is true --- an incredible amount of time and energy has
-> gone down these ratholes.  On the second hand, if you **can** build your
-> own tools, languages, and operating systems you **absolutely should**
-> because the leverage htat can be obtained (and often the time not
+> gone down these ratholes.  On the second hand, if you* **can** *build your
+> own tools, languages, and operating systems you* **absolutely should**
+> *because the leverage that can be obtained (and often the time not
 > wasted in trying to fix other people's not quite right tools) can be
 > incredible.*
 
@@ -40,38 +40,32 @@ Here are some examples.
 | Khoros, [lv0](http://lv0.org/) | 2004 -- | Lua | Bare Machine | ||
 | LuaOs, SafeLua | 2004 -- | Lua | | || 
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/) also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser ||
-| [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ...<b>microcontrollers | Embedded controllers |
+| [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ...<br>microcontrollers | Embedded controllers |
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) | 2007 -- | Python | Native OS | OLPC laptop<br>Linux + Gtk | Education |
 | [Cleese](https://github.com/jtauber/cleese/) | 2003 --| Python | Bare machine |||
 | [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board<br>(ARM processor) | Education |
 | [Python OS Project (POP)](http://python-os/en/) | 2009 -- | Python | Native OS | Linux | Desktop OS<br>"Just For Fun" |
 
-Key to Substrate column
+Key to **Substrate** column
 
-Bare machine 
-: The system includes an operating system kernel written mostly
+* **Bare machine** 
+The system includes an operating system kernel written mostly
 in the favored language, with only a minimal amount of C or assembler.
 The "bare machine" might actually be virtual machine or emulator
 such as QEMU.
 
-Virtual Machine
-: Similar to Bare Machine, but the system is designed from the
+* **Virtual Machine** Similar to Bare Machine, but the system is designed from the
 beginning to be deployed only on VMs.
 
-Native OS 
-: The system runs on top of a conventional OS, whose facilities are
-all available.  The system provides an environment where programmers
-and users can avoid utilities not written in the favored language.
+* **Native OS** The system runs on top of a conventional OS, whose facilities are
+all available.  Programmers and users can avoid utilities not written in the favored language.
 
-Sandbox
-: The system runs on top of a conventional OS, but in a self-contained
+* **Sandbox** The system runs on top of a conventional OS, but in a self-contained
 environment where most of the the host's facilities are not available.
 Programmers and users can only use the utilities provided in the
 favored language.
 
-OS components 
-
-: The system runs on a minimal OS built from components chosen from a
+* **OS components** The system runs on a minimal OS built from components chosen from a
 collection such as [Flux OSKit](http://www.cs.utah.edu/flux/oskit/).
 A more recent collection is
 [Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html).
