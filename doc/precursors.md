@@ -4,15 +4,27 @@
 > all in our favorite language!*
 
 This seductive idea recurs among each generation of programmers.  It
-has inspired some interesting experiments and a few influential systems.
+has inspired some interesting experiments and a few influential
+systems.  Alan Kay explained the rationale
+[here](http://www.vpri.org/pdf/m2004001_power.pdf):
+
+> * ... in programming there is a widespread first order theory that one
+> shouldn't build one's own tools, languages, and especially operating
+> systems.  This is true --- an incredible amount of time and energy has
+> gone down these ratholes.  On the second hand, if you **can** build your
+> own tools, languages, and operating systems you **absolutely should**
+> because the leverage htat can be obtained (and often the time not
+> wasted in trying to fix other people's not quite right tools) can be
+> incredible.*
+
 Here are some examples.
 
 | System | Era | Language | Substrate    | Platform  | Applications |
 | ------ | --- | -------- | -------- | -------   | ------- |
 | [MCP](http://en.wikipedia.org/wiki/MCP_%28Burroughs_Large_Systems%29), also [here](http://en.wikipedia.org/wiki/Burroughs_large_systems) | 1961-- | Algol (ESPOL) | Bare machine | Burroughs B5000 | Data processing |
 | [Unix](http://cm.bell-labs.com/cm/cs/who/dmr/hist.html)  | 1969 -- | C | Bare machine | PDP 7, PDP 11, ... | Programming<br>Document preparation  |
-| Smalltalk | 1970s | Smalltalk | Bare machine | Xerox Alto, ...<br>(purpose-built) | Education |
-| Lisp Machines | 1970s, 80s | Lisp | Bare machine | Symbolics, LMI, ...<br>(purpose-built)| Artificial Intelligence |
+| [Smalltalk](http://classes.soe.ucsf.edu/cmps112/Spring03/readings/Ingalls78.html), also [here](http://www.vpri.org/pdf/m2004001_power.pdf) and [here](http://news.ycombinator.com/item?id=3996209) | 1970s | Smalltalk | Bare machine | Xerox Alto, ...<br>(purpose-built) | Education |
+| [Lisp Machines](http://en.wikipedia.org/wiki/Lisp_machine), also [here](http://www.lispmachine.net/) and [here](http://www.andromeda.com/people/ddyer/lisp/) | 1970s, 80s | Lisp | Bare machine | MIT CONS, Symbolics, LMI, ...<br>(purpose-built)| Artificial Intelligence |
 | Oberon | late 1980s | Oberon | Bare machine | ETH Ceres, ...<br>(NS32032 processor) | Programming<br>Electronics CAD|
 | [Plan 9](http://plan9.bell-labs.com/sys/doc/9.html), also [here](http://doc.cat-v.org/plan_9/) | late 1980s -- | C, Alef | Bare machine | various | Programming<br>Electronics CAD |
 | ["Scheme Machine"](http://lists.tunes.org/archives/lispos/1998-December/002514.html) | 1998 | Scheme (MzScheme) | OS components | [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), x86 | |
@@ -28,6 +40,7 @@ Here are some examples.
 | Khoros, [lv0](http://lv0.org/) | 2004 -- | Lua | Bare Machine | ||
 | LuaOs, SafeLua | 2004 -- | Lua | | || 
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/) also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser ||
+| [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ...<b>microcontrollers | Embedded controllers |
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) | 2007 -- | Python | Native OS | OLPC laptop<br>Linux + Gtk | Education |
 | [Cleese](https://github.com/jtauber/cleese/) | 2003 --| Python | Bare machine |||
 | [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board<br>(ARM processor) | Education |
@@ -36,14 +49,14 @@ Here are some examples.
 Key to Substrate column
 
 Bare machine 
-: The system includes an operating system kernel written
-in the favored language, and (usually) a bit of C or assembler.
+: The system includes an operating system kernel written mostly
+in the favored language, with only a minimal amount of C or assembler.
 The "bare machine" might actually be virtual machine or emulator
 such as QEMU.
 
 Virtual Machine
 : Similar to Bare Machine, but the system is designed from the
-beginning to be deployed only on VMs
+beginning to be deployed only on VMs.
 
 Native OS 
 : The system runs on top of a conventional OS, whose facilities are
@@ -51,11 +64,15 @@ all available.  The system provides an environment where programmers
 and users can avoid utilities not written in the favored language.
 
 Sandbox
-: The system runs on top of a conventional OS in a "sandbox" where
-most of the the host's facilities are not available.  Programmers and
-users can only use the utilities provided in the favored language.
+: The system runs on top of a conventional OS, but in a self-contained
+environment where most of the the host's facilities are not available.
+Programmers and users can only use the utilities provided in the
+favored language.
 
-OS components
-: The system runs on a minimal OS built from components, for example
-[Flux OSKit](http://www.cs.utah.edu/flux/oskit/) or
+OS components 
+
+: The system runs on a minimal OS built from components chosen from a
+collection such as [Flux OSKit](http://www.cs.utah.edu/flux/oskit/).
+A more recent collection is
 [Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html).
+
