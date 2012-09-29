@@ -13,7 +13,7 @@ systems.  Alan Kay explained the rationale
 > systems.  This is true --- an incredible amount of time and energy has
 > gone down these ratholes.  On the second hand, if you* **can** *build your
 > own tools, languages, and operating systems you* **absolutely should**
-> *because the leverage htat can be obtained (and often the time not
+> *because the leverage that can be obtained (and often the time not
 > wasted in trying to fix other people's not quite right tools) can be
 > incredible.*
 
