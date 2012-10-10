@@ -1,9 +1,10 @@
 
-Here are examples of systems software written in Python.  Here we
+Here are examples of systems software written in Python.  We
 mostly exclude programs which are Python wrappers around a core
-written in another language (like many modules in the Python
-standard library).  We also exclude programs written in other
-languages that can be scripted in Python.
+written in another language (like many modules in the Python standard
+library), but we make a few exceptions for exemplary APIs or
+interesting techniques.  We also exclude programs written in other
+languages that can be scripted in Python --- there are so many.
 
 | Program | Description |
 | ------- | ----------- |
@@ -15,5 +16,5 @@ languages that can be scripted in Python.
 | [terminal](http://blog.daum.net/nskystars/2644517) | "A Simple Linux Framebuffer Terminal in Python (and C)" using the techniques above | 
 | [Python X Library](http://python-xlib.sourceforge.net/) | "a fully functional X client library for Python programs. It is written entirely in Python, in contrast to earlier X libraries for Python (the ancient X extension and the newer plxlib) which were interfaces to the C Xlib." |
 | [tinywm](http://incise.org/tinywm.html) | "a tiny window manager that I created as an exercise in minimalism. ... It is only around 50 lines of C. There is also a Python version using python-xlib." |
-| [PyCairo](http://www.tortall.net/mu/wiki/CairoTutorial), also [here](http://cairographics.org/pycairo/) | "Cairo is a 2D (vector) graphics library ... (that) provides operations similar to the drawing operators of PostScript and PDF. Operations in cairo including stroking and filling cubic Bézier splines, transforming and compositing translucent images, and antialiased text rendering. All drawing operations can be transformed by any affine transformation (scale, rotation, shear, etc.)", "Cairo is implemented as a library written in the C programming language, but bindings are available for several different programming languages." "Pycairo is a set of Python bindings ..." |
+| [PyCairo](http://www.tortall.net/mu/wiki/CairoTutorial), also [here](http://cairographics.org/pycairo/) | "Cairo is a 2D (vector) graphics library ... (that) provides operations similar to the drawing operators of PostScript and PDF. Operations in cairo including stroking and filling cubic Bézier splines, transforming and compositing translucent images, and antialiased text rendering. All drawing operations can be transformed by any affine transformation (scale, rotation, shear, etc.)", "Cairo is implemented as a library written in the C programming language, but bindings are available for several different programming languages." "Pycairo is a set of Python bindings ..." Cairo can write to the [Linux framebuffer](http://lists.cairographics.org/archives/cairo/2010-July/020378.html)|
 | [peppy](http://peppy.flipturn.org/) | "an XEmacs-like editor in Python", "wrap(s) the wonderful [Scintilla](http://www.scintilla.org/) editing component" |
