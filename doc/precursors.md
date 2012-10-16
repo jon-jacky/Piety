@@ -40,9 +40,10 @@ Here are some examples.
 | [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | 2008 -- | Lua | Bare Machine | ||
 | [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | 2011 -- | Lua (SafeLua) | Bare Machine, Native OS, Sandbox |  Linux || 
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/), also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser ||
-| [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ...<b>microcontrollers | Embedded controllers |
+| [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ...<br>microcontrollers | Embedded controllers |
+| [Cleese](https://github.com/jtauber/cleese/), also [here](http://code.google.com/p/cleese/) | 2003, 2009 | Python | Bare machine |||
+| [Unununium](http://mail.python.org/pipermail/python-announce-list/2004-July/003220.html), also [here](http://web.archive.org/web/20061107165236/http://www.unununium.org/) | 2004 - 2006 | Python | Bare machine, Native OS | Linux ||
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) | 2007 -- | Python | Native OS | OLPC laptop<br>Linux + Gtk | Education |
-| [Cleese](https://github.com/jtauber/cleese/) | 2003 --| Python | Bare machine |||
 | [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board<br>(ARM processor) | Education |
 | [Python OS Project (POP)](http://python-os.info/en/) | 2009 -- | Python | Native OS | Linux | Desktop OS<br>"Just For Fun" |
 | [OSDev.org](http://wiki.osdev.org/), also [here](http://wiki.osdev.org/Projects) | 2008 -- | various | various | various | various |
