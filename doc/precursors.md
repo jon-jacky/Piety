@@ -46,10 +46,10 @@ Here are some examples.
 | [Cosmos](http://cosmos.codeplex.com/) | 2007 -- | C# | Bare machine | x86 | OS components |
 | [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | 2008 -- | Lua | Bare Machine | ||
 | [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | 2011 -- | Lua (SafeLua) | Bare Machine, Native OS, Sandbox |  Linux || 
-| [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/), also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser | "An IDE ... self-supporting ... used insie the browser without any external tools ..." |
-|[Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html) | 2009 -- | C | Bare machine | x86 | OS components |
+| [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/), also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser | "An IDE ... self-supporting ... inside the browser without any external tools" |
+|[Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html) | 2009 -- | C | Bare machine | x86 | OS components, used in Stanford [CS140](http://www.scs.stanford.edu/12au-cs140/) OS course |
 | [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ... microcontrollers | Embedded controllers |
-| [Cleese](https://github.com/jtauber/cleese/), also [here](http://code.google.com/p/cleese/) | 2003, 2009 | Python | Bare machine | x86 | "microkernel based on Python VM and all other OS ... in Python" |
+| [Cleese](https://github.com/jtauber/cleese/), also [here](http://code.google.com/p/cleese/) | 2003, 2009 | Python | Bare machine | x86 | "microkernel mostly based on the Python VM and all other OS functionality written Python" |
 | [Unununium](http://mail.python.org/pipermail/python-announce-list/2004-July/003220.html), also [here](http://web.archive.org/web/20061013010205/http://www.unununium.org/) | 2004 -- 2006 | Python | OS components, then Native OS |  [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), then Linux | "create a better computing environment by maximizing interconnection between components" |
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) | 2007 -- | Python | Native OS | OLPC laptop, Linux + Gtk | Education |
 | [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board (ARM processor) | "... interpreter-centric OS ... easy to use ... educational ... fun!" |
@@ -80,5 +80,7 @@ components chosen from a collection such as [Flux OSKit](http://www.cs.utah.edu/
 [Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html),
 or [Cosmos](http://cosmos.codeplex.com/).
 
-[OSDev.org](http://wiki.osdev.org/) has many pages on creating and
-experimenting with operating systems.
+[CS140](http://www.scs.stanford.edu/12au-cs140/): Operating
+Systems (Stanford) and [OSDev.org](http://wiki.osdev.org/) have
+many pages on creating and experimenting with operating systems.
+
