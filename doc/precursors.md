@@ -37,22 +37,22 @@ Here are some examples.
 | [JNode](http://www.jnode.org/) | 2003 -- | Java | Bare machine | | |
 | [hOp, House](http://programatica.cs.pdx.edu/House/) | 2004 -- | Haskell | Bare Machine | x86 | "more secure and more reliable software systems" | 
 | [HaLVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), also [here](https://github.com/GaloisInc/HaLVM), and [HaNS](http://www.haskell.org/pipermail/haskell-cafe/2011-May/092291.html) | 2010 -- | Haskell | Virtual Machine | Xen hypervisor | "experimental network services" |
-| [Mirage](http://www.openmirage.org/), also [here](http://www.openmirage.org/wiki/papers) and [here](http://dl.acm.org/citation.cfm?id=1863114)| 2006 -- | O'Caml | Virtual Machine | Xen hypervisor | "I/O intensive cloud services ... minimize cost of cloud resources" |
+| [Mirage](http://www.openmirage.org/), also [here](http://www.openmirage.org/wiki/papers) and [here](http://dl.acm.org/citation.cfm?id=1863114)| 2006 -- | O'Caml | Virtual Machine | Xen hypervisor | "I/O intensive cloud services ... minimize the use and cost of cloud resources" |
 | [STEPS]( http://vpri.org/html/work/ifnct.htm), also [here](http://www.vpri.org/pdf/tr2011004_steps11.pdf) and [here](http://news.ycombinator.com/item?id=3996209) | 2006 -- |  OMeta, Nile, Maru, Nothing, ... "Problem-oriented languages" | Bare machine |  various | "recreating (personal computing) ... in less than 1/1000 the amount of program code" | 
 | [movitz](http://common-lisp.net/project/movitz/) | 2004 -- | Lisp (CL) |  Bare Machine | x86 | "development platform for operating system kernels, embedded, and single-purpose applications" |
 | [Gracle](gracle_excerpts.txt) | 2004 -- | Lisp (CL) | Native OS | Linux | "development and deployment environment" | 
 | [LOSAK](http://losak.sourceforge.net/) | 2004 -- | Lisp (LOSAK) | Bare Machine | | |
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
 | [Cosmos](http://cosmos.codeplex.com/) | 2007 -- | C# | Bare machine | x86 | OS components |
-| [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | 2008 -- | Lua | Bare Machine | ||
-| [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | 2011 -- | Lua (SafeLua) | Bare Machine, Native OS, Sandbox |  Linux || 
+| [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | 2008 -- | Lua, C | Bare Machine | x86-64 | "elite, micro, minimal, nano, old school, pico, retro, rock solid, secure, simple, stable, straight edge or suckless OS" |
+| [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | 2011 -- | Lua (SafeLua) | Bare Machine, Native OS, Sandbox |  Linux | "customizable light-weight sandboxes ... run untrusted code safely" | 
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/), also [here](http://www.lively-kernel.org/)  | 2008 -- | Javascript | Sandbox | Web browser | "An IDE ... self-supporting ... inside the browser without any external tools" |
-|[Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html) | 2009 -- | C | Bare machine | x86 | OS components, used in Stanford [CS140](http://www.scs.stanford.edu/12au-cs140/) OS course |
+|[Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html) | 2009 -- | C | Bare machine | x86 | OS components, used in Stanford [CS140](http://www.scs.stanford.edu/12au-cs140/) course |
 | [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/)  | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ... microcontrollers | Embedded controllers |
-| [Cleese](https://github.com/jtauber/cleese/), also [here](http://code.google.com/p/cleese/) | 2003, 2009 | Python | Bare machine | x86 | "microkernel mostly based on the Python VM and all other OS functionality written Python" |
+| [Cleese](https://github.com/jtauber/cleese/), also [here](http://code.google.com/p/cleese/) | 2003, 2009 | Python | Bare machine | x86 | "microkernel mostly based on the Python VM and all other OS functionality written in Python" |
 | [Unununium](http://mail.python.org/pipermail/python-announce-list/2004-July/003220.html), also [here](http://web.archive.org/web/20061013010205/http://www.unununium.org/) | 2004 -- 2006 | Python | OS components, then Native OS |  [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), then Linux | "create a better computing environment by maximizing interconnection between components" |
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) | 2007 -- | Python | Native OS | OLPC laptop, Linux + Gtk | Education |
-| [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board (ARM processor) | "... interpreter-centric OS ... easy to use ... educational ... fun!" |
+| [Pycorn](http://www.pycorn.org/home) | 2008 -- | Python | Bare machine | Gumstix Verdex board (ARM processor) | "... interpreter-centric OS ... access to the full capabilities of the computer ... educational ... fun!" |
 | [Python OS Project (POP)](http://python-os.info/en/) | 2009 -- | Python | Native OS | Linux | "Dominate desktop OS market!" |
 
 Key to **Substrate** column
@@ -81,6 +81,6 @@ components chosen from a collection such as [Flux OSKit](http://www.cs.utah.edu/
 or [Cosmos](http://cosmos.codeplex.com/).
 
 [CS140](http://www.scs.stanford.edu/12au-cs140/): Operating
-Systems (Stanford) and [OSDev.org](http://wiki.osdev.org/) have
+Systems (at Stanford) and [OSDev.org](http://wiki.osdev.org/) have
 many pages on creating and experimenting with operating systems.
 
