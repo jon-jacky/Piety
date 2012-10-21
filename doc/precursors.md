@@ -41,7 +41,7 @@ Here are some examples.
 | [STEPS]( http://vpri.org/html/work/ifnct.htm), also [here](http://www.vpri.org/pdf/tr2011004_steps11.pdf) and [here](http://news.ycombinator.com/item?id=3996209) | 2006 -- |  OMeta, Nile, Maru, Nothing, ... "Problem-oriented languages" | Bare machine |  various | "recreating (personal computing) ... in less than 1/1000 the amount of program code" | 
 | [movitz](http://common-lisp.net/project/movitz/) | 2004 -- | Lisp (CL) |  Bare Machine | x86 | "development platform for operating system kernels, embedded, and single-purpose applications" |
 | [Gracle](gracle_excerpts.txt) | 2004 -- | Lisp (CL) | Native OS | Linux | "single-level store ... objects in main memory are all persistent" | 
-| [LOSAK](http://losak.sourceforge.net/) | 2004 -- | Lisp (LOSAK) | Bare Machine | | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection ..."|
+| [LOSAK](http://losak.sourceforge.net/) | 2004 -- | Lisp (LOSAK) | Bare Machine | | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection"|
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
 | [Cosmos](http://cosmos.codeplex.com/) | 2007 -- | C# | Bare machine | x86 | OS components |
 | [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | 2008 -- | Lua, C | Bare Machine | x86-64 | "elite, micro, minimal, nano, old school, pico, retro, rock solid, secure, simple, stable, straight edge or suckless OS" |
