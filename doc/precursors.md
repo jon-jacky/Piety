@@ -32,7 +32,7 @@ Here are some examples.
 | [Plan 9](http://plan9.bell-labs.com/sys/doc/9.html), also [here](http://doc.cat-v.org/plan_9/) | late 1980s -- | C, Alef | Bare machine | various | Programming, Electronics CAD |
 |  [Flux OSKit](http://www.cs.utah.edu/flux/oskit/) | 1997 -- | C | Bare machine | x86, StrongArm, various | OS components |
 | ["Scheme Machine"](http://lists.tunes.org/archives/lispos/1998-December/002514.html) | 1998 | Scheme (MzScheme) | OS components | [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), x86 | "For now, it's just fun" |
-| [ML/OS](http://dspace.mit.edu/bitstream/handle/1721.1/47545/40495469.pdf), also [here](http://www.cs.utah.edu/flux/papers/oskit-sosp97.html) | 1997 | ML (SML/NJ) | OS components | [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), x86 | "demonstrate ... advanced programming language features such as continuations and type safety in system-level programming" |
+| [ML/OS](http://dspace.mit.edu/bitstream/handle/1721.1/47545/40495469.pdf), also [here](http://www.cs.utah.edu/flux/papers/oskit-sosp97.html) | 1997 | ML (SML/NJ) | OS components | [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), x86 | "demonstrate ... advanced ... features such as continuations and type safety in system-level programming" |
 | [Squeak](http://www.squeak.org/), also [here](http://ftp.squeak.org/docs/OOPSLA.Squeak.html) | 1997 -- | Smalltalk | Sandbox | various | "development environment in which to build educational software"  |
 | [JNode](http://www.jnode.org/) | 2003 -- | Java | Bare machine | x86 | "Any Java application should run on it, fast and secure!" |
 | [hOp, House](http://programatica.cs.pdx.edu/House/) | 2004 -- | Haskell | Bare Machine | x86 | "more secure and more reliable software systems" | 
@@ -41,7 +41,7 @@ Here are some examples.
 | [STEPS]( http://vpri.org/html/work/ifnct.htm), also [here](http://www.vpri.org/pdf/tr2011004_steps11.pdf) and [here](http://news.ycombinator.com/item?id=3996209) | 2006 -- |  OMeta, Nile, Maru, Nothing, ... "Problem-oriented languages" | Bare machine |  various | "recreating (personal computing) ... in less than 1/1000 the amount of program code" | 
 | [movitz](http://common-lisp.net/project/movitz/) | 2004 -- | Lisp (CL) |  Bare Machine | x86 | "development platform for operating system kernels, embedded, and single-purpose applications" |
 | [Gracle](gracle_excerpts.txt) | 2004 -- | Lisp (CL) | Native OS | Linux | "single-level store ... objects in main memory are all persistent" | 
-| [LOSAK](http://losak.sourceforge.net/) | 2004 -- | Lisp (LOSAK) | Bare Machine | | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, strict separation of processes, ... real-time garbage collection ..."|
+| [LOSAK](http://losak.sourceforge.net/) | 2004 -- | Lisp (LOSAK) | Bare Machine | | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection ..."|
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
 | [Cosmos](http://cosmos.codeplex.com/) | 2007 -- | C# | Bare machine | x86 | OS components |
 | [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | 2008 -- | Lua, C | Bare Machine | x86-64 | "elite, micro, minimal, nano, old school, pico, retro, rock solid, secure, simple, stable, straight edge or suckless OS" |
