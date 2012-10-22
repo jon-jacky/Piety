@@ -26,11 +26,11 @@ Here are some examples.
 | ------ | --- | -------- | -------- | -------   | ------- |
 | [MCP](http://en.wikipedia.org/wiki/MCP_%28Burroughs_Large_Systems%29), also [here](http://en.wikipedia.org/wiki/Burroughs_large_systems) | 1961-- | Algol (ESPOL) | Bare machine | Burroughs B5000 | Data processing |
 | [Unix](http://cm.bell-labs.com/cm/cs/who/dmr/hist.html), also [here](http://genius.cat-v.org/ken-thompson/interviews/unix-and-beyond)  | 1969 -- | C | Bare machine | PDP 7, PDP 11, ... | Programming, Document preparation  |
-| [Smalltalk](http://classes.soe.ucsc.edu/cmps112/Spring03/readings/Ingalls78.html), also [here](http://classes.soe.ucsc.edu/cmps112/Spring03/readings/Ingalls81.html) and [here](http://propella.sakura.ne.jp/earlyHistoryST/EarlyHistoryST.html) and [here](http://www.vpri.org/pdf/m2004001_power.pdf) and [here](http://news.ycombinator.com/item?id=4229788) | 1970s | Smalltalk | Bare machine | Xerox Alto, Dorado, ... (purpose-built) | "support children of all ages in the world of information ... a language powerful enough to write its own OS but in the friendly form of ... a scripting language" |
+| [Smalltalk](http://classes.soe.ucsc.edu/cmps112/Spring03/readings/Ingalls78.html), also [here](http://classes.soe.ucsc.edu/cmps112/Spring03/readings/Ingalls81.html) and [here](http://propella.sakura.ne.jp/earlyHistoryST/EarlyHistoryST.html) and [here](http://www.vpri.org/pdf/m2004001_power.pdf) and [here](http://news.ycombinator.com/item?id=4229788) | 1970s | Smalltalk | Bare machine | Xerox Alto, Dorado, ... (purpose-built) | "support children of all ages in the world of information" "... a language powerful enough to write its own OS but in the friendly form of ... a scripting language" |
 | [Lisp Machines](http://en.wikipedia.org/wiki/Lisp_machine), also [here](http://www.ugcs.caltech.edu/~weel/lispm.php) and [here](http://www.andromeda.com/people/ddyer/lisp/) and [here](http://www.ugcs.caltech.edu/~weel/lispm/genera-concepts.pdf) | 1970s, 80s | Lisp | Bare machine | MIT CONS, Symbolics, LMI, ... (purpose-built)| Artificial Intelligence |
 | [Oberon](http://en.wikipedia.org/wiki/Oberon_%28operating_system%29), also [here](http://www.oberon.ethz.ch/) | late 1980s | Oberon | Bare machine | ETH Ceres, ... (NS32032 processor) | Programming, Electronics CAD, "entire system ... can be ... understood as a whole" |
 | [Plan 9](http://plan9.bell-labs.com/sys/doc/9.html), also [here](http://doc.cat-v.org/plan_9/) | late 1980s -- | C, Alef | Bare machine | various | Programming, Electronics CAD, "a user builds a private computing environment and recreates it wherever desired" |
-|  [Flux OSKit](http://www.cs.utah.edu/flux/oskit/) | 1997 -- | C | Bare machine | x86, StrongArm, various | OS components, "goal is to lower the barrier to entry to OS R&D and to lower its costs" |
+|  [Flux OSKit](http://www.cs.utah.edu/flux/oskit/) | 1997 -- | C | Bare machine | x86, StrongArm, various | OS components, "to lower the barrier to entry to OS R&D and to lower its costs" |
 | ["Scheme Machine"](http://lists.tunes.org/archives/lispos/1998-December/002514.html) | 1998 | Scheme (MzScheme) | OS components | [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), x86 | "For now, it's just fun" |
 | [ML/OS](http://dspace.mit.edu/bitstream/handle/1721.1/47545/40495469.pdf), also [here](http://www.cs.utah.edu/flux/papers/oskit-sosp97.html) | 1997 | ML (SML/NJ) | OS components | [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), x86 | "demonstrate ... advanced ... features such as continuations and type safety in system-level programming" |
 | [Squeak](http://www.squeak.org/), also [here](http://ftp.squeak.org/docs/OOPSLA.Squeak.html) | 1997 -- | Smalltalk | Sandbox | various | "development environment in which to build educational software"  |
@@ -75,7 +75,7 @@ or [Cosmos](http://cosmos.codeplex.com/).
 Programmers and users working in the favored language can mostly avoid
 the conventional OS.
 
-* **Sandbox** The system runs on top of a conventional OS, but in a
+* **Sandbox** The system runs on top of a conventional OS, in a
 self-contained environment where most of the the host's facilities are
 not available.  Programmers and users working in the sandbox can only
 use the utilities provided in the favored language.
