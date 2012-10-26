@@ -84,7 +84,14 @@ self-contained environment where most of the the host's facilities are
 not available.  Programmers and users working in the sandbox can only
 use the utilities provided in the favored language.
 
-[CS140](http://www.scs.stanford.edu/12au-cs140/): Operating
-Systems (at Stanford) and [OSDev.org](http://wiki.osdev.org/) have
-many pages on creating and experimenting with operating systems.
+Not shown in the table are
+[Chromium](http://dev.chromium.org/chromium-os),
+[Android](http://www.android-x86.org/), and [Firefox
+OS](http://en.wikipedia.org/wiki/Firefox_OS) (formerly
+[B2G](https://wiki.mozilla.org/B2G)). Each is a Linux supporting a
+browser or browser-like applications. 
 
+[CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford), [Baking
+Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
+(Cambridge), and [OSDev.org](http://wiki.osdev.org/) provide
+instruction on building operating system.
