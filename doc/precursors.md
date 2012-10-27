@@ -84,14 +84,19 @@ self-contained environment where most of the the host's facilities are
 not available.  Programmers and users working in the sandbox can only
 use the utilities provided in the favored language.
 
-Not shown in the table are
-[Chromium](http://dev.chromium.org/chromium-os),
-[Android](http://www.android-x86.org/), and [Firefox
-OS](http://en.wikipedia.org/wiki/Firefox_OS) (formerly
-[B2G](https://wiki.mozilla.org/B2G)). Each is a Linux supporting a
-browser or browser-like applications. 
+Not shown in the table are several OS for mobile devices: 
+[Chromium](http://dev.chromium.org/chromium-os)
+(also [here](http://dev.chromium.org/chromium-os/chromiumos-design-docs/software-architecture)),
+[Android](http://www.android-x86.org/) 
+(also [here](http://www.tbray.org/ongoing/When/201x/2010/11/14/What-Android-Is)), 
+[Firefox OS](http://en.wikipedia.org/wiki/Firefox_OS) 
+(formerly [B2G](https://wiki.mozilla.org/B2G/Architecture)),
+and [iOS](http://developer.apple.com/library/ios/#documentation/Miscellaneous/Conceptual/iPhoneOSTechOverview/Introduction/Introduction.html)).
+Each is a Linux (or OS X) kernel supporting a
+browser or browser-like applications.  None features a start-from-scratch 
+ethos, a single language, or a deliberately simple design.
 
 [CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford), [Baking
 Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 (Cambridge), and [OSDev.org](http://wiki.osdev.org/) provide
-instruction on building operating system.
+instruction on building operating systems.
