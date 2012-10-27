@@ -91,7 +91,7 @@ Not shown in the table are several OS for mobile devices:
 (also [here](http://www.tbray.org/ongoing/When/201x/2010/11/14/What-Android-Is)), 
 [Firefox OS](http://en.wikipedia.org/wiki/Firefox_OS) 
 (formerly [B2G](https://wiki.mozilla.org/B2G/Architecture)),
-and [iOS](http://developer.apple.com/library/ios/#documentation/Miscellaneous/Conceptual/iPhoneOSTechOverview/Introduction/Introduction.html)).
+and [iOS](http://developer.apple.com/library/ios/#documentation/Miscellaneous/Conceptual/iPhoneOSTechOverview/Introduction/Introduction.html).
 Each is a Linux (or OS X) kernel supporting a
 browser or browser-like applications.  None features a start-from-scratch 
 ethos, a single language, or a deliberately simple design.
