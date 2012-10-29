@@ -102,6 +102,6 @@ Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 instruction on building operating systems.
 
 Here are more links on operating system 
-[design](http://jon-jacky.github.com/home/links.html#design)
+[design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
 
