@@ -100,3 +100,8 @@ ethos, a single language, or a deliberately simple design.
 Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 (Cambridge), and [OSDev.org](http://wiki.osdev.org/) provide
 instruction on building operating systems.
+
+Here are more links on operating system 
+[design](http://jon-jacky.github.com/home/links.html#design)
+and [history](http://jon-jacky.github.com/home/links.html#history).
+
