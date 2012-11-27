@@ -47,6 +47,7 @@ Here are some examples.
 | [movitz](http://common-lisp.net/project/movitz/) | 2004 -- | Lisp (CL) |  Bare Machine | x86 | "development platform for operating system kernels, embedded, and single-purpose applications" |
 | [Gracle](gracle_excerpts.txt) | 2004 -- | Lisp (CL) | Native OS | Linux | "single-level store ... objects in main memory are all persistent" | 
 | [LOSAK](http://losak.sourceforge.net/) | 2004 -- | Lisp (LOSAK) | Bare Machine | QEMU, Bochs | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection"|
+| [lisPImachine](http://lispm.dyndns.org/), also [here](http://lispm.dyndns.org/ccl) | 2012 | Lisp (Clozure CL) | Native OS | Raspberry Pi, Linux/Raspian | "Linux on the command line, with GNU Emacs, the SLIME development environment for Common Lisp based on Emacs and ... Clozure Common Lisp" |
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
 | [Cosmos](http://cosmos.codeplex.com/) | 2007 -- | C# | Bare machine | x86 | OS components, "complete construction kit built from the ground up in C#" |
 | [JONESFORTH](http://rwmj.wordpress.com/2010/08/07/jonesforth-git-repository/), also [here](http://git.annexia.org/?p=jonesforth.git;a=summary) and [here](https://github.com/nornagon/jonesforth) and [here](https://raw.github.com/nornagon/jonesforth/master/jonesforth.S) and [here](https://raw.github.com/nornagon/jonesforth/master/jonesforth.f) | 2007 -- | FORTH | Native OS | Linux | " a FORTH program in 2,000 lines ... which will boot and provide an entire development environment (inc. editor, compiler etc)" |
@@ -107,7 +108,7 @@ systems:
 (Cambridge), 
 [these](http://news.ycombinator.com/item?id=4834008)
 (CMU, UMD, MIT, Stanford, Harvard),
-[bkerndev](http://www.osdever.net/bkerndev/),
+[bkerndev](http://www.osdever.net/bkerndev/index.php),
 [JamesM](http://www.jamesmolloy.co.uk/tutorial_html/),
 [OSDev.org](http://wiki.osdev.org/), ...
 
