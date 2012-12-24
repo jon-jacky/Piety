@@ -2,6 +2,8 @@
 I can no longer find the Gracle paper on the web.  It is sufficiently
 interesting that I typed in a few excerpts here.
 
+UPDATE: found at http://dept-info.labri.fr/~strandh/gracle.ps
+
 ---
 
 Gracle: A development and deployment environment for Common Lisp
