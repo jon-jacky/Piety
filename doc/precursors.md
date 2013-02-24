@@ -52,6 +52,8 @@ Here are some examples.
 | [LispmFPGA](http://www.aviduratas.de/lisp/lispmfpga/), also [here](https://groups.google.com/forum/?fromgroups=#!topic/comp.lang.lisp/36_qKNErHAg) | 2006 -- | Lisp (CL subset) | Bare machine (FPGA) | Spartan 3 Xilinx FPGA, Digilent Spartan 3 Starter Kit | "a CPU with Lisp optimized instruction set together with a complete set of system software written in Lisp" |
 | [IGOR](http://opencores.org/project,igor), also [here](http://www.idi.ntnu.no/news/index.php?news=163) and [here](http://www.flickr.com/photos/kaitorge/sets/72157609445719327/show/) | 2008 -- 2010 | Lisp | Bare machine (FPGA) | Custom PCB with FPGA | "Fourteen students have collaborated in constructing a Lisp machine (IGOR) from scratch."|
 | [lisPImachine](http://lispm.dyndns.org/), also [here](http://lispm.dyndns.org/ccl) | 2012 | Lisp (Clozure CL) | Native OS | Raspberry Pi, Linux/Raspian | "Linux on the command line, ... the SLIME development environment for Common Lisp based on Emacs and ... Clozure Common Lisp" |
+| [Boot-to-Guile](https://lists.gnu.org/archive/html/guile-user/2013-02/msg00131.html) also [here](http://savannah.gnu.org/forum/forum.php?forum_id=7506) | 2013 | Scheme (Guile) | Native OS | Linux (QEMU image) | "a familiar & friendly REPL, run straight from
+the initrd!" |
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
 | [Cosmos](http://cosmos.codeplex.com/) | 2007 -- | C# | Bare machine | x86 | OS components, "complete construction kit built from the ground up in C#" |
 | [JONESFORTH](http://rwmj.wordpress.com/2010/08/07/jonesforth-git-repository/), also [here](http://git.annexia.org/?p=jonesforth.git;a=summary) and [here](https://github.com/nornagon/jonesforth) and [here](https://raw.github.com/nornagon/jonesforth/master/jonesforth.S) and [here](https://raw.github.com/nornagon/jonesforth/master/jonesforth.f) | 2007 -- | FORTH | Native OS | Linux | " a FORTH program in 2,000 lines ... which will boot and provide an entire development environment (inc. editor, compiler etc)" |
@@ -69,6 +71,7 @@ Here are some examples.
 | [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) and [here](http://www.sugarlabs.org/index.php) | 2007 -- | Python | Native OS | OLPC laptop, Linux + Gtk | "an inexpensive laptop project intended to help educate children around the world" |
 | [Pycorn](http://www.pycorn.org/home), also [here](https://github.com/tornewuff/pycorn) | 2008 -- | Python | Bare machine | Gumstix Verdex board (ARM processor) | "interpreter-centric OS ... access to the full capabilities of the computer ... educational ... fun!" |
 | [Python OS Project (POP)](http://python-os.info/en/) | 2009 -- | Python | Native OS | Linux | "Fun ... easy to modify OS" "Dominate desktop OS market!" |
+| [raspi+python+ipython](http://www.pythononwheels.org/post) | 2013 | Python | Native OS | Linux (Raspian) on Raspberry Pi | "using ... [IPython as a shell](http://transneptune.net/2009/06/16/ipython-as-your-default-shell/) ... works on any Linux" |
 
 Key to **Substrate** column
 
