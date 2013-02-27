@@ -81,7 +81,7 @@ project size and longevity:
 
 * **R** Research and Development, usually sponsored by industry or
 government.  Some of these are almost like commercial products
-(**C** above), except the product is made available for free
+( **C** above), except the product is made available for free
 
 * **A** Academic research by a group at a university, often supported
 in part by grants from government or industry
