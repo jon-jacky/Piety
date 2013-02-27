@@ -41,28 +41,28 @@ Here are some examples.
 |[JX](http://www4.cs.fau.de/Projects/JX/) | A | 1999 -- | Java | Bare machine | x86, "Many ... components, for example the file system, also run on an unmodified JVM" | "benefit from the modern software technology of this object-oriented type-safe language" |
 | [JNode](http://www.jnode.org/) | R | 2003 -- | Java | Bare machine | x86 | "Any Java application should run on it, fast and secure!" |
 | [A2, BlueBottle, AOS](http://www.oberon.ethz.ch/), also [here](http://www.ocp.inf.ethz.ch/wiki/Documentation/Front) and [here](http://bluebottle.ethz.ch/) and [here](http://bbos.org/xref/) | A | 2003 -- | Oberon | Bare machine | x86, ARM | "a single-user, multi-core, multi-tasking system that runs on bare hardware or on top of a host operating system." |
-| [hOp, House](http://programatica.cs.pdx.edu/House/) | R | 2004 -- | Haskell | Bare machine | x86 | "more secure and more reliable software systems" | 
+| [hOp, House](http://programatica.cs.pdx.edu/House/) | A | 2004 -- | Haskell | Bare machine | x86 | "more secure and more reliable software systems" | 
 | [HaLVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), also [here](https://github.com/GaloisInc/HaLVM), and [HaNS](http://www.haskell.org/pipermail/haskell-cafe/2011-May/092291.html) | R | 2010 -- | Haskell | Virtual Machine | Xen hypervisor | "experimental network services" |
 | [Mirage](http://www.openmirage.org/), also [here](http://www.openmirage.org/wiki/papers) and [here](http://dl.acm.org/citation.cfm?id=1863114)| A | 2006 -- | O'Caml | Virtual Machine | Xen hypervisor | "I/O intensive cloud services ... minimize the use and cost of cloud resources" |
 | [STEPS]( http://vpri.org/html/work/ifnct.htm), also [here](http://www.vpri.org/pdf/tr2011004_steps11.pdf) and [here](http://news.ycombinator.com/item?id=3996209) | R | 2006 -- |  [OMeta](http://tinlizzie.org/ometa/), [Nile](http://www.vpri.org/vp_wiki/index.php/Gezira), [Maru](http://piumarta.com/software/maru/), Nothing, ... "Problem-oriented languages" | Bare machine |  various | "recreating (personal computing) ... in less than 1/1000 the amount of program code" | 
 | [movitz](http://common-lisp.net/project/movitz/) | P | 2004 -- | Lisp (CL) |  Bare machine | x86 | "development platform for operating system kernels, embedded, and single-purpose applications" |
 | [Gracle](http://dept-info.labri.fr/~strandh/gracle.ps), also [here](gracle_excerpts.txt) | P | 2004 -- | Lisp (CL) | Native OS | Linux | "single-level store ... objects in main memory are all persistent" | 
 | [LOSAK](http://losak.sourceforge.net/) | P | 2004 -- | Lisp (LOSAK) | Bare machine | QEMU, Bochs | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection"|
-| [Armpit Scheme](http://armpit.sourceforge.net/), other embedded Schemes | P | 2006 -- | Scheme | Bare machine | ARM (BeagleBoard XM, etc.) | "'Scheme to the metal' ... running without any other OS. ... turning the MCU into a rudimentary Scheme machine. " |
+| [Armpit Scheme](http://armpit.sourceforge.net/), other embedded Schemes | A | 2006 -- | Scheme | Bare machine | ARM (BeagleBoard XM, etc.) | "'Scheme to the metal' ... running without any other OS. ... turning the MCU into a rudimentary Scheme machine. " |
 | [LispmFPGA](http://www.aviduratas.de/lisp/lispmfpga/), also [here](https://groups.google.com/forum/?fromgroups=#!topic/comp.lang.lisp/36_qKNErHAg) | P | 2006 -- | Lisp (CL subset) | Bare machine (FPGA) | Spartan 3 Xilinx FPGA, Digilent Spartan 3 Starter Kit | "a CPU with Lisp optimized instruction set together with a complete set of system software written in Lisp" |
 | [IGOR](http://opencores.org/project,igor), also [here](http://www.idi.ntnu.no/news/index.php?news=163) and [here](http://www.flickr.com/photos/kaitorge/sets/72157609445719327/show/) | S | 2008 -- 2010 | Lisp | Bare machine (FPGA) | Custom PCB with FPGA | "Fourteen students have collaborated in constructing a Lisp machine (IGOR) from scratch."|
 | [DreamOS](http://www.stripedgazelle.org/joey/dreamos.html), also [here](http://www.stripedgazelle.org/joey/dream.html) and [here](https://groups.google.com/forum/?fromgroups=#!topic/comp.lang.scheme/qwhCVbPZQvk) | P | 2009 | Scheme (R4RS) | Bare machine | X86 (Bochs) | "compiled using an x86 assembler written in Scheme" |
 | [lisPImachine](http://lispm.dyndns.org/), also [here](http://lispm.dyndns.org/ccl) | P | 2012 | Lisp (Clozure CL) | Native OS | Linux (Raspian) on Raspberry Pi | "Linux on the command line, ... the SLIME development environment for Common Lisp based on Emacs and ... Clozure Common Lisp" |
 | [Boot-to-Guile](https://lists.gnu.org/archive/html/guile-user/2013-02/msg00131.html), also [here](http://savannah.gnu.org/forum/forum.php?forum_id=7506) | P | 2013 | Scheme (Guile) | Native OS | Linux (QEMU image) | "a familiar & friendly REPL, run straight from the initrd!" |
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | R | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
-| [Cosmos](http://cosmos.codeplex.com/) | P | 2007 -- | C# | Bare machine | x86 | OS components, "complete construction kit built from the ground up in C#" |
+| [Cosmos](http://cosmos.codeplex.com/) | R | 2007 -- | C# | Bare machine | x86 | OS components, "complete construction kit built from the ground up in C#" |
 | [JONESFORTH](http://rwmj.wordpress.com/2010/08/07/jonesforth-git-repository/), also [here](http://git.annexia.org/?p=jonesforth.git;a=summary) and [here](https://github.com/nornagon/jonesforth) and [here](https://raw.github.com/nornagon/jonesforth/master/jonesforth.S) and [here](https://raw.github.com/nornagon/jonesforth/master/jonesforth.f) | P | 2007 -- | FORTH | Native OS | Linux | " a FORTH program in 2,000 lines ... which will boot and provide an entire development environment (inc. editor, compiler etc)" |
 | [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | P | 2008 -- | Lua, C | Bare machine | x86-64 | "elite, micro, minimal, nano, old school, pico, retro, rock solid, secure, simple, stable, straight edge or suckless OS" |
-| [eLua](http://www.eluaproject.net/doc/v0.8/en_arch_overview.html) | P | 2011? -- | Lua, C | Bare machine | [eLuaBrain](http://eluabrain.blogspot.fr/) (Cortex-M3) and many more | "embedded software ... with the power of Lua ... on a wide range of microcontroller architectures" |
+| [eLua](http://www.eluaproject.net/doc/v0.8/en_arch_overview.html) | R | 2011? -- | Lua, C | Bare machine | [eLuaBrain](http://eluabrain.blogspot.fr/) (Cortex-M3) and many more | "embedded software ... with the power of Lua ... on a wide range of microcontroller architectures" |
 | [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | P | 2011 -- | Lua (SafeLua) | Bare machine, Native OS, Sandbox |  Linux | "customizable light-weight sandboxes ... run untrusted code safely" | 
 | [ES Operating System](http://code.google.com/p/es-operating-system/), also [here](http://code.google.com/p/es-operating-system/wiki/XV_Semana_Informatica) | P | 2004 -- | Javascript ("ECMAScript"), C++ | Bare machine | x86 | "pure component operating system ... components written in C++ can be seamlessly controlled from ECMAScript" |
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/), also [here](http://www.lively-kernel.org/)  | R | 2008 -- | Javascript | Sandbox | Web browser | "An IDE ... self-supporting ... inside the browser without any external tools" |
-| [OS.js](http://andersevenrud.github.com/OS.js/) | R | 2012 -- | Javascript | Sandbox | WebKit and Gecko based browsers | "Cloud/Web Desktop platform" | 
+| [OS.js](http://andersevenrud.github.com/OS.js/) | P | 2012 -- | Javascript | Sandbox | WebKit and Gecko based browsers | "Cloud/Web Desktop platform" | 
 |[Pintos](http://www.stanford.edu/class/cs140/projects/pintos/pintos.html) | A | 2009 -- | C | Bare machine | x86 | OS components, used in Stanford [CS140](http://www.scs.stanford.edu/12au-cs140/) course |
 | [Erlang on Xen](http://erlangonxen.org/) | R | 2011 -- | Erlang | Virtual machine | Xen hypervisor | "running Erlang on the bare virtual iron ... startup latency 100-1000 times lower than ... typical Linux + Erlang" |
 | [Python-on-a-Chip, PyMite VM](http://code.google.com/p/python-on-a-chip/), also [here](http://wiki.python.org/moin/PyMite)  | P | 2000 -- | Python | Bare machine | PIC, ARM, Arduino, ... | "runs a significant subset of the Python language on microcontrollers without an OS" |
@@ -74,14 +74,14 @@ Here are some examples.
 | [raspi+python+ipython](http://www.pythononwheels.org/post/blog) | P | 2013 | Python | Native OS | Linux (Raspian) on Raspberry Pi | "using [IPython as a shell](http://transneptune.net/2009/06/16/ipython-as-your-default-shell/) ... works on any Linux" |
 
 
-Key to **T** (project **Type**) column, a rough indicator of project size and
-longevity.
+Key to **T** (project **Type**) column, perhaps an indicator of
+project size and longevity:
 
 * **C** Commercial product sold to customers, including ongoing support
 
 * **R** Research and Development, usually sponsored by industry or
 government.  Some of these are almost like commercial products
-(C above), except the product is made available for free
+(**C** above), except the product is made available for free
 
 * **A** Academic research by a group at a university, often supported
 in part by grants from government or industry
@@ -93,7 +93,7 @@ course or graduates.
 * **P** Personal project by an individual or small group
 
 
-Key to **Substrate** column
+Key to **Substrate** column:
 
 * **Bare machine** 
 The system includes an operating system kernel written mostly
