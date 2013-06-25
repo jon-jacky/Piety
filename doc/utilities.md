@@ -6,9 +6,12 @@ Python, or programmable in Python.
 | [Python Standard Library](http://docs.python.org/2/library/) | Library | Source, binding, API | Source code in [Python](http://hg.python.org/cpython/file/tip/Lib) and [C](http://hg.python.org/cpython/file/tip/Modules) |
 | [Other popular libraries](http://wiki.python.org/moin/UsefulModules) | Libraries | Source, binding, API | From the [Python Wiki](http://wiki.python.org/moin/) |
 | [Applications](http://wiki.python.org/moin/Applications) | Various | Source, etc. | From the [Python Wiki](http://wiki.python.org/moin/) |
-| [Editors and Shells](http://wiki.python.org/moin/PythonEditors) | Editors, shells | Source, etc. | From the [Python Wiki](http://wiki.python.org/moin/) |
-| [TCPStack](https://github.com/dound/vns/blob/master/TCPStack.py) | Network | Source, API | Lightweight TCP stack.  Part of [VNS](http://yuba.stanford.edu/vns/), the "Virtual Network System for teaching and experimentation" (also [here](http://yuba.stanford.edu/vns/files/pub/vns_sigcse.pdf)). |
+| [Editors and shells](http://wiki.python.org/moin/PythonEditors) | Editors, shells | Source, etc. | From the [Python Wiki](http://wiki.python.org/moin/) |
+| [pip](https://pypi.python.org/pypi/pip), also [here](http://www.pip-installer.org/en/latest/) | Package manager | Source | "A tool for installing and managing Python packages".  Handles dependencies.  | 
+| [muXTCP](https://github.com/enki/muXTCP) | Network | Source, API | Python userspace TCP/IP Stack (from 2005, unmaintained) |
+| [TCPStack](https://github.com/dound/vns/blob/master/TCPStack.py) | Network | Source, API | Lightweight TCP stack.  Part of [VNS](http://yuba.stanford.edu/vns/), the "Virtual Network System for teaching and experimentation" (also [here](http://yuba.stanford.edu/vns/files/pub/vns_sigcse.pdf) and [here](http://stackoverflow.com/questions/1581087/python-tcp-stack-implementation#comment2171604_1581087)). |
 | [ws30](https://github.com/jon-jacky/uw_python/blob/gh-pages/winter_2012/week05/ws30.py) | Web server | Source | "ws30 -- the thirty minute web server ... how fast could I write a simple web server in python?"  Simpler than the [server in the standard library](http://docs.python.org/2/library/basehttpserver.html) |
+| [Grail](http://en.wikipedia.org/wiki/Grail_%28web_browser%29), also [here](https://github.com/mdoege/grailbrowser) and [here](http://grail.sourceforge.net/info/papers/restofus.html) | Web browser | Source, applets | A web browser in Python written in 1995 by Guido van Rossum.  Abandoned 1999. Supports HTML 2.0.  Requires Tcl/Tk. Works in Python 2.7. [Trail](https://github.com/mdoege/Trail) is a recently enhanced version. |
 | [uzbl](http://uzbl.org/), also [here](https://github.com/Dieterbe/uzbl) | Web browser | Wrapper, configuration, client | "Uses WebKitGtk+ for rendering and network interaction", "Uses a set of scripts (mostly Python) ... so things work out of the box; yet plenty of room for customization."  |
 | [Linux Framebuffer](http://blog.daum.net/nskystars/2626663) | Graphics | Source, API | "Drawing to the Linux Framebuffer in Python" Writes to /dev/fb0 using fcntl, mmap, struct.  Looks like a general technique for doing low-level I/O in Linux.  Based on C code [here](http://doc.qt.digia.com/3.0/emb-framebuffer-howto.html), but simpler. |
 | [Python X Library](http://python-xlib.sourceforge.net/) | Graphics | Source, API | "a fully functional X client library for Python programs. It is written entirely in Python, in contrast to earlier X libraries for Python (the ancient X extension and the newer plxlib) which were interfaces to the C Xlib." |
@@ -27,6 +30,15 @@ Key to **Python role** column
 * **Source**
 The component is written in Python.
 
+* **API** 
+The component provides an Application Programming Interface: Python
+classes and functions that can be called from a user's 
+Python program to invoke component behavior.
+
+* **Binding** 
+The component is a library written in another language,
+with a Python API as an alternative to the native API.
+
 * **Wrapper** 
 The component is a program whose core is written in another language,
 that is invoked by a Python wrapper.
@@ -37,14 +49,9 @@ The component can be configured by scripts written in Python.
 * **Plugin**
 The component can load Python code that extends its behavior.
 
-* **API** 
-The component provides an Application Programming Interface: Python
-classes and functions that can be called from a user's 
-Python program to invoke component behavior.
-
-* **Binding** 
-The component is a library written in another language,
-with a Python API as an alternative to the native API.
+* **Applet** 
+The component is a browser that can download and execute
+Python code (the "applet") from a host.
 
 * **Query language** 
 The component is a database whose query language is provided as a Python API.
