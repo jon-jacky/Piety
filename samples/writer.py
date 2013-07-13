@@ -1,0 +1,61 @@
+"""
+writer.py - write to files to demonstrate interleaving concurrency.
+
+Defines class Writer, with a method that writes a single line to the
+end of a file.
+"""
+
+import datetime
+
+class Writer(object):
+    """
+    Write to files to demonstrate interleaving concurrency.
+
+    The method write() writes a single line to the end of a file.
+    Schedule calls to write() on a recurring event, such as a periodic
+    timeout.  View the growing file in a terminal window with tail -f.
+    Multiple Writer instances can run concurrently, with the output of
+    each displayed in its own window.
+
+    Each Writer instance includes a sequence number attribute,
+    seqno, that counts the calls to write().
+    """
+
+    def __init__(self, fname=None, makeline=None):
+        """ 
+        Creates a Writer instance and opens its file for writing.
+
+        fname - optional argument, the name of the file to write.
+        Otherwise Writer generates a unique name of the form
+        fw4538857808.txt (where the digits are the instance id).
+ 
+        makeline - optional argument, the function to generate the
+        line of text to write.  Otherwise Writer uses
+        self.default_makeline defined here.
+        """
+        self.seqno = 0
+        self.fname = fname if fname else 'fw%s.txt' % id(self)
+        self.makeline = makeline if makeline else self.default_makeline
+        self.f = open(self.fname, 'w')
+        
+    def default_makeline(self, seqno, fname):
+        """ 
+        generates a line from the sequence number seqno, the filename
+        fname, and also a new timestamp, for example:
+        5 fw4538857808.txt 2013-07-13 11:32:42.231009
+        """
+        return '%6d %s %s\n' % (seqno, fname, datetime.datetime.now())
+
+    def write(self):
+        """ writes a single line to the end of a file, flushes the file so the
+        line appears immediately, increments the sequence number.
+        """
+        s = self.makeline(self.seqno, self.fname)
+        self.f.write(s)
+        self.f.flush()
+        self.seqno += 1
+
+    def close(self):
+        """ closes the file
+        """
+        return self.f.close()
