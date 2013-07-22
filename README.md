@@ -10,12 +10,29 @@ is a response to this impulse:
 > small, easy to understand, and fun to program.  And, let's build it
 > all in our favorite language!*
 
+We draw inspiration from the single-user, single-language,
+special-hardware computers of the 1970s and 80s: Smalltalk, Lisp
+machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
+is an experiment to see if we can achieve something similar today with
+Python, but running on ordinary hardware.
+
+We aim to produce, in Python, a minimal system capable of --
+what else? -- writing and running Python programs.  This requires only
+a text console, a Python interpreter, an editor, and a file system.
+We also hope to experiment with TCP/IP networking (including the web)
+and graphics.  We aim to see how far we can get with just Python.
+
+For now Piety runs in any ordinary Python interpreter session.  We
+hope someday to run Piety on a bare machine with only a Python
+interpreter (and perhaps a few minimal interrupt handlers written in C
+or assembler).
+
 This repository contains some notes and experiments in these
 directories:
 
 - **doc**, notes and documents
 
-- **piety**, scheduler
+- **piety**, operating system core: scheduler
 
 - **samples**, samples to run under the scheduler 
 
