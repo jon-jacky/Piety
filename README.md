@@ -27,12 +27,18 @@ hope someday to run Piety on a bare machine with only a Python
 interpreter (and perhaps a few minimal interrupt handlers written in C
 or assembler).
 
+Recent projects by others in a similar spirit include
+[PyCorn](http://www.pycorn.org/home) and
+[Cleese](https://github.com/jtauber/cleese/) in Python, and
+[STEPS](http://www.vpri.org/pdf/tr2011004_steps11.pdf) in other
+languages.
+
 This repository contains some notes and experiments in these
 directories:
 
 - **doc**, notes and documents
 
-- **piety**, operating system core: scheduler
+- **piety**, scheduler
 
 - **samples**, samples to run under the scheduler 
 
