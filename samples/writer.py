@@ -2,7 +2,12 @@
 writer.py - write to files to demonstrate interleaving concurrency.
 
 Defines class Writer, with a method that writes a single line to the
-end of a file.
+end of a file.  By default, this line contains the file name and a
+timestamp.  A different function to generate the line in some other
+form can be passed as an optional argument to the constructor.
+
+Multiple Writer instances can run concurrently, with the output of
+each displayed in its own window.
 """
 
 import datetime
