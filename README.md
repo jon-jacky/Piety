@@ -11,7 +11,7 @@ is a response to this impulse:
 > all in our favorite language!*
 
 We draw inspiration from the single-user, single-language,
-special-hardware computers of the 1970s and 80s: Smalltalk, Lisp
+special-hardware systems of the 1970s and 80s: Smalltalk, Lisp
 machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
 is an experiment to see if we can achieve something similar today with
 Python, but running on ordinary hardware.
