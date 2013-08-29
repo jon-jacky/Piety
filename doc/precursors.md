@@ -150,10 +150,12 @@ ethos, a single language, or a deliberately simple design.
 Many sites provide instructions and examples for building operating
 systems: 
 [CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford),
+[6.828](http://pdos.csail.mit.edu/6.828/2012/xv6.html) (MIT),
 [Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 (Cambridge), 
 [these](http://news.ycombinator.com/item?id=4834008)
 (CMU, UMD, MIT, Stanford, Harvard),
+[BrokenThorn](http://www.brokenthorn.com/Resources/OSDevIndex.html),
 [bkerndev](http://www.osdever.net/bkerndev/index.php),
 [JamesM](http://www.jamesmolloy.co.uk/tutorial_html/),
 [OSDev.org](http://wiki.osdev.org/), ...
