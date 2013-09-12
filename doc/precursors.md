@@ -151,6 +151,7 @@ Many sites provide instructions and examples for building operating
 systems: 
 [CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford),
 [6.828](http://pdos.csail.mit.edu/6.828/2012/xv6.html) (MIT),
+[CS194-24](http://www.cs.berkeley.edu/~kubitron/courses/cs194-24-S13/index_lectures.html) (Berkeley),
 [Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 (Cambridge), 
 [these](http://news.ycombinator.com/item?id=4834008)

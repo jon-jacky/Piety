@@ -34,6 +34,7 @@ Python, or programmable in Python.
 | [CodernityDB](http://labs.codernity.com/codernitydb/) | Database | Source, query language | "CodernityDB is opensource, pure Python (no 3rd party dependency), fast (really fast check Speed if you don’t believe in words), multiplatform, schema-less, NoSQL database." |
 | [MyHDL](http://www.myhdl.org/doku.php), for example [here](http://www.myhdl.org/doku.php/cookbook:ff) | Hardware description language | Source, API | "MyHDL is a free, open-source package for using Python as a hardware description and verification language." "MyHDL can convert a design to Verilog or VHDL."  More [here](http://shakthimaan.com/downloads/glv/2011/pycon-2011/from-python-to-silicon.pdf). |
 | [coroutines](http://www.dabeaz.com/coroutines/) | Programming technique | Source | "...  a practical exploration of using Python coroutines (extended generators) for solving problems in data processing, event handling, and concurrent programming."  "Part 7: Writing an Operating System" includes lots of code samples. |
+| [evergreen](https://crate.io/packages/evergreen/), also [here](https://evergreen.readthedocs.org/en/latest/) and [here](https://github.com/saghul/evergreen) | Cooperative multitasking | Source, API | "driven by an event loop which will run the given tasks and i/o operations in a non-blocking manner while presenting the user a synchronous, blocking API","Ability to monkey patch standard library modules to make them cooperative" |
 
 Key to **Python role** column
 
