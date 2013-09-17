@@ -19,6 +19,10 @@ class Task(object):
         handler runs until it returns (or yields) control to the
         scheduler.  There is no preemption.
 
+        This constructor creates a Task object also adds it to to
+        tasks, the collection of Task objects eligible to be
+        scheduled.
+
         This constructor should always be called with keyword
         arguments. Arguments are:
 
@@ -34,7 +38,7 @@ class Task(object):
         never invoked.  In this version the events are the file
         objects watched by the select call in the scheduler's
         event loop, including sys.stdin and possibly others. 
-        Another event is timeout_event, the periodic select timeout event
+        Another event is timeout, the periodic select timeout event
 
         guard - Boolean callable object which must return True to
         cause the scheduler to invoke the handler.  Defaults to a
@@ -55,35 +59,44 @@ class Task(object):
 
 tasks = dict() # { event : list of tasks waiting for that event }
 inputs = [sys.stdin] # could add to this list
-timeout_event = -1
+#outputs = [sys.stdout] # causes run loop to exit without handling other events
+outputs = [] # FIXME? for now [sys.stdout] doesn't work
+exceptions = []
+timeout = -1 # different from any fd.fileno()
 
 # counts events of all types, must be global so handlers can use it
 ievent = 0
 
-def run(timeout_interval=1,nevents=0):
+def run(period=1,nevents=0):
     """
     Run the Piety event loop
-    timeout_interval: determines event loop period, default 1 sec
+    period: event loop period, default 1 sec
     nevents: number of events (of any kind) to process
               default nevents=0 processes forever
     """
     global ievent # must be global so tasks can use it
     maxevents = ievent + nevents # when to stop
     while not nevents or ievent < maxevents:
-        inputready,outputready,exceptready = select(inputs,[],[],
-                                                    timeout_interval)
-        # stdin
+        inputready,outputready,exceptready = select(inputs,outputs,exceptions,
+                                                    period)
+        # inputs
         for fd in inputready:
-            if fd == sys.stdin:
-                for t in tasks[sys.stdin]:
+            if fd in tasks:
+                for t in tasks[fd]:
                     if t.guard():
                         t.handler()
+            else:
+                s = fd.readline() # works on stdin, fd.read() hangs
+                print 'unhandled input from fd %s: %s' % (fd, s)
 
         # periodic timeout
         if not (inputready or outputready or exceptready): 
-            for t in tasks[timeout_event]:
+            if timeout in tasks:
+                for t in tasks[timeout]:
                     if t.guard():
-                        t.handler()        
+                        t.handler()
+            else:
+                pass # if no timeout handler, just continue
 
         ievent += 1
 

@@ -12,9 +12,9 @@ import piety
 
 w0,w1 = Writer(fname='w0.txt'),Writer('w1.txt')
 
-t0 = piety.Task(handler=w0.write,event=piety.timeout_event)
+t0 = piety.Task(handler=w0.write,event=piety.timeout)
 
-t1 = piety.Task(handler=w1.write,event=piety.timeout_event)
+t1 = piety.Task(handler=w1.write,event=piety.timeout)
 t1.guard = (lambda: bool(piety.ievent%2)) # every other event
 
 def wtest(n):
