@@ -11,6 +11,17 @@ getchar returns as soon as a single character is typed (without
 waiting for RETURN).  Function restore restores normal line mode (or
 whatever was in effect when setup was called).
 
+This module only works on Unix-like systems including Linux and OS X
+because it uses the tty and termios modules.
+
+For more about tty and termios see
+
+http://docs.python.org/2/library/tty.html
+http://docs.python.org/2/library/termios.html
+http://hg.python.org/cpython/file/1dc925ee441a/Lib/tty.py
+
+http://man7.org/linux/man-pages/man3/termios.3.html
+
 """
 
 import sys, tty, termios
@@ -24,6 +35,8 @@ def setup():
     """
     global saved_settings
     saved_settings = termios.tcgetattr(fd)
+    # tty.setraw just calls termios.tcsetattr with particular flags
+    # see http://hg.python.org/cpython/file/1dc925ee441a/Lib/tty.py
     tty.setraw(fd)
 
 
