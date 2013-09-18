@@ -6,7 +6,7 @@ scheduler, the console, and some utilities.
 
 ### Scheduler ### 
 
-The core of Piety operating system is the scheduler module *piety*.
+The core of the Piety operating system is the scheduler module *piety*.
 The scheduler itself is the function *piety.run*. It can run in any
 Python interpreter session.  It schedules instances of the
 *piety.Task* class, also defined in this module.
@@ -53,7 +53,8 @@ by calling the *setup* function in the *terminal* module.  The
 
 ### Modules ###
 
-Modules in the *piety* directory include:
+These are the modules in the *piety* directory.  For more details see
+their docstrings.
 
 - **piety**, scheduler, defines *Task* class and *run* function
 

@@ -40,6 +40,6 @@ directories:
 
 - **piety**, scheduler, console, and utilities
 
-- **samples**, samples to run under the scheduler 
+- **samples**, samples and tests to run under the scheduler 
 
 
