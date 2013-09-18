@@ -4,7 +4,7 @@ piety
 The **piety** directory contains the Piety operating system code: the
 scheduler, the console, and some utilities.
 
-### Scheduler ### 
+### Scheduler ###
 
 The core of the Piety operating system is the scheduler module *piety*.
 The scheduler itself is the function *piety.run*. It can run in any
@@ -49,7 +49,6 @@ command line application.
 To use *getchar*, the console must be put into single-character mode,
 by calling the *setup* function in the *terminal* module.  The
 *restore* function returns to the previous mode.
-
 
 ### Modules ###
 
