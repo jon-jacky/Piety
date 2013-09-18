@@ -46,3 +46,4 @@ def putstr(s):
     If you want newline, you must explicitly include it in s.
     """
     sys.stdout.write(s)
+    sys.stdout.flush() # otherwise s doesn't appear until user types input

@@ -82,15 +82,12 @@ class Console(object):
             self.cmdline = self.cmdline[:-1] # remove last character
             if self.echo:
                 terminal.putstr('^H') # old-timers will recognize this
-                sys.stdout.flush() # otherwise c doesn't appear until type next
         elif c == '\f' : # form feed, ^L, redisplay cmdline, useful after ^H
             # no change to cmdline
             terminal.putstr('^L\r\n' + self.prompt + self.cmdline) # on new line
-            sys.stdout.flush() # otherwise c doesn't appear until type next
         # raw mode terminal doesn't respond to ^C, must handle here
         elif c == '\x03' : # ascii ETX, ^C, raise exception
             terminal.putstr('^C') # on new line
-            sys.stdout.flush() # otherwise c doesn't appear until type next
             terminal.restore() # otherwise traceback looks like a mess
             print
             raise KeyboardInterrupt
@@ -98,7 +95,6 @@ class Console(object):
             self.cmdline += c # yes, I know this is inefficient
             if self.echo:
                 terminal.putstr(c) # no RETURN - all c go on same line
-                sys.stdout.flush() # otherwise c doesn't appear until type next
         return c  # so caller can check for terminator or ...
 
     def do_command(self):
@@ -116,6 +112,5 @@ class Console(object):
         """
         self.cmdline = str()
         terminal.putstr(self.prompt) # prompt does not end with \n
-        sys.stdout.flush() # otherwise prompt doesn't appear until type on kb
         terminal.setup() # resume single character mode
 
