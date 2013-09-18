@@ -38,7 +38,7 @@ directories:
 
 - **doc**, notes and documents
 
-- **piety**, scheduler
+- **piety**, scheduler, console, and utilities
 
 - **samples**, samples to run under the scheduler 
 
