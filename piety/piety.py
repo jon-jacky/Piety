@@ -1,5 +1,13 @@
 """
-piety.py - Piety scheduler
+piety.py - Piety scheduler, defines the Task class and run function.  
+
+To run tasks in Piety, import the piety module, create some Task
+instances, then call run. More details appear in the docstrings below,
+and in the examples in the samples directory.
+
+This version of the scheduler uses the select module, so it must run
+on a Unix-like host OS (including OS X).  
+
 """
 
 import sys

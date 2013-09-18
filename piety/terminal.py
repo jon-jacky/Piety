@@ -22,6 +22,11 @@ http://hg.python.org/cpython/file/1dc925ee441a/Lib/tty.py
 
 http://man7.org/linux/man-pages/man3/termios.3.html
 
+Terminal settings assigned by this module apply to all tasks
+(including all Console instances) in the Piety session, because Piety
+runs in a single Python interpreter session.  Echo and editing can be
+customized in each Console instance.
+
 """
 
 import sys, tty, termios

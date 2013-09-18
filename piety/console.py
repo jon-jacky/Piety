@@ -28,6 +28,12 @@ Return, Enter: execute command line by passing it to command function
 ^L, formfeed: redisplay command line on new line, useful after ^H
 ^C: raise KeyboardInterrupt, usually exits Piety, returns to Python interpreter
 any other key: append character to command line 
+
+Echo and editing are handled here, rather than in the terminal module,
+so they can be different for each console instance.  It might be
+possible to make different Console subclasses with different getchar
+methods that provide different echo and edit behavior.
+
 """
 
 import sys
