@@ -16,11 +16,12 @@ machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
 is an experiment to see if we can achieve something similar today with
 Python, but running on ordinary hardware.
 
-We aim to produce, in Python, a minimal system capable of --
-what else? -- writing and running Python programs.  This requires only
-a text console, a Python interpreter, an editor, and a file system.
-We also hope to experiment with TCP/IP networking (including the web)
-and graphics.  We aim to see how far we can get with just Python.
+We aim to produce, in Python, a minimal system capable of -- what
+else? -- writing and running Python programs.  This requires only a
+text console, a Python interpreter, an editor, and persistent storage
+(like a file system).  We also hope to experiment with TCP/IP
+networking (including the web) and graphics.  We aim to see how far we
+can get with just Python.
 
 Piety might be used for ---
 
