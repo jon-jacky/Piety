@@ -22,8 +22,25 @@ a text console, a Python interpreter, an editor, and a file system.
 We also hope to experiment with TCP/IP networking (including the web)
 and graphics.  We aim to see how far we can get with just Python.
 
+Piety might be used for ---
+
+- **Education** - Exhibit and explain almost all of the code for an
+    entire system, expressed in a readable high-level language (as
+    they did for
+    [Oberon](http://www.ethoberon.ethz.ch/WirthPubl/ProjectOberon.pdf)).
+    Use the Python interpreter to inspect and manipulate any data
+    structures in a running system.
+
+- **Research** - Experiment with new or unconventional operating
+    system constructs (like the alternative to the file system
+    proposed for [Gracle](https://github.com/jon-jacky/Piety/blob/master/doc/gracle_excerpts.txt)).
+
+- **Embedded computing** - Run standalone Python applications on minimal platforms (something like [PyMite](https://wiki.python.org/moin/PyMite)).
+
+- **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [Elrlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
+
 For now Piety runs in any ordinary Python interpreter session.  We
-hope someday to run Piety on a bare machine with only a Python
+plan to run Piety on a bare machine with only a Python
 interpreter (and perhaps a few minimal interrupt handlers written in C
 or assembler).
 
