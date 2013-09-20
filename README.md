@@ -19,9 +19,11 @@ Python, but running on ordinary hardware.
 We aim to produce, in Python, a minimal system capable of -- what
 else? -- writing and running Python programs.  This requires only a
 text console, a Python interpreter, an editor, and persistent storage
-(like a file system).  We also hope to experiment with TCP/IP
+(not necessarily a file system).  We also hope to experiment with TCP/IP
 networking (including the web) and graphics.  We aim to see how far we
-can get with just Python.
+can get with just Python.  There is already a lot of work by others
+that we might be able to use or adapt (see
+[doc/utilities.md](doc/utilities.md)).
 
 Piety might be used for ---
 
@@ -40,7 +42,7 @@ Piety might be used for ---
 
 - **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [Elrlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
 
-For now, Piety runs in an ordinary Python interpreter session on any
+For now, Piety runs in an ordinary Python interpreter session on another
 host operating system.  We plan to run Piety on a bare machine (or
 bare VM) with no other operating system, but only a Python interpreter
 (with the minimum of hardware support written in C or assembler).
