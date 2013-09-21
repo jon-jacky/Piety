@@ -5,12 +5,16 @@ To run tasks in Piety, import the piety module, create some Task
 instances, then call run. More details appear in the docstrings below,
 and in the examples in the samples directory.
 
-This version of the scheduler uses the select module, so it must run
-on a Unix-like host OS (including OS X).  
+This is a platform-dependent module. It uses the select module, so it
+must run on a Unix-like host OS (including Linux and Mac OS X).  One
+of the select channels is stdin (which I recall does *not* work
+in the Windows version of select).
 
 """
 
 import sys
+import datetime
+import terminal
 from select import select
 
 class Task(object):
@@ -70,12 +74,12 @@ inputs = [sys.stdin] # could add to this list
 #outputs = [sys.stdout] # causes run loop to exit without handling other events
 outputs = [] # FIXME? for now [sys.stdout] doesn't work
 exceptions = []
-timeout = -1 # different from any fd.fileno()
+timeout = -1 # timeout EVENT not interval.  different from any fd.fileno()
 
 # counts events of all types, must be global so handlers can use it
 ievent = 0
 
-def run(period=1,nevents=0):
+def run(period=1.000,nevents=0):
     """
     Run the Piety event loop
     period: event loop period, default 1 sec
@@ -84,9 +88,13 @@ def run(period=1,nevents=0):
     """
     global ievent # must be global so tasks can use it
     maxevents = ievent + nevents # when to stop
+    interval = period # timeout INTERVAL in seconds, select argument
     while not nevents or ievent < maxevents:
+        # Python select doesn't assign time remaining to timeout argument
+        # so we have to time it ourselves
+        t0 = datetime.datetime.now()
         inputready,outputready,exceptready = select(inputs,outputs,exceptions,
-                                                    period)
+                                                    interval)
         # inputs
         for fd in inputready:
             if fd in tasks:
@@ -96,8 +104,17 @@ def run(period=1,nevents=0):
             else:
                 s = fd.readline() # works on stdin, fd.read() hangs
                 print 'unhandled input from fd %s: %s' % (fd, s)
+            
+            # Make sure timeout events occur periodically even if input appears
+            # adjust timeout for nearly-constant interval between timeout events
+            # despite variable time spent waiting for input and processing it
+            t1 = datetime.datetime.now()
+            dt = t1 - t0
+            dt_sec = dt.seconds + 0.000001*dt.microseconds
+            interval = interval - dt_sec # should never be negative ...
+            interval = interval if interval > 0.0 else period # ... but ...
 
-        # periodic timeout
+        # periodic timeout if no input
         if not (inputready or outputready or exceptready): 
             if timeout in tasks:
                 for t in tasks[timeout]:
@@ -105,6 +122,8 @@ def run(period=1,nevents=0):
                         t.handler()
             else:
                 pass # if no timeout handler, just continue
+            interval = period # if we got here, full period must have elapsed
 
+        # terminal.putstr(' interval %s ' % interval) # DEBUG check adjustment
         ievent += 1
 
