@@ -42,10 +42,12 @@ Piety might be used for ---
 
 - **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [Elrlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
 
-For now, Piety runs in an ordinary Python interpreter session on another
+For now, Piety runs in an ordinary Python interpreter session on a
 host operating system.  We plan to run Piety on a bare machine (or
 bare VM) with no other operating system, but only a Python interpreter
-(with the minimum of hardware support written in C or assembler).
+(with the minimum of hardware support in C or assembler).  There are
+only a few platform-dependent modules.  Most modules developed for
+Piety on a host operating system should also work on a bare machine.
 
 Recent projects by others in a similar spirit include
 [PyCorn](http://www.pycorn.org/home) and
