@@ -1,3 +1,4 @@
+
 """
 console.py - skeleton command line application for Piety
 
@@ -57,7 +58,7 @@ class Console(object):
     command line to it.  We may add command line editing.
     """
 
-    def __init__(self, prompt='piety>', terminator='\r', echo=True,
+    def __init__(self, prompt='piety> ', terminator='\r', echo=True,
                  command=None):
         """
         Creates a Console instance
