@@ -2,7 +2,7 @@ piety
 =====
 
 The **piety** directory contains the Piety operating system code: the
-scheduler, the console, and some utilities.
+scheduler, console, shell, and some utilities.
 
 ### Scheduler ###
 
@@ -50,6 +50,12 @@ To use *getchar*, the console must be put into single-character mode,
 by calling the *setup* function in the *terminal* module.  The
 *restore* function returns to the previous mode.
 
+### Shell ###
+
+Python shell for Piety.  Defines the command function *mk_shell* that
+returns a function that is passed to the *Console* constructor, that
+makes the *Console* instance behave as a Python shell.
+
 ### Modules ###
 
 These are the modules in the *piety* directory.  For more details see
@@ -60,3 +66,6 @@ their docstrings.
 - **console**, skeleton command line application
 
 - **terminal**, utilities used by *console*
+
+- ***shell**, Python shell, behaves like usual top-level interpreter
+

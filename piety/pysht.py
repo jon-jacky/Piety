@@ -1,14 +1,34 @@
 """
 pysht.py - Python shell for Piety
 
-Defines the command function passed to the Console constructor,
-then makes that Console instance into a Python shell.
+Defines the command function 'mk_shell' that returns a function (a
+closure) that is passed to the Console constructor, that makes the
+Console instance behave as a Python shell.
 
-Simply passes the command function to the Python eval function (for
-expressions) or the exec statement (statements).  On eval and exec:
+We use mk_shell to make a closure so we can create different shells
+that use different modules to lookup names and bind variables.
+Usually we use the __main__ module so the shell returned by mk_shell
+behaves just like the usual top-level interpreter.   But we could 
+configure the returned shell differently.
+
+To use it:
+ from console import Console
+ import pysht
+ import sys
+ gbls = sys.modules['__main__'].__dict__
+ shell = Console(prompt='piety>>> ', command=pysht.mk_shell(gbls))
+
+Put this code in the application module that uses the shell, not here
+in pysht module, so different shell instances can use different
+modules.
+
+The command function returned by mk_shell simply passes the command
+line to the Python eval function (for expressions) or the exec
+statement (statements).  On eval and exec:
 
  http://docs.python.org/2/library/functions.html#eval 
  http://docs.python.org/2/reference/simple_stmts.html#exec
+ http://stackoverflow.com/questions/2220699/whats-the-difference-between-eval-exec-and-compile-in-python
  http://lucumr.pocoo.org/2011/2/1/exec-in-python/
 
 Pysht is the name of a river and a ghost town on the Olympic peninsula
@@ -22,22 +42,26 @@ Clallam language, translated as "against the wind or current"[1] or
 
 """
 
-def python(line):
+def mk_shell(globals):
     """
-    Pass line to Python interpreter, with the global environment
+    Console expects a command function with one argument, the command line
+    use mk_shell to make the command function with globals dictionary baked in
+    globals is sys.modules['__main__'].__dict__ to make shell behave like usual
     """
-    gbls = globals() # just call it once
-    try:
-        # if line is an expression, evaluate and print value
-        print eval(line, gbls)
-    except SyntaxError:
-        # statements (not exprs) like x = 42 crash eval with syntax error 
-        # but exec does *not* print value
-        exec line in gbls
 
-# To use it:
-#  from console import Console
-#  import pysht
-#  shell = Console(prompt='piety>>> ', command=pysht.python)
-# But create shell in application not here in pysht module
-#  so we can have multiple shell instances
+    def shell(cmdline):
+        """
+        Pass cmdline to Python to execute, with the globals dictionary
+        This is a closure with variable globals from the environment
+        """
+        try:
+            # exec does not automatically print values so use eval if we can
+            result = eval(cmdline, globals)
+            # strings print out with enclosing single quotes just like usual
+            print "'"+result+"'" if isinstance(result,str) else result
+            # statements (not exprs) like x = 42 crash eval with syntax error 
+            #  so use exec for those
+        except SyntaxError:
+            exec cmdline in globals
+
+    return shell

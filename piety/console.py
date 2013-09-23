@@ -5,16 +5,15 @@ console.py - skeleton command line application for Piety
 Defines a class Console, with a getchar method that gets a single
 character typed at the console keyboard, and adds it to a command line
 (usually).  When getchar gets a line terminator character, it calls a
-command function and passes the command line to it.  Getchar also handles
-some editing functions and other control keys (see below).
+command function and passes the command line to it.  Getchar also
+handles some editing functions and other control keys (see below).
 
 The getchar method is non-blocking when it is scheduled by the Piety
 scheduler.  Other Piety tasks can run while the user is entering the
 command line.
 
-To use getchar, the console must have already been put into
-single-character mode, by calling the setup function in the terminal
-module.  Call the restore function to return to the previous mode.
+Before calling the getchar method, put the console instance in
+single-character mode by calling its restart method.
 
 The default command function simply echoes the command line to the
 console display.  A different command function can be passed as an
@@ -119,5 +118,5 @@ class Console(object):
         """
         self.cmdline = str()
         terminal.putstr(self.prompt) # prompt does not end with \n
-        terminal.setup() # resume single character mode
+        terminal.setup() # enter or resume single character mode
 

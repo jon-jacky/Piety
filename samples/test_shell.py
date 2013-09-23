@@ -1,45 +1,52 @@
 """
 test_shell.py - demonstrate Peity scheduler with one task: Python shell
 
-To create an interactive Python shell, just pass Python's eval function
-to the Console constructor.
+Piety shell uses the __main__ namespace to find, store variables
 
-Import this module into a Python session, then type test() to begin
+Import this module into a Python session, then type run() to begin
 handling console input:
 
-Jonathans-MacBook-Pro:samples jon$ python -i path.py
+ $ python -i path.py
+>>> __name__
+'__main__'
+>>> x = 42
+>>> x
+42
 >>> import test_shell
 >>> test_shell.run()
-piety>>> 1=1^H^H^H^L
-piety>>> 1 + 1
-2
-piety>>> dir()
-['__builtins__', '__doc__', '__file__', '__name__', '__package__', 'python']
-piety>>> x = 42
 piety>>> x
 42
-
-BUT 
-
+piety>>> x = 666
+piety>>> x
+666
+piety>>> 1+1
+2
+piety>>> "Hello world"
+'Hello world'
+piety>>> dir()
+['__builtins__', '__doc__', '__name__', '__package__', 'sys', 'test_shell', 'x']
+piety>>> __name__
+'__main__'
 piety>>> ^C
 ...
 KeyboardInterrupt
 >>> x
-Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'x' is not defined
+666
+>>> __name__
+'__main__'
 
-Oh dear.
- 
+
 """
 
+import sys
 from console import Console
 import pysht
 import piety
 
 # create shell here not in pysht module
 #  so we can have multiple shell instances
-shell = Console(prompt='piety>>> ', command=pysht.python)
+main_gbls = sys.modules['__main__'].__dict__
+shell = Console(prompt='piety>>> ', command=pysht.mk_shell(main_gbls))
 
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 

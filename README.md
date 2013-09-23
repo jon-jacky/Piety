@@ -60,7 +60,7 @@ directories:
 
 - **doc**, notes and documents
 
-- **piety**, scheduler, console, and utilities
+- **piety**, scheduler, console, shell, utilities
 
 - **samples**, samples and tests to run under the scheduler 
 
