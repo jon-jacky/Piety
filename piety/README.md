@@ -4,6 +4,14 @@ piety
 The **piety** directory contains the Piety operating system code: the
 scheduler, console, shell, and some utilities.
 
+Piety runs in a single Python interpeter session.  All Piety software,
+including both operating system and applications, executes in this
+session.  The session might run on a host operating system or on a
+bare machine (with the minimum of hardware support in C or assembler).
+There are only a few platform-dependent modules.  Most modules
+developed for Piety on a host operating system should also work on a
+bare machine.
+
 ### Scheduler ###
 
 The core of the Piety operating system is the scheduler module *piety*.
@@ -16,16 +24,23 @@ instances, then call *run*.  See the examples in the *samples*
 directory.  More details appear in docstrings.
 
 Piety is event-driven.  Each Piety *Task* instance is defined by an
-*event*, a *guard*, a *handler*, and a *name*.  The scheduler may
-invoke a task's handler when its event occurs and its guard is True.
-Then the handler runs until it returns control to the scheduler.
-There is no preemption.  This is called *cooperative multitasking*.
+*event*, a *guard*, a *handler*, and a *name*.  The scheduler is an
+event loop that may invoke a task's handler when its event occurs and
+its guard is True.  Then the handler runs until it returns control to
+the scheduler.  There is no preemption.  This is called *cooperative
+multitasking*.
 
 A handler can be any Python callable including a function, method,
 generator or coroutine.  A guard can be any Python callable that
 returns a Boolean value.  Events can include input becoming available
-on a file or socket, or a timer tick. (In this version, Piety can
-schedule on any event handled by the *select* system call.)
+on a file (including *stdin*) or socket, or a timer tick. (In this
+version, Piety can schedule on any event handled by the *select*
+system call.)
+
+It is the programmer's obligation to ensure that each handler finishes
+quickly enough for acceptable performance.  Many existing Python
+applications and modules are not designed to cooperate in the way that
+Piety requires.  It may be possible to adapt some of them.
 
 ### Console ###
 
@@ -37,24 +52,27 @@ command function and passes the command line to it.  *Getchar* also
 handles some editing functions and other control keys.
 
 The *getchar* method is non-blocking when it is scheduled by the Piety
-scheduler.  Other Piety tasks can run while the user is entering the
-command line.
+scheduler.  Other Piety tasks can run while the user is entering or
+editing the command line.
 
 The command function is passed as an argument to the *Console*
 constructor, so this same class can act as the front end to any
-command line application.
+command line application.  The command function can invoke the Python
+interpreter itself, so a *Console* instance can act as Piety's Python
+shell.
+
+### Shell ###
+
+The *pysht* module defines a function *mk_shell* that accepts
+configuration settings and returns a command function that can be
+passed to the *Console* constructor, to make that *Console* instance
+into a Python sell.
 
 ### Terminal ###
 
 To use *getchar*, the console must be put into single-character mode,
 by calling the *setup* function in the *terminal* module.  The
 *restore* function returns to the previous mode.
-
-### Shell ###
-
-Python shell for Piety.  Defines the command function *mk_shell* that
-returns a function that is passed to the *Console* constructor, that
-makes the *Console* instance behave as a Python shell.
 
 ### Modules ###
 
@@ -65,7 +83,8 @@ their docstrings.
 
 - **console**, skeleton command line application
 
-- **terminal**, utilities used by *console*
+- **pysht**, Python shell for Piety, configures a *Console* to provide
+    a Python interpreter.
 
-- ***shell**, Python shell, behaves like usual top-level interpreter
+- **terminal**, utilities used by *console*
 
