@@ -16,13 +16,14 @@ machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
 is an experiment to see if we can achieve something similar today with
 Python, but running on ordinary hardware.
 
-We aim to produce, in Python, a minimal system capable of -- what
-else? -- writing and running Python programs.  This requires only a
-text console, a Python interpreter, an editor, and persistent storage
-(not necessarily a file system).  We also hope to experiment with TCP/IP
-networking (including the web) and graphics.  We aim to see how far we
-can get with just Python.  There is already a lot of work by others
-that we might be able to use or adapt (see
+We aim to produce, in Python, a simple but self-contained personal
+computer operating system capable of -- what else? -- writing and
+running Python programs.  A minimal system requires only a text
+console, a Python interpreter, some standard library modules, and
+persistent storage (not necessarily a file system).  We also hope to
+experiment with TCP/IP networking (including the web) and graphics.
+We aim to see how far we can get with just Python.  There is already a
+lot of work by others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
 
 Piety might be used for ---
@@ -56,7 +57,8 @@ Recent projects by others in a similar spirit include
 languages.
 
 This repository contains some notes and experiments in these
-directories:
+directories.  Each directory contains a *README* file with more
+information.
 
 - **doc**, notes and documents
 

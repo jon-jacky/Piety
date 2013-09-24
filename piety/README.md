@@ -66,7 +66,7 @@ shell.
 The *pysht* module defines a function *mk_shell* that accepts
 configuration settings and returns a command function that can be
 passed to the *Console* constructor, to make that *Console* instance
-into a Python sell.
+into a Python shell.
 
 ### Terminal ###
 
@@ -83,7 +83,7 @@ their docstrings.
 
 - **console**, skeleton command line application
 
-- **pysht**, Python shell for Piety, configures a *Console* to provide
+- **pysht**, Python shell, configures *console* to provide
     a Python interpreter.
 
 - **terminal**, utilities used by *console*
