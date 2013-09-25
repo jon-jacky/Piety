@@ -14,33 +14,27 @@ bare machine.
 
 ### Scheduler ###
 
-The core of the Piety operating system is the scheduler module *piety*.
-The scheduler itself is the function *piety.run*. It can run in any
-Python interpreter session.  It schedules instances of the
-*piety.Task* class, also defined in this module.
+The *piety* module schedules multiple tasks in a single Python
+interpreter session.  To run the Piety operating system: start Python,
+import the *piety* module, create some *piety.Task* instances, then
+call *piety.run*.  Usually, one of the tasks is a Python shell, so you
+can continue to interact while Piety is running.  See the examples in
+the *samples* directory.  More details appear in docstrings.
 
-To run tasks in Piety, import the *piety* module, create some *Task*
-instances, then call *run*.  See the examples in the *samples*
-directory.  More details appear in docstrings.
-
-Piety is event-driven.  Each Piety *Task* instance is defined by an
-*event*, a *guard*, a *handler*, and a *name*.  The scheduler is an
+Piety is event-driven.  Each Piety task is defined by an *event*, a
+*handler*, a *guard*, and a *name*.  A handler can be any Python
+callable, including a function, method, generator, or coroutine.  A
+guard can be any callable that returns a Boolean.  The scheduler is an
 event loop that may invoke a task's handler when its event occurs and
-its guard is True.  Then the handler runs until it returns control to
+its guard is true.  Then the handler runs until it returns control to
 the scheduler.  There is no preemption.  This is called *cooperative
 multitasking*.
 
-A handler can be any Python callable including a function, method,
-generator or coroutine.  A guard can be any Python callable that
-returns a Boolean value.  Events can include input becoming available
-on a file (including *stdin*) or socket, or a timer tick. (In this
-version, Piety can schedule on any event handled by the *select*
-system call.)
-
 It is the programmer's obligation to ensure that each handler finishes
 quickly enough for acceptable performance.  Many existing Python
-applications and modules are not designed to cooperate in the way that
-Piety requires.  It may be possible to adapt some of them.
+applications and modules are not designed to cooperate in this way ---
+instead they take over the Python session, postponing all other tasks.
+However, it may be possible to adapt some of them.
 
 ### Console ###
 
@@ -51,9 +45,9 @@ character typed at the console keyboard, and adds it to a command line
 command function and passes the command line to it.  *Getchar* also
 handles some editing functions and other control keys.
 
-The *getchar* method is non-blocking when it is scheduled by the Piety
-scheduler.  Other Piety tasks can run while the user is entering or
-editing the command line.
+The *getchar* method (including the command function it may call) can
+be one of the handlers scheduled by *piety.run*.  Other Piety tasks
+can run while the user is entering or editing the command line.
 
 The command function is passed as an argument to the *Console*
 constructor, so this same class can act as the front end to any
