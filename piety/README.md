@@ -64,9 +64,7 @@ into a Python shell.
 
 ### Terminal ###
 
-To use *getchar*, the console must be put into single-character mode,
-by calling the *setup* function in the *terminal* module.  The
-*restore* function returns to the previous mode.
+The *terminal* module contains platform-dependent functions used by *console*.
 
 ### Modules ###
 
