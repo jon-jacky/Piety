@@ -21,20 +21,22 @@ call *piety.run*.  Usually, one of the tasks is a Python shell, so you
 can continue to interact while Piety is running.  See the examples in
 the *samples* directory.  More details appear in docstrings.
 
-Piety is event-driven.  Each Piety task is defined by an *event*, a
-*handler*, a *guard*, and a *name*.  A handler can be any Python
-callable, including a function, method, generator, or coroutine.  A
-guard can be any callable that returns a Boolean.  The scheduler is an
-event loop that may invoke a task's handler when its event occurs and
-its guard is true.  Then the handler runs until it returns control to
-the scheduler.  There is no preemption.  This is called *cooperative
+Piety is event-driven.  Each Piety task identifies an *event*, a
+*handler*, and a *guard*.  A handler can be any Python callable,
+including a function, method, generator, or coroutine.  A guard can be
+any callable that returns a Boolean.  The scheduler is an event loop
+that may call a task's handler when its event occurs and its guard is
+true.  Then the handler runs until it returns control to the
+scheduler.  There is no preemption.  This is called *cooperative
 multitasking*.
 
-It is the programmer's obligation to ensure that each handler finishes
-quickly enough for acceptable performance.  Many existing Python
-applications and modules are not designed to cooperate in this way ---
-instead they take over the Python session, postponing all other tasks.
-However, it may be possible to adapt some of them.
+All software that runs in Piety must be organized as a collection of
+functions or methods (etc.) that can be called as handlers.  It is the
+programmer's obligation to ensure that each handler finishes quickly
+enough for acceptable performance.  Many existing Python applications
+and modules are not designed to cooperate in this way --- instead they
+take over the Python session, postponing all other tasks.  However, it
+may be possible to adapt some of them.
 
 ### Console ###
 
@@ -46,8 +48,9 @@ command function and passes the command line to it.  *Getchar* also
 handles some editing functions and other control keys.
 
 The *getchar* method (including the command function it may call) can
-be one of the handlers scheduled by *piety.run*.  Other Piety tasks
-can run while the user is entering or editing the command line.
+be one of the handlers scheduled by *piety.run*, called each time the
+user types a single key.  Other Piety tasks can run while the user is
+entering or editing the command line.
 
 The command function is passed as an argument to the *Console*
 constructor, so this same class can act as the front end to any
