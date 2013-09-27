@@ -14,20 +14,20 @@ handling console input:
 42
 >>> import test_shell
 >>> test_shell.run()
-piety>>> x
+piety> x
 42
-piety>>> x = 666
-piety>>> x
+piety> x = 666
+piety> x
 666
-piety>>> 1+1
+piety> 1+1
 2
-piety>>> "Hello world"
+piety> "Hello world"
 'Hello world'
-piety>>> dir()
+piety> dir()
 ['__builtins__', '__doc__', '__name__', '__package__', 'sys', 'test_shell', 'x']
-piety>>> __name__
+piety> __name__
 '__main__'
-piety>>> ^C
+piety> ^C
 ...
 KeyboardInterrupt
 >>> x
@@ -46,7 +46,7 @@ import piety
 # create shell here not in pysht module
 #  so we can have multiple shell instances
 main_gbls = sys.modules['__main__'].__dict__
-shell = Console(prompt='piety>>> ', command=pysht.mk_shell(main_gbls))
+shell = Console(command=pysht.mk_shell(main_gbls))
 
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 

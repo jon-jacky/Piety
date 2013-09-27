@@ -1,26 +1,30 @@
 """
 pysht.py - Python shell for Piety
 
-Defines the command function 'mk_shell' that returns a function (a
-closure) that is passed to the Console constructor, that makes the
-Console instance behave as a Python shell.
+Defines the function 'mk_shell' whose parameters define a
+configuration, which returns a function (a closure) that is passed to
+the Console constructor, that makes the Console instance behave as a
+Python shell.
 
 We use mk_shell to make a closure so we can create different shells
-that use different modules to lookup names and bind variables.
-Usually we use the __main__ module so the shell returned by mk_shell
-behaves just like the usual top-level interpreter.   But we could 
-configure the returned shell differently.
+that use different configurations.
+
+At this time the only configuration parameter is the 'globals'
+dictionary used by eval and exec to look up names and bind variables.
+
+The default globals dictionary is from the __main__ module so the
+shell returned by mk_shell behaves just like the usual top-level
+interpreter.  But we could configure the shell differently.
 
 To use it:
- from console import Console
+ import console
  import pysht
  import sys
- gbls = sys.modules['__main__'].__dict__
- shell = Console(prompt='piety>>> ', command=pysht.mk_shell(gbls))
+ shell = console.Console(prompt='piety> ', command=pysht.mk_shell())
 
 Put this code in the application module that uses the shell, not here
 in pysht module, so different shell instances can use different
-modules.
+configurations.
 
 The command function returned by mk_shell simply passes the command
 line to the Python eval function (for expressions) or the exec
@@ -42,17 +46,21 @@ Clallam language, translated as "against the wind or current"[1] or
 
 """
 
-def mk_shell(globals):
+import sys
+
+main_globals = sys.modules['__main__'].__dict__
+
+def mk_shell(globals=main_globals):
     """
     Console expects a command function with one argument, the command line
     use mk_shell to make the command function with globals dictionary baked in
-    globals is sys.modules['__main__'].__dict__ to make shell behave like usual
+    accept the default globals to use the same dictionary the __main__ module
     """
 
     def shell(cmdline):
         """
-        Pass cmdline to Python to execute, with the globals dictionary
-        This is a closure with variable globals from the environment
+        Pass cmdline to Python eval or exec to execute
+        This is a closure that includes the globals dictionary 
         """
         try:
             # exec does not automatically print values so use eval if we can

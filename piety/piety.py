@@ -1,8 +1,8 @@
 """
 piety.py - Piety scheduler, defines the Task class and run function.  
 
-To run tasks in Piety, import the piety module, create some Task
-instances, then call run. More details appear in the docstrings below,
+To run tasks in Piety, import the piety module, create some piety.Task
+instances, then call piety.run. More details appear in the docstrings below,
 and in the examples in the samples directory.
 
 This is a platform-dependent module. It uses the select module, so it
@@ -25,7 +25,7 @@ class Task(object):
 
     def __init__(self, name=None, handler=None, event=None, guard=None):
         """
-        A Task instance is defined by a handler, an event, a guard,
+        A Task instance identifies a handler, an event, a guard,
         and an optional name.  The Piety scheduler may invoke the
         handler when the event occurs and the guard is True.  Then the
         handler runs until it returns (or yields) control to the
@@ -78,6 +78,14 @@ timeout = -1 # timeout EVENT not interval.  different from any fd.fileno()
 
 # counts events of all types, must be global so handlers can use it
 ievent = 0
+done = False  # for exit
+
+def exit():
+    """ 
+    exit from Piety event loop
+    """
+    global done
+    done = True
 
 def run(period=1.000,nevents=0):
     """
@@ -89,7 +97,7 @@ def run(period=1.000,nevents=0):
     global ievent # must be global so tasks can use it
     maxevents = ievent + nevents # when to stop
     interval = period # timeout INTERVAL in seconds, select argument
-    while not nevents or ievent < maxevents:
+    while not done and not nevents or ievent < maxevents:
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
         t0 = datetime.datetime.now()
