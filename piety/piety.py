@@ -78,14 +78,14 @@ timeout = -1 # timeout EVENT not interval.  different from any fd.fileno()
 
 # counts events of all types, must be global so handlers can use it
 ievent = 0
-done = False  # for exit
+done = False  # supports exit on demand
 
 def exit():
     """ 
     exit from Piety event loop
     """
     global done
-    done = True
+    done = True # must reset to False before we can resume
 
 def run(period=1.000,nevents=0):
     """

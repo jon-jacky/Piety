@@ -20,6 +20,7 @@ def run_piety():
     setup terminal and (re)start piety
     must be one command at the python prompt
     """
+    piety.done = False # reset, might be resuming after piety.exit() 
     shell.restart() # clear buffer, print prompt
     piety.run(nevents=0) # loop forever, don't return
 
