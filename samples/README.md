@@ -25,3 +25,8 @@ the order they were written.
 
 - **test_shell_writers**, test Python shell under the scheduler
     concurrently with two writers.
+
+- **run_piety**, start Piety with Python shell running
+
+- **run_piety_writers**, start Piety with Python shell running and two
+    writer tasks defined but not running.

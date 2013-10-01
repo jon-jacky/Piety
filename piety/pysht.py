@@ -46,7 +46,7 @@ Clallam language, translated as "against the wind or current"[1] or
 
 """
 
-import sys
+import sys, traceback
 
 main_globals = sys.modules['__main__'].__dict__
 
@@ -63,13 +63,16 @@ def mk_shell(globals=main_globals):
         This is a closure that includes the globals dictionary 
         """
         try:
-            # exec does not automatically print values so use eval if we can
-            result = eval(cmdline, globals)
-            # strings print out with enclosing single quotes just like usual
-            print "'"+result+"'" if isinstance(result,str) else result
-            # statements (not exprs) like x = 42 crash eval with syntax error 
-            #  so use exec for those
-        except SyntaxError:
-            exec cmdline in globals
+            try:
+                # exec does not automatically print values so use eval if we can
+                result = eval(cmdline, globals)
+                # strings print out with enclosing single quotes just like usual
+                print "'"+result+"'" if isinstance(result,str) else result
+                # statements (not exprs) like x = 42 crash eval with syntax error 
+                #  so use exec for those
+            except SyntaxError:
+                exec cmdline in globals
+        except BaseException as e:
+          traceback.print_exc() # looks just like unhandled exception
 
     return shell
