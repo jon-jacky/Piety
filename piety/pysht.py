@@ -62,12 +62,17 @@ def mk_shell(globals=main_globals):
         Pass cmdline to Python eval or exec to execute
         This is a closure that includes the globals dictionary 
         """
-        try:
-            try:
+        try: # don't crash out of piety if exception, but print traceback
+            try: # try eval, if it fails call exec
                 # exec does not automatically print values so use eval if we can
                 result = eval(cmdline, globals)
-                # strings print out with enclosing single quotes just like usual
-                print "'"+result+"'" if isinstance(result,str) else result
+                # print out results just as in standard Python REPL
+                if result == None:
+                    pass
+                elif isinstance(result,str):
+                    print "'"+result+"'"
+                else:
+                    print result
                 # statements (not exprs) like x = 42 crash eval with syntax error 
                 #  so use exec for those
             except SyntaxError:

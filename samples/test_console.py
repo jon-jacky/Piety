@@ -1,12 +1,12 @@
 """
 test_console.py - demonstrate Peity scheduler with one console task
 
-Import this module into a Python session, then type ctest() to begin
+Import this module into a Python session, then type test() to begin
 handling console input:
 
  $ python -i path.py
  >>> import test_console
- >>> test_console.ctest()
+ >>> test_console.test()
  piety>abcdef^H^H^L
  piety>abcd
  abcd
@@ -14,7 +14,7 @@ handling console input:
  ... traceback ...
  KeyboardInterrupt
  >>> test_console.c0.command = test_console.print_3times
- >>> test_console.ctest()
+ >>> test_console.test()
  piety>efghi
  efghi
  output line 0 ...
@@ -31,8 +31,8 @@ c0 = Console()
 
 t0 = piety.Task(handler=c0.getchar, event=piety.sys.stdin)
 
-def ctest():
-    """ ctest() calls piety.run(nevents=0)
+def test():
+    """ test() calls piety.run(nevents=0)
     """
     c0.restart() # clear buffer, print prompt
     piety.run(nevents=0) # loop forever, don't return

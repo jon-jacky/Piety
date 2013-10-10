@@ -29,4 +29,4 @@ the order they were written.
 - **run_piety**, start Piety with Python shell running
 
 - **run_piety_writers**, start Piety with Python shell running and two
-    writer tasks defined but not running.
+    writer tasks defined, but only one running.

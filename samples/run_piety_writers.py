@@ -1,10 +1,10 @@
 """
 Like run_piety but include writer tasks also for convenience
 
- python -i run_piety_writers
-
-But then both writers are started with guard=(lambda:False) so
-they won't run until you revise guard.
+ $ python -i run_piety_writers.py
+... only t1 is writing ...
+piety> t0.enabled=piety.true
+... now t0 is writing also ...
 
 """
 
@@ -30,14 +30,18 @@ def run_piety():
 
 r = run_piety # abbreviation, 'resume'
 
-w0,w1 = Writer(fname='w0.txt'),Writer('w1.txt')
-
-# writer tasks assigned guard=(lambda:False) so they don't start running
-t0 = piety.Task(handler=w0.write,event=piety.timeout,guard=(lambda:False))
-t1 = piety.Task(handler=w1.write,event=piety.timeout,guard=(lambda:False))
+w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
 
 # use this for t1.guard
-alternate = (lambda: bool(piety.ievent%2)) # every other event
+def alternate():
+    """
+    Returns True on every other timeout event
+    """
+    return bool(piety.ievent[piety.timeout]%2)
+
+# writer tasks assigned guard=(lambda:False) so they don't start running
+t0 = piety.Task(handler=w0.write,event=piety.timeout,enabled=piety.false)
+t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
 
 # default guard=(lambda:True) so start running immediately
 shell = console.Console(command=pysht.mk_shell(), exiter=piety.exit)

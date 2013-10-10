@@ -24,6 +24,8 @@ def run_piety():
     shell.restart() # clear buffer, print prompt
     piety.run(nevents=0) # loop forever, don't return
 
+r = run_piety # abbreviation, 'resume'
+
 shell = console.Console(command=pysht.mk_shell(), exiter=piety.exit)
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 

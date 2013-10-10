@@ -3,7 +3,7 @@ test_shell.py - demonstrate Peity scheduler with one task: Python shell
 
 Piety shell uses the __main__ namespace to find, store variables
 
-Import this module into a Python session, then type run() to begin
+Import this module into a Python session, then type test() to begin
 handling console input:
 
  $ python -i path.py
@@ -13,7 +13,7 @@ handling console input:
 >>> x
 42
 >>> import test_shell
->>> test_shell.run()
+>>> test_shell.test()
 piety> x
 42
 piety> x = 666
@@ -50,7 +50,7 @@ shell = Console(command=pysht.mk_shell(main_gbls))
 
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
-def run():
+def test():
     """ call piety.run(nevents=0)
     """
     shell.restart() # clear buffer, print prompt

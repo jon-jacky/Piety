@@ -7,7 +7,7 @@ as many in w1.txt.  Meanwhile can type at peity> prompts
 
  $ python -i path.py
  >>> import test_console_writers
- >>> test_console_writers.cwtest(30)
+ >>> test_console_writers.test(30)
  ... lines are added to w0.txt and half as many to w1.txt ...
  ... meanwhile type at piety> prompts without blocking writers ...
  30
@@ -32,8 +32,8 @@ t1.guard = (lambda: bool(piety.ievent%2)) # every other event
 c0 = Console()
 t2 = piety.Task(handler=c0.getchar, event=piety.sys.stdin)
 
-def cwtest(n):
-    """c wtest(n) calls piety.run(nevents=n)
+def test(n):
+    """test(n) calls piety.run(nevents=n)
     """
     c0.restart() # clear buffer, print prompt
     piety.run(nevents=n)

@@ -22,13 +22,13 @@ can continue to interact while Piety is running.  See the examples in
 the *samples* directory.  More details appear in docstrings.
 
 Piety is event-driven.  Each Piety task identifies an *event*, a
-*handler*, and a *guard*.  A handler can be any Python callable,
-including a function, method, generator, or coroutine.  A guard can be
-any callable that returns a Boolean.  The scheduler is an event loop
-that may call a task's handler when its event occurs and its guard is
-true.  Then the handler runs until it returns control to the
-scheduler.  There is no preemption.  This is called *cooperative
-multitasking*.
+*handler*, and an *enabling condition*.  A handler can be any Python
+callable, including a function, method, generator, or coroutine.  An
+enabling condition can be any callable that returns a Boolean.  The
+scheduler is an event loop that may call a task's handler when its
+event occurs and its enabling condition is true.  Then the handler
+runs until it returns control to the scheduler.  There is no
+preemption.  This is called *cooperative multitasking*.
 
 All software that runs in Piety must be organized as a collection of
 functions or methods (etc.) that can be called as handlers.  It is the

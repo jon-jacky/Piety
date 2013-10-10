@@ -3,9 +3,10 @@ test_console_blocking.py - demonstrate single character input, output to console
 
  ...$ python -i path.py
  >>> import test_console_blocking
- >>> test_console_blocking.ctest()
+ >>> test_console_blocking.test()
  piety> ... type characters, then RETURN ...
  ... prints string of the characters you typed ...
+ piety>
  >>>
 
 """
@@ -14,7 +15,7 @@ import terminal, console
 
 c0 = console.Console() # all default args
 
-def ctest():
+def test():
     """ 
     loop calling getchar until line terminator, then print buffer contents
     """
