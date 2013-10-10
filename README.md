@@ -41,7 +41,7 @@ Piety might be used for ---
 
 - **Embedded computing** - Run standalone Python applications on minimal platforms (something like [PyMite](https://wiki.python.org/moin/PyMite)).
 
-- **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [Elrlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
+- **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), [Erlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
 
 For now, Piety runs in an ordinary Python interpreter session on a
 host operating system.  We plan to run Piety on a bare machine (or
