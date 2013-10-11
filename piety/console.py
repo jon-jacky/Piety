@@ -81,6 +81,7 @@ class Console(object):
         self.exit = exiter
         self.history = list() # list of cmdline, earliest first
         self.iline = 0 # index into cmdline history
+        self.continuation = '.'*(len(self.prompt)-1) + ' ' # continuation prompt
 
     def getchar(self):
         """
@@ -89,6 +90,7 @@ class Console(object):
         Key codes from http://www.unix-manuals.com/refs/misc/ascii-table.html
         RET, Enter, or ^M: Execute command line
         DEL, Backspace, or ^H: Remove last character c from command line, echo \c
+        ^J: Start new line without executing command, for multiline input
         ^L: Redisplay prompt and command line (useful after edits)
         ^U: Discard command line, display new prompt
         ^P: Retrieve previous command line from history, for edit or execution
@@ -114,19 +116,26 @@ class Console(object):
                 terminal.putstr('\\%s' % last) # maybe more helpful than ^H
         elif c == '\f' : # form feed, ^L, redisplay cmdline, useful after ^H
             # no change to cmdline
-            terminal.putstr('^L\r\n' + self.prompt + self.cmdline) # on new line
+            # terminal.putstr('^L\r\n' + self.prompt + self.cmdline) # on new line
+            terminal.putstr('^L\r\n' + self.prompt)  # on new line
+            terminal.putlines(self.cmdline) # might be multiple lines
         elif c == '\x15': # ^U discard cmdline, display prompt on new line
             self.cmdline = str() 
             terminal.putstr('^U\r\n' + self.prompt) 
+        elif c == '\x0A': # ^J linefeed, insert \n, continuation prompt on new line
+            self.cmdline += c
+            terminal.putstr('^J\r\n' + self.continuation)
         elif c == '\x10': # ^P previous line in history FIXME or up arrow
             self.cmdline = self.history[self.iline] 
             self.iline = self.iline - 1 if self.iline > 0 else 0
-            terminal.putstr('^P\r\n' + self.prompt + self.cmdline) # on new line
+            terminal.putstr('^P\r\n' + self.prompt) # on new line
+            terminal.putlines(self.cmdline) # might be multiple lines
         elif c == '\x0E': # ^N next line in history FIXME or down arrow
             self.iline = self.iline + 1 \
                 if self.iline < len(self.history)-1 else self.iline
             self.cmdline = self.history[self.iline]
-            terminal.putstr('^N\r\n' + self.prompt + self.cmdline) # on new line
+            terminal.putstr('^N\r\n' + self.prompt)  # on new line
+            terminal.putlines(self.cmdline) # might be multiple lines
         elif c == '\x04': # ^D, exit console application, return to caller
             # only exit if cmdline is empty, same behavior as Python
             if not self.cmdline and self.exit:
@@ -153,7 +162,7 @@ class Console(object):
                 terminal.putstr(c) # no RETURN - all c go on same line
 
         return c  # so caller can check for terminator or ...
-
+        
     def do_command(self):
         """
         Process command line and reinitialize
