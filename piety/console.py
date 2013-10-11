@@ -45,6 +45,18 @@ def echoline(cmdline):
     """
     print cmdline
 
+
+def putlines(s):
+    """
+    format and print possibly multi-line string, at each linebreak print \r\n
+    """
+    lines = s.splitlines()
+    lastline = len(lines) - 1 # index of last line
+    for iline, line in enumerate(lines):
+        terminal.putstr(line)
+        if iline < lastline:
+            terminal.putstr('\r\n')
+
 # Print regrets when ^D but no self.exit
 noexit = 'No exit function defined, type ^C for KeyboardInterrupt'
 
@@ -118,7 +130,7 @@ class Console(object):
             # no change to cmdline
             # terminal.putstr('^L\r\n' + self.prompt + self.cmdline) # on new line
             terminal.putstr('^L\r\n' + self.prompt)  # on new line
-            terminal.putlines(self.cmdline) # might be multiple lines
+            putlines(self.cmdline) # might be multiple lines
         elif c == '\x15': # ^U discard cmdline, display prompt on new line
             self.cmdline = str() 
             terminal.putstr('^U\r\n' + self.prompt) 
@@ -129,13 +141,13 @@ class Console(object):
             self.cmdline = self.history[self.iline] 
             self.iline = self.iline - 1 if self.iline > 0 else 0
             terminal.putstr('^P\r\n' + self.prompt) # on new line
-            terminal.putlines(self.cmdline) # might be multiple lines
+            putlines(self.cmdline) # might be multiple lines
         elif c == '\x0E': # ^N next line in history FIXME or down arrow
             self.iline = self.iline + 1 \
                 if self.iline < len(self.history)-1 else self.iline
             self.cmdline = self.history[self.iline]
             terminal.putstr('^N\r\n' + self.prompt)  # on new line
-            terminal.putlines(self.cmdline) # might be multiple lines
+            putlines(self.cmdline) # might be multiple lines
         elif c == '\x04': # ^D, exit console application, return to caller
             # only exit if cmdline is empty, same behavior as Python
             if not self.cmdline and self.exit:

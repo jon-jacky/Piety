@@ -64,15 +64,3 @@ def putstr(s):
     """
     sys.stdout.write(s)
     sys.stdout.flush() # otherwise s doesn't appear until user types input
-
-
-def putlines(s):
-    """
-    print possibly multi-line string, at each \n print \r\n
-    """
-    lines = s.split('\n')
-    lastline = len(lines) - 1 # index of last line
-    for iline, line in enumerate(lines):
-        putstr(line)
-        if iline < lastline:
-            putstr('\r\n')
