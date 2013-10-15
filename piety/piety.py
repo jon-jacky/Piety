@@ -16,6 +16,7 @@ import sys
 import datetime
 import terminal
 from select import select
+from collections import defaultdict, Counter
 
 def true():
     """
@@ -28,6 +29,11 @@ def false():
     Return False, defined here so we can say t0.enabled = false
     """
     return False
+
+tasks_list = list() # list of tasks in order of creation
+
+schedule = defaultdict(list) # { event : list of tasks waiting for that event }
+                             # would deque be better than list?
 
 class Task(object):
     """
@@ -75,14 +81,9 @@ class Task(object):
         self.event = event
         self.enabled = enabled
         tasks_list.append(self)
-        if event and event in schedule:
+        if event:
             schedule[event].append(self)
-        else:
-            # FIXME use default dictionary with default []
-            schedule[event] = [ self ]
 
-tasks_list = list() # list of tasks in order of creation
-schedule = dict() # { event : list of tasks waiting for that event }
 inputs = [sys.stdin] # could add to this list
 #outputs = [sys.stdout] # causes run loop to exit without handling other events
 outputs = [] # FIXME? for now [sys.stdout] doesn't work
@@ -90,8 +91,7 @@ exceptions = []
 timeout = -1 # timeout EVENT not interval.  different from any fd.fileno()
 
 # count each kind of event, global so enabling conditions and handlers can use it
-# FIXME use default dictionary
-ievent = { sys.stdin:0, timeout:0 } # { event: number of occurrences }
+ievent = Counter([sys.stdin,timeout]) # { event: number of occurrences }
 
 done = False  # can exit on demand
 period = 1.000 # seconds, periodic timer for timeout events
@@ -149,6 +149,7 @@ def run(nevents=0):
     global ievent # must be global so enabling conditions and handlers can use it
     maxevents = ievent[timeout] + nevents # when to stop
     interval = period # timeout INTERVAL in seconds, uses global period
+    # counts timeout events, for all events ... or sum(ievent.values()) < ...
     while not done and (not nevents or ievent[timeout] < maxevents):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
