@@ -3,13 +3,13 @@ Start piety at the command line:
 
  python -i run_piety.py  
 
+Run Piety in an interactive Python session
+If you exit from Piety or interrupt it, you will still be in Python
+and can resume Piety with r()
+
 """
 
 import sys
-
-# for now assume we're running in Piety/samples 
-# put Piety/piety on the path so we can import those modules
-sys.path.append('../piety') 
 
 import console
 import pysht

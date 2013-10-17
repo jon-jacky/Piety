@@ -1,0 +1,4 @@
+# Run Piety in an interactive Python session
+# If you exit from Piety or interrupt it, you will still be in Python
+# and can resume Piety with r()
+python -i $HOME/Piety/bin/run_piety.py

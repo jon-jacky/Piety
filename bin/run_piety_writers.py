@@ -11,10 +11,6 @@ piety> t0.enabled=piety.true
 import sys
 from writer import Writer
 
-# for now assume we're running in Piety/samples 
-# put Piety/piety on the path so we can import those modules
-sys.path.append('../piety') 
-
 import console
 import pysht
 import piety
