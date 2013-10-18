@@ -1,7 +1,7 @@
 Piety tests
 ===========
 
-Tests for modules in *Piety/bin* and *Piety/samples* (there may be
+Tests for modules in *Piety/piety* and *Piety/samples* (there may be
 more tests in those directories).  For directions, see the docstrings
 in each module.  Modules are listed in the order they were written.
 

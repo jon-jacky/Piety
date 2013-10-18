@@ -60,10 +60,12 @@ This repository contains some notes and experiments in these
 directories.  Each directory contains a *README* file with more
 information.
 
-- **doc**, notes and documents
+- **bin**: commands and Python programs for running Piety on a host operating system
 
-- **piety**, scheduler, console, shell, utilities
+- **doc**: notes and documents
 
-- **samples**, samples and tests to run under the scheduler 
+- **piety**: scheduler, console, shell, utilities
 
+- **samples**: sample applications to run under the Piety scheduler 
 
+- **test**: tests for modules in *Piety/piety* and *Piety/samples*
