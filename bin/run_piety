@@ -1,11 +1,17 @@
+#!/usr/bin/env python
 """
-Start piety at the command line:
+Start a Piety session running in an interactive Python session
 
- python -i run_piety.py  
+ python -i run_piety
 
-Run Piety in an interactive Python session
 If you exit from Piety or interrupt it, you will still be in Python
-and can resume Piety with r()
+and can resume your Piety session with r()
+
+You can also start a standalone Piety session at the command line:
+
+ run_piety
+
+But here, if you exit or interrupt Piety you will also exit Python.  
 
 """
 
@@ -29,4 +35,5 @@ r = run_piety # abbreviation, 'resume'
 shell = console.Console(command=pysht.mk_shell(), exiter=piety.exit)
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
-run_piety()
+if __name__ == '__main__':
+    run_piety()

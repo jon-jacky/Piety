@@ -1,10 +1,17 @@
+#!/usr/bin/env python
 """
-Like run_piety but include writer tasks also for convenience
+Start a Piety session running in an interactive Python session
 
- $ python -i run_piety_writers.py
-... only t1 is writing ...
-piety> t0.enabled=piety.true
-... now t0 is writing also ...
+ python -i run_piety_writers
+
+If you exit from Piety or interrupt it, you will still be in Python
+and can resume your Piety session with r()
+
+You can also start a standalone Piety session at the command line:
+
+ run_piety_writers
+
+But here, if you exit or interrupt Piety you will also exit Python.  
 
 """
 
@@ -15,7 +22,7 @@ import console
 import pysht
 import piety
 
-def run_piety():
+def run_piety_writers():
     """ 
     setup terminal and (re)start piety
     must be one command at the python prompt
@@ -24,7 +31,7 @@ def run_piety():
     shell.restart() # clear buffer, print prompt
     piety.run(nevents=0) # loop forever, don't return
 
-r = run_piety # abbreviation, 'resume'
+r = run_piety_writers # abbreviation, 'resume'
 
 w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
 
@@ -43,4 +50,5 @@ t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
 shell = console.Console(command=pysht.mk_shell(), exiter=piety.exit)
 t2 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
-run_piety()
+if __name__ == '__main__':
+    run_piety_writers()

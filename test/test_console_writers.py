@@ -1,17 +1,21 @@
 """
-test_console_writers.py - show that console does not block cconcurrent writers
+test_console_writers.py - show that console does not block concurrent writers
 
-Import this module into a Python session, then ctype wtest(30) -- or
-any other integer argument -- to write that many lines in w0.txt and half
-as many in w1.txt.  Meanwhile can type at peity> prompts
-
- $ python -i path.py
- >>> import test_console_writers
- >>> test_console_writers.test(30)
+ $ python -i test_console_writers.py
+piety> abc
+abc
+piety> def
+def
  ... lines are added to w0.txt and half as many to w1.txt ...
  ... meanwhile type at piety> prompts without blocking writers ...
  30
- >>>
+     >>>
+>>> test(10)
+piety> fjfjfj
+fjfjfj
+... again, lines appear in w0.txt and w1.txt as you type
+piety> 10
+      >>>
 
 Use tail -f w0.txt and w1.txt in separate terminal windows to view
 concurrent writers output.
@@ -39,6 +43,8 @@ def test(n):
     piety.run(nevents=n)
     return n
 
+if __name__ == '__main__':
+    test(30)
 
 
 

@@ -18,17 +18,22 @@ The commands are:
  the execution *PATH*, and adds *Piety/piety* and *Piety/samples* to
  the *PYTHONPATH*.
 
-- **piety**: Run a Piety session.  Start Python, import the essential
-  Piety modules, and start a single console task running a Python 
-  interpreter.
+- **piety**: run a Piety session.  Start Python, import the essential
+  Piety modules, and start a single console task running a Python
+  interpreter.  If you exit from Piety or interrupt it, you will still
+  be in Python and can resume Piety with r().
+
+- **piety_writers**: similar to the *piety* command, but also starts
+    with two writer tasks defined (but only one running).
 
 The programs are:
 
-- **run_piety**, start Piety with Python shell running.  Invoked by
-    the *piety* command.
+- **run_piety**: start Piety with Python shell running.  Invoked by
+    the *piety* command.  But here, if you exit from Piety or
+    interrupt it, you will also exit from Python.
 
-- **run_piety_writers**, start Piety with Python shell running and two
-    writer tasks defined, but only one running.
+- **run_piety_writers**: similar to *run_piety*, but also starts with two
+    writer tasks defined.  Invoked by the *piety_writers* command.
 
 
 Revised Oct 2013

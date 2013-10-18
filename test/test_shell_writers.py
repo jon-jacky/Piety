@@ -1,28 +1,20 @@
 """
 test_shell_writers.py - demonstrate Peity scheduler with Python shell and writers
 
- $ python -i path.py
->>> import test_shell_writers
->>> x = 42
->>> __name__
-'__main__'
->>> test_shell_writers.test(100)
-piety> 
-piety> 'Both writers are wriring^H^H^H^L
-piety> 'Both writers are wrir^Hting!'
+ $ python -i test_shell_writers.py
+piety> x  \ =^U
+piety> 'Both writers are writing!'
 'Both writers are writing!'
-piety> x
+piety> x = 42
+piety> ^C
+...
+KeyboardInterrupt
+>>> x
 42
-piety> dir()
-['__builtins__', '__doc__', '__name__', '__package__', 'sys', 'test_shell_writers', 'x']
-piety> 1+1
-2
-piety> x = 666
-piety> 100
-            >>> x
-666
->>> __name__
-'__main__'
+>>> test()
+piety> 'Both writers have resumes\sd!'
+'Both writers have resumed!'
+piety>
 
 """
 
@@ -46,9 +38,12 @@ shell = Console(prompt='piety> ', command=pysht.mk_shell(main_gbls))
 
 t2 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
-def test(n):
-    """ call piety.run(nevents=n)
+def test():
+    """ call piety.run()
     """
     shell.restart() # clear buffer, print prompt
-    piety.run(nevents=n) # loop forever, don't return
+    piety.run() # loop forever, don't return
     return n
+
+if __name__ == '__main__':
+    test()

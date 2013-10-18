@@ -1,12 +1,13 @@
 """
 test_terminal.py - demonstrate single character input, output to console
 
- ...$ python -i path.py
- >>> import test_terminal
- >>> test_terminal.test()
- piety> ... type characters, then RETURN ...
- ... prints string of the characters you typed ...
- >>>
+ python -i test_terminal.py
+piety>abcd
+abcd
+>>> test()
+piety>efgh
+efgh
+>>>
 
 """
 
@@ -29,6 +30,9 @@ def test():
     terminal.restore()
     print # resume on next line
     print line
+
+if __name__ == '__main__':
+    test()
 
 
 

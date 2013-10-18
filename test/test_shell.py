@@ -3,38 +3,26 @@ test_shell.py - demonstrate Peity scheduler with one task: Python shell
 
 Piety shell uses the __main__ namespace to find, store variables
 
-Import this module into a Python session, then type test() to begin
-handling console input:
-
- $ python -i path.py
->>> __name__
-'__main__'
->>> x = 42
->>> x
-42
->>> import test_shell
->>> test_shell.test()
-piety> x
-42
-piety> x = 666
-piety> x
-666
-piety> 1+1
-2
-piety> "Hello world"
-'Hello world'
-piety> dir()
-['__builtins__', '__doc__', '__name__', '__package__', 'sys', 'test_shell', 'x']
+$ python -i test_shell.py
+piety> x = 42
 piety> __name__
 '__main__'
+piety> dir()
+['Console', '__builtins__', '__doc__', '__file__', '__name__', '__package__', 'main_gbls', 'piety', 'pysht', 'shell', 'sys', 't0', 'test', 'x']
 piety> ^C
 ...
 KeyboardInterrupt
 >>> x
-666
+42
 >>> __name__
 '__main__'
-
+>>> dir()
+['Console', '__builtins__', '__doc__', '__name__', '__package__', 'main_gbls', 'piety', 'pysht', 'shell', 'sys', 't0', 'test', 'x']
+>>> x = 666
+>>> test()
+piety> x
+666
+piety> 
 
 """
 
@@ -55,3 +43,6 @@ def test():
     """
     shell.restart() # clear buffer, print prompt
     piety.run(nevents=0) # loop forever, don't return
+
+if __name__ == '__main__':
+    test()

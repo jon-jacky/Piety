@@ -1,13 +1,15 @@
 """
 test_console_blocking.py - demonstrate single character input, output to console
 
- ...$ python -i path.py
- >>> import test_console_blocking
- >>> test_console_blocking.test()
- piety> ... type characters, then RETURN ...
- ... prints string of the characters you typed ...
- piety>
- >>>
+ $ python -i test_console_blocking.py
+piety> abcd
+abcd
+piety> 
+>>> test()
+piety> efgh
+efgh
+piety> 
+>>> 
 
 """
 
@@ -27,5 +29,7 @@ def test():
     terminal.restore()
     print # resume on next line
 
+if __name__ == '__main__':
+    test()
 
 
