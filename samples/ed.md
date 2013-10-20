@@ -160,10 +160,6 @@ Adding, changing, deleting text:
 - *d(i,j)*: **d**elete text from lines *i* through *j* (default
    *o*,*o*).  Set *dot* to the first undeleted line.
 
-
-(more to come)
-
-
 Command mode:
 
 - *cmd()*: Enter command mode.
@@ -197,7 +193,7 @@ line number, then *Return*.
 
 The module *ed* has variable *buffers*, a dictionary from buffer names
 (strings, usually the file name) to *Buffer* instances.  Variable
-*buf* is a string, the key for the current buffer in *buffers*.
+*current* is a string, the key for the current buffer in *buffers*.
 Variables *o* ("dot") and *S* are the current line and last line in
 the current buffer.
 
