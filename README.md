@@ -60,7 +60,7 @@ This repository contains some notes and experiments in these
 directories.  Each directory contains a *README* file with more
 information.
 
-- **bin**: commands and Python programs for running Piety on a host operating system
+- **bin**: commands and programs for running Piety on a host operating system
 
 - **doc**: notes and documents
 
@@ -68,4 +68,4 @@ information.
 
 - **samples**: sample applications to run under the Piety scheduler 
 
-- **test**: tests for modules in *Piety/piety* and *Piety/samples*
+- **test**: tests for modules in *piety* and *samples*
