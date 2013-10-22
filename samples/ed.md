@@ -60,54 +60,12 @@ Likewise, you can edit in the buffers with Python commands not
 provided in *ed*, for example with any of the string or regular
 expression functions or methods.
 
-### Python API ###
+### Python API summary ###
 
-Here we describe the Python functions and attributes (variables) in
-the *ed* module that implement editor commands.
-
-Most functions have the same single-character names as the commands.
-
-There may be several named text buffers, all stored in the variable
-*buffers*, a dictionary from buffer names (strings) to buffer
-instances.  Most commands apply to the *current buffer*, identified by
-its name in the variable *current*.  The function call *buf()* returns
-*buffers[current]*.  The contents of the current buffer are stored in
-an array of lines (strings).  The function call *lines()* returns
-*buf().lines*.
-
-The current line (where, by default, text is changed or inserted) is
-called *dot*.  After most commands, *dot* is updated to the last line
-affected (the last line read in from a file, etc.).  The current line
-*dot* and the last line in the buffer are identified by the variables
-*o* and *S*, which look like . (period) and *$*, used in *ed* command
-mode.  Our *o* and *S* are integer indices into the list of strings,
-so *dot*, the current line, can be accessed as *lines()[o]*.
-
-Many commands apply to a line *i* or to a range of lines starting with
-*i* (included) up through line *j* (also included, unlike Python
-slices).  Lines *i* and *j* can be identified by line number (an
-integer index).  As usual for Python (but unlike Unix *ed*) 0
-indicates the first line in the buffer.  The index -1 indicates the
-last line in the buffer, and other negative numbers index backward
-from the end (as usual for Python).  Line numbers can be represented
-relative to *dot* or the last line, for example *o + 1* (the line
-after *dot*) or *S - 3* (three lines before the last).
-
-In each *ed* function call where they might appear, lines *i* and *j*
-are always optional arguments in that order (declared with * *args*
-syntax), with defaults (if used) assigned in the function body.
-Usually *i* and *j* both default to *o* (*dot*), or *i, j* default to
-*0, S* (beginning to end, the whole buffer).
-
-Lines *i* and *j* can also be identified by the patterns (substrings)
-they contain.  If you provide a string instead of a number for *i* or
-*j*, *ed* uses the first line after *dot* which contains that
-string. If the string begins with a minus sign, *ed* searches backward
-and uses the last line before *dot* that contains that string (to
-search forward for a string that begins with a minus sign, precede the minus
-with a backslash).
-
-### API Variables and Functions ###
+These are the Python functions and attributes (variables) in
+the *ed* module that implement editor commands.  Most functions have
+the same single-character names as the commands.  More explanation
+follows in the next session.
 
 Data structures:
 
@@ -206,6 +164,48 @@ Command mode:
   deleted so it is possible to resume the command mode session with
   *ed()* again.
 
+
+### Python API explanation ###
+
+There may be several named text buffers, all stored in the variable
+*buffers*, a dictionary from buffer names (strings) to buffer
+instances.  Most commands apply to the *current buffer*, identified by
+its name in the variable *current*.  The function call *buf()* returns
+*buffers[current]*.  The contents of the current buffer are stored in
+an array of lines (strings).  The function call *lines()* returns
+*buf().lines*.
+
+The current line (where, by default, text is changed or inserted) is
+called *dot*.  After most commands, *dot* is updated to the last line
+affected (the last line read in from a file, etc.).  The current line
+*dot* and the last line in the buffer are identified by the variables
+*o* and *S*, which look like . (period) and *$*, used in *ed* command
+mode.  Our *o* and *S* are integer indices into the list of strings,
+so *dot*, the current line, can be accessed as *lines()[o]*.
+
+Many commands apply to a line *i* or to a range of lines starting with
+*i* (included) up through line *j* (also included, unlike Python
+slices).  Lines *i* and *j* can be identified by line number (an
+integer index).  As usual for Python (but unlike Unix *ed*) 0
+indicates the first line in the buffer.  The index -1 indicates the
+last line in the buffer, and other negative numbers index backward
+from the end (as usual for Python).  Line numbers can be represented
+relative to *dot* or the last line, for example *o + 1* (the line
+after *dot*) or *S - 3* (three lines before the last).
+
+In each *ed* function call where they might appear, lines *i* and *j*
+are always optional arguments in that order (declared with * *args*
+syntax), with defaults (if used) assigned in the function body.
+Usually *i* and *j* both default to *o* (*dot*), or *i, j* default to
+*0, S* (beginning to end, the whole buffer).
+
+Lines *i* and *j* can also be identified by the patterns (substrings)
+they contain.  If you provide a string instead of a number for *i* or
+*j*, *ed* uses the first line after *dot* which contains that
+string. If the string begins with a minus sign, *ed* searches backward
+and uses the last line before *dot* that contains that string (to
+search forward for a string that begins with a minus sign, precede the minus
+with a backslash).
 
 ### Command mode ###
 
