@@ -21,7 +21,7 @@ The commands are:
 - **piety**: run a Piety session.  Start Python, import the essential
   Piety modules, and start a single console task running a Python
   interpreter.  If you exit from Piety or interrupt it, you will still
-  be in Python and can resume Piety with r().
+  be in Python and can resume Piety with resume().
 
 - **piety_writers**: similar to the *piety* command, but also starts
     with two writer tasks defined (but only one running).
