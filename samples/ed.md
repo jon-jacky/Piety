@@ -231,7 +231,7 @@ with a backslash).
 
 These API variables and functions are implemented:
 
-*buffers, current, buf, lines, o, S, B, b, D, n, m, l
+*buffers, current, buf, lines, o, S, B, b, D, n, m, l*
 
 
 
