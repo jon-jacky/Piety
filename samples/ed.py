@@ -46,7 +46,7 @@ def S():
     """
     $, index of the last line in the current buffer
     """
-    return len(lines()) - 1 if current if buffers else None
+    return len(lines()) - 1 if current in buffers else None
 
 
 # Commands
