@@ -14,7 +14,7 @@ class Buffer(object):
         New text buffer
         """
         self.lines = list() # text in the current buffer, a list of strings
-        self.dot = None # index of current line dot . in buf().lines
+        self.dot = None # index of current line dot . in lines
         self.filename = None # filename (string) 
         self.unsaved = False # True if  buffer contains unsaved changes
 
@@ -22,7 +22,7 @@ class Buffer(object):
 
 buffers = dict() # dictionary from buffer names (strings) to buffers
 
-current = None #  name of the current buffer
+current = None #  name of the current buffer, None if no buffers
 
 def buf():
     """
@@ -46,7 +46,8 @@ def S():
     """
     $, index of the last line in the current buffer
     """
-    return len(lines()) - 1 if current in buffers else None
+    nlines = len(buf().lines) if current in buffers else None
+    return nlines - 1 if nlines else None
 
 
 # Commands
@@ -64,7 +65,7 @@ def B(filename):
         fd = open(filename, mode='r')        
         temp.lines = fd.readlines()
         fd.close()
-    # if we got this far, readlines must have succeeded
+    # if we got this far, open and readlines must have succeeded
     temp.filename = filename
     nlines = len(temp.lines) # might be 0
     if nlines:
@@ -78,7 +79,7 @@ def b(name):
     """
     Set current buffer to name
     """
-    global buffer
+    global current
     if name in buffers:
         current = name
     else:
@@ -86,9 +87,9 @@ def b(name):
 
 def D(name):
     """
-    Delete buffer named 'name'
+    Delete buffer named 'name'.  What if it's the current buffer
     """
-    global buffer
+    global buffers
     if name in buffers:
         del buffer[name]
     else:
@@ -99,15 +100,16 @@ def n():
     """
     Print buffer names.  Current buffer is marked with
     . (period).  Buffers with unsaved changes are marked with an asterisk.
-    Also print ., $,, name and filename of each buffer.
+    Also print name, ., $, and filename of each buffer.
     """
-    for n in buffers:
-        print '%s %s %d %d %s %s' % \
-            ('.' if n == current else ' ',
-             '*' if buffers[n].unsaved else ' ',
-             buffers[n].dot, 
-             len(buffers[n].lines)-1,
-             n, buffers[n].filename)
+    for name in buffers:
+        # use %s not %d everwhere, dot might be None
+        print '%s%s%-12s %6s%6s %s' % \
+            ('.' if name == current else ' ',
+             '*' if buffers[name].unsaved else ' ',
+             name, buffers[name].dot, 
+             (len(buffers[name].lines))-1, # $, not N of lines
+             buffers[name].filename)
 
 def m():
     """
@@ -115,17 +117,26 @@ def m():
     information: number of last line $, buffer name current,
     filename.
     """
-    print '%d/%d  %s  %s' % (o(),S(), current, buf().filename)
+    # use %s everywhere, not %d - . and $ might be None
+    if current in buffers:
+        print '%s/%s  %s  %s' % (o(),S(), current, buf().filename)
+    else:
+        print '?'
 
-def l(i):
+def l(*args):
     """
+    args is empty or (i), a line
     Move dot to line i and print it. Defaults to .+1,
     the line after dot, so repeatedly invoking l() advances through
     the buffer, printing successive lines. Invoking l(pattern) moves
     dot to the next line that contains pattern, and prints it.
     """
-    if i in lines():
+    if args:
+        i = args[0]
+    else:
+        i = o() + 1
+    if current in buffers and (0 <= i <= S()):
         buf().dot = i
-        print lines()[i]
+        print (lines()[i]).rstrip() # strip trailing \n
     else:
         print '?'
