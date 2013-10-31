@@ -45,14 +45,22 @@ remain, so the editing session can be resumed at any time by typing
 *ed()* again.
 
 For every *ed* command there is an ordinary Python function, so you
-can edit directly from the Python prompt.  The following
-commands have the same effect as the preceding example:
+can edit directly from the Python prompt.  The following commands have
+the same effect as the preceding example.  Notice how all the input
+text is the argument to the *a* function, a single multi-line
+triple-quoted string.  When running the *piety* Python shell,
+you must terminate each line inside the triple quoted string with *^J*
+instead of *Return*.
 
     >>> from ed import *
     >>> B('test.txt')
     0 lines
-    >>> a()
-    ... enter text, quit by typing a period at the start of a line ...
+    >>> a("""ed() enters ed command mode, with the : command  prompt.
+    ... 'B <name>' creates a new buffer and loads the named file
+    ... 'a' enters ed input mode and appends the text after the current line.
+    ... 'w' writes the buffer contents back to the file
+    ... 'q' quits ed command mode.
+    ... To quit input mode, type a period by itself at the start of a line.""")
     >>> w()
     test.txt, 6 lines
 
@@ -69,7 +77,9 @@ follows in the next session.
 
 Data structures:
 
-- *buffers*: dictionary from buffer names (strings) to buffers
+- *Buffer*: class, defines objects that store text etc.
+
+- *buffers*: dictionary from buffer names (strings) to Buffer instances
 
 - *current*: name of the current buffer
 
@@ -93,7 +103,7 @@ Data structures:
 - *S()*: returns *len(buf().lines) - 1*, index of last line in *lines*.
   Roughly resembles the dollar sign *$* used in *ed* command mode.
 
-Working with files and buffers:
+Commands - Working with files and buffers:
 
 - *B(name)*: Create a new **B**uffer and load the file *name*.  Print
    the number of lines read (0 when creating a new file). The new
@@ -137,13 +147,9 @@ Displaying and navigating text:
 
 Adding, changing, deleting text:
 
-- *a(i)*: **a**ppend text after line *i* (default .), using
-   input mode.
+- *a(i, text)*: **a**ppend *text* after line *i* (default .).
    
-- . (period at the start of a line in input mode) exit input mode.
-
-- *i(i)*: **i**nsert text before line *i* (default .), using
-   input mode.
+- *i(i, text)*: **i**nsert *text* before line *i* (default .).
 
 - *c(i,j)*: **c**hange (replace) text from lines *i* through *j*
    (default .,.), using input mode
@@ -231,12 +237,13 @@ with a backslash).
 
 These API variables and functions are implemented:
 
-*buffers, current, buf, lines, o, S, B, b, D, n, m, l*
-
-
+*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i*
 
 These commands are implemented:
 
 (None)
+
+For now, line addresses *i* and *j* must be integers.  Text patterns are not
+yet supported.
 
 Revised Oct 2013
