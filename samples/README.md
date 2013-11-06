@@ -9,6 +9,8 @@ in *Piety/tests*.
 
 - **ed.md**: description of *ed*
 
+- **test_ed**: test, demonstrate Python API for *ed*
+
 - **writer**: write to files to demonstrate interleaving concurrency
 
 - **test_writers**: demonstrate *writer* with two concurrent *Writer*
