@@ -67,12 +67,15 @@ def B(filename):
     filename, but without any path prefix.
     """
     global buffers, current
+    if not isinstance(filename,str):
+        print '? B filename (string)'
+        return
     temp = Buffer()
     if isfile(filename):
         fd = open(filename, mode='r')        
         temp.lines = fd.readlines()
         fd.close()
-    # if we got this far, open and readlines must have succeeded
+    # else new file will be created when buffer is written out
     temp.filename = filename
     nlines = len(temp.lines) # might be 0
     if nlines:
@@ -90,27 +93,23 @@ def b(name):
     if name in buffers:
         current = name
     else:
-        print '?'
+        print '? b buffername (string)'
 
 def w(*args):
     """
-    optional args are, in this order: name, i, j 
-    write lines i through j in current buffer
-    (defaults 0 and $, the entire buffer) to file name (default: filename
-    from which buffer was read, or, if none, current buffer name). 
+    write current buffer contents to file name 
+    (default: stored filename or, if none, current buffer name). 
     Print the file name and the number of lines written. Does not change dot.
+    Does not change stored filename.
     """
-    name = buf().filename if current in buffers and buf().filename else current
-    i,j = 0, S() # defaults
     if len(args) > 0:
         name = args[0]
-    if len(args) > 1:
-        i = args[1]
-    if len(args) > 2:
-        j = args[2]
-    if not (isinstance(name,str) and isinstance(i,int) and isinstance(j,int)
-            and (0 <= i <= S()) and (0 <= j <= S()) and (i <= j)):
-        print '?'
+    elif current in buffers and buf().filename:
+        name = buf().filename 
+    else:
+        name = current
+    if not (isinstance(name,str)):
+        print '? w filename (string)'
         return
     fd = open(name, 'w')
     for line in lines():
@@ -123,14 +122,14 @@ def D(name):
     """
     Delete buffer named 'name'
     """
-    global buffers
+    global buffers, current
     if name in buffers:
-        del buffer[name]
-        if name == current:
+        del buffers[name]
+        if name == current: # pick a new current buffer
             keys = buffers.keys()
             current = keys[0] if keys else None
     else:
-        print '?'    
+        print '? D buffername (string)'    
 
 
 # Displaying information
@@ -165,14 +164,15 @@ def m():
 
 def p(*args):
     """
-    args is empty defaults (.,.) or (i) start line or (i,j) start, end lines
     Print lines i through j in the current buffer
+    i defaults to dot, j defaults to i
+    Does not change dot
     """
     nargs = len(args)
     if nargs == 0:
         i,j = o(),o()
     elif nargs == 1:
-        i,j = args[0],o()
+        i,j = args[0],args[0]
     else: # nargs > 1
         i,j = args[0],args[1]
     if current in buffers and (0 <= i <= S()) and (0 <= j <= S()) and (i <= j):
@@ -180,7 +180,7 @@ def p(*args):
         for iline in xrange(i,j+1): # xrange upper limit is not inclusive
             print text[iline].rstrip() # strip trailing \n
     else: 
-        print '?'
+        print '? p start (int) end (int)'
 
     
 def l(*args):
@@ -193,13 +193,16 @@ def l(*args):
     """
     if args:
         i = args[0]
+        if not isinstance(i,int):
+            print '? l line (int)'
+            return
     else:
         i = o() + 1
     if current in buffers and (0 <= i <= S()):
         buf().dot = i
         print (lines()[i]).rstrip() # strip trailing \n
     else:
-        print '?'
+        print '? l line (int)'
 
 # Adding, changing, and deleting text
 
@@ -209,7 +212,7 @@ def a(*args):
     Here the first argument i might be missing but the next argument,
     the text - a string - is almost always going to be present.
     """
-    return add_text(True, *args)
+    return changelines(a, *args)
 
 def i(*args):
     """
@@ -217,34 +220,45 @@ def i(*args):
     Here the first argument i might be missing but the next argument,
     the text - a string - is almost always going to be present.
     """
-    return add_text(False, *args)
+    return changelines(i, *args)
 
 
-def add_text(append, *args):
+def changelines(func, *args):
     """
     implements both append *a* and insert *i* commands
-    append is Boolean argument, True for *a* and False for *i*
+    func is the function to perform - pass in function object, not name
     """
-    iline, text = o(), None # defaults
+    iline,jline, text = o(),o(),None # defaults, 'i' is name of insert fcn
     nargs = len(args)
     if nargs == 0:
-        print '?'
+        print '? a|i line (int) text (string)'
         return
     elif nargs == 1:
-        bigstring = args[0] # FIXME? check bigstring is a string
-    else: # nargs > 1:
-        iline, bigstring = args[0], args[1] # FIXME? check types
+        bigstring = args[0]
+    elif nargs == 2:
+        iline, bigstring = args[0], args[1]
+    elif nargs == 3: # used for change only
+        iline, jline, bigstring = args[0], args[1]
     newlines = [ line + '\n' for line in bigstring.split('\n') ]
     old_dot = o()
     if current in buffers and (0 <= iline <= S()): # unempty buffer
-        point = o()+1 if append else o() # else is for insert
-        buf().lines[point:point] = newlines
+        if func == a: # append
+            start = iline+1 
+            end = start
+        elif func == i: # insert 
+            start = iline
+            end = start
+        # other functions to come?
+        else: 
+            print '? a|i (function object)'
+            return
+        buf().lines[start:end] = newlines
         buf().dot = old_dot + len(newlines)
     elif current in buffers and not lines(): # empty buffer
         buf().lines = newlines
         buf().dot = len(newlines) - 1
-    else: # no buffer or bad iline
-        print '?'
+    else: # no buffer or bad iline,jline
+        print '? a|i line (int) text (string)'
         return
     if newlines:
         buf().unsaved = True

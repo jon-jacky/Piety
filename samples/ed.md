@@ -106,21 +106,23 @@ Data structures:
 Commands - Working with files and buffers:
 
 - *B(name)*: Create a new **B**uffer and load the file *name*.  Print
-   the number of lines read (0 when creating a new file). The new
-   buffer, also titled *name*, becomes the current buffer.
+   the file name and number of lines read (0 when creating a new
+   file). Set *dot* to the last line.  The new buffer, also titled
+   *name*, becomes the current buffer.
 
 - *u(name)*: Create a new empty b **u**ffer named *name*.  Do not read
   any file.  The new buffer becomes the current buffer.
 
 - *r(name, i)*: **r**ead file *name* into the current buffer after line
-  *i* (default .).  Print the number of lines read.
+  *i* (default .).  Print the file name and number of lines read.
+  Set *dot* to the last line read.
 
-- *b(name)*: Set current **b**uffer to *name*.
+- *b(name)*: Set current **b**uffer to *name*.  Do not change its *dot*.
 
-- *w(name, i, j)*: **w**rite lines *i* through *j* in current buffer
-  (defaults *0* and *$*, the entire buffer) to file *name* (default:
-  current buffer name).  Print the file name and the number of lines written.
-  Does not change *dot*.
+- *w(name)*: **w**rite current buffer to file *name* 
+  (default: stored file name, or if none, current buffer name).  
+  Print the file name and the number of lines written.
+  Does not change *dot*.  Does not change stored filename.
 
 - *D(name)*: **D**elete buffer *name* (default: current buffer).  If 
   buffer has unsaved changes, prompt for confirmation.  
@@ -137,8 +139,8 @@ Displaying information:
 
 Displaying and navigating text:
 
-- *p(i, j)*: **p**rint lines *i* through *j* in the current buffer
-  (defaults .,.).
+- *p(i, j)*: **p**rint lines *i* through *j* in the current buffer.
+    *i* defaults to *dot*, *j* defaults to *i*.  Does not change *dot*.
 
 - *l(i)*: Move *dot* to **l**ine *i* and print it.  Defaults to *.+1*,
   the line after *dot*, so repeatedly invoking *l()* advances through
@@ -147,30 +149,32 @@ Displaying and navigating text:
 
 Adding, changing, deleting text:
 
-- *a(i, text)*: **a**ppend *text* after line *i* (default .).
+- *a(i, text)*: **a**ppend *text* after line *i* (default .).  Set
+   *dot* to the last line appended.
    
-- *i(i, text)*: **i**nsert *text* before line *i* (default .).
+- *i(i, text)*: **i**nsert *text* before line *i* (default .).  Set
+   *dot* to the last line inserted.
 
-- *c(i,j)*: **c**hange (replace) text from lines *i* through *j*
-   (default .,.), using input mode
+- *c(i,j, text)*: **c**hange (replace) lines *i* through *j* to *text*.
+   (*i,j* default to .,.).  Set *dot* to the last replacement line.
 
 - *s(pattern,new,i,j,global)*: **s**ubstitute *new* for *pattern* in lines
    *i* thrugh *j*. When *global* is *True* (the default), substitute
    all occurrences in each line. To substitute only the first
    occurence on each line, set *global* to *False*.  Lines *i,j* default
    to .,.  The special patterns *'%'* and *'$'* indicate the 
-   beginning and end of the line.
+   beginning and end of the line.  Set *dot* to the last changed line.
    
-- *d(i,j)*: **d**elete text from lines *i* through *j* (default .,.).  
-  Set *dot* to the first undeleted line.
+- *d(i,j)*: **d**elete text from lines *i* through *j* (default .,.).
+   Set *dot* to the first undeleted line.
 
 Command mode:
 
 - *ed()*: Enter command mode.
 
 - *q()*: **q**uit command mode.  No buffers or other context are
-  deleted so it is possible to resume the command mode session with
-  *ed()* again.
+  deleted so it is possible to continue editing using the Python API,
+  or to resume the command mode session with *ed()* again.
 
 ### Command mode ###
 
@@ -216,14 +220,14 @@ integer index).  As usual for Python (but unlike Unix *ed*) 0
 indicates the first line in the buffer.  The index -1 indicates the
 last line in the buffer, and other negative numbers index backward
 from the end (as usual for Python).  Line numbers can be represented
-relative to *dot* or the last line, for example *o + 1* (the line
-after *dot*) or *S - 3* (three lines before the last).
+relative to *dot* or the last line, for example *o() + 1* (the line
+after *dot*) or *S() - 3* (three lines before the last).
 
 In each *ed* function call where they might appear, lines *i* and *j*
 are always optional arguments in that order (declared with * *args*
 syntax), with defaults (if used) assigned in the function body.
 Usually *i* and *j* both default to . (*dot*), or *i, j* default to
-*0, S* (beginning to end, the whole buffer).
+*0, S()* (beginning to end, the whole buffer).
 
 Lines *i* and *j* can also be identified by the patterns (substrings)
 they contain.  If you provide a string instead of a number for *i* or
@@ -246,4 +250,4 @@ These commands are implemented:
 For now, line addresses *i* and *j* must be integers.  Text patterns are not
 yet supported.
 
-Revised Oct 2013
+Revised Nov 2013
