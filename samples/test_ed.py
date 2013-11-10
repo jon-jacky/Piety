@@ -53,7 +53,7 @@ print
 print "> print o()    # current line index"
 print o()
 print
-print "> print S()    # last line index"
+print "> print S()    # length of buffer, last line index + 1"
 print S()
 print
 print "> m()          # current buffer status"
@@ -137,6 +137,34 @@ print
 
 print "> w()  # write file"
 w()
+print
+
+print "> l(12) # go to line 12 and print"
+l(12)
+print
+
+print "> p() # print current line"
+p()
+print
+
+print "> d() # delete dot"
+d()
+print
+
+print "> p() # print current line"
+p()
+print
+
+print "> d(o(),S()) # delete current line through the end"
+d(o(),S())
+print
+
+print "> p() # print current line"
+p()
+print
+
+print "> p(0,S()) # print entire buffer"
+p(0,S())
 print
 
 print '# Remove new.txt before running this script again, to obtain the same results'

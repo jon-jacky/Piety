@@ -18,43 +18,71 @@ class Buffer(object):
     def __init__(self):
         """
         New text buffer
+        Be careful to only access lines by slice not index
+        Then dot == 0 works even when lines == []
         """
-        self.lines = list() # text in the current buffer, a list of strings
-        self.dot = None # index of current line dot . in lines
+        self.lines = [] # text in the current buffer, a list of strings
+        self.dot = 0 # index of current line dot . in lines
         self.filename = None # filename (string) 
         self.unsaved = False # True if  buffer contains unsaved changes
 
-buffers = dict() # dictionary from buffer names (strings) to buffers
+current = 'scratch'  #  name of the current buffer, start with scratch buffer
 
-current = None #  name of the current buffer, None if no buffers
+# the state of ed is a dictionary from buffer names (strings) to buffers
+# start with an empty scratch buffer, there is always a current buffer
+buffers = dict() 
+buffers[current] = Buffer()
 
-# Any function might be called in the initial state with no buffers
+# Access to data structures
 
 def buf():
     """
     The current buffer: text and metadata
     """
-    # buffers might be empty
-    return buffers[current] if current in buffers else None
+    return buffers[current]
 
 def lines():
     """
     Text in the current buffer: a list of lines
     """
-    return buf().lines if current in buffers else None
+    return buf().lines
 
 def o():
     """
-    ., index of the current line dot where text is changed/inserted by default
+    . (dot), index of the current line where text is changed/inserted by default
     """
-    return buf().dot if current in buffers else None
+    return buf().dot
 
 def S():
     """
-    $, index of the last line in the current buffer
+    $, number of lines in the current buffer, index of last line + 1
     """
-    nlines = len(buf().lines) if current in buffers else None
-    return nlines - 1 if nlines else None
+    return len(buf().lines)
+
+
+# helper functions for commands: get and check arguments
+
+def get_range(func, args):
+    """
+    Return start, end: ints that define range of lines.
+     func: function object to name in error msg
+     args: sequence of arguments (possibly empty)
+    Assign defaults for missing arguments
+    Check type and range.  If  error, print message and return None.
+    """
+    nargs = len(args)
+    if nargs == 0:
+        start, end = o(),o()+1
+    elif nargs == 1:
+        start, end = args[0], args[0]+1
+    else:
+        start, end = args[0], args[1]
+    if (isinstance(start, int) and isinstance(end, int)
+        and (0 <= start <= end <= S())):
+        return start, end
+    else:
+        print '? %s start line, end line' % func.__name__
+        return None
 
 
 # Commands - working with files and buffers
@@ -66,7 +94,7 @@ def B(filename):
     the current buffer.  The name of the buffer is the same as the
     filename, but without any path prefix.
     """
-    global buffers, current
+    global current
     if not isinstance(filename,str):
         print '? B filename (string)'
         return
@@ -104,7 +132,7 @@ def w(*args):
     """
     if len(args) > 0:
         name = args[0]
-    elif current in buffers and buf().filename:
+    elif buf().filename:
         name = buf().filename 
     else:
         name = current
@@ -115,7 +143,7 @@ def w(*args):
     for line in lines():
         fd.write(line)
     buf().unsaved = False
-    print '%s, %d' % (name, len(lines()))
+    print '%s, %d lines' % (name, len(lines()))
 
         
 def D(name):
@@ -123,13 +151,14 @@ def D(name):
     Delete buffer named 'name'
     """
     global buffers, current
-    if name in buffers:
+    # there must always be at least one buffer
+    if name in buffers and not name == 'scratch': 
         del buffers[name]
         if name == current: # pick a new current buffer
             keys = buffers.keys()
             current = keys[0] if keys else None
     else:
-        print '? D buffername (string)'    
+        print '? D buffername (string)'
 
 
 # Displaying information
@@ -141,150 +170,102 @@ def n():
     Also print name, ., $, and filename of each buffer.
     """
     for name in buffers:
-        # use %s not %d everwhere, dot might be None
         lines = buffers[name].lines
-        print '%s%s%-12s %6s%6s %s' % \
+        print '%s%s%-12s %6d%6d %s' % \
             ('.' if name == current else ' ',
              '*' if buffers[name].unsaved else ' ',
-             name, buffers[name].dot, 
-             len(lines)-1 if lines else None, # $, not N of lines
-             buffers[name].filename)
+             name, buffers[name].dot, len(lines), buffers[name].filename)
 
 def m():
     """
-    Print current line number, .  Also print other status
-    information: number of last line $, buffer name current,
-    filename.
+    Print current line index, dot.  Also print other status information:
+    length of buffer $, buffer name current, buffer filename.
     """
-    # use %s everywhere, not %d - . and $ might be None
-    if current in buffers: # initially None
-        print '%s/%s  %s  %s' % (o(),S(), current, buf().filename)
+    print '%d/%d  %s  %s' % (o(), S(), current, buf().filename)
+
 
 # Displaying and navigating text
 
 def p(*args):
     """
-    Print lines i through j in the current buffer
-    i defaults to dot, j defaults to i
-    Does not change dot
+    Print text in range. Do not change dot.
     """
-    nargs = len(args)
-    if nargs == 0:
-        i,j = o(),o()
-    elif nargs == 1:
-        i,j = args[0],args[0]
-    else: # nargs > 1
-        i,j = args[0],args[1]
-    if current in buffers and (0 <= i <= S()) and (0 <= j <= S()) and (i <= j):
-        text = lines()
-        for iline in xrange(i,j+1): # xrange upper limit is not inclusive
-            print text[iline].rstrip() # strip trailing \n
-    else: 
-        print '? p start (int) end (int)'
+    limits = get_range(p, args)
+    if limits:
+        start, end = limits
+    else:
+        return
+    for line in lines()[start:end]:
+        print line.rstrip() # strip trailing \n
 
     
 def l(*args):
     """
-    args is empty or (i), a line
-    Move dot to line i and print it. Defaults to .+1,
-    the line after dot, so repeatedly invoking l() advances through
-    the buffer, printing successive lines. Invoking l(pattern) moves
-    dot to the next line that contains pattern, and prints it.
+    args is iline
+    Move dot to line iline and print it. Defaults to .+1, line after dot,
+    so repeatedly invoking l() advances through the buffer, printing lines. 
     """
-    if args:
-        i = args[0]
-        if not isinstance(i,int):
-            print '? l line (int)'
-            return
+    if len(args) == 0:
+        iline = o() + 1
     else:
-        i = o() + 1
-    if current in buffers and (0 <= i <= S()):
-        buf().dot = i
-        print (lines()[i]).rstrip() # strip trailing \n
-    else:
-        print '? l line (int)'
+        iline = args[0]
+    if not (isinstance(iline, int) and (0 <= iline < S())):
+        print '? l line'
+        return
+    buf().dot = iline
+    print (lines()[iline]).rstrip() # strip trailing \n
+
 
 # Adding, changing, and deleting text
 
 def a(*args):
     """
     Append text after line i (default .)
-    Here the first argument i might be missing but the next argument,
-    the text - a string - is almost always going to be present.
     """
-    return changelines(a, *args)
+    return addlines(a, *args)
 
 def i(*args):
     """
     Insert text before line i (default .)
-    Here the first argument i might be missing but the next argument,
-    the text - a string - is almost always going to be present.
     """
-    return changelines(i, *args)
+    return addlines(i, *args)
 
 
-def changelines(func, *args):
+def addlines(func, *args):
     """
     implements both append *a* and insert *i* commands
     func is the function to perform - pass in function object, not name
+    args might be iline, text or just text
     """
-    iline,jline, text = o(),o(),None # defaults, 'i' is name of insert fcn
+    iline, bigstring = o(), '' # defaults
     nargs = len(args)
     if nargs == 0:
-        print '? a|i line (int) text (string)'
-        return
+        pass # use defaults
     elif nargs == 1:
         bigstring = args[0]
-    elif nargs == 2:
+    else:
         iline, bigstring = args[0], args[1]
-    elif nargs == 3: # used for change only
-        iline, jline, bigstring = args[0], args[1]
-    newlines = [ line + '\n' for line in bigstring.split('\n') ]
-    old_dot = o()
-    if current in buffers and (0 <= iline <= S()): # unempty buffer
-        if func == a: # append
-            start = iline+1 
-            end = start
-        elif func == i: # insert 
-            start = iline
-            end = start
-        # other functions to come?
-        else: 
-            print '? a|i (function object)'
-            return
-        buf().lines[start:end] = newlines
-        buf().dot = old_dot + len(newlines)
-    elif current in buffers and not lines(): # empty buffer
-        buf().lines = newlines
-        buf().dot = len(newlines) - 1
-    else: # no buffer or bad iline,jline
-        print '? a|i line (int) text (string)'
+    if not (isinstance(iline, int) and isinstance(bigstring, str)
+            and (0 <= iline <= S())): # S() == 0 when buffer is enpty
+        print '? %s line (int) text (string)' % func.__name__
         return
+    if bigstring:
+        newlines = [ line + '\n' for line in bigstring.split('\n') ] 
+    else:
+        newlines = [] # no '\n' line when bigstring is empty
+    if func == a: # append
+        start = iline+1 
+    elif func == i: # insert 
+        start = iline
+    else:
+        print '? a or i (function object)'
+        return
+    end = start
+    buf().lines[start:end] = newlines
+    buf().dot = o() + len(newlines)
     if newlines:
         buf().unsaved = True
 
-
-def get_range(func, args):
-    """
-    Return start, end: ints that define range of lines.
-     func: function object to name in error msg
-     args: sequence of arguments (possibly empty)
-    Assign defaults for mussing arguments
-    Check type and range.  If  error, print message and return None.
-    """
-    nargs = len(args)
-    if nargs == 0:
-        start, end = o(),o()+1
-    elif nargs == 1:
-        start, end = args[0], args[0]+1
-    elif nargs == 2:
-        start, end = args[0], args[1]
-    if (isinstance(start, int) and isinstance(end, int)
-        and (0 <= start < end <= S())):
-        return start, end
-    else:
-        print '? %s start line, end line' % func.__name__
-        return None
 
 def d(*args):
     """
