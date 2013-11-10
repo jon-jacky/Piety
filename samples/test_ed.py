@@ -5,7 +5,7 @@ Run this script from the directory above Piety, it uses relative paths:
 
  python -i Piety/samples/test_ed.py
 
-ed functions tested in this version: B n m p l o S b D i a w
+ed functions tested in this version: B n m p l o S b D i a w d
 
 """
 

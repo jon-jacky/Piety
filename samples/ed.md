@@ -68,6 +68,34 @@ Likewise, you can edit in the buffers with Python commands not
 provided in *ed*, for example with any of the string or regular
 expression functions or methods.
 
+### Python API conventions ###
+
+Many *ed* functions take arguments indicating a line *i* or a range
+of lines *i, j*.  Like Python sequences (but unlike Unix *ed*), line
+numbers begin with 0 (not 1), and the range *i,j* includes line *i* but
+excludes line *j*.  For example, the range *5,8* includes the three lines
+indexed *5,6,7* and the range *5,6* includes just line *5*.
+
+The current line (where, by default, text is changed or inserted) is
+called *dot* (indicated in *ed* command mode by a period *.*).  After
+most commands, *dot* is updated to the last line affected (the last
+line inserted, etc.).  The index of the current line *dot* and the
+length of the buffer are returned by the function calls *o()* and
+*S()* (which look like the *.* and *$* used in command mode).  The
+index of the last line is *S() - 1*, so the range *0,S()* is the whole
+buffer.
+
+Function arguments *i,j* are always optional.  The default for *i* is
+usually *dot*, the default for *j* (if *i* is given) is usually *i+1*,
+and the default for *i,j* (if both are omitted) is usually *.,.+1* but
+sometimes *0,S()*.
+
+Lines *i* and *j* can be identified by the patterns (substrings) they
+contain, instead of their integer indices.  If you provide a string
+*/text/* instead of a number for the *i* or *j* argument, *ed* uses
+the first line after *dot* which contains *text*.  To search backward
+from *dot*, use *\text\*. (This feature is not yet implemented.)
+
 ### Python API summary ###
 
 These are the Python functions and attributes (variables) in
@@ -81,7 +109,7 @@ Data structures:
 
 - *buffers*: dictionary from buffer names (strings) to Buffer instances
 
-- *current*: name of the current buffer
+- *current*: name of the current buffer where changes are made.
 
 - *buf()*: returns *buffers[current]*, the current buffer
 
@@ -97,11 +125,14 @@ Data structures:
 
 - *lines()*: returns *buf().lines*
 
-- *o()*: returns *buf().dot*, index of current line in *lines*.
-   Perhaps it resembles the period *.* used in *ed* command mode.
+- *o()*: returns *buf().dot*, index of the current line in *lines*.  The
+   name *o* resembles the period *.* used to indicae *dot* in *ed*
+   command mode.
 
-- *S()*: returns *len(buf().lines) - 1*, index of last line in *lines*.
-  Roughly resembles the dollar sign *$* used in *ed* command mode.
+- *S()*: returns *len(buf().lines)*, the length of the buffer.  The
+  index of the last line is *S()-1*.  The name *S* resembles the
+  dollar sign *$* used to indicate the end of the buffer in *ed*
+  command mode.
 
 Commands - Working with files and buffers:
 
@@ -119,10 +150,10 @@ Commands - Working with files and buffers:
 
 - *b(name)*: Set current **b**uffer to *name*.  Do not change its *dot*.
 
-- *w(name)*: **w**rite current buffer to file *name* 
-  (default: stored file name, or if none, current buffer name).  
-  Print the file name and the number of lines written.
-  Does not change *dot*.  Does not change stored filename.
+- *w(name)*: **w**rite current buffer to file *name* (default: stored
+  file name, or if none, current buffer name). Print the file name and
+  the number of lines written.  Does not change *dot*.  Does not
+  change stored filename.
 
 - *D(name)*: **D**elete buffer *name* (default: current buffer).  If 
   buffer has unsaved changes, prompt for confirmation.  
@@ -133,19 +164,19 @@ Displaying information:
   . (period).  Buffers with unsaved changes are marked with an asterisk.
   Also print ., *$*, and *filename* of each buffer.
 
-- *m()*: Print current line nu **m**ber, ..  Also print other status
-   information: number of last line *$*, buffer name *current*,
-   *filename*.
+- *m()*: Print current line nu **m**ber, *dot*.  Also print number of
+   lines *$*, buffer name *current*, and its *filename*.
 
 Displaying and navigating text:
 
 - *p(i, j)*: **p**rint lines *i* through *j* in the current buffer.
-    *i* defaults to *dot*, *j* defaults to *i*.  Does not change *dot*.
+    *i* defaults to *dot*, *j* defaults to *i+1*.  Does not change *dot*.
 
 - *l(i)*: Move *dot* to **l**ine *i* and print it.  Defaults to *.+1*,
   the line after *dot*, so repeatedly invoking *l()* advances through
-  the buffer, printing successive lines.  Invoking *l(pattern)* moves
-  *dot* to the next line that contains *pattern*, and prints it.
+  the buffer, printing successive lines.  Invoking *l(/text/)* moves
+  *dot* forward to the next line that contains *text*, and prints it.
+  *l(\text\\)* moves *dot* backward.
 
 Adding, changing, deleting text:
 
@@ -155,17 +186,17 @@ Adding, changing, deleting text:
 - *i(i, text)*: **i**nsert *text* before line *i* (default .).  Set
    *dot* to the last line inserted.
 
-- *c(i,j, text)*: **c**hange (replace) lines *i* through *j* to *text*.
-   (*i,j* default to .,.).  Set *dot* to the last replacement line.
+- *c(i,j, text)*: **c**hange (replace) lines *i* up to *j* to *text*.
+   (*i,j* default to .,.+1).  Set *dot* to the last replacement line.
 
 - *s(pattern,new,i,j,global)*: **s**ubstitute *new* for *pattern* in lines
-   *i* thrugh *j*. When *global* is *True* (the default), substitute
+   *i* up to *j*. When *global* is *True* (the default), substitute
    all occurrences in each line. To substitute only the first
    occurence on each line, set *global* to *False*.  Lines *i,j* default
-   to .,.  The special patterns *'%'* and *'$'* indicate the 
+   to .,.+1  The special patterns *'%'* and *'$'* indicate the 
    beginning and end of the line.  Set *dot* to the last changed line.
    
-- *d(i,j)*: **d**elete text from lines *i* through *j* (default .,.).
+- *d(i,j)*: **d**elete text from lines *i* up to *j* (default .,.+1).
    Set *dot* to the first undeleted line.
 
 Command mode:
@@ -180,9 +211,10 @@ Command mode:
 
 For command mode syntax, consult any Unix *ed* reference.  In brief:
 one or two line numbers as needed *precede* the single letter command,
-separated by commas.  Dot is indicated by a period and the last line
-is indicated by the dollar sign *$*.  So the function call to print
-the from the line before *dot* to three lines before the end is:
+separated by commas.  Dot is indicated by a period and the length of
+the buffer is indicated by the dollar sign *$*.  So the function call
+to print the from the line before *dot* to three lines before the end
+is:
 
     p(o()-1,S()-3)
 
@@ -193,55 +225,14 @@ The corresponding command is:
 The command names are the same as the function names, except *m*
 (print line nu **m**ber) is the command *=*, and the function *l*
 (move *dot* to line *i* and print) is the empty command - just type a
-line number or search string, then *Return*.
-
-### Python API explanation ###
-
-There may be several named text buffers, all stored in the variable
-*buffers*, a dictionary from buffer names (strings) to buffer
-instances.  Most commands apply to the *current buffer*, identified by
-its name in the variable *current*.  The function call *buf()* returns
-*buffers[current]*.  The contents of the current buffer are stored in
-an array of lines (strings).  The function call *lines()* returns
-*buf().lines*.
-
-The current line (where, by default, text is changed or inserted) is
-called *dot*.  After most commands, *dot* is updated to the last line
-affected (the last line read in from a file, etc.).  The current line
-*dot* and the last line in the buffer are returned by the function calls
-*o()* and *S()*, which look like . (period) and *$*, used in *ed* command
-mode.  Our . and *$* are integer indices into the list of strings,
-so *dot*, the current line, can be accessed as *lines()[o()]*.
-
-Many commands apply to a line *i* or to a range of lines starting with
-*i* (included) up through line *j* (also included, unlike Python
-slices).  Lines *i* and *j* can be identified by line number (an
-integer index).  As usual for Python (but unlike Unix *ed*) 0
-indicates the first line in the buffer.  The index -1 indicates the
-last line in the buffer, and other negative numbers index backward
-from the end (as usual for Python).  Line numbers can be represented
-relative to *dot* or the last line, for example *o() + 1* (the line
-after *dot*) or *S() - 3* (three lines before the last).
-
-In each *ed* function call where they might appear, lines *i* and *j*
-are always optional arguments in that order (declared with * *args*
-syntax), with defaults (if used) assigned in the function body.
-Usually *i* and *j* both default to . (*dot*), or *i, j* default to
-*0, S()* (beginning to end, the whole buffer).
-
-Lines *i* and *j* can also be identified by the patterns (substrings)
-they contain.  If you provide a string instead of a number for *i* or
-*j*, *ed* uses the first line after *dot* which contains that
-string. If the string begins with a minus sign, *ed* searches backward
-and uses the last line before *dot* that contains that string (to
-search forward for a string that begins with a minus sign, precede the minus
-with a backslash).
+line number or search string, then *Return*.  Just pressing *Return* 
+advances *dot* to the next line and prints it.
 
 ### Status ###
 
 These API variables and functions are implemented:
 
-*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i*
+*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i, d*
 
 These commands are implemented:
 
