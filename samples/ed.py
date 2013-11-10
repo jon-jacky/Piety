@@ -263,3 +263,38 @@ def changelines(func, *args):
     if newlines:
         buf().unsaved = True
 
+
+def get_range(func, args):
+    """
+    Return start, end: ints that define range of lines.
+     func: function object to name in error msg
+     args: sequence of arguments (possibly empty)
+    Assign defaults for mussing arguments
+    Check type and range.  If  error, print message and return None.
+    """
+    nargs = len(args)
+    if nargs == 0:
+        start, end = o(),o()+1
+    elif nargs == 1:
+        start, end = args[0], args[0]+1
+    elif nargs == 2:
+        start, end = args[0], args[1]
+    if (isinstance(start, int) and isinstance(end, int)
+        and (0 <= start < end <= S())):
+        return start, end
+    else:
+        print '? %s start line, end line' % func.__name__
+        return None
+
+def d(*args):
+    """
+    delete text in range
+    Set dot to the first undeleted line
+    """
+    limits = get_range(d, args)
+    if limits:
+        start, end = limits
+    else:
+        return
+    buf().lines[start:end] = []
+    buf().dot = min(start, S()-1) # if we deleted end of buffer

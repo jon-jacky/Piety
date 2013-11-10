@@ -139,7 +139,7 @@ print "> w()  # write file"
 w()
 print
 
-print '# Must remove new.txt before running this script again'
+print '# Remove new.txt before running this script again, to obtain the same results'
 print
 
 
