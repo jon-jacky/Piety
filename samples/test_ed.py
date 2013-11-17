@@ -30,7 +30,7 @@ print "> m() # describe current buffer"
 m()
 print
 
-print "> p(0,5) # print lines 0..5"
+print "> p(0,5) # print lines 0 up to 5"
 p(0,5)
 print
 print "> l(6) # set . to line 6 and print"
@@ -92,6 +92,8 @@ print '...'
 i("""Line 1  
 Line 2
 Line 3""")
+print "> p() # print the current line"
+p()
 print "> p(0,S()) # print the entire buffer"
 p(0,S())
 print 
@@ -101,6 +103,8 @@ print '...'
 a("""Line A
 Line B
 Line C""")
+print "> p() # print the current line"
+p()
 print "> p(0,S())   # print the entire buffer"
 p(0,S())
 print
@@ -110,18 +114,22 @@ print '...'
 i(0, """Line a
 Line b
 Line c""")
+print "> p() # print the current line"
+p()
 print "> p(0,S())   # print the entire buffer"
 p(0,S())
 print
 
 
-print '> l(4)  # move to the middle of the buffer'
-l(4)
+print '> l(3)  # move to the middle of the buffer'
+l(3)
 print '> i("""Line i   # insert in the middle of the buffer'
 print '...'
 i("""Line i
 Line ii
 Line iii""")
+print "> p() # print the current line"
+p()
 print "> p(0,S())   # print the entire buffer"
 p(0,S())
 print
@@ -131,6 +139,8 @@ print '...'
 a("""Line I
 Line II
 Line III""")
+print "> p() # print the current line"
+p()
 print "> p(0,S())   # print the entire buffer"
 p(0,S())
 print
@@ -169,8 +179,3 @@ print
 
 print '# Remove new.txt before running this script again, to obtain the same results'
 print
-
-
-
-       
-              
