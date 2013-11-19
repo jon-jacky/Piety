@@ -5,6 +5,8 @@ Run this script from the directory above Piety, it uses relative paths:
 
  python -i Piety/samples/test_ed.py
 
+ Remove test_ed.txt before running this script again, to obtain the same results
+
 ed functions tested in this version: B n m p l o S b D i a w d
 
 """
@@ -17,8 +19,8 @@ from ed import *
 print "> B(42) # filename expected, print error message"
 B(42)
 print
-print "> B('new.txt') # read new file"
-B('new.txt')
+print "> B('test_ed.txt') # read new file"
+B('test_ed.txt')
 print
 print "> B('Piety/samples/ed.py') # read existing file"
 B('Piety/samples/ed.py')
@@ -65,8 +67,8 @@ n()
 print
 
 print
-print "> b('new.txt') # set current buffer"
-b('new.txt')
+print "> b('test_ed.txt') # set current buffer"
+b('test_ed.txt')
 print 
 print "> m() # current buffer"
 m()
@@ -177,5 +179,5 @@ print "> p(0,S()) # print entire buffer"
 p(0,S())
 print
 
-print '# Remove new.txt before running this script again, to obtain the same results'
+print '# Remove test_ed.txt before running this script again, to obtain the same result'
 print
