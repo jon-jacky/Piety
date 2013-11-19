@@ -290,7 +290,8 @@ def do_ai(f, iline, placeholder, string):
     """
     newlines = [ line + '\n' for line in string.split('\n') ]
     if string:
-        start = iline if f == i else iline+1 # i insert else a append
+        # empty buffer when not lines() is a special case for append
+        start = iline if (f == i or not lines()) else iline+1 # insert else append
         end = start
         buf().lines[start:end] = newlines
         buf().dot = start + len(newlines)-1
