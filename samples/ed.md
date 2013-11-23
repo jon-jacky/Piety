@@ -152,8 +152,8 @@ Commands - Working with files and buffers:
 
 - *w(name)*: **w**rite current buffer to file *name* (default: stored
   file name, or if none, current buffer name). Print the file name and
-  the number of lines written.  Does not change *dot*.  Does not
-  change stored filename.
+  the number of lines written.  Do not change *dot*. 
+  Change buf().filename to name, so subsequent writes go to the same file.
 
 - *D(name)*: **D**elete buffer *name* (default: current buffer).  If 
   buffer has unsaved changes, prompt for confirmation.  
@@ -232,7 +232,7 @@ advances *dot* to the next line and prints it.
 
 These API variables and functions are implemented:
 
-*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i, d*
+*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i, d, u, r, c*
 
 These commands are implemented:
 

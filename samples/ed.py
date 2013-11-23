@@ -78,8 +78,8 @@ def do_cmd(f, f_cmd, args):
      f is only used for f.__name__ in the error message.
     f_cmd is the function that does the work, with arg list (f, start,end,string)
      f_cmd must take all 4 args, can assume they are valid, need not use them all
-    If args are all valid, call f_cmd
-    If any arg not valid, print error message and return, don't call f_cmd
+    If args are all valid, call f_cmd and return True
+    If any arg not valid, print error message and return False, don't call f_cmd
     """
     if lines():
         start, end, string = o(), o()+1, ''
@@ -95,7 +95,7 @@ def do_cmd(f, f_cmd, args):
             string = args[0]
         else:
             print '? %s arg is not int or string' % f.__name__
-            return
+            return False
     elif len(args) == 2:
         if isinstance(args[0], int) and isinstance(args[1], int):
             start, end  = args[0], args[1]
@@ -104,28 +104,95 @@ def do_cmd(f, f_cmd, args):
             end = start + 1
         else:
             print '? %s args are not int,int or int,string' % f.__name__
-            return
+            return False
     elif len(args) == 3:
         if not (isinstance(args[0], int) and isinstance(args[1], int)
                 and isinstance(args[2], str)):
             print '? %s args are not int,int,string' % f.__name__
-            return
+            return False
         else:
             start, end, string = args[0], args[1], args[2]
     else:
         print '? %s more than 3 args given' % funct.__name__
-        return
+        return False
     # print 'dot %s   start %d    end %d   S() %d' % (o(), start, end, S()) #DEBUG
     if not ((lines() and 0 <= start <= end <= S()) # allow start == end, nop
             or (not(lines()) and 0 == start == S())): # empty buffer
         print '? %s start, end out of range or wrong order' % f.__name__
-        return
+        return False
     else:
         f_cmd(f, start, end, string)
-    
+        return True
+
+def no_cmd(f, start, end, string):
+    """
+    does nothing, call do_cmd on this function just to check arguments
+    """
+    pass
+
 
 # Commands - working with files and buffers
 
+def u(name):
+    """
+    Create a new empty buffer, make it the current buffer
+    """
+    if not isinstance(name, str):
+        print '? u name (string)'
+        return 
+    if name in buffers:
+        print '? name in use'
+        return
+    u_cmd(name)
+
+def u_cmd(name):
+    """
+    do u (new buffer) command, assume valid arguments
+    """
+    global current
+    temp = Buffer()
+    buffers[name] = temp
+    current = name
+
+
+def r(*args):
+    """
+    r(iline, filename) read file into the current buffer after iline (default .)
+    Print the file name and number of lines read. Set *dot* to the last line read.
+    """
+    if len(args) == 1 and isinstance(args[0], str):
+        filename = args[0]
+        iline = o() if lines() else 0 # o() == None when buffer is empty
+    elif (len(args) == 2 and 
+          isinstance(args[0], int) and isinstance(args[1], int)):
+        iline = args[0]
+        filename = args[1]
+    else:
+        print '? r(iline, filename), iline optional'
+        return
+    if not ((lines() and 0 <= iline < S())
+            or (not(lines()) and 0 == iline == S())):
+        print '? iline out of range'
+        return
+    r_cmd(iline, filename)
+            
+        
+def r_cmd(iline, filename):
+    """
+    Do r (read file) command, assume valid arguments
+    """
+    if isfile(filename):
+        fd = open(filename, mode='r')        
+        lines = fd.readlines()
+        fd.close()
+        addlines(a, iline, lines) # a for append. Also updates dot, unsaved
+        nlines = len(lines)
+    # if no file, don't print error message, just say 0 lines read
+    else:
+        nlines = 0
+    print '%s, %d lines' % (filename, nlines)
+
+ 
 def B(filename):
     """
     Create a new Buffer and load the file name.  Print the number of
@@ -133,24 +200,13 @@ def B(filename):
     the current buffer.  The name of the buffer is the same as the
     filename, but without any path prefix.
     """
-    # FIXME?  Can't we build this out of functions u and r - ?
     global current
     if not isinstance(filename,str):
         print '? B filename (string)'
         return
-    temp = Buffer()
-    if isfile(filename):
-        fd = open(filename, mode='r')        
-        temp.lines = fd.readlines()
-        fd.close()
-    # else new file will be created when buffer is written out
-    temp.filename = filename
-    nlines = len(temp.lines) # might be 0
-    if nlines:
-        temp.dot = nlines - 1 # last line
-    current = basename(filename)
-    buffers[current] = temp
-    print '%s, %d lines' % (filename, nlines)
+    u_cmd(basename(filename)) # create buffer, make it current
+    buf().filename = filename
+    r_cmd(0, filename) # now new buffer is current, append at line 0
 
 
 def b(name):
@@ -169,7 +225,7 @@ def w(*args):
     w(name) write current buffer contents to file name 
     (default: stored filename or, if none, current buffer name). 
     Print the file name and the number of lines written. Does not change dot.
-    Does not change stored filename.
+    Change buf().filename to name, so subsequent writes go to the same file.
     """
     if len(args) > 0:
         name = args[0]
@@ -184,6 +240,7 @@ def w(*args):
     for line in lines():
         fd.write(line)
     buf().unsaved = False
+    buf().filename = name
     print '%s, %d lines' % (name, len(lines()))
 
         
@@ -207,6 +264,7 @@ def D(name):
     if name == current: # pick a new current buffer
         keys = buffers.keys()
         current = keys[0] if keys else None
+
 
 # Displaying information
 
@@ -243,7 +301,6 @@ def p_cmd(placeholder, start, end, placeholder1):
     """
     do p command, assumes valid arguments
     """
-    # FIXME: should yield to scheduler after N lines
     for line in lines()[start:end]:
         print line.rstrip() # strip trailing \n
     
@@ -272,30 +329,36 @@ def l(*args):
 
 def a(*args):
     """
-    a(i, text)  Append text after line i (default .)
+    a(iline, text)  Append text after iline (default .)
     """
-    do_cmd(a, do_ai, args)
+    do_cmd(a, ai_cmd, args)
 
 def i(*args):
     """
-    i(i, text)  Insert text before line i (default .)
+    i(iline, text)  Insert text before iline (default .)
     """
-    do_cmd(i, do_ai, args)
+    do_cmd(i, ai_cmd, args)
 
 
-def do_ai(f, iline, placeholder, string):
+def ai_cmd(f, iline, placeholder, string):
     """
     implements both append *a* and insert *i* commands
     f is the function to perform, used to select insertion point
     """
-    newlines = [ line + '\n' for line in string.split('\n') ]
     if string:
-        # empty buffer when not lines() is a special case for append
-        start = iline if (f == i or not lines()) else iline+1 # insert else append
-        end = start
-        buf().lines[start:end] = newlines
-        buf().dot = start + len(newlines)-1
-        buf().unsaved = True
+        newlines = [ line + '\n' for line in string.split('\n') ]
+        addlines(f, iline, newlines)
+
+def addlines(f, iline, newlines):
+    """
+    append or insert newlines in current buffer at iline, used by a i r commands
+    """
+    # empty buffer when not lines() is a special case for append
+    start = iline if (f == i or not lines()) else iline+1 # insert else append
+    end = start
+    buf().lines[start:end] = newlines
+    buf().dot = start + len(newlines)-1
+    buf().unsaved = True
 
 
 def d(*args):
@@ -323,6 +386,7 @@ def c(*args):
     c(i,j, text): change (replace) lines i up to j to text.
     (i,j default to .,.+1).  Set dot to the last replacement line.
     """
-    # FIXME not yet tested
-    d(args)
-    i(args)
+    if do_cmd(c, no_cmd, args):
+        # if we got this far, args are valid
+        do_cmd(d, d_cmd, args)
+        do_cmd(i, ai_cmd, args)

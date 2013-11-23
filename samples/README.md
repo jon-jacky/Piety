@@ -9,7 +9,7 @@ in *Piety/tests*.
 
 - **ed.md**: description of *ed*
 
-- **test_ed, test_ed_small**: test, demonstrate Python API for *ed*
+- **test_ed, test_ed_small, test_ed_urc**: test, demonstrate Python API for *ed*
 
 - **writer**: write to files to demonstrate interleaving concurrency
 

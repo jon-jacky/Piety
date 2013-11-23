@@ -12,17 +12,7 @@ Run this script from the directory above Piety, it uses relative paths:
 """
 
 from ed import *
-
-def test_cmd(f, descrip, *args):
-    print '> %s%s # %s' % (f.__name__, args, descrip)
-    f(*args) if args != ((),) else f() # empty args special case
-    print "> m() # print buffer status"
-    m()
-    print "> p() # print the current line"
-    p()
-    print "> p(0,S())   # print the entire buffer"
-    p(0,S())
-    print
+from test_cmd import test_cmd
 
 test_cmd(B, 'open new file', 'test_ed_small.txt')
 test_cmd(i, 'insert line in empty file', 'Line i')
