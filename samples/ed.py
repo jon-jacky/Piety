@@ -3,6 +3,9 @@ ed.py - ed is the standard text editor.  For more explanation see ed.md.
 
 Limitations: for now line addresses must be integers.
               Text patterns are not yet supported.
+
+This code is mostly argument checking and handling various special cases!
+
 """
 
 from os.path import isfile, basename
@@ -36,18 +39,21 @@ buffers[current] = Buffer()
 
 # Access to data structures
 
+# current buffer
 def buf():
     """
     The current buffer: text and metadata
     """
     return buffers[current]
 
+# content in current buffer
 def lines():
     """
     Text in the current buffer: a list of lines
     """
     return buf().lines
 
+# . dot, insertion point in current buffer
 def o():
     """
     . (dot), index of the current line where text is changed/inserted by default
@@ -55,6 +61,7 @@ def o():
     """
     return buf().dot
 
+# $, end of current buffer
 def S():
     """
     $, number of lines in the current buffer, index of last line + 1
@@ -64,22 +71,24 @@ def S():
 
 # helper functions for commands
 
+# check arguments, run command
 def do_cmd(f, f_cmd, args):
     """
     Get and check arguments from args, a sequence.
      then call function object f_cmd that does the work
+    f is the caller, a function object.  
+     f is only used for f.__name__ in the error message.
+    f_cmd is the function that does the work, with arg list (f, start,end,string)
+     f_cmd must take all 4 args, can assume they are valid, need not use them all
+    If args are all valid, call f_cmd and return tuple (start,end,string)
+    If any arg not valid, print error message and return False, don't call f_cmd
+    Return value makes it possible to check args just once, then call g_cmd etc.
     Getting args is not trivial because usually every arg is optional
     Currently handles six cases, where args is:
      0:() 1a:(start) 1b:(string) 2a:(start,end) 2b:(start,string) 
       3:(start,end,string)
     All other cases are errors
-    For now start, end must be int. Later we can add cases for /text/
-    f is the caller, a function object.  
-     f is only used for f.__name__ in the error message.
-    f_cmd is the function that does the work, with arg list (f, start,end,string)
-     f_cmd must take all 4 args, can assume they are valid, need not use them all
-    If args are all valid, call f_cmd and return True
-    If any arg not valid, print error message and return False, don't call f_cmd
+    For now start and end must be int. Later we can add cases for /text/
     """
     if lines():
         start, end, string = o(), o()+1, ''
@@ -122,17 +131,11 @@ def do_cmd(f, f_cmd, args):
         return False
     else:
         f_cmd(f, start, end, string)
-        return True
-
-def no_cmd(f, start, end, string):
-    """
-    does nothing, call do_cmd on this function just to check arguments
-    """
-    pass
-
+        return start, end, string
 
 # Commands - working with files and buffers
 
+# create new buffer
 def u(name):
     """
     Create a new empty buffer, make it the current buffer
@@ -154,7 +157,7 @@ def u_cmd(name):
     buffers[name] = temp
     current = name
 
-
+# read file into current buffer
 def r(*args):
     """
     r(iline, filename) read file into the current buffer after iline (default .)
@@ -192,7 +195,7 @@ def r_cmd(iline, filename):
         nlines = 0
     print '%s, %d lines' % (filename, nlines)
 
- 
+# read file, create buffer
 def B(filename):
     """
     Create a new Buffer and load the file name.  Print the number of
@@ -208,7 +211,7 @@ def B(filename):
     buf().filename = filename
     r_cmd(0, filename) # now new buffer is current, append at line 0
 
-
+# set current buffer
 def b(name):
     """
     Set current buffer to name
@@ -219,7 +222,7 @@ def b(name):
     else:
         print '? b buffername (string)'
 
-
+# write buffer to file
 def w(*args):
     """
     w(name) write current buffer contents to file name 
@@ -244,6 +247,7 @@ def w(*args):
     print '%s, %d lines' % (name, len(lines()))
 
         
+# delete buffer
 def D(name):
     """
     Delete buffer named 'name'
@@ -268,6 +272,7 @@ def D(name):
 
 # Displaying information
 
+# buffers
 def n():
     """
     Print buffer names.  Current buffer is marked with
@@ -281,6 +286,7 @@ def n():
              name, buffers[name].dot, len(buffers[name].lines),
              buffers[name].filename)
 
+# current buffer
 def m():
     """
     Print current line index, dot.  Also print other status information:
@@ -291,6 +297,7 @@ def m():
 
 # Displaying and navigating text
 
+# print
 def p(*args):
     """
     p(i, j) Print text in range, default .,.+1.  Do not change dot.
@@ -304,7 +311,7 @@ def p_cmd(placeholder, start, end, placeholder1):
     for line in lines()[start:end]:
         print line.rstrip() # strip trailing \n
     
-
+# advance to line and print
 def l(*args):
     """
     l(iline) Move dot to line iline and print it. Defaults to .+1, line after dot,
@@ -327,18 +334,19 @@ def l(*args):
 
 # Adding, changing, and deleting text
 
+# append
 def a(*args):
     """
     a(iline, text)  Append text after iline (default .)
     """
     do_cmd(a, ai_cmd, args)
 
+# insert
 def i(*args):
     """
     i(iline, text)  Insert text before iline (default .)
     """
     do_cmd(i, ai_cmd, args)
-
 
 def ai_cmd(f, iline, placeholder, string):
     """
@@ -360,7 +368,7 @@ def addlines(f, iline, newlines):
     buf().dot = start + len(newlines)-1
     buf().unsaved = True
 
-
+# delete
 def d(*args):
     """
     d(i,j)  delete text in range, default .,.+1
@@ -380,13 +388,21 @@ def d_cmd(placeholder, start, end, placeholder1):
         else:
             buf().dot = None
         
-
+# change (replace)
 def c(*args):
     """
     c(i,j, text): change (replace) lines i up to j to text.
     (i,j default to .,.+1).  Set dot to the last replacement line.
     """
-    if do_cmd(c, no_cmd, args):
-        # if we got this far, args are valid
-        do_cmd(d, d_cmd, args)
-        do_cmd(i, ai_cmd, args)
+    # delete then insert
+    # if args are not valid, do_cmd does not change buffer and returns False
+    valid_args = do_cmd(d, d_cmd, args) # delete if args are valid
+    if valid_args:
+        start, end, string = valid_args
+        # now must reevaluate o(), preceding delete changed it
+        # new o() is first line after deletes, so usually must insert not append
+        # BUT last line is a special case, here o() is last line so must append
+        # BUT BUT when last line is also first line is a special special case
+        # Must check 'start' to find if that one line was start or end of file
+        f = i if o() < S()-1 or start == 0 else a # f = insert if ... else append
+        ai_cmd(f,o(),end,string) # end here is placeholder, required but not used

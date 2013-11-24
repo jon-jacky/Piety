@@ -152,11 +152,13 @@ Commands - Working with files and buffers:
 
 - *w(name)*: **w**rite current buffer to file *name* (default: stored
   file name, or if none, current buffer name). Print the file name and
-  the number of lines written.  Do not change *dot*. 
-  Change buf().filename to name, so subsequent writes go to the same file.
+  the number of lines written.  Do not change *dot*.  Change
+  *buf().filename* to *name*, so subsequent writes (with no
+  argument) go to the same file.
 
-- *D(name)*: **D**elete buffer *name* (default: current buffer).  If 
-  buffer has unsaved changes, prompt for confirmation.  
+- *D(name)*: **D**elete buffer *name* (default: current buffer).  If
+  buffer has unsaved changes, prompt for confirmation (the
+  confirmation prompt is not currently implemented).
 
 Displaying information:
 
