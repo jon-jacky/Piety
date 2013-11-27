@@ -86,9 +86,11 @@ index of the last line is *S() - 1*, so the range *0,S()* is the whole
 buffer.
 
 Function arguments *i,j* are always optional.  The default for *i* is
-usually *dot*, the default for *j* (if *i* is given) is usually *i+1*,
-and the default for *i,j* (if both are omitted) is usually *.,.+1* but
-sometimes *0,S()*.
+usually *dot* (the current line), the default for *j* (if *i* is
+given) is usually *i+1* (the next line), and the default for *i,j* (if
+both are omitted) is usually *.,.+1* (the current line, remember the
+second index is not included in the range).  Sometimes the default
+range is *0,S()* (the whole buffer).
 
 Lines *i* and *j* can be identified by the patterns (substrings) they
 contain, instead of their integer indices.  If you provide a string
@@ -190,16 +192,15 @@ Adding, changing, deleting text:
 
 - *c(i,j, text)*: **c**hange (replace) lines *i* up to *j* to *text*.
    (*i,j* default to .,.+1).  Set *dot* to the last replacement line.
-
-- *s(pattern,new,i,j,global)*: **s**ubstitute *new* for *pattern* in lines
-   *i* up to *j*. When *global* is *True* (the default), substitute
-   all occurrences in each line. To substitute only the first
-   occurence on each line, set *global* to *False*.  Lines *i,j* default
-   to .,.+1  The special patterns *'%'* and *'$'* indicate the 
-   beginning and end of the line.  Set *dot* to the last changed line.
    
 - *d(i,j)*: **d**elete text from lines *i* up to *j* (default .,.+1).
    Set *dot* to the first undeleted line.
+
+- *s(i,j,pattern,new,global)*: **s**ubstitute *new* for *pattern* in lines
+   *i* up to *j*. When *global* is *True* (the default), substitute
+   all occurrences in each line. To substitute only the first
+   occurence on each line, set *global* to *False*.  Lines *i,j* default
+   to .,.+1  Set *dot* to the last changed line.
 
 Command mode:
 
