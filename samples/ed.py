@@ -1,12 +1,21 @@
 """
-ed.py - ed is the standard text editor.  For more explanation see ed.md.
+ed.py - ed is the standard text editor.  
 
-Limitations: for now line addresses must be integers.
-              Text patterns are not yet supported.
+ed is a line-oriented text editor written in pure Python.  It provides
+some of the commands from the classic Unix editor ed, augmented with
+commands for managing multiple buffers and files from the later Unix
+(and Plan 9) editor, sam.
 
-This code is mostly argument checking and handling various special cases!
+For more explanation see ed.md.
+
+Limitations: for now line addresses must be integers. text patterns
+are not yet supported.
 
 """
+
+# Much of this code is command parsing, argument checking, help text
+# (docstrings), and handling special cases: empty buffer, one-line
+# buffer, append/insert at first/last line.
 
 from os.path import isfile, basename
 
@@ -39,39 +48,35 @@ buffers[current] = Buffer()
 
 # Access to data structures
 
-# current buffer
 def buf():
     """
-    The current buffer: text and metadata
+    Return the current buffer, text and metadata
     """
     return buffers[current]
 
-# content in current buffer
 def lines():
     """
-    Text in the current buffer: a list of lines
+    Return text in the current buffer, a list of lines
     """
     return buf().lines
 
-# . dot, insertion point in current buffer
 def o():
     """
-    . (dot), index of the current line where text is changed/inserted by default
-              returns None when buffer is empty
+    Return . (dot), index of the current line.
+    where text is changed/inserted by default. 
+    Returns None when the buffer is empty.
     """
     return buf().dot
 
-# $, end of current buffer
 def S():
     """
-    $, number of lines in the current buffer, index of last line + 1
+    Return number of lines in the current buffer, index of last line + 1
     """
     return len(lines()) # 0 when buffer is empty
 
 
 # helper functions for commands
 
-# check arguments, run command
 def do_cmd(f, f_cmd, args):
     """
     Get and check arguments from args, a sequence.
@@ -135,7 +140,6 @@ def do_cmd(f, f_cmd, args):
 
 # Commands - working with files and buffers
 
-# create new buffer
 def u(name):
     """
     Create a new empty buffer, make it the current buffer
@@ -150,18 +154,19 @@ def u(name):
 
 def u_cmd(name):
     """
-    do u (new buffer) command, assume valid arguments
+    Do u (new buffer) command, assume valid arguments
     """
     global current
     temp = Buffer()
     buffers[name] = temp
     current = name
 
-# read file into current buffer
+
 def r(*args):
     """
-    r(iline, filename) read file into the current buffer after iline (default .)
-    Print the file name and number of lines read. Set *dot* to the last line read.
+    r(iline, filename) read file into current buffer after iline, default .
+    Print the file name and number of lines read. 
+    Set . to the last line read.
     """
     if len(args) == 1 and isinstance(args[0], str):
         filename = args[0]
@@ -178,8 +183,7 @@ def r(*args):
         print '? iline out of range'
         return
     r_cmd(iline, filename)
-            
-        
+                    
 def r_cmd(iline, filename):
     """
     Do r (read file) command, assume valid arguments
@@ -195,10 +199,10 @@ def r_cmd(iline, filename):
         nlines = 0
     print '%s, %d lines' % (filename, nlines)
 
-# read file, create buffer
+
 def B(filename):
     """
-    Create a new Buffer and load the file name.  Print the number of
+    Create a new Buffer and load the named file.  Print the number of
     lines read (0 when creating a new file). The new buffer becomes 
     the current buffer.  The name of the buffer is the same as the
     filename, but without any path prefix.
@@ -211,7 +215,6 @@ def B(filename):
     buf().filename = filename
     r_cmd(0, filename) # now new buffer is current, append at line 0
 
-# set current buffer
 def b(name):
     """
     Set current buffer to name
@@ -222,13 +225,14 @@ def b(name):
     else:
         print '? b buffername (string)'
 
-# write buffer to file
+
 def w(*args):
     """
     w(name) write current buffer contents to file name 
     (default: stored filename or, if none, current buffer name). 
-    Print the file name and the number of lines written. Does not change dot.
-    Change buf().filename to name, so subsequent writes go to the same file.
+    Print the file name and the number of lines written. 
+    Do not change dot.  Change buf().filename to name, 
+    so subsequent writes go to the same file.
     """
     if len(args) > 0:
         name = args[0]
@@ -246,11 +250,10 @@ def w(*args):
     buf().filename = name
     print '%s, %d lines' % (name, len(lines()))
 
-        
-# delete buffer
+
 def D(name):
     """
-    Delete buffer named 'name'
+    Delete the named buffer
     """
     global buffers, current
     if name not in buffers:
@@ -272,7 +275,6 @@ def D(name):
 
 # Displaying information
 
-# buffers
 def n():
     """
     Print buffer names.  Current buffer is marked with
@@ -286,7 +288,6 @@ def n():
              name, buffers[name].dot, len(buffers[name].lines),
              buffers[name].filename)
 
-# current buffer
 def m():
     """
     Print current line index, dot.  Also print other status information:
@@ -297,7 +298,6 @@ def m():
 
 # Displaying and navigating text
 
-# print
 def p(*args):
     """
     p(i, j) Print text in range, default .,.+1.  Do not change dot.
@@ -310,12 +310,13 @@ def p_cmd(placeholder, start, end, placeholder1):
     """
     for line in lines()[start:end]:
         print line.rstrip() # strip trailing \n
+
     
-# advance to line and print
 def l(*args):
     """
-    l(iline) Move dot to line iline and print it. Defaults to .+1, line after dot,
-    so repeatedly invoking l() advances through the buffer, printing lines. 
+    l(iline) Move dot to line iline and print it. Defaults to .+1, 
+    line after dot, so repeatedly invoking l() advances through buffer, 
+    printing lines. 
     """
     # We don't use do_cmd here because this uses o()+1 not o() as default
     if not lines():
@@ -334,23 +335,21 @@ def l(*args):
 
 # Adding, changing, and deleting text
 
-# append
 def a(*args):
     """
-    a(iline, text)  Append text after iline (default .)
+    a(iline, text)  Append text after iline, default .
     """
     do_cmd(a, ai_cmd, args)
 
-# insert
 def i(*args):
     """
-    i(iline, text)  Insert text before iline (default .)
+    i(iline, text)  Insert text before iline, default .
     """
     do_cmd(i, ai_cmd, args)
 
 def ai_cmd(f, iline, placeholder, string):
     """
-    implements both append *a* and insert *i* commands
+    implements both a (append) and i (insert)commands
     f is the function to perform, used to select insertion point
     """
     if string:
@@ -359,7 +358,7 @@ def ai_cmd(f, iline, placeholder, string):
 
 def addlines(f, iline, newlines):
     """
-    append or insert newlines in current buffer at iline, used by a i r commands
+    append or insert newlines in current buffer at iline, used by a, i, r
     """
     # empty buffer when not lines() is a special case for append
     start = iline if (f == i or not lines()) else iline+1 # insert else append
@@ -368,7 +367,7 @@ def addlines(f, iline, newlines):
     buf().dot = start + len(newlines)-1
     buf().unsaved = True
 
-# delete
+
 def d(*args):
     """
     d(i,j)  delete text in range, default .,.+1
@@ -387,12 +386,12 @@ def d_cmd(placeholder, start, end, placeholder1):
             buf().dot = min(start,S()-1) # S()-1 if we deleted end of buffer
         else:
             buf().dot = None
+
         
-# change (replace)
 def c(*args):
     """
     c(i,j, text): change (replace) lines i up to j to text.
-    (i,j default to .,.+1).  Set dot to the last replacement line.
+    i,j default to .,.+1  Set dot to the last replacement line.
     """
     # delete then insert
     # if args are not valid, do_cmd does not change buffer and returns False
