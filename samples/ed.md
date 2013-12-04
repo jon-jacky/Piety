@@ -173,8 +173,9 @@ Displaying information:
 
 Displaying and navigating text:
 
-- *p(i, j)*: **p**rint lines *i* through *j* in the current buffer.
-    *i* defaults to *dot*, *j* defaults to *i+1*.  Does not change *dot*.
+- *p(i, j)*: **p**rint lines *i* up to *j* in the current buffer.
+    *i* defaults to *dot*, *j* defaults to *i+1*.  
+    Change *dot* to the last line printed.
 
 - *l(i)*: Move *dot* to **l**ine *i* and print it.  Defaults to *.+1*,
   the line after *dot*, so repeatedly invoking *l()* advances through
@@ -244,4 +245,4 @@ These commands are implemented:
 For now, line addresses *i* and *j* must be integers.  Text patterns are not
 yet supported.
 
-Revised Nov 2013
+Revised Dec 2013
