@@ -85,10 +85,10 @@ length of the buffer are returned by the function calls *o()* and
 index of the last line is *S() - 1*, so the range *0,S()* is the whole
 buffer.
 
-Function arguments *i,j* are always optional.  The default for *i* is
-usually *dot* (the current line), the default for *j* (if *i* is
-given) is usually *i+1* (the next line), and the default for *i,j* (if
-both are omitted) is usually *.,.+1* (the current line, remember the
+Line *i* and range *i,j* are always optional.  The default for *i* is
+usually *dot* (the current line), the default for *j* (if only *i* is
+given) is usually *i+1* (the line after *i*), and the default for *i,j* (if
+both are omitted) is usually *.,.+1* (the current line, recall the
 second index is not included in the range).  Sometimes the default
 range is *0,S()* (the whole buffer).
 
@@ -235,7 +235,7 @@ advances *dot* to the next line and prints it.
 
 These API variables and functions are implemented:
 
-*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i, d, u, r, c*
+*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i, d, u, r, c, s*
 
 These commands are implemented:
 

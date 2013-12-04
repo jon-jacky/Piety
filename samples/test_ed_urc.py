@@ -3,7 +3,7 @@ test_ed_urc.py - Test ed.py functions (b)u(ffer), r(ead), c(hange)
 
 Run this script from the directory above Piety, it uses relative paths:
 
- python -i Piety/samples/test_ur.py
+ python -i Piety/samples/test_ed_urc.py
 
 These tests don't write any files, so you needn't delete anything afterward.
 

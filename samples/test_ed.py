@@ -46,7 +46,7 @@ print
 print "> p()    # print current line"
 p()  
 print
-print "> p(99)  # print line 99, don't change ."
+print "> p(99)  # print line 99, advance ."
 p(99)
 print
 print "> p() # print current line"
@@ -136,9 +136,9 @@ print "> p(0,S())   # print the entire buffer"
 p(0,S())
 print
 
-print '> a("""Line I   # append in the middle of the buffer'
+print '> a(5, """Line I   # append in the middle of the buffer'
 print '...'
-a("""Line I
+a(5, """Line I
 Line II
 Line III""")
 print "> p() # print the current line"

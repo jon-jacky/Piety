@@ -4,18 +4,16 @@ ed.py - ed is the standard text editor.
 ed is a line-oriented text editor written in pure Python.  It provides
 some of the commands from the classic Unix editor ed, augmented with
 commands for managing multiple buffers and files from the later Unix
-(and Plan 9) editor, sam.
+(and Plan 9) editor, sam.  You can use it in a command mode that
+emulates Unix ed, or use its API to edit from the Python prompt or
+write editing scripts in Python.
 
-For more explanation see ed.md.
+For more explanation see ed.md and the docstrings here.
 
 Limitations: for now line addresses must be integers. text patterns
 are not yet supported.
 
 """
-
-# Much of this code is command parsing, argument checking, help text
-# (docstrings), and handling special cases: empty buffer, one-line
-# buffer, append/insert at first/last line.
 
 from os.path import isfile, basename
 
@@ -81,6 +79,7 @@ def do_cmd(f, f_cmd, args):
     """
     Get and check arguments from args, a sequence.
      then call function object f_cmd that does the work
+    Used by functions a, c, d, i, p
     f is the caller, a function object.  
      f is only used for f.__name__ in the error message.
     f_cmd is the function that does the work, with arg list (f, start,end,string)
@@ -137,6 +136,13 @@ def do_cmd(f, f_cmd, args):
     else:
         f_cmd(f, start, end, string)
         return start, end, string
+
+def no_cmd(placeholder, placeholder1, placeholder2, placeholder3):
+    """
+    do-nothing command, pass to d_cmd to check arguments only
+    """
+    pass
+
 
 # Commands - working with files and buffers
 
@@ -300,7 +306,8 @@ def m():
 
 def p(*args):
     """
-    p(i, j) Print text in range, default .,.+1.  Do not change dot.
+    p(i, j) Print text in range, default .,.+1.  
+    Change dot to last line printed.
     """
     do_cmd(p, p_cmd, args)
     
@@ -310,7 +317,8 @@ def p_cmd(placeholder, start, end, placeholder1):
     """
     for line in lines()[start:end]:
         print line.rstrip() # strip trailing \n
-
+    if start < end:
+        buf().dot = end - 1 # end is the line after the last printed
     
 def l(*args):
     """
@@ -405,3 +413,37 @@ def c(*args):
         # Must check 'start' to find if that one line was start or end of file
         f = i if o() < S()-1 or start == 0 else a # f = insert if ... else append
         ai_cmd(f,o(),end,string) # end here is placeholder, required but not used
+
+
+def s(*args):
+    """
+    s(i,j,pattern,new,glbl): substitute new for pattern in lines
+    i up to j. When glbl is True (the default), substitute
+    all occurrences in each line. To substitute only the first
+    occurence on each line, set glbl to False.  Lines i,j default
+    to .,.+1  Set dot to the last changed line.
+    """
+    # Use do_cmd to get and check i,j args, here just get pattern,new,glbl
+    # valid args suffix are (...,pattern,new) (...,pattern,new,glbl)
+    if len(args) > 1 and isinstance(args[-2],str) and isinstance(args[-1],str):
+        pattern = args[-2]
+        new = args[-1]
+        glbl = True
+        valid_args = do_cmd(s, no_cmd, args[:-2]) # get,check any i,j args
+    elif (len(args) > 2 and isinstance(args[-3],str) and isinstance(args[-2],str)
+          and True): # last arg can almost always be interpreted as Boolean
+        pattern = args[-3]
+        new = args[-2]
+        glbl = bool(args[-1])
+        valid_args = do_cmd(s, no_cmd, args[:-3]) # get,check any i,j args
+    else:
+        print '? s(start,end,pattern,new,global) int int str str bool'
+        return
+    if valid_args:
+        start, end, string = valid_args # string is placeholder, not used
+        for i in range(start,end):
+            if pattern in lines()[i]: # test to see if we should advance dot
+                lines()[i] = lines()[i].replace(pattern,new, -1 if glbl else 1)
+                buf().dot = i
+
+
