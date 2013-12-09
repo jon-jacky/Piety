@@ -1,9 +1,7 @@
 """
 test_ed_urc.py - Test ed.py functions (b)u(ffer), r(ead), c(hange)
 
-Run this script from the directory above Piety, it uses relative paths:
-
- python -i Piety/samples/test_ed_urc.py
+ python -i test_ed_urc.py
 
 These tests don't write any files, so you needn't delete anything afterward.
 
@@ -18,13 +16,13 @@ print "> n() # print buffers"
 n()
 print
 
-test_cmd(r, 'read file into empty buffer', 'Piety/samples/test_cmd.py')
+test_cmd(r, 'read file into empty buffer', 'test_cmd.py')
 
 print "> l(9) # advance to line 9 and print it"
 l(9)
 print
 
-test_cmd(r, 'read file into middle of buffer', 'Piety/samples/README.md')
+test_cmd(r, 'read file into middle of buffer', 'README.md.txt')
 
 print "> p() # print the current line"
 p()

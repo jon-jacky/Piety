@@ -3,8 +3,11 @@
 # If you install Piety, commands and modules may go to some standard place
 #  and you will no longer need these assignments
 
-# execution path to bin, to run Piety commands: piety, possibly others
-export PATH=$PATH:$HOME/Piety/bin
+# define $PIETY, this definition assumes you have ~/Piety
+export PIETY=$HOME/Piety 
 
-# Python path to pymodule, to import Piety modules: piety.py etc.
-export PYTHONPATH=$HOME/Piety/piety:$HOME/Piety/samples:$PYTHONPATH
+# execution path to bin, to run Piety commands: piety, possibly others
+export PATH=$PATH:$PIETY/bin
+
+# Python path to piety, to import Piety modules: piety.py etc.
+export PYTHONPATH=$PIETY/piety:$PIETY/samples:$PYTHONPATH

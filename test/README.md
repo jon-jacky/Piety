@@ -2,8 +2,10 @@ Piety tests
 ===========
 
 Tests for modules in *Piety/piety* and *Piety/samples* (there may be
-more tests in those directories).  For directions, see the docstrings
-in each module.  Modules are listed in the order they were written.
+more tests in those directories).  All of these tests assume the
+execution path and Python path are set as in *Piety/bin/piety_paths*.
+For detailed directions, see the docstrings in each module.  Modules
+are listed in the order they were written.
 
 - **test_terminal**, test the *terminal* module
 
@@ -18,3 +20,5 @@ in each module.  Modules are listed in the order they were written.
 
 - **test_shell_writers**, test Python shell under the scheduler
     concurrently with two writers.
+
+- **ed**, directory of tests of *ed*.

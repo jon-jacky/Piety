@@ -351,7 +351,7 @@ def i(*args):
 
 def ai_cmd(f, iline, placeholder, string):
     """
-    implements a(ppend), i(nsert), and c(hange) commands
+    implements both a (append) and i (insert)commands
     f is the function to perform, used to select insertion point
     """
     if string:
@@ -360,7 +360,7 @@ def ai_cmd(f, iline, placeholder, string):
 
 def addlines(f, iline, newlines):
     """
-    append or insert newlines in current buffer at iline, used by a, c, i, r
+    append or insert newlines in current buffer at iline, used by a, i, r
     """
     # empty buffer when not lines() is a special case for append
     start = iline if (f == i or not lines()) else iline+1 # insert else append

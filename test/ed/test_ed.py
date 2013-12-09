@@ -1,11 +1,9 @@
 """
 test_ed.py  - test, demonstrate Python API for the text editor ed.py
 
-Run this script from the directory above Piety, it uses relative paths:
+ python -i test_ed.py
 
- python -i Piety/samples/test_ed.py
-
- Remove test_ed.txt before running this script again, to obtain the same results
+Remove test_ed.txt before running this script again, to obtain the same results
 
 ed functions tested in this version: B n m p l o S b D i a w d
 
@@ -22,8 +20,8 @@ print
 print "> B('test_ed.txt') # read new file"
 B('test_ed.txt')
 print
-print "> B('Piety/samples/ed.py') # read existing file"
-B('Piety/samples/ed.py')
+print "> B('ed.py.txt') # read existing file"
+B('ed.py.txt')
 print
 print "> n() # list all buffers"
 n()
@@ -81,8 +79,8 @@ print "> D('foo.txt')  # buffer name expected, print error message"
 D('foo.txt')
 print
 
-print "> D('ed.py')  # Delete buffer"
-D('ed.py')
+print "> D('ed.py.txt')  # Delete buffer"
+D('ed.py.txt')
 print
 
 print "> n() # list all buffers"
