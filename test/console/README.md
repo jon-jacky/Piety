@@ -1,7 +1,7 @@
 Console tests
 =============
 
-Tests for Piety *terminal*, *console*, and *pysht* (shell).
+Tests for Piety *terminal*, *console*, and *pysht* (Python shell).
 
 For detailed directions, see the docstrings in each module.  Modules
 are listed in the order they were written.
