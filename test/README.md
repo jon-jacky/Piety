@@ -6,7 +6,7 @@ more tests in those directories).  All of these tests assume the
 execution path and Python path are set as in *Piety/bin/piety_paths*.
 For detailed directions, see the docstrings in each module.
 
-- **console*, directory of tests for *terminal*, *console*, and *pysht* (shell)
+- **console**, directory of tests for *terminal*, *console*, and *pysht* (Python shell)
 
 - **ed**, directory of tests of *ed*.
 
