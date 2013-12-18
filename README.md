@@ -31,7 +31,7 @@ Piety might be used for ---
 - **Education** - Exhibit and explain almost all of the code for an
     entire system, expressed in a readable high-level language (as
     they did for
-    [Oberon](http://www.ethoberon.ethz.ch/WirthPubl/ProjectOberon.pdf)).
+    [Oberon](http://www.inf.ethz.ch/personal/wirth/ProjectOberon/)).
     Use the Python interpreter to inspect and manipulate any data
     structures in a running system.
 
@@ -39,7 +39,7 @@ Piety might be used for ---
     system constructs (like the alternative to the file system
     proposed for [Gracle](https://github.com/jon-jacky/Piety/blob/master/doc/gracle_excerpts.txt)).
 
-- **Embedded computing** - Run standalone Python applications on minimal platforms (something like [PyMite](https://wiki.python.org/moin/PyMite)).
+- **Embedded computing** - Run standalone Python applications on minimal platforms (something like [PyMite](https://wiki.python.org/moin/PyMite) or [Micro Python](http://micropython.org/).
 
 - **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), [Erlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
 
