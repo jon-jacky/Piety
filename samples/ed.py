@@ -10,8 +10,9 @@ write editing scripts in Python.
 
 For more explanation see ed.md and the docstrings here.
 
-Limitations: for now line addresses must be integers. text patterns
-are not yet supported.
+Limitations: /pattern/ as line address only works in the l command,
+   only for forward searches from . to $, with no wraparound
+ For now other line addresses must be integers
 
 """
 
@@ -326,10 +327,26 @@ def l(*args):
         return
     elif len(args) == 0:
         iline = o() + 1
-    else:
+    elif isinstance(args[0], int):
         iline = args[0]
-    if not (isinstance(iline, int) and (0 <= iline < S())):
-        print '? l (line)'
+    # fold all this this into do_cmd ?
+    elif (isinstance(args[0], str) and 
+          args[0].startswith('/') and args[0].endswith('/')):
+        pattern = args[0][1:-1]
+        found = False
+        # search only to end of buffer, no wrap around yet
+        for imatch, line in enumerate(lines()[o()+1:]):
+            if pattern in line:
+                found = True
+                break
+        iline = o()+1 + imatch if found else o()
+    elif (isinstance(args[0], str) and 
+          args[0].startswith('?') and args[0].endswith('?')):
+        pass # FIXME search backward, assign iline
+    else:
+        print "? l (line number or '/pattern/' or '?pattern?')"
+    if not (0 <= iline < S()):
+        print '? line number out of range 0:%d' % S()
         return
     buf().dot = iline
     print (lines()[iline]).rstrip() # strip trailing \n
