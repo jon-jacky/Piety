@@ -10,7 +10,7 @@ write editing scripts in Python.
 
 For more explanation see ed.md and the docstrings here.
 
-Limitations: /pattern/ as line address only works in the l command,
+Limitations: /pattern/ as line address works in l command only,
    only for forward searches from . to $, with no wraparound
  For now other line addresses must be integers
 
@@ -36,6 +36,7 @@ class Buffer(object):
         self.dot = None # index of current line, None when buffer is empty
         self.filename = None # filename (string) 
         self.unsaved = False # True if buffer contains unsaved changes
+        self.pattern = '' # search string - default '' matches any line
 
 # buffers are in a dict from buffer names (strings) to Buffer instances
 buffers = dict() 
@@ -75,6 +76,24 @@ def S():
 
 
 # helper functions for commands
+
+def search(forward=True):
+    """
+    Search for pattern.  Search forward from .+1 to end of buffer
+     (or if forward=False, search backward from .-1 to start of buffer)
+    If found, return line number.  If not, return .
+    This version stops at end (or start) of buffer, does not wrap around.
+    This verion searches for exact match, not regex match.
+    """
+    found = False
+    slines = lines()[o()+1:] if forward else reversed(lines()[:o()-1])
+    for imatch, line in enumerate(slines):
+        if buf().pattern in line:
+            found = True
+            break
+    if not found:
+        return o()
+    return o()+1 + imatch if forward else o()-2 - imatch
 
 def do_cmd(f, f_cmd, args):
     """
@@ -322,6 +341,7 @@ def l(*args):
     printing lines. 
     """
     # We don't use do_cmd here because this uses o()+1 not o() as default
+    # FIXME but do_cmd has f arg so we can handle special case there 
     if not lines():
         print '? empty buffer'
         return
@@ -329,20 +349,15 @@ def l(*args):
         iline = o() + 1
     elif isinstance(args[0], int):
         iline = args[0]
-    # fold all this this into do_cmd ?
     elif (isinstance(args[0], str) and 
-          args[0].startswith('/') and args[0].endswith('/')):
+          ((args[0].startswith('/') and args[0].endswith('/'))
+           or (args[0].startswith('?') and args[0].endswith('?')))):
         pattern = args[0][1:-1]
-        found = False
-        # search only to end of buffer, no wrap around yet
-        for imatch, line in enumerate(lines()[o()+1:]):
-            if pattern in line:
-                found = True
-                break
-        iline = o()+1 + imatch if found else o()
-    elif (isinstance(args[0], str) and 
-          args[0].startswith('?') and args[0].endswith('?')):
-        pass # FIXME search backward, assign iline
+        if pattern:
+            buf().pattern = pattern 
+        # else if new pattern is empty, use saved buf().pattern
+        forward = (args[0][0] == '/')
+        iline = search(forward)
     else:
         print "? l (line number or '/pattern/' or '?pattern?')"
     if not (0 <= iline < S()):
