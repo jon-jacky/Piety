@@ -10,9 +10,11 @@ write editing scripts in Python.
 
 For more explanation see ed.md and the docstrings here.
 
-Limitations: /pattern/ as line address works in l command only,
-   only for forward searches from . to $, with no wraparound
- For now other line addresses must be integers
+Limitations: 
+   In s(ubstitute) command, pattern must be literal string, not regexp
+   /pattern/ (forward search) ?pattern? (backward) as line address 
+   pattern must be literal string, not regexp
+   searches only to end (or beginning) of buffer, no wraparound
 
 """
 
@@ -77,11 +79,20 @@ def S():
 
 # helper functions for commands
 
+def isaddress(arg):
+    """
+    Return true if arg is an integer or a pattern address
+    """
+    return (isinstance(arg, int) or
+            (isinstance(arg, str) and 
+             ((arg.startswith('/') and arg.endswith('/')) # forward search
+              or (arg.startswith('?') and arg.endswith('?'))))) # backward
+                                
 def search(forward=True):
     """
-    Search for pattern.  Search forward from .+1 to end of buffer
+    Search for buf().pattern.  Search forward from .+1 to end of buffer
      (or if forward=False, search backward from .-1 to start of buffer)
-    If found, return line number.  If not, return .
+    If found, return line number.  If not found, return .
     This version stops at end (or start) of buffer, does not wrap around.
     This verion searches for exact match, not regex match.
     """
@@ -94,6 +105,22 @@ def search(forward=True):
     if not found:
         return o()
     return o()+1 + imatch if forward else o()-2 - imatch
+
+def address(arg):
+    """
+    Return line number corresponding to address, might be an integer or pattern.
+    We assume here that isaddress(arg) is True.
+    """
+    if isinstance(arg, int):
+        return arg
+    else:
+        pattern = arg[1:-1]
+        if pattern:
+            buf().pattern = pattern 
+        # else if new pattern is empty as in // or ??,  use saved buf().pattern
+        forward = (arg[0] == '/')
+        return search(forward)
+
 
 def do_cmd(f, f_cmd, args):
     """
@@ -109,10 +136,13 @@ def do_cmd(f, f_cmd, args):
     Return value makes it possible to check args just once, then call g_cmd etc.
     Getting args is not trivial because usually every arg is optional
     Currently handles six cases, where args is:
-     0:() 1a:(start) 1b:(string) 2a:(start,end) 2b:(start,string) 
-      3:(start,end,string)
+     0:() 
+     1a:(start) 1b:(string) 
+     2a:(start,end) 2b:(start,string) 
+     3:(start,end,string)
     All other cases are errors
-    For now start and end must be int. Later we can add cases for /text/, ?text?
+    start and end are addresses, either int or '/pattern/' or '?pattern?'
+    string is text content, in case of 1b and 2b can't be '/.../' or '?...?'
     """
     if lines():
         start, end, string = o(), o()+1, ''
@@ -121,30 +151,30 @@ def do_cmd(f, f_cmd, args):
     if len(args) == 0:
         pass # use defaults
     elif len(args) == 1:
-        if isinstance(args[0], int):
-            start = args[0]
+        if isaddress(args[0]):
+            start = address(args[0])
             end = start + 1
         elif isinstance(args[0], str):
             string = args[0]
         else:
-            print '? %s arg is not int or string' % f.__name__
+            print '? %s arg is not address or string' % f.__name__
             return False
     elif len(args) == 2:
-        if isinstance(args[0], int) and isinstance(args[1], int):
-            start, end  = args[0], args[1]
-        elif isinstance(args[0], int) and isinstance(args[1], str):
-            start, string = args[0], args[1]
+        if isaddress(args[0]) and isaddress(args[1]):
+            start, end  = address(args[0]), address(args[1])
+        elif isaddress(args[0]) and isinstance(args[1], str):
+            start, string = address(args[0]), args[1]
             end = start + 1
         else:
-            print '? %s args are not int,int or int,string' % f.__name__
+            print '? %s args are not address,address or address,string' % f.__name__
             return False
     elif len(args) == 3:
-        if not (isinstance(args[0], int) and isinstance(args[1], int)
+        if not (isaddress(args[0]) and isaddress(args[1])
                 and isinstance(args[2], str)):
-            print '? %s args are not int,int,string' % f.__name__
+            print '? %s args are not address,address,string' % f.__name__
             return False
         else:
-            start, end, string = args[0], args[1], args[2]
+            start, end, string = address(args[0]), address(args[1]), args[2]
     else:
         print '? %s more than 3 args given' % funct.__name__
         return False
@@ -347,17 +377,8 @@ def l(*args):
         return
     elif len(args) == 0:
         iline = o() + 1
-    elif isinstance(args[0], int):
-        iline = args[0]
-    elif (isinstance(args[0], str) and 
-          ((args[0].startswith('/') and args[0].endswith('/'))
-           or (args[0].startswith('?') and args[0].endswith('?')))):
-        pattern = args[0][1:-1]
-        if pattern:
-            buf().pattern = pattern 
-        # else if new pattern is empty, use saved buf().pattern
-        forward = (args[0][0] == '/')
-        iline = search(forward)
+    elif isaddress(args[0]):
+        iline = address(args[0])
     else:
         print "? l (line number or '/pattern/' or '?pattern?')"
     if not (0 <= iline < S()):
