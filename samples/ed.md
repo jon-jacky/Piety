@@ -92,11 +92,10 @@ both are omitted) is usually *.,.+1* (the current line, recall the
 second index is not included in the range).  Sometimes the default
 range is *0,S()* (the whole buffer).
 
-Lines *i* and *j* can be identified by the patterns (substrings) they
-contain, instead of their integer indices.  If you provide a string
-*/text/* instead of a number for the *i* or *j* argument, *ed* uses
-the first line after *dot* which contains *text*.  To search backward
-from *dot*, use *\text\*. (This feature is not yet implemented.)
+The functions *f* (or *z*) search forward (or backward) from *dot* for
+a given pattern, and return the line number of the first match.
+Typically they are invoked as part of the address expression passed to
+a line number argument.
 
 ### Python API summary ###
 
@@ -125,6 +124,8 @@ Data structures:
 
 - *buf().unsaved*: True if the current buffer contains unsaved changes
 
+- *buf().pattern*: Search pattern
+
 - *lines()*: returns *buf().lines*
 
 - *o()*: returns *buf().dot*, index of the current line in *lines*.  The
@@ -136,6 +137,19 @@ Data structures:
   dollar sign *$* used to indicate the end of the buffer in *ed*
   command mode.
 
+Address expressions
+
+- *f(pattern)* - **f**ind, or **f**orward search for *pattern*.
+  Return line number of the next occurrence of *pattern* after *dot*.
+  If pattern is not found, return *dot*.  Do not update *dot*, but if
+  *pattern* is not empty, update the stored pattern.  If *pattern* is
+  the empty string, search for the stored pattern.  Typically,
+  *f('text')* is invoked as part of the address expression passed to a
+  line number argument.
+
+- *z(pattern)* - reverse search for *pattern*.  Like *f*, but searches
+  backward from *dot*.
+
 Commands - Working with files and buffers:
 
 - *B(name)*: Create a new **B**uffer and load the file *name*.  Print
@@ -143,14 +157,12 @@ Commands - Working with files and buffers:
    file). Set *dot* to the last line.  The new buffer, also titled
    *name*, becomes the current buffer.
 
-- *u(name)*: Create a new empty b **u**ffer named *name*.  Do not read
-  any file.  The new buffer becomes the current buffer.
-
 - *r(name, i)*: **r**ead file *name* into the current buffer after line
   *i* (default .).  Print the file name and number of lines read.
   Set *dot* to the last line read.
 
 - *b(name)*: Set current **b**uffer to *name*.  Do not change its *dot*.
+  If no buffer *name*, create a new empty buffer (without reading any file).
 
 - *w(name)*: **w**rite current buffer to file *name* (default: stored
   file name, or if none, current buffer name). Print the file name and
@@ -159,17 +171,20 @@ Commands - Working with files and buffers:
   argument) go to the same file.
 
 - *D(name)*: **D**elete buffer *name* (default: current buffer).  If
-  buffer has unsaved changes, prompt for confirmation (the
-  confirmation prompt is not currently implemented).
+  buffer has unsaved changes, print message and exit without deleting.
+
+- *DD(name)*: **D**elete buffer *name* (default: current buffer).  Like *DD*,
+  but deletes without warning even if there are unsaved changes.
 
 Displaying information:
 
-- *n()*: Print buffer **n**ames.  Current buffer is marked with
-  . (period).  Buffers with unsaved changes are marked with an asterisk.
-  Also print ., *$*, and *filename* of each buffer.
+- *e()*: **e**valuate address expression to line number and print it.
+  Also print name and other information about the current buffer.  
+  Do not chanage *dot*.
 
-- *m()*: Print current line nu **m**ber, *dot*.  Also print number of
-   lines *$*, buffer name *current*, and its *filename*.
+- *n()*: Print buffer **n**ames and other information.  Current buffer
+  is marked with . (period).  Buffers with unsaved changes are marked
+  with an asterisk.  Also print ., *$*, and *filename* of each buffer.
 
 Displaying and navigating text:
 
@@ -179,9 +194,7 @@ Displaying and navigating text:
 
 - *l(i)*: Move *dot* to **l**ine *i* and print it.  Defaults to *.+1*,
   the line after *dot*, so repeatedly invoking *l()* advances through
-  the buffer, printing successive lines.  Invoking *l(/text/)* moves
-  *dot* forward to the next line that contains *text*, and prints it.
-  *l(\text\\)* moves *dot* backward.
+  the buffer, printing successive lines.
 
 Adding, changing, deleting text:
 
@@ -202,6 +215,35 @@ Adding, changing, deleting text:
    all occurrences in each line. To substitute only the first
    occurence on each line, set *global* to *False*.  Lines *i,j* default
    to .,.+1  Set *dot* to the last changed line.
+
+Shortcuts, conveniences, and composites.  Not yet implemented.
+
+- *k(i, label)*: mar**k** *dot* with *label*.  The default line is
+*dot*.  When *dot* moves on, the label remains on the marked line
+until it is explicitly moved by calling *k* on that label again.  The
+default *label* is *'@'*, called *mark*.  The lines between *mark*
+and *dot*, inclusive, are called the *region*.  If present, the
+*region* is the default text range for several commands.  If no line
+is labelled with *mark*, the region is the line at *dot*.
+
+- *?(label)*: return the line number at *label*, or None of there is no such line.
+
+- *K(label)*: unmar**K**, remove *label* from its line, wherever it may be.
+  Again, the default label is the *mark*.
+
+- *m(i,j,k,buffer)*: **m**ove selected lines, insert at given line in
+   selected *buffer*.
+
+- *t(i,j,k,buffer)*: **t**ransfer (copy) selected lines, insert at given line 
+   in selected *buffer*.
+
+- *x(i,j)*: *cut*, move selected lines into *paste* buffer,
+  overwriting previous paste buffer contents.
+
+- *X(i,j): *copy* selected lines into *paste* buffer.
+
+- *y(i,buffer)*: **y**ank, insert contents of paste buffer given line in
+   given buffer, default *dot*.
 
 Command mode:
 
@@ -240,9 +282,5 @@ These API variables and functions are implemented:
 
 These commands are implemented:
 
-(None)
 
-For now, line addresses *i* and *j* must be integers.  Text patterns are not
-yet supported.
-
-Revised Dec 2013
+Revised Jan 2014

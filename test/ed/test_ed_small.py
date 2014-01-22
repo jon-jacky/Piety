@@ -27,9 +27,9 @@ test_cmd(i, 'insert line at start of one-line file', 'Line ii')
 test_cmd(w, 'write two line file with different name', 'test_ed_small_2.txt')
 test_cmd(d, 'delete first line from two-line file', ())
 
-# Test new u,c command
+# Test new b,c command
 
-test_cmd(u, 'Create new buffer', 'new.txt')
+test_cmd(b, 'Create new buffer', 'new.txt')
 test_cmd(a, 'Add first line to empty buffer', 'Line 1')
 test_cmd(a, 'Add second line to one-line buffer', 'Line 2')
 test_cmd(c, 'Change last line in two-line buffer', 'Changed line 2')

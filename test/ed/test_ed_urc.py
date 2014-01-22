@@ -1,5 +1,5 @@
 """
-test_ed_urc.py - Test ed.py functions (b)u(ffer), r(ead), c(hange)
+test_ed_urc.py - Test ed.py functions b(uffer), r(ead), c(hange)
 
  python -i test_ed_urc.py
 
@@ -10,7 +10,7 @@ These tests don't write any files, so you needn't delete anything afterward.
 from ed import *
 from test_cmd import test_cmd
 
-test_cmd(u, 'create buffer', 'new.txt')
+test_cmd(b, 'create buffer', 'new.txt')
 
 print "> n() # print buffers"
 n()

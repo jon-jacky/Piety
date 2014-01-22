@@ -12,8 +12,7 @@ For more explanation see ed.md and the docstrings here.
 
 Limitations: 
    In s(ubstitute) command, pattern must be literal string, not regexp
-   /pattern/ (forward search) ?pattern? (backward) as line address 
-   pattern must be literal string, not regexp
+   search pattern must be literal string, not regexp
    searches only to end (or beginning) of buffer, no wraparound
 
 """
@@ -76,23 +75,29 @@ def S():
     """
     return len(lines()) # 0 when buffer is empty
 
-
 # helper functions for commands
 
 def isaddress(arg):
     """
-    Return true if arg is an integer or a pattern address
+    Return true if arg is a line address
     """
-    return (isinstance(arg, int) or
-            (isinstance(arg, str) and 
-             ((arg.startswith('/') and arg.endswith('/')) # forward search
-              or (arg.startswith('?') and arg.endswith('?'))))) # backward
-                                
+    # trivial - used to check pattern addresses here but now use f, z instead
+    return isinstance(arg, int)
+                     
+def address(arg):
+    """
+    Return line number for line address of arg. assume isaddress(arg) is True.
+    """
+    # trivial - used to search pattern addresses here but now use f, z instead
+    return arg
+
+# search commands
+
 def search(forward=True):
     """
     Search for buf().pattern.  Search forward from .+1 to end of buffer
      (or if forward=False, search backward from .-1 to start of buffer)
-    If found, return line number.  If not found, return .
+    If found, return line number.  If not found, return None.
     This version stops at end (or start) of buffer, does not wrap around.
     This verion searches for exact match, not regex match.
     """
@@ -103,24 +108,31 @@ def search(forward=True):
             found = True
             break
     if not found:
-        return o()
+        return None
     return o()+1 + imatch if forward else o()-2 - imatch
 
-def address(arg):
+def f_cmd(pattern, fwd=True):
     """
-    Return line number corresponding to address, might be an integer or pattern.
-    We assume here that isaddress(arg) is True.
+    Update buf().pattern if pattern is nonempty, otherwise retain old pattern
+    Search for pattern, return line number where found, o() if not found
+    Search forward if fwd is True, backward otherwise
     """
-    if isinstance(arg, int):
-        return arg
-    else:
-        pattern = arg[1:-1]
-        if pattern:
-            buf().pattern = pattern 
-        # else if new pattern is empty as in // or ??,  use saved buf().pattern
-        forward = (arg[0] == '/')
-        return search(forward)
+    if pattern:
+        buf().pattern = pattern 
+    imatch = search(forward=fwd) 
+    return imatch if imatch else o()
 
+def f(pattern):
+    """
+    forward search for pattern, return line number where found, o() if not found
+    """
+    return f_cmd(pattern, fwd=True)
+
+def z(pattern):
+    """
+    backward search for pattern, return line number where found, o() if not found
+    """
+    return f_cmd(pattern, fwd=False)
 
 def do_cmd(f, f_cmd, args):
     """
@@ -193,30 +205,7 @@ def no_cmd(placeholder, placeholder1, placeholder2, placeholder3):
     """
     pass
 
-
 # Commands - working with files and buffers
-
-def u(name):
-    """
-    Create a new empty buffer, make it the current buffer
-    """
-    if not isinstance(name, str):
-        print '? u name (string)'
-        return 
-    if name in buffers:
-        print '? name in use'
-        return
-    u_cmd(name)
-
-def u_cmd(name):
-    """
-    Do u (new buffer) command, assume valid arguments
-    """
-    global current
-    temp = Buffer()
-    buffers[name] = temp
-    current = name
-
 
 def r(*args):
     """
@@ -231,7 +220,6 @@ def r(*args):
             print '? r(iline, filename), iline optional, filename must not be empty'
             return
         r_cmd(iline, filename)
-
 
 def r_cmd(iline, filename):
     """
@@ -249,6 +237,27 @@ def r_cmd(iline, filename):
         nlines = 0
     print '%s, %d lines' % (filename, nlines)
 
+def b(name):
+    """
+    Set current buffer to name.  If no buffer with that name, create one
+    """
+    global current
+    if not isinstance(name, str):
+        print '? b name (string)'
+        return 
+    if name in buffers:
+        current = name
+    else:
+        b_cmd(name)
+
+def b_cmd(name):
+    """
+    Do b (new buffer) command, assume valid arguments
+    """
+    global current
+    temp = Buffer()
+    buffers[name] = temp
+    current = name
 
 def B(filename):
     """
@@ -261,20 +270,9 @@ def B(filename):
     if not isinstance(filename,str):
         print '? B filename (string)'
         return
-    u_cmd(basename(filename)) # create buffer, make it current
+    b_cmd(basename(filename)) # create buffer, make it current
     buf().filename = filename
     r_cmd(0, filename) # now new buffer is current, append at line 0
-
-def b(name):
-    """
-    Set current buffer to name
-    """
-    global current
-    if name in buffers:
-        current = name
-    else:
-        print '? b buffername (string)'
-
 
 def w(*args):
     """
@@ -300,28 +298,33 @@ def w(*args):
     buf().filename = name
     print '%s, %d lines' % (name, len(lines()))
 
-
-def D(name):
+def D(*args):
     """
-    Delete the named buffer
+    Delete the named buffer, if unsaved changes print message and exit
+    """
+    name = args[0] if args else current
+    if name in buffers and buffers[name].unsaved:
+        pass
+        print '? unsaved changes, must use DD to delete'
+        return
+    DD(*args)
+
+def DD(*args):
+    """
+    Delete the named buffer, even if it has unsaved changes
     """
     global buffers, current
+    name = args[0] if args else current
     if name not in buffers:
         print '? D buffername (string)'
         return
     if name == 'scratch': 
         print "? Can't delete scratch buffer"
         return
-    if buffers[name].unsaved:
-        pass
-        # print '? unsaved changes'
-        # return
-        # FIXME but then how can we delete it anyway?
     del buffers[name]
     if name == current: # pick a new current buffer
         keys = buffers.keys()
         current = keys[0] if keys else None
-
 
 # Displaying information
 
@@ -338,13 +341,18 @@ def n():
              name, buffers[name].dot, len(buffers[name].lines),
              buffers[name].filename)
 
-def m():
+def e(*args):
     """
-    Print current line index, dot.  Also print other status information:
-    length of buffer $, buffer name current, buffer filename.
+    Print first arg, should be an address. Also print other buffer information
     """
-    print '%s/%d  %s  %s' % (o(), S(), current, buf().filename)
+    do_cmd(e, e_cmd, args)
 
+def e_cmd(placeholder, start, end, placeholder1):
+    """
+    do e command, print value of start arg and other buffer information
+    """
+    print '%s/%d  %s  %s' % (start, S(), current, buf().filename)
+    
 
 # Displaying and navigating text
 
@@ -386,7 +394,6 @@ def l(*args):
         return
     buf().dot = iline
     print (lines()[iline]).rstrip() # strip trailing \n
-
 
 # Adding, changing, and deleting text
 
@@ -441,7 +448,6 @@ def d_cmd(placeholder, start, end, placeholder1):
             buf().dot = min(start,S()-1) # S()-1 if we deleted end of buffer
         else:
             buf().dot = None
-
         
 def c(*args):
     """
@@ -460,7 +466,6 @@ def c(*args):
         # Must check 'start' to find if that one line was start or end of file
         f = i if o() < S()-1 or start == 0 else a # f = insert if ... else append
         ai_cmd(f,o(),end,string) # end here is placeholder, required but not used
-
 
 def s(*args):
     """

@@ -49,6 +49,3 @@ print
 s(1,4,'vi','emacs',False)
 p(0,S())
 print
-
-
- 

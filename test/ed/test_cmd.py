@@ -8,8 +8,8 @@ from ed import *
 def test_cmd(f, descrip, *args):
     print '> %s%s # %s' % (f.__name__, args, descrip)
     f(*args) if args != ((),) else f() # empty args special case
-    print "> m() # print buffer status"
-    m()
+    print "> e() # print buffer status"
+    e()
     print "> p() # print the current line"
     p()
     saved_dot = o() # save dot because...
