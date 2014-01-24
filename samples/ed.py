@@ -497,3 +497,51 @@ def s(*args):
             if pattern in lines()[i]: # test to see if we should advance dot
                 lines()[i] = lines()[i].replace(pattern,new, -1 if glbl else 1)
                 buf().dot = i
+
+
+# command mode
+
+def q():
+    """
+    quit command mode
+    """
+    pass # caller quits when this command requested
+
+def parse_cmd(command):
+    """
+    returns cmd, start, end, text, text2, flags
+    """
+    # FIXME for now just handle commands without any arguments
+    cmd = command
+    return cmd, None, None, None, None, None
+
+def goodargs(arglist):
+    """
+    Squeeze out None args to make variable-length arglist
+    """
+    return tuple([ arg for arg in arglist if arg != None ])
+
+def ed_cmd(command):
+    """
+    Handle a single command: parse it, call function from API
+    """
+    allargs = parse_cmd(command) # cmd, start, end, text, text2, flags
+    cmd = allargs[0]
+    if cmd in globals(): # dict from name (string) to object (fcn)
+        globals()[cmd](*goodargs(allargs[1:]))
+    else:
+        print '? command not implemented: %s' % cmd
+    return cmd # so caller knows when to quit
+
+def ed():
+    """
+    Top level ed command to use at Python prompt.
+    Won't work in Piety because it calls blocking command raw_input
+    """
+    cmd = 'ed' # anything but 'q'
+    while not cmd == 'q':
+        command = raw_input(':') # maybe make prompt a parameter
+        cmd = ed_cmd(command)    # handler
+
+if __name__ == '__main__':
+    ed()
