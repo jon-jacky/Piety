@@ -93,9 +93,14 @@ second index is not included in the range).  Sometimes the default
 range is *0,S()* (the whole buffer).
 
 The functions *f* (or *z*) search forward (or backward) from *dot* for
-a given pattern, and return the line number of the first match.
+a given pattern, and return the line number of the first match.  They
+implement */pattern/* and *?pattern?* from Unix *ed*.
 Typically they are invoked as part of the address expression passed to
 a line number argument.
+
+Every Python API function that implements an *ed* command has a signature
+like p(*args), with a single-letter name and an argument list declared *args,
+so all arguments are optional.  
 
 ### Python API summary ###
 
@@ -141,6 +146,7 @@ Address expressions
 
 - *f(pattern)* - **f**ind, or **f**orward search for *pattern*.
   Return line number of the next occurrence of *pattern* after *dot*.
+  Implements */pattern/* and *//* in command mode. 
   If pattern is not found, return *dot*.  Do not update *dot*, but if
   *pattern* is not empty, update the stored pattern.  If *pattern* is
   the empty string, search for the stored pattern.  Typically,
@@ -148,7 +154,7 @@ Address expressions
   line number argument.
 
 - *z(pattern)* - reverse search for *pattern*.  Like *f*, but searches
-  backward from *dot*.
+  backward from *dot*.    Implements *?pattern?* and *??* in command mode. 
 
 Commands - Working with files and buffers:
 
@@ -178,7 +184,8 @@ Commands - Working with files and buffers:
 
 Displaying information:
 
-- *e()*: **e**valuate address expression to line number and print it.
+- *e(line)*: **e**valuate address expression to line number and print it.
+  Implements *=* in command mode.
   Also print name and other information about the current buffer.  
   Do not chanage *dot*.
 
@@ -218,18 +225,21 @@ Adding, changing, deleting text:
 
 Shortcuts, conveniences, and composites.  Not yet implemented.
 
-- *k(i, label)*: mar**k** *dot* with *label*.  The default line is
+- *k(iline, c)*: mar **k** *iline* with label *c*.  The default line is
 *dot*.  When *dot* moves on, the label remains on the marked line
 until it is explicitly moved by calling *k* on that label again.  The
-default *label* is *'@'*, called *mark*.  The lines between *mark*
+default label is *@*, called *mark*.  The lines between *mark*
 and *dot*, inclusive, are called the *region*.  If present, the
 *region* is the default text range for several commands.  If no line
-is labelled with *mark*, the region is the line at *dot*.
+is labelled with *mark*, the region is the line at *dot*.  In Unix *ed*, 
+the label *c* must be a single lower-case character, but in *ed.py* it
+can be any string.  The label *@* has no special meaning in Unix *ed*.
 
-- *?(label)*: return the line number at *label*, or None of there is no such line.
+- *F(c)*: return the line number at label *c*, or None of there is no such line.
+  Implements *'c* in *ed*.
 
-- *K(label)*: unmar**K**, remove *label* from its line, wherever it may be.
-  Again, the default label is the *mark*.
+- *K(label)*: unmar **K**, remove *label* from its line, wherever it may be.
+  Again, the default label is the mark, *@*.
 
 - *m(i,j,k,buffer)*: **m**ove selected lines, insert at given line in
    selected *buffer*.
@@ -240,9 +250,9 @@ is labelled with *mark*, the region is the line at *dot*.
 - *x(i,j)*: *cut*, move selected lines into *paste* buffer,
   overwriting previous paste buffer contents.
 
-- *X(i,j): *copy* selected lines into *paste* buffer.
+- *X(i,j)*: *copy* selected lines into *paste* buffer.
 
-- *y(i,buffer)*: **y**ank, insert contents of paste buffer given line in
+- *y(k,buffer)*: **y**ank, insert contents of paste buffer given line in
    given buffer, default *dot*.
 
 Command mode:

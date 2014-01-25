@@ -124,13 +124,15 @@ def f_cmd(pattern, fwd=True):
 
 def f(pattern):
     """
-    forward search for pattern, return line number where found, o() if not found
+    Forward search for pattern, return line number where found, o() if not found.
+    Implements /pattern/ and // in command mode.
     """
     return f_cmd(pattern, fwd=True)
 
 def z(pattern):
     """
-    backward search for pattern, return line number where found, o() if not found
+    Backward search for pattern, return line number where found, o() if not found.
+    Implements ?pattern? and ?? in command mode.
     """
     return f_cmd(pattern, fwd=False)
 
@@ -206,6 +208,7 @@ def no_cmd(placeholder, placeholder1, placeholder2, placeholder3):
     pass
 
 # Commands - working with files and buffers
+# All commands must use *args to deal with optional arguments
 
 def r(*args):
     """
@@ -237,14 +240,15 @@ def r_cmd(iline, filename):
         nlines = 0
     print '%s, %d lines' % (filename, nlines)
 
-def b(name):
+def b(*args):
     """
     Set current buffer to name.  If no buffer with that name, create one
     """
     global current
-    if not isinstance(name, str):
-        print '? b name (string)'
-        return 
+    if not args or not isinstance(args[0], str):
+        print '? b buffername (string)'
+        return
+    name = args[0]
     if name in buffers:
         current = name
     else:
@@ -259,7 +263,7 @@ def b_cmd(name):
     buffers[name] = temp
     current = name
 
-def B(filename):
+def B(*args):
     """
     Create a new Buffer and load the named file.  Print the number of
     lines read (0 when creating a new file). The new buffer becomes 
@@ -267,9 +271,10 @@ def B(filename):
     filename, but without any path prefix.
     """
     global current
-    if not isinstance(filename,str):
+    if not args or not isinstance(args[0], str):
         print '? B filename (string)'
         return
+    filename = args[0]
     b_cmd(basename(filename)) # create buffer, make it current
     buf().filename = filename
     r_cmd(0, filename) # now new buffer is current, append at line 0
@@ -328,22 +333,23 @@ def DD(*args):
 
 # Displaying information
 
-def n():
+def print_status(bufname, iline):
     """
-    Print buffer names.  Current buffer is marked with
-    . (period).  Buffers with unsaved changes are marked with an asterisk.
-    Also print name, ., $, and filename of each buffer.
+    as in  ./$    Buffer         File
+           ---    ------         ----
+       iline/N  .*bufname        filename 
     """
-    for name in buffers:
-        print '%s%s%-12s %6s%6d %s' % \
-            ('.' if name == current else ' ',
-             '*' if buffers[name].unsaved else ' ',
-             name, buffers[name].dot, len(buffers[name].lines),
-             buffers[name].filename)
+    buf = buffers[bufname]
+    loc = '%s/%d' % (iline, len(buf.lines))
+    print '%7s  %s%s%-12s  %s' % (loc, 
+                               '.' if bufname == current else ' ',
+                               '*' if buf.unsaved else ' ', 
+                               bufname, buf.filename)
 
 def e(*args):
     """
     Print first arg, should be an address. Also print other buffer information
+    Implements = in command mode 
     """
     do_cmd(e, e_cmd, args)
 
@@ -351,9 +357,19 @@ def e_cmd(placeholder, start, end, placeholder1):
     """
     do e command, print value of start arg and other buffer information
     """
-    print '%s/%d  %s  %s' % (start, S(), current, buf().filename)
-    
+    print_status(current, start)
 
+def n(*args):
+    """
+    Print status of all buffers
+    """
+    # ignore args
+    print """    ./$    Buffer        File
+    ---    ------        ----"""
+    for name in buffers:
+        print_status(name, buffers[name].dot)
+
+    
 # Displaying and navigating text
 
 def p(*args):
@@ -501,13 +517,14 @@ def s(*args):
 
 # command mode
 
-def q():
+def q(*args):
     """
     quit command mode
     """
+    # ignore args
     pass # caller quits when this command requested
 
-def parse_cmd(command):
+def parse(command):
     """
     returns cmd, start, end, text, text2, flags
     """
@@ -519,16 +536,16 @@ def goodargs(arglist):
     """
     Squeeze out None args to make variable-length arglist
     """
-    return tuple([ arg for arg in arglist if arg != None ])
+    return 
 
 def ed_cmd(command):
     """
     Handle a single command: parse it, call function from API
     """
-    allargs = parse_cmd(command) # cmd, start, end, text, text2, flags
-    cmd = allargs[0]
-    if cmd in globals(): # dict from name (string) to object (fcn)
-        globals()[cmd](*goodargs(allargs[1:]))
+    tokens = tuple([ t for t in parse(command) if t != None ])
+    cmd, args = tokens[0], tokens[1:]
+    if cmd in globals(): # dict from name (string) to object (function)
+        globals()[cmd](*args)
     else:
         print '? command not implemented: %s' % cmd
     return cmd # so caller knows when to quit
