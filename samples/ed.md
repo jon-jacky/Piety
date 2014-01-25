@@ -288,9 +288,20 @@ advances *dot* to the next line and prints it.
 
 These API variables and functions are implemented:
 
-*buffers, current, buf, lines, o, S, B, b, w, D, n, m, p, l, a, i, d, u, r, c, s*
+*buffers, current, buf, lines, o, S, f, z, r, b, B, w, D, DD, n, e, p,
+ l, a, i, d, c, s, q*
 
-These commands are implemented:
+All edit mode commands are implemented, but only as (single character)
+command names with no arguments.  Commands that have default argument
+values use them, but many commands are not useful.
 
+Limitations:
+
+In the **s**ubstitute command, the *pattern* must be literal string, not a 
+regular expression.  
+
+In the *f* and *z* functions, the search *pattern* must be a literal
+string, not a regular expression.  The program searches only to end
+(or beginning) of the buffer, with no wraparound.
 
 Revised Jan 2014
