@@ -278,8 +278,8 @@ The corresponding command is:
 
     .-1,$-3p
 
-The command names are the same as the function names, except *m*
-(print line nu **m**ber) is the command *=*, and the function *l*
+The command names are the same as the function names, except *e*
+(**e**valuate line number) is the command *=*, and the function *l*
 (move *dot* to line *i* and print) is the empty command - just type a
 line number or search string, then *Return*.  Just pressing *Return* 
 advances *dot* to the next line and prints it.
@@ -289,19 +289,23 @@ advances *dot* to the next line and prints it.
 These API variables and functions are implemented:
 
 *buffers, current, buf, lines, o, S, f, z, r, b, B, w, D, DD, n, e, p,
- l, a, i, d, c, s, q*
+ l, a, i, d, c, s*
 
-All edit mode commands are implemented, but only as (single character)
-command names with no arguments.  Commands that have default argument
-values use them, but many commands are not useful.
+Also *ed* and *q* to enter and quit *ed* command mode.
 
 Limitations:
 
-In the **s**ubstitute command, the *pattern* must be literal string, not a 
+In the **s**ubstitute function, the *pattern* must be literal string, not a 
 regular expression.  
 
 In the *f* and *z* functions, the search *pattern* must be a literal
 string, not a regular expression.  The program searches only to end
 (or beginning) of the buffer, with no wraparound.
+
+The *ed* command mode is barely working.  All commands are
+implemented, but only as (single character) command names with no
+arguments.  Commands that have default argument values use them, but
+many commands are not yet useful.  Command mode blocks when waiting
+for a command, so it does not yet work with the Piety scheduler.
 
 Revised Jan 2014

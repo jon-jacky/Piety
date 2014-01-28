@@ -417,19 +417,24 @@ def a(*args):
     """
     a(iline, text)  Append text after iline, default .
     """
-    do_cmd(a, ai_cmd, args)
+    do_cmd(a, aic_cmd, args)
 
 def i(*args):
     """
     i(iline, text)  Insert text before iline, default .
     """
-    do_cmd(i, ai_cmd, args)
+    do_cmd(i, aic_cmd, args)
 
-def ai_cmd(f, iline, placeholder, string):
+# FIXME for now store line for a,i,c commands used in ed input mode - hack!
+aic_line = 0
+
+def aic_cmd(f, iline, placeholder, string):
     """
     implements a(ppend), i(nsert), and c(hange) commands
     f is the function to perform, used to select insertion point
     """
+    global aic_line
+    aic_line = iline # FIXME needed by a,i,c in ed input mode, hack
     if string:
         newlines = [ line + '\n' for line in string.split('\n') ]
         addlines(f, iline, newlines)
@@ -481,7 +486,7 @@ def c(*args):
         # BUT BUT when last line is also first line is a special special case
         # Must check 'start' to find if that one line was start or end of file
         f = i if o() < S()-1 or start == 0 else a # f = insert if ... else append
-        ai_cmd(f,o(),end,string) # end here is placeholder, required but not used
+        aic_cmd(f,o(),end,string) # end here is placeholder, required but not used
 
 def s(*args):
     """
@@ -550,15 +555,32 @@ def ed_cmd(command):
         print '? command not implemented: %s' % cmd
     return cmd # so caller knows when to quit
 
+command_mode = True # alternates with input mode used by a,i,c commands
+
 def ed():
     """
     Top level ed command to use at Python prompt.
     Won't work in Piety because it calls blocking command raw_input
     """
+    global command_mode
+    command_mode = True
     cmd = 'ed' # anything but 'q'
     while not cmd == 'q':
-        command = raw_input(':') # maybe make prompt a parameter
-        cmd = ed_cmd(command)    # handler
+        if command_mode:
+            command = raw_input(':') # maybe make prompt a parameter
+            cmd = ed_cmd(command)    # handler
+            if cmd in ('a','i','c'):
+                command_mode = False # enter input mode
+                newlines = '' # one big string
+        else: # input mode for a, i, c commands
+            line = raw_input() # no prompt
+            if line == '.':
+                globals()[cmd](aic_line, newlines) # FIXME uses global aic_line
+                command_mode = True
+            else:
+                newlines += line + '\n' # raw_input strips \n, put it back
+
+# Run the editor from the system command line:  python ed.py
 
 if __name__ == '__main__':
     ed()
