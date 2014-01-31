@@ -17,6 +17,7 @@ Limitations:
 
 """
 
+import re
 from os.path import isfile, basename
 
 # items appear in same order as in ed.md
@@ -529,19 +530,37 @@ def q(*args):
     # ignore args
     pass # caller quits when this command requested
 
+# compile regexp for each command form
+Cmd = re.compile(r'\s*([a-zA-Z])(.*)')
+l1Cmd = re.compile(r'\s*(\d+)\s*([a-zA-Z])(.*)')
+l1l2Cmd = re.compile(r'\s*(\d+)\s*,\s*(\d+)\s*([a-zA-Z])(.*)')
+
 def parse(command):
     """
-    returns cmd, start, end, text, text2, flags
+    Parses command string, returns multiple values in this order:
+     cmd - single-character command name
+     istart, jend - integer line numbers 
+     params - string containing other command parameters
+    All are optional except cmd, assigns None if item is not present
     """
-    # FIXME for now just handle commands without any arguments
-    cmd = command
-    return cmd, None, None, None, None, None
-
-def goodargs(arglist):
-    """
-    Squeeze out None args to make variable-length arglist
-    """
-    return 
+    cmd, istart, jend, params = None, None, None, None
+    m = Cmd.match(command)
+    if m:
+        cmd, params = m.group(1), m.group(2).strip()
+    else:
+        m = l1Cmd.match(command)
+        if m:
+            istart, cmd, params = (int(m.group(1)), 
+                                   m.group(2), m.group(3).strip())
+        else:
+            m = l1l2Cmd.match(command)
+            if m:
+                istart, jend, cmd, params = (int(m.group(1)), int(m.group(2)),
+                                             m.group(3), m.group(4).strip())
+            else:
+                print '? cannot parse command: %s' % command
+    # change order, put cmd first, if params is empty string return None
+    return cmd, istart, jend, params if params else None 
 
 def ed_cmd(command):
     """
@@ -549,7 +568,7 @@ def ed_cmd(command):
     """
     tokens = tuple([ t for t in parse(command) if t != None ])
     cmd, args = tokens[0], tokens[1:]
-    if cmd in globals(): # dict from name (string) to object (function)
+    if cmd in globals(): # dict from name (string) to object (fcn or ...)
         globals()[cmd](*args)
     else:
         print '? command not implemented: %s' % cmd
@@ -576,7 +595,7 @@ def ed():
             line = raw_input() # no prompt
             if line == '.':
                 globals()[cmd](aic_line, newlines) # FIXME uses global aic_line
-                command_mode = True
+                command_mode = True # exit input mode
             else:
                 newlines += line + '\n' # raw_input strips \n, put it back
 

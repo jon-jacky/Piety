@@ -299,13 +299,13 @@ In the **s**ubstitute function, the *pattern* must be literal string, not a
 regular expression.  
 
 In the *f* and *z* functions, the search *pattern* must be a literal
-string, not a regular expression.  The program searches only to end
+string, not a regular expression.  The program searches only to the end
 (or beginning) of the buffer, with no wraparound.
 
-The *ed* command mode is barely working.  All commands are
-implemented, but only as (single character) command names with no
-arguments.  Commands that have default argument values use them, but
-many commands are not yet useful.  Command mode blocks when waiting
-for a command, so it does not yet work with the Piety scheduler.
+The *ed* command mode is now working for many commands, but with
+numeric line address arguments only. 
+
+Command mode blocks when waiting for a command, so it does not yet
+work with the Piety scheduler.
 
 Revised Jan 2014
