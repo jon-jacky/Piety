@@ -1,5 +1,5 @@
-**Piety** is a notional operating system to be written in Python.  It
-is a response to this impulse:
+This table provides information and links about some unusual operating
+systems.  Most are responses to this impulse:
 
 > *Today's operating systems and applications are bloated and
 > complicated.  Let's start over, and create a complete system that is
@@ -57,7 +57,7 @@ Here are some examples.
 | [Schemix](http://www.abstractnonsense.com/schemix/), also [here](https://news.ycombinator.com/item?id=6589165) | P | 2003 | Scheme (TinyScheme) | Native OS | "implemented as a patch to the Linux kernel" | "exploration of the Linux kernel ... rapid, interactive prototyping of Linux drivers and ... kernel features" |
 | [movitz](http://common-lisp.net/project/movitz/), also [here](https://news.ycombinator.com/item?id=6589986) | P | 2004 -- | Lisp (CL) |  Bare machine | x86 | "development platform for operating system kernels, embedded, and single-purpose applications" |
 | [Gracle](http://dept-info.labri.fr/~strandh/gracle.ps), also [here](gracle_excerpts.txt) | P | 2004 -- | Lisp (CL) | Native OS | Linux | "single-level store ... objects in main memory are all persistent" | 
-| [LOSAK](http://losak.sourceforge.net/) | P | 2004 -- | Lisp (LOSAK) | Bare machine | QEMU, Bochs | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection"|
+| [LOSAK](http://losak.sourceforge.net/), then [multischeme](https://github.com/ojarjur/multischeme), also [here](https://news.ycombinator.com/item?id=7166755) | P | 2004 -- | Lisp (LOSAK), then Scheme | Bare machine | QEMU, Bochs | "OS kernel ... implemented with a partial evaluator ... pre-emptive multitasking, ... real-time garbage collection"|
 | [Armpit Scheme](http://armpit.sourceforge.net/), other embedded Schemes | A | 2006 -- | Scheme | Bare machine | ARM (BeagleBoard XM, etc.) | "'Scheme to the metal' ... running without any other OS. ... turning the MCU into a rudimentary Scheme machine. " |
 | [LispmFPGA](http://www.aviduratas.de/lisp/lispmfpga/), also [here](https://groups.google.com/forum/?fromgroups=#!topic/comp.lang.lisp/36_qKNErHAg) | P | 2006 -- | Lisp (CL subset) | Bare machine (FPGA) | Spartan 3 Xilinx FPGA, Digilent Spartan 3 Starter Kit | "a CPU with Lisp optimized instruction set together with a complete set of system software written in Lisp" |
 | [IGOR](http://opencores.org/project,igor), also [here](http://www.idi.ntnu.no/news/index.php?news=163) and [here](http://www.flickr.com/photos/kaitorge/sets/72157609445719327/show/) | S | 2008 -- 2010 | Lisp | Bare machine (FPGA) | Custom PCB with FPGA | "Fourteen students have collaborated in constructing a Lisp machine (IGOR) from scratch."|
