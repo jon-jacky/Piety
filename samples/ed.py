@@ -597,7 +597,8 @@ def ed():
                 globals()[cmd](aic_line, newlines) # FIXME uses global aic_line
                 command_mode = True # exit input mode
             else:
-                newlines += line + '\n' # raw_input strips \n, put it back
+                # \n is separator not terminator
+                newlines += ('\n' + line) if newlines else line
 
 # Run the editor from the system command line:  python ed.py
 

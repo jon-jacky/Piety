@@ -26,7 +26,7 @@ Here is a brief **ed** session in a Python session:
     >>> from ed import *
     >>> ed()
     :B test.txt
-    0 lines
+    test.txt, 0 lines
     :a
     ed() enters ed command mode, with the : command  prompt.
     'B <name>' creates a new buffer and loads the named file
@@ -54,7 +54,7 @@ instead of *Return*.
 
     >>> from ed import *
     >>> B('test.txt')
-    0 lines
+    test.txt, 0 lines
     >>> a("""ed() enters ed command mode, with the : command  prompt.
     ... 'B <name>' creates a new buffer and loads the named file
     ... 'a' enters ed input mode and appends the text after the current line.
