@@ -20,61 +20,9 @@ Limitations:
 import re
 from os.path import isfile, basename
 
+import ed0  # editor core
+
 # items appear in same order as in ed.md
-
-# data structures
-
-class Buffer(object):
-    """
-    Text buffer for ed 
-    """
-    def __init__(self):
-        """
-        New text buffer
-        Be careful to only access lines by slice not index
-        Then dot == 0 works even when lines == []
-        """
-        self.lines = [] # text in the current buffer, a list of strings
-        self.dot = None # index of current line, None when buffer is empty
-        self.filename = None # filename (string) 
-        self.unsaved = False # True if buffer contains unsaved changes
-        self.pattern = '' # search string - default '' matches any line
-
-# buffers are in a dict from buffer names (strings) to Buffer instances
-buffers = dict() 
-
-# There is always a current buffer so we can avoid check for special case
-# Start with one empty buffer named 'scratch', can't ever delete it
-current = 'scratch'
-buffers[current] = Buffer()  
-
-# Access to data structures
-
-def buf():
-    """
-    Return the current buffer, text and metadata
-    """
-    return buffers[current]
-
-def lines():
-    """
-    Return text in the current buffer, a list of lines
-    """
-    return buf().lines
-
-def o():
-    """
-    Return . (dot), index of the current line.
-    where text is changed/inserted by default. 
-    Returns None when the buffer is empty.
-    """
-    return buf().dot
-
-def S():
-    """
-    Return number of lines in the current buffer, index of last line + 1
-    """
-    return len(lines()) # 0 when buffer is empty
 
 # helper functions for commands
 
@@ -92,50 +40,6 @@ def address(arg):
     # trivial - used to search pattern addresses here but now use f, z instead
     return arg
 
-# search commands
-
-def search(forward=True):
-    """
-    Search for buf().pattern.  Search forward from .+1 to end of buffer
-     (or if forward=False, search backward from .-1 to start of buffer)
-    If found, return line number.  If not found, return None.
-    This version stops at end (or start) of buffer, does not wrap around.
-    This verion searches for exact match, not regex match.
-    """
-    found = False
-    slines = lines()[o()+1:] if forward else reversed(lines()[:o()-1])
-    for imatch, line in enumerate(slines):
-        if buf().pattern in line:
-            found = True
-            break
-    if not found:
-        return None
-    return o()+1 + imatch if forward else o()-2 - imatch
-
-def f_cmd(pattern, fwd=True):
-    """
-    Update buf().pattern if pattern is nonempty, otherwise retain old pattern
-    Search for pattern, return line number where found, o() if not found
-    Search forward if fwd is True, backward otherwise
-    """
-    if pattern:
-        buf().pattern = pattern 
-    imatch = search(forward=fwd) 
-    return imatch if imatch else o()
-
-def f(pattern):
-    """
-    Forward search for pattern, return line number where found, o() if not found.
-    Implements /pattern/ and // in command mode.
-    """
-    return f_cmd(pattern, fwd=True)
-
-def z(pattern):
-    """
-    Backward search for pattern, return line number where found, o() if not found.
-    Implements ?pattern? and ?? in command mode.
-    """
-    return f_cmd(pattern, fwd=False)
 
 def do_cmd(f, f_cmd, args):
     """
@@ -231,11 +135,7 @@ def r_cmd(iline, filename):
     """
     # r_cmd is used by both r and B
     if isfile(filename):
-        fd = open(filename, mode='r')        
-        lines = fd.readlines()
-        fd.close()
-        addlines(a, iline, lines) # a for append. Also updates dot, unsaved
-        nlines = len(lines)
+        ed0.r(iline, filename)
     # if no file, don't print error message, just say 0 lines read
     else:
         nlines = 0
@@ -250,19 +150,7 @@ def b(*args):
         print '? b buffername (string)'
         return
     name = args[0]
-    if name in buffers:
-        current = name
-    else:
-        b_cmd(name)
-
-def b_cmd(name):
-    """
-    Do b (new buffer) command, assume valid arguments
-    """
-    global current
-    temp = Buffer()
-    buffers[name] = temp
-    current = name
+    ed0.b(name)
 
 def B(*args):
     """
@@ -276,9 +164,7 @@ def B(*args):
         print '? B filename (string)'
         return
     filename = args[0]
-    b_cmd(basename(filename)) # create buffer, make it current
-    buf().filename = filename
-    r_cmd(0, filename) # now new buffer is current, append at line 0
+    ed0.B(filename)
 
 def w(*args):
     """
@@ -297,10 +183,7 @@ def w(*args):
     if not (isinstance(name,str)):
         print '? w filename (string)'
         return
-    fd = open(name, 'w')
-    for line in lines():
-        fd.write(line)
-    buf().unsaved = False
+    ed0.w(name)
     buf().filename = name
     print '%s, %d lines' % (name, len(lines()))
 
@@ -327,7 +210,7 @@ def DD(*args):
     if name == 'scratch': 
         print "? Can't delete scratch buffer"
         return
-    del buffers[name]
+    ed0.D(name)
     if name == current: # pick a new current buffer
         keys = buffers.keys()
         current = keys[0] if keys else None
@@ -384,10 +267,7 @@ def p_cmd(placeholder, start, end, placeholder1):
     """
     do p command, assumes valid arguments
     """
-    for line in lines()[start:end]:
-        print line.rstrip() # strip trailing \n
-    if start < end:
-        buf().dot = end - 1 # end is the line after the last printed
+    ed0.p(start, end)
     
 def l(*args):
     """
@@ -409,8 +289,7 @@ def l(*args):
     if not (0 <= iline < S()):
         print '? line number out of range 0:%d' % S()
         return
-    buf().dot = iline
-    print (lines()[iline]).rstrip() # strip trailing \n
+    ed0.l(iline)
 
 # Adding, changing, and deleting text
 
@@ -437,20 +316,7 @@ def aic_cmd(f, iline, placeholder, string):
     global aic_line
     aic_line = iline # FIXME needed by a,i,c in ed input mode, hack
     if string:
-        newlines = [ line + '\n' for line in string.split('\n') ]
-        addlines(f, iline, newlines)
-
-def addlines(f, iline, newlines):
-    """
-    append or insert newlines in current buffer at iline, used by a, c, i, r
-    """
-    # empty buffer when not lines() is a special case for append
-    start = iline if (f == i or not lines()) else iline+1 # insert else append
-    end = start
-    buf().lines[start:end] = newlines
-    buf().dot = start + len(newlines)-1
-    buf().unsaved = True
-
+        ed0.addlines(f, iline, string)
 
 def d(*args):
     """
@@ -464,12 +330,7 @@ def d_cmd(placeholder, start, end, placeholder1):
     Do d command, assume valid arguments
     """
     if lines() and start < end:
-        buf().lines[start:end] = []
-        buf.unsaved = True
-        if lines():
-            buf().dot = min(start,S()-1) # S()-1 if we deleted end of buffer
-        else:
-            buf().dot = None
+        ed0.d(start, end)
         
 def c(*args):
     """
@@ -515,11 +376,7 @@ def s(*args):
         return
     if valid_args:
         start, end, string = valid_args # string is placeholder, not used
-        for i in range(start,end):
-            if pattern in lines()[i]: # test to see if we should advance dot
-                lines()[i] = lines()[i].replace(pattern,new, -1 if glbl else 1)
-                buf().dot = i
-
+        ed0.s(start, end, pattern, new, glbl)
 
 # command mode
 
