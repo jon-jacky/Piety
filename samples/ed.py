@@ -21,6 +21,7 @@ import re
 from os.path import isfile, basename
 
 import ed0  # editor core
+from ed0 import buffers, current, lines, o, S, buf, f, z
 
 # items appear in same order as in ed.md
 
@@ -134,18 +135,13 @@ def r_cmd(iline, filename):
     Do r (read file) command, assume valid arguments
     """
     # r_cmd is used by both r and B
-    if isfile(filename):
-        ed0.r(iline, filename)
-    # if no file, don't print error message, just say 0 lines read
-    else:
-        nlines = 0
+    nlines = ed0.r(iline, filename)
     print '%s, %d lines' % (filename, nlines)
 
 def b(*args):
     """
     Set current buffer to name.  If no buffer with that name, create one
     """
-    global current
     if not args or not isinstance(args[0], str):
         print '? b buffername (string)'
         return
@@ -159,7 +155,6 @@ def B(*args):
     the current buffer.  The name of the buffer is the same as the
     filename, but without any path prefix.
     """
-    global current
     if not args or not isinstance(args[0], str):
         print '? B filename (string)'
         return
@@ -179,7 +174,7 @@ def w(*args):
     elif buf().filename:
         name = buf().filename 
     else:
-        name = current
+        name = ed0.current
     if not (isinstance(name,str)):
         print '? w filename (string)'
         return
@@ -191,7 +186,7 @@ def D(*args):
     """
     Delete the named buffer, if unsaved changes print message and exit
     """
-    name = args[0] if args else current
+    name = args[0] if args else ed0.current
     if name in buffers and buffers[name].unsaved:
         pass
         print '? unsaved changes, must use DD to delete'
@@ -202,8 +197,7 @@ def DD(*args):
     """
     Delete the named buffer, even if it has unsaved changes
     """
-    global buffers, current
-    name = args[0] if args else current
+    name = args[0] if args else ed0.current
     if name not in buffers:
         print '? D buffername (string)'
         return
@@ -211,9 +205,6 @@ def DD(*args):
         print "? Can't delete scratch buffer"
         return
     ed0.D(name)
-    if name == current: # pick a new current buffer
-        keys = buffers.keys()
-        current = keys[0] if keys else None
 
 # Displaying information
 
@@ -226,7 +217,7 @@ def print_status(bufname, iline):
     buf = buffers[bufname]
     loc = '%s/%d' % (iline, len(buf.lines))
     print '%7s  %s%s%-12s  %s' % (loc, 
-                               '.' if bufname == current else ' ',
+                               '.' if bufname == ed0.current else ' ',
                                '*' if buf.unsaved else ' ', 
                                bufname, buf.filename)
 
@@ -241,7 +232,7 @@ def e_cmd(placeholder, start, end, placeholder1):
     """
     do e command, print value of start arg and other buffer information
     """
-    print_status(current, start)
+    print_status(ed0.current, start)
 
 def n(*args):
     """
@@ -316,7 +307,12 @@ def aic_cmd(f, iline, placeholder, string):
     global aic_line
     aic_line = iline # FIXME needed by a,i,c in ed input mode, hack
     if string:
-        ed0.addlines(f, iline, string)
+        if f == a:
+            ed0.a(iline, string)
+        elif f == i: 
+            ed0.i(iline, string)
+        else:
+            print '? unrecognized aic_cmd with f arg: %s' % f
 
 def d(*args):
     """
@@ -332,7 +328,8 @@ def d_cmd(placeholder, start, end, placeholder1):
     if lines() and start < end:
         ed0.d(start, end)
         
-def c(*args):
+# Can't untangle this - let's just use rewritten c() below
+def cNOT(*args):
     """
     c(i,j, text): change (replace) lines i up to j to text.
     i,j default to .,.+1  Set dot to the last replacement line.
@@ -350,14 +347,14 @@ def c(*args):
         f = i if o() < S()-1 or start == 0 else a # f = insert if ... else append
         aic_cmd(f,o(),end,string) # end here is placeholder, required but not used
 
+def c(*args):
+    # simplify for testing - just pass args through to ed0.c
+    valid_args = do_cmd(r, no_cmd, args)
+    if valid_args: # if not, do_cmd already wrote error msgs
+        start, end, text = valid_args
+        ed0.c(start,end,text)
+        
 def s(*args):
-    """
-    s(i,j,pattern,new,glbl): substitute new for pattern in lines
-    i up to j. When glbl is True (the default), substitute
-    all occurrences in each line. To substitute only the first
-    occurence on each line, set glbl to False.  Lines i,j default
-    to .,.+1  Set dot to the last changed line.
-    """
     # Use do_cmd to get and check i,j args, here just get pattern,new,glbl
     # valid args suffix are (...,pattern,new) (...,pattern,new,glbl)
     if len(args) > 1 and isinstance(args[-2],str) and isinstance(args[-1],str):
