@@ -111,9 +111,6 @@ def r(iline, filename):
         lines = fd.readlines() # each line in lines ends with \n
         fd.close()
         insert(iline+1, lines)
-        return len(lines) # caller may print this
-    else:
-        return 0
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
