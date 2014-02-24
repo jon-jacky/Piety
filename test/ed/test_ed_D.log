@@ -1,0 +1,77 @@
+ Test D with unsaved changes, then DD on current buffer
+
+B('new.txt')
+new.txt, 0 lines
+
+i('Here is a line')
+
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+    0/1  .*new.txt       new.txt
+
+D()
+? unsaved changes, use DD to delete
+
+DD()
+
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0  . scratch       None
+
+ Test D with saved changes on current buffer
+
+B('new1.txt')
+new1.txt, 0 lines
+
+i('Here is a line')
+
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+    0/1  .*new1.txt      new1.txt
+
+w()
+new1.txt, 1 lines
+
+D()
+
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0  . scratch       None
+
+Test D with saved changes on a different buffer
+
+B('new2.txt')
+new2.txt, 0 lines
+
+i('Here is a line')
+
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+    0/1  .*new2.txt      new2.txt
+
+w()
+new2.txt, 1 lines
+
+b('scratch')
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0  . scratch       None
+    0/1    new2.txt      new2.txt
+
+D('new2.txt')
+
+n()
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0  . scratch       None
+
+Remove new1.txt, new2.txt before running script again to obtain same results

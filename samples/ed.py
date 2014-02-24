@@ -17,7 +17,7 @@ Limitations:
 
 """
 
-import re
+import re, os
 
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
@@ -92,7 +92,9 @@ def B(*args):
     if not filename:
         print '? file name'
         return
-    ed0.B(filename)
+    b(os.path.basename(filename)) # buffername may differ from filename
+    buf().filename = filename
+    r(filename)
 
 def w(*args):
     'write current buffer contents to file name'
@@ -184,10 +186,19 @@ def l(*args):
 
 # Adding, changing, and deleting text
 
+
+def a(*args):
+    'Append lines from string after  iline, update dot to last appended line'
+    ai_cmd(ed0.a, args)
+
+def i(*args):
+    'Insert lines from string before iline, update dot to last inserted line'
+    ai_cmd(ed0.i, args)
+
 # FIXME for now store line for a,i,c commands used in ed input mode - hack!
 aic_line = 0
 
-def ai_cmd(cmd, *args):
+def ai_cmd(cmd, args):
     'a(ppend) or i(nsert) command'
     start, x, text, xx = parse_args(args)
     iline = mk_start(start)
@@ -198,14 +209,6 @@ def ai_cmd(cmd, *args):
         aic_line = iline  # FIXME, temporary
         cmd(iline, text)
 
-def a(*args):
-    'Append lines from string after  iline, update dot to last appended line'
-    ai_cmd(ed0.a, args)
-
-def i(*args):
-    'Insert lines from string before iline, update dot to last inserted line'
-    ai_cmd(ed0.i, args)
-
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
     start, end, x, xxx = parse_args(args)
@@ -213,7 +216,7 @@ def d(*args):
     if not range_ok(istart, iend):
         print '? address out of range'
         return
-    ed0.d(start, end)
+    ed0.d(istart, iend)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
@@ -223,7 +226,7 @@ def c(*args):
         print '? address out of range'
         return
     aic_line = istart # FIXME needed?
-    ed0.c(start,end,text)
+    ed0.c(istart,iend,text)
         
 def s(*args):
     """
@@ -233,7 +236,7 @@ def s(*args):
     """
     start, end, pattern, params = parse_args(args)
     istart, iend = mk_range(start, end)
-    if not range_ok(start, end):
+    if not range_ok(istart, iend):
         print '? address out of range'
         return
     # params might be [ new, glbl ]
@@ -246,7 +249,7 @@ def s(*args):
         glbl = bool(params[1])
     else:
         glbl = True
-    ed0.s(start, end, pattern, new, glbl)
+    ed0.s(istart, iend, pattern, new, glbl)
 
 # command mode
 

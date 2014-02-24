@@ -105,12 +105,12 @@ def insert(iline, lines):
 # files and buffers
 
 def r(iline, filename):
-    'Read file contents into buffer after iline, return n of lines'
+    'Read file contents into buffer after iline'
     if os.path.isfile(filename): 
         fd = open(filename, mode='r')        
-        lines = fd.readlines() # each line in lines ends with \n
+        strings = fd.readlines() # each string in lines ends with \n
         fd.close()
-        insert(iline+1, lines)
+        insert(iline+1 if lines() else iline, strings) # like append, below
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
@@ -121,12 +121,6 @@ def b(name):
         temp = Buffer()
         buffers[name] = temp
         current = name
-
-def B(filename):
-    'Create a new buffer and load the named file'
-    b(os.path.basename(filename)) # create buffer, make it current
-    buf().filename = filename
-    r(0, filename) # now new buffer is current, append at line 0
 
 def w(name):
     'Write current buffer contents to file name'
