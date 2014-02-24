@@ -178,7 +178,7 @@ def l(*args):
         return
     # don't use usual default dot here, instead advance dot
     if iline == None:
-        iline = o() + 11
+        iline = o() + 1
     if not start_ok(iline):
         print '? address out of range'
         return
