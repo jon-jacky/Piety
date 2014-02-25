@@ -2,14 +2,13 @@
 ed0.py - editor core: data structures and functions used by ed.py
 
 In this API there are no optional or keyword arguments.
-
 There is no error checking, no error messages, and no progress messages.
 
-Line addresses use Python index conventions:
-the first line number is 0 and the last line number is number of lines minus 1
-
-Line address ranges use Python slice index conventions: the first line
-is at the start index, the last line is at one less than the end index.
+This API uses the classic Unix ed conventions for indexing and range
+(which are unlike Python): The index of the first line is 1, the index
+of the last line is the same as the number of lines (the length of the
+buffer in lines), and range i,j includes the line with index j (so the
+range i,i is just the line i).
 """
 
 import os.path
@@ -20,7 +19,8 @@ class Buffer(object):
     'Text buffer for ed, a list of lines (strings) and other information'
     def __init__(self):
         'New text buffer'
-        self.lines = [] # text in current buffer, a list of strings, each ends in \n
+        # Buffer always contains empty line at index 0, never used or printed
+        self.lines = [''] # text in current buffer, a list of strings
         self.dot = None # index of current line, None when buffer is empty
         self.filename = None # filename (string) 
         self.unsaved = False # True if buffer contains unsaved changes
@@ -40,16 +40,42 @@ def buf():
     return buffers[current]
 
 def lines():
-    'Return text in the current buffer, a list of lines'
+    'Return text in the current buffer: list of lines (strings), might be empty'
     return buf().lines
 
 def o():
-    'Return dot (index of the current line), or None if buffer empty'
+    'Return index of the current line (called dot), 0 if the buffer is empty'
     return buf().dot
 
 def S():
-    'Return number of lines in the current buffer, index of last line + 1'
-    return len(lines()) # 0 when buffer is empty
+    'Return index of the last line, 0 if the buffer is empty'
+    return len(lines())
+
+# defaults and range checking are done in this module 
+# because they depend on indexing and range conventions
+
+def mk_start(start):
+    'Return start if given, else default dot, 0 if buffer is empty'
+    return start if start != None else o()
+
+def mk_range(start, end):
+    'Return start, end if given, else return defaults, calc default end from start'
+    istart = mk_start(start)
+    return istart, end if end != None else istart
+
+def start_ok(iline):
+    """Return True if iline address is in buffer, always False for empty buffer
+    Used by most commands, which don't make sense for an empty buffer"""
+    return (0 < iline <= S()) 
+
+def start_empty_ok(iline)
+    """Return True if iline address is in buffer, or iline is 0 for start of buffer
+    Used by commands which make sense for an empty buffer: insert, append, read"""
+    return (0 <= iline <= S())
+
+def range_ok(start, end):
+    'Return True if start and end are in buffer, and start does not follow end'
+    return start_ok(start) and start_ok(end) and start <= end
 
 # search, line addresses
 

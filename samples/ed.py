@@ -21,7 +21,8 @@ import re, os
 
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
-from ed0 import buffers, lines, o, S, buf, f, z # use these here without prefix
+# use these here without prefix
+from ed0 import buffers, lines, o, S, buf, f, z, mk_start, mk_range, start_ok, start_empty_ok, range_ok
 # must use ed0.current with prefix here to get correct value as it is updated
 
 # arg lists, defaults, range checking
@@ -45,23 +46,6 @@ def parse_args(args):
         text = None 
     return start, end, text, params # params might still be non-empty
 
-def mk_start(start):
-    'return start if given, else default dot, or 0 if dot is None when empty buffer'
-    return start if start != None else (o() if o() != None else 0)
-
-def mk_range(start, end):
-    'return start, end if given, else return defaults, calc default end from start'
-    istart = mk_start(start)
-    return istart, end if end else (istart+1 if lines() else 0)
-
-def start_ok(iline):
-    'return True if iline address is in buffer, accounting for empty buffer'
-    return (0 <= iline < S()) or (not(lines()) and iline == 0)
-
-def range_ok(start, end):
-    'end can be S() outside buffer, empty range start == end is ok, does nothing'
-    return start_ok(start) and (start_ok(end) or end == S()) and start <= end
-
 # files and buffers
 
 def r(*args):
@@ -71,7 +55,7 @@ def r(*args):
         print '? file name'
         return
     iline = mk_start(start)
-    if not start_ok(iline):
+    if not start_empty_ok(iline): # r command works even for empty buffer
         print '? address out of range'
         return
     S0 = S() # record number of lines now to calc how many we read
@@ -202,7 +186,7 @@ def ai_cmd(cmd, args):
     'a(ppend) or i(nsert) command'
     start, x, text, xx = parse_args(args)
     iline = mk_start(start)
-    if not start_ok(iline):
+    if not start_empty_ok(iline):  # a, i commands work even for empty buffer
         print '? address out of range'
         return
     if text:
