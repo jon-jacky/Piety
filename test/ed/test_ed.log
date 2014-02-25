@@ -1,0 +1,198 @@
+> B(42) # filename expected, print error message
+? file name
+
+> B('test_ed.txt') # read new file
+test_ed.txt, 0 lines
+
+> B('ed.py.txt') # read existing file
+ed.py.txt, 441 lines
+
+> n() # list all buffers
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+440/441  .*ed.py.txt     ed.py.txt
+ None/0    test_ed.txt   test_ed.txt
+
+> e() # describe current buffer
+440/441  .*ed.py.txt     ed.py.txt
+
+> p(0,6) # print lines 0 up to (not including) 6
+"""
+ed.py - ed is the standard text editor.
+
+ed is a line-oriented text editor written in pure Python.  It provides
+some of the commands from the classic Unix editor ed, augmented with
+commands for managing multiple buffers and files from the later Unix
+
+> l(6) # set . to line 6 and print
+(and Plan 9) editor, sam.  You can use it in a command mode that
+> l() # advance . one line and print (several times)
+emulates Unix ed, or use its API to edit from the Python prompt or
+write editing scripts in Python.
+
+For more explanation see ed.md and the docstrings here.
+
+> p()    # print current line
+For more explanation see ed.md and the docstrings here.
+
+> p(99)  # print line 99, advance .
+        start, end, string = 0, 1, '' # empty buffer, 0:1 is a valid slice
+
+> p() # print current line
+        start, end, string = 0, 1, '' # empty buffer, 0:1 is a valid slice
+
+> print o()    # current line index
+99
+
+> print S()    # length of buffer, last line index + 1
+441
+
+> e()          # current buffer status
+ 99/441  .*ed.py.txt     ed.py.txt
+
+> n() # all buffers
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+ 99/441  .*ed.py.txt     ed.py.txt
+ None/0    test_ed.txt   test_ed.txt
+
+
+> b('test_ed.txt') # set current buffer
+
+> e() # current buffer
+    0/0  . test_ed.txt   test_ed.txt
+
+> n() # all buffers
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+ 99/441   *ed.py.txt     ed.py.txt
+ None/0  . test_ed.txt   test_ed.txt
+
+> D('foo.txt')  # buffer name expected, print error message
+? buffer name
+
+> D('ed.py.txt')  # Delete buffer
+? unsaved changes, use DD to delete
+
+> n() # list all buffers
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+ 99/441   *ed.py.txt     ed.py.txt
+ None/0  . test_ed.txt   test_ed.txt
+
+> i("""Line 1   # insert at the beginning of the buffer
+...
+> p() # print the current line
+Line 3
+> p(0,S()) # print the entire buffer
+Line 1
+Line 2
+Line 3
+
+> a("""Line A   # append at the end of the buffer
+...
+> p() # print the current line
+Line C
+> p(0,S())   # print the entire buffer
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+
+> i(0, """Line a   # insert at the beginning of the buffer
+...
+> p() # print the current line
+Line c
+> p(0,S())   # print the entire buffer
+Line a
+Line b
+Line c
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+
+> l(3)  # move to the middle of the buffer
+Line 1
+> i("""Line i   # insert in the middle of the buffer
+...
+> p() # print the current line
+Line iii
+> p(0,S())   # print the entire buffer
+Line a
+Line b
+Line c
+Line i
+Line ii
+Line iii
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+
+> a(5, """Line I   # append in the middle of the buffer
+...
+> p() # print the current line
+Line III
+> p(0,S())   # print the entire buffer
+Line a
+Line b
+Line c
+Line i
+Line ii
+Line iii
+Line I
+Line II
+Line III
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+
+> w()  # write file
+test_ed.txt, 15 lines
+
+> l(12) # go to line 12 and print
+Line A
+
+> p() # print current line
+Line A
+
+> d() # delete dot
+
+> p() # print current line
+Line B
+
+> d(o(),S()) # delete current line through the end
+
+> p() # print current line
+Line 3
+
+> p(0,S()) # print entire buffer
+Line a
+Line b
+Line c
+Line i
+Line ii
+Line iii
+Line I
+Line II
+Line III
+Line 1
+Line 2
+Line 3
+
+# Remove test_ed.txt before running this script again, to obtain the same result
+

@@ -1,0 +1,177 @@
+> b('new.txt',) # create buffer
+> e() # print buffer status
+    0/0  . new.txt       None
+> p(0,S())   # print the entire buffer
+
+> n() # print buffers
+    ./$    Buffer        File
+    ---    ------        ----
+ None/0    scratch       None
+ None/0  . new.txt       None
+
+> r('test_cmd.py',) # read file into empty buffer
+test_cmd.py, 23 lines
+> e() # print buffer status
+  22/23  .*new.txt       None
+> p() # print the current line
+
+> p(0,S())   # print the entire buffer
+"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print '> %s%s # %s' % (f.__name__, args, descrip)
+    f(*args) if args != ((),) else f() # empty args special case
+    print "> e() # print buffer status"
+    e()
+    if buf().lines:
+        print "> p() # print the current line"
+        p()
+    saved_dot = o() # save dot because...
+
+    # print the entire buffer leaves dot at the last line
+    print "> p(0,S())   # print the entire buffer"
+    p(0,S())
+    print
+    buf().dot = saved_dot # put it back where it was, undo effect of p(...)
+
+
+> l(9) # advance to line 9 and print it
+    f(*args) if args != ((),) else f() # empty args special case
+
+> r('README.md.txt',) # read file into middle of buffer
+README.md.txt, 17 lines
+> e() # print buffer status
+  26/40  .*new.txt       None
+> p() # print the current line
+    instances
+> p(0,S())   # print the entire buffer
+"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print '> %s%s # %s' % (f.__name__, args, descrip)
+    f(*args) if args != ((),) else f() # empty args special case
+Piety samples
+=============
+
+Sample applications to run under the Piety scheduler.  For directions,
+see the docstrings in each module, and the *.md* files.  More tests are
+in *Piety/tests*.
+
+- **ed**: text editor
+
+- **ed.md**: description of *ed*
+
+- **test_ed, test_ed_small, test_ed_urc**: test, demonstrate Python API for *ed*
+
+- **writer**: write to files to demonstrate interleaving concurrency
+
+- **test_writers**: demonstrate *writer* with two concurrent *Writer*
+    instances
+    print "> e() # print buffer status"
+    e()
+    if buf().lines:
+        print "> p() # print the current line"
+        p()
+    saved_dot = o() # save dot because...
+
+    # print the entire buffer leaves dot at the last line
+    print "> p(0,S())   # print the entire buffer"
+    p(0,S())
+    print
+    buf().dot = saved_dot # put it back where it was, undo effect of p(...)
+
+
+> p() # print the current line
+    instances
+
+> c('### This is the changed line ###',) # change the current line
+> e() # print buffer status
+  26/40  .*new.txt       None
+> p() # print the current line
+### This is the changed line ###
+> p(0,S())   # print the entire buffer
+"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print '> %s%s # %s' % (f.__name__, args, descrip)
+    f(*args) if args != ((),) else f() # empty args special case
+Piety samples
+=============
+
+Sample applications to run under the Piety scheduler.  For directions,
+see the docstrings in each module, and the *.md* files.  More tests are
+in *Piety/tests*.
+
+- **ed**: text editor
+
+- **ed.md**: description of *ed*
+
+- **test_ed, test_ed_small, test_ed_urc**: test, demonstrate Python API for *ed*
+
+- **writer**: write to files to demonstrate interleaving concurrency
+
+- **test_writers**: demonstrate *writer* with two concurrent *Writer*
+### This is the changed line ###
+    print "> e() # print buffer status"
+    e()
+    if buf().lines:
+        print "> p() # print the current line"
+        p()
+    saved_dot = o() # save dot because...
+
+    # print the entire buffer leaves dot at the last line
+    print "> p(0,S())   # print the entire buffer"
+    p(0,S())
+    print
+    buf().dot = saved_dot # put it back where it was, undo effect of p(...)
+
+
+> c(26, 40, '### This line replaces all that followed ###') # replace all the remaining lines
+> e() # print buffer status
+  26/27  .*new.txt       None
+> p() # print the current line
+### This line replaces all that followed ###
+> p(0,S())   # print the entire buffer
+"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print '> %s%s # %s' % (f.__name__, args, descrip)
+    f(*args) if args != ((),) else f() # empty args special case
+Piety samples
+=============
+
+Sample applications to run under the Piety scheduler.  For directions,
+see the docstrings in each module, and the *.md* files.  More tests are
+in *Piety/tests*.
+
+- **ed**: text editor
+
+- **ed.md**: description of *ed*
+
+- **test_ed, test_ed_small, test_ed_urc**: test, demonstrate Python API for *ed*
+
+- **writer**: write to files to demonstrate interleaving concurrency
+
+- **test_writers**: demonstrate *writer* with two concurrent *Writer*
+### This line replaces all that followed ###
+

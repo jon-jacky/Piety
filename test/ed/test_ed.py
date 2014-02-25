@@ -30,13 +30,14 @@ print "> e() # describe current buffer"
 e()
 print
 
-print "> p(0,5) # print lines 0 up to 5"
-p(0,5)
+print "> p(0,6) # print lines 0 up to (not including) 6"
+p(0,6)
 print
 print "> l(6) # set . to line 6 and print"
 l(6)
 
 print "> l() # advance . one line and print (several times)"
+l()
 l()
 l()
 l()

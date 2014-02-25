@@ -1,0 +1,24 @@
+Line 0
+Line 1
+Line 2
+
+    2/3  .*scratch       None
+
+? file name
+
+? address out of range
+
+rtest0.txt, 1 lines
+
+Line 0
+Line 1
+Line 2
+This is rtest0
+
+rtest1.txt, 1 lines
+
+Line 0
+Line 1
+This is rtest1
+Line 2
+This is rtest0

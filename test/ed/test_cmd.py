@@ -10,9 +10,11 @@ def test_cmd(f, descrip, *args):
     f(*args) if args != ((),) else f() # empty args special case
     print "> e() # print buffer status"
     e()
-    print "> p() # print the current line"
-    p()
+    if buf().lines:
+        print "> p() # print the current line"
+        p()
     saved_dot = o() # save dot because...
+
     # print the entire buffer leaves dot at the last line
     print "> p(0,S())   # print the entire buffer"
     p(0,S())
