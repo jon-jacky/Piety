@@ -91,7 +91,7 @@ def w(*args):
         filename = ed0.current
     ed0.w(filename)
     buf().filename = filename
-    print '%s, %d lines' % (filename, len(lines()))
+    print '%s, %d lines' % (filename, len(lines())-1) # don't print empty line 0
 
 def D_cmd(confirm, *args):
     'Delete named buffer, used by D and DD'
@@ -121,7 +121,7 @@ def DD(*args):
 def print_status(bufname, iline):
     'used by e and n, given bufname and iline prints dot, $, filename, unsaved'
     buf = buffers[bufname]
-    loc = '%s/%d' % (iline, len(buf.lines))
+    loc = '%s/%d' % (iline, len(buf.lines)-1) # don't count empty first line
     print '%7s  %s%s%-12s  %s' % (loc, 
                                '.' if bufname == ed0.current else ' ',
                                '*' if buf.unsaved else ' ', 
@@ -133,7 +133,7 @@ def e(*args):
     iline = mk_start(start)
     # Even print out-of-range address for debugging, but warn after
     print_status(ed0.current, iline)
-    if not start_ok(iline):
+    if not start_empty_ok(iline): # don't print error message when file is empty
         print '? address out of range'
 
 def n(*args):

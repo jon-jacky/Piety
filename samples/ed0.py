@@ -7,8 +7,8 @@ There is no error checking, no error messages, and no progress messages.
 This API uses the classic Unix ed conventions for indexing and range
 (which are unlike Python): The index of the first line is 1, the index
 of the last line is the same as the number of lines (the length of the
-buffer in lines), and range i,j includes the line with index j (so the
-range i,i is just the line i).
+buffer in lines), and range i,j includes the last line with index j
+(so the range i,i is just the line i, but it is not empty).
 """
 
 import os.path
@@ -16,12 +16,12 @@ import os.path
 # data structures
 
 class Buffer(object):
-    'Text buffer for ed, a list of lines (strings) and other information'
+    'Text buffer for ed, a list of lines (strings) and metadata'
     def __init__(self):
         'New text buffer'
         # Buffer always contains empty line at index 0, never used or printed
         self.lines = [''] # text in current buffer, a list of strings
-        self.dot = None # index of current line, None when buffer is empty
+        self.dot = 0 # index of current line, 0 when buffer is empty
         self.filename = None # filename (string) 
         self.unsaved = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
@@ -40,7 +40,9 @@ def buf():
     return buffers[current]
 
 def lines():
-    'Return text in the current buffer: list of lines (strings), might be empty'
+    """Return text in the current buffer: list of lines (strings)
+    list of lines is never empty, there is always an empty line 0.
+    Each line is a string terminated with \n, as returned by Python readlines()."""
     return buf().lines
 
 def o():
@@ -49,7 +51,7 @@ def o():
 
 def S():
     'Return index of the last line, 0 if the buffer is empty'
-    return len(lines())
+    return len(lines())-1 # don't count empty first line at index 0
 
 # defaults and range checking are done in this module 
 # because they depend on indexing and range conventions
@@ -68,7 +70,7 @@ def start_ok(iline):
     Used by most commands, which don't make sense for an empty buffer"""
     return (0 < iline <= S()) 
 
-def start_empty_ok(iline)
+def start_empty_ok(iline):
     """Return True if iline address is in buffer, or iline is 0 for start of buffer
     Used by commands which make sense for an empty buffer: insert, append, read"""
     return (0 <= iline <= S())
@@ -80,13 +82,11 @@ def range_ok(start, end):
 # search, line addresses
 
 def search_buf(forward=True):
-    """
-    Search for buf().pattern.  Search forward from .+1 to end of buffer
+    """Search for buf().pattern.  Search forward from .+1 to end of buffer
     (or if forward=False, search backward from .-1 to start of buffer)
     If found, return line number.  If not found, return None.
     This version stops at end (or start) of buffer, does not wrap around.
-    This verion searches for exact match, not regex match.
-    """
+    This verion searches for exact match, not regex match."""
     found = False
     slines = lines()[o()+1:] if forward else reversed(lines()[:o()-1])
     for imatch, line in enumerate(slines):
@@ -98,11 +98,9 @@ def search_buf(forward=True):
     return o()+1 + imatch if forward else o()-2 - imatch
 
 def search(pattern, fwd=True):
-    """
-    Update buf().pattern if pattern is nonempty, otherwise retain old pattern
+    """Update buf().pattern if pattern is nonempty, otherwise retain old pattern
     Search for buf().pattern, return line number where found, dot if not found
-    Search forward if fwd is True, backward otherwise
-    """
+    Search forward if fwd is True, backward otherwise."""
     if pattern:
         buf().pattern = pattern 
     imatch = search_buf(forward=fwd) 
@@ -119,7 +117,7 @@ def z(pattern):
 # helpers for a(ppend), i(nsert), c(hange), r(ead)
 
 def splitlines(string):
-    'Split up string with embedded \n, return list of lines'
+    'Split up string with embedded \n, return list of lines each with terminal \n'
     return [ line + '\n' for line in string.split('\n') ]
 
 def insert(iline, lines):
@@ -136,7 +134,7 @@ def r(iline, filename):
         fd = open(filename, mode='r')        
         strings = fd.readlines() # each string in lines ends with \n
         fd.close()
-        insert(iline+1 if lines() else iline, strings) # like append, below
+        insert(iline+1, strings) # like append, below
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
@@ -151,7 +149,7 @@ def b(name):
 def w(name):
     'Write current buffer contents to file name'
     fd = open(name, 'w')
-    for line in lines():
+    for line in lines()[1:]: # don't print empty line 0
         fd.write(line)
     buf().unsaved = False
 
@@ -172,28 +170,29 @@ def l(iline):
 
 def p(start, end):
     'Print lines from start up to end, leave dot at last line printed'
-    for iline in xrange(start,end):
+    for iline in xrange(start,end+1): #  classic ed range is inclusive, unlike Python
         l(iline)
 
 # adding, changing, and deleting text
 
 def a(iline, string):
     'Append lines from string after iline, update dot to last appended line'
-    insert(iline+1 if lines() else iline, splitlines(string)) #empty buf special case
+    insert(iline+1, splitlines(string))
 
 def i(iline, string):
     'Insert lines from string before iline, update dot to last inserted line'
-    insert(iline, splitlines(string))
+    # iline at initial empty line with index 0 is a special case, append instead
+    insert(iline if iline else iline+1, splitlines(string))
 
 def d(start, end):
     'Delete text from start up to end, set dot to first line after deletes or...'
-    buf().lines[start:end] = []
+    buf().lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
     buf.unsaved = True
-    if lines():
+    if lines()[1:]: # retain empty line 0
         # first line after deletes, or last line in buffer
-        buf().dot = min(start,S()-1) # S()-1 if we deleted end of buffer
+        buf().dot = min(start,S()) # S() if we deleted end of buffer
     else:
-        buf().dot = None
+        buf().dot = 0
 
 def c(start, end, string):
     'Change (replace) lines from start up to end with lines from string'
@@ -201,12 +200,10 @@ def c(start, end, string):
     i(start,string) # original start is now insertion point
 
 def s(start, end, pattern, new, glbl):
-    """
-    Substitute new for pattern in lines from start up to end.
+    """Substitute new for pattern in lines from start up to end.
     When glbl is True (the default), substitute all occurrences in each line,
-    otherwise substitute only the first occurrence in each line.
-    """
-    for i in range(start,end):
+    otherwise substitute only the first occurrence in each line."""
+    for i in range(start,end+1): # classic ed range is inclusive, unlike Python
         if pattern in lines()[i]: # test to see if we should advance dot
             lines()[i] = lines()[i].replace(pattern,new, -1 if glbl else 1)
             buf().dot = i
