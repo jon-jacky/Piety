@@ -1,4 +1,4 @@
-This table provides information and links about some unusual operating
+This page provides information and links about some unusual operating
 systems.  Most are responses to this impulse:
 
 > *Today's operating systems and applications are bloated and
@@ -64,6 +64,7 @@ Here are some examples.
 | [DreamOS](http://www.stripedgazelle.org/joey/dreamos.html), also [here](http://www.stripedgazelle.org/joey/dream.html) and [here](https://groups.google.com/forum/?fromgroups=#!topic/comp.lang.scheme/qwhCVbPZQvk) | P | 2009 | Scheme (R4RS) | Bare machine | X86 (Bochs) | "compiled using an x86 assembler written in Scheme" |
 | [lisPImachine](http://lispm.dyndns.org/), also [here](http://lispm.dyndns.org/ccl) | P | 2012 | Lisp (Clozure CL) | Native OS | Linux (Raspian) on Raspberry Pi | "Linux on the command line, ... the SLIME development environment for Common Lisp based on Emacs and ... Clozure Common Lisp" |
 | [ECMAchine](http://alex.nisnevich.com/ecmachine/), also [here](https://github.com/AlexNisnevich/ECMAchine) | P | 2012 | Lisp, Javascript | Sandbox | Web browser | "an in-browser Scheme REPL that is also a toy operating system. It has a virtual filesystem ... (and) a rudimentary process management system." |
+|[Emacs](http://www.informatimago.com/linux/emacs-on-user-mode-linux.html), pertinent also [here](http://nic.ferrier.me.uk/blog/2010_10/elnode) and [here](http://www.emacswiki.org/emacs/w3) and [here](http://batsov.com/articles/2012/02/19/package-management-in-emacs-the-good-the-bad-and-the-ugly/) | P | 2012 | Emacs Lisp | Native OS | Linux | "Emacs standing alone on a Linux Kernel", also web server, browser, package management  |
 | [Boot-to-Guile](https://lists.gnu.org/archive/html/guile-user/2013-02/msg00131.html), also [here](http://savannah.gnu.org/forum/forum.php?forum_id=7506) | P | 2013 | Scheme (Guile) | Native OS | Linux (QEMU image) | "a familiar & friendly REPL, run straight from the initrd!" |
 | [Singularity](http://research.microsoft.com/en-us/projects/singularity/) | R | 2004 -- | C# | Bare machine | x86 | "more reliable systems and applications" | 
 | [Cosmos](http://cosmos.codeplex.com/) | R | 2007 -- | C# | Bare machine | x86 | OS components, "complete construction kit built from the ground up in C#" |
