@@ -1,66 +1,66 @@
 B('ed.py.txt')
 ed.py.txt, 441 lines
-l(0)
+l(1)
 """
 
 Search forward - explicit pattern
 
 l(f('text'))
 ed.py - ed is the standard text editor.
-  1/441  .*ed.py.txt     ed.py.txt
+  2/441  .*ed.py.txt     ed.py.txt
 l(f('text'))
 ed is a line-oriented text editor written in pure Python.  It provides
-  3/441  .*ed.py.txt     ed.py.txt
+  4/441  .*ed.py.txt     ed.py.txt
 l(f('text'))
 Limitations: for now line addresses must be integers. text patterns
- 12/441  .*ed.py.txt     ed.py.txt
+ 13/441  .*ed.py.txt     ed.py.txt
 l(f('text'))
         New text buffer
- 29/441  .*ed.py.txt     ed.py.txt
+ 30/441  .*ed.py.txt     ed.py.txt
 
 Search backward - explicit pattern
 
 l(z(text))
 Limitations: for now line addresses must be integers. text patterns
- 12/441  .*ed.py.txt     ed.py.txt
+ 13/441  .*ed.py.txt     ed.py.txt
 l(z(text))
 ed is a line-oriented text editor written in pure Python.  It provides
-  3/441  .*ed.py.txt     ed.py.txt
+  4/441  .*ed.py.txt     ed.py.txt
 l(z(text))
 ed.py - ed is the standard text editor.
-  1/441  .*ed.py.txt     ed.py.txt
+  2/441  .*ed.py.txt     ed.py.txt
 l(z(text))
 ed.py - ed is the standard text editor.
-  1/441  .*ed.py.txt     ed.py.txt
+  2/441  .*ed.py.txt     ed.py.txt
 
 Search forward again - stored pattern
 
-l(0)
+l(1)
 """
 l(f(''))
 ed.py - ed is the standard text editor.
-  1/441  .*ed.py.txt     ed.py.txt
+  2/441  .*ed.py.txt     ed.py.txt
 l(f(''))
 ed is a line-oriented text editor written in pure Python.  It provides
-  3/441  .*ed.py.txt     ed.py.txt
+  4/441  .*ed.py.txt     ed.py.txt
 l(f(''))
 Limitations: for now line addresses must be integers. text patterns
- 12/441  .*ed.py.txt     ed.py.txt
+ 13/441  .*ed.py.txt     ed.py.txt
 l(f(''))
         New text buffer
- 29/441  .*ed.py.txt     ed.py.txt
+ 30/441  .*ed.py.txt     ed.py.txt
 
 search backward - stored pattern
 
 l(z(''))
 Limitations: for now line addresses must be integers. text patterns
- 12/441  .*ed.py.txt     ed.py.txt
+ 13/441  .*ed.py.txt     ed.py.txt
 l(z(''))
 ed is a line-oriented text editor written in pure Python.  It provides
-  3/441  .*ed.py.txt     ed.py.txt
+  4/441  .*ed.py.txt     ed.py.txt
 l(z(''))
 ed.py - ed is the standard text editor.
-  1/441  .*ed.py.txt     ed.py.txt
+  2/441  .*ed.py.txt     ed.py.txt
 l(z(''))
 ed.py - ed is the standard text editor.
-  1/441  .*ed.py.txt     ed.py.txt
+  2/441  .*ed.py.txt     ed.py.txt

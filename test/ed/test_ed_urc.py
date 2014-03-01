@@ -18,8 +18,8 @@ print
 
 test_cmd(r, 'read file into empty buffer', 'test_cmd.py')
 
-print "> l(9) # advance to line 9 and print it"
-l(9)
+print "> l(10) # advance to line 9 and print it"
+l(10)
 print
 
 test_cmd(r, 'read file into middle of buffer', 'README.md.txt')

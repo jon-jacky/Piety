@@ -14,7 +14,7 @@ In this line there is a single mention of ed.
 And in this last line we mention ed, then ed again, twice altogether.""")
 print
 
-p(0,S())
+p(1,S())
 print
 
 p()
@@ -30,22 +30,22 @@ s('emacs','vi',False)
 p()
 print
 
-s(0,'ed','emacs')
+s(1,'ed','emacs')
 p()
 print
 
-s(0,'emacs','vi',False)
+s(1,'emacs','vi',False)
 p()
 print
 
-s(0,'emacs','ed')
-p(0)
+s(1,'emacs','ed')
+p(1)
 print
 
-s(1,4,'ed','vi')
-p(0,S())
+s(2,4,'ed','vi')
+p(1,S())
 print
 
-s(1,4,'vi','emacs',False)
-p(0,S())
+s(2,4,'vi','emacs',False)
+p(1,S())
 print

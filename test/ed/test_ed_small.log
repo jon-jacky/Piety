@@ -1,67 +1,67 @@
 > B('test_ed_small.txt',) # open new file
 test_ed_small.txt, 2 lines
 > e() # print buffer status
-    1/2  .*test_ed_small.txt  test_ed_small.txt
+    2/2  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line a
 
 > i('Line i',) # insert line in empty file
 > e() # print buffer status
-    1/3  .*test_ed_small.txt  test_ed_small.txt
+    2/3  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line i
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line a
 
 > d((),) # delete line from one-line file
 > e() # print buffer status
-    1/2  .*test_ed_small.txt  test_ed_small.txt
+    2/2  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line a
 
 > a('Line a',) # append line in empty file
 > e() # print buffer status
-    2/3  .*test_ed_small.txt  test_ed_small.txt
+    3/3  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line a
 Line a
 
 > d((),) # delete line from one-line file
 > e() # print buffer status
-    1/2  .*test_ed_small.txt  test_ed_small.txt
+    2/2  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line a
 
 > i('Line i',) # insert line in empty file
 > e() # print buffer status
-    1/3  .*test_ed_small.txt  test_ed_small.txt
+    2/3  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line i
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line a
 
 > a('Line a',) # append line in one-line file
 > e() # print buffer status
-    2/4  .*test_ed_small.txt  test_ed_small.txt
+    3/4  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line a
@@ -70,10 +70,10 @@ Line a
 > w((),) # write two line file
 test_ed_small.txt, 4 lines
 > e() # print buffer status
-    2/4  . test_ed_small.txt  test_ed_small.txt
+    3/4  . test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line a
@@ -81,20 +81,20 @@ Line a
 
 > d((),) # delete last line from two-line file
 > e() # print buffer status
-    2/3  . test_ed_small.txt  test_ed_small.txt
+    3/3  . test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line a
 
 > i('Line ii',) # insert line at start of one-line file
 > e() # print buffer status
-    2/4  .*test_ed_small.txt  test_ed_small.txt
+    3/4  .*test_ed_small.txt  test_ed_small.txt
 > p() # print the current line
 Line ii
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line ii
@@ -103,10 +103,10 @@ Line a
 > w('test_ed_small_2.txt',) # write two line file with different name
 test_ed_small_2.txt, 4 lines
 > e() # print buffer status
-    2/4  . test_ed_small.txt  test_ed_small_2.txt
+    3/4  . test_ed_small.txt  test_ed_small_2.txt
 > p() # print the current line
 Line ii
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line ii
@@ -114,10 +114,10 @@ Line a
 
 > d((),) # delete first line from two-line file
 > e() # print buffer status
-    2/3  . test_ed_small.txt  test_ed_small_2.txt
+    3/3  . test_ed_small.txt  test_ed_small_2.txt
 > p() # print the current line
 Line a
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line i
 Line i
 Line a
@@ -125,41 +125,45 @@ Line a
 > b('new.txt',) # Create new buffer
 > e() # print buffer status
     0/0  . new.txt       None
-> p(0,S())   # print the entire buffer
+> p() # print the current line
+? address out of range
+> p(1,S())   # print the entire buffer
+? address out of range
 
 > a('Line 1',) # Add first line to empty buffer
 > e() # print buffer status
-    0/1  .*new.txt       None
+    1/1  .*new.txt       None
 > p() # print the current line
 Line 1
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line 1
 
 > a('Line 2',) # Add second line to one-line buffer
 > e() # print buffer status
-    1/2  .*new.txt       None
+    2/2  .*new.txt       None
 > p() # print the current line
 Line 2
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line 1
 Line 2
 
 > c('Changed line 2',) # Change last line in two-line buffer
 > e() # print buffer status
-    1/2  .*new.txt       None
+    2/2  .*new.txt       None
 > p() # print the current line
 Changed line 2
-> p(0,S())   # print the entire buffer
+> p(1,S())   # print the entire buffer
 Line 1
 Changed line 2
 
 > c(0, 'Changed line 1') # Change first line in two-line buffer
+? address out of range
 > e() # print buffer status
-    0/2  .*new.txt       None
+    2/2  .*new.txt       None
 > p() # print the current line
-Changed line 1
-> p(0,S())   # print the entire buffer
-Changed line 1
+Changed line 2
+> p(1,S())   # print the entire buffer
+Line 1
 Changed line 2
 
 # Remove test_ed_small.txt and test_ed_small_2.txt
