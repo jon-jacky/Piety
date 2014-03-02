@@ -29,7 +29,7 @@ from ed0 import buffers, lines, o, S, buf, f, z, mk_start, mk_range, start_ok, s
 
 def parse_args(args):
     """
-    Parse variable-lengthargument list, all arguments optional
+    Parse variable-length argument list, all arguments optional
     Return start, end: int or None, text: str or None, params: list. might be []
     """
     # get 2, 1, or 0 optional line numbers from head of args list
@@ -170,7 +170,6 @@ def l(*args):
 
 # Adding, changing, and deleting text
 
-
 def a(*args):
     'Append lines from string after  iline, update dot to last appended line'
     ai_cmd(ed0.a, args)
@@ -275,43 +274,37 @@ def parse_cmd(command):
     # change order, put cmd first, if params is empty string return None
     return cmd, istart, jend, params if params else None 
 
-def ed_cmd(command):
-    """
-    Handle a single command: parse it, call function from API
-    """
-    tokens = tuple([ t for t in parse_cmd(command) if t != None ])
-    cmd, args = tokens[0], tokens[1:]
-    if cmd in globals(): # dict from name (string) to object (fcn or ...)
-        globals()[cmd](*args)
-    else:
-        print '? command not implemented: %s' % cmd
-    return cmd # so caller knows when to quit
-
-command_mode = True # alternates with input mode used by a,i,c commands
+complete_cmds = ('rbBwDDenpldsq') # commands that do not require further input
+input_cmds = ('aic') # commands that use input mode to collect text
 
 def ed():
     """
     Top level ed command to use at Python prompt.
-    Won't work in Piety because it calls blocking command raw_input
+    This version won't work in Piety because it calls blocking command raw_input
     """
-    global command_mode
-    command_mode = True
+    command_mode = True # alternates with input mode used by a,i,c commands
     cmd = 'ed' # anything but 'q'
     while not cmd == 'q':
         if command_mode:
             command = raw_input(':') # maybe make prompt a parameter
-            cmd = ed_cmd(command)    # handler
-            if cmd in ('a','i','c'):
+            tokens = tuple([ t for t in parse_cmd(command) if t != None ])
+            cmd, args = tokens[0], tokens[1:]
+            if cmd in complete_cmds:
+                globals()[cmd](*args) # dict from name (string) to object (function)
+            elif cmd in input_cmds:
                 command_mode = False # enter input mode
-                newlines = '' # one big string
-        else: # input mode for a, i, c commands
+                addlines = '' # one big string
+            else:
+                print '? command not implemented: %s' % cmd
+        else: # input mode for commands that collect text
             line = raw_input() # no prompt
             if line == '.':
-                globals()[cmd](aic_line, newlines) # FIXME uses global aic_line
+                args += (addlines,)
+                globals()[cmd](*args)
                 command_mode = True # exit input mode
             else:
-                # \n is separator not terminator
-                newlines += ('\n' + line) if newlines else line
+                # \n is separator not terminator, first line is special case
+                addlines += ('\n' + line) if addlines else line
 
 # Run the editor from the system command line:  python ed.py
 
