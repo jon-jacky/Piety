@@ -94,7 +94,7 @@ def w(*args):
     print '%s, %d lines' % (filename, len(lines())-1) # don't print empty line 0
 
 def D_cmd(confirm, *args):
-    'Delete named buffer, used by D and DD'
+    'Delete named buffer, used by D and X'
     x, xx, text, xxx = parse_args(args)
     buffername = text if text else ed0.current
     if not buffername in buffers:
@@ -104,7 +104,7 @@ def D_cmd(confirm, *args):
         print "? Can't delete scratch buffer"
         return
     if confirm and buffers[buffername].unsaved:
-        print '? unsaved changes, use DD to delete'
+        print '? unsaved changes, use X to delete'
         return
     ed0.D(buffername)
 
@@ -112,7 +112,7 @@ def D(*args):
     'Delete the named buffer, if unsaved changes print message and exit'
     D_cmd(True, *args)
 
-def DD(*args):
+def X(*args):
     'Delete the named buffer, even if it has unsaved changes'
     D_cmd(False, *args)
 
@@ -178,9 +178,6 @@ def i(*args):
     'Insert lines from string before iline, update dot to last inserted line'
     ai_cmd(ed0.i, args)
 
-# FIXME for now store line for a,i,c commands used in ed input mode - hack!
-aic_line = 0
-
 def ai_cmd(cmd, args):
     'a(ppend) or i(nsert) command'
     start, x, text, xx = parse_args(args)
@@ -189,7 +186,6 @@ def ai_cmd(cmd, args):
         print '? address out of range'
         return
     if text:
-        aic_line = iline  # FIXME, temporary
         cmd(iline, text)
 
 def d(*args):
@@ -208,7 +204,6 @@ def c(*args):
     if not range_ok(istart, iend):
         print '? address out of range'
         return
-    aic_line = istart # FIXME needed?
     ed0.c(istart,iend,text)
         
 def s(*args):
@@ -240,12 +235,28 @@ def q(*args):
     'quit command mode'
     pass # ignore args, caller quits when this command requested
 
-# FIXME not practical to to match whole command at once - too many combinations
-#  handle the addresses one at a time
-# compile regexp for each command form
-Cmd = re.compile(r'\s*([a-zA-Z])(.*)')
-l1Cmd = re.compile(r'\s*(\d+)\s*([a-zA-Z])(.*)')
-l1l2Cmd = re.compile(r'\s*(\d+)\s*,\s*(\d+)\s*([a-zA-Z])(.*)')
+
+complete_cmds = 'rbBwDXenpldsq' # commands that do not require further input
+input_cmds = 'aic' # commands that use input mode to collect text
+ed_cmds = complete_cmds + input_cmds
+
+# regular expressions for command parts, no spaces allowed
+number = re.compile(r'(\d+)')
+fwdsearch = re.compile(r'/(.*)/')
+bkdsearch = re.compile(r'\?(.*)\?')
+text = re.compile(r'(.*)') # nonblank
+
+def match_address(command):
+    'return line number at start of command (None of not found), and rest of command'
+    if command[0] == '.':
+        return≈ o(), command[1:]
+    if command[0] == '$':
+        return S(), command[1:]
+    m = match(number):
+    if m:
+        return int(m.group(1)), command[m.end()+1:]
+    # FIXME - fwdsearch, bkdsearch to come
+    return None, command
 
 def parse_cmd(command):
     """
@@ -256,26 +267,23 @@ def parse_cmd(command):
     All are optional except cmd, assigns None if item is not present
     """
     cmd, istart, jend, params = None, None, None, None
-    m = Cmd.match(command)
-    if m:
-        cmd, params = m.group(1), m.group(2).strip()
+    # look for start address, optional
+    istart, tail = match_address(command)
+    # look for end address, optional
+    if istart != None:
+        if tail[0] == ',': # precedes end address, following addr NOT optional
+            jend, tail = match_address(command)
+            if jend == None:
+                print '? end address expected at ...%s' % tail
+                return # FIXME Error return
+    # look for command, NOT optional
+    if tail[0] in ed_cmds:  # command
+        cmd, params = tail[0], tail[1:].strip()
     else:
-        m = l1Cmd.match(command)
-        if m:
-            istart, cmd, params = (int(m.group(1)), 
-                                   m.group(2), m.group(3).strip())
-        else:
-            m = l1l2Cmd.match(command)
-            if m:
-                istart, jend, cmd, params = (int(m.group(1)), int(m.group(2)),
-                                             m.group(3), m.group(4).strip())
-            else:
-                print '? cannot parse command: %s' % command
-    # change order, put cmd first, if params is empty string return None
+        print '? command expected at ...%s' % tail
+        return # FIXME error return
+    # FIXME? is params separated into args in each cmd fcn?
     return cmd, istart, jend, params if params else None 
-
-complete_cmds = ('rbBwDDenpldsq') # commands that do not require further input
-input_cmds = ('aic') # commands that use input mode to collect text
 
 def ed():
     """
@@ -287,6 +295,7 @@ def ed():
     while not cmd == 'q':
         if command_mode:
             command = raw_input(':') # maybe make prompt a parameter
+            # FIXME handle parse_cmd error return
             tokens = tuple([ t for t in parse_cmd(command) if t != None ])
             cmd, args = tokens[0], tokens[1:]
             if cmd in complete_cmds:
