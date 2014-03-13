@@ -15,9 +15,10 @@ l
 p
 100p
 p
-.p
-$p
+.e
+$e
 e
+n
 b test_ed.txt
 e
 n
@@ -38,7 +39,7 @@ Line C
 .
 p
 1,$p
-i
+1i
 Line a
 Line b
 Line c
@@ -69,6 +70,7 @@ p
 .,$d
 p
 1,$p
+q
 END
 echo ""
 echo "Remove test_ed.txt before running this script again, to obtain the same result"

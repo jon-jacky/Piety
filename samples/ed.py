@@ -76,9 +76,10 @@ def B(*args):
     if not filename:
         print '? file name'
         return
-    b(os.path.basename(filename)) # buffername may differ from filename
+    ed0.b(os.path.basename(filename)) # buffername may differ from filename
     buf().filename = filename
-    r(filename)
+    ed0.r(0, filename, new_buffer=True)
+    print '%s, %d lines' % (filename, S())
 
 def w(*args):
     'write current buffer contents to file name'
@@ -249,12 +250,12 @@ text = re.compile(r'(.*)') # nonblank
 def match_address(command):
     'return line number at start of command (None of not found), and rest of command'
     if command[0] == '.':
-        return≈ o(), command[1:]
+        return o(), command[1:]
     if command[0] == '$':
         return S(), command[1:]
-    m = match(number):
+    m = number.match(command)
     if m:
-        return int(m.group(1)), command[m.end()+1:]
+        return int(m.group(1)), command[m.end():]
     # FIXME - fwdsearch, bkdsearch to come
     return None, command
 
@@ -267,22 +268,22 @@ def parse_cmd(command):
     All are optional except cmd, assigns None if item is not present
     """
     cmd, istart, jend, params = None, None, None, None
-    # look for start address, optional
+    # look for start address, optional. if no match istart,tail == None,command
     istart, tail = match_address(command)
     # look for end address, optional
     if istart != None:
         if tail[0] == ',': # precedes end address, following addr NOT optional
-            jend, tail = match_address(command)
+            jend, tail = match_address(tail[1:])
             if jend == None:
                 print '? end address expected at ...%s' % tail
-                return # FIXME Error return
+                return 'ERROR', istart, jend, params
     # look for command, NOT optional
     if tail[0] in ed_cmds:  # command
         cmd, params = tail[0], tail[1:].strip()
     else:
         print '? command expected at ...%s' % tail
-        return # FIXME error return
-    # FIXME? is params separated into args in each cmd fcn?
+        return 'ERROR', istart, jend, params
+    # downstream code may extract multiple args from params
     return cmd, istart, jend, params if params else None 
 
 def ed():
@@ -295,8 +296,11 @@ def ed():
     while not cmd == 'q':
         if command_mode:
             command = raw_input(':') # maybe make prompt a parameter
-            # FIXME handle parse_cmd error return
-            tokens = tuple([ t for t in parse_cmd(command) if t != None ])
+            items = parse_cmd(command)
+            if items[0] == 'ERROR':
+                return # parse_cmd already printed message
+            else:
+                tokens = tuple([ t for t in items if t != None ])
             cmd, args = tokens[0], tokens[1:]
             if cmd in complete_cmds:
                 globals()[cmd](*args) # dict from name (string) to object (function)

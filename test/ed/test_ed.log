@@ -11,11 +11,11 @@ ed.py.txt, 441 lines
     ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
-441/441  .*ed.py.txt     ed.py.txt
+441/441  . ed.py.txt     ed.py.txt
     0/0    test_ed.txt   test_ed.txt
 
 > e() # describe current buffer
-441/441  .*ed.py.txt     ed.py.txt
+441/441  . ed.py.txt     ed.py.txt
 
 > p(1,6) # print lines 1 up through 6
 """
@@ -49,13 +49,13 @@ For more explanation see ed.md and the docstrings here.
 441
 
 > e()          # current buffer status
-100/441  .*ed.py.txt     ed.py.txt
+100/441  . ed.py.txt     ed.py.txt
 
 > n() # all buffers
     ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
-100/441  .*ed.py.txt     ed.py.txt
+100/441  . ed.py.txt     ed.py.txt
     0/0    test_ed.txt   test_ed.txt
 
 
@@ -68,20 +68,18 @@ For more explanation see ed.md and the docstrings here.
     ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
-100/441   *ed.py.txt     ed.py.txt
+100/441    ed.py.txt     ed.py.txt
     0/0  . test_ed.txt   test_ed.txt
 
 > D('foo.txt')  # buffer name expected, print error message
 ? buffer name
 
 > D('ed.py.txt')  # Delete buffer
-? unsaved changes, use DD to delete
 
 > n() # list all buffers
     ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
-100/441   *ed.py.txt     ed.py.txt
     0/0  . test_ed.txt   test_ed.txt
 
 > i("""Line 1   # insert at the beginning of the buffer

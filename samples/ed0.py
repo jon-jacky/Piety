@@ -120,21 +120,22 @@ def splitlines(string):
     'Split up string with embedded \n, return list of lines each with terminal \n'
     return [ line + '\n' for line in string.split('\n') ]
 
-def insert(iline, lines):
+def insert(iline, lines, new_buffer=False):
     'Insert lines (list of strings) before iline, update dot to last inserted line'
     buf().lines[iline:iline] = lines # sic, insert lines at this position
     buf().dot = iline + len(lines)-1
-    buf().unsaved = True
+    if not new_buffer:
+        buf().unsaved = True
 
 # files and buffers
 
-def r(iline, filename):
+def r(iline, filename, new_buffer=False):
     'Read file contents into buffer after iline'
     if os.path.isfile(filename): 
         fd = open(filename, mode='r')        
         strings = fd.readlines() # each string in lines ends with \n
         fd.close()
-        insert(iline+1, strings) # like append, below
+        insert(iline+1, strings, new_buffer=new_buffer) # like append, below
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'

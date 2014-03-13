@@ -1,6 +1,6 @@
 # sample.sh - test ed.py command mode and input mode  with example from ed.md
 #              additional commands confirm file got written and show its contents
-python -c "from ed import *; ed()" <<END
+python -c "from ed import *; ed()" <<'END'
 B test.txt
 a
 ed() enters ed command mode, with the : command  prompt.
@@ -13,7 +13,7 @@ To quit input mode, type a period by itself at the start of a line.
 w
 D
 B test.txt
-1,5p
+1,$p
 q
 END
 echo ""

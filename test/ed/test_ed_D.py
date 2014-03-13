@@ -1,11 +1,11 @@
 """
-test_ed_D.py - test D and DD delete buffer commands
+test_ed_D.py - test D and X delete buffer commands
 
 """
 
 from ed import *
 
-print' Test D with unsaved changes, then DD on current buffer'
+print' Test D with unsaved changes, then X on current buffer'
 print
 
 print "B('new.txt')"
@@ -24,8 +24,8 @@ print "D()"
 D()
 print
 
-print "DD()"
-DD()
+print "X()"
+X()
 print
 
 print "n()"
