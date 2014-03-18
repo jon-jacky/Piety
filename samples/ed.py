@@ -243,20 +243,30 @@ ed_cmds = complete_cmds + input_cmds
 
 # regular expressions for command parts, no spaces allowed
 number = re.compile(r'(\d+)')
-fwdsearch = re.compile(r'/(.*)/')
-bkdsearch = re.compile(r'\?(.*)\?')
+fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
+bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
 
 def match_address(command):
     'return line number at start of command (None of not found), and rest of command'
-    if command[0] == '.':
+    if command[0] == '.': # current line
         return o(), command[1:]
-    if command[0] == '$':
+    if command[0] == '$': # last line
         return S(), command[1:]
-    m = number.match(command)
+    if command[0] == ';': # equivalent to .,$  - current line to end
+        return o(), ',$'+ command[1:]
+    if command[0] in ',%': # equivalent to 1,$ - whole buffer
+        return 1, ',$'+ command[1:]
+    m = number.match(command) # digits, the line number
     if m:
         return int(m.group(1)), command[m.end():]
-    # FIXME - fwdsearch, bkdsearch to come
+    m = fwdsearch.match(command)  # /text/ or // - forward search
+    if m: 
+        return f(m.group(1)), command[m.end():]
+    m = bkdsearch.match(command)  # /text/ or // - forward search
+    if m: 
+        return z(m.group(1)), command[m.end():]
+    # FIXME - also handle /text/ ?text? -n +n 'c 
     return None, command
 
 def parse_cmd(command):
@@ -295,10 +305,11 @@ def ed():
     cmd = 'ed' # anything but 'q'
     while not cmd == 'q':
         if command_mode:
-            command = raw_input(':') # maybe make prompt a parameter
+            # FIXME blocks here at raw_input()
+            command = raw_input() # no prompt - maybe make prompt a parameter
             items = parse_cmd(command)
             if items[0] == 'ERROR':
-                return # parse_cmd already printed message
+                break # parse_cmd already printed message
             else:
                 tokens = tuple([ t for t in items if t != None ])
             cmd, args = tokens[0], tokens[1:]
