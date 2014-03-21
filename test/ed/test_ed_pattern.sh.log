@@ -1,66 +1,35 @@
-B('ed.py.txt')
 ed.py.txt, 441 lines
-l(1)
+                buf().dot = i
 """
-
-Search Forward - explicit pattern
-
-l(F('text'))
 ed.py - ed is the standard text editor.
   2/441  . ed.py.txt     ed.py.txt
-l(F('text'))
 ed is a line-oriented text editor written in pure Python.  It provides
   4/441  . ed.py.txt     ed.py.txt
-l(F('text'))
 Limitations: for now line addresses must be integers. text patterns
  13/441  . ed.py.txt     ed.py.txt
-l(F('text'))
         New text buffer
  30/441  . ed.py.txt     ed.py.txt
-
-Search backward (Reverse) - explicit pattern
-
-l(R(text))
 Limitations: for now line addresses must be integers. text patterns
  13/441  . ed.py.txt     ed.py.txt
-l(R(text))
 ed is a line-oriented text editor written in pure Python.  It provides
   4/441  . ed.py.txt     ed.py.txt
-l(R(text))
 ed.py - ed is the standard text editor.
   2/441  . ed.py.txt     ed.py.txt
-l(R(text))
-ed.py - ed is the standard text editor.
-  2/441  . ed.py.txt     ed.py.txt
-
-Search Forward again - stored pattern
-
-l(1)
+ed is a line-oriented text editor written in pure Python.  It provides
 """
-l(F(''))
 ed.py - ed is the standard text editor.
   2/441  . ed.py.txt     ed.py.txt
-l(F(''))
 ed is a line-oriented text editor written in pure Python.  It provides
   4/441  . ed.py.txt     ed.py.txt
-l(F(''))
 Limitations: for now line addresses must be integers. text patterns
  13/441  . ed.py.txt     ed.py.txt
-l(F(''))
         New text buffer
  30/441  . ed.py.txt     ed.py.txt
-
-search backward (Reverse) -  stored pattern
-
-l(R(''))
 Limitations: for now line addresses must be integers. text patterns
  13/441  . ed.py.txt     ed.py.txt
-l(R(''))
 ed is a line-oriented text editor written in pure Python.  It provides
   4/441  . ed.py.txt     ed.py.txt
-l(R(''))
 ed.py - ed is the standard text editor.
   2/441  . ed.py.txt     ed.py.txt
-l(R(''))
 ed.py - ed is the standard text editor.
   2/441  . ed.py.txt     ed.py.txt

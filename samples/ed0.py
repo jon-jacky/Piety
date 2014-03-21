@@ -106,11 +106,11 @@ def search(pattern, fwd=True):
     imatch = search_buf(forward=fwd) 
     return imatch if imatch else o()
 
-def f(pattern):
-    'Forward search for pattern, return line number where found, o() if not found'
+def F(pattern):
+    'Forward Search for pattern, return line number where found, o() if not found'
     return search(pattern, fwd=True)
 
-def z(pattern):
+def R(pattern):
     'Backward search for pattern, return line number where found, o() if not found'
     return search(pattern, fwd=False)
 
@@ -200,12 +200,12 @@ def c(start, end, string):
     d(start,end)
     i(start,string) # original start is now insertion point
 
-def s(start, end, pattern, new, glbl):
-    """Substitute new for pattern in lines from start up to end.
-    When glbl is True (the default), substitute all occurrences in each line,
+def s(start, end, old, new, glbl):
+    """Substitute new for old in lines from start up to end.
+    When glbl is True, substitute all occurrences in each line,
     otherwise substitute only the first occurrence in each line."""
     for i in range(start,end+1): # classic ed range is inclusive, unlike Python
-        if pattern in lines()[i]: # test to see if we should advance dot
-            lines()[i] = lines()[i].replace(pattern,new, -1 if glbl else 1)
+        if old in lines()[i]: # test to see if we should advance dot
+            lines()[i] = lines()[i].replace(old,new, -1 if glbl else 1)
             buf().dot = i
             buf().unsaved = True

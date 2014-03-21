@@ -18,10 +18,11 @@ p
 p
 1s/emacs/vi/
 p
-1/emacs/ed/g
+1s/emacs/ed/g
 1p
 2,4s/ed/vi/g
 1,$p
 2,4s/vi/emacs/
 1,$p
+q
 END

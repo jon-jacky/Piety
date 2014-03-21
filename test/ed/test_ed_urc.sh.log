@@ -1,9 +1,9 @@
-::    ./$    Buffer        File
+    ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
     0/0  . new.txt       None
-:test_cmd.py, 23 lines
-:"""
+test_cmd.py, 23 lines
+"""
 test_cmd - utility function for testing ed.py
 
 """
@@ -26,11 +26,11 @@ def test_cmd(f, descrip, *args):
     print
     buf().dot = saved_dot # put it back where it was, undo effect of p(...)
 
-:    f(*args) if args != ((),) else f() # empty args special case
-:README.md.txt, 17 lines
-:    instances
-::  27/40  .*new.txt       None
-:"""
+    f(*args) if args != ((),) else f() # empty args special case
+README.md.txt, 17 lines
+    instances
+  27/40  .*new.txt       None
+"""
 test_cmd - utility function for testing ed.py
 
 """
@@ -70,8 +70,8 @@ in *Piety/tests*.
     print
     buf().dot = saved_dot # put it back where it was, undo effect of p(...)
 
-:### This is the changed line ###
-::"""
+### This is the changed line ###
+"""
 test_cmd - utility function for testing ed.py
 
 """
@@ -98,4 +98,3 @@ in *Piety/tests*.
 
 - **test_writers**: demonstrate *writer* with two concurrent *Writer*
 ### This line replaces all that follows ###
-:

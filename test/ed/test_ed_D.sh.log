@@ -1,33 +1,33 @@
-:new.txt, 0 lines
-::    ./$    Buffer        File
+new.txt, 0 lines
+    ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
     1/1  .*new.txt       new.txt
-:? unsaved changes, use X to delete
-::    ./$    Buffer        File
+? unsaved changes, use X to delete
+    ./$    Buffer        File
     ---    ------        ----
     0/0  . scratch       None
-:new1.txt, 0 lines
-::    ./$    Buffer        File
+new1.txt, 1 lines
+    ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
-    1/1  .*new1.txt      new1.txt
-:new1.txt, 1 lines
-::    ./$    Buffer        File
+    1/2  .*new1.txt      new1.txt
+new1.txt, 2 lines
+    ./$    Buffer        File
     ---    ------        ----
     0/0  . scratch       None
-:new2.txt, 0 lines
-::    ./$    Buffer        File
+new2.txt, 1 lines
+    ./$    Buffer        File
     ---    ------        ----
     0/0    scratch       None
-    1/1  .*new2.txt      new2.txt
-:new2.txt, 1 lines
-::    ./$    Buffer        File
+    1/2  .*new2.txt      new2.txt
+new2.txt, 2 lines
+    ./$    Buffer        File
     ---    ------        ----
     0/0  . scratch       None
-    1/1    new2.txt      new2.txt
-::    ./$    Buffer        File
+    1/2    new2.txt      new2.txt
+    ./$    Buffer        File
     ---    ------        ----
     0/0  . scratch       None
-:
+
 Remove new1.txt, new2.txt before running script again to obtain same results

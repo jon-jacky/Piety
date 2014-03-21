@@ -11,36 +11,36 @@ print "l(1)"
 l(1)
 
 print """
-Search forward - explicit pattern
+Search Forward - explicit pattern
 """
 for i in range(4):
-    print "l(f('text'))"
-    l(f('text'))
+    print "l(F('text'))"
+    l(F('text'))
     e()
 
 print """
-Search backward - explicit pattern
+Search backward (Reverse) - explicit pattern
 """
 for i in range(4):
-    print "l(z(text))"
-    l(z('text'))
+    print "l(R(text))"
+    l(R('text'))
     e()
 
 print """
-Search forward again - stored pattern
+Search Forward again - stored pattern
 """
 print "l(1)"
 l(1) # back to top
 for i in range(4):
-    print "l(f(''))"
-    l(f(''))
+    print "l(F(''))"
+    l(F(''))
     e()
 
 
 print """
-search backward - stored pattern
+search backward (Reverse) -  stored pattern
 """
 for i in range(4):
-    print "l(z(''))"
-    l(z(''))
+    print "l(R(''))"
+    l(R(''))
     e()

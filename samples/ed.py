@@ -2,9 +2,9 @@
 ed.py - ed is the standard text editor.  
 
 ed is a line-oriented text editor written in pure Python.  It provides
-some of the commands from the classic Unix editor ed, augmented with
-commands for managing multiple buffers and files from the later Unix
-(and Plan 9) editor, sam.  You can use it in a command mode that
+many of the commands from the classic Unix editor ed, augmented with a
+few commands for managing multiple buffers and files from the later
+Unix (and Plan 9) editor, sam.  You can use it in a command mode that
 emulates Unix ed, or use its API to edit from the Python prompt or
 write editing scripts in Python.
 
@@ -22,7 +22,7 @@ import re, os
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
 # use these here without prefix
-from ed0 import buffers, lines, o, S, buf, f, z, mk_start, mk_range, start_ok, start_empty_ok, range_ok
+from ed0 import buffers, lines, o, S, buf, F, R, mk_start, mk_range, start_ok, start_empty_ok, range_ok
 # must use ed0.current with prefix here to get correct value as it is updated
 
 # arg lists, defaults, range checking
@@ -209,26 +209,26 @@ def c(*args):
         
 def s(*args):
     """
-    Substitute new for pattern in lines from start up to end.
-    When glbl is True (the default), substitute all occurrences in each line,
-    otherwise substitute only the first occurrence in each line.
+    Substitute new for old in lines from start up to end.
+    When glbl is False (the default), substitute only the first occurrence 
+    in each line.  Otherwise substitute all occurrences in each line
     """
-    start, end, pattern, params = parse_args(args)
+    start, end, old, params = parse_args(args)
     istart, iend = mk_range(start, end)
     if not range_ok(istart, iend):
         print '? address out of range'
         return
     # params might be [ new, glbl ]
-    if pattern and len(params) > 0 and isinstance(params[0],str):
+    if old and len(params) > 0 and isinstance(params[0],str):
         new = params[0]
     else:
-        print '? pattern, replacement'
+        print '? old, new'
         return
     if len(params) > 1:
         glbl = bool(params[1])
     else:
-        glbl = True
-    ed0.s(istart, iend, pattern, new, glbl)
+        glbl = False # default
+    ed0.s(istart, iend, old, new, glbl)
 
 # command mode
 
@@ -262,11 +262,11 @@ def match_address(command):
         return int(m.group(1)), command[m.end():]
     m = fwdsearch.match(command)  # /text/ or // - forward search
     if m: 
-        return f(m.group(1)), command[m.end():]
-    m = bkdsearch.match(command)  # /text/ or // - forward search
+        return F(m.group(1)), command[m.end():] # FIXME rename S
+    m = bkdsearch.match(command)  # ?text? or ?? - backward search
     if m: 
-        return z(m.group(1)), command[m.end():]
-    # FIXME - also handle /text/ ?text? -n +n 'c 
+        return R(m.group(1)), command[m.end():] # FIXME rename R
+    # FIXME - also handle -n +n 'c 
     return None, command
 
 def parse_cmd(command):
@@ -293,13 +293,17 @@ def parse_cmd(command):
     else:
         print '? command expected at ...%s' % tail
         return 'ERROR', istart, jend, params
-    # downstream code may extract multiple args from params
-    return cmd, istart, jend, params if params else None 
+    # command-specific parameter parsing
+    if cmd == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
+        empty, old, new, glbl = params.split('/') # glbl == '' when g absent
+        return cmd, istart, jend, old, new, glbl
+    else:
+        return cmd, istart, jend, params if params else None 
 
 def ed():
     """
     Top level ed command to use at Python prompt.
-    This version won't work in Piety because it calls blocking command raw_input
+    This version won't work in Piety, it calls blocking command raw_input
     """
     command_mode = True # alternates with input mode used by a,i,c commands
     cmd = 'ed' # anything but 'q'
