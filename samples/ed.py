@@ -222,7 +222,7 @@ def s(*args):
     if old and len(params) > 0 and isinstance(params[0],str):
         new = params[0]
     else:
-        print '? old, new'
+        print '? /old/new/'
         return
     if len(params) > 1:
         glbl = bool(params[1])
@@ -249,6 +249,8 @@ text = re.compile(r'(.*)') # nonblank
 
 def match_address(command):
     'return line number at start of command (None of not found), and rest of command'
+    if command == '':
+        return None, '' 
     if command[0] == '.': # current line
         return o(), command[1:]
     if command[0] == '$': # last line
@@ -278,18 +280,23 @@ def parse_cmd(command):
     All are optional except cmd, assigns None if item is not present
     """
     cmd, istart, jend, params = None, None, None, None
-    # look for start address, optional. if no match istart,tail == None,command
+    # look for start addr, optional. if no match istart,tail == None,command
     istart, tail = match_address(command)
     # look for end address, optional
     if istart != None:
-        if tail[0] == ',': # precedes end address, following addr NOT optional
+        if tail and tail[0] == ',': # addr separator, next addr NOT optional
             jend, tail = match_address(tail[1:])
             if jend == None:
                 print '? end address expected at ...%s' % tail
                 return 'ERROR', istart, jend, params
     # look for command, NOT optional
-    if tail[0] in ed_cmds:  # command
+    if tail and tail[0] in ed_cmds:
         cmd, params = tail[0], tail[1:].strip()
+    # special case command names
+    elif tail == '':
+        cmd = 'l' # default for empty command
+    elif tail[0] == '=':
+        cmd = 'e'
     else:
         print '? command expected at ...%s' % tail
         return 'ERROR', istart, jend, params
@@ -297,6 +304,7 @@ def parse_cmd(command):
     if cmd == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
         return cmd, istart, jend, old, new, glbl
+    # all other commands, no special parameter parsing
     else:
         return cmd, istart, jend, params if params else None 
 
