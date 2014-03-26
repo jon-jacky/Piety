@@ -8,12 +8,12 @@ Unix (and Plan 9) editor, sam.  You can use it in a command mode that
 emulates Unix ed, or use its API to edit from the Python prompt or
 write editing scripts in Python.
 
-For more explanation see ed.md and the docstrings here.
+This module provides both the classic command interface and the public
+Python API.  Another module, ed0.py, provides the core: data structures
+and the internal API.
 
-Limitations: 
-   In s(ubstitute) command, pattern must be literal string, not regexp
-   search pattern must be literal string, not regexp
-   searches only to end (or beginning) of buffer, no wraparound
+For more explanation see ed.md, the docstrings here, and the tests
+in Piety/test/ed/
 
 """
 

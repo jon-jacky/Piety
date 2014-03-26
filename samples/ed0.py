@@ -1,8 +1,9 @@
 """
 ed0.py - editor core: data structures and functions used by ed.py
 
-In this API there are no optional or keyword arguments.
-There is no error checking, no error messages, and no progress messages.
+In this module each function has a fixed (positional) argument list,
+provides no error checking, and no error messages or progress
+messages.
 
 This API uses the classic Unix ed conventions for indexing and range
 (which are unlike Python): The index of the first line is 1, the index
