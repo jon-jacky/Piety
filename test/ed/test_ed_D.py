@@ -80,8 +80,8 @@ print "w()"
 w()
 print
 
-print "b('scratch')"
-b('scratch')
+print "b('main')"
+b('main')
 print "n()"
 n()
 print

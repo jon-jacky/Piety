@@ -1,7 +1,7 @@
     ./$    Buffer        File
     ---    ------        ----
-    0/0    scratch       None
-    0/0  . new.txt       None
+    0/0    main          no current filename
+    0/0  . new.txt       no current filename
 test_cmd.py, 23 lines
 """
 test_cmd - utility function for testing ed.py
@@ -13,8 +13,8 @@ from ed import *
 def test_cmd(f, descrip, *args):
     print '> %s%s # %s' % (f.__name__, args, descrip)
     f(*args) if args != ((),) else f() # empty args special case
-    print "> e() # print buffer status"
-    e()
+    print "> b() # print buffer status"
+    b()
     if buf().lines:
         print "> p() # print the current line"
         p()
@@ -29,7 +29,7 @@ def test_cmd(f, descrip, *args):
     f(*args) if args != ((),) else f() # empty args special case
 README.md.txt, 17 lines
     instances
-  27/40  .*new.txt       None
+  27/40  .*new.txt       test_cmd.py
 """
 test_cmd - utility function for testing ed.py
 
@@ -57,8 +57,8 @@ in *Piety/tests*.
 
 - **test_writers**: demonstrate *writer* with two concurrent *Writer*
 ### This is the changed line ###
-    print "> e() # print buffer status"
-    e()
+    print "> b() # print buffer status"
+    b()
     if buf().lines:
         print "> p() # print the current line"
         p()

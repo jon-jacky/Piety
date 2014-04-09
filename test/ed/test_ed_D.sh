@@ -23,7 +23,7 @@ Here is a line
 .
 n
 w
-b scratch
+b main
 n
 D new2.txt
 n

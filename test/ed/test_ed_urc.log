@@ -1,21 +1,21 @@
 > b('new.txt',) # create buffer
-> e() # print buffer status
-    0/0  . new.txt       None
+> b() # print buffer status
+    0/0  . new.txt       no current filename
 > p() # print the current line
-? address out of range
+? invalid address
 > p(1,S())   # print the entire buffer
-? address out of range
+? invalid address
 
 > n() # print buffers
     ./$    Buffer        File
     ---    ------        ----
-    0/0    scratch       None
-    0/0  . new.txt       None
+    0/0    main          no current filename
+    0/0  . new.txt       no current filename
 
 > r('test_cmd.py',) # read file into empty buffer
 test_cmd.py, 23 lines
-> e() # print buffer status
-  23/23  .*new.txt       None
+> b() # print buffer status
+  23/23  .*new.txt       test_cmd.py
 > p() # print the current line
 
 > p(1,S())   # print the entire buffer
@@ -29,8 +29,8 @@ from ed import *
 def test_cmd(f, descrip, *args):
     print '> %s%s # %s' % (f.__name__, args, descrip)
     f(*args) if args != ((),) else f() # empty args special case
-    print "> e() # print buffer status"
-    e()
+    print "> b() # print buffer status"
+    b()
     if buf().lines:
         print "> p() # print the current line"
         p()
@@ -48,8 +48,8 @@ def test_cmd(f, descrip, *args):
 
 > r('README.md.txt',) # read file into middle of buffer
 README.md.txt, 17 lines
-> e() # print buffer status
-  27/40  .*new.txt       None
+> b() # print buffer status
+  27/40  .*new.txt       test_cmd.py
 > p() # print the current line
     instances
 > p(1,S())   # print the entire buffer
@@ -80,8 +80,8 @@ in *Piety/tests*.
 
 - **test_writers**: demonstrate *writer* with two concurrent *Writer*
     instances
-    print "> e() # print buffer status"
-    e()
+    print "> b() # print buffer status"
+    b()
     if buf().lines:
         print "> p() # print the current line"
         p()
@@ -98,8 +98,8 @@ in *Piety/tests*.
     instances
 
 > c('### This is the changed line ###',) # change the current line
-> e() # print buffer status
-  27/40  .*new.txt       None
+> b() # print buffer status
+  27/40  .*new.txt       test_cmd.py
 > p() # print the current line
 ### This is the changed line ###
 > p(1,S())   # print the entire buffer
@@ -130,8 +130,8 @@ in *Piety/tests*.
 
 - **test_writers**: demonstrate *writer* with two concurrent *Writer*
 ### This is the changed line ###
-    print "> e() # print buffer status"
-    e()
+    print "> b() # print buffer status"
+    b()
     if buf().lines:
         print "> p() # print the current line"
         p()
@@ -145,8 +145,8 @@ in *Piety/tests*.
 
 
 > c(27, 40, '### This line replaces all that followed ###') # replace all the remaining lines
-> e() # print buffer status
-  27/27  .*new.txt       None
+> b() # print buffer status
+  27/27  .*new.txt       test_cmd.py
 > p() # print the current line
 ### This line replaces all that followed ###
 > p(1,S())   # print the entire buffer

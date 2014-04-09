@@ -1,9 +1,9 @@
 Line 0
 Line 1
 Line 2
-    3/3  .*scratch       None
-? file name
-? address out of range
+    3/3  .*main          no current filename
+? no current filename
+? invalid address
 rtest0.txt, 1 lines
 Line 0
 Line 1

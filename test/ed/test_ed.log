@@ -10,11 +10,11 @@ ed.py.txt, 441 lines
 > n() # list all buffers
     ./$    Buffer        File
     ---    ------        ----
-    0/0    scratch       None
-441/441  . ed.py.txt     ed.py.txt
     0/0    test_ed.txt   test_ed.txt
+    0/0    main          no current filename
+441/441  . ed.py.txt     ed.py.txt
 
-> e() # describe current buffer
+> b() # describe current buffer
 441/441  . ed.py.txt     ed.py.txt
 
 > p(1,6) # print lines 1 up through 6
@@ -48,28 +48,28 @@ For more explanation see ed.md and the docstrings here.
 > print S()    # length of buffer
 441
 
-> e()          # current buffer status
+> b()          # current buffer status
 100/441  . ed.py.txt     ed.py.txt
 
 > n() # all buffers
     ./$    Buffer        File
     ---    ------        ----
-    0/0    scratch       None
-100/441  . ed.py.txt     ed.py.txt
     0/0    test_ed.txt   test_ed.txt
+    0/0    main          no current filename
+100/441  . ed.py.txt     ed.py.txt
 
 
 > b('test_ed.txt') # set current buffer
 
-> e() # current buffer
+> b() # current buffer
     0/0  . test_ed.txt   test_ed.txt
 
 > n() # all buffers
     ./$    Buffer        File
     ---    ------        ----
-    0/0    scratch       None
-100/441    ed.py.txt     ed.py.txt
     0/0  . test_ed.txt   test_ed.txt
+    0/0    main          no current filename
+100/441    ed.py.txt     ed.py.txt
 
 > D('foo.txt')  # buffer name expected, print error message
 ? buffer name
@@ -79,8 +79,8 @@ For more explanation see ed.md and the docstrings here.
 > n() # list all buffers
     ./$    Buffer        File
     ---    ------        ----
-    0/0    scratch       None
     0/0  . test_ed.txt   test_ed.txt
+    0/0    main          no current filename
 
 > i("""Line 1   # insert at the beginning of the buffer
 ...

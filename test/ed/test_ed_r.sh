@@ -7,7 +7,7 @@ Line 1
 Line 2
 .
 1,$p
-e
+b
 r
 101r rtest0.txt
 r rtest0.txt

@@ -5,7 +5,7 @@ B 42
 B test_ed.txt
 B ed.py.txt
 n
-e
+b
 1,6p
 7l
 l
@@ -15,12 +15,12 @@ l
 p
 100p
 p
-.e
-$e
-e
+.=
+=
+b
 n
 b test_ed.txt
-e
+b
 n
 D foo.txt
 D ed.py.txt
@@ -62,7 +62,6 @@ Line III
 p
 1,$p
 w
-p
 13l
 p
 d

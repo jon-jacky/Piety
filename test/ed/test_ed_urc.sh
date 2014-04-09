@@ -11,7 +11,7 @@ p
 c
 ### This is the changed line ###
 .
-e
+b
 1,$p
 27l
 .,$c
@@ -20,4 +20,3 @@ e
 1,$p
 q
 END
-

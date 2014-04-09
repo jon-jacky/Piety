@@ -30,8 +30,8 @@ class Buffer(object):
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 
 # There is always a current buffer so we can avoid check for special case
-# Start with one empty buffer named 'scratch', can't ever delete it
-current = 'scratch'
+# Start with one empty buffer named 'main', can't ever delete it
+current = 'main'
 buffers[current] = Buffer()  
 
 # access to data structures
@@ -130,6 +130,10 @@ def insert(iline, lines, new_buffer=False):
 
 # files and buffers
 
+def f(filename):
+    'set default filename for current buffer'
+    buf().filename = filename
+
 def r(iline, filename, new_buffer=False):
     'Read file contents into buffer after iline'
     if os.path.isfile(filename): 
@@ -140,13 +144,16 @@ def r(iline, filename, new_buffer=False):
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
-    global current
     if name in buffers:
         current = name
-    else:
-        temp = Buffer()
-        buffers[name] = temp
-        current = name
+        return
+    b_new(name)
+
+def b_new(name):
+    global current
+    temp = Buffer()
+    buffers[name] = temp
+    current = name
 
 def w(name):
     'Write current buffer contents to file name'

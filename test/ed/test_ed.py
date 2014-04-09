@@ -26,8 +26,8 @@ print
 print "> n() # list all buffers"
 n()
 print
-print "> e() # describe current buffer"
-e()
+print "> b() # describe current buffer"
+b()
 print
 
 print "> p(1,6) # print lines 1 up through 6"
@@ -57,8 +57,8 @@ print
 print "> print S()    # length of buffer"
 print S()
 print
-print "> e()          # current buffer status"
-e()
+print "> b()          # current buffer status"
+b()
 print
 
 print "> n() # all buffers"
@@ -69,8 +69,8 @@ print
 print "> b('test_ed.txt') # set current buffer"
 b('test_ed.txt')
 print 
-print "> e() # current buffer"
-e()
+print "> b() # current buffer"
+b()
 print
 print "> n() # all buffers"
 n()

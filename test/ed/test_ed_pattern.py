@@ -16,7 +16,7 @@ Search Forward - explicit pattern
 for i in range(4):
     print "l(F('text'))"
     l(F('text'))
-    e()
+    b()
 
 print """
 Search backward (Reverse) - explicit pattern
@@ -24,7 +24,7 @@ Search backward (Reverse) - explicit pattern
 for i in range(4):
     print "l(R(text))"
     l(R('text'))
-    e()
+    b()
 
 print """
 Search Forward again - stored pattern
@@ -34,7 +34,7 @@ l(1) # back to top
 for i in range(4):
     print "l(F(''))"
     l(F(''))
-    e()
+    b()
 
 
 print """
@@ -43,4 +43,4 @@ search backward (Reverse) -  stored pattern
 for i in range(4):
     print "l(R(''))"
     l(R(''))
-    e()
+    b()

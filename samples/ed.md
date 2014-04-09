@@ -13,7 +13,7 @@ the Python prompt or write editing scripts in Python.
 
 **ed** supports these commands from classic *ed*:
 
- *= a c d i l p q r s w*
+ *= a c d e E f i l p q r s w*
 
 **ed** supports these line address forms from classic *ed*:
 
@@ -35,13 +35,13 @@ interactive Python session.  Here is a brief example:
 
     >>> from ed import *
     >>> ed()
-    B test.txt
+    e test.txt
     test.txt, 0 lines
     a
     ed() enters ed command mode.  By default, there is no command  prompt.
-    'B <name>' creates a new buffer and loads the named file
+    'e <name>' loads the named file into the current buffer.
     'a' enters ed input mode and appends the text after the current line.
-    'w' writes the buffer contents back to the file
+    'w' writes the buffer contents back to the file.
     'q' quits ed command mode.
     To quit input mode, type a period by itself at the start of a line.
     .
@@ -61,10 +61,10 @@ write editing scripts in Python.  Here is the preceding example
 expressed using the API:
 
     >>> from ed import *
-    >>> B('test.txt')
+    >>> e('test.txt')
     test.txt, 0 lines
-    >>> a("""ed() enters ed command mode, with the : command  prompt.
-    ... 'B <name>' creates a new buffer and loads the named file
+    >>> a("""ed() enters ed command mode.  By default, there is no command prompt.
+    ... 'e <name>' loads the named file into the current buffer.
     ... 'a' enters ed input mode and appends the text after the current line.
     ... 'w' writes the buffer contents back to the file
     ... 'q' quits ed command mode.
@@ -79,8 +79,9 @@ are printed by the interactive Python interpreter, they are not part
 of the string argument.)
 
 For every supported *ed* command there is a corresponding API function
-with the same name.  Usually all of the arguments are optional (the
-functions are all defined with *args argument lists).  
+with the same name (the *A* (for address) function implements *=*).
+Usually all of the arguments are optional (the functions are all
+defined with *args argument lists).
 
 Arguments appear in the same order as they do in command mode, so the
 *ed* print commands *p* *1p* and *1,4p* correspond to the API print
@@ -103,18 +104,18 @@ messages or progress messages.
 
 ## Limitations ##
 
-**ed** does not support the classic *ed* commands *e E* and *f*.  Use
-*b* and *B* from *sam* instead.  This will be fixed soon.
-
-**ed** does not support these other classic *ed* commands: 
+**ed** does not support these classic *ed* commands: 
 *H h j k m n P Q t u wq W z*.  Some of these might be supported in the
 future.
 
-**ed** does not support the classic *ed* iteration commands *g G v V*.
-We do not plan to support these in the future.
-
 **ed** does not support the classic *ed* address forms *+ - ^ -n ^n +n*.
 Some of these might be supported in the future.
+
+**ed** does not support the classic *ed* *p* command suffix (for
+printing the current line after any command).
+
+**ed** does not support the classic *ed* iteration commands *g G v V*.
+We do not plan to support these in the future.
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
@@ -129,6 +130,4 @@ There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-Revised Mar 2014
-
-
+Revised Apr 2014
