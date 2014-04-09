@@ -14,7 +14,6 @@ and the internal API.
 
 For more explanation see ed.md, the docstrings here, and the tests
 in Piety/test/ed/
-
 """
 
 import re, os
@@ -89,9 +88,7 @@ def E(*args):
         print '? no current filename'
         return
     ed0.b_new(ed0.current) # replace previous current buffer with new buffer
-    # FIXME? next 3 lines repeated at end of B()
-    buf().filename = filename
-    ed0.r(0, filename, new_buffer=True) # FIXME? does r really need new_buffer 
+    ed0.r_new(filename)
     print '%s, %d lines' % (filename, S())
 
 def r(*args):
@@ -131,9 +128,7 @@ def B(*args):
         print '? buffer name %s already in use' % buffername
         return
     ed0.b(buffername)
-    # FIXME? next 3 lines repeated at end of E
-    buf().filename = filename
-    ed0.r(0, filename, new_buffer=True)
+    ed0.r_new(filename)
     print '%s, %d lines' % (filename, S())
 
 def w(*args):

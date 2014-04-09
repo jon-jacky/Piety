@@ -82,12 +82,12 @@ def range_ok(start, end):
 
 # search, line addresses
 
-def search_buf(forward=True):
+def search_buf(forward):
     """Search for buf().pattern.  Search forward from .+1 to end of buffer
-    (or if forward=False, search backward from .-1 to start of buffer)
+    (or if forward is False, search backward from .-1 to start of buffer)
     If found, return line number.  If not found, return None.
     This version stops at end (or start) of buffer, does not wrap around.
-    This verion searches for exact match, not regex match."""
+    This version searches for exact match, not regex match."""
     found = False
     slines = lines()[o()+1:] if forward else reversed(lines()[:o()-1])
     for imatch, line in enumerate(slines):
@@ -98,22 +98,22 @@ def search_buf(forward=True):
         return None
     return o()+1 + imatch if forward else o()-2 - imatch
 
-def search(pattern, fwd=True):
+def search(pattern, forward):
     """Update buf().pattern if pattern is nonempty, otherwise retain old pattern
     Search for buf().pattern, return line number where found, dot if not found
-    Search forward if fwd is True, backward otherwise."""
+    Search forward if forward is True, backward otherwise."""
     if pattern:
         buf().pattern = pattern 
-    imatch = search_buf(forward=fwd) 
+    imatch = search_buf(forward)
     return imatch if imatch else o()
 
 def F(pattern):
     'Forward Search for pattern, return line number where found, o() if not found'
-    return search(pattern, fwd=True)
+    return search(pattern, True)
 
 def R(pattern):
     'Backward search for pattern, return line number where found, o() if not found'
-    return search(pattern, fwd=False)
+    return search(pattern, False)
 
 # helpers for a(ppend), i(nsert), c(hange), r(ead)
 
@@ -121,12 +121,11 @@ def splitlines(string):
     'Split up string with embedded \n, return list of lines each with terminal \n'
     return [ line + '\n' for line in string.split('\n') ]
 
-def insert(iline, lines, new_buffer=False):
+def insert(iline, lines):
     'Insert lines (list of strings) before iline, update dot to last inserted line'
     buf().lines[iline:iline] = lines # sic, insert lines at this position
     buf().dot = iline + len(lines)-1
-    if not new_buffer:
-        buf().unsaved = True
+    buf().unsaved = True # usually the right thing but ed.B and E override it.
 
 # files and buffers
 
@@ -134,13 +133,19 @@ def f(filename):
     'set default filename for current buffer'
     buf().filename = filename
 
-def r(iline, filename, new_buffer=False):
+def r(iline, filename):
     'Read file contents into buffer after iline'
     if os.path.isfile(filename): 
         fd = open(filename, mode='r')        
         strings = fd.readlines() # each string in lines ends with \n
         fd.close()
-        insert(iline+1, strings, new_buffer=new_buffer) # like append, below
+        insert(iline+1, strings) # like append, below
+
+def r_new(filename):
+    'Read file contents into new empty current buffer'
+    buf().filename = filename
+    r(0, filename)
+    buf().unsaved = False # insert in r sets unsaved = True, this is exception
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
@@ -150,9 +155,10 @@ def b(name):
     b_new(name)
 
 def b_new(name):
+    'Create buffer with given name. Replace any existing buffer with same name'
     global current
     temp = Buffer()
-    buffers[name] = temp
+    buffers[name] = temp # replace buffers[name] if it already exists
     current = name
 
 def w(name):
