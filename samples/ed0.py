@@ -141,12 +141,6 @@ def r(iline, filename):
         fd.close()
         insert(iline+1, strings) # like append, below
 
-def r_new(filename):
-    'Read file contents into new empty current buffer'
-    buf().filename = filename
-    r(0, filename)
-    buf().unsaved = False # insert in r sets unsaved = True, this is exception
-
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
     if name in buffers:
@@ -160,6 +154,13 @@ def b_new(name):
     temp = Buffer()
     buffers[name] = temp # replace buffers[name] if it already exists
     current = name
+
+def r_new(buffername, filename):
+    'Create new buffer, Read in file contents'
+    b_new(buffername)
+    buf().filename = filename
+    r(0, filename)
+    buf().unsaved = False # insert in r sets unsaved = True, this is exception
 
 def w(name):
     'Write current buffer contents to file name'

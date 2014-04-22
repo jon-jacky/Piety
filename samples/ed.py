@@ -20,9 +20,9 @@ import re, os
 
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
-# use these here without prefix
-from ed0 import buffers, lines, o, S, buf, F, R, mk_start, mk_range, start_ok, start_empty_ok, range_ok
-# must use ed0.current with prefix here to get correct value as it is updated
+
+# can use these with no ed0 prefix, convenient for interactive sessions
+from ed0 import o, S, F, R, buf
 
 # arg lists, defaults, range checking
 
@@ -87,8 +87,7 @@ def E(*args):
     if not filename:
         print '? no current filename'
         return
-    ed0.b_new(ed0.current) # replace previous current buffer with new buffer
-    ed0.r_new(filename)
+    ed0.r_new(ed0.current, filename) # replace previous current buffer with new
     print '%s, %d lines' % (filename, S())
 
 def r(*args):
@@ -97,8 +96,8 @@ def r(*args):
     filename = current_filename(name)
     if not filename:
         return # current_filename already printed error msg
-    iline = mk_start(start)
-    if not start_empty_ok(iline): # r command works even for empty buffer
+    iline = ed0.mk_start(start)
+    if not ed0.start_empty_ok(iline): # r command works even for empty buffer
         print '? invalid address'
         return
     S0 = S() # record number of lines now to calc how many we read
@@ -123,12 +122,11 @@ def B(*args):
         print '? file name'
         return
     buffername = os.path.basename(filename) # may differ from filename
-    if buffername in buffers:
+    if buffername in ed0.buffers:
         # FIXME? create new buffername a la emacs name<1>, name<2> etc.
         print '? buffer name %s already in use' % buffername
         return
-    ed0.b(buffername)
-    ed0.r_new(filename)
+    ed0.r_new(buffername, filename)
     print '%s, %d lines' % (filename, S())
 
 def w(*args):
@@ -138,13 +136,13 @@ def w(*args):
     if not filename:
         return # current_filename already printed error msg
     ed0.w(filename)
-    print '%s, %d lines' % (filename, len(lines())-1) # don't print empty line 0
+    print '%s, %d lines' % (filename, S())
 
 def D(*args):
     'Delete the named buffer, if unsaved changes print message and exit'
     x, xx, text, xxx = parse_args(args)
     name = text if text else ed0.current
-    if name in buffers and buffers[name].unsaved:
+    if name in ed0.buffers and ed0.buffers[name].unsaved:
         print '? unsaved changes, use X to delete'
         return
     X(*args)
@@ -153,7 +151,7 @@ def X(*args):
     'Delete the named buffer, even if it has unsaved changes'
     x, xx, text, xxx = parse_args(args)
     name = text if text else ed0.current
-    if not name in buffers:
+    if not name in ed0.buffers:
         print '? buffer name'
         return
     if name == 'main':
@@ -165,7 +163,7 @@ def X(*args):
 
 def print_status(bufname, iline):
     'used by e and n, given bufname and iline prints dot, $, filename, unsaved'
-    buf = buffers[bufname]
+    buf = ed0.buffers[bufname]
     loc = '%s/%d' % (iline, len(buf.lines)-1) # don't count empty first line
     print '%7s  %s%s%-12s  %s' % (loc, 
                                '.' if bufname == ed0.current else ' ',
@@ -177,7 +175,7 @@ def A(*args):
     ' = in command mode, print the line number of the addressed line'
     start, x, xx, xxx = parse_args(args)
     iline = start if start != None else S() # default $ not .
-    if start_empty_ok(iline): # don't print error message when file is empty
+    if ed0.start_empty_ok(iline): # don't print error message when file is empty
         print iline
     else:
         print '? invalid address'
@@ -186,16 +184,16 @@ def n(*args):
     'Print status of all buffers'
     print """    ./$    Buffer        File
     ---    ------        ----"""
-    for name in buffers:
-        print_status(name, buffers[name].dot)
+    for name in ed0.buffers:
+        print_status(name, ed0.buffers[name].dot)
     
 # Displaying and navigating text
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
     istart, jend, x, xx = parse_args(args)
-    start, end = mk_range(istart, jend)
-    if not range_ok(start, end):
+    start, end = ed0.mk_range(istart, jend)
+    if not ed0.range_ok(start, end):
         print '? invalid address'
         return
     ed0.p(start, end)
@@ -203,13 +201,13 @@ def p(*args):
 def l(*args):
     'Advance dot to iline and print it'
     iline, x, xx, xxx = parse_args(args)
-    if not lines():
+    if not ed0.lines():
         print '? empty buffer'
         return
     # don't use usual default dot here, instead advance dot
     if iline == None:
         iline = o() + 1
-    if not start_ok(iline):
+    if not ed0.start_ok(iline):
         print '? invalid address'
         return
     ed0.l(iline)
@@ -227,8 +225,8 @@ def i(*args):
 def ai_cmd(cmd, args):
     'a(ppend) or i(nsert) command'
     start, x, text, xx = parse_args(args)
-    iline = mk_start(start)
-    if not start_empty_ok(iline):  # a, i commands work even for empty buffer
+    iline = ed0.mk_start(start)
+    if not ed0.start_empty_ok(iline): # a, i commands work even for empty buffer
         print '? invalid address'
         return
     if text:
@@ -237,8 +235,8 @@ def ai_cmd(cmd, args):
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
     start, end, x, xxx = parse_args(args)
-    istart, iend = mk_range(start, end)
-    if not range_ok(istart, iend):
+    istart, iend = ed0.mk_range(start, end)
+    if not ed0.range_ok(istart, iend):
         print '? invalid address'
         return
     ed0.d(istart, iend)
@@ -246,8 +244,8 @@ def d(*args):
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
     start, end, text, x = parse_args(args)
-    istart, iend = mk_range(start, end)
-    if not range_ok(istart, iend):
+    istart, iend = ed0.mk_range(start, end)
+    if not ed0.range_ok(istart, iend):
         print '? invalid address'
         return
     ed0.c(istart,iend,text)
@@ -259,8 +257,8 @@ def s(*args):
     in each line.  Otherwise substitute all occurrences in each line
     """
     start, end, old, params = parse_args(args)
-    istart, iend = mk_range(start, end)
-    if not range_ok(istart, iend):
+    istart, iend = ed0.mk_range(start, end)
+    if not ed0.range_ok(istart, iend):
         print '? invalid address'
         return
     # params might be [ new, glbl ]
