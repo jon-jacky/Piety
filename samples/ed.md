@@ -22,13 +22,19 @@ the Python prompt or write editing scripts in Python.
 Classic *ed* is described in many books: *The Unix Programming
 Environment* by Kernighan and Pike, *Software Tools* by Kernighan and
 Plauger, etc.  Or just type *man ed* on any Unix-like system
-(including Mac OS X).
+(including Mac OS X).  The version of *ed* in Plan 9 is almost the
+same, and is described in a completely rewritten man page at
+[http://plan9.bell-labs.com/magic/man2html/1/ed](http://plan9.bell-labs.com/magic/man2html/1/ed)
+and
+[http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
 
 **ed** also supports these commands from *sam*:
 
  *b B D n*
 
-The *sam* editor is described at [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html).
+The *sam* editor is described at
+[http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
+and [http://sam.cat-v.org/](http://sam.cat-v.org/).
 
 **ed** can run as a standalone program, but is intended to run in an
 interactive Python session.  Here is a brief example:
@@ -115,7 +121,6 @@ Some of these might be supported in the future.
 printing the current line after any command).
 
 **ed** does not support the classic *ed* iteration commands *g G v V*.
-We do not plan to support these in the future.
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
@@ -126,8 +131,15 @@ forward to the end of the buffer (or backward to the beginning). It
 does not wrap around and continue searching from the beginning (or
 end).
 
+The *B* command accepts only one file name argument, not multiple file
+names as in *sam*.
+
 There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
+
+In command mode, **ed** blocks while waiting for the next command, so
+it cannnot work with a cooperative mulitasking scheduler such as
+*piety*.  We plan to fix this.
 
 Revised Apr 2014
