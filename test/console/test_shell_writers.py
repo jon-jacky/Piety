@@ -2,19 +2,19 @@
 test_shell_writers.py - demonstrate Peity scheduler with Python shell and writers
 
  $ python -i test_shell_writers.py
-piety> x  \ =^U
-piety> 'Both writers are writing!'
+pysh>> x  \ =^U
+pysh>> 'Both writers are writing!'
 'Both writers are writing!'
-piety> x = 42
-piety> ^C
+pysh>> x = 42
+pysh>> ^C
 ...
 KeyboardInterrupt
 >>> x
 42
 >>> test()
-piety> 'Both writers have resumes\sd!'
+pysh>> 'Both writers have resumes\sd!'
 'Both writers have resumed!'
-piety>
+pysh>>
 
 """
 
@@ -34,7 +34,7 @@ t1.enabled = (lambda: bool(piety.ievent[piety.timeout]%2)) # every other event
 # create shell here not in pysht module
 #  so we can have multiple shell instances
 main_gbls = sys.modules['__main__'].__dict__
-shell = Console(prompt='piety> ', command=pysht.mk_shell(main_gbls))
+shell = Console(prompt='pysh>> ', command=pysht.mk_shell(main_gbls))
 
 t2 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 

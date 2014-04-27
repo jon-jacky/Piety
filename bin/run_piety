@@ -32,7 +32,8 @@ def run_piety():
 
 resume = run_piety # but not 'r', single-char commands reserved for ed
 
-shell = console.Console(command=pysht.mk_shell(), exiter=piety.exit)
+shell = console.Console(prompt='pysh>> ', command=pysht.mk_shell(), 
+                        exiter=piety.exit)
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
 if __name__ == '__main__':

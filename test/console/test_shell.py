@@ -4,12 +4,12 @@ test_shell.py - demonstrate Peity scheduler with one task: Python shell
 Piety shell uses the __main__ namespace to find, store variables
 
 $ python -i test_shell.py
-piety> x = 42
-piety> __name__
+pysh>> x = 42
+pysh>> __name__
 '__main__'
-piety> dir()
+pysh>> dir()
 ['Console', '__builtins__', '__doc__', '__file__', '__name__', '__package__', 'main_gbls', 'piety', 'pysht', 'shell', 'sys', 't0', 'test', 'x']
-piety> ^C
+pysh>> ^C
 ...
 KeyboardInterrupt
 >>> x
@@ -20,9 +20,9 @@ KeyboardInterrupt
 ['Console', '__builtins__', '__doc__', '__name__', '__package__', 'main_gbls', 'piety', 'pysht', 'shell', 'sys', 't0', 'test', 'x']
 >>> x = 666
 >>> test()
-piety> x
+pysh>> x
 666
-piety> 
+pysh>> 
 
 """
 
@@ -34,7 +34,7 @@ import piety
 # create shell here not in pysht module
 #  so we can have multiple shell instances
 main_gbls = sys.modules['__main__'].__dict__
-shell = Console(command=pysht.mk_shell(main_gbls))
+shell = Console(prompt="pysh>> ", command=pysht.mk_shell(main_gbls))
 
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 

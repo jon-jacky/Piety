@@ -20,7 +20,7 @@ To use it:
  import console
  import pysht
  import sys
- shell = console.Console(prompt='piety> ', command=pysht.mk_shell())
+ shell = console.Console(prompt='pysh> ', command=pysht.mk_shell())
 
 Put this code in the application module that uses the shell, not here
 in pysht module, so different shell instances can use different
