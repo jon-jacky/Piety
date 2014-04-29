@@ -1,9 +1,9 @@
 42, 0 lines
-test_ed.txt, 15 lines
+test_ed.txt, 0 lines
 ed.py.txt, 441 lines
     ./$    Buffer        File
     ---    ------        ----
-  15/15    test_ed.txt   test_ed.txt
+    0/0    test_ed.txt   test_ed.txt
     0/0    main          no current filename
     0/0    42            42
 441/441  . ed.py.txt     ed.py.txt
@@ -27,61 +27,31 @@ For more explanation see ed.md and the docstrings here.
 100/441  . ed.py.txt     ed.py.txt
     ./$    Buffer        File
     ---    ------        ----
-  15/15    test_ed.txt   test_ed.txt
+    0/0    test_ed.txt   test_ed.txt
     0/0    main          no current filename
     0/0    42            42
 100/441  . ed.py.txt     ed.py.txt
-  15/15  . test_ed.txt   test_ed.txt
+100/441  . ed.py.txt     ed.py.txt
     ./$    Buffer        File
     ---    ------        ----
-  15/15  . test_ed.txt   test_ed.txt
+    0/0    test_ed.txt   test_ed.txt
     0/0    main          no current filename
     0/0    42            42
-100/441    ed.py.txt     ed.py.txt
+100/441  . ed.py.txt     ed.py.txt
 ? buffer name
     ./$    Buffer        File
     ---    ------        ----
-  15/15  . test_ed.txt   test_ed.txt
+    0/0  . test_ed.txt   test_ed.txt
     0/0    main          no current filename
     0/0    42            42
 Line 3
-Line a
-Line b
-Line c
-Line i
-Line ii
-Line iii
-Line I
-Line II
-Line III
-Line 1
-Line 2
-Line 3
-Line A
-Line B
 Line 1
 Line 2
 Line 3
 Line C
-Line C
-Line a
-Line b
-Line c
-Line i
-Line ii
-Line iii
-Line I
-Line II
-Line III
 Line 1
 Line 2
 Line 3
-Line A
-Line B
-Line 1
-Line 2
-Line 3
-Line C
 Line A
 Line B
 Line C
@@ -89,28 +59,13 @@ Line c
 Line a
 Line b
 Line c
-Line a
-Line b
-Line c
-Line i
-Line ii
-Line iii
-Line I
-Line II
-Line III
 Line 1
 Line 2
 Line 3
 Line A
 Line B
+Line C
 Line 1
-Line 2
-Line 3
-Line C
-Line A
-Line B
-Line C
-Line a
 Line iii
 Line a
 Line b
@@ -118,24 +73,9 @@ Line c
 Line i
 Line ii
 Line iii
-Line a
-Line b
-Line c
-Line i
-Line ii
-Line iii
-Line I
-Line II
-Line III
 Line 1
 Line 2
 Line 3
-Line A
-Line B
-Line 1
-Line 2
-Line 3
-Line C
 Line A
 Line B
 Line C
@@ -149,6 +89,17 @@ Line iii
 Line I
 Line II
 Line III
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+test_ed.txt, 15 lines
+Line A
+Line A
+Line B
+Line 3
 Line a
 Line b
 Line c
@@ -161,31 +112,5 @@ Line III
 Line 1
 Line 2
 Line 3
-Line A
-Line B
-Line 1
-Line 2
-Line 3
-Line C
-Line A
-Line B
-Line C
-test_ed.txt, 30 lines
-Line i
-Line i
-Line ii
-Line c
-Line a
-Line b
-Line c
-Line i
-Line ii
-Line iii
-Line I
-Line II
-Line III
-Line a
-Line b
-Line c
 
 Remove test_ed.txt before running this script again, to obtain the same result

@@ -351,39 +351,51 @@ def parse_cmd(command):
     else:
         return cmd, istart, jend, params if params else None 
 
+# state variables that must persist between ed_cmd invocations during input mode
+command_mode = True # alternates with input mode used by a,i,c commands
+addlines = ''  # text accumulated in input mode      
+cmd = ''   # command name, must persist through input mode
+args = []  # command arguments, must persist through input mode
+
+def ed_cmd(line):
+    """
+    Process one input line without blocking in ed command or input mode
+    Update buffers and control state variables: command_mode,addlines,cmd,args
+    """
+    global command_mode, addlines, cmd, args #persist across calls in input mode
+    if command_mode:
+        items = parse_cmd(line)
+        if items[0] == 'ERROR':
+            return None # parse_cmd already printed message
+        else:
+            tokens = tuple([ t for t in items if t != None ])
+        cmd, args = tokens[0], tokens[1:]
+        if cmd in complete_cmds:
+            globals()[cmd](*args) # dict from name (string) to object (function)
+        elif cmd in input_cmds:
+            command_mode = False # enter input mode
+            addlines = '' # one big string
+        else:
+            print '? command not implemented: %s' % cmd
+        return
+    else: # input mode for commands that collect text
+        if line == '.':
+            args += (addlines,)
+            globals()[cmd](*args)
+            command_mode = True # exit input mode
+        else:
+            # \n is separator not terminator, first line is special case
+            addlines += ('\n' + line) if addlines else line
+        return
+
 def ed():
     """
     Top level ed command to use at Python prompt.
     This version won't work in Piety, it calls blocking command raw_input
     """
-    command_mode = True # alternates with input mode used by a,i,c commands
-    cmd = 'ed' # anything but 'q'
     while not cmd == 'q':
-        if command_mode:
-            # FIXME blocks here at raw_input()
-            command = raw_input() # no prompt - maybe make prompt a parameter
-            items = parse_cmd(command)
-            if items[0] == 'ERROR':
-                continue # parse_cmd already printed message
-            else:
-                tokens = tuple([ t for t in items if t != None ])
-            cmd, args = tokens[0], tokens[1:]
-            if cmd in complete_cmds:
-                globals()[cmd](*args) # dict from name (string) to object (function)
-            elif cmd in input_cmds:
-                command_mode = False # enter input mode
-                addlines = '' # one big string
-            else:
-                print '? command not implemented: %s' % cmd
-        else: # input mode for commands that collect text
-            line = raw_input() # no prompt
-            if line == '.':
-                args += (addlines,)
-                globals()[cmd](*args)
-                command_mode = True # exit input mode
-            else:
-                # \n is separator not terminator, first line is special case
-                addlines += ('\n' + line) if addlines else line
+        line = raw_input() # blocking. no prompt - maybe make prompt a parameter
+        ed_cmd(line) # non-blocking
 
 # Run the editor from the system command line:  python ed.py
 
