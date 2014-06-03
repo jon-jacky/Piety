@@ -60,6 +60,20 @@ def putlines(s):
 # Print regrets when ^D but no self.exit
 noexit = 'No exit function defined, type ^C for KeyboardInterrupt'
 
+# focus is the Console task that has console focus:
+# the task whose command function is called when the command line is complete
+# FIXME - should focus be a class variable instead of a module variable?
+
+focus = None
+
+def change_focus(new_focus, resume):
+  """
+  new_focus - the task that gets the new focus
+  resume - function to call on focus change - to refresh screen or ...
+  """
+  global focus
+  focus = new_focus
+  # resume() # print prompt, refresh screen or ... # FIXME not needed?
 
 class Console(object):
     """
@@ -186,9 +200,10 @@ class Console(object):
 
     def restart(self):
         """
-        Initialize: clear command line, print prompt, set single-char mode, 
+        Initialize: clear command line, set single-char mode
         """
         self.cmdline = str()
-        terminal.putstr(self.prompt) # prompt does not end with \n
+        # not self.prompt, the command function may have changed the focus
+        terminal.putstr(focus.prompt) # prompt does not end with \n
         terminal.setup() # enter or resume single character mode
 

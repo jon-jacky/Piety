@@ -277,6 +277,7 @@ def s(*args):
 
 def q(*args):
     'quit command mode'
+    print 'quit command mode' # DEBUG
     pass # ignore args, caller quits when this command requested
 
 
