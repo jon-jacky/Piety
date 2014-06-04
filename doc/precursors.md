@@ -51,7 +51,7 @@ Here are some examples.
 | [JNode](http://www.jnode.org/) | R | 2003 -- | Java | Bare machine | x86 | "Any Java application should run on it, fast and secure!" |
 |[Haiku](https://www.haiku-os.org/), also [here](http://www.osnews.com/story/24945/A_Programmer_s_Introduction_to_the_Haiku_OS) and [here](http://spectrum.ieee.org/computing/software/the-dawn-of-haiku-os/0) | R | 2001 -- | C++ | Bare machine | x86, ARM, PPC | "pervasive multithreading", "in C++ as a series of programmer-accessible objects" |
 | [A2, BlueBottle, AOS](http://www.oberon.ethz.ch/), also [here](http://www.ocp.inf.ethz.ch/wiki/Documentation/Front) and [here](http://bluebottle.ethz.ch/) and [here](http://bbos.org/xref/) | A | 2003 -- | Oberon | Bare machine | x86, ARM | "a single-user, multi-core, multi-tasking system that runs on bare hardware or on top of a host operating system." |
-| [Contiki](http://www.contiki-os.org/#about), with [lwIP and uIP](http://dunkels.com/adam/software.html) network stacks, also [here](http://dunkels.com/adam/publications-abstracts.html#dunkels04contiki) and [here](http://dunkels.com/adam/publications-abstracts.html#dunkels03full) | A | 2003 -- | C | Bare machine | 8-bit microcontrollers: TI MSP430, Amtel AVR | "tiny networked sensors", "dynamically download code", "full TCP/IP for 8-bits" |
+| [Contiki](http://www.contiki-os.org/#about), with [lwIP and uIP](http://dunkels.com/adam/software.html) network stacks, also [here](http://dunkels.com/adam/publications-abstracts.html#dunkels04contiki) and [here](http://dunkels.com/adam/publications-abstracts.html#dunkels03full) and [here](http://www.wired.com/2014/06/contiki/) | A | 2003 -- | C | Bare machine | 8-bit microcontrollers: TI MSP430, Amtel AVR | "tiny networked sensors", "dynamically download code", "full TCP/IP for 8-bits" |
 | [hOp, House](http://programatica.cs.pdx.edu/House/) | A | 2004 -- | Haskell | Bare machine | x86 | "more secure and more reliable software systems" | 
 | [HaLVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), also [here](https://github.com/GaloisInc/HaLVM), and [HaNS](http://www.haskell.org/pipermail/haskell-cafe/2011-May/092291.html) | R | 2010 -- | Haskell | Virtual Machine | Xen hypervisor | "experimental network services" |
 | [Mirage](http://www.openmirage.org/), also [here](http://www.openmirage.org/wiki/papers) and [here](http://dl.acm.org/citation.cfm?id=1863114) and [here](http://www.xenproject.org/developers/teams/mirage-os.html) and [here](http://www.xenproject.org/component/mtree/research/111-unikernels-library-operating-systems-for-the-cloud.html?Itemid=) and [here](http://blog.xen.org/index.php/2013/12/09/announcing-the-1-0-release-of-mirage-os/) and [here](http://cacm.acm.org/magazines/2014/1/170866-unikernels/abstract) | A | 2006 -- | O'Caml | Virtual Machine | Xen hypervisor | "I/O intensive cloud services ... minimize the use and cost of cloud resources" |
@@ -96,26 +96,26 @@ Here are some examples.
 | [Pycorn](http://www.pycorn.org/home), also [here](https://github.com/tornewuff/pycorn) | P | 2008 -- | Python | Bare machine | Gumstix Verdex board (ARM processor) | "interpreter-centric OS ... access to the full capabilities of the computer ... educational ... fun!" |
 | [Python OS Project (POP)](http://python-os.info/en/) | P | 2009 -- | Python | Native OS | Linux | "Fun ... easy to modify OS" "Dominate desktop OS market!" |
 | [raspi+python+ipython](http://www.pythononwheels.org/post/blog) | P | 2013 | Python | Native OS | Linux (Raspian) on Raspberry Pi | "using [IPython as a shell](http://transneptune.net/2009/06/16/ipython-as-your-default-shell/) ... works on any Linux" |
-| [Micro Python](http://micropython.org/), also [here](https://github.com/micropython/micropython) and [here](http://www.kickstarter.com/projects/214379695/micro-python-python-for-microcontrollers) and [here](http://hackaday.com/2013/11/27/interview-with-damien-george-creator-of-the-micro-python-project/) | P | 2013 | Python 3 | Bare machine | "32-bit ARM with the Thumb v2 instruction set, such as Cortex M. ... tested on an STM32F405 chip" | "complete rewrite, from scratch, of Python. ...  includes a complete parser, compiler, virtual machine, runtime system, garbage collector and support libraries to run on a microcontroller." |
+| [Micro Python](http://micropython.org/), also [here](https://github.com/micropython/micropython) and [here](http://www.kickstarter.com/projects/214379695/micro-python-python-for-microcontrollers) and [here](http://hackaday.com/2013/11/27/interview-with-damien-george-creator-of-the-micro-python-project/) and [here](https://mail.python.org/pipermail/python-list/2014-June/673020.html) and [here](https://www.youtube.com/watch?v=hmGISrwPtyA) | P | 2013 | Python 3 | Bare machine, native OS  | "32-bit ARM with the Thumb v2 instruction set, such as Cortex M. ... tested on an STM32F405 chip", Linux | "complete rewrite, from scratch, of Python. ...  includes a complete parser, compiler, virtual machine, runtime system, garbage collector and support libraries to run on a microcontroller." |
 
 Key to **T** (project **Type**) column, perhaps an indicator of
 project size and longevity:
 
-* **C**ommercial product sold to customers, including ongoing support
+* **C** ommercial product sold to customers, including ongoing support
 
-* **R**esearch and Development, usually sponsored by industry or
+* **R** esearch and Development, usually sponsored by industry or
 government.  Some of these are almost like commercial products
 ( **C** above), except the product is not sold, but distributed
 by other means.
 
-* **A**cademic research by a group at a university, often supported
+* **A** cademic research by a group at a university, often supported
 in part by grants from government or industry
 
-* **S**tudent project by an individual or small group, for a course
+* **S** tudent project by an individual or small group, for a course
 or thesis.  Usually development ends when the student completes the
 course or graduates.
 
-* **P**ersonal project by an individual or small group
+* **P** ersonal project by an individual or small group
 
 
 Key to **Substrate** column:
