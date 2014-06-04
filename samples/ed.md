@@ -9,6 +9,9 @@ from the later Unix (and Plan 9) editor *sam*.  You can use **ed** in
 a command mode that emulates classic *ed*, or use its API to edit from
 the Python prompt or write editing scripts in Python.
 
+**ed** can wait for input without blocking, so it can run with a
+cooperative multitasking system such as *Piety*.
+
 ## Commands ##
 
 **ed** supports these commands from classic *ed*:
@@ -99,6 +102,28 @@ The line address forms *. $ /text/ ?text?* correspond to the function
 calls *o() S() F(text) R(text)*.  For example, the print commands *.,$p* and
 */text/p* correspond to function calls *p(o(),S())* and *p(F('text'))*.
 
+The API also provides a function *ed_cmd* with a single string argument,
+which is exactly the command string you would type to *ed* in command mode or 
+the text string you would type in input mode.  Here is the preceding example
+expressed once more using *ed_cmd*:
+
+    >>> from ed import *
+    >>> ed_cmd('e test.txt')
+    test.txt, 0 lines
+    >>> ed_cmd('a')
+    >>> ed_cmd('ed() enters ed command mode.  By default, there is no command prompt.')
+    >>> ed_cmd("'e <name>' loads the named file into the current buffer.")
+    >>> ed_cmd("'a' enters ed input mode and appends the text after the current line.")
+    >>> ed_cmd("'w' writes the buffer contents back to the file")
+    >>> ed_cmd("'q' quits ed command mode.")
+    >>> ed_cmd('To quit input mode, type a period by itself at the start of a line.')
+    >>> ed_cmd('.')
+    >>> ed_cmd('w')
+    test.txt, 6 lines
+
+When *ed* is running with the *Piety* cooperative multitasking
+scheduler, *Piety* collects a command line or input line without
+blocking, and then passes that line to *ed_cmd*.
 
 ## Modules ##
 
@@ -138,8 +163,4 @@ There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-In command mode, **ed** blocks while waiting for the next command, so
-it cannnot work with a cooperative mulitasking scheduler such as
-*piety*.  We plan to fix this.
-
-Revised Apr 2014
+Revised June 2014
