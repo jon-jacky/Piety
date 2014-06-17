@@ -277,9 +277,7 @@ def s(*args):
 
 def q(*args):
     'quit command mode, ignore args, caller quits'
-    global cmd
-    cmd = '' # replace 'q', otherwise next ed() quits immediately
-
+    pass
 
 complete_cmds = 'deEflpqrswbBDnAX' # commands that do not require further input
 input_cmds = 'aic' # commands that use input mode to collect text
@@ -406,6 +404,8 @@ def ed():
     Top level ed command to use at Python prompt.
     This version won't work in Piety, it calls blocking command raw_input
     """
+    global cmd
+    cmd = '' # anything but 'q', must replace 'q' from previous quit
     while not cmd == 'q':
         line = raw_input() # blocking. no prompt - maybe make prompt a parameter
         ed_cmd(line) # non-blocking

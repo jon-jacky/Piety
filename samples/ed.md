@@ -139,8 +139,9 @@ messages or progress messages.
 *H h j k m n P Q t u wq W z*.  Some of these might be supported in the
 future.
 
-**ed** does not support the classic *ed* address forms *+ - ^ 'c*.
-Some of these might be supported in the future.
+**ed** does not support the classic *ed* address forms: *+ - ^ 'c*
+Some of these might be supported in the future
+(*+number -number ^number* are already supported).
 
 **ed** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).

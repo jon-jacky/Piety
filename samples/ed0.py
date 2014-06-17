@@ -143,6 +143,7 @@ def r(iline, filename):
 
 def b(name):
     'Set current buffer to name.  If no buffer with that name, create one'
+    global current
     if name in buffers:
         current = name
         return
