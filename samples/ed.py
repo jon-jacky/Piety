@@ -287,6 +287,9 @@ ed_cmds = complete_cmds + input_cmds
 
 # regular expressions for command parts, no spaces allowed
 number = re.compile(r'(\d+)')
+fwdnumber = re.compile(r'\+(\d+)')
+bkdnumber = re.compile(r'\-(\d+)')
+bkdcnumber = re.compile(r'\^(\d+)')
 fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
@@ -306,6 +309,15 @@ def match_address(command):
     m = number.match(command) # digits, the line number
     if m:
         return int(m.group(1)), command[m.end():]
+    m = fwdnumber.match(command) # +digits, relative line number forward
+    if m:
+        return o() + int(m.group(1)), command[m.end():]
+    m = bkdnumber.match(command) # -digits, relative line number backward
+    if m:
+        return o() - int(m.group(1)), command[m.end():]
+    m = bkdcnumber.match(command) # ^digits, relative line number backward
+    if m:
+        return o() - int(m.group(1)), command[m.end():]
     m = fwdsearch.match(command)  # /text/ or // - forward search
     if m: 
         return F(m.group(1)), command[m.end():] # FIXME rename S

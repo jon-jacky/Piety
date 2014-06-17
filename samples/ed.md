@@ -20,7 +20,7 @@ cooperative multitasking system such as *Piety*.
 
 **ed** supports these line address forms from classic *ed*:
 
- *number . , ; % $ /text/ ?text?*
+ *number . , ; % $ /text/ ?text? +number -number ^number* (but not bare *+ - ^*)
 
 Classic *ed* is described in many books: *The Unix Programming
 Environment* by Kernighan and Pike, *Software Tools* by Kernighan and
@@ -139,7 +139,7 @@ messages or progress messages.
 *H h j k m n P Q t u wq W z*.  Some of these might be supported in the
 future.
 
-**ed** does not support the classic *ed* address forms *+ - ^ -n ^n +n*.
+**ed** does not support the classic *ed* address forms *+ - ^ 'c*.
 Some of these might be supported in the future.
 
 **ed** does not support the classic *ed* *p* command suffix (for
