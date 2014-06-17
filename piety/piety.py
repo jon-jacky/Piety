@@ -162,6 +162,7 @@ def run(nevents=0):
                 for t in schedule[fd]:
                     if t.enabled():
                         t.handler()
+                        break # we consumed data from fd, might be no more
             else:
                 s = fd.readline() # works on stdin, fd.read() hangs
                 print 'unhandled input from fd %s: %s' % (fd, s)
@@ -182,8 +183,8 @@ def run(nevents=0):
                 for t in schedule[timeout]:
                     if t.enabled():
                         t.handler()
+                        # no break needed - there is no data to consume
             else:
                 pass # if no timeout handler, just continue
             interval = period # if we got here, full period must have elapsed
             ievent[timeout] += 1
-

@@ -1,4 +1,4 @@
 # Run Piety in an interactive Python session, with two writer tasks defined
 # If you exit from Piety or interrupt it, you will still be in Python
 # and can resume Piety with resume()
-python -i $PIETY/bin/run_piety_writers
+python -i $PIETY/bin/run_ed_writers

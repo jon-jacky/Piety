@@ -276,9 +276,9 @@ def s(*args):
 # command mode
 
 def q(*args):
-    'quit command mode'
-    print 'quit command mode' # DEBUG
-    pass # ignore args, caller quits when this command requested
+    'quit command mode, ignore args, caller quits'
+    global cmd
+    cmd = '' # replace 'q', otherwise next ed() quits immediately
 
 
 complete_cmds = 'deEflpqrswbBDnAX' # commands that do not require further input
