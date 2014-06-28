@@ -19,7 +19,7 @@ pysh>>
 """
 
 import sys
-from console import Console
+import console
 from writer import Writer
 import pysht
 import piety
@@ -34,16 +34,18 @@ t1.enabled = (lambda: bool(piety.ievent[piety.timeout]%2)) # every other event
 # create shell here not in pysht module
 #  so we can have multiple shell instances
 main_gbls = sys.modules['__main__'].__dict__
-shell = Console(prompt='pysh>> ', command=pysht.mk_shell(main_gbls))
+shell = console.Console(prompt='pysh>> ', command=pysht.mk_shell(main_gbls),
+                        exiter=piety.exit)
 
-t2 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
+console.focus = shell
+
+pysh = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
 def test():
     """ call piety.run()
     """
     shell.restart() # clear buffer, print prompt
     piety.run() # loop forever, don't return
-    return n
 
 if __name__ == '__main__':
     test()

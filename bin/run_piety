@@ -36,5 +36,7 @@ shell = console.Console(prompt='pysh>> ', command=pysht.mk_shell(),
                         exiter=piety.exit)
 t0 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
+console.focus = shell
+
 if __name__ == '__main__':
     run_piety()

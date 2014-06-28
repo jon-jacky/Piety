@@ -58,6 +58,17 @@ command line application.  The command function can invoke the Python
 interpreter itself, so a *Console* instance can act as Piety's Python
 shell.
 
+It is possible to have more than one console task in a Piety session.
+For example, it is typical to have a Python shell and an editor.  In
+that case it is necessary to ensure that, at any time, only one
+console task has the *focus*.  Console keyboard input only goes to the
+task with the focus; its command function is called when the command
+line is complete.  This task is identified by assigning that task to
+the *focus* variable in the *console* module.  Each console task's
+enabling condition checks whether it has the focus.  The *focus*
+variable is reassigned each time a different console task is
+activated.  See *piety/run_ed* for a programming example.
+
 ### Shell ###
 
 The *pysht* module defines a function *mk_shell* that accepts

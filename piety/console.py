@@ -32,11 +32,11 @@ Echo and editing are handled here, rather than in the terminal module,
 so they can be different for each console instance.  It should be
 possible to make different Console subclasses with different getchar
 methods that provide different echo and edit behavior.
-
 """
 
 import sys
 import terminal
+import ascii, ansi
 
 def echoline(cmdline):
     """
@@ -62,7 +62,6 @@ noexit = 'No exit function defined, type ^C for KeyboardInterrupt'
 
 # focus is the Console task that has console focus:
 # the task whose command function is called when the command line is complete
-# FIXME - should focus be a class variable instead of a module variable?
 
 focus = None
 
@@ -86,7 +85,7 @@ class Console(object):
     """
 
     def __init__(self, prompt='piety> ', terminator='\r', echo=True,
-                 command=None, exiter=None):
+                 command=None, exiter=None, edit='ansi'):
         """
         Creates a Console instance
         prompt - optional argument, prompt string, default is 'piety>'
@@ -95,10 +94,13 @@ class Console(object):
         command - optional argument, function to execute command line
           can be any callable that takes one argument, a string
           default just echoes the command line
-        exit_fn - optional argument, function to execute in response to ^D key.
+        exiter - optional argument, function to execute in response to ^D key.
           default merely prints a line advising ^C to interrupt.
+        edit - default 'ansi' for ansi cursor positioning and in-line editing
+               use 'plain' for no cursor positioning, like a printing terminal
         """
         self.cmdline = str()
+        self.point = 0 # index where next character will be inserted
         self.prompt = prompt
         self.terminator = terminator
         self.echo = echo
@@ -108,22 +110,36 @@ class Console(object):
         self.history = list() # list of cmdline, earliest first
         self.iline = 0 # index into cmdline history
         self.continuation = '.'*(len(self.prompt)-1) + ' ' # continuation prompt
+        self.edit = edit
 
     def getchar(self):
         """
         Get character from console keyboard and add to command line, 
          or edit command line or access command history using control keys
-        Key codes from http://www.unix-manuals.com/refs/misc/ascii-table.html
+        These commands work when edit='plain' or edit='ansi', 
+         they do not reposition the cursor, would work on a printing terminal,
+         can only add or delete characters at the end of the line:
+
         RET, Enter, or ^M: Execute command line
-        DEL, Backspace, or ^H: Remove last character c from command line, echo \c
+        DEL, Backspace, or ^H: Delete character before cursor
         ^J: Start new line without executing command, for multiline input
         ^L: Redisplay prompt and command line (useful after edits)
         ^U: Discard command line, display new prompt
         ^P: Retrieve previous command line from history, for edit or execution
         ^N: Retrieve next command line from history
-        ^D: (at start of line only) exit Piety, return to Python prompt
+        ^D: (empty line only) exit Piety, return to Python prompt
         ^C: (while Piety command running) interrupt command, return to Piety prompt
         ^C: (at Piety command prompt) interrupt Piety, return to Python prompt
+
+        These additional commands reposition the cursor, work when edit='ansi',
+         so you can add or delete characters anywhere in the line:
+ 
+        ^A: Move cursor to start of line
+        ^B: Move cursor back one character
+        ^D: Delete character under cursor (non-empty line only) 
+        ^E: Move cursor to end of line
+        ^F: Move cursor forward one character 
+        ^K: Delete from cursor to end of line
         """
         c = terminal.getchar()
 
@@ -134,57 +150,100 @@ class Console(object):
             self.do_command()
 
         # control keys and command line editing
-        elif c in ('\b', '\x7F'): # (backspace, delete) treated the same
-            last = self.cmdline[-1] if self.cmdline else ''
-            self.cmdline = self.cmdline[:-1] # remove last character
-            if self.echo:
-                # terminal.putstr('^H') # old-timers will recognize this
-                terminal.putstr('\\%s' % last) # maybe more helpful than ^H
+        elif c == ascii.cb and self.edit == 'ansi':  # ^B, back one char
+            if self.point > 0:
+                self.point -= 1
+                terminal.putstr(ansi.cub % 1)
+        elif c == ascii.cf and self.edit == 'ansi':  # ^F, fwd one char
+            if self.point < len(self.cmdline):
+                self.point += 1
+                terminal.putstr(ansi.cuf % 1)
+        elif c == ascii.ca and self.edit == 'ansi':  # ^A, start of line
+            self.point = 0
+            start = len(self.prompt)+1 # allow for space after prompt
+            terminal.putstr(ansi.cha % start)
+        elif c == ascii.ce and self.edit == 'ansi':  # ^E, end of line
+            self.point = len(self.cmdline)
+            eol = len(self.prompt)+1+len(self.cmdline)
+            terminal.putstr(ansi.cha % eol)
+        elif c in ('\b', ascii.delete): # (backspace, delete) treated the same
+            # delete the character *before* the cursor
+            if self.point > 0:
+                ch = self.cmdline[self.point-1] # so we can print it below
+                self.cmdline = (self.cmdline[:self.point-1] + 
+                                self.cmdline[self.point:])
+                self.point -= 1
+                if self.echo:
+                    if self.edit == 'ansi':
+                        terminal.putstr(ansi.cub % 1)
+                        terminal.putstr(ansi.dch % 1)
+                    else: # edit plain
+                        # terminal.putstr('^H') # old-timers will recognize this
+                        terminal.putstr('\\%s' % ch) # more helpful than just ^H
+        elif c == '\v' and self.edit == 'ansi': # \v, ^K, delete to end of line
+            self.cmdline = self.cmdline[:self.point]
+            # self.point does not change
+            terminal.putstr(ansi.el % 0) # 0 erases to end of line
         elif c == '\f' : # form feed, ^L, redisplay cmdline, useful after ^H
-            # no change to cmdline
-            # terminal.putstr('^L\r\n' + self.prompt + self.cmdline) # on new line
+            # no change to cmdline or point
             terminal.putstr('^L\r\n' + self.prompt)  # on new line
             putlines(self.cmdline) # might be multiple lines
-        elif c == '\x15': # ^U discard cmdline, display prompt on new line
+        elif c == ascii.cu: # ^U discard cmdline, display prompt on new line
             self.cmdline = str() 
+            self.point = 0
             terminal.putstr('^U\r\n' + self.prompt) 
-        elif c == '\x0A': # ^J linefeed, insert \n, continuation prompt on new line
+        elif c == '\n': # ^J linefeed, insert \n, continuatn prompt on new line
             self.cmdline += c
             terminal.putstr('^J\r\n' + self.continuation)
-        elif c == '\x10': # ^P previous line in history FIXME or up arrow
+        elif c == ascii.cp: # ^P previous line in history FIXME or up arrow
             self.cmdline = self.history[self.iline] 
+            self.point = len(self.cmdline)
             self.iline = self.iline - 1 if self.iline > 0 else 0
             terminal.putstr('^P\r\n' + self.prompt) # on new line
             putlines(self.cmdline) # might be multiple lines
-        elif c == '\x0E': # ^N next line in history FIXME or down arrow
+        elif c == ascii.cn: # ^N next line in history FIXME or down arrow
             self.iline = self.iline + 1 \
                 if self.iline < len(self.history)-1 else self.iline
             self.cmdline = self.history[self.iline]
+            self.point = len(self.cmdline)
             terminal.putstr('^N\r\n' + self.prompt)  # on new line
             putlines(self.cmdline) # might be multiple lines
-        elif c == '\x04': # ^D, exit console application, return to caller
+        elif c == ascii.cd: # ^D, delete under cursor OR exit console applction
+            # delete under cursor if command line is not empty
+            if self.cmdline: 
+                self.cmdline = (self.cmdline[:self.point] + 
+                                self.cmdline[self.point+1:])
+                # self.point does not change
+                if self.echo and self.edit == 'ansi':
+                        terminal.putstr(ansi.dch % 1)
+                return
             # only exit if cmdline is empty, same behavior as Python
             if not self.cmdline and self.exit:
                 terminal.putstr('^D') 
                 terminal.restore() 
                 print # start new line
+                self.point = 0
                 self.exit() # call exiter
             elif not self.cmdline and not self.exit:
                 terminal.putstr('^D\r\n' + noexit + '\r\n' + self.prompt)
             else: 
                 pass # if cmdline is not empty, ^D does nothing, not even echo
         # raw mode terminal doesn't respond to ^C, must handle here
-        elif c == '\x03' : # ^C interrupt console application
+        elif c == ascii.cc: # ^C interrupt console application
             terminal.putstr('^C') 
             terminal.restore() # on new line...
             print              # ... otherwise traceback is a mess
             raise KeyboardInterrupt
         # end of control keys and command line editing
 
-        # handle ordinary non-control characters:
+        # handle ordinary printing characters:
         else:
-            self.cmdline += c # yes, I know this is inefficient
+            self.cmdline = (self.cmdline[:self.point] + c +
+                            self.cmdline[self.point:])
+            self.point += 1
             if self.echo:
+                if self.edit == 'ansi': # open space to insert character
+                    terminal.putstr(ansi.ich % 1)
                 terminal.putstr(c) # no RETURN - all c go on same line
 
         return c  # so caller can check for terminator or ...
@@ -203,7 +262,7 @@ class Console(object):
         Initialize: clear command line, set single-char mode
         """
         self.cmdline = str()
+        self.point = 0
         # not self.prompt, the command function may have changed the focus
         terminal.putstr(focus.prompt) # prompt does not end with \n
         terminal.setup() # enter or resume single character mode
-
