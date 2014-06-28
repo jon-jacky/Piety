@@ -87,7 +87,7 @@ their docstrings.
 
 - **piety**, scheduler, defines *Task* class and *run* function
 
-- **console**, skeleton command line application
+- **console, ascii, ansi**, skeleton command line application
 
 - **pysht**, Python shell, configures *console* to provide
     a Python interpreter.
