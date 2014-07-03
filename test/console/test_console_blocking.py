@@ -17,6 +17,8 @@ import terminal, console
 
 c0 = console.Console() # all default args
 
+console.focus = c0
+
 def test():
     """ 
     loop calling getchar until line terminator, then print buffer contents

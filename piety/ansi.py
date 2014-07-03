@@ -1,15 +1,26 @@
 """
-ansi.py - ANSI terminal control codes, see urwid/escape.py also
+ansi.py - ANSI terminal control codes.  Best explanation at:
+           http://www.inwap.com/pdp10/ansicode.txt.  
+          See also:
            http://en.wikipedia.org/wiki/ANSI_escape_code
-           http://www.inwap.com/pdp10/ansicode.txt
+           http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+          Other pages with the same information in different formats:
            http://ascii-table.com/ansi-escape-sequences.php
            http://www.sweger.com/ansiplus/EscSeq.html
-           http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 """
 
+import re
 from ascii import esc
 
-csi = esc+'['  # control sequence introducer
+csi = esc+'['    # control sequence introducer
+
+# Inputs: arrow keys
+up    = csi+'A'
+down  = csi+'B'
+right = csi+'C'
+left  = csi+'D'
+
+# Outputs with parameters
 
 cuf = csi+'%dC'  # cursor forward %d characters
 cub = csi+'%dD'  # cursor backward %d characters
@@ -21,3 +32,6 @@ dch = csi+'%dP'  # delete chars, remove %d chars at current position
 el  = csi+'%dK'  # erase in line, %d 0: erase from cursor to end of line
                  #                %d 1: erase from start of line to cursor
                  #                %d 2: erase entire line
+
+# regex from https://github.com/helgefmi/ansiterm/blob/master/ansiterm.py 
+ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')

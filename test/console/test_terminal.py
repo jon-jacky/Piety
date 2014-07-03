@@ -24,8 +24,9 @@ def test():
     ch = 'x'
     line = str()
     while not ch == terminator:
-        ch = terminal.getchar()
+        ch = terminal.getchars(3)
         terminal.putstr(ch) # echo in place
+        terminal.putstr(' c %s ' % [c for c in ch]) # DEBUG print control codes
         line += ch # yes, I know this is inefficient
     terminal.restore()
     print # resume on next line

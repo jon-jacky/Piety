@@ -56,6 +56,12 @@ def getchar():
     """
     return sys.stdin.read(1)
 
+def getchars(n):
+    """
+    Get up to n characters from console keyboard, without waiting for RETURN
+    """
+    return sys.stdin.read(n)
+
 def putstr(s):
     """
     Print string (can be just one character) on console  

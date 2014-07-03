@@ -100,6 +100,7 @@ class Console(object):
                use 'plain' for no cursor positioning, like a printing terminal
         """
         self.cmdline = str()
+        self.ctlseq = str() # escape sequences etc.
         self.point = 0 # index where next character will be inserted
         self.prompt = prompt
         self.terminator = terminator
@@ -143,6 +144,25 @@ class Console(object):
         """
         c = terminal.getchar()
 
+        # collect ansi escape sequence
+        # nonempty ctlseq means collection in progress 
+        # FIXME select wakes up (puts stdin in inputready) after each esc
+        #  BUT remaining characters accumulate without waking up select
+        #  next esc char wakes up select, then the tail of prev esc seq is read
+        #  so program responds to previous esc seq when you type the next one
+        ctlseq = str() # local copy of self.ctlseq
+        if c == ascii.esc:
+            self.ctlseq = c
+            return
+        if self.ctlseq:
+            self.ctlseq += c
+            if not ansi.ctlseq.match(self.ctlseq):
+                return # esc sequence not complete, continue collecting
+            else:
+                ctlseq = self.ctlseq
+                self.ctlsef = '' # esc sequence complete, stop collecting
+                # handle esc sequence below
+
         # command line done, execute command
         if c == self.terminator: # cmdline does NOT include terminator
             self.history.append(self.cmdline) # save command in history list
@@ -150,11 +170,11 @@ class Console(object):
             self.do_command()
 
         # control keys and command line editing
-        elif c == ascii.cb and self.edit == 'ansi':  # ^B, back one char
+        elif (c == ascii.cb or ctlseq==ansi.left) and self.edit == 'ansi': # ^B, back
             if self.point > 0:
                 self.point -= 1
                 terminal.putstr(ansi.cub % 1)
-        elif c == ascii.cf and self.edit == 'ansi':  # ^F, fwd one char
+        elif (c == ascii.cf or ctlseq==ansi.right) and self.edit == 'ansi': # ^F, forward
             if self.point < len(self.cmdline):
                 self.point += 1
                 terminal.putstr(ansi.cuf % 1)
@@ -195,16 +215,18 @@ class Console(object):
         elif c == '\n': # ^J linefeed, insert \n, continuatn prompt on new line
             self.cmdline += c
             terminal.putstr('^J\r\n' + self.continuation)
-        elif c == ascii.cp: # ^P previous line in history FIXME or up arrow
-            self.cmdline = self.history[self.iline] 
+        elif (c == ascii.cp or ctlseq==ansi.up) : # ^P previous line in history
+            if self.history:
+                self.cmdline = self.history[self.iline]
             self.point = len(self.cmdline)
             self.iline = self.iline - 1 if self.iline > 0 else 0
             terminal.putstr('^P\r\n' + self.prompt) # on new line
             putlines(self.cmdline) # might be multiple lines
-        elif c == ascii.cn: # ^N next line in history FIXME or down arrow
+        elif (c == ascii.cn or ctlseq==ansi.down): # ^N next line in history
             self.iline = self.iline + 1 \
                 if self.iline < len(self.history)-1 else self.iline
-            self.cmdline = self.history[self.iline]
+            if self.history:
+                self.cmdline = self.history[self.iline]
             self.point = len(self.cmdline)
             terminal.putstr('^N\r\n' + self.prompt)  # on new line
             putlines(self.cmdline) # might be multiple lines
@@ -216,7 +238,6 @@ class Console(object):
                 # self.point does not change
                 if self.echo and self.edit == 'ansi':
                         terminal.putstr(ansi.dch % 1)
-                return
             # only exit if cmdline is empty, same behavior as Python
             if not self.cmdline and self.exit:
                 terminal.putstr('^D') 
@@ -246,8 +267,6 @@ class Console(object):
                     terminal.putstr(ansi.ich % 1)
                 terminal.putstr(c) # no RETURN - all c go on same line
 
-        return c  # so caller can check for terminator or ...
-        
     def do_command(self):
         """
         Process command line and reinitialize
