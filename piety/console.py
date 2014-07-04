@@ -160,7 +160,7 @@ class Console(object):
                 return # esc sequence not complete, continue collecting
             else:
                 ctlseq = self.ctlseq
-                self.ctlsef = '' # esc sequence complete, stop collecting
+                self.ctlseq = '' # esc sequence complete, stop collecting
                 # handle esc sequence below
 
         # command line done, execute command
