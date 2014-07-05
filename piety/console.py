@@ -100,7 +100,6 @@ class Console(object):
                use 'plain' for no cursor positioning, like a printing terminal
         """
         self.cmdline = str()
-        self.ctlseq = str() # escape sequences etc.
         self.point = 0 # index where next character will be inserted
         self.prompt = prompt
         self.terminator = terminator
@@ -135,33 +134,49 @@ class Console(object):
         These additional commands reposition the cursor, work when edit='ansi',
          so you can add or delete characters anywhere in the line:
  
-        ^A: Move cursor to start of line
-        ^B: Move cursor back one character
+        ^A, left arrow: Move cursor to start of line
+        ^B, right arrow: Move cursor back one character
         ^D: Delete character under cursor (non-empty line only) 
         ^E: Move cursor to end of line
         ^F: Move cursor forward one character 
         ^K: Delete from cursor to end of line
+         up arrow: retrieve previous line from command history
+         down arrow: retrieve next line from history
         """
         c = terminal.getchar()
 
-        # collect ansi escape sequence
-        # nonempty ctlseq means collection in progress 
-        # FIXME select wakes up (puts stdin in inputready) after each esc
-        #  BUT remaining characters accumulate without waking up select
+        # Collect entire ansi escape sequence within a single call to getchar.
+        # BECAUSE select wakes up (puts stdin in inputready) after each esc
+        #  BUT remaining chars in sequence accumulate without waking up select
         #  next esc char wakes up select, then the tail of prev esc seq is read
-        #  so program responds to previous esc seq when you type the next one
-        ctlseq = str() # local copy of self.ctlseq
+        #  so must loop to read whole esc sequence here in a single call
+        # FOR NOW just detect the four arrow keys with codes esc[A etc,
+        #  must return immediately as soon as we detect esc seq is *not* arrow.
+        # This code expects the *only* esc sequences will be the 4 arrow keys.
+        # WARNING: This blocks waiting for at least one character after esc.
+        #  Any character other than [ following esc is discarded.
+        #  Any character not in ABCD following esc[ is discarded.
+        # This technique can *not* be used to collect emacs-style M-x sequences
+        #  typed by hand, because code blocks after M (esc) until x.
+        # FIXME investigate using termios module to configure read with timeout
+        #  See http://man7.org/linux/man-pages/man3/termios.3.html
+        #  also http://hg.python.org/cpython/file/1dc925ee441a/Modules/termios.c
+        #   regarding ICANON, c_cc[VMIN], c_cc[VTIME]
+        ctlseq = '' # local variable, 
         if c == ascii.esc:
-            self.ctlseq = c
-            return
-        if self.ctlseq:
-            self.ctlseq += c
-            if not ansi.ctlseq.match(self.ctlseq):
-                return # esc sequence not complete, continue collecting
+            ctlseq = c
+            c1 = terminal.getchar()
+            if c1 != '[':
+                return # discard esc c1, not ansi ctl seq introducer (csi).
             else:
-                ctlseq = self.ctlseq
-                self.ctlseq = '' # esc sequence complete, stop collecting
-                # handle esc sequence below
+                ctlseq += c1
+                c2 = terminal.getchar()
+                if c2 not in 'ABCD':  # four arrow keys are esc[A etc.
+                    return # discard esc [ c2, not one of the four arrow keys
+                else:
+                    ctlseq += c2 
+                    # print ('ctlseq: %s' % [c for c in ctlseq]) # DEBUG
+                    # arrow key detected, one of ansi.left etc., handle below
 
         # command line done, execute command
         if c == self.terminator: # cmdline does NOT include terminator
