@@ -26,6 +26,7 @@ class Buffer(object):
         self.filename = None # filename (string) 
         self.unsaved = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
+        self.npage = 22 # page length used, optionally set by z scroll command
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 

@@ -63,7 +63,7 @@ def current_filename(filename):
 
 def f(*args):
     'set default filename, if filename not specified print current filename'
-    x, xx, filename, xxx = parse_args(args)
+    x, xx, filename, xxx = parse_arg(args)
     if filename:
         ed0.f(filename)
         return
@@ -189,14 +189,6 @@ def n(*args):
     
 # Displaying and navigating text
 
-def p(*args):
-    'Print lines from start up to end, leave dot at last line printed'
-    istart, jend, x, xx = parse_args(args)
-    start, end = ed0.mk_range(istart, jend)
-    if not ed0.range_ok(start, end):
-        print '? invalid address'
-        return
-    ed0.p(start, end)
     
 def l(*args):
     'Advance dot to iline and print it'
@@ -211,6 +203,40 @@ def l(*args):
         print '? invalid address'
         return
     ed0.l(iline)
+
+def p(*args):
+    'Print lines from start up to end, leave dot at last line printed'
+    istart, jend, x, xx = parse_args(args)
+    start, end = ed0.mk_range(istart, jend)
+    if not ed0.range_ok(start, end):
+        print '? invalid address'
+        return
+    ed0.p(start, end)
+    
+def z(*args):
+    """
+    Scroll: print buf().npage lines starting at iline.
+    Leave dot at last line printed. If parameter is present, update bu().npage
+    """
+    start, x, npage_string, xxx = parse_args(args)
+    print 'start %s, npage_string %s' % (start, npage_string)
+    iline = ed0.mk_start(start)
+    if not ed0.start_empty_ok(iline):
+        print '? invalid address'
+        return
+    if npage_string:
+        try:
+            npage = int(npage_string)
+        except:
+            print '? integer expected: %s' % npage_string
+            return 
+        if npage < 1:
+            print '? integer > 1 expected %d' % npage
+            return
+        buf().npage = npage
+    end = iline + buf().npage 
+    end = end if end <= S() else S()
+    ed0.p(iline, end)
 
 # Adding, changing, and deleting text
 
@@ -279,7 +305,7 @@ def q(*args):
     'quit command mode, ignore args, caller quits'
     pass
 
-complete_cmds = 'deEflpqrswbBDnAX' # commands that do not require further input
+complete_cmds = 'deEflpqrswzbBDnAX' # commands that do not require further input
 input_cmds = 'aic' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 

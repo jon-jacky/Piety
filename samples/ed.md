@@ -16,7 +16,7 @@ cooperative multitasking system such as *Piety*.
 
 **ed** supports these commands from classic *ed*:
 
- *= a c d e E f i l p q r s w*
+ *= a c d e E f i l p q r s w z*
 
 **ed** supports these line address forms from classic *ed*:
 
@@ -136,8 +136,11 @@ messages or progress messages.
 ## Limitations ##
 
 **ed** does not support these classic *ed* commands: 
-*H h j k m n P Q t u wq W z*.  Some of these might be supported in the
+*H h j k m n P Q t u wq W*.  Some of these might be supported in the
 future.
+
+**ed** supports the *sam* command *n* (print list of buffers),
+not the classic *ed* command *n* (print line numbers).
 
 **ed** does not support these classic *ed* address forms: *+ - ^ 'c*.
 Some of these might be supported in the future
@@ -157,11 +160,11 @@ forward to the end of the buffer (or backward to the beginning). It
 does not wrap around and continue searching from the beginning (or
 end).
 
-The *B* command accepts only one file name argument, not multiple file
-names as in *sam*.
+The *B* (and *D*) commands accept only one file (or buffer) name argument, 
+not multiple names as in *sam*.
 
 There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-Revised June 2014
+Revised July 2014
