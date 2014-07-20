@@ -216,7 +216,7 @@ def p(*args):
 def z(*args):
     """
     Scroll: print buf().npage lines starting at iline.
-    Leave dot at last line printed. If parameter is present, update bu().npage
+    Leave dot at last line printed. If parameter is present, update buf().npage
     """
     start, x, npage_string, xxx = parse_args(args)
     print 'start %s, npage_string %s' % (start, npage_string)
