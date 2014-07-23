@@ -9,14 +9,18 @@ emulates Unix ed, or use its API to edit from the Python prompt or
 write editing scripts in Python.
 
 This module provides both the classic command interface and the public
-Python API.  Another module, ed0.py, provides the core: data structures
-and the internal API.
+Python API.  This module reads and writes at the console, but does not
+directly update buffers or access files.  Another module, ed0.py,
+provides the core: data structures and the internal API.  That module
+does not access the console, but updates buffers and reads and writes
+files.
 
 For more explanation see ed.md, the docstrings here, and the tests
 in Piety/test/ed/
 """
 
 import re, os
+import pysht  # provides embedded Python shell for ! command
 
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
@@ -202,7 +206,7 @@ def l(*args):
     if not ed0.start_ok(iline):
         print '? invalid address'
         return
-    ed0.l(iline)
+    print ed0.l(iline)
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
@@ -211,7 +215,8 @@ def p(*args):
     if not ed0.range_ok(start, end):
         print '? invalid address'
         return
-    ed0.p(start, end)
+    for iline in xrange(start,end+1): # +1 because classic ed range is inclusive
+        print ed0.l(iline)
     
 def z(*args):
     """
@@ -394,6 +399,8 @@ addlines = ''  # text accumulated in input mode
 cmd = ''   # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
 
+pysh = pysht.mk_shell() # embedded Python shell for ! command
+
 def ed_cmd(line):
     """
     Process one input line without blocking in ed command or input mode
@@ -401,6 +408,9 @@ def ed_cmd(line):
     """
     global command_mode, addlines, cmd, args #persist across calls in input mode
     if command_mode:
+        if line and line[0] == '!': # special case - not a 1-char command
+            pysh(line[1:]) # execute Python expression or statement
+            return
         items = parse_cmd(line)
         if items[0] == 'ERROR':
             return None # parse_cmd already printed message

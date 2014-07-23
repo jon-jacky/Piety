@@ -16,7 +16,7 @@ cooperative multitasking system such as *Piety*.
 
 **ed** supports these commands from classic *ed*:
 
- *= a c d e E f i l p q r s w z*
+ *= ! a c d e E f i l p q r s w z*
 
 **ed** supports these line address forms from classic *ed*:
 

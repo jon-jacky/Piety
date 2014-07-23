@@ -3,7 +3,8 @@ ed0.py - editor core: data structures and functions used by ed.py
 
 In this module each function has a fixed (positional) argument list,
 provides no error checking, and no error messages or progress
-messages.
+messages.  It has no print statements, and does not read or write at
+the console.  This module updates buffers and reads and writes files.
 
 This API uses the classic Unix ed conventions for indexing and range
 (which are unlike Python): The index of the first line is 1, the index
@@ -182,14 +183,9 @@ def D(name):
 # displaying and navigating text
 
 def l(iline):
-    'Advance dot to iline and print it'
+    'Advance dot to iline and return it (so caller can print it)'
     buf().dot = iline
-    print (lines()[iline]).rstrip() # strip trailing \n
-
-def p(start, end):
-    'Print lines from start up to end, leave dot at last line printed'
-    for iline in xrange(start,end+1): #  classic ed range is inclusive, unlike Python
-        l(iline)
+    return (lines()[iline]).rstrip() # strip trailing \n
 
 # adding, changing, and deleting text
 
