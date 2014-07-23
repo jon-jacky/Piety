@@ -1,13 +1,12 @@
 """
-pysht.py - Python shell for Piety
-
+pysht.py - Callable Python shell.  Can be embedded in any Python application,
+            but was designed to work with the Piety scheduler and Console.
+           
 Defines the function 'mk_shell' whose parameters define a
-configuration, which returns a function (a closure) that is passed to
-the Console constructor, that makes the Console instance behave as a
-Python shell.
-
-We use mk_shell to make a closure so we can create different shells
-that use different configurations.
+configuration, which returns a function (a closure) that interprets a
+single Python expression or statement.  This function is the callable
+Python shell.  We use a closure so we can create different shells that
+use different configurations.
 
 At this time the only configuration parameter is the 'globals'
 dictionary used by eval and exec to look up names and bind variables.
@@ -16,15 +15,25 @@ The default globals dictionary is from the __main__ module so the
 shell returned by mk_shell behaves just like the usual top-level
 interpreter.  But we could configure the shell differently.
 
-To use it:
+To use pysht with any Python application: 
+
+ import pysht
+ pysh = pysht.mk_shell()
+ command = "print 'Now it is', datetime.datetime.now()"
+ pysh(command) # prints Now it is ...
+
+To use pysht with Piety, pass the function returned by mk_shell to the
+Console constructor, that makes the Console instance behave as a
+Python shell:
+
  import console
  import pysht
  import sys
  shell = console.Console(prompt='pysh> ', command=pysht.mk_shell())
 
-Put this code in the application module that uses the shell, not here
-in pysht module, so different shell instances can use different
-configurations.
+This code belongs in the Piety application module that uses the shell, not
+here in the pysht module, so different shell instances can use
+different configurations.
 
 The command function returned by mk_shell simply passes the command
 line to the Python eval function (for expressions) or the exec
@@ -35,10 +44,10 @@ statement (statements).  On eval and exec:
  http://stackoverflow.com/questions/2220699/whats-the-difference-between-eval-exec-and-compile-in-python
  http://lucumr.pocoo.org/2011/2/1/exec-in-python/
 
-Pysht is the name of a river and a ghost town on the Olympic peninsula
-in Washington state in the northwest USA.  The name is from the
-Clallam language, translated as "against the wind or current"[1] or
-"where the wind blows from all directions"[3].
+Pysht (rhymes with "fished") is the name of a river and a ghost town
+on the Olympic peninsula in Washington state in the northwest USA.
+The name is from the Clallam language, translated as "against the wind
+or current"[1] or "where the wind blows from all directions"[3].
  
  1. http://en.wikipedia.org/wiki/Pysht_River 
  2. http://en.wikipedia.org/wiki/Pysht,_Washington
