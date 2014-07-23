@@ -63,6 +63,9 @@ After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by typing
 *ed()* again.
 
+In *!command*, *command* must be a Python expression or statement
+(with no leading space), not a shell command as in classic *ed*.
+
 ## API ##
 
 **ed** has a Python API so you can edit from the Python prompt or
