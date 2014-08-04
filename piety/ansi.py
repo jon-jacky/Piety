@@ -52,6 +52,7 @@ sgr = csi + '%s' + 'm' # set graphic rendition. %s is ;-separated integers like
 
 # sgr, attribute values
 clear = 0      # clears attributes (not transparent!)
+
 bold = 1
 dim = 2        # no effect in mac term by itself, dim with background color
 italic = 3     # no effect in mac terminal
@@ -59,14 +60,19 @@ underine = 4
 blink_slow = 5 # ouch! blinks - very irritating
 blink_fast = 6 # doesn't blink in mac terminal
 inverse = 7
+
+no_colors = range(bold,inverse+1)
+
 concealed = 8  # 'do not display character echoed locally' - ?
 reserved = 9   # 'reserved for future standardization'
 primary_font = 10 # LA100
 alternate_font = 11 # LA100 had fonts 11 - 19, no effect on mac term
+
 clear_bold = 22 # clear bold or dim only
 clear_underline = 24 # clear underline only
 clear_blink = 25 # clear slow or fast blink only
 clear_inverse = 27 # clear inverse only
+
 black = 30  # write with black
 red = 31    # etc. ...
 green = 32
@@ -75,6 +81,9 @@ blue = 34
 magenta = 35
 cyan = 36
 white = 37    # gray on mac terminal
+
+fg_colors = range(black,white+1)
+
 black_bg = 40 # set background to black
 red_bg = 41
 green_bg = 42
@@ -84,6 +93,8 @@ magenta_bg = 45
 cyan_bg = 46
 white_bg = 47 # gray on mac terminal
 
+bg_colors = range(black_bg, white_bg+1)
+
 def attrs(*attributes):
     """
     Convert variable length arg list of integers to ansi attributes string
@@ -92,7 +103,7 @@ def attrs(*attributes):
     return ';'.join([ str(i) for i in attributes ])
 
 # sgr, set graphic rendition, frequently used special cases
-sgr_clear = sgr % attrs(clear)  # set graphic rendition - clear all
+sgr_clear = sgr % attrs(clear)  # clear all attributes - return to normal
 
 def render(text, *attributes):
     """
@@ -106,10 +117,10 @@ def render(text, *attributes):
 ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')
 
 if __name__ == '__main__':
-    for i in range(1,8) + range(30,38) + range(41,48): # b/w, fg colors, bg
+    for i in no_colors + fg_colors + bg_colors:
         render('Demonstrating ansi sgr attribute %d' % i, i)
         print # each demo on its own line
-    for i in range(41,48): # bgcolors
-        for j in (2,1): # dim, bold
+    for i in bg_colors:
+        for j in (dim,bold): 
             render('Demonstrating ansi sgr attributes %d, %d' % (i,j), i, j)
             print

@@ -176,7 +176,7 @@ class Console(object):
                 else:
                     ctlseq += c2 
                     # print ('ctlseq: %s' % [c for c in ctlseq]) # DEBUG
-                    # arrow key detected, one of ansi.left etc., handle below
+                    # arrow key detected, one of ansi.cuf1 etc., handle below
 
         # command line done, execute command
         if c == self.terminator: # cmdline does NOT include terminator
@@ -185,11 +185,11 @@ class Console(object):
             self.do_command()
 
         # control keys and command line editing
-        elif (c == ascii.cb or ctlseq==ansi.left) and self.edit == 'ansi': # ^B, back
+        elif (c == ascii.cb or ctlseq==ansi.cub1) and self.edit == 'ansi': # ^B, back
             if self.point > 0:
                 self.point -= 1
                 terminal.putstr(ansi.cub % 1)
-        elif (c == ascii.cf or ctlseq==ansi.right) and self.edit == 'ansi': # ^F, forward
+        elif (c == ascii.cf or ctlseq==ansi.cuf1) and self.edit == 'ansi': # ^F, forward
             if self.point < len(self.cmdline):
                 self.point += 1
                 terminal.putstr(ansi.cuf % 1)
@@ -230,14 +230,14 @@ class Console(object):
         elif c == '\n': # ^J linefeed, insert \n, continuatn prompt on new line
             self.cmdline += c
             terminal.putstr('^J\r\n' + self.continuation)
-        elif (c == ascii.cp or ctlseq==ansi.up) : # ^P previous line in history
+        elif (c == ascii.cp or ctlseq==ansi.cuu1) : # ^P prev line in history
             if self.history:
                 self.cmdline = self.history[self.iline]
             self.point = len(self.cmdline)
             self.iline = self.iline - 1 if self.iline > 0 else 0
             terminal.putstr('^P\r\n' + self.prompt) # on new line
             putlines(self.cmdline) # might be multiple lines
-        elif (c == ascii.cn or ctlseq==ansi.down): # ^N next line in history
+        elif (c == ascii.cn or ctlseq==ansi.cud1): # ^N next line in history
             self.iline = self.iline + 1 \
                 if self.iline < len(self.history)-1 else self.iline
             if self.history:
