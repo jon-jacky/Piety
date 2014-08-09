@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 """
-Start a Piety session *with the ed* editor running in an interactive
-Python session
+Start a Piety session with the ed editor running in an interactive
+Python session:
 
- python -i run_ed
-
-From the Piety python prompt pysh>>  type ed() to enter ed command mode.
-To return to pysh from ed command mode,  type q.
+   $ python -i run_ed
+ pysh>> ... python statements ...
+ pysh>> from ed import *
+ pysh>> ed()
+ ... ed command mode ...
+ q
+ pysh>> ... python statements ...
 
 If you exit from pysh or interrupt it, you will still be in Python
 and can resume your Piety session with resume()
@@ -42,17 +45,19 @@ editor = console.Console(prompt='',command=ed.ed_cmd,exiter=piety.exit)
 edit = piety.Task(name='edit', handler=editor.getchar, event=piety.sys.stdin,
                   enabled=(lambda: console.focus == editor))
 
-# Must assign ed_q here because ed module contains ed function
-#  ed module name will be reassigned to ed.ed function 
-#  when we do pysh>> from ed import *
-# Grab reference to ed module contents *before* we reassign ed
-ed_q =  ed.q
-
+# Most of the work here was already done 
+# when we made ed.ed_cmd the command function in the editor console.
 def ed_revised():
     'revised ed command that changes focus to editor'
     console.change_focus(editor, editor.restart)
 
 ed.ed = ed_revised # monkeypatch
+
+# Must assign ed_q here because ed module contains ed function
+#  ed module name will be reassigned to ed.ed function 
+#  when we do pysh>> from ed import *
+# Grab reference to ed module contents *before* we reassign ed
+ed_q =  ed.q
 
 def q_revised():
     'revised q command that returns focus to shell'

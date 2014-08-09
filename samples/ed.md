@@ -64,7 +64,8 @@ remain, so the editing session can be resumed at any time by typing
 *ed()* again.
 
 In *!command*, *command* is passed to the Python interpreter, not 
-to the system command shell *sh* as in classic *ed*.
+to the system command shell *sh* as in classic *ed*.  Use this
+to execute Python statements without leaving *ed* command mode.
 
 ## API ##
 

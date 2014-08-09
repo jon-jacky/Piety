@@ -14,6 +14,7 @@ This page says 'Line and column numbers start at 1':
  http://www.umich.edu/~archive/apple2/misc/programmers/vt100.codes.txt
 """
 
+import sys
 import re
 from ascii import esc
 
@@ -110,8 +111,8 @@ def render(text, *attributes):
     Print text with one or more attributes, each given by a separate int arg,
     then clear attributes, but do not print newline.
     """
-    # without final '' here, bg color continues to end of next line
-    print sgr % attrs(*attributes) + text + sgr_clear, '', # , so no newline
+    # use write not print, we don't want newline or trailing space
+    sys.stdout.write(sgr % attrs(*attributes) + text + sgr_clear)
 
 # regex from https://github.com/helgefmi/ansiterm/blob/master/ansiterm.py 
 ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')

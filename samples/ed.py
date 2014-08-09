@@ -208,6 +208,11 @@ def l(*args):
         return
     print ed0.l(iline)
 
+def p_lines(ifirst,ilast):
+    'Print line numbers ifirst through ilast, inclusive, without arg checking'
+    for iline in xrange(ifirst,ilast+1): # +1 because ifirst,ilast is inclusive
+        print ed0.l(iline)
+
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
     istart, jend, x, xx = parse_args(args)
@@ -215,8 +220,7 @@ def p(*args):
     if not ed0.range_ok(start, end):
         print '? invalid address'
         return
-    for iline in xrange(start,end+1): # +1 because classic ed range is inclusive
-        print ed0.l(iline)
+    p_lines(start, end)
     
 def z(*args):
     """
@@ -241,7 +245,7 @@ def z(*args):
         buf().npage = npage
     end = iline + buf().npage 
     end = end if end <= S() else S()
-    ed0.p(iline, end)
+    p_lines(iline, end)
 
 # Adding, changing, and deleting text
 
