@@ -36,9 +36,10 @@ cup = csi+'%d;%dH' # cursor position %d line, %d column
 ich = csi+'%d@'  # insert chars, make room for %d chars at current position
 dch = csi+'%dP'  # delete chars, remove %d chars at current position
 
-el  = csi+'%dK'  # erase in line, %d 0: erase from cursor to end of line
-                 #                %d 1: erase from start of line to cursor
-                 #                %d 2: erase entire line
+el  = csi+'%dK'  # erase in line, %d is 0 start, 1 end, or 2 all
+el_end   = el % 0  # 0: erase from cursor to end of line
+el_start = el % 1  # 1: erase from start of line to cursor
+el_all   = el % 2  # 2: erase entire line
 
 ed  = csi+'J'    # erase display from cursor to end
 
