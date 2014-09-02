@@ -105,7 +105,7 @@ def display_cursor(win_1, win_h, bufname):
     if ed0.S(): # buffer not empty
         buf = ed0.buffers[bufname]
         ch0 = buf.lines[buf.dot][0] # first char on line, makes blinking cursor
-        ch0 = '_' if ch0 == '\n' else ch0 # empty line, make cursor visible
+        ch0 = '_' if ch0 in (' ','\n') else ch0 # empty, make cursor visible
         # win_d = is line number location of dot on display, if it is visible
         win_d = win_1 + (buf.dot - seg_1)
         if win_1 <= win_d <= win_1 + win_h - 1:
@@ -138,7 +138,16 @@ def restore_display():
 def edv_cmd(cmd):
     'Process one command without blocking.'
     try:
-        ed.ed_cmd(cmd) # non-blocking
+        # special cases, command synonyms
+        if cmd == 'Z': # move cursor forward a page
+            ed.ed_cmd('+%dp' % ed.buf().npage) 
+        elif cmd == 'X': # backward a page
+            ed.ed_cmd('-%dp' % ed.buf().npage) 
+        elif cmd == ' ': # backward a line
+            ed.ed_cmd('-1p')
+        # RET in ed already moves forward a line
+        else:
+            ed.ed_cmd(cmd) # non-blocking
         update_display()
     except BaseException as e:
         restore_display() # so we can see entire traceback 
