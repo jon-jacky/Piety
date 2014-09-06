@@ -70,6 +70,7 @@ reserved = 9   # 'reserved for future standardization'
 primary_font = 10 # LA100
 alternate_font = 11 # LA100 had fonts 11 - 19, no effect on mac term
 
+# sgr, set graphic rendition, frequently used special cases
 clear_bold = 22 # clear bold or dim only
 clear_underline = 24 # clear underline only
 clear_blink = 25 # clear slow or fast blink only
@@ -104,8 +105,7 @@ def attrs(*attributes):
     """
     return ';'.join([ str(i) for i in attributes ])
 
-# sgr, set graphic rendition, frequently used special cases
-sgr_clear = sgr % attrs(clear)  # clear all attributes - return to normal
+clear_all = sgr % attrs(clear)  # clear all attributes - return to normal
 
 def render(text, *attributes):
     """
@@ -113,7 +113,7 @@ def render(text, *attributes):
     then clear attributes, but do not print newline.
     """
     # use write not print, we don't want newline or trailing space
-    sys.stdout.write(sgr % attrs(*attributes) + text + sgr_clear)
+    sys.stdout.write(sgr % attrs(*attributes) + text + clear_all)
 
 # regex from https://github.com/helgefmi/ansiterm/blob/master/ansiterm.py 
 ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')
