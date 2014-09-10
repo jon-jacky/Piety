@@ -8,9 +8,6 @@ Platform-dependent.  Requires display to use ansi control codes.
 Probably requires Unix-like OS to get display geometry. Tested on mac terminal.
 """
 
-# For now just call ed_cmd
-# all input and output in a 3-line scrolling region at the bottom.
-
 import sys
 import traceback
 import subprocess
@@ -18,7 +15,7 @@ import ed0, ed, ansi
 
 render = sys.stdout.write # unlike print, don't write newline or space
 
-# display dimensions, works on Mac OS X, probably other Unix
+# Get display dimensions.  This works on Mac OS X, probably other Unix.
 nlines, ncols = [ int(n) 
                   for n in subprocess.check_output(['stty','size']).split()]
 
@@ -45,9 +42,24 @@ cmd_n = None #  " bottom "
 seg_1 = None # index in buffer of first line displayed in text window
 seg_n = None #  " last "
 
-cursor_i = None # line number on display where text buffer cursor appears
+cursor_i = None # line number of dot on display, if it is visible, else 0
 
-def calc_window_geometry():
+# Values saved before ed command so we can test for changes after
+cmd_h0, current0, filename0, cursor_i0 = None, None, None, None
+
+def save_parameters():
+    'Store window parameters before ed cmd so we can test for changes after'
+    global cmd_h0, current0, filename0, cursor_i0
+    cmd_h0, current0, filename0, cursor_i0 = \
+        cmd_h, ed0.current, ed.buf().filename, cursor_i
+
+def layout_changed():
+    return cmd_h != cmd_h0
+
+def contents_changed():
+    return ed0.current != current0 or ed.buf().filename != filename0
+
+def calc_layout():
     """
     Calculate window dimensions and positions
     """
@@ -67,7 +79,7 @@ def calc_window_geometry():
 def display_status(status_1, bufname):
     'Starting on status_1 line, print information about named buffer.'
     # based on print_status in ed, but full window width
-    buf = ed0.buffers[bufname] # not to be confused with ed.buf()
+    buf = ed0.buffers[bufname] # ed.buf() is ed0.buffers[current] not ...[bufname]
     # later, maybe optimize by printing these fields separately
     loc = '%s/%d' % (buf.dot, len(buf.lines)-1) # don't count empty first line
     filename_str = buf.filename if buf.filename else 'no current filename'
@@ -79,28 +91,35 @@ def display_status(status_1, bufname):
     render(ansi.cup % (status_1, 1)) # cursor to buffer status line    
     ansi.render(status, ansi.white_bg) # white_bg is actually gray on mac term
 
-# display_* fcn arguments describe window, might be multiple windows later
-
-def display_centered(win_1, win_h, bufname):
+def locate_window(bufname):
     """
-    Start on win_1 line, display win_h lines from named buffer centered on dot.
-    Rewrites every line in window. Moving cursor one line scrolls entire window.
+    Compute segment of buffer that is visible in window
+    Assign seg_1, seg_n: indices in buffer of first, last lines shown in window
+    Center window on dot if possible, otherwise show top or bottom of buffer
     """
-    # seg_1, seg_n are indices in buffer of first, last lines shown in window
-    # win_d is line number location of dot on display, or 0 if dot not visible
-    global seg_1, seg_n, win_d
-    buf = ed0.buffers[bufname]
+    global seg_1, seg_n
+    buf = ed0.buffers[bufname] # ed.buf() is ed0.buffers[current] not ...[bufname]
+    # Visible segment is at top of buffer, begins at first line
     if ed.o() < win_h/2 or ed.S() <= win_h: # win_h/2 python 2 integer division
-        seg_1 = 1  # segment at top
+        seg_1 = 1  
         seg_n = min(win_h, ed.S())
+    # Visible segment is at bottom of buffer, ends at last line
     elif ed.S() - ed.o() < win_h/2 and ed.S() >= win_h: 
-        seg_1 = ed.S() - (win_h - 1)  # segment at bottom
+        seg_1 = ed.S() - (win_h - 1)
         seg_n = ed.S()
+    # Visible segment is centered on dot
     else:
-        seg_1 = ed.o() - win_h/2  # segment centered on dot
+        seg_1 = ed.o() - win_h/2  
         seg_n = seg_1 + (win_h - 1)
+
+def display_window(bufname):
+    """
+    Start on win_1 line, display lines seg_1 .. seg_n from buffer bufname 
+    If space remains in window, pad with empty lines to win_h
+    """
+    buf = ed0.buffers[bufname] # ed.buf() is ed0.buffers[current] 
     seg_h = seg_n - seg_1 + 1 # lines in segment, usually same as win_h
-    blank_h = win_h - seg_h # n of blank lines at window bottom
+    blank_h = win_h - seg_h   # n of padding empty lines at window bottom
     render(ansi.cup % (win_1,1))  # cursor to window top
     for line in buf.lines[seg_1:seg_n+1]: # python slice, upper limit excluded
         print line.rstrip()[:ncols-1], # remove trailing \n, truncate don't wrap
@@ -108,51 +127,58 @@ def display_centered(win_1, win_h, bufname):
     for line in range(blank_h):
         print ansi.el_all # erase entire line, advance to next
 
-def cursor_line(win_1, win_h, bufname):
+def locate_cursor(bufname):
     """
-    Return dot_i, ch0, chx where
-    dot_i is line number of dot on display, if it is visible, else 0
-    ch0 is first character of line at dot, if there is one, else None
-    chx is cursor character, ch0 or _ if ch0 is space or empty
+    Update cursor_i, line number of dot on display, if it is visible, else 0
     """
-    dot_i, ch0, chx = 0, '', ''
+    global cursor_i
+    buf = ed0.buffers[bufname] # ed.buf() is ed0.buffers[current] 
     if ed0.S(): # buffer not empty
-        buf = ed0.buffers[bufname]
-        ch0 = buf.lines[buf.dot][0] # first char on line, makes blinking cursor
-        chx = '_' if ch0 in (' ','\n') else ch0 # make space or empty visible
-        dot_i = win_1 + (buf.dot - seg_1)
-        dot_i = dot_i if win_1 <= dot_i <= win_1 + win_h - 1 else 0
-    return dot_i, ch0, chx
+        cursor_i = win_1 + (buf.dot - seg_1)
+        cursor_i = cursor_i if win_1 <= cursor_i <= win_1 + win_h - 1 else 0
+    else:
+        cursor_i = 0 # , cursor_c, cursor_g = 0, '', ''
 
 def remove_cursor(cursor_i, ch):
-    'At start of line cursor_i, replace cursor with original character ch'
+    'At start of line cursor_i, replace cursor with character ch, no attributes'
     render(ansi.cup % (cursor_i, 1))
     ansi.render(ch, ansi.clear_all)
 
 def display_cursor(cursor_i, ch):
-    'At start of line cursor_i, put cursor character ch with attributes'
+    'At start of line cursor_i, put character ch with attributes'
     render(ansi.cup % (cursor_i, 1))
     ansi.render(ch, ansi.white_bg) # no blink_slow, too noisy
 
-def init_display(scroll_h):
-    'Clear screen, update display.'
-    global cmd_h
-    cmd_h = scroll_h
-    calc_window_geometry() # must initialize cmd_1, cmd_n
+def init_display():
+    'Clear screen, render display.'
+    bufname = ed0.current
+    buf = ed0.buffers[bufname] # ed.buf() is ed0.buffers[current] not ...[bufname]
+    # layout
+    calc_layout() # initialize cmd_1, cmd_n etc.
     render(ansi.cup % (1,1)) # cursor to origin, don't advance to next line
     render(ansi.ed) # clear screen from cursor
+    # window
+    locate_window(bufname) # assign seg_1, seg_n
+    display_window(bufname)
+    # cursor
+    locate_cursor(bufname) # assign cursor_i
+    if cursor_i:
+        chx = buf.lines[buf.dot][0] # first char on line, makes blinking cursor
+        chx = '_' if chx in (' ','\n') else chx # make space or empty visible
+        display_cursor(cursor_i, chx)
+    # scrolling input region
     render(ansi.decstbm % (cmd_1, cmd_n)) # set scrolling region
-    update_display()
 
 def update_display():
-    'Show windows, set scroll to command window, cursor to bottom'
-    dot_i, ch0, chx = cursor_line(win_1, win_h, ed0.current)
-    calc_window_geometry() # might have been changed by edv command
-    remove_cursor(dot_i, ch0)
-    display_centered(win_1, win_h, ed0.current) # rewrites everthing!
-    dot_i, ch0, chx = cursor_line(win_1, win_h, ed0.current)
-    display_cursor(dot_i, chx)
-    display_status(status_1, ed0.current)
+    'Show window, cursor, status line, set scroll to input region, place cursor'
+    bufname = ed0.current
+    if True: # FIXME layout_changed() or contents_changed():
+        init_display()
+    elif False: # FIXME cursor moved outside already displayed window
+        pass
+    else: # FIXME cursor remained in window
+        pass
+    display_status(status_1, bufname)
     render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom
 
 def restore_display():
@@ -185,7 +211,10 @@ def edv(scroll_h=cmd_h):
     Won't cooperate with Piety scheduler, calls blocking command raw_input.
     scroll_h sets n of lines in bottom scrolling region, defaults to cmd_h
     """
-    init_display(scroll_h)
+    cmd_h = scroll_h
+    init_display()
+    display_status(status_1, ed0.current)
+    render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom
     cmd = '' # anything but 'q', must replace 'q' from previous quit
     while not cmd == 'q':
         cmd = raw_input() # blocking. no prompt - maybe make prompt a parameter
