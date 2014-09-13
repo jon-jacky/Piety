@@ -42,27 +42,33 @@ cmd_n = None #  " bottom "
 seg_1 = None # index in buffer of first line displayed in text window
 seg_n = None #  " last "
 
-cursor_i = None # line number of dot on display, if it is visible, else 0
+cursor_i = None # line number of current buffer dot on display
+cursor_ch = None # character that cursor overwrites
+cursor_chx = None # cursor character, same as cursor_ch except when it's blank
 
-# Values saved before ed command so we can test for changes after
-cmd_h0, current0, filename0, cursor_i0 = None, None, None, None
+#Values saved before ed command so we can test for changes after
+cmd_h0, current0, filename0, cursor_i0, cursor_ch0 = None, None, None, None, None
 
 def save_parameters():
-    'Store window parameters before ed cmd so we can test for changes after'
-    global cmd_h0, current0, filename0, cursor_i0
-    cmd_h0, current0, filename0, cursor_i0 = \
-        cmd_h, ed0.current, ed.buf().filename, cursor_i
+    'Save window parameters before ed cmd so we can test for changes after'
+    global cmd_h0, current0, filename0, cursor_i0, cursor_ch0
+    cmd_h0, current0, filename0, cursor_i0, cursor_ch0 = \
+        cmd_h, ed0.current, ed.buf().filename, cursor_i, cursor_ch
 
 def layout_changed():
-    return cmd_h != cmd_h0
+    return cmd_h != cmd_h0 # only one window for now
 
 def contents_changed():
     return ed0.current != current0 or ed.buf().filename != filename0
 
+def cursor_elsewhere():
+    'Cursor lies outside segment of buffer visible in window'
+    # buf() is okay here, this can only be called on current buffer
+    dot_i = ed.buf().dot # line number of cursor in buffer (not screen)
+    return (not seg_1 <= dot_i <= seg_n) if dot_i else False
+
 def calc_layout():
-    """
-    Calculate window dimensions and positions
-    """
+    'Calculate window dimensions and positions'
     global cmd_1, cmd_n, status_1, win_h, win_n, seg_1, seg_n
     # scrolling command region at the bottom
     cmd_1 = nlines - cmd_h + 1 # +1 because nlines is last within cmd element
@@ -130,24 +136,34 @@ def display_window(bufname):
 def locate_cursor(bufname):
     """
     Update cursor_i, line number of dot on display, if it is visible, else 0
+    Also update cursor_ch, the cursor character - we need to erase it later
     """
-    global cursor_i
+    global cursor_i, cursor_ch, cursor_chx
     buf = ed0.buffers[bufname] # ed.buf() is ed0.buffers[current] 
     if ed0.S(): # buffer not empty
+        # cursor_ch is character at start of line that cursor overwrites
+        cursor_ch = buf.lines[buf.dot][0]
+        # To ensure cursor on space or empty line is visible, use cursor_chx
+        cursor_chx = '_' if cursor_ch in (' ','\n') else cursor_ch
         cursor_i = win_1 + (buf.dot - seg_1)
         cursor_i = cursor_i if win_1 <= cursor_i <= win_1 + win_h - 1 else 0
     else:
-        cursor_i = 0 # , cursor_c, cursor_g = 0, '', ''
+        cursor_i = 0
+        cursor_ch = ''
 
-def remove_cursor(cursor_i, ch):
-    'At start of line cursor_i, replace cursor with character ch, no attributes'
-    render(ansi.cup % (cursor_i, 1))
-    ansi.render(ch, ansi.clear_all)
+def display_cursor():
+    'Display cursor at start of line cursor_i'
+    if cursor_i:
+        render(ansi.cup % (cursor_i, 1))
+        ansi.render(cursor_chx, ansi.white_bg) # but no blink - that's too noisy
 
-def display_cursor(cursor_i, ch):
-    'At start of line cursor_i, put character ch with attributes'
-    render(ansi.cup % (cursor_i, 1))
-    ansi.render(ch, ansi.white_bg) # no blink_slow, too noisy
+def erase_cursor():
+    'At start of line cursor_i0, replace cursor with saved char, no attributes'
+    if cursor_i0:
+        # if line is empty must use ' ' to overwrite '_'
+        ch = cursor_ch0 if not cursor_ch0 == '\n' else ' '
+        render(ansi.cup % (cursor_i0, 1))
+        ansi.render(ch, ansi.clear)
 
 def init_display():
     'Clear screen, render display.'
@@ -161,23 +177,28 @@ def init_display():
     locate_window(bufname) # assign seg_1, seg_n
     display_window(bufname)
     # cursor
-    locate_cursor(bufname) # assign cursor_i
-    if cursor_i:
-        chx = buf.lines[buf.dot][0] # first char on line, makes blinking cursor
-        chx = '_' if chx in (' ','\n') else chx # make space or empty visible
-        display_cursor(cursor_i, chx)
+    locate_cursor(bufname) # assign cursor_i, cursor_ch
+    display_cursor()
     # scrolling input region
     render(ansi.decstbm % (cmd_1, cmd_n)) # set scrolling region
 
 def update_display():
-    'Show window, cursor, status line, set scroll to input region, place cursor'
+    'Show window, cursor, status line.  Set scroll to input region, place cursor'
     bufname = ed0.current
-    if True: # FIXME layout_changed() or contents_changed():
+    locate_cursor(bufname) # assign new cursor_i, cursor_ch
+    # recalculate layout and redisplay everything
+    if layout_changed() or contents_changed():  # FIXME? contents_changed
         init_display()
-    elif False: # FIXME cursor moved outside already displayed window
-        pass
-    else: # FIXME cursor remained in window
-        pass
+    # Cursor moved outside window, redisplay window contents and cursor
+    elif cursor_elsewhere(): 
+        locate_window(bufname) # assign new seg_1, seg_n
+        locate_cursor(bufname) # *re*assign new cursor_i, cursor_ch
+        display_window(bufname)
+        display_cursor()
+    # Cursor remained in window, move cursor only
+    else: 
+        erase_cursor()
+        display_cursor()
     display_status(status_1, bufname)
     render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom
 
@@ -188,7 +209,9 @@ def restore_display():
 
 def edv_cmd(cmd):
     'Process one command without blocking.'
+    # try/except ensures we restore display, especially scrolling
     try:
+        save_parameters() # before ed_cmd
         # special cases, command synonyms
         if cmd == 'Z': # move cursor forward a page
             ed.ed_cmd('+%dp' % ed.buf().npage) 
@@ -209,9 +232,13 @@ def edv(scroll_h=cmd_h):
     """
     Top level edv command to invoke from python prompt or command line.
     Won't cooperate with Piety scheduler, calls blocking command raw_input.
-    scroll_h sets n of lines in bottom scrolling region, defaults to cmd_h
+    scroll_h arg sets n of lines in bottom scrolling region, defaults to cmd_h
     """
+    global cmd_h
     cmd_h = scroll_h
+    # FIXME?  Can't next 3 lines be handled by update_display in edv_cmd?
+    #  No, we need to display everything before user enters first cmd.
+    # We also need to do this initialization when we run edv from Piety.
     init_display()
     display_status(status_1, ed0.current)
     render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom

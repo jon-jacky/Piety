@@ -105,20 +105,19 @@ def attrs(*attributes):
     """
     return ';'.join([ str(i) for i in attributes ])
 
-clear_all = sgr % attrs(clear)  # clear all attributes - return to normal
-
 def render(text, *attributes):
     """
     Print text with one or more attributes, each given by a separate int arg,
     then clear attributes, but do not print newline.
     """
     # use write not print, we don't want newline or trailing space
-    sys.stdout.write(sgr % attrs(*attributes) + text + clear_all)
+    sys.stdout.write(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 # regex from https://github.com/helgefmi/ansiterm/blob/master/ansiterm.py 
 ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')
 
 if __name__ == '__main__':
+    # print a bunch of lines in all their ansi glory
     for i in no_colors + fg_colors + bg_colors:
         render('Demonstrating ansi sgr attribute %d' % i, i)
         print # each demo on its own line
