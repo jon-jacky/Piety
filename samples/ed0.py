@@ -119,12 +119,8 @@ def R(pattern):
 
 # helpers for a(ppend), i(nsert), c(hange), r(ead)
 
-def splitlines(string):
-    'Split up string with embedded \n, return list of lines each with terminal \n'
-    return [ line + '\n' for line in string.split('\n') ]
-
 def insert(iline, lines):
-    'Insert lines (list of strings) before iline, update dot to last inserted line'
+    'Insert lines (list of strings) before iline,update dot to last inserted line'
     buf().lines[iline:iline] = lines # sic, insert lines at this position
     buf().dot = iline + len(lines)-1
     buf().unsaved = True # usually the right thing but ed.B and E override it.
@@ -139,6 +135,7 @@ def r(iline, filename):
     'Read file contents into buffer after iline'
     if os.path.isfile(filename): 
         fd = open(filename, mode='r')        
+        # fd.readlines reads file into a list of strings, one per line
         strings = fd.readlines() # each string in lines ends with \n
         fd.close()
         insert(iline+1, strings) # like append, below
@@ -191,12 +188,15 @@ def l(iline):
 
 def a(iline, string):
     'Append lines from string after iline, update dot to last appended line'
-    insert(iline+1, splitlines(string))
+    # string is one big str with linebreaks indicated by embedded \n
+    # splitlines(True) breaks at \n to make list of strings
+    # keepends True arg keeps each trailing \n, same convention as fd.readlines()
+    insert(iline+1, string.splitlines(True))
 
 def i(iline, string):
     'Insert lines from string before iline, update dot to last inserted line'
     # iline at initial empty line with index 0 is a special case, append instead
-    insert(iline if iline else iline+1, splitlines(string))
+    insert(iline if iline else iline+1, string.splitlines(True))
 
 def d(start, end):
     'Delete text from start up to end, set dot to first line after deletes or...'

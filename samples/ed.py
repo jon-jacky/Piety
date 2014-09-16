@@ -142,16 +142,20 @@ def w(*args):
     ed0.w(filename)
     print '%s, %d lines' % (filename, S())
 
+D_count = 0 # number of consecutive times D command has been invoked
+
 def D(*args):
     'Delete the named buffer, if unsaved changes print message and exit'
+    global D_count
     x, xx, text, xxx = parse_args(args)
     name = text if text else ed0.current
-    if name in ed0.buffers and ed0.buffers[name].unsaved:
-        print '? unsaved changes, use X to delete'
+    if name in ed0.buffers and ed0.buffers[name].unsaved and not D_count:
+        print '? unsaved changes, repeat D to delete'
+        D_count += 1 # must invoke D twice to confirm, see message below
         return
-    X(*args)
+    DD(*args)
 
-def X(*args):
+def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
     x, xx, text, xxx = parse_args(args)
     name = text if text else ed0.current
@@ -162,6 +166,7 @@ def X(*args):
         print "? Can't delete main buffer"
         return
     ed0.D(name)
+    print '%s, buffer deleted' % name
 
 # Displaying information
 
@@ -314,7 +319,7 @@ def q(*args):
     'quit command mode, ignore args, caller quits'
     pass
 
-complete_cmds = 'deEflpqrswzbBDnAX' # commands that do not require further input
+complete_cmds = 'deEflpqrswzbBDnA' # commands that do not require further input
 input_cmds = 'aic' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -368,6 +373,7 @@ def parse_cmd(command):
      params - string containing other command parameters
     All are optional except cmd, assigns None if item is not present
     """
+    global D_count
     cmd, istart, jend, params = None, None, None, None
     # look for start addr, optional. if no match istart,tail == None,command
     istart, tail = match_address(command)
@@ -389,6 +395,8 @@ def parse_cmd(command):
     else:
         print '? command expected at %s' % tail
         return 'ERROR', istart, jend, params
+    # special handling for commands that must be repeated to confirm
+    D_count = 0 if cmd != 'D' else D_count
     # command-specific parameter parsing
     if cmd == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
@@ -431,12 +439,15 @@ def ed_cmd(line):
         return
     else: # input mode for commands that collect text
         if line == '.':
+            # NOT! remove extra \n at the end, unless it's a single blank line
             args += (addlines,)
+            print [ c for c in args ] # DEBUG
             globals()[cmd](*args)
             command_mode = True # exit input mode
         else:
-            # \n is separator not terminator, first line is special case
-            addlines += ('\n' + line) if addlines else line
+            # raw_input returns line with final \n stripped off
+            # BUT addlines is one big string, need \n to break lines
+            addlines += (line + '\n')
         return
 
 def ed():
