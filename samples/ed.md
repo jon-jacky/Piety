@@ -10,7 +10,10 @@ a command mode that emulates classic *ed*, or use its API to edit from
 the Python prompt or write editing scripts in Python.
 
 **ed** can wait for input without blocking, so it can run with a
-cooperative multitasking system such as *Piety*.
+cooperative multitasking system such as [Piety](../piety/README.md).
+
+**ed** provides the command line and internals for the display editor
+  [edv](edv.md).
 
 ## Commands ##
 
@@ -39,8 +42,9 @@ The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
 and [http://sam.cat-v.org/](http://sam.cat-v.org/).
 
-**ed** can run as a standalone program, but is intended to run in an
-interactive Python session.  Here is a brief example:
+**ed** can run as a standalone program: *python ed.py*.  But *ed* is
+intended to run in an interactive Python session.  Here is a brief
+example:
 
     >>> from ed import *
     >>> ed()
@@ -171,4 +175,4 @@ There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-Revised July 2014
+Revised September 2014
