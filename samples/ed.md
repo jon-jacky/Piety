@@ -1,27 +1,27 @@
 
-ed
+ed.py
 ==
 
-**ed** is a line-oriented text editor written in pure Python.  It
+**ed.py** is a line-oriented text editor written in pure Python.  It
 provides many of the commands from the classic Unix editor *ed*,
 augmented with a few commands for handling multiple buffers and files
-from the later Unix (and Plan 9) editor *sam*.  You can use **ed** in
+from the later Unix (and Plan 9) editor *sam*.  You can use **ed.py** in
 a command mode that emulates classic *ed*, or use its API to edit from
 the Python prompt or write editing scripts in Python.
 
-**ed** can wait for input without blocking, so it can run with a
+**ed.py** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
 
-**ed** provides the command line and internals for the display editor
-  [edv](edv.md).
+**ed.py** provides the command line and internals for the display editor
+  [edd](edd.md).
 
 ## Commands ##
 
-**ed** supports these commands from classic *ed*:
+**ed.py** supports these commands from classic *ed*:
 
  *= ! a c d e E f i l p q r s w z*
 
-**ed** supports these line address forms from classic *ed*:
+**ed.py** supports these line address forms from classic *ed*:
 
  *number . , ; % $ /text/ ?text? +number -number ^number* (but not bare *+ - ^*)
 
@@ -34,7 +34,7 @@ same, and is described in a completely rewritten man page at
 and
 [http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
 
-**ed** also supports these commands from *sam*:
+**ed.py** also supports these commands from *sam*:
 
  *b B D n*
 
@@ -42,16 +42,16 @@ The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
 and [http://sam.cat-v.org/](http://sam.cat-v.org/).
 
-**ed** can run as a standalone program: *python ed.py*.  But *ed* is
+**ed.py** can run as a standalone program: *python ed.py*.  But *ed* is
 intended to run in an interactive Python session.  Here is a brief
 example:
 
-    >>> from ed import *
-    >>> ed()
+    >>> import ed
+    >>> ed.main()
     e test.txt
     test.txt, 0 lines
     a
-    ed() enters ed command mode.  By default, there is no command  prompt.
+    ed.main() enters ed command mode.  By default, there is no command prompt.
     'e <name>' loads the named file into the current buffer.
     'a' enters ed input mode and appends the text after the current line.
     'w' writes the buffer contents back to the file.
@@ -65,17 +65,18 @@ example:
 
 After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by typing
-*ed()* again.
+*ed.main()* again.
 
-In *!command*, *command* is passed to the Python interpreter, not 
-to the system command shell *sh* as in classic *ed*.  Use this
+In *!command*, the *command* is passed to the Python interpreter, not 
+to the system command shell as in classic *ed*.  Use this
 to execute Python statements without leaving *ed* command mode.
 
 ## API ##
 
-**ed** has a Python API so you can edit from the Python prompt or
+**ed.py** has a Python API so you can edit from the Python prompt or
 write editing scripts in Python.  Here is the preceding example
-expressed using the API:
+expressed using the API.  Here we use the *from ed import ...* form
+so we don't have to prefix each function call with *ed.*
 
     >>> from ed import *
     >>> e('test.txt')
@@ -110,60 +111,63 @@ The line address forms *. $ /text/ ?text?* correspond to the function
 calls *o() S() F(text) R(text)*.  For example, the print commands *.,$p* and
 */text/p* correspond to function calls *p(o(),S())* and *p(F('text'))*.
 
-The API also provides a function *ed_cmd* with a single string argument,
-which is exactly the command string you would type to *ed* in command mode or 
-the text string you would type in input mode.  Here is the preceding example
-expressed once more using *ed_cmd*:
+The API also provides a function *cmd* with a single string
+argument, which is exactly the command string you would type to *ed*
+in command mode or the text string you would type in input mode.  Here
+is the preceding example expressed once more using *ed.cmd*:
 
-    >>> from ed import *
-    >>> ed_cmd('e test.txt')
+    >>> import ed
+    >>> ed.cmd('e test.txt')
     test.txt, 0 lines
-    >>> ed_cmd('a')
-    >>> ed_cmd('ed() enters ed command mode.  By default, there is no command prompt.')
-    >>> ed_cmd("'e <name>' loads the named file into the current buffer.")
-    >>> ed_cmd("'a' enters ed input mode and appends the text after the current line.")
-    >>> ed_cmd("'w' writes the buffer contents back to the file")
-    >>> ed_cmd("'q' quits ed command mode.")
-    >>> ed_cmd('To quit input mode, type a period by itself at the start of a line.')
-    >>> ed_cmd('.')
-    >>> ed_cmd('w')
+    >>> ed.cmd('a')
+    >>> ed.cmd('ed() enters ed command mode.  By default, there is no command prompt.')
+    >>> ed.cmd("'e <name>' loads the named file into the current buffer.")
+    >>> ed.cmd("'a' enters ed input mode and appends the text after the current line.")
+    >>> ed.cmd("'w' writes the buffer contents back to the file")
+    >>> ed.cmd("'q' quits ed command mode.")
+    >>> ed.cmd('To quit input mode, type a period by itself at the start of a line.')
+    >>> ed.cmd('.')
+    >>> ed.cmd('w')
     test.txt, 6 lines
 
-When *ed* is running with the *Piety* cooperative multitasking
+When **ed.py** is running with the *Piety* cooperative multitasking
 scheduler, *Piety* collects a command line or input line without
-blocking, and then passes that line to *ed_cmd*.
+blocking, and then passes that line to *ed.cmd*.  In a *Piety*
+session, start **ed.py** in nonblocking mode by typing *ed.run()*
+instead of *ed.main()*.
 
 ## Modules ##
 
-**ed** comprises two modules.  *ed.py* provides both the commands and
-the public Python API.  *ed0.py* provides the core: the data
-structures and the internal API for updating them, where each function has
-a fixed argument list, provides no error checking, and no error
-messages or progress messages.
+**ed.py** provides the user interface: the command line and the public
+Python API described above, including command line parsing, argument
+checking, and error messages.  **ed.py** imports *ed0.py*, which
+provides the core: the data structures and the internal API for
+updating them, where each function has a fixed argument list, provides
+no error checking, and no error messages or progress messages.
 
 ## Limitations ##
 
-**ed** does not support these classic *ed* commands: 
+**ed.py** does not support these classic *ed* commands: 
 *H h j k m n P Q t u wq W*.  Some of these might be supported in the
 future.
 
-**ed** supports the *sam* command *n* (print list of buffers),
+**ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
 
-**ed** does not support these classic *ed* address forms: *+ - ^ 'c*.
+**ed.py** does not support these classic *ed* address forms: *+ - ^ 'c*.
 Some of these might be supported in the future
 (*+number -number ^number* are already supported).
 
-**ed** does not support the classic *ed* *p* command suffix (for
+**ed.py** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).
 
-**ed** does not support the classic *ed* iteration commands *g G v V*.
+**ed.py** does not support the classic *ed* iteration commands *g G v V*.
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
 expression.  Regular expressions might be supported in the future.
 
-In the */text/* and *?text?* address forms, **ed** only searches
+In the */text/* and *?text?* address forms, **ed.py** only searches
 forward to the end of the buffer (or backward to the beginning). It
 does not wrap around and continue searching from the beginning (or
 end).

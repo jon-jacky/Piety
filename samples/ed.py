@@ -262,7 +262,7 @@ def i(*args):
     'Insert lines from string before iline, update dot to last inserted line'
     ai_cmd(ed0.i, args)
 
-def ai_cmd(cmd, args):
+def ai_cmd(cmd_fcn, args):
     'a(ppend) or i(nsert) command'
     start, x, text, xx = parse_args(args)
     iline = ed0.mk_start(start)
@@ -270,7 +270,7 @@ def ai_cmd(cmd, args):
         print '? invalid address'
         return
     if text:
-        cmd(iline, text)
+        cmd_fcn(iline, text)
 
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
@@ -332,51 +332,54 @@ fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
 
-def match_address(command):
-    'return line number at start of command (None of not found), and rest of command'
-    if command == '':
-        return None, '' 
-    if command[0] == '.': # current line
-        return o(), command[1:]
-    if command[0] == '$': # last line
-        return S(), command[1:]
-    if command[0] == ';': # equivalent to .,$  - current line to end
-        return o(), ',$'+ command[1:]
-    if command[0] in ',%': # equivalent to 1,$ - whole buffer
-        return 1, ',$'+ command[1:]
-    m = number.match(command) # digits, the line number
-    if m:
-        return int(m.group(1)), command[m.end():]
-    m = fwdnumber.match(command) # +digits, relative line number forward
-    if m:
-        return o() + int(m.group(1)), command[m.end():]
-    m = bkdnumber.match(command) # -digits, relative line number backward
-    if m:
-        return o() - int(m.group(1)), command[m.end():]
-    m = bkdcnumber.match(command) # ^digits, relative line number backward
-    if m:
-        return o() - int(m.group(1)), command[m.end():]
-    m = fwdsearch.match(command)  # /text/ or // - forward search
-    if m: 
-        return F(m.group(1)), command[m.end():] # FIXME rename S
-    m = bkdsearch.match(command)  # ?text? or ?? - backward search
-    if m: 
-        return R(m.group(1)), command[m.end():] # FIXME rename R
-    # FIXME - also handle -n +n 'c 
-    return None, command
-
-def parse_cmd(command):
+def match_address(cmd_string):
     """
-    Parses command string, returns multiple values in this order:
-     cmd - single-character command name
+    return line number at start of cmd_string (None of not found), 
+     and rest of cmd_string
+    """
+    if cmd_string == '':
+        return None, '' 
+    if cmd_string[0] == '.': # current line
+        return o(), cmd_string[1:]
+    if cmd_string[0] == '$': # last line
+        return S(), cmd_string[1:]
+    if cmd_string[0] == ';': # equivalent to .,$  - current line to end
+        return o(), ',$'+ cmd_string[1:]
+    if cmd_string[0] in ',%': # equivalent to 1,$ - whole buffer
+        return 1, ',$'+ cmd_string[1:]
+    m = number.match(cmd_string) # digits, the line number
+    if m:
+        return int(m.group(1)), cmd_string[m.end():]
+    m = fwdnumber.match(cmd_string) # +digits, relative line number forward
+    if m:
+        return o() + int(m.group(1)), cmd_string[m.end():]
+    m = bkdnumber.match(cmd_string) # -digits, relative line number backward
+    if m:
+        return o() - int(m.group(1)), cmd_string[m.end():]
+    m = bkdcnumber.match(cmd_string) # ^digits, relative line number backward
+    if m:
+        return o() - int(m.group(1)), cmd_string[m.end():]
+    m = fwdsearch.match(cmd_string)  # /text/ or // - forward search
+    if m: 
+        return F(m.group(1)), cmd_string[m.end():] # FIXME rename S
+    m = bkdsearch.match(cmd_string)  # ?text? or ?? - backward search
+    if m: 
+        return R(m.group(1)), cmd_string[m.end():] # FIXME rename R
+    # FIXME - also handle -n +n 'c 
+    return None, cmd_string
+
+def parse_cmd(cmd_string):
+    """
+    Parses cmd_string, returns multiple values in this order:
+     cmd_name - single-character command name
      istart, jend - integer line numbers 
      params - string containing other command parameters
-    All are optional except cmd, assigns None if item is not present
+    All are optional except cmd_name, assigns None if item is not present
     """
     global D_count
-    cmd, istart, jend, params = None, None, None, None
-    # look for start addr, optional. if no match istart,tail == None,command
-    istart, tail = match_address(command)
+    cmd_name, istart, jend, params = None, None, None, None
+    # look for start addr, optional. if no match istart,tail == None,cmd_string
+    istart, tail = match_address(cmd_string)
     # look for end address, optional
     if istart != None:
         if tail and tail[0] == ',': # addr separator, next addr NOT optional
@@ -384,43 +387,44 @@ def parse_cmd(command):
             if jend == None:
                 print '? end address expected at %s' % tail
                 return 'ERROR', istart, jend, params
-    # look for command, NOT optional
+    # look for cmd_string, NOT optional
     if tail and tail[0] in ed_cmds:
-        cmd, params = tail[0], tail[1:].strip()
+        cmd_name, params = tail[0], tail[1:].strip()
     # special case command names
     elif tail == '':
-        cmd = 'l' # default for empty command
+        cmd_name = 'l' # default for empty cmd_string
     elif tail[0] == '=':
-        cmd = 'A'
+        cmd_name = 'A'
     else:
         print '? command expected at %s' % tail
         return 'ERROR', istart, jend, params
     # special handling for commands that must be repeated to confirm
-    D_count = 0 if cmd != 'D' else D_count
+    D_count = 0 if cmd_name != 'D' else D_count
     # command-specific parameter parsing
-    if cmd == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
+    if cmd_name == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
-        return cmd, istart, jend, old, new, glbl
+        return cmd_name, istart, jend, old, new, glbl
     # all other commands, no special parameter parsing
     else:
-        return cmd, istart, jend, params if params else None 
+        return cmd_name, istart, jend, params if params else None 
 
 # state variables that must persist between ed_cmd invocations during input mode
 command_mode = True # alternates with input mode used by a,i,c commands
 addlines = ''  # text accumulated in input mode      
-cmd = ''   # command name, must persist through input mode
+cmd_name = ''   # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
 
 pysh = pysht.mk_shell() # embedded Python shell for ! command
 
-def ed_cmd(line):
+def cmd(line):
     """
     Process one input line without blocking in ed command or input mode
-    Update buffers and control state variables: command_mode,addlines,cmd,args
+    Update buffers and control state variables: 
+     command_mode, addlines, cmd_name, args
     """
-    global command_mode, addlines, cmd, args #persist across calls in input mode
+    global command_mode, addlines, cmd_name, args #persist across calls in input mode
     if command_mode:
-        if line and line[0] == '!': # special case - not a 1-char command
+        if line and line[0] == '!': # special case - not a 1-char cmd_name
             pysh(line[1:]) # execute Python expression or statement
             return
         items = parse_cmd(line)
@@ -428,21 +432,21 @@ def ed_cmd(line):
             return None # parse_cmd already printed message
         else:
             tokens = tuple([ t for t in items if t != None ])
-        cmd, args = tokens[0], tokens[1:]
-        if cmd in complete_cmds:
-            globals()[cmd](*args) # dict from name (string) to object (function)
-        elif cmd in input_cmds:
+        cmd_name, args = tokens[0], tokens[1:]
+        if cmd_name in complete_cmds:
+            globals()[cmd_name](*args) # dict from name (string) to object (function)
+        elif cmd_name in input_cmds:
             command_mode = False # enter input mode
             addlines = '' # one big string
         else:
-            print '? command not implemented: %s' % cmd
+            print '? command not implemented: %s' % cmd_name
         return
     else: # input mode for commands that collect text
         if line == '.':
             # NOT! remove extra \n at the end, unless it's a single blank line
             args += (addlines,)
-            print [ c for c in args ] # DEBUG
-            globals()[cmd](*args)
+            # print [ c for c in args ] # DEBUG
+            globals()[cmd_name](*args)
             command_mode = True # exit input mode
         else:
             # raw_input returns line with final \n stripped off
@@ -450,18 +454,18 @@ def ed_cmd(line):
             addlines += (line + '\n')
         return
 
-def ed():
+def main():
     """
     Top level ed command to use at Python prompt.
     This version won't work in Piety, it calls blocking command raw_input
     """
-    global cmd
-    cmd = '' # anything but 'q', must replace 'q' from previous quit
-    while not cmd == 'q':
+    global cmd_name
+    cmd_name = '' # anything but 'q', must replace 'q' from previous quit
+    while not cmd_name == 'q':
         line = raw_input() # blocking. no prompt - maybe make prompt a parameter
-        ed_cmd(line) # non-blocking
+        cmd(line) # non-blocking
 
 # Run the editor from the system command line:  python ed.py
 
 if __name__ == '__main__':
-    ed()
+    main()
