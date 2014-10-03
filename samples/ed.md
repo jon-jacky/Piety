@@ -2,11 +2,11 @@
 ed.py
 ==
 
-**ed.py** is a line-oriented text editor written in pure Python.  It
-provides many of the commands from the classic Unix editor *ed*,
-augmented with a few commands for handling multiple buffers and files
-from the later Unix (and Plan 9) editor *sam*.  You can use **ed.py** in
-a command mode that emulates classic *ed*, or use its API to edit from
+**ed.py** is a text editor in pure Python inspired by the classic Unix
+editor *ed*.  It provides many of the commands from *ed*, augmented
+with a few commands for handling multiple buffers and files from the
+later Unix (and Plan 9) editor *sam*.  You can use **ed.py** in a
+command mode that emulates classic *ed*, or use its API to edit from
 the Python prompt or write editing scripts in Python.
 
 **ed.py** can wait for input without blocking, so it can run with a
@@ -23,7 +23,14 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** supports these line address forms from classic *ed*:
 
- *number . , ; % $ /text/ ?text? +number -number ^number* (but not bare *+ - ^*)
+ *number . , ; % $ /text/ // ?text? ?? +number -number ^number* (but not bare *+ - ^*)
+
+
+**ed.py** also supports these commands from *sam*:
+
+ *b B D n*
+
+Here is a [command summary](ed.txt).
 
 Classic *ed* is described in many books: *The Unix Programming
 Environment* by Kernighan and Pike, *Software Tools* by Kernighan and
@@ -33,10 +40,6 @@ same, and is described in a completely rewritten man page at
 [http://plan9.bell-labs.com/magic/man2html/1/ed](http://plan9.bell-labs.com/magic/man2html/1/ed)
 and
 [http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
-
-**ed.py** also supports these commands from *sam*:
-
- *b B D n*
 
 The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)

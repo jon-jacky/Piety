@@ -1,0 +1,63 @@
+ed.py summary.  Commands from classic ed:
+
+ (empty command) advance to next line and print
+ <address> move to addressed line and print
+ = calculate and print line number from line address
+ ! execute Python statement
+ . exit input mode
+ A calculate and print address (same as =)
+ a append lines (enter input mode)
+ c change (replace) lines (enter input mode)
+ d delete lines
+ e read named file into current buffer (replace previous contents)
+ E read file into buffer, replace contents even if unsaved changes
+ f change file name for current buffer
+ i insert lines (enter input mode)
+ l go to addressed line and print (default next line)
+ p print lines
+ q quit (exit editor)
+ r read named file, insert lines at current position
+ s substitute (search/replace) in lines
+ w write lines to file (default is entire buffer)
+ z print a page of lines
+
+Commands from sam:
+
+ b create named buffer, change to named buffer, or print current buffer status
+ B read named file and load into new buffer
+ D delete buffer
+ n list buffers
+
+Line addresses:
+
+ . current line, called dot (default for most commands)
+ $ last line
+ <n> (number) line number (starting at 1 not 0)
+ +<n> n lines after dot
+ -<n> n lines before dot
+ /text/ forward search, next line containing text
+ //     forward search, using previous search text
+ ?text? backward search, nearest previous line containing text
+ ??     backward search, using previous search text
+ , entire buffer (same as 1,$)
+ % entire buffer (same as ,)
+ ; current line to end of buffer (same as .,$)
+
+Command format:
+
+ start,endCparameters
+
+ All fields are optional, with helpful defaults.
+ Here C is command name, all names are one character, default is l.
+ start, end are line addresses.
+ If both are present, command applies to all lines in range.  
+ If only start is present, command applies to that line.  
+ If both are absent, most commands apply to the current line.
+ Most commands move the current line to the last affected line.
+ Parameters may be file or buffer names, search/replace strings, ...
+ All commands are terminated by RETURN (including the empty command).
+ a,i,c enter input mode, where you type lines of text to add to buffer.
+ Type . by itself at the start of a line to exit input mode.
+
+For more information, type man ed on any Unix-like system.
+
