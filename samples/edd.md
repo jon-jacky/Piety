@@ -17,19 +17,20 @@ commands that directly control the display.  All display updates are
 side effects of *ed.py* commands as they move the current line around
 in the buffer, change buffer contents, or select a different buffer.
 
+**edd** provides a few new commands (not in *ed.py*) to make it easy
+to move around the buffer (by changing the current line): *Z* pages
+forward, *X* pages backward, and *space* moves backward one line.  The
+*ed.py* empty command (just type *RETURN*) moves forward one line.
+
+You can execute any Python statement in an *edd* session by preceding
+it with the *!* character, for example *!dir(edd)*.
+
 **edd** can run as a standalone program: *python edd.py*.  But *edd*
 is intended to run in an interactive python sesson: *import edd* then
 *edd.main()*.  In that case, you can suspend *edd* by typing its *q*
 command, execute other Python statements, then resume by typing
 *edd.main()* again.  You will find all your buffers and other editor
 state as you left it.
-
-**edd** provides a few new commands (not in *ed.py*) to make it easy to
-move around the buffer (by changing dot).  *Z* pages forward, *X*
-pages backward, and *space* moves backward one line.
-
-You can execute any Python statement in an *edd* session by preceding
-it with the *!* character, for example *!dir(edd)*.
 
 By default, the *edd* command region displays just two lines.  But
 this is usually not enough to show all of the output from some *edd*
@@ -41,7 +42,7 @@ to the pertinent variable:  *!edd.cmd_h=8*.
 
 **edd** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
-In a *Piety* session, start **edd** in nonblocking mode by typing
+In a *Piety* session, start *edd* in nonblocking mode by typing
 *edd.run()* instead of *edd.main()*.
 
 Revised October 2014

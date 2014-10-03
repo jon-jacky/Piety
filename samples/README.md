@@ -5,14 +5,16 @@ Sample applications to run under the Piety scheduler.  For directions,
 see the docstrings in each module, and the *.md* files.  Tests are
 under *Piety/tests*.
 
-- **ed**: text editor inspired by the classic Unix editor *ed*
+- **ed.py**: text editor inspired by the classic Unix editor *ed*
 
-- **ed0**: functions and data structures used by *ed*
+- **ed0.py**: functions and data structures used by *ed*
 
-- **ed.md**: description of *ed*
+- **ed.md**: description of *ed.py*
 
-- **edv**: display editor based on *ed*
+- **ed.txt** command summary for *ed.py*
 
-- **edv.md**: description of *edv*
+- **edd.py**: display editor based on *ed.py*
 
-- **writer**: write to files to demonstrate interleaving concurrency
+- **edd.md**: description of *edd*
+
+- **writer.py**: write to files to demonstrate interleaving concurrency
