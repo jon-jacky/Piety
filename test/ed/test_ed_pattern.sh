@@ -1,6 +1,6 @@
 # test_ed_pattern.sh - Same fcns as test_ed_pattern.py but commands not API
 #
-python -c "from ed import *; ed()" <<'END'
+python -c "import ed; ed.main()" <<'END'
 B ed.py.txt
 /text/l
 1l

@@ -1,6 +1,6 @@
 # test_ed_s.sh - Same operations as test_ed_s.py but commands not API
 #
-python -c "from ed import *; ed()" <<'END'
+python -c "import ed; ed.main()" <<'END'
 a
 ed is an editor based on the classic Unix editor ed.
 Again we mention ed.  This is test of ed.

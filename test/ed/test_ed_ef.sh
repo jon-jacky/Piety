@@ -1,6 +1,6 @@
 # test_ef.sh - Test f e E commands
 #
-python -c "from ed import *; ed()" <<'END'
+python -c "import ed; ed.main()" <<'END'
 f
 e
 f ed.py.txt

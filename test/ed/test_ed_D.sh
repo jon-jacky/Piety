@@ -1,6 +1,6 @@
 # test_ed_D.sh - Same operations as test_ed_D.py but commands not API
 #
-python -c "from ed import *; ed()" <<'END'
+python -c "import ed; ed.main()" <<'END'
 B new.txt
 i
 Here is a line
