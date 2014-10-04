@@ -62,7 +62,7 @@ def file_changed():
 
 def text_changed():
     'Buffer text contents changed in buffer segment visible in window'
-    return ed.cmd in 'aicds' # append, insert, change, delete, substitute
+    return ed.cmd_name in 'aicds' # append, insert, change, delete, substitute
     
 def cursor_moved():
     'Cursor moved to a different line on the display'
@@ -217,28 +217,28 @@ def restore_display():
     print(ansi.decstbmn)
     print(ansi.cup % (nlines,1))
 
-def command(cmd):
-    'Process one command without blocking.'
+def cmd(line):
+    'Process one command line without blocking.'
     # try/except ensures we restore display, especially scrolling
     try:
-        save_parameters() # before ed_cmd
+        save_parameters() # before ed.cmd
         # special cases, command synonyms
-        if cmd == 'Z': # move cursor forward a page
-            ed.ed_cmd('+%dp' % ed.buf().npage) 
-        elif cmd == 'X': # backward a page
-            ed.ed_cmd('-%dp' % ed.buf().npage) 
-        elif cmd == ' ': # backward a line
-            ed.ed_cmd('-1p')
+        if line == 'Z': # move cursor forward a page
+            ed.cmd('+%dp' % ed.buf().npage) 
+        elif line == 'X': # backward a page
+            ed.cmd('-%dp' % ed.buf().npage) 
+        elif line == ' ': # backward a line
+            ed.cmd('-1p')
         # RET in ed already moves forward a line
         else:
-            ed.ed_cmd(cmd) # non-blocking
+            ed.cmd(line) # non-blocking
         update_display()
     except BaseException as e:
         restore_display() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         exit()
 
-cmd = None # This must be global so text_changed() can test it
+line = None # This must be global so text_changed() can test it
 
 def main(scroll_h=cmd_h):
     """
@@ -246,13 +246,13 @@ def main(scroll_h=cmd_h):
     Won't cooperate with Piety scheduler, calls blocking command raw_input.
     scroll_h arg sets n of lines in bottom scrolling region, defaults to cmd_h
     """
-    global cmd, cmd_h
+    global line, cmd_h
     cmd_h = scroll_h
     init_display()
-    cmd = None # anything but 'q', must replace 'q' from previous quit
-    while not cmd == 'q':
-        cmd = raw_input() # blocking. no prompt - maybe make prompt a parameter
-        command(cmd) # no blocking
+    line = '' # anything but 'q', must replace 'q' from previous quit
+    while not line == 'q':
+        line = raw_input() # blocking. no prompt - maybe make prompt a parameter
+        cmd(line) # no blocking
     restore_display()
 
 # Run the editor from the system command line: python edd.py
