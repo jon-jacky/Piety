@@ -12,7 +12,7 @@ prints the response, and any preceding commands and responses scroll
 up.  But also, *edd* updates the window to show the command's effects
 on the buffer and the current line.
 
-**edd** provides all of the commands of *ed.py*.  There are no *edd*
+**edd** provides all of the [commands](ed.txt) of *ed.py*.  There are no *edd*
 commands that directly control the display.  All display updates are
 side effects of *ed.py* commands as they move the current line around
 in the buffer, change buffer contents, or select a different buffer.
@@ -42,8 +42,6 @@ to the pertinent variable:  *!edd.cmd_h=8*.
 
 **edd** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
-In a *Piety* session, start *edd* in nonblocking mode by typing
-*edd.run()* instead of *edd.main()*.
 
 Revised October 2014
 

@@ -2,11 +2,11 @@
 pysht.py - Callable Python shell.  Can be embedded in any Python application,
             but was designed to work with the Piety scheduler and Console.
            
-Defines the function 'mk_shell' whose parameters define a
-configuration, which returns a function (a closure) that interprets a
-single Python expression or statement.  This function is the callable
-Python shell.  We use a closure so we can create different shells that
-use different configurations.
+pysht (rhymes with "fished") defines the function 'mk_shell' whose
+parameters define a configuration, which returns a function (a
+closure) that interprets a single Python expression or statement.
+This function is the callable Python shell.  We use a closure so we
+can create different shells that use different configurations.
 
 At this time the only configuration parameter is the 'globals'
 dictionary used by eval and exec to look up names and bind variables.

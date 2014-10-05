@@ -1,77 +1,47 @@
 #!/usr/bin/env python
 """
 Start a Piety session with the edd display editor
-
-...$ ./ed
-pysh>> piety.tasks()
-...
-pysh>> edd.run()
-... shows edd display ...
-e README.md
-.. or enter any other ed.py commands ...
-q
-... cleans up edd display ...
-pysh>> ^D
-...$
-
 """
 
 import sys
 
 import console
-import pysht
 import piety
-import ed
-import edd
+import pysht
 
-# shell is the console object whose command is the pysht shell
-shell = console.Console(prompt='pysh>> ', command=pysht.mk_shell(), 
-                        exiter=piety.exit)
-# pysh is the task running the shell console object
-pysh = piety.Task(name='pysh', handler=shell.getchar, event=piety.sys.stdin,
-                  enabled=(lambda: console.focus == shell))
+# use 'import foo as foo_m' so we can use foo as command name
+import ed as ed_m 
+import edd as edd_m
 
-# editor is the console object whose command is edd 
-# must explicitly override default piety> prompt with empty prompt ''
-# keep default exiter for emergency escape with ^D
-editor = console.Console(prompt='', command=edd.cmd, exiter=piety.exit)
-# edit is the task running the editor console object
-# don't call it edd or ed because those are the names of the editor modules
-edit = piety.Task(name='edit', handler=editor.getchar, event=piety.sys.stdin,
-                  enabled=(lambda: console.focus == editor))
+none = lambda: None
 
-# call this edd_run because we have another def run() below
-def edd_run():
-    'start edd, change focus to editor'
-    edd.init_display() # initally paint screen
-    console.change_focus(editor)
+# pysht
 
-# Put this in edd module to distinguish edd.run() from piety run()
-# There is no run defined in edd module itself
-edd.run = edd_run
+# pysht_c is the console object whose command is the pysht shell
+pysht_c = console.Console(prompt='>> ', command=pysht.mk_shell(), exiter=piety.exit)
 
-def pause():
-    'quit from ed, restore display, restore focus to shell'
-    # ed.q() # now ed.q does nothing - it's just pass
-    edd.restore_display()
-    console.change_focus(shell)
+# pysht_t is the task running the pysht_c console object
+pysht_t= piety.Task(name='pysht', handler=pysht_c.getchar, event=piety.sys.stdin,
+                    enabled=(lambda: console.focus == pysht_c))
 
-# Must put this in ed module *not* edd module - edd has no q of its own
-ed.q = pause
+# pysht is the callable to invoke to run the pysht shell in the real console
+pysht = console.Command(pysht_c, pysht_c.restart, none, none, None)
 
-# start or restart piety scheduler from python prompt
+
+# edd
+
+edd_c = console.Console(prompt='', command=edd_m.cmd, exiter=piety.exit)
+edd_t = piety.Task(name='edd', handler=edd_c.getchar, event=piety.sys.stdin,
+                    enabled=(lambda: console.focus == edd_c))
+edd = console.Command(edd_c, edd_m.init_display, ed_m.q, edd_m.restore_display,
+                      pysht_c)
+
+
 def run():
-    """ 
-    Set up terminal, initialize shell, and (re)start piety
-    Type run() at the Python >>> prompt to start or resume
-     Piety sheduler with the shell running
-    """
+    'Assign focus to pysht shell, print shell prompt, (re)start scheduler.'
+    pysht()
     piety.done = False # reset, might be resuming after piety.exit() 
-    shell.restart()
     piety.run(nevents=0) # loop forever, don't return
-
-# start running with focus on piety python shell
-console.focus = shell
 
 if __name__ == '__main__':
     run()

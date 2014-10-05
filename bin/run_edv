@@ -35,41 +35,43 @@ pysh = piety.Task(name='pysh', handler=shell.getchar, event=piety.sys.stdin,
 # editor is the console object whose command is edv 
 # must explicitly override default piety> prompt with empty prompt ''
 # keep default exiter for emergency escape with ^D
-editor = console.Console(prompt='',command=edv.edv_cmd,exiter=piety.exit)
+editor = console.Console(prompt='', command=edv.command, exiter=piety.exit)
 # edit is the task running the editor console object
 # don't call it edv or ed because those are the names of the editor modules
 edit = piety.Task(name='edit', handler=editor.getchar, event=piety.sys.stdin,
                   enabled=(lambda: console.focus == editor))
 
-def edv_focus():
+# Does run() actually do anything?  Isn't there an edv.run ?
+
+def run():
     'start edv, change focus to editor'
     edv.init_display() # initally paint screen
     console.change_focus(editor, editor.restart) # change focus, set terminal
 
-def q_focus():
-    'q from ed, restore display, restore focus to shell'
+def suspend():
+    'quit from ed, restore display, restore focus to shell'
     # ed.q() # now ed.q does nothing - it's just pass
     edv.restore_display()
     console.change_focus(shell, shell.restart)
 
-ed.q = q_focus # monkeypatch, works because now ed.q does nothing
+# Must monkeypatch ed q(uit) command to also restore display, restore focus
+# FIXME shouldn't this be edv.q
+ed.q = suspend 
 
 # start running with focus on piety python shell
 console.focus = shell
 
 # start or restart piety scheduler from python prompt
-def run_piety():
+def main():
     """ 
     setup terminal and (re)start piety
     one command at the python prompt
+
     """
     piety.done = False # reset, might be resuming after piety.exit() 
     shell.restart() # clear buffer, print prompt
     piety.run(nevents=0) # loop forever, don't return
 
-# alias 
-resume = run_piety # but not 'r', single-char commands reserved for ed
-
 if __name__ == '__main__':
-    run_piety()
+    main()
 

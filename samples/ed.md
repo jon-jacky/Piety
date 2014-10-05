@@ -135,9 +135,7 @@ is the preceding example expressed once more using *ed.cmd*:
 
 When **ed.py** is running with the *Piety* cooperative multitasking
 scheduler, *Piety* collects a command line or input line without
-blocking, and then passes that line to *ed.cmd*.  In a *Piety*
-session, start **ed.py** in nonblocking mode by typing *ed.run()*
-instead of *ed.main()*.
+blocking, and then passes that line to *ed.cmd*.
 
 ## Modules ##
 
@@ -182,4 +180,4 @@ There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-Revised September 2014
+Revised October 2014

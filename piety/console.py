@@ -1,10 +1,12 @@
 """
 console.py - skeleton command line application for Piety
 
-Defines a class Console, with a getchar method that gets a single
-character typed at the console keyboard, and adds it to a command line
-(usually).  When getchar gets a line terminator character, it calls a
-command function and passes the command line to it.  
+Defines Console class and Command class.
+
+Console has a getchar method that gets a single character typed at the
+console keyboard, and adds it to a command line (usually).  When
+getchar gets a line terminator character, it calls a command function
+and passes the command line to it.
 
 Getchar also provides some line editing functions and command history
 (see getchar docstring).
@@ -32,6 +34,11 @@ Echo and editing are handled here, rather than in the terminal module,
 so they can be different for each console instance.  It should be
 possible to make different Console subclasses with different getchar
 methods that provide different echo and edit behavior.
+
+Command makes a console instance into a command (callable) that can be
+invoked conveniently from the Piety shell.  It manages console focus,
+initialization, and cleanup.
+
 """
 
 import sys
@@ -39,17 +46,11 @@ import terminal
 import ascii, ansi
 
 def echoline(cmdline):
-    """
-    Print command line on console display.  
-    Here command line must be passed parameter.
-    """
+    'Print cmdline on console'
     print cmdline
 
-
 def putlines(s):
-    """
-    format and print possibly multi-line string, at each linebreak print \r\n
-    """
+    'Format and print possibly multi-line string, at each linebreak print \r\n'
     lines = s.splitlines()
     lastline = len(lines) - 1 # index of last line
     for iline, line in enumerate(lines):
@@ -65,14 +66,10 @@ noexit = 'No exit function defined, type ^C for KeyboardInterrupt'
 
 focus = None
 
-def change_focus(new_focus, resume):
-  """
-  new_focus - the task that gets the new focus
-  resume - function to call on focus change - to refresh screen or ...
-  """
+def change_focus(new_focus):
+  'change console focus to console instance new_focus'
   global focus
   focus = new_focus
-  # resume() # print prompt, refresh screen or ... # FIXME not needed?
 
 class Console(object):
     """
@@ -87,7 +84,6 @@ class Console(object):
     def __init__(self, prompt='piety> ', terminator='\r', echo=True,
                  command=None, exiter=None, edit='ansi'):
         """
-        Creates a Console instance
         prompt - optional argument, prompt string, default is 'piety>'
         terminator - optional argument, default is RETURN '\r'
         echo - optional argument, default is True
@@ -283,20 +279,42 @@ class Console(object):
                 terminal.putstr(c) # no RETURN - all c go on same line
 
     def do_command(self):
-        """
-        Process command line and reinitialize
-        """
+        'Process command line and restart'
         terminal.restore() # resume line mode for command output
         print # print command output on new line
         self.command(self.cmdline)
         self.restart()
 
     def restart(self):
-        """
-        Initialize: clear command line, set single-char mode
-        """
+        'Clear command line, print command prompt, set single-char mode'
         self.cmdline = str()
         self.point = 0
-        # not self.prompt, the command function may have changed the focus
+        # not self.prompt, the command function may have changed the focus # FIXME?
         terminal.putstr(focus.prompt) # prompt does not end with \n
         terminal.setup() # enter or resume single character mode
+
+class Command(object):
+    'Callable command object that can be invoked from the Piety shell'
+    
+    def __init__(self, console, run, quit, cleanup, successor):
+        """
+        console - console instance to be invoked by command object
+        run - method to call to initialize console when command runs or resumes
+        quit - method command calls to quit, we'll monkeypatch this
+        cleanup - method to call to clean up console when command exits or suspends
+        successor - console instance that gets focus when command exits or suspends
+                     usually successor will be the pysht shell
+        """
+        self.console = console
+        self.run = run
+        def new_quit():
+            quit() 
+            cleanup()
+            change_focus(successor)
+        sys.modules[quit.__module__].__dict__[quit.__name__] = new_quit
+
+    def __call__(self):
+        change_focus(self.console)
+        self.run()
+
+

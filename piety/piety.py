@@ -9,7 +9,6 @@ This is a platform-dependent module. It uses the select module, so it
 must run on a Unix-like host OS (including Linux and Mac OS X).  One
 of the select channels is stdin (which I recall does *not* work
 in the Windows version of select).
-
 """
 
 import sys
@@ -19,26 +18,20 @@ from select import select
 from collections import defaultdict, Counter
 
 def true():
-    """
-    Return True, defined here so we can say t0.enabled = true
-    """
+    'Return True, defined here so we can say t0.enabled = true'
     return True
 
 def false():
-    """
-    Return False, defined here so we can say t0.enabled = false
-    """
+    'Return False, defined here so we can say t0.enabled = false'
     return False
 
 tasks_list = list() # list of tasks in order of creation
 
 schedule = defaultdict(list) # { event : list of tasks waiting for that event }
                              # would deque be better than list?
-
+        
 class Task(object):
-    """
-    Task instances are scheduled and invoked by the Piety scheduler.
-    """
+    'Task instances are scheduled and invoked by the Piety scheduler.'
     taskno = 0
 
     def __init__(self, name=None, handler=None, event=None, enabled=true):
@@ -97,14 +90,10 @@ done = False  # can exit on demand
 period = 1.000 # seconds, periodic timer for timeout events
 
 def tasks():
-    """
-    display information about all tasks
-    """
+    'Display information about all tasks.'
 
     def oname(obj):
-        """
-        extract informative name from Python object description string
-        """
+        'Extract informative name from Pytahon object description string.'
         s = str(obj)
         if s.startswith('<function'):
             name = (s.split())[1]
@@ -117,9 +106,7 @@ def tasks():
         return name.strip("'<>,")
 
     def ename(e):
-        """
-        Handle special case in event name
-        """
+        'Handle special case in event name.'
         if e == -1:
             return 'timeout %s s' % period
         else:
@@ -133,15 +120,13 @@ def tasks():
              ievent[t.event], ename(t.event), oname(t.handler))
 
 def exit():
-    """ 
-    exit from Piety event loop
-    """
+    'Exit from Piety event loop'
     global done
     done = True # must reset to False before we can resume
 
 def run(nevents=0):
     """
-    Run the Piety event loop
+    Run the Piety event loop.
     period: event loop period, default 1 sec
     nevents: number of timeout events to process, then exit run loop.
               default nevents=0 process until done=True or unhandled exception
