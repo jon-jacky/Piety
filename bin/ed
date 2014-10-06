@@ -2,10 +2,6 @@
 """
 Run a Piety session including the ed line editor.
 
-Now obsolete.  This module monkeypatches ed.run and ed.q, which works
-but is now deprecated.  Instead, use console.Command, see edd for an
-example.
-
 Start this script by ./ed not ed because classic ed might be on the PATH.
 
 ...$ ./ed
@@ -17,6 +13,12 @@ e README.md
 q
 pysh>> ^D
 ...$
+
+This script shows how to ensure that console focus is switched between
+the two console tasks: the shell pysht and the application ed.
+However, the method it uses for this works, but is now deprecated: it
+monkeypatches ed.run and ed.q.  It is better to use console.Command,
+see edd for an example.
 """
 
 import sys

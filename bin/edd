@@ -16,6 +16,10 @@ q
 q
 >> ^D
  $
+
+This script shows how to ensure that console focus is switched between
+the two console tasks: the shell pysht and the application edd, by using
+console.Command.
 """
 
 import sys
