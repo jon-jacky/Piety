@@ -30,7 +30,7 @@ Some of the scripts are:
     switched between the two console tasks.  However, the method it
     uses works, but is now deprecated.
 
-- **ed**: Start Piety with the *pysht* shell and *edd* display editor
+- **edd**: Start Piety with the *pysht* shell and *edd* display editor
     tasks.  This script shows how to ensure that console focus is
     switched between the two console tasks, using the current,
     recommended method.
