@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 """
-Start a Piety session with the edd display editor
+Run a Piety session including the edd display editor
+
+  $ edd
+>> piety.tasks()
+... pysht, edd ...
+>> edd()
+... display appears ...
+e README.md
+1
+q
+>> ... any python statements ...
+>> edd()
+... edd resumes with display, buffer contents, other state as before ...
+q
+>> ^D
+ $
 """
 
 import sys

@@ -50,5 +50,7 @@ t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
 shell = console.Console(command=pysht.mk_shell(), exiter=piety.exit)
 t2 = piety.Task(handler=shell.getchar, event=piety.sys.stdin)
 
+console.focus = shell
+
 if __name__ == '__main__':
     run_piety_writers()

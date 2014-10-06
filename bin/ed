@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 """
-Start a Piety session with the ed.py editor
+Run a Piety session including the ed line editor.
 
-Start by ./ed because classic ed is on the path.  For example:
+Now obsolete.  This module monkeypatches ed.run and ed.q, which works
+but is now deprecated.  Instead, use console.Command, see edd for an
+example.
+
+Start this script by ./ed not ed because classic ed might be on the PATH.
 
 ...$ ./ed
-pysh>> piety.tasks()
+pysh>> piety.run()
 ...
-pysh>> ed.run()
+pysh>> ed.main()
 e README.md
 .. or enter any other ed.py commands ...
 q
 pysh>> ^D
 ...$
-
 """
 
 import sys

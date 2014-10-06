@@ -38,7 +38,6 @@ methods that provide different echo and edit behavior.
 Command makes a console instance into a command (callable) that can be
 invoked conveniently from the Piety shell.  It manages console focus,
 initialization, and cleanup.
-
 """
 
 import sys
@@ -311,6 +310,7 @@ class Command(object):
             quit() 
             cleanup()
             change_focus(successor)
+        # monkeypatch quit, replace it with new_quit (which calls quit)
         sys.modules[quit.__module__].__dict__[quit.__name__] = new_quit
 
     def __call__(self):
