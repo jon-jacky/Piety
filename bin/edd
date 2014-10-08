@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Run a Piety session including the edd display editor
+Run a Piety session including the ed line editor and edd display editor
 
   $ edd
 >> piety.tasks()
@@ -11,8 +11,8 @@ e README.md
 1
 q
 >> ... any python statements ...
->> edd()
-... edd resumes with display, buffer contents, other state as before ...
+>> ed()
+... now ed sees the buffers and other editor state left by edd ...
 q
 >> ^D
  $
@@ -20,6 +20,11 @@ q
 This script shows how to ensure that console focus is switched between
 the two console tasks: the shell pysht and the application edd, by using
 console.Command.
+
+This script shows how the ed line editor and the edd display editor
+use the same buffers, cursor positions, and other editor state.  Both
+ed and edd store and update editor state in the ed0 module.
+
 """
 
 import sys
@@ -29,6 +34,7 @@ import piety
 import pysht
 
 # use 'import foo as foo_m' so we can use foo as command name
+import writer # not a console command - writers run in the background
 import ed as ed_m 
 import edd as edd_m
 
@@ -54,6 +60,26 @@ edd_t = piety.Task(name='edd', handler=edd_c.getchar, event=piety.sys.stdin,
                     enabled=(lambda: console.focus == edd_c))
 edd = console.Command(edd_c, edd_m.init_display, ed_m.q, edd_m.restore_display,
                       pysht_c)
+
+# ed
+
+ed_c = console.Console(prompt='', command=ed_m.cmd, exiter=piety.exit)
+ed_t = piety.Task(name='ed', handler=ed_c.getchar, event=piety.sys.stdin,
+                    enabled=(lambda: console.focus == ed_c))
+ed = console.Command(ed_c, none, ed_m.q, none, pysht_c)
+
+
+# writers
+
+# use this for t1.guard
+def alternate():
+    'Returns True on every other timeout event'
+    return bool(piety.ievent[piety.timeout]%2)
+
+# w0 writer task assigned enabled=piety.false so they don't start running
+wr0, wr1 = writer.Writer(fname='w0.txt'), writer.Writer(fname='w1.txt')
+w0 = piety.Task(name='w0',handler=wr0.write,event=piety.timeout,enabled=piety.false)
+w1 = piety.Task(name='w1',handler=wr1.write,event=piety.timeout,enabled=alternate)
 
 
 def run():
