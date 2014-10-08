@@ -18,7 +18,7 @@ q
  $
 
 This script shows how to ensure that console focus is switched between
-the two console tasks: the shell pysht and the application edd, by using
+the  console tasks: the shell pysht and the editors ed and edd, by using
 console.Command.
 
 This script shows how the ed line editor and the edd display editor

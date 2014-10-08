@@ -37,8 +37,8 @@ Startup scripts:
 
 - **edd**: Start Piety with the *pysht* shell, *ed* line editor, and
     *edd* display editor tasks.  This script demonstrates how to
-    *ensure that console focus is switched between the three console
-    *tasks, using the current, recommended method involving
-    **console.Command*.
+    ensure that console focus is switched between the three console
+    tasks, using the current, recommended method involving
+    *console.Command*.
 
 Revised October 2014
