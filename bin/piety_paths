@@ -7,7 +7,7 @@
 export PIETY=$HOME/Piety 
 
 # execution path to bin, to run Piety commands: piety, possibly others
-export PATH=$PATH:$PIETY/bin
+export PATH=$PIETY/bin:$PIETY/scripts:$PATH
 
 # Python path to piety, to import Piety modules: piety.py etc.
 export PYTHONPATH=$PIETY/piety:$PIETY/samples:$PYTHONPATH

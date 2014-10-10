@@ -19,7 +19,7 @@ interpreter session.  To run the Piety operating system: start Python,
 import the *piety* module, create some *piety.Task* instances, then
 call *piety.run*.  Usually, one of the tasks is a Python shell, so you
 can continue to interact while Piety is running.  See the examples in
-the *samples* directory.  More details appear in docstrings.
+the *scripts* directory.  More details appear in docstrings.
 
 Piety is event-driven.  Each Piety task identifies an *event*, a
 *handler*, and an *enabling condition*.  A handler can be any Python
@@ -67,7 +67,7 @@ line is complete.  This task is identified by assigning that task to
 the *focus* variable in the *console* module.  Each console task's
 enabling condition checks whether it has the focus.  The *focus*
 variable is reassigned each time a different console task is
-activated.  See *piety/run_ed* for a programming example.
+activated.  See *scripts/edd* for a programming example.
 
 ### Shell ###
 

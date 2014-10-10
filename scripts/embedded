@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+"""
+Start a Piety session running two concurrent file writer tasks, but
+without an interactive interpreter.  Shows that Piety can run in a
+'headless' mode with no console, as is needed in some embedded
+systems.
+
+When you run this script, Piety schedules the tasks to write 100
+messages to w0.txt and 50 messages to w1.txt, then Piety exits.  To
+see the writers working, open a terminal window and type: tail -f
+w0.txt.  In another terminal window: tail -f w1.txt.
+
+To repeatedly schedule the tasks, start the command using python -i
+embedded. When Piety exits, writing stops, and the Python prompt appears, type
+writers():
+
+ $ python -i embedded
+ ... writers write ...
+ >>> writers()
+ ... writers write again ...
+
+"""
+
+import sys
+from writer import Writer
+
+import console
+import piety
+
+def writers():
+    '(re)start piety with writer tasks'
+    piety.done = False # reset, might be resuming after piety.exit() 
+    piety.run(nevents=100) # handle 100 clock ticks and exit
+
+w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
+
+# use this for t1.guard
+def alternate():
+    'Return True on every other timeout event.'
+    return bool(piety.ievent[piety.timeout]%2)
+
+# writer tasks assigned guard=(lambda:False) so they don't start running
+t0 = piety.Task(handler=w0.write,event=piety.timeout,enabled=piety.true)
+t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
+
+if __name__ == '__main__':
+    writers()
