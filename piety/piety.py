@@ -17,18 +17,12 @@ import terminal
 from select import select
 from collections import defaultdict, Counter
 
-def true():
-    'Return True, defined here so we can say t0.enabled = true'
-    return True
+true = lambda: True # callable always returns True, can say t0.enabled = piety.true
 
-def false():
-    'Return False, defined here so we can say t0.enabled = false'
-    return False
+false = lambda: False # callable always returns False
 
-tasks_list = list() # list of tasks in order of creation
-
-schedule = defaultdict(list) # { event : list of tasks waiting for that event }
-                             # would deque be better than list?
+none = lambda: None # callable always returns None
+    
         
 class Task(object):
     'Task instances are scheduled and invoked by the Piety scheduler.'
@@ -76,6 +70,11 @@ class Task(object):
         tasks_list.append(self)
         if event:
             schedule[event].append(self)
+
+tasks_list = list() # list of tasks in order of creation
+
+schedule = defaultdict(list) # { event : list of tasks waiting for that event }
+                             # would deque be better than list?
 
 inputs = [sys.stdin] # could add to this list
 #outputs = [sys.stdout] # causes run loop to exit without handling other events

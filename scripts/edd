@@ -35,38 +35,44 @@ import pysht
 
 # use 'import foo as foo_m' so we can use foo as command name
 import writer # not a console command - writers run in the background
-import ed as ed_m 
-import edd as edd_m
+import ed
+import edd
 
 none = lambda: None
 
+class Prefix(object): pass  # use object names as disambigating prefixes
+
+task = Prefix() # piety.Task objects
+vt = Prefix() # console.Console objects
+rc = Prefix() # console.Command objects 
+
 # pysht
 
-# pysht_c is the console object whose command is the pysht shell
-pysht_c = console.Console(prompt='>> ', command=pysht.mk_shell(), exiter=piety.exit)
+# vt.pysht is the console object whose command is the pysht shell
+vt.pysht = console.Console(prompt='>> ', command=pysht.mk_shell(), exiter=piety.exit)
 
-# pysht_t is the task running the pysht_c console object
-pysht_t= piety.Task(name='pysht', handler=pysht_c.getchar, event=piety.sys.stdin,
-                    enabled=(lambda: console.focus == pysht_c))
+# task.pysht is the task running the vt.pysht console object
+task.pysht= piety.Task(name='pysht', handler=vt.pysht.getchar, event=piety.sys.stdin,
+                    enabled=(lambda: console.focus == vt.pysht))
 
-# pysht is the callable to invoke to run the pysht shell in the real console
-pysht = console.Command(pysht_c, pysht_c.restart, none, none, None)
+# rc.pysht is the callable to invoke to run the pysht shell in the real console
+rc.pysht = console.Command(vt.pysht, vt.pysht.restart, none, none, None)
 
 
 # edd
 
-edd_c = console.Console(prompt='', command=edd_m.cmd, exiter=piety.exit)
-edd_t = piety.Task(name='edd', handler=edd_c.getchar, event=piety.sys.stdin,
-                    enabled=(lambda: console.focus == edd_c))
-edd = console.Command(edd_c, edd_m.init_display, ed_m.q, edd_m.restore_display,
-                      pysht_c)
+vt.edd = console.Console(prompt='', command=edd.cmd, exiter=piety.exit)
+task.edd = piety.Task(name='edd', handler=vt.edd.getchar, event=piety.sys.stdin,
+                    enabled=(lambda: console.focus == vt.edd))
+rc.edd = console.Command(vt.edd, edd.init_display, ed.q, edd.restore_display,
+                      vt.pysht)
 
 # ed
 
-ed_c = console.Console(prompt='', command=ed_m.cmd, exiter=piety.exit)
-ed_t = piety.Task(name='ed', handler=ed_c.getchar, event=piety.sys.stdin,
-                    enabled=(lambda: console.focus == ed_c))
-ed = console.Command(ed_c, none, ed_m.q, none, pysht_c)
+vt.ed = console.Console(prompt='', command=ed.cmd, exiter=piety.exit)
+task.ed = piety.Task(name='ed', handler=vt.ed.getchar, event=piety.sys.stdin,
+                    enabled=(lambda: console.focus == vt.ed))
+rc.ed = console.Command(vt.ed, none, ed.q, none, vt.pysht)
 
 
 # writers
@@ -78,13 +84,13 @@ def alternate():
 
 # w0 writer task assigned enabled=piety.false so they don't start running
 wr0, wr1 = writer.Writer(fname='w0.txt'), writer.Writer(fname='w1.txt')
-w0 = piety.Task(name='w0',handler=wr0.write,event=piety.timeout,enabled=piety.false)
-w1 = piety.Task(name='w1',handler=wr1.write,event=piety.timeout,enabled=alternate)
+task.w0 = piety.Task(name='w0',handler=wr0.write,event=piety.timeout,enabled=piety.false)
+task.w1 = piety.Task(name='w1',handler=wr1.write,event=piety.timeout,enabled=alternate)
 
 
 def run():
     'Assign focus to pysht shell, print shell prompt, (re)start scheduler.'
-    pysht()
+    rc.pysht()
     piety.done = False # reset, might be resuming after piety.exit() 
     piety.run(nevents=0) # loop forever, don't return
 
