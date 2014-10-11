@@ -38,8 +38,6 @@ import writer # not a console command - writers run in the background
 import ed
 import edd
 
-none = lambda: None
-
 class Prefix(object): pass  # use object names as disambigating prefixes
 
 task = Prefix() # piety.Task objects
@@ -56,8 +54,7 @@ task.pysht= piety.Task(name='pysht', handler=vt.pysht.getchar, event=piety.sys.s
                     enabled=(lambda: console.focus == vt.pysht))
 
 # rc.pysht is the callable to invoke to run the pysht shell in the real console
-rc.pysht = console.Command(vt.pysht, vt.pysht.restart, none, none, None)
-
+rc.pysht = console.Command(vt.pysht, vt.pysht.restart, piety.none, piety.none, None)
 
 # edd
 
@@ -66,14 +63,12 @@ task.edd = piety.Task(name='edd', handler=vt.edd.getchar, event=piety.sys.stdin,
                     enabled=(lambda: console.focus == vt.edd))
 rc.edd = console.Command(vt.edd, edd.init_display, ed.q, edd.restore_display,
                       vt.pysht)
-
 # ed
 
 vt.ed = console.Console(prompt='', command=ed.cmd, exiter=piety.exit)
 task.ed = piety.Task(name='ed', handler=vt.ed.getchar, event=piety.sys.stdin,
                     enabled=(lambda: console.focus == vt.ed))
 rc.ed = console.Command(vt.ed, none, ed.q, none, vt.pysht)
-
 
 # writers
 
@@ -86,7 +81,6 @@ def alternate():
 wr0, wr1 = writer.Writer(fname='w0.txt'), writer.Writer(fname='w1.txt')
 task.w0 = piety.Task(name='w0',handler=wr0.write,event=piety.timeout,enabled=piety.false)
 task.w1 = piety.Task(name='w1',handler=wr1.write,event=piety.timeout,enabled=alternate)
-
 
 def run():
     'Assign focus to pysht shell, print shell prompt, (re)start scheduler.'
