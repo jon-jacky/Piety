@@ -38,6 +38,14 @@ buffers[current] = Buffer()
 
 # access to data structures
 
+def bufname():
+    'Return current buffer name'
+    return current
+
+def buffer(bufname):
+    'Return buffer identified by bufname'
+    return buffers[bufname]
+
 def buf():
     'Return the current buffer, text and metadata'
     return buffers[current]

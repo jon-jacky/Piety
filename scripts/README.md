@@ -40,5 +40,8 @@ Startup scripts:
     coding style.  It shows naming conventions for task, console, and
     command instances, and shows how to ensure that console focus is
     switched among the console tasks by using *console.Command*.
+    This script also shows how *ed* and *edd* provide two different
+    user interfaces to the same editor state, so you can switch back
+    and forth and keep the same buffers, cursor position, etc.
 
 Revised October 2014

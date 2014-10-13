@@ -26,7 +26,7 @@ import pysht  # provides embedded Python shell for ! command
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
 
 # can use these with no ed0 prefix, convenient for interactive sessions
-from ed0 import o, S, F, R, buf
+from ed0 import o, S, F, R, bufname, buffer, buf
 
 # arg lists, defaults, range checking
 
