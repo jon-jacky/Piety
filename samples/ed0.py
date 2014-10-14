@@ -36,7 +36,7 @@ buffers = dict() # dict from buffer names (strings) to Buffer instances
 current = 'main'
 buffers[current] = Buffer()  
 
-# access to data structures
+# Access to data structures.  At this time bufname and buffer are only used by edd.
 
 def bufname():
     'Return current buffer name'

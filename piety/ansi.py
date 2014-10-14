@@ -12,6 +12,8 @@ Other pages with the same information in different formats:
  http://www.sweger.com/ansiplus/EscSeq.html
 This page says 'Line and column numbers start at 1':
  http://www.umich.edu/~archive/apple2/misc/programmers/vt100.codes.txt
+More advice in:
+ https://github.com/antirez/linenoise, especially blob/master/linenoise.c
 """
 
 import sys
@@ -115,6 +117,32 @@ def render(text, *attributes):
 
 # regex from https://github.com/helgefmi/ansiterm/blob/master/ansiterm.py 
 ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')
+
+# common functions with descriptive names
+
+def put_cursor(line, column):
+    'Move cursor to line, column'
+    sys.stdout.write(cup % (line, column))
+
+def erase_line_end():
+    'Erase from cursor to end of line'
+    sys.stdout.write(el_end)
+
+def erase_line():
+    'Erase entire line'
+    sys.stdout.write(el_all)
+
+def erase_display():
+    'Erase entire display'
+    sys.stdout.write(ed)
+
+def set_scroll(ltop, lbottom):
+    'Set scrolling region to lines ltop through lbottom (line numbers)'
+    sys.stdout.write(decstbm % (ltop, lbottom))
+
+def set_scroll_all():
+    'Set scrolling region to entire display'
+    sys.stdout.write(decstbmn)
 
 if __name__ == '__main__':
     # print a bunch of lines in all their ansi glory

@@ -8,7 +8,8 @@ Described in ed.md.  To run: python edd.py or import edd then edd.main()
 import sys
 import traceback
 import subprocess
-import ed, ansi
+import ansi as display
+import ed
 
 render = sys.stdout.write # unlike print, don't write newline or space
 
@@ -105,8 +106,8 @@ def display_status(bufname):
                                '*' if buf.unsaved else ' ', 
                                bufname, filename_str)
     status += (ncols - (25 + len(filename_str)))*' ' # bg_color all ncols
-    render(ansi.cup % (status_1, 1)) # cursor to buffer status line    
-    ansi.render(status, ansi.white_bg) # white_bg is actually gray on mac term
+    display.put_cursor(status_1, 1)
+    display.render(status, display.white_bg) # white_bg is actually gray on mac term
 
 def locate_window(bufname):
     """
@@ -138,12 +139,14 @@ def display_window(bufname):
     buf = ed.buffer(bufname)
     seg_h = seg_n - seg_1 + 1 # lines in segment, usually same as win_h
     blank_h = win_h - seg_h   # n of padding empty lines at window bottom
-    render(ansi.cup % (win_1,1))  # cursor to window top
+    display.put_cursor(win_1,1)  # cursor to window top
     for line in buf.lines[seg_1:seg_n+1]: # python slice, upper limit excluded
         print line.rstrip()[:ncols-1], # remove trailing \n, truncate don't wrap
-        print ansi.el_end    # erase to end of line, print \n to advance to next
+        display.erase_line_end() 
+        print # print \n to advance to next
     for line in range(blank_h):
-        print ansi.el_all # erase entire line, advance to next
+        display.erase_line()
+        print # advance to next
 
 def locate_cursor(bufname):
     """
@@ -166,16 +169,16 @@ def locate_cursor(bufname):
 def display_cursor():
     'Display cursor at start of line cursor_i'
     if cursor_i:
-        render(ansi.cup % (cursor_i, 1))
-        ansi.render(cursor_chx, ansi.white_bg) # but no blink - that's too noisy
+        display.put_cursor(cursor_i, 1)
+        display.render(cursor_chx, display.white_bg) # but no blink - that's too noisy
 
 def erase_cursor():
     'At start of line cursor_i0, replace cursor with saved char, no attributes'
     if cursor_i0:
         # if line is empty must use ' ' to overwrite '_'
         ch = cursor_ch0 if not cursor_ch0 == '\n' else ' '
-        render(ansi.cup % (cursor_i0, 1))
-        ansi.render(ch, ansi.clear)
+        display.put_cursor(cursor_i0, 1)
+        display.render(ch, display.clear)
 
 def update_window(bufname):
     'Locate and render one window and its cursor, also status line'
@@ -188,11 +191,11 @@ def update_window(bufname):
 def init_display():
     'Clear and render entire display, set scrolling region, place cursor'
     calc_layout() # initialize cmd_1, cmd_n etc.
-    render(ansi.cup % (1,1)) # cursor to origin, don't advance to next line
-    render(ansi.ed) # clear screen from cursor
+    display.put_cursor(1,1) # origin, upper left corner
+    display.erase_display() 
     update_window(ed.bufname())
-    render(ansi.decstbm % (cmd_1, cmd_n)) # set scrolling region
-    render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom
+    display.set_scroll(cmd_1, cmd_n) 
+    display.put_cursor(cmd_n, 1) # bottom line
 
 def update_display():
     'Show window, cursor, status line.  Set scroll to input region, place cursor'
@@ -203,19 +206,20 @@ def update_display():
     # New contents or cursor outside window, redisplay window and cursor
     elif file_changed() or text_changed() or cursor_elsewhere():
         update_window(ed.bufname())
-        render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom
+        display.put_cursor(cmd_n, 1) # line at bottom
     # Cursor remained in window, move cursor only
     elif cursor_moved():
         erase_cursor()
         display_cursor()
-        render(ansi.cup % (cmd_n, 1)) # cursor to col 1, line at bottom
+        display_status(ed.bufname()) # FIXME? could write line number only
+        display.put_cursor(cmd_n, 1)
     else:
         pass # no changes to display
 
 def restore_display():
     'Restore full-screen scrolling, cursor to bottom.'
-    print(ansi.decstbmn)
-    print(ansi.cup % (nlines,1))
+    display.set_scroll_all()
+    display.put_cursor(nlines,1)
 
 def cmd(line):
     'Process one command line without blocking.'

@@ -25,7 +25,8 @@ import pysht  # provides embedded Python shell for ! command
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
 
-# can use these with no ed0 prefix, convenient for interactive sessions
+# Can use these with no ed0 prefix, convenient for interactive sessions.
+# At this time bufname and buffer are only used by edd.
 from ed0 import o, S, F, R, bufname, buffer, buf
 
 # arg lists, defaults, range checking
