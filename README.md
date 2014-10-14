@@ -68,4 +68,6 @@ information.
 
 - **samples**: sample applications to run under the Piety scheduler 
 
+- **scripts**: startup scripts that define tasks, then start the Piety scheduler
+
 - **test**: tests for modules in *piety* and *samples*
