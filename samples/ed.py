@@ -411,8 +411,7 @@ def parse_cmd(cmd_string):
 
 # state variables that must persist between ed_cmd invocations during input mode
 command_mode = True # alternates with input mode used by a,i,c commands
-addlines = ''  # text accumulated in input mode      
-cmd_name = ''   # command name, must persist through input mode
+cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
 
 pysh = pysht.mk_shell() # embedded Python shell for ! command
@@ -421,9 +420,10 @@ def cmd(line):
     """
     Process one input line without blocking in ed command or input mode
     Update buffers and control state variables: 
-     command_mode, addlines, cmd_name, args
+     command_mode, cmd_name, args
     """
-    global command_mode, addlines, cmd_name, args #persist across calls in input mode
+    # state variables that must persist between cmd invocations during input mode
+    global command_mode, cmd_name, args
     if command_mode:
         if line and line[0] == '!': # special case - not a 1-char cmd_name
             pysh(line[1:]) # execute Python expression or statement
@@ -438,21 +438,33 @@ def cmd(line):
             globals()[cmd_name](*args) # dict from name (string) to object (function)
         elif cmd_name in input_cmds:
             command_mode = False # enter input mode
-            addlines = '' # one big string
+            # We will add each line to buffer when user types RET at end-of-line,
+            # *unlike* in Python API where we pass multiple input lines at once.
+            istart, jend, x, xxx = parse_args(args) # might be int or None
+            input_line, end_line = ed0.mk_range(istart, jend) # int only
+            if not ed0.range_ok(input_line, end_line):
+                print '? invalid address'
+            # assign dot to prepare for input mode, where we a(ppend) each line
+            elif cmd_name == 'a':
+                buf().dot = input_line
+            elif cmd_name == 'i' and input_line > 0:
+                buf().dot = input_line - 1 # so we can a(ppend) instead of i(nsert)
+            elif cmd_name == 'c': # change command deletes changed lines first
+                ed0.d(input_line, end_line) # updates buf().dot
+                buf().dot = input_line - 1
+            else:
+                print '? command not supported in input mode: %s' % cmd_name
         else:
             print '? command not implemented: %s' % cmd_name
         return
-    else: # input mode for commands that collect text
+    # Here we are in input mode for a,i,c commands that collect text
+    else: 
         if line == '.':
-            # NOT! remove extra \n at the end, unless it's a single blank line
-            args += (addlines,)
-            # print [ c for c in args ] # DEBUG
-            globals()[cmd_name](*args)
             command_mode = True # exit input mode
         else:
-            # raw_input returns line with final \n stripped off
-            # BUT addlines is one big string, need \n to break lines
-            addlines += (line + '\n')
+            # Recall raw_input returns each line with final \n stripped off,
+            # BUT ed0.a requires \n at end of each line
+            ed0.a(o(), line + '\n') # append new line after dot, advance dot
         return
 
 def main():
