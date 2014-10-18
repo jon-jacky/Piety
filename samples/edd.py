@@ -131,6 +131,13 @@ def locate_window(bufname):
         seg_1 = buf.dot - win_h/2  
         seg_n = seg_1 + (win_h - 1)
 
+def display_lines(buf, first, last):
+    'Display lines in buf numbered first through last '
+    for line in buf.lines[first:last+1]: # python slice, upper limit excluded
+        print line.rstrip()[:ncols-1], # remove trailing \n, truncate don't wrap
+        display.erase_line_end() 
+        print # advance to next line
+    
 def display_window(bufname):
     """
     Start on win_1 line, display lines seg_1 .. seg_n from buffer bufname 
@@ -140,13 +147,16 @@ def display_window(bufname):
     seg_h = seg_n - seg_1 + 1 # lines in segment, usually same as win_h
     blank_h = win_h - seg_h   # n of padding empty lines at window bottom
     display.put_cursor(win_1,1)  # cursor to window top
-    for line in buf.lines[seg_1:seg_n+1]: # python slice, upper limit excluded
-        print line.rstrip()[:ncols-1], # remove trailing \n, truncate don't wrap
-        display.erase_line_end() 
-        print # print \n to advance to next
-    for line in range(blank_h):
+    if ed.command_mode:
+        display_lines(buf, seg_1, seg_n)
+    else: # input mode and this window displays current buffer around dot
+        display_lines(buf, seg_1, ed.o())
+        display.erase_line() # open line for input
+        print # next line
+        display_lines(buf, ed.o()+1, seg_n-1)
+    for line in range(blank_h if ed.command_mode else blank_h - 1):
         display.erase_line()
-        print # advance to next
+        print
 
 def locate_cursor(bufname):
     """
@@ -185,7 +195,9 @@ def update_window(bufname):
     locate_window(bufname) # assign new seg_1, seg_n
     locate_cursor(bufname) # *re*assign new cursor_i, cursor_ch
     display_window(bufname)
-    display_cursor()
+    if ed.command_mode: # and window shows current buffer around dot
+        display_cursor()
+    # else input mode, update_display will put cursor at open input line
     display_status(bufname)
 
 def init_display():
@@ -206,7 +218,10 @@ def update_display():
     # New contents or cursor outside window, redisplay window and cursor
     elif file_changed() or text_changed() or cursor_elsewhere():
         update_window(ed.bufname())
-        display.put_cursor(cmd_n, 1) # line at bottom
+        if ed.command_mode:
+            display.put_cursor(cmd_n, 1) # line at bottom
+        else: # input mode and window shows current buffer around dot
+            display.put_cursor(cursor_i+1, 1) # open line after dot
     # Cursor remained in window, move cursor only
     elif cursor_moved():
         erase_cursor()

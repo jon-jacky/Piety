@@ -419,8 +419,7 @@ pysh = pysht.mk_shell() # embedded Python shell for ! command
 def cmd(line):
     """
     Process one input line without blocking in ed command or input mode
-    Update buffers and control state variables: 
-     command_mode, cmd_name, args
+    Update buffers and control state variables: command_mode, cmd_name, args
     """
     # state variables that must persist between cmd invocations during input mode
     global command_mode, cmd_name, args
@@ -449,7 +448,7 @@ def cmd(line):
                 buf().dot = input_line
             elif cmd_name == 'i' and input_line > 0:
                 buf().dot = input_line - 1 # so we can a(ppend) instead of i(nsert)
-            elif cmd_name == 'c': # change command deletes changed lines first
+            elif cmd_name == 'c': # c(hange) command deletes changed lines first
                 ed0.d(input_line, end_line) # updates buf().dot
                 buf().dot = input_line - 1
             else:
@@ -457,8 +456,7 @@ def cmd(line):
         else:
             print '? command not implemented: %s' % cmd_name
         return
-    # Here we are in input mode for a,i,c commands that collect text
-    else: 
+    else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
         else:
