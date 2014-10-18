@@ -142,6 +142,7 @@ def display_window(bufname):
     """
     Start on win_1 line, display lines seg_1 .. seg_n from buffer bufname 
     If space remains in window, pad with empty lines to win_h
+    If in input mode, open line where text will be typed
     """
     buf = ed.buffer(bufname)
     seg_h = seg_n - seg_1 + 1 # lines in segment, usually same as win_h
