@@ -18,7 +18,7 @@ side effects of *ed.py* commands as they move the current line around
 in the buffer, change buffer contents, or select a different buffer.
 
 When you type a command *a*, *i*, or *c* that enters *input mode*,
-*edd* opens a line in the window at the insertion point an puts the
+*edd* opens a line in the window at the insertion point and puts the
 cursor there.  You then type lines of text directly into the window
 (not the command region).  You can edit within each line in the usual
 way (as provided by *readline*).  When you are done, type a period at
