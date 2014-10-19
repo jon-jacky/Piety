@@ -19,11 +19,13 @@ in the buffer, change buffer contents, or select a different buffer.
 
 When you type a command *a*, *i*, or *c* that enters *input mode*,
 *edd* opens a line in the window at the insertion point and puts the
-cursor there.  You then type lines of text directly into the window
-(not the command region).  You can edit within each line in the usual
-way (as provided by *readline*).  When you are done, type a period at
-the start of a line to exit input mode.  Then *edd* puts the cursor
-back in the command region for you to type the next command.
+cursor there.  You then type lines of text (as many as you want)
+directly into the window (not the command region).  You can edit
+within your current line in any way provided by *readline* (or your
+local equivalent), but you can't edit other lines (that you have
+already finished by typing RETURN).  When you are done, type a period
+at the start of a line to exit input mode.  Then *edd* puts the cursor
+back in the command region for you to type another command.
 
 **edd** provides a few new commands (not in *ed.py*) to make it easy
 to move around the buffer (by changing the current line): *Z* pages
