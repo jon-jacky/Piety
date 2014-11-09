@@ -14,6 +14,7 @@ piety>
 """
 
 import terminal, console
+import vt_keyboard as keyboard
 
 c0 = console.Console() # all default args
 
@@ -25,7 +26,7 @@ def test():
     """
     c0.restart() # includes terminal.setup()
     ch = 'x' # anything but c0.terminator
-    while not ch == c0.terminator:
+    while not ch == keyboard.cr:
         ch = c0.getchar() # also updates c0.cmdline
         # terminal.putstr(ch) # echo in place  NOT! We have default echo=True
     terminal.restore()

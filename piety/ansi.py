@@ -18,15 +18,15 @@ More advice in:
 
 import sys
 import re
-from ascii import esc
+import ascii
 
-csi = esc+'['    # control sequence introducer
+csi = ascii.esc+'['    # control sequence introducer
 
 # Inputs: arrow keys
-cuu1 = csi+'A'  # cursor up, default 1 char
-cud1 = csi+'B'  # cursor down, default 1 char
-cuf1 = csi+'C'  # cursor forward, default 1 char
-cub1 = csi+'D'  # cursor backward, default 1 char
+cuu = csi+'A'  # cursor up, default 1 char
+cud = csi+'B'  # cursor down, default 1 char
+cuf = csi+'C'  # cursor forward (right), default 1 char
+cub = csi+'D'  # cursor backward (left), default 1 char
 
 # Outputs with parameters
 
@@ -109,7 +109,7 @@ def attrs(*attributes):
 
 def render(text, *attributes):
     """
-    Print text with one or more attributes, each given by a separate int arg,
+    Print text with one or more attributes, each given by separate int arg,
     then clear attributes, but do not print newline.
     """
     # use write not print, we don't want newline or trailing space
@@ -117,32 +117,6 @@ def render(text, *attributes):
 
 # regex from https://github.com/helgefmi/ansiterm/blob/master/ansiterm.py 
 ctlseq = re.compile(r'^\x1b\[?([\d;]*)(\w)')
-
-# common functions with descriptive names
-
-def put_cursor(line, column):
-    'Move cursor to line, column'
-    sys.stdout.write(cup % (line, column))
-
-def erase_line_end():
-    'Erase from cursor to end of line'
-    sys.stdout.write(el_end)
-
-def erase_line():
-    'Erase entire line'
-    sys.stdout.write(el_all)
-
-def erase_display():
-    'Erase entire display'
-    sys.stdout.write(ed)
-
-def set_scroll(ltop, lbottom):
-    'Set scrolling region to lines ltop through lbottom (line numbers)'
-    sys.stdout.write(decstbm % (ltop, lbottom))
-
-def set_scroll_all():
-    'Set scrolling region to entire display'
-    sys.stdout.write(decstbmn)
 
 if __name__ == '__main__':
     # print a bunch of lines in all their ansi glory

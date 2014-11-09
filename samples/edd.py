@@ -1,14 +1,12 @@
 """
 edd - display editor based on the line editor ed.py.  
-
-Described in ed.md.  To run: python edd.py or import edd then edd.main()
-
+  Described in ed.md.  To run: python edd.py or import edd then edd.main()
 """
 
 import sys
 import traceback
 import subprocess
-import ansi as display
+import vt_display as display
 import ed
 
 render = sys.stdout.write # unlike print, don't write newline or space
@@ -133,9 +131,9 @@ def locate_window(bufname):
 
 def display_lines(buf, first, last):
     'Display lines in buf numbered first through last '
-    for line in buf.lines[first:last+1]: # python slice, upper limit excluded
-        print line.rstrip()[:ncols-1], # remove trailing \n, truncate don't wrap
-        display.erase_line_end() 
+    for line in buf.lines[first:last+1]: # slice, upper limit excluded
+        print line.rstrip()[:ncols-1], # remove \n, truncate don't wrap
+        display.kill_line() # erase from cursor to end
         print # advance to next line
     
 def display_window(bufname):
@@ -152,11 +150,11 @@ def display_window(bufname):
         display_lines(buf, seg_1, seg_n)
     else: # input mode and this window displays current buffer around dot
         display_lines(buf, seg_1, ed.o())
-        display.erase_line() # open line for input
+        display.kill_whole_line() # open line for input
         print # next line
         display_lines(buf, ed.o()+1, seg_n-1)
     for line in range(blank_h if ed.command_mode else blank_h - 1):
-        display.erase_line()
+        display.kill_whole_line()
         print
 
 def locate_cursor(bufname):

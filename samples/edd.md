@@ -21,19 +21,20 @@ When you type a command *a*, *i*, or *c* that enters *input mode*,
 *edd* opens a line in the window at the insertion point and puts the
 cursor there.  You then type lines of text (as many as you want)
 directly into the window (not the command region).  You can edit
-within your current line in any way provided by *readline* (or your
-local equivalent), but you can't edit other lines (that you have
-already finished by typing RETURN).  When you are done, type a period
-at the start of a line to exit input mode.  Then *edd* puts the cursor
-back in the command region for you to type another command.
+within your current line in any way provided by your Python's
+*raw_input* (or your local substitute), but you can't edit other lines
+(that you have already finished by typing RETURN).  When you are done,
+type a period at the start of a line to exit input mode.  Then *edd*
+puts the cursor back in the command region for you to type another
+command.
 
 **edd** provides a few new commands (not in *ed.py*) to make it easy
 to move around the buffer (by changing the current line): *Z* pages
 forward, *X* pages backward, and *space* moves backward one line.  The
 *ed.py* empty command (just type *RETURN*) moves forward one line.
 
-You can execute any Python statement in an *edd* session by preceding
-it with the *!* character, for example *!dir(edd)*.
+You can execute any Python statement at the *edd* command line by
+preceding it with the *!* character, for example *!dir(edd)*.
 
 **edd** can run as a standalone program: *python edd.py*.  But *edd*
 is intended to run in an interactive python sesson: *import edd* then
