@@ -62,10 +62,6 @@ def change_focus(new_focus):
   global focus
   focus = new_focus
 
-def echoline(cmdline):
-    'Print cmdline on console'
-    print cmdline
-
 def putlines(s):
     """
     Format and print possibly multi-line string
@@ -77,6 +73,10 @@ def putlines(s):
         terminal.putstr(line)
         if iline < lastline:
             terminal.putstr('\r\n')
+
+def echoline(cmdline):
+    'Print cmdline on console'
+    print cmdline
 
 class Console(object):
     """
@@ -91,7 +91,7 @@ class Console(object):
     The 'key' might actually be a multi-character control sequence (as
     in Emacs).  Some of the keys do command line editing.
     """
-    def __init__(self, prompt='piety> ', command=None, exiter=exit):
+    def __init__(self, prompt='> ', command=None, exiter=exit):
         """
         prompt - optional argument, prompt string, default is 'piety>'
         command - optional argument, function to execute command line,
@@ -169,7 +169,8 @@ class Console(object):
         putlines(self.cmdline) # might be multiple lines
 
     def newline(self):
-        self.cmdline += key
+        self.cmdline += '\n'
+        self.point += 1
         terminal.putstr('^J\r\n' + self.continuation)
 
     def previous_history(self):
@@ -274,7 +275,7 @@ class Console(object):
     def move_end_of_line(self):
         self.point = len(self.cmdline)
         eol = len(self.prompt) + 1 + len(self.cmdline)
-        display.move_end_of_line()
+        display.move_to_column(eol)
 
     def forward_char(self):
         if self.point < len(self.cmdline):

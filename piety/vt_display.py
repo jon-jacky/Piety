@@ -19,18 +19,18 @@ def move_to_column(column):
     sys.stdout.write(ansi.cha % column)
 
 def forward_char():
-    sys.stdout.write(ansi.cuf % 1)
+    sys.stdout.write(ansi.cuf) # move just one char
 
 def backward_char():
-    sys.stdout.write(ansi.cub % 1)
+    sys.stdout.write(ansi.cub)
 
 def move_beginning_of_line():
     sys.stdout.write(ansi.cha % 1)
 
-def move_end_of_line():
-    sys.stdout.write(ansi.cha % eol)
+#def move_end_of_line():
+#   sys.stdout.write(ansi.cha % eol) # just use move_to_column
 
-# insertion - names from emacs
+# insertion
 
 def self_insert_char(key):
     'Insert character in front of cursor'
@@ -45,7 +45,7 @@ def delete_char():
 
 def backward_delete_char():
     'Delete character before cursor'
-    sys.stdout.write(ansi.cub % 1)
+    sys.stdout.write(ansi.cub)
     sys.stdout.write(ansi.dch % 1)
 
 def kill_line():

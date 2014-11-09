@@ -30,8 +30,8 @@ cub = csi+'D'  # cursor backward (left), default 1 char
 
 # Outputs with parameters
 
-cuf = csi+'%dC'  # cursor forward %d characters
-cub = csi+'%dD'  # cursor backward %d characters
+cufd = csi+'%dC'  # cursor forward %d characters, avoid name clash
+cubd = csi+'%dD'  # cursor backward %d characters
 cha = csi+'%dG'  # cursor horizontal absolute, column %d
 cup = csi+'%d;%dH' # cursor position %d line, %d column
 
