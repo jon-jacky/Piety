@@ -5,13 +5,13 @@ Run a Piety session including the ed line editor and edd display editor
   $ edd
 >> piety.tasks()
 ... pysht, edd ...
->> edd()
+>> rc.edd()
 ... display appears ...
 e README.md
 1
 q
 >> ... any python statements ...
->> ed()
+>> rc.ed()
 ... now ed sees the buffers and other editor state left by edd ...
 q
 >> ^D

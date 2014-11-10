@@ -5,8 +5,6 @@ Run a Piety session including the ed line editor.
 Start this script by ./ed not ed because classic ed might be on the PATH.
 
 ...$ ./ed
-pysh>> piety.run()
-...
 pysh>> ed.main()
 e README.md
 .. or enter any other ed.py commands ...
