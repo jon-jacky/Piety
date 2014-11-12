@@ -5,7 +5,7 @@ edd - display editor based on the line editor ed.py.
 
 import sys
 import traceback
-import subprocess
+import subprocess # just to get display dimensions
 import vt_display as display
 import ed
 
@@ -268,8 +268,9 @@ def main(scroll_h=cmd_h):
     cmd_h = scroll_h
     init_display()
     line = '' # anything but 'q', must replace 'q' from previous quit
-    while not line == 'q':
-        line = raw_input() # blocking. no prompt - maybe make prompt a parameter
+    ed.quit = False # allow restart
+    while not ed.quit:
+        line = raw_input() # blocking. no prompt - make prompt a parameter?
         cmd(line) # no blocking
     restore_display()
 

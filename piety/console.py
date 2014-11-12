@@ -320,12 +320,12 @@ class Console(object):
         if key == keyboard.esc:
             c1 = terminal.getchar()
             if c1 != '[':
-                return # discard esc c1, not ansi ctl seq introducer (csi).
+                return key # discard esc c1, not ansi ctl seq introducer (csi).
             else:
                 key += c1
                 c2 = terminal.getchar()
                 if c2 not in 'ABCD':  # four arrow keys are esc[A etc.
-                    return # discard esc [ c2, not one of the 4 arrow keys
+                    return key # discard esc [ c2, not one of the 4 arrow keys
                 else:
                     key += c2 
                     # print ('key: %s' % [c for c in key]) # DEBUG
@@ -337,7 +337,7 @@ class Console(object):
             self.self_insert_command(key)
         else:
             print keyboard.bel, # sound indicates key not handled
-
+        return key # caller might check for 'q' quit cmd or ...
 
 class Command(object):
     'Callable command object that can be invoked from the Piety shell'
