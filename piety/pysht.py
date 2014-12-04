@@ -1,5 +1,5 @@
 """
-pysht.py - Callable Python shell.  Can be embedded in any Python application,
+pysht.py - Callable Python shell, can be embedded in any Python application,
             but was designed to work with the Piety scheduler and Console.
            
 pysht (rhymes with "fished") defines the function 'mk_shell' whose
@@ -22,18 +22,7 @@ To use pysht with any Python application:
  command = "print 'Now it is', datetime.datetime.now()"
  pysh(command) # prints Now it is ...
 
-To use pysht with Piety, pass the function returned by mk_shell to the
-Console constructor, that makes the Console instance behave as a
-Python shell:
-
- import console
- import pysht
- import sys
- shell = console.Console(prompt='pysh> ', command=pysht.mk_shell())
-
-This code belongs in the Piety application module that uses the shell, not
-here in the pysht module, so different shell instances can use
-different configurations.
+See also the main function defined below.
 
 The command function returned by mk_shell simply passes the command
 line to the Python eval function (for expressions) or the exec
@@ -62,8 +51,8 @@ main_globals = sys.modules['__main__'].__dict__
 def mk_shell(globals=main_globals):
     """
     Console expects a command function with one argument, the command line
-    use mk_shell to make the command function with globals dictionary baked in
-    accept the default globals to use the same dictionary the __main__ module
+    use mk_shell to make the command function with globals dict baked in
+    accept the default globals to use the same dict as the __main__ module
     """
 
     def shell(cmdline):
@@ -73,7 +62,8 @@ def mk_shell(globals=main_globals):
         """
         try: # don't crash out of piety if exception, but print traceback
             try: # try eval, if it fails call exec
-                # exec does not automatically print values so use eval if we can
+                # exec does not automatically print values,
+                #  so use eval if we can
                 result = eval(cmdline, globals)
                 # print out results just as in standard Python REPL
                 if result == None:
@@ -82,11 +72,31 @@ def mk_shell(globals=main_globals):
                     print "'"+result+"'"
                 else:
                     print result
-                # statements (not exprs) like x = 42 crash eval with syntax error 
-                #  so use exec for those
+                # statements (not exprs) like x = 42 crash eval
+                #  with syntax error, so use exec for those
             except SyntaxError:
                 exec cmdline in globals
         except BaseException as e:
           traceback.print_exc() # looks just like unhandled exception
 
     return shell
+
+# Test
+
+quit = False
+
+def exit():
+    'Call this function to exit from the shell'
+    global quit
+    quit = True
+
+def main():
+    'Python REPL using home-made pysh shell'
+    pysh = mk_shell()
+    print "pysh shell, type any Python statement, exit() to exit"
+    while not quit:
+        stmt = raw_input('>> ')
+        pysh(stmt)
+
+if __name__ == '__main__':
+    main()

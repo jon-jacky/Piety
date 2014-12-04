@@ -1,6 +1,8 @@
 """
 terminal.py - single character input and output from the console
 
+Has a main method, python terminal.py demonstrates most functions.
+
 Provides function getchar that reads a single character from the
 console (stdin).  Also function putstr that can write a string of
 characters (or just one) without formatting (unlike Python print), so
@@ -13,8 +15,7 @@ whatever was in effect when setup was called).
 
 Terminal settings assigned by this module apply to all tasks
 (including all Console instances) in the Piety session, because Piety
-runs in a single Python interpreter session.  Echo and editing can be
-customized in each Console instance.
+runs in a single Python interpreter session.
 
 This is a platform-dependent module.  It uses the termios and tty
 modules, so it must run on a Unix-like host OS (including Linux and
@@ -70,3 +71,20 @@ def putstr(s):
     """
     sys.stdout.write(s)
     sys.stdout.flush() # otherwise s doesn't appear until user types input
+
+# Test
+
+def main():
+    c = line = ''
+    setup() # enter single character more
+    putstr('> ')
+    while not c == '\r':
+        c = getchar()
+        putstr(c)
+        line += c
+    restore() # return to normal mode
+    print
+    print line
+
+if __name__ == '__main__':
+    main()

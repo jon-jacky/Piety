@@ -40,6 +40,8 @@ may be possible to adapt some of them.
 
 ### Console ###
 
+THIS SECTION IS OBSOLETE, REVISIONS COMING SOON
+
 The *console* module contains a skeleton command line application.
 It defines a class *Console*, with a *getchar* method that gets a single
 character typed at the console keyboard, and adds it to a command line
@@ -84,6 +86,8 @@ The *terminal* module contains platform-dependent functions used by *console*.
 
 These are the modules in the *piety* directory.  For more details see
 their docstrings.
+
+THIS LIST IS INCOMPLETE, REVISIONS COMING SOON
 
 - **piety**, scheduler, defines *Task* class and *run* function
 

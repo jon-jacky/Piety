@@ -2,6 +2,9 @@
 Piety scripts directory
 =======================
 
+SOME OF THESE SCRIPTS ARE NOT CONSISTENT WITH THE CURRENT PIETY
+MODULES.  THEY MIGHT NOT WORK.  FIXES COMING SOON.
+
 Most of these are *startup scripts* that define Piety tasks, then
 start the Piety scheduler.  
 
@@ -44,4 +47,4 @@ Startup scripts:
     user interfaces to the same editor state, so you can switch back
     and forth and keep the same buffers, cursor position, etc.
 
-Revised October 2014
+Revised December 2014

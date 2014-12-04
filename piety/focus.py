@@ -3,6 +3,8 @@ focus.py - Manage focus for multiple terminal applications.
            The single stdin/stdout can be multiplexed among several.
 """
 
+import sys
+
 # Focus is the task that has console focus:
 # the task whose command function is called when input line is complete.
 focus = None
@@ -23,9 +25,9 @@ class Command(object):
                when command runs or resumes
         quit - method command calls to quit, we'll monkeypatch this
         cleanup - method to call to clean up console 
-               when command exits or suspends
+               when command pauses (exits or suspends)
         successor - console instance that gets focus 
-               when command exits or suspends
+               when command pauses.
                usually successor will be the pysht shell
         """
         self.console = console

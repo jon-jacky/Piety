@@ -1,5 +1,7 @@
 """
 key.py - Collect, store, handle single key or multi-character key sequences
+
+Has a main method, python key.py demonstrates most functions.
 """
 
 import terminal
@@ -56,6 +58,8 @@ class Key(object):
         self.key = ''
         return k 
 
+# Test
+
 def handler(key):
     'Just output the character to the terminal'
     terminal.putstr(key)
@@ -72,7 +76,7 @@ def main():
         line += key
     terminal.restore() # normal mode
     print 
-    print line
+    print [ c for c in line ] # show any esc or other unprintables
 
 if __name__ == '__main__':
     main()

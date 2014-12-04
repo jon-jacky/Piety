@@ -5,6 +5,8 @@ To run tasks in Piety, import the piety module, create some piety.Task
 instances, then call piety.run. More details appear in the docstrings below,
 and in the examples in the samples directory.
 
+Has a main method, python piety.py demonstrates the basics.
+
 This is a platform-dependent module. It uses the select module, so it
 must run on a Unix-like host OS (including Linux and Mac OS X).  One
 of the select channels is stdin (which I recall does *not* work
@@ -172,3 +174,20 @@ def run(nevents=0):
                 pass # if no timeout handler, just continue
             interval = period # if we got here, full period must have elapsed
             ievent[timeout] += 1
+
+# Test
+
+def task0(): print 'Task 0'
+
+def task1(): print 'Task 1'
+
+t0 = Task(handler=task0, event=timeout, enabled=true)
+t1 = Task(handler=task1, event=timeout, enabled=true)
+
+def main():
+    done = False # reset, might be resuming after exit() 
+    run(nevents=10) # handle 10 clock ticks and exit
+    tasks() # show the tasks
+
+if __name__ == '__main__':
+    main()
