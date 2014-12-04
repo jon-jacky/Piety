@@ -1,42 +1,26 @@
 """
-edd configuration that imports Piety console module 
-instead of using built-in Python raw_input to get command line.
-BUT does not use Piety scheduler.
-
-This is like test/console/test_console_blocking
-but also passes in edd.cmd instead of using default echoline command
-
-$ python edd.c
-... edd commands
-q
-$
-
+eddc.py - edd configuration that uses console and key modules
+          instead of using built-in Python raw_input to get command line.
 """
 
-import edd
-import console
-import terminal
+import edd, console, key, line
 
-c0 = console.Console(prompt='', command=edd.cmd, exiter=edd.ed.q) 
+c = console.Console(prompt='', command=edd.cmd, 
+                    optional_keymap=line.keymap,
+                    initialize=edd.init_display,
+                    exit=edd.ed.q, cleanup=edd.restore_display) 
 
-console.focus = c0
+k = key.Key(c.handle_key)
 
 def main():
-    """ 
-    loop calling getchar until line terminator, then print buffer contents
-    """
-    # restart and restore are done by console do_command also
-    # BUT both initial c0.restart and final terminal.restore needed here
-    c0.restart() # includes terminal.setup()
-    edd.init_display()
-    key = None # anything but 'q'
-    edd.ed.quit = False # allow restart
+    # terminal setup and restore are done for each command 
+    #  by c.do_command via k.getchar
+    # BUT initial c.resume is needed here.
+    edd.ed.quit = False
+    c.resume() # calls edd.init_display then terminal.setup()
     while not edd.ed.quit:
-        key = c0.getchar() # also updates c0.cmdline
-    edd.restore_display()
-    terminal.restore() # restore terminal mode
+        key = k.getchar()
+    # exit, cleanup handled by c.pause called by c.handle_key via k.getchar
 
 if __name__ == '__main__':
     main()
-
-  
