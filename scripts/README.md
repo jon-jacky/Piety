@@ -18,8 +18,8 @@ Python interpreter: *python piety* etc.
 Startup scripts:
 
 - **pyshc** - Runs the *pysh* Python shell, without using the Piety
-  scheduler.  Uses the *console* and *key* modules instead of Python
-  *raw_input* to collect the command line.
+  scheduler.  Uses the nonblocking *console* and *key* modules instead of 
+  the blocking Python *raw_input* to collect the command line.
 
 - **pysh**: Start a Piety session running the *pysh* Python shell.
  You can then use this shell to create and run more tasks.
