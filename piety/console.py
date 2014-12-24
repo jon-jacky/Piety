@@ -36,8 +36,14 @@ def putlines(s):
 
 class Console(object):
 
+    # class variable, might be used by multiple instances
+    # True when same console instance will continue after do_command
+    # Usually True, but False when do_command resumes a different console task
+    # Set False by __call__ below, restored True by do_command below
+    continues = True # recall 'continue' (with no s) is a Python keyword
+
     def __init__(self, prompt='> ', command=echo, 
-                 initialize=None, exit=None, cleanup=None, 
+                 resume=None, quit=None, pause=None, 
                  optional_keymap=None): 
         """
         prompt - Prompt string that appears at the start of each line
@@ -45,13 +51,13 @@ class Console(object):
         command - Function to execute command line
           Can be any callable that takes one argument, a string.
           Default just echoes the command line.
-        initialize - optional argument, function to call to initialize
+        resume - optional argument, function to call to initialize
           terminal before accepting input.
-        exit - optional argument, function to call to exit application,
+        quit - optional argument, function to call to exit application,
            which is called if you type ^D at an empty command line.
           Default simply prints message advising you can type ^C
-        cleanup - optional argument, function to call to clean up
-          terminal after exit is executed.  
+        pause - optional argument, function to call to clean up
+          terminal after quit is executed.  
           Default does nothing - often nothing is needed.
         optional_keymap - keymap for additional functions such as
           in-line editing, default is None.  Entries in this keymap
@@ -61,9 +67,9 @@ class Console(object):
         self.point = 0  # index where next character will be inserted
         self.prompt = prompt
         self.command = command
-        self.initialize = initialize
-        self.exit = exit
-        self.cleanup = cleanup
+        self.resume = resume
+        self.quit = quit
+        self.pause = pause
         self.history = list() # list of command lines, earliest first
         self.iline = 0 # index into history
         self.continuation = '.'*(len(self.prompt)-1) + ' ' # prompt
@@ -77,9 +83,9 @@ class Console(object):
         'Collect command line and dispatch on command'
         # key arg might be single character or a sequence of characters
         # Special cases for ^D, otherwise ^D is handled by keymap
-        if key == keyboard.C_d and not self.chars and not self.exit:
+        if key == keyboard.C_d and not self.chars and not self.quit:
             terminal.putstr('^D\r\n' + noexit + '\r\n' + self.prompt)
-        elif key == keyboard.C_d and  not self.chars and self.exit:
+        elif key == keyboard.C_d and  not self.chars and self.quit:
             self.end_of_file()
         elif key in self.keymap:
             self.keymap[key](self) # fcn not method needs self arg
@@ -94,46 +100,51 @@ class Console(object):
     def do_command(self):
         'Process command line and restart'
         # special case for self.pause so we *don't* restart, but cleanup
-        if self.chars == self.exit.__name__ : # If None, ^D is only way out
-          self.pause()
+        if self.chars == self.quit.__name__ : # If None, ^D is only way out
+          self.do_pause()
         else:
           terminal.restore() # resume line mode for command output
           print # print command output on new line
-          self.command(self.chars)
-          self.restart() # print prompt and resume single character mode
+          self.command(self.chars) # might quit, set Console.continues = False
+          if Console.continues:  # typical case - self.command was not quit
+              self.restart(self.prompt) # print prompt, resume single char mode
+          else: # self.command was quit, set Console.continues = False
+              self.chars = str() # clear these, anticipating after next pause
+              self.point = 0
+              Console.continues = True # keep executing new Console instance
 
-    def restart(self):
+    def restart(self, prompt):
         'Clear command line, print command prompt, set single-char mode'
         self.chars = str()
         self.point = 0
-        terminal.putstr(self.prompt) # prompt does not end with \n
+        terminal.putstr(prompt) # prompt does not end with \n
         terminal.setup() # enter or resume single character mode
 
-    def resume(self):
+    def __call__(self):
         'Configure terminal display and prepare to accept input'
-        if self.initialize:
-          self.initialize()
-        self.restart()
+        if self.resume:
+          self.resume()
+        self.restart(self.prompt)
+        Console.continues = False # instead resume different Console instance
 
     def end_of_file(self):
         'Handle end-of-file key'
-        terminal.putstr('^D') 
-        print # start new line
-        self.pause()
+        terminal.putstr('^D\r\n') # we're still in terminal raw mode
+        self.do_pause() # restores terminal
 
-    def pause(self):
-        'Clear command line, *dont* print command promt, exit and cleanup'
+    def do_pause(self):
+        'Clear command line, exit and cleanup, print piety prompt'
         self.chars = str()
         self.point = 0
-        if self.exit:
-          self.exit()
+        if self.quit:
+          self.quit()
         else:
-          print 'No exit function defined, type ^C for KeyboardInterrupt'
-        if self.cleanup:
-          self.cleanup()
-        else:
-          terminal.restore() # resume normal mode
-          print # continue activities on new line after program exits
+          print 'No quit function defined, type ^C for KeyboardInterrupt'
+        if self.pause:
+          self.pause()
+        # here we actually want to restart not self but successor console
+        print # prompt on new line
+        self.restart('>> ') # for now, successor is always piety.
 
 # Command functions for the basic_keymap table defined below.
 # All of these commands work on printing terminals.
@@ -238,8 +249,8 @@ def q():
 def main():
     global quit
     quit = False # earlier invocation might have set it True
-    c = Console(exit=q)
-    c.resume() # prompt first time, execute terminal.setup()
+    c = Console(quit=q)
+    c() # prompt first time, execute terminal.setup()
     while not quit:
         # multi-char control sequences like keyboard.up don't work here
         k = terminal.getchar()

@@ -12,11 +12,11 @@ w0.txt.  In another terminal window: tail -f w1.txt.
 
 To repeatedly schedule the tasks, start the command using python -i
 embedded. When Piety exits, writing stops, and the Python prompt
-appears, type run():
+appears, type main():
 
  $ python -i embedded
- ... w0 writes 10 messages, w1 writes fifty, then they stop ...
- >>> run()
+ ... w0 writes 10 messages, w1 writes five, then they stop ...
+ >>> main()
  ... writers write, stop again ...
 
 """
@@ -38,10 +38,10 @@ def alternate():
 t0 = piety.Task(handler=w0.write,event=piety.timeout,enabled=piety.true)
 t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
 
-def run():
+def main():
     '(re)start piety with writer tasks'
     piety.done = False # reset, might be resuming after piety.exit() 
     piety.run(nevents=10) # handle 10 clock ticks and exit
 
 if __name__ == '__main__':
-    run()
+    main()

@@ -1,110 +1,74 @@
 #!/usr/bin/env python
 """
-Run a Piety session including the ed line editor and edd display editor
-
-  $ edd
->> piety.tasks()
-... pysht, edd ...
->> rc.edd()
-... display appears ...
-e README.md
-1
-q
->> ... any python statements ...
->> rc.ed()
-... now ed sees the buffers and other editor state left by edd ...
-q
->> ^D
- $
-
-This script shows how to ensure that console focus is switched between
-the  console tasks: the shell pysht and the editors ed and edd, by using
-console.Command.
-
-This script shows how the ed line editor and the edd display editor
-provide two different user interfaces to the same buffers, cursor
-positions, and other editor state.  Both ed and edd store and update
-editor state in the ed0 module.
+Run a Piety session with pysh shell, ed line editor, and edd display editor.
+ Starts shell with >> prompt, type vt.ed() or vt.edd() to start an editor.
 """
 
 import sys
 
+import terminal
 import key
 import line
 import console
-import focus
-import piety
 import pysht
+import piety as p
 
-
-import writer # not a console command - writers run in the background
 import ed
 import edd
 
-class Prefix(object): pass  # use object names as disambigating prefixes
+class Namespace(object): pass  # use object names as disambigating prefixes
 
-task = Prefix() # piety.Task objects
-kb = Prefix() # key.Key objects
-vt = Prefix() # console.Console objects
-rc = Prefix() # focus.Command objects 
+t = Namespace() # p.Task objects
+kb = Namespace() # key.Key objects
+vt = Namespace() # console.Console objects
 
-# pysht
+# pysh
 
-# vt.pysht is the console whose command is the pysht shell
-vt.pysht = console.Console(prompt='>> ', command=pysht.mk_shell(), 
-                           optional_keymap=line.keymap,
-                           exit=piety.exit)
+# t.pysh is the task running the vt.pysh console via kb.pysh
+t.pysh= p.Task(name='pysh', event=p.sys.stdin)
 
-# kb.pysht is the key whose console is vt.pysht
-kb.pysht = key.Key(vt.pysht.handle_key)
+# vt.pysh is the console whose command is the pysh shell
+vt.pysh = console.Console(prompt='>> ', command=pysht.mk_shell(), 
+                          resume=p.mk_resume(t.pysh), quit=p.quit,
+                          pause=p.mk_pause(t.pysh, terminal.restore),
+                          optional_keymap=line.keymap)
 
-# task.pysht is the task running the vt.pysht console
-task.pysht= piety.Task(name='pysht', handler=kb.pysht.getchar, 
-                       event=piety.sys.stdin,
-                       enabled=(lambda: focus.focus == vt.pysht))
+# kb.pysh is the key whose console is vt.pysh
+kb.pysh = key.Key(vt.pysh.handle_key)
 
-# rc.pysht is the callable to invoke to run the pysht shell
-rc.pysht = focus.Command(vt.pysht, vt.pysht.restart, piety.none, 
-                         piety.none, None)
+# now that we have kb object we can assign handler
+t.pysh.handler = kb.pysh.getchar
+
+# ed, note : prompt
+
+def ed_pause():
+    terminal.restore()
+
+t.ed = p.Task(name='ed', event=p.sys.stdin)
+vt.ed = console.Console(prompt=':', command=ed.cmd,
+                         resume=p.mk_resume(t.ed), quit=ed.q,
+                         pause=p.mk_pause(t.ed),
+                         optional_keymap=line.keymap)
+kb.ed = key.Key(vt.ed.handle_key)
+t.ed.handler = kb.ed.getchar
 
 # edd
-vt.edd = console.Console(prompt='', command=edd.cmd, 
-                         optional_keymap=line.keymap,
-                         exit=piety.exit)
+t.edd = p.Task(name='edd', event=p.sys.stdin)
+vt.edd = console.Console(prompt='', command=edd.cmd,
+                         resume=p.mk_resume(t.edd, edd.init_display), 
+                         quit=ed.q,
+                         pause=p.mk_pause(t.edd, edd.restore_display),
+                         optional_keymap=line.keymap)
 kb.edd = key.Key(vt.edd.handle_key)
-task.edd = piety.Task(name='edd', handler=kb.edd.getchar,
-                      event=piety.sys.stdin,
-                      enabled=(lambda: focus.focus == vt.edd))
-rc.edd = focus.Command(vt.edd, edd.init_display, ed.q, edd.restore_display,
-                       vt.pysht)
+t.edd.handler = kb.edd.getchar
 
-# ed - no optional_keymap - just use retro printing termimal editing
-vt.ed = console.Console(prompt='', command=ed.cmd, exit=piety.exit)
-kb.ed = key.Key(vt.ed.handle_key)
-task.ed = piety.Task(name='ed', handler=kb.ed.getchar, 
-                     event=piety.sys.stdin,
-                     enabled=(lambda: focus.focus == vt.ed))
-rc.ed = focus.Command(vt.ed, piety.none, ed.q, piety.none, vt.pysht)
-
-# writers
-
-# use this for t1.guard
-def alternate():
-    'Returns True on every other timeout event'
-    return bool(piety.ievent[piety.timeout]%2)
-
-# w0 writer task assigned enabled=piety.false so they don't start running
-wr0, wr1 = writer.Writer(fname='w0.txt'), writer.Writer(fname='w1.txt')
-task.w0 = piety.Task(name='w0', handler=wr0.write, event=piety.timeout,
-                     enabled=piety.false)
-task.w1 = piety.Task(name='w1', handler=wr1.write, event=piety.timeout,
-                     enabled=alternate)
-
-def run():
-    'Assign focus to pysht shell, print shell prompt, (re)start scheduler.'
-    rc.pysht()
-    piety.done = False # reset, might be resuming after piety.exit() 
-    piety.run(nevents=0) # loop forever, don't return
+def main():
+    'Assign focus to pysh shell, print shell prompt, (re)start scheduler.'
+    vt.pysh()
+    console.Console.continues = True
+    p.done = False # reset, might be resuming after p.exit() 
+    p.run(nevents=0) # loop forever, don't return
+    terminal.restore()
 
 if __name__ == '__main__':
-    run()
+    main()

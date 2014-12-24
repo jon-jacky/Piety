@@ -38,21 +38,21 @@ and modules are not designed to cooperate in this way --- instead they
 take over the Python session, postponing all other tasks.  However, it
 may be possible to adapt some of them.
 
+It is possible to have more than one task that has a handler for a
+same event.  For some events, it is necessary that only one task
+handle that event, that task is said to have the *focus* for that
+event.  The Piety scheduler manages the focus for such events,
+multiplexing the event among the tasks that might handle it.
+
 ### Console ###
 
-THIS SECTION IS OBSOLETE, REVISIONS COMING SOON
-
-The *console* module contains a skeleton command line application.
-It defines a class *Console*, with a *getchar* method that gets a single
-character typed at the console keyboard, and adds it to a command line
-(usually).  When *getchar* gets a line terminator character, it calls a
-command function and passes the command line to it.  *Getchar* also
-handles some editing functions and other control keys.
-
-The *getchar* method (including the command function it may call) can
-be one of the handlers scheduled by *piety.run*, called each time the
-user types a single key.  Other Piety tasks can run while the user is
-entering or editing the command line.
+The *console* module contains a skeleton command line application.  It
+defines a class *Console*, with a *handle_key* method that gets a
+single character typed at the console keyboard, and adds it to a
+command line (usually).  When *handle_key* gets a line terminator
+character, it calls a command function and passes the command line to
+it.  The *handle_key* method also handles some editing functions and
+other control keys.
 
 The command function is passed as an argument to the *Console*
 constructor, so this same class can act as the front end to any
@@ -60,16 +60,17 @@ command line application.  The command function can invoke the Python
 interpreter itself, so a *Console* instance can act as Piety's Python
 shell.
 
-It is possible to have more than one console task in a Piety session.
-For example, it is typical to have a Python shell and an editor.  In
-that case it is necessary to ensure that, at any time, only one
-console task has the *focus*.  Console keyboard input only goes to the
-task with the focus; its command function is called when the command
-line is complete.  This task is identified by assigning that task to
-the *focus* variable in the *console* module.  Each console task's
-enabling condition checks whether it has the focus.  The *focus*
-variable is reassigned each time a different console task is
-activated.  See *scripts/edd* for a programming example.
+The Console *handle_key* method is usually called by the *getchar*
+method in the *key* module.  It is this *getchar* method that is the
+console task's handler, that is invoked by the Piety scheduler
+
+It is typical to have more than one console task in a Piety session:
+for example, a Python shell and an editor.  In that case it is
+necessary to ensure that, at any time, only one console task has the
+*focus*.  Console keyboard input only goes to the task with the focus;
+its command function is called when the command line is complete.
+Console tasks call functions in the Piety scheduler module to acquire
+and release the focus.
 
 ### Shell ###
 
@@ -78,23 +79,19 @@ configuration settings and returns a command function that can be
 passed to the *Console* constructor, to make that *Console* instance
 into a Python shell.
 
-### Terminal ###
-
-The *terminal* module contains platform-dependent functions used by *console*.
-
 ### Modules ###
 
 These are the modules in the *piety* directory.  For more details see
 their docstrings.
 
-THIS LIST IS INCOMPLETE, REVISIONS COMING SOON
+- **piety**: scheduler, defines *Task* class and *run* function
 
-- **piety**, scheduler, defines *Task* class and *run* function
+- **console**: skeleton command line application
 
-- **console, ascii, ansi**, skeleton command line application
-
-- **pysht**, Python shell, configures *console* to provide
+- **pysht**: Python shell, configures *console* to provide
     a Python interpreter.
 
-- **terminal**, utilities used by *console*
+- **ascii, ansi, key, line, terminal, vt_display, vt_keyboard**:
+    utilities that support *console* and terminal applications.
 
+Revised December 2014

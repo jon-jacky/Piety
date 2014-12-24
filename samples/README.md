@@ -11,14 +11,14 @@ under *Piety/tests*, some demonstrations are under *Piety/scripts*.
 
 - **ed.md**: description of *ed.py*
 
+- **ed.txt** command summary for *ed.py*
+
 - **edc.py**: *ed* configured to use nonblocking Piety *console* instead of 
                 blocking Python *raw_input*
 
-- **ed.txt** command summary for *ed.py*
-
 - **edd.py**: display editor based on *ed.py*
 
-- **edd.md**: description of *edd*
+- **edd.md**: description of *edd.py*
 
 - **eddc.py**: *edd* configured to use nonblocking Piety *console* instead of 
                 blocking Python *raw_input*

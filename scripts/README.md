@@ -2,11 +2,8 @@
 Piety scripts directory
 =======================
 
-SOME OF THESE SCRIPTS ARE NOT CONSISTENT WITH THE CURRENT PIETY
-MODULES.  THEY MIGHT NOT WORK.  FIXES COMING SOON.
-
-Most of these are *startup scripts* that define Piety tasks, then
-start the Piety scheduler.  
+Startup scripts that define Piety tasks, then start the Piety
+scheduler.
 
 To conveniently use these scripts, this directory should be on your
 execution *PATH*.  Or, its contents should be installed in some
@@ -20,11 +17,14 @@ Python interpreter: *python piety* etc.
 
 Startup scripts:
 
-- **piety**: Start a Piety session running an interactive Python
- interpreter, using the *pysht* shell.  You can then use this shell to
- create and run more tasks.
+- **pyshc** - Runs the *pysh* Python shell, without using the Piety
+  scheduler.  Uses the *console* and *key* modules instead of Python
+  *raw_input* to collect the command line.
 
-- **writers**: Similar to the *piety* script, but also starts with
+- **pysh**: Start a Piety session running the *pysh* Python shell.
+ You can then use this shell to create and run more tasks.
+
+- **writers**: Similar to the *pysh* script, but also creates
     two concurrent file writer tasks, which you can start and stop
     from the shell.
 
@@ -33,18 +33,11 @@ Startup scripts:
    can run in a "headless" mode with no console, as is needed in some
    embedded systems.
 
-- **ed**: Start Piety with the *pysht* shell and *ed* line editor
-    tasks.  *Warning*: this script demonstrates one way to get console
-    focus to switch between the two console tasks.  The method it uses
-    works, but is now deprecated.
-
-- **edd**: Start Piety with the *pysht* shell, *ed* line editor, and
-    *edd* display editor tasks.  This script demonstrates recommended
-    coding style.  It shows naming conventions for task, console, and
-    command instances, and shows how to ensure that console focus is
-    switched among the console tasks by using *console.Command*.
-    This script also shows how *ed* and *edd* provide two different
-    user interfaces to the same editor state, so you can switch back
-    and forth and keep the same buffers, cursor position, etc.
+- **edd**: Starts Piety with the *pysh* shell, *ed* line editor, and
+    *edd* display editor tasks.  Exhibits a coding style including
+    naming conventions for task, console, and key instances.  Demonstrates
+    how *ed* and *edd* provide two different user interfaces to the
+    same editor state, so you can switch back and forth and keep the
+    same buffers, cursor position, etc.
 
 Revised December 2014

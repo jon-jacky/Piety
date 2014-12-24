@@ -7,8 +7,8 @@ import edd, console, key, line
 
 c = console.Console(prompt='', command=edd.cmd, 
                     optional_keymap=line.keymap,
-                    initialize=edd.init_display,
-                    exit=edd.ed.q, cleanup=edd.restore_display) 
+                    resume=edd.init_display,
+                    quit=edd.ed.q, pause=edd.restore_display) 
 
 k = key.Key(c.handle_key)
 
@@ -17,10 +17,10 @@ def main():
     #  by c.do_command via k.getchar
     # BUT initial c.resume is needed here.
     edd.ed.quit = False
-    c.resume() # calls edd.init_display then terminal.setup()
+    c() # calls edd.init_display then terminal.setup()
     while not edd.ed.quit:
-        key = k.getchar()
-    # exit, cleanup handled by c.pause called by c.handle_key via k.getchar
+        key = k.getchar() # calls c.handle_key
+    # quit, cleanup by c.do_pause called by c.handle_key via k.getchar
 
 if __name__ == '__main__':
     main()

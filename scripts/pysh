@@ -1,0 +1,39 @@
+#!/usr/bin/env python
+"""
+Start a Piety session running an interactive Python interpreter, using
+the pysht shell.  You can then use this shell to create and run more tasks.
+"""
+
+import sys
+
+import key
+import line
+import console
+import pysht
+import piety as p
+import terminal # for terminal.restore
+
+# t is the task running the pysh console via key k
+# We will assign handler to k.getchar below.
+t = p.Task(name='pysh', event=p.sys.stdin)
+
+# pysh is the console whose command is the pysht shell
+# We name the console object pysh (no t), different from module pysht.
+# No resume and pause args needed because no scheduler so no focus needed
+pysh = console.Console(prompt='>> ', command=pysht.mk_shell(), 
+                       quit=p.quit, optional_keymap=line.keymap)
+
+# k is the key whose console is pysh
+k = key.Key(pysh.handle_key)
+
+t.handler = k.getchar
+
+def main():
+    pysh()
+    console.Console.continues = True
+    p.done = False # reset, might be resuming after p.quit() 
+    p.run(nevents=0) # loop forever, don't return
+    terminal.restore()
+
+if __name__ == '__main__':
+    main()

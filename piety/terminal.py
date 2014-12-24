@@ -32,14 +32,21 @@ http://man7.org/linux/man-pages/man3/termios.3.html
 import sys, tty, termios
 
 fd = sys.stdin.fileno() # Isn't sys.stdin always fileno 0 ?
-saved_settings = termios.tcgetattr(fd) # in case someone calls restore first
+line_mode_settings = termios.tcgetattr(fd) # in case someone calls restore first
+
+# ...$ python
+# >>> import terminal
+# >>> terminal.line_mode_settings
+# [27394, 3, 19200, 536872395, 9600, 9600, ['\x04', '\xff', '\xff', '\x7f', '\x17', '\x15', '\x12', '\xff', '\x03', '\x1c', '\x1a', '\x19', '\x11', '\x13', '\x16', '\x0f', '\x01', '\x00', '\x14', '\xff']]
 
 def setup():
     """
     set sys.input to single character mode, save original mode
     """
-    global saved_settings
-    saved_settings = termios.tcgetattr(fd)
+    # DON'T save settings again - we alread saved them on import, see above
+    #  this function should be idempotent.
+    #global saved_settings
+    #saved_settings = termios.tcgetattr(fd)
     # tty.setraw just calls termios.tcsetattr with particular flags
     # see http://hg.python.org/cpython/file/1dc925ee441a/Lib/tty.py
     tty.setraw(fd)
@@ -47,9 +54,9 @@ def setup():
 
 def restore():
     """
-    restore sys.input to original mode saved by setup
+    restore sys.input to line mode
     """
-    termios.tcsetattr(fd, termios.TCSAFLUSH, saved_settings)
+    termios.tcsetattr(fd, termios.TCSAFLUSH, line_mode_settings)
 
 def getchar():
     """

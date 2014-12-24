@@ -85,15 +85,17 @@ def mk_shell(globals=main_globals):
 
 quit = False
 
-def exit():
+def q():
     'Call this function to exit from the shell'
     global quit
     quit = True
 
 def main():
     'Python REPL using home-made pysh shell'
+    global quit
     pysh = mk_shell()
-    print "pysh shell, type any Python statement, exit() to exit"
+    print "pysh shell, type any Python statement, q() to exit"
+    quit = False # may have been set by previous invocation
     while not quit:
         stmt = raw_input('>> ')
         pysh(stmt)

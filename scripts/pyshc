@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+"""
+pyshc.py - Run a pysh Python shell session.
+          Use console and key modules instead of
+           Python raw_input to get command line as in pysh.c main.  
+          BUT do not use Piety scheduler.
+"""
+
+import pysht, console, key, line, terminal
+
+# define before use in pysh = ... below
+
+quit = False
+
+def q():
+    'Call this function to exit from the shell'
+    global quit
+    quit = True
+
+# Here the optional initialize and cleanup args are default None
+pysh = console.Console(prompt='>> ', command=pysht.mk_shell(), 
+                       optional_keymap=line.keymap, quit=q) 
+
+k = key.Key(pysh.handle_key)
+
+def main():
+    # terminal setup and restore are done for each command 
+    #  by pysh.do_command via k.getchar
+    # BUT initial pysh() is needed here.
+    global quit
+    quit = False
+    pysh() # calls terminal.setup()
+    console.Console.continues = True
+    while not quit:
+        key = k.getchar() # calls pysh.handle_key
+    # quit handled by pysh.pause called by pysh.handle_key via k.getchar
+    terminal.restore()
+
+if __name__ == '__main__':
+    main()
