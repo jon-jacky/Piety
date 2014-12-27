@@ -2,8 +2,7 @@
 Piety scripts directory
 =======================
 
-Startup scripts that define Piety tasks, then start the Piety
-scheduler.
+Run applications using the Piety modules.
 
 To conveniently use these scripts, this directory should be on your
 execution *PATH*.  Or, its contents should be installed in some
@@ -15,11 +14,16 @@ host, you can run a script by simply naming it on the command line:
 *piety* etc.  On other systems, you should be able to run them with the
 Python interpreter: *python piety* etc.
 
-Startup scripts:
+These scripts use the *console* module to run command line
+applications, but do not use the Piety scheduler.
 
-- **pyshc** - Runs the *pysh* Python shell, without using the Piety
-  scheduler.  Uses the nonblocking *console* and *key* modules instead of 
-  the blocking Python *raw_input* to collect the command line.
+- **pyshc**: Runs the *pysh* Python shell.
+
+- **edc**: Runs the *ed* line editor.
+
+- **eddc**: Runs the *edd* display editor.
+
+These scripts define Piety tasks, then start the Piety scheduler:
 
 - **pysh**: Start a Piety session running the *pysh* Python shell.
  You can then use this shell to create and run more tasks.

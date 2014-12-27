@@ -13,14 +13,8 @@ under *Piety/tests*, some demonstrations are under *Piety/scripts*.
 
 - **ed.txt** command summary for *ed.py*
 
-- **edc.py**: *ed* configured to use nonblocking Piety *console* instead of 
-                blocking Python *raw_input*
-
 - **edd.py**: display editor based on *ed.py*
 
 - **edd.md**: description of *edd.py*
-
-- **eddc.py**: *edd* configured to use nonblocking Piety *console* instead of 
-                blocking Python *raw_input*
 
 - **writer.py**: write to files to demonstrate interleaving concurrency
