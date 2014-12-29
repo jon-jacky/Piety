@@ -3,13 +3,10 @@ edd - display editor based on the line editor ed.py.
   Described in ed.md.  To run: python edd.py or import edd then edd.main()
 """
 
-import sys
 import traceback
 import subprocess # just to get display dimensions
-import vt_display as display
+import ansi_display as display
 import ed
-
-render = sys.stdout.write # unlike print, don't write newline or space
 
 # Get display dimensions.  This works on Mac OS X, probably other Unix.
 nlines, ncols = [ int(n) 
