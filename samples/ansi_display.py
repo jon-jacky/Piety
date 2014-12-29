@@ -4,7 +4,6 @@ ansi_display - update the display using ansi control sequences
 """
 
 import sys
-import terminal # for putstr
 
 esc = '\x1B' # \e does not work 'invalid \x escape'
 
@@ -26,6 +25,8 @@ sgr = csi + '%s' + 'm' # set graphic rendition. %s is ;-separated integers like
 clear = 0      # clears attributes (not transparent!)
 white_bg = 47 # gray on mac terminal
 
+putstr = sys.stdout.write # print string without newline at end
+
 def attrs(*attributes):
     """
     Convert variable length arg list of integers to ansi attributes string
@@ -42,23 +43,23 @@ def render(text, *attributes):
     sys.stdout.write(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 def erase_display(): # name in gnu readline
-    terminal.putstr(ed)
+    putstr(ed)
 
 def put_cursor(line, column):      # not in emacs or gnu readline
-    terminal.putstr(cup % (line, column))
+    putstr(cup % (line, column))
 
 def kill_line():
     'Erase from cursor to end of line'
-    terminal.putstr(el_end)
+    putstr(el_end)
 
 def kill_whole_line():
     'Erase entire line'
-    terminal.putstr(el_all)
+    putstr(el_all)
 
 def set_scroll(ltop, lbottom): 
     'Set scrolling region to lines ltop through lbottom (line numbers)'
-    terminal.putstr(decstbm % (ltop, lbottom))
+    putstr(decstbm % (ltop, lbottom))
 
 def set_scroll_all():
     'Set scrolling region to entire display'
-    terminal.putstr(decstbmn)
+    putstr(decstbmn)
