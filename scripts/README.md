@@ -2,7 +2,8 @@
 Piety scripts directory
 =======================
 
-Run applications using the Piety modules.
+Run applications (from the *samples* directory) using the Piety
+modules (from the *piety* directory).
 
 To conveniently use these scripts, this directory should be on your
 execution *PATH*.  Or, its contents should be installed in some

@@ -38,7 +38,7 @@ import terminal
 import key
 import line
 import console
-import pysht
+import pysh
 import piety
 
 w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
@@ -55,13 +55,13 @@ t0 = piety.Task(handler=w0.write,event=piety.timeout,enabled=piety.false)
 t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
 
 t2 = piety.Task(name='pysh', event=piety.sys.stdin)
-pysh = console.Console(prompt='>> ', command=pysht.mk_shell(), 
+pyshc = console.Console(prompt='>> ', command=pysh.mk_shell(), 
                        quit=piety.quit, optional_keymap=line.keymap)
-k = key.Key(pysh.handle_key)
+k = key.Key(pyshc.handle_key)
 t2.handler = k.getchar
 
 def main():
-    pysh()
+    pyshc()
     console.Console.continues = True
     piety.done = False # reset, might be resuming after piety.quit() 
     piety.run(nevents=0) # loop forever, don't return

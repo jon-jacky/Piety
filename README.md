@@ -71,3 +71,9 @@ information.
 - **scripts**: startup scripts that define tasks, then start the Piety scheduler
 
 - **test**: tests for modules in *piety* and *samples*
+
+To ensure modularity, modules in *samples* do not import
+modules in *piety*, and vice versa.  Modules in *scripts* import
+modules from both *samples* and *piety*.
+
+Revised December 2014

@@ -10,7 +10,7 @@ import terminal
 import key
 import line
 import console
-import pysht
+import pysh
 import piety as p
 
 import ed
@@ -28,7 +28,7 @@ vt = Namespace() # console.Console objects
 t.pysh= p.Task(name='pysh', event=p.sys.stdin)
 
 # vt.pysh is the console whose command is the pysh shell
-vt.pysh = console.Console(prompt='>> ', command=pysht.mk_shell(), 
+vt.pysh = console.Console(prompt='>> ', command=pysh.mk_shell(), 
                           resume=p.mk_resume(t.pysh), quit=p.quit,
                           pause=p.mk_pause(t.pysh, terminal.restore),
                           optional_keymap=line.keymap)

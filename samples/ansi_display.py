@@ -1,10 +1,17 @@
 """
 ansi_display - update the display using ansi control sequences
                 just the mininum needed by the edd display editor
+               also, get display dimensions
 """
 
 import sys
+import subprocess # just to get display dimensions
 
+def dimensions():
+    'Return nlines, ncols. Works on Mac OS X, probably other Unix.'
+    return [ int(n) 
+             for n in subprocess.check_output(['stty','size']).split()]
+         
 esc = '\x1B' # \e does not work 'invalid \x escape'
 
 csi = esc+'['    # ANSI control sequence introducer

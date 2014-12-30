@@ -1,22 +1,12 @@
 """
-ed.py - ed is the standard text editor.  
-
-ed is a line-oriented text editor written in pure Python.  It provides
-many of the commands from the classic Unix editor ed, augmented with a
-few commands for managing multiple buffers and files from the later
-Unix (and Plan 9) editor, sam.  You can use it in a command mode that
-emulates Unix ed, or use its API to edit from the Python prompt or
-write editing scripts in Python.
+ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 
 This module provides both the classic command interface and the public
-Python API.  This module reads and writes at the console, but does not
-directly update buffers or access files.  Another module, ed0.py,
-provides the core: data structures and the internal API.  That module
-does not access the console, but updates buffers and reads and writes
-files.
+Python API.  It imports another module, ed0.py, which provides the
+core: data structures and the internal API.
 
-For more explanation see ed.md, the docstrings here, and the tests
-in Piety/test/ed/
+For more explanation see ed.md, ed.txt, the docstrings here, and the tests
+in test/ed/
 """
 
 import re, os

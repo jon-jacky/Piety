@@ -4,17 +4,14 @@ edd - display editor based on the line editor ed.py.
 """
 
 import traceback
-import subprocess # just to get display dimensions
 import ansi_display as display
 import ed
-
-# Get display dimensions.  This works on Mac OS X, probably other Unix.
-nlines, ncols = [ int(n) 
-                  for n in subprocess.check_output(['stty','size']).split()]
 
 # Position display elements.  For now, just three regions from top to bottom:
 #  1 text buffer window  2 buffer status line  3 scrolling command input region
 # Line numbers on display and in each element are 1-based as in ed and ansi.
+
+nlines, ncols = display.dimensions()
 
 # Defaults, might be updated while program is running, especially cmd_h:
 

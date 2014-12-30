@@ -38,6 +38,11 @@ and modules are not designed to cooperate in this way --- instead they
 take over the Python session, postponing all other tasks.  However, it
 may be possible to adapt some of them.
 
+A Piety application must not block waiting to read input.  The Piety
+scheduler for Unix hosts uses the Unix *select* function to ensure
+that the scheduler only calls handlers when there is input ready to
+read.
+
 It is possible to have more than one task that has a handler for a
 same event.  For some events, it is necessary that only one task
 handle that event, that task is said to have the *focus* for that
@@ -72,13 +77,6 @@ its command function is called when the command line is complete.
 Console tasks call functions in the Piety scheduler module to acquire
 and release the focus.
 
-### Shell ###
-
-The *pysht* module defines a function *mk_shell* that accepts
-configuration settings and returns a command function that can be
-passed to the *Console* constructor, to make that *Console* instance
-into a Python shell.
-
 ### Modules ###
 
 These are the modules in the *piety* directory.  For more details see
@@ -88,10 +86,11 @@ their docstrings.
 
 - **console**: skeleton command line application
 
-- **pysht**: Python shell, configures *console* to provide
-    a Python interpreter.
-
 - **ascii, ansi, key, line, terminal, vt_display, vt_keyboard**:
     utilities that support *console* and terminal applications.
+
+The *pysh* Python shell is not here.  It is in the *samples* directory
+because *ed* and *edd* there use it.  It does not depend on any Piety
+scheduling machinery, it is just another self-contained application.
 
 Revised December 2014

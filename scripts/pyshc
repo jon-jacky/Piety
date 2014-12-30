@@ -2,13 +2,13 @@
 """
 pyshc.py - Run a pysh Python shell session.
           Use console and key modules instead of
-           Python raw_input to get command line as in pysh.c main.  
+           Python raw_input to get command line as in pysh.py main.  
           BUT do not use Piety scheduler.
 """
 
-import pysht, console, key, line, terminal
+import pysh, console, key, line, terminal
 
-# define before use in pysh = ... below
+# define before use in pyshc = ... below
 
 quit = False
 
@@ -18,22 +18,22 @@ def q():
     quit = True
 
 # Here the optional initialize and cleanup args are default None
-pysh = console.Console(prompt='>> ', command=pysht.mk_shell(), 
+pyshc = console.Console(prompt='>> ', command=pysh.mk_shell(), 
                        optional_keymap=line.keymap, quit=q) 
 
-k = key.Key(pysh.handle_key)
+k = key.Key(pyshc.handle_key)
 
 def main():
     # terminal setup and restore are done for each command 
-    #  by pysh.do_command via k.getchar
-    # BUT initial pysh() is needed here.
+    #  by pyshc.do_command via k.getchar
+    # BUT initial pyshc() is needed here.
     global quit
     quit = False
-    pysh() # calls terminal.setup()
+    pyshc() # calls terminal.setup()
     console.Console.continues = True
     while not quit:
-        key = k.getchar() # calls pysh.handle_key
-    # quit handled by pysh.pause called by pysh.handle_key via k.getchar
+        key = k.getchar() # calls pyshc.handle_key
+    # quit handled by pyshc.pause called by pyshc.handle_key via k.getchar
     terminal.restore()
 
 if __name__ == '__main__':

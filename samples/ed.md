@@ -141,10 +141,13 @@ blocking, and then passes that line to *ed.cmd*.
 
 **ed.py** provides the user interface: the command line and the public
 Python API described above, including command line parsing, argument
-checking, and error messages.  **ed.py** imports *ed0.py*, which
-provides the core: the data structures and the internal API for
-updating them, where each function has a fixed argument list, provides
-no error checking, and no error messages or progress messages.
+checking, and error messages.  **ed.py** reads and writes at the
+console, but does not directly update buffers or access files.
+**ed.py** imports *ed0.py*, which provides the core: the data
+structures and the internal API for updating them, where each function
+has a fixed argument list, provides no error checking, and no error
+messages or progress messages.  *ed0.py* does not access the
+console, but updates buffers and reads and writes files.
 
 ## Limitations ##
 
