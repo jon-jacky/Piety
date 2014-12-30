@@ -64,11 +64,14 @@ information.
 
 - **doc**: notes and documents
 
-- **piety**: scheduler, console, shell, utilities
+- **piety**: scheduler, console, utilities
 
-- **samples**: sample applications to run under the Piety scheduler 
+- **samples**: sample applications to run under the Piety scheduler,
+    including the *pysh* Python shell, the *ed* line editor, and the
+    *edd* display editor.
 
-- **scripts**: startup scripts that define tasks, then start the Piety scheduler
+- **scripts**: startup scripts that define tasks, then start the Piety
+    scheduler
 
 - **test**: tests for modules in *piety* and *samples*
 
