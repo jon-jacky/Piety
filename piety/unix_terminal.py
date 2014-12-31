@@ -1,21 +1,6 @@
 """
-terminal.py - single character input and output from the console
-
-Has a main method, python terminal.py demonstrates most functions.
-
-Provides function getchar that reads a single character from the
-console (stdin).  Also function putstr that can write a string of
-characters (or just one) without formatting (unlike Python print), so
-if you want newline you have to explicitly include it in the string.
-
-Also provides function setup to put stdin in single-character mode so
-getchar returns as soon as a single character is typed (without
-waiting for RETURN).  Function restore restores normal line mode (or
-whatever was in effect when setup was called).
-
-Terminal settings assigned by this module apply to all tasks
-(including all Console instances) in the Piety session, because Piety
-runs in a single Python interpreter session.
+unix_terminal.py - functions to set character mode or line mode
+                    functions to read/write single char or string
 
 This is a platform-dependent module.  It uses the termios and tty
 modules, so it must run on a Unix-like host OS (including Linux and
@@ -39,7 +24,7 @@ line_mode_settings = termios.tcgetattr(fd) # in case someone calls restore first
 # >>> terminal.line_mode_settings
 # [27394, 3, 19200, 536872395, 9600, 9600, ['\x04', '\xff', '\xff', '\x7f', '\x17', '\x15', '\x12', '\xff', '\x03', '\x1c', '\x1a', '\x19', '\x11', '\x13', '\x16', '\x0f', '\x01', '\x00', '\x14', '\xff']]
 
-def setup():
+def set_char_mode():
     """
     set sys.input to single character mode, save original mode
     """
@@ -52,7 +37,7 @@ def setup():
     tty.setraw(fd)
 
 
-def restore():
+def set_line_mode():
     """
     restore sys.input to line mode
     """
@@ -83,13 +68,13 @@ def putstr(s):
 
 def main():
     c = line = ''
-    setup() # enter single character more
+    set_char_mode() # enter single character more
     putstr('> ')
     while not c == '\r':
         c = getchar()
         putstr(c)
         line += c
-    restore() # return to normal mode
+    set_line_mode() # return to normal mode
     print
     print line
 

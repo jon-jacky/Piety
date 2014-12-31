@@ -10,13 +10,13 @@ Has a main method, python console.py demonstrates most functions.
 
 import sys
 import string # for string.printable
-import terminal
+import unix_terminal as terminal
 
 # For terminals where pressing the Control key sends ASCII control codes,
 #  up and down keys send ANSI control sequences.
 # Printing terminals will work.
 # Replace this import to use a different kind of keyboard.
-import vt_keyboard as keyboard
+import ansi_keyboard as keyboard
 
 def echo(line):
     'Default command, print line on console'
@@ -103,7 +103,7 @@ class Console(object):
         if self.chars == self.quit.__name__ : # If None, ^D is only way out
           self.do_pause()
         else:
-          terminal.restore() # resume line mode for command output
+          terminal.set_line_mode() # resume line mode for command output
           print # print command output on new line
           self.command(self.chars) # might quit, set Console.continues = False
           if Console.continues:  # typical case - self.command was not quit
@@ -118,7 +118,7 @@ class Console(object):
         self.chars = str()
         self.point = 0
         terminal.putstr(prompt) # prompt does not end with \n
-        terminal.setup() # enter or resume single character mode
+        terminal.set_char_mode()
 
     def __call__(self):
         'Configure terminal display and prepare to accept input'
@@ -165,7 +165,7 @@ def accept_line(c):
 def interrupt(c):
     # raw mode terminal doesn't respond to ^C, must handle here
     terminal.putstr('^C') 
-    terminal.restore() # on new line...
+    terminal.set_line_mode() # on new line...
     print              # ... otherwise traceback is a mess
     raise KeyboardInterrupt
 
@@ -250,12 +250,12 @@ def main():
     global quit
     quit = False # earlier invocation might have set it True
     c = Console(quit=q)
-    c() # prompt first time, execute terminal.setup()
+    c() # prompt first time, execute terminal.set_char_mode()
     while not quit:
         # multi-char control sequences like keyboard.up don't work here
         k = terminal.getchar()
         c.handle_key(k)
-    # After q or ^D, c.handle_key executes c.pause with terminal.restore()
+    # After q or ^D, c.handle_key executes c.pause with terminal.set_line_mode()
 
 if __name__ == '__main__':
     main()
