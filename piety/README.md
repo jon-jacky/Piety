@@ -86,11 +86,11 @@ their docstrings.
 
 - **console**: skeleton command line application
 
-- **ascii, ansi, key, line, terminal, vt_display, vt_keyboard**:
-    utilities that support *console* and terminal applications.
+- **unix_terminal, ansi_keyboard**: utilities that support *console*
 
-The *pysh* Python shell is not here.  It is in the *samples* directory
-because *ed* and *edd* there use it.  It does not depend on any Piety
-scheduling machinery, it is just another self-contained application.
+The *pysh* Python shell is not in this directory.  It is in the
+*samples* directory because *ed* and *edd* there use it.  It does not
+depend on any Piety scheduling machinery, it is just another
+self-contained application.
 
 Revised December 2014
