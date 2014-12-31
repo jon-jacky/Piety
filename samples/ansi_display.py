@@ -12,25 +12,30 @@ def dimensions():
     return [ int(n) 
              for n in subprocess.check_output(['stty','size']).split()]
          
-esc = '\x1B' # \e does not work 'invalid \x escape'
-
+esc = '\x1B'     # \e does not work 'invalid \x escape'
 csi = esc+'['    # ANSI control sequence introducer
+
+cha = csi+'%dG'  # cursor horizontal absolute, column %d
+cub = csi+'D'    # cursor backward (left), default 1 char
+cuf = csi+'C'    # cursor forward (right), default 1 char
 cup = csi+'%d;%dH' # cursor position %d line, %d column
+dch = csi+'%dP'  # delete chars, remove %d chars at current position
 ed  = csi+'J'    # erase display from cursor to end
 el  = csi+'%dK'  # erase in line, %d is 0 start, 1 end, or 2 all
 el_end = el % 0  # 0: erase from cursor to end of line
 el_all = el % 2  # 2: erase entire line
-decstbm = csi+'%d;%dr' # DEC Set Top Bottom Margins (set scrolling region)
-                       # %d,%d is top, bottom, so 23;24 is bottom two lines
-                       # then it sets cursor at the top of the page
+ich = csi+'%d@'  # insert chars, make room for %d chars at current position
+decstbm = csi+'%d;%dr' # DEC Set Top Bottom Margins (set scrolling region
+                 # %d,%d is top, bottom, so 23;24 is bottom two lines
+                 # then it sets cursor at the top of the page
 decstbmn  = csi+';r' # decstbm default: set scrolling region to full screen
 
 sgr = csi + '%s' + 'm' # set graphic rendition. %s is ;-separated integers like
-                 # bold+inverse: esc[0;1;7m by ansi.sgr % ';'.join('017')
+                 # bold+inverse: esc[0;1;7m by sgr % ';'.join('017')
 
 # sgr, attribute values
-clear = 0      # clears attributes (not transparent!)
-white_bg = 47 # gray on mac terminal
+clear = 0        # clears attributes (not transparent!)
+white_bg = 47    # gray on mac terminal
 
 putstr = sys.stdout.write # print string without newline at end
 
@@ -48,6 +53,33 @@ def render(text, *attributes):
     """
     # use write not print, we don't want newline or trailing space
     sys.stdout.write(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+
+# used by line
+
+def self_insert_char(key):
+    'Insert character in front of cursor'
+    putstr((ich % 1) + key) # open space to insert char
+
+def delete_char():
+    'Delete character under the cursor'
+    putstr(dch % 1)
+
+def backward_delete_char():
+    'Delete character before cursor'
+    putstr(cub + dch % 1)
+
+def forward_char():
+    putstr(cuf) # move just one char
+
+def backward_char():
+    putstr(cub)
+
+def move_to_column(column):
+    putstr(cha % column)
+
+# line also uses kill_line, defined below
+
+# used by edd
 
 def erase_display(): # name in gnu readline
     putstr(ed)

@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 """
 pyshc.py - Run a pysh Python shell session.
-          Use console and key modules instead of
-           Python raw_input to get command line as in pysh.py main.  
-          BUT do not use Piety scheduler.
+ Use console and key modules instead of Python raw_input to get command line.
+ BUT do not use Piety scheduler.
 """
 
 import pysh, console, key, line, terminal
@@ -29,12 +28,12 @@ def main():
     # BUT initial pyshc() is needed here.
     global quit
     quit = False
-    pyshc() # calls terminal.setup()
+    pyshc() # calls terminal.set_char_mode()
     console.Console.continues = True
     while not quit:
         key = k.getchar() # calls pyshc.handle_key
     # quit handled by pyshc.pause called by pyshc.handle_key via k.getchar
-    terminal.restore()
+    terminal.set_line_mode()
 
 if __name__ == '__main__':
     main()
