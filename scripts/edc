@@ -19,12 +19,12 @@ def main():
     #  by c.do_command via k.getchar
     # BUT initial c() is needed here.
     ed.quit = False
-    c() # calls terminal.setup()
+    c() # calls terminal.set_char_mode()
     console.Console.continues = True # c() set it False, must be True
     while not ed.quit:
         key = k.getchar() # calls c.handle_key
     # quit handled by c.pause called by c.handle_key via k.getchar
-    terminal.restore()
+    terminal.set_line_mode()
 
 if __name__ == '__main__':
     main()

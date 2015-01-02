@@ -11,7 +11,7 @@ import line
 import console
 import pysh
 import piety as p
-import terminal # for terminal.restore
+import terminal # for terminal.set_line_mode
 
 # t is the task running the pysh console via key k
 # We will assign handler to k.getchar below.
@@ -33,7 +33,7 @@ def main():
     console.Console.continues = True
     p.done = False # reset, might be resuming after p.quit() 
     p.run(nevents=0) # loop forever, don't return
-    terminal.restore()
+    terminal.set_line_mode()
 
 if __name__ == '__main__':
     main()

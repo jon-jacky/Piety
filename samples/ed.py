@@ -10,7 +10,7 @@ in test/ed/
 """
 
 import re, os
-import pysht  # provides embedded Python shell for ! command
+import pysh  # provides embedded Python shell for ! command
 
 # ed0 is editor core: data structures and functions that update them
 import ed0  # must prefix command names: ed0.p etc. to disambiguate from p here
@@ -407,7 +407,7 @@ command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
 
-pysh = pysht.mk_shell() # embedded Python shell for ! command
+pysh = pysh.mk_shell() # embedded Python shell for ! command
 
 def cmd(line):
     """
