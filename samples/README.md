@@ -7,10 +7,9 @@ under *Piety/tests*, some demonstrations are under *Piety/scripts*.
 
 To be a Piety application, a program must provide all of if its
 functionality in a *handler* that can be called by the Piety
-scheduler.  (Or, in several different handlers.)  The handler must
-complete its work quickly, then exit (return control to the Piety
-scheduler).  The handler must not block waiting for input (or anything
-else).
+scheduler.  (Or in several different handlers.)  The handler must
+complete its work quickly, then exit.  The handler must not block
+waiting for input (or anything else).
 
 All of these programs provide such a handler.  Nevertheless, they are
 all self-contained: they do not depend on the Piety scheduler, or on
@@ -20,7 +19,7 @@ Therefore, any of these applications could be moved out of the Piety
 repository to other repositories.
 
 The applications here can be run from the command line, without using
-the Piety scheduler at all: *$ python <application>*.  In that
+the Piety scheduler at all: *$ python ed.py* etc.  In that
 case, the application runs its *main* function, which replaces the
 Piety scheduler with a loop that gets input using a blocking read
 (usually *raw_input*), then passes it to the handler.  (The *main*
@@ -38,10 +37,10 @@ handler is returned by *mk_shell()*.  It has a *main* method.
 Editor applications:
 
 - **ed.py**: text editor inspired by the classic Unix editor *ed*.
-  Its handler is *cmd*.  It has a *main* method.
+  Its handler is *cmd*.  It has a *main* function.
 
 - **edd.py**: display editor based on *ed.py*.  Its hander is *cmd*.
-  It has a *main* method.
+  It has a *main* function.
 
 - **ed0.py**: library of functions and data structures used by *ed.py*
     and *edd.py*
