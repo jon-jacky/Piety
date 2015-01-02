@@ -39,7 +39,7 @@ Editor applications:
 - **ed.py**: text editor inspired by the classic Unix editor *ed*.
   Its handler is *cmd*.  It has a *main* function.
 
-- **edd.py**: display editor based on *ed.py*.  Its hander is *cmd*.
+- **edd.py**: display editor based on *ed.py*.  Its handler is *cmd*.
   It has a *main* function.
 
 - **ed0.py**: library of functions and data structures used by *ed.py*
@@ -58,10 +58,11 @@ Libraries:
 
 - **vt_keyboard.py**, **key.py**, **line.py**: support terminal
     keyboard input with history and editing, similar to Unix
-    *readline*.  Can optionally be used with any terminal
-    applications, including *pysh*, *ed*, and *edd*.  The applications
-    do not import these modules, instead they are coordinated by the
-    Piety *console* module.  See examples in the *scripts* directory.
+    *readline* or Python *raw_input*, but without blocking.  Can
+    optionally be used with any terminal applications, including
+    *pysh*, *ed*, and *edd*.  The applications do not import these
+    modules, instead they are coordinated by the Piety *console*
+    module.  See examples in the *scripts* directory.
 
 Other:
 
