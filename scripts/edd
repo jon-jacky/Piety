@@ -30,7 +30,7 @@ t.pysh= p.Task(name='pysh', event=p.sys.stdin)
 # vt.pysh is the console whose command is the pysh shell
 vt.pysh = console.Console(prompt='>> ', command=pysh.mk_shell(), 
                           resume=p.mk_resume(t.pysh), quit=p.quit,
-                          pause=p.mk_pause(t.pysh, terminal.restore),
+                          pause=p.mk_pause(t.pysh, terminal.set_line_mode),
                           optional_keymap=line.keymap)
 
 # kb.pysh is the key whose console is vt.pysh
@@ -42,7 +42,7 @@ t.pysh.handler = kb.pysh.getchar
 # ed, note : prompt
 
 def ed_pause():
-    terminal.restore()
+    terminal.set_line_mode()
 
 t.ed = p.Task(name='ed', event=p.sys.stdin)
 vt.ed = console.Console(prompt=':', command=ed.cmd,
@@ -68,7 +68,7 @@ def main():
     console.Console.continues = True
     p.done = False # reset, might be resuming after p.exit() 
     p.run(nevents=0) # loop forever, don't return
-    terminal.restore()
+    terminal.set_line_mode()
 
 if __name__ == '__main__':
     main()

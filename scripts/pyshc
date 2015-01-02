@@ -31,7 +31,7 @@ def main():
     pyshc() # calls terminal.set_char_mode()
     console.Console.continues = True
     while not quit:
-        key = k.getchar() # calls pyshc.handle_key
+        k.getchar() # calls pyshc.handle_key
     # quit handled by pyshc.pause called by pyshc.handle_key via k.getchar
     terminal.set_line_mode()
 

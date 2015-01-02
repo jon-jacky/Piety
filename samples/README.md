@@ -5,18 +5,17 @@ Sample applications to run under the Piety scheduler.  For directions,
 see the docstrings in each module, and the *.md* files.  Some tests are
 under *Piety/tests*, some demonstrations are under *Piety/scripts*.
 
-To be a Piety application, a program must provide all of if its
-functionality in a *handler* that can be called by the Piety
-scheduler.  (Or in several different handlers.)  The handler must
-complete its work quickly, then exit.  The handler must not block
-waiting for input (or anything else).
+To be a *Piety* application, a program must provide all of if its
+functionality in one or more *handlers* that can be called by the Piety
+scheduler.  Each handler must complete its work quickly, then exit.
+The handlers must not block waiting for input (or anything else).
 
-All of these programs provide such a handler.  Nevertheless, they are
-all self-contained: they do not depend on the Piety scheduler, or on
-any other Piety directories.  (That is, they do not import any Piety
-scheduler modules or modules from other Piety directories).
-Therefore, any of these applications could be moved out of the Piety
-repository to other repositories.
+To be a Piety *application*, a program must be self-contained: it must
+not depend on the Piety scheduler, or on any other Piety directories.
+(That is, it must not import any Piety scheduler modules or modules
+from other Piety directories).  Therefore, any of these applications
+can be used without Piety, and could be moved out of the Piety
+repository to another repository.
 
 The applications here can be run from the command line, without using
 the Piety scheduler at all: *$ python ed.py* etc.  In that

@@ -5,13 +5,8 @@ the pysh shell.  You can then use this shell to create and run more tasks.
 """
 
 import sys
-
-import key
-import line
-import console
-import pysh
+import pysh, console, key, line, terminal
 import piety as p
-import terminal # for terminal.set_line_mode
 
 # t is the task running the pysh console via key k
 # We will assign handler to k.getchar below.
@@ -21,7 +16,7 @@ t = p.Task(name='pysh', event=p.sys.stdin)
 # We name the console object pyshc (final c), different from pysh module
 # No resume and pause args needed because no scheduler so no focus needed
 pyshc = console.Console(prompt='>> ', command=pysh.mk_shell(), 
-                       quit=p.quit, optional_keymap=line.keymap)
+                        optional_keymap=line.keymap, quit=p.quit)
 
 # k is the key whose console is pyshc
 k = key.Key(pyshc.handle_key)

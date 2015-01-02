@@ -65,7 +65,7 @@ def main():
     console.Console.continues = True
     piety.done = False # reset, might be resuming after piety.quit() 
     piety.run(nevents=0) # loop forever, don't return
-    terminal.restore()
+    terminal.set_line_mode()
 
 if __name__ == '__main__':
     main()
