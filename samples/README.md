@@ -22,7 +22,8 @@ the Piety scheduler at all: *$ python ed.py* etc.  In that
 case, the application runs its *main* function, which replaces the
 Piety scheduler with a loop that gets input using a blocking read
 (usually *raw_input*), then passes it to the handler.  (The *main*
-function is *not* the handler because it blocks waiting for input.)
+function cannot be a Piety handler because it blocks waiting for input,
+and does not exit quickly --- it takes over the Python session.)
 
 Notes on some of the modules follow.
 
