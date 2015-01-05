@@ -2,9 +2,8 @@
 command.py - Skeleton terminal application.
   Collects a command (string), passes it to a handler (callable) to execute.
   Can collect command without blocking for cooperative multitasking.
-  Provides command history, editing similar to Unix readline, Python raw_input
-
-Has a main method, python command.py demonstrates most functions.
+  Provides command history, editing similar to Unix readline, Python raw_input.
+ Has a main method, python command.py demonstrates most functions.
 """
 
 import sys
@@ -39,13 +38,14 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='> ', handler=echo):
+    def __init__(self, prompt='> ', handler=echo, stop='q'):
         """
         prompt - Prompt string that appears at the start of each line
           Default is '> '
         handler - Function to execute command
           Can be any callable that takes one argument, a string.
           Default just echoes the command.
+        stop - Command string to exit application, causes cleanup
         """
         self.command = '' # command string 
         self.point = 0  # index where next character will be inserted
@@ -55,16 +55,18 @@ class Command(object):
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
+        self.stop = stop
 
-        # keymap must be an attribute because its values are bound methods
-        # keys in keymap can be multicharacter sequences, not just single chars
-        # update or reassign keymap to use different keys, methods
+        # keymap must be an attribute because its values are bound methods.
+        # Keys in keymap can be multicharacter sequences, not just single chars
+        # Update or reassign keymap to use different keys, methods.
+        # Function names in keymap are same as in GNU readline or Emacs
         self.keymap = {
             # This entry requires special-case handling
             #  because it takes an additional argument: the key
-            # Use this with printing terminals, comment out now
+            # Use this function with printing terminals, comment out now:
             #  string.printable: self.self_append_command,
-            # This requires display terminal with cursor addressing
+            # This function requires display terminal with cursor addressing:
             string.printable: self.self_insert_command,
 
             # these entries work on a printing terminal
@@ -106,7 +108,7 @@ class Command(object):
         if key in string.printable[:-5]: # exclude \t\n\r\v\f at the end
             self.keymap[string.printable](key)
         elif key in self.keymap:
-            self.keymap[key]() # fcn not method needs self arg
+            self.keymap[key]()
         else:
             print keyboard.bel, # sound indicates key not handled
         return key # caller might check for 'q' quit cmd or ...
@@ -114,14 +116,15 @@ class Command(object):
     # Methods, not directly invoked by keys in keymap
 
     def do_command(self):
-        'Process command string and restart'
+        'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print # print command output on new line
         self.handler(self.command)
-        self.restart() # not quite right after q command, prints prompt again
+        if self.command != self.stop:
+            self.restart() # do NOT print prompt etc. at program exit
 
     def restart(self):
-        'Clear command line, print command prompt, set single-char mode'
+        'Clear command string, print command prompt, set single-char mode'
         self.command = str()
         self.point = 0
         terminal.putstr(self.prompt) # prompt does not end with \n
@@ -245,8 +248,7 @@ def main():
     while not quit:
         # multi-char control sequences keyboard.up,down don't work here
         k = terminal.getchar()
-        c.handle_key(k)
-    terminal.set_line_mode()
+        c.handle_key(k) # q command recognized by .stop restores terminal
 
 if __name__ == '__main__':
     main()
