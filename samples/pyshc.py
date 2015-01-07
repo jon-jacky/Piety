@@ -7,25 +7,16 @@ pyshc.py - Run a pysh Python shell session.
 
 import pysh, command, key
 
-quit = False
+pyshc = command.Command(prompt='>> ', handler=pysh.mk_shell(), stop='exit()')
 
-# For some reason calling exit() from pysh crashes so we provide q() instead
-
-def q():
-    'Call this function to exit from the shell'
-    global quit
-    quit = True
-
-pyshc = command.Command(prompt='>> ', handler=pysh.mk_shell(), stop='q()')
-
-k = key.Key(py.handle_key)
+k = key.Key(pyshc.handle_key)
 
 def main():
-    global quit
-    quit = False # earlier invocation might have set it True
-    print "pysh shell, type any Python statement, q() to exit"
+    'Python REPL using home-made pysh shell'
+    pysh.pexit = False # earlier invocation might have set it True
+    print "pysh shell, type any Python statement, exit() to exit"
     pyshc.restart()
-    while not quit:
+    while not pysh.pexit:
         k.getchar()
 
 if __name__ == '__main__':
