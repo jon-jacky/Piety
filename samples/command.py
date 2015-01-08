@@ -89,7 +89,7 @@ class Command(object):
             keyboard.delete: self.backward_delete_char,
             keyboard.C_a: self.move_beginning_of_line,
             keyboard.C_b: self.backward_char,
-            keyboard.C_d: self.delete_char,
+            keyboard.C_d: self.handle_C_d, # exit or self.delete_char,
             keyboard.C_e: self.move_end_of_line,
             keyboard.C_f: self.forward_char,
             keyboard.C_k: self.kill_line,
@@ -129,6 +129,15 @@ class Command(object):
         self.point = 0
         terminal.putstr(self.prompt) # prompt does not end with \n
         terminal.set_char_mode()
+
+    def handle_C_d(self):
+        '^D: stop if command string is empty, otherwise delete character'
+        if not self.command:
+            self.command = self.stop  
+            terminal.putstr('^D\r\n')
+            self.do_command()  # works on printing terminal
+        else:
+            self.delete_char() # requires display terminal
 
     # All the other methods are invoked via keymap
 

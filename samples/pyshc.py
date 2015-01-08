@@ -14,7 +14,7 @@ k = key.Key(pyshc.handle_key)
 def main():
     'Python REPL using home-made pysh shell'
     pysh.pexit = False # earlier invocation might have set it True
-    print "pysh shell, type any Python statement, exit() to exit"
+    print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
     pyshc.restart()
     while not pysh.pexit:
         k.getchar()
