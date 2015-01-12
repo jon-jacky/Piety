@@ -39,15 +39,6 @@ import sys, traceback
 
 main_globals = sys.modules['__main__'].__dict__
 
-# pysh handles exit() as a special case 
-# We do NOT want to exit from the underlying Python session, just from pysh.
-pexit = False
-
-def exit():
-    'Call this function to exit from pysh shell, NOT underlying Python session'
-    global pexit
-    pexit = True
-
 def mk_shell(globals=main_globals):
     """
     Returns a handler function with one argument, the command.
@@ -60,10 +51,8 @@ def mk_shell(globals=main_globals):
         Pass command to Python eval or exec to execute
         This is a closure that includes the globals dictionary 
         """
-        # exit() is a special case - do NOT exit from underlying Python session
-        if command == 'exit()':
-            exit()
-            return
+        if command == 'exit()':  # DON'T exit from underlying Python session
+            return               # here exit() does nothing
         try: # don't crash out of piety if exception, but print traceback
             try: # try eval, if it fails call exec
                 # exec does not automatically print values,
@@ -89,13 +78,15 @@ def mk_shell(globals=main_globals):
 
 def main():
     'Python REPL using home-made pysh shell'
-    global pexit
-    pexit = False # may have been set by True previous invocation
+    pexit = False
     pysh = mk_shell()
     print "pysh shell, type any Python statement, exit() to exit"
     while not pexit:
         command = raw_input('>> ')
-        pysh(command)
+        pysh(command) # in pysh exit() does nothing
+        if command == 'exit()': # special case - do NOT exit from Python
+            pexit = True
+
 
 if __name__ == '__main__':
     main()

@@ -19,11 +19,12 @@ import ansi_display as display
 quit = False
 
 def echo(command):
-    'Default handler, print command on console, exit after q'
+    'Default handler, print command on console, q exits without printing'
     global quit
-    print command
     if command == 'q':
         quit = True
+    else:
+        print command
 
 def putlines(s):
     """
@@ -38,29 +39,42 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='> ', handler=echo, stop='q'):
+    def __init__(self, run=None, prompt='> ', handler=echo, 
+                 stop=None, stopcmd='q'):
         """
+        All arguments are optional, with defaults
+        run - function to call when application starts up or resumes
+           for example to initialize screen or ...
+          After that, system then prints the command prompt.
+          Default does nothing more than print the command prompt.
+          This gets assigned to __call__ function
         prompt - Prompt string that appears at the start of each line
           Default is '> '
         handler - Function to execute command
           Can be any callable that takes one argument, a string.
           Default just echoes the command.
-        stop - Command string to exit application, causes cleanup
+        stop - function to call when application exits or suspends
+          for example to clean up screen or ...
+          Called after executing stopcmd (below), default does nothing more
+        stopcmd - Command string to exit or suspend application, after that
+          system then executes stop function (above).  Defaults to 'q'.
         """
-        self.command = '' # command string 
-        self.point = 0  # index where next character will be inserted
         self.prompt = prompt # string to prompt for command 
         self.handler = handler # callable that executes command string
-        self.history = list() # list of commands, earliest first
+        self.run = run
+        self.stopcmd = stopcmd
+        self.stop = stop
+        self.command = '' # command string 
+        self.point = 0  # index of insertion point in self.command
+        self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
-        self.stop = stop
 
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
         # Update or reassign keymap to use different keys, methods.
-        # Function names in keymap are same as in GNU readline or Emacs
+        # Most function names in keymap are same as in GNU readline or Emacs
         self.keymap = {
             # This entry requires special-case handling
             #  because it takes an additional argument: the key
@@ -119,9 +133,17 @@ class Command(object):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print # print command output on new line
-        self.handler(self.command)
-        if self.command != self.stop:
-            self.restart() # do NOT print prompt etc. at program exit
+        if self.command == self.stopcmd:
+            self.do_stop()
+        else:
+            self.handler(self.command)
+            self.restart()
+
+    def do_stop(self):
+        'Execute optional stop function if it exists, else call handler'
+        self.handler(self.stopcmd)        
+        if self.stop:
+            self.stop()
 
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
@@ -130,12 +152,18 @@ class Command(object):
         terminal.putstr(self.prompt) # prompt does not end with \n
         terminal.set_char_mode()
 
+    def __call__(self):
+        'Execute optional run function if it exists, then restart command line'
+        if self.run:
+            self.run()
+        self.restart()
+
     def handle_C_d(self):
         '^D: stop if command string is empty, otherwise delete character'
         if not self.command:
-            self.command = self.stop  
-            terminal.putstr('^D\r\n')
-            self.do_command()  # works on printing terminal
+            terminal.set_line_mode()
+            print('^D') # advance line too
+            self.do_stop()
         else:
             self.delete_char() # requires display terminal
 
@@ -253,7 +281,7 @@ def main():
     global quit
     quit = False # earlier invocation might have set it True
     c = Command()
-    c.restart()
+    c()
     while not quit:
         # multi-char control sequences keyboard.up,down don't work here
         k = terminal.getchar()
