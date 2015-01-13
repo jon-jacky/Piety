@@ -85,8 +85,9 @@ Libraries:
 Wrapper:
 
 - **command.py**: provides the *Command* class, an interface to the
-  Piety scheduler that provides *readline*-like functionality in a
-  nonblocking interface to the Piety scheduler
+  Piety scheduler for terminal applications.  It provides
+  *readline*-like functionality in a nonblocking interface to the
+  Piety scheduler.
 
 Wrapped applications:
 
