@@ -84,7 +84,7 @@ Libraries:
 
 Wrapper:
 
-- ***command.py**: provides the *Command* class, an interface to the
+- **command.py**: provides the *Command* class, an interface to the
   Piety scheduler that provides *readline*-like functionality in a
   nonblocking interface to the Piety scheduler
 
@@ -92,8 +92,8 @@ Wrapped applications:
 
 - **pyshc.py**: *pysh* Python shell wrapped in a *Command* instance.
 
-- **edc.py**: *ed* line editor in a *Command* instance.
+- **edc.py**: *ed* line editor wrapped in a *Command* instance.
 
-- **eddc.py**: *edd* line editor in a *Command* instance.
+- **eddc.py**: *edd* line editor wrapped in a *Command* instance.
 
 Revised Jan 2015
