@@ -1,5 +1,5 @@
 """
-ansi_keyboard.py - ASCII and ANSI control codes for keyboard
+keyboard.py - ASCII and ANSI control codes for the terminal keyboard
 
 ASCII control codes
  http://en.wikipedia.org/wiki/ASCII#ASCII_control_characters

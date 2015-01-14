@@ -105,40 +105,6 @@ def tasks():
             (t.taskno, t.name, oname(t.enabled), 
              ievent[t.event], ename(t.event), oname(t.handler))
 
-# Variables, functions, class that manage focus
-# Focus is needed for events that *only one* task at at time can handle
-# For example, only one task at a time can handle stdin, that task has focus
-
-# Focus for each event is implemented by a stack of tasks that can handle it
-# Stack is implemented by deque, top of stack is right end of deque
-# The task that has focus for event e is the top of stack at focus[e][-1].
-focus =  defaultdict(deque)
-
-def has_focus(task, event):
-    return (event not in focus or focus[event][-1] == task)
-
-def acquire_focus(task, event):
-    focus[event].append(task)
-
-def release_focus(event):
-    focus[event].pop() # raises IndexError if empty
-
-# Combine resume and pause with focus
-
-def mk_resume(task, resume=None):
-    def new_resume():
-        acquire_focus(task, task.event)
-        if resume:
-            resume()
-    return new_resume
-
-def mk_pause(task, pause=None):
-    def new_pause():
-        if pause:
-            pause()
-        release_focus(task.event)
-    return new_pause
-
 # Variables annd functions used in Piety event loop
 
 period = 1.000 # seconds, periodic timer for timeout events
@@ -197,7 +163,7 @@ def run(nevents=0):
         for fd in inputready:
             if fd in schedule:
                 for t in schedule[fd]:
-                    if has_focus(t, fd) and t.enabled():
+                    if t.enabled():
                         t.handler()
                         # Without flush here, char doesn't appear on terminal
                         #  until *next* character is typed at keyboard.

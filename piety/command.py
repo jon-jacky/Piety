@@ -8,13 +8,7 @@ command.py - Skeleton terminal application.
 
 import sys
 import string # for string.printable
-import terminal
-
-# For terminals where pressing the Control key sends ASCII control codes,
-#  up and down keys send ANSI control sequences.
-# Replace these imports to use a different kind of keyboard or display
-import vt_keyboard as keyboard
-import ansi_display as display
+import terminal, keyboard, display
 
 quit = False
 

@@ -4,8 +4,7 @@ key.py - Collect, store, handle single key or multi-character key sequences
 Has a main method, python key.py demonstrates most functions.
 """
 
-import terminal
-import vt_keyboard as keyboard
+import terminal, keyboard
 
 class Key(object): 
     """

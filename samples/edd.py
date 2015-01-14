@@ -4,14 +4,13 @@ edd - display editor based on the line editor ed.py.
 """
 
 import traceback
-import ansi_display as display
-import ed
+import terminal, display, ed
 
 # Position display elements.  For now, just three regions from top to bottom:
 #  1 text buffer window  2 buffer status line  3 scrolling command input region
 # Line numbers on display and in each element are 1-based as in ed and ansi.
 
-nlines, ncols = display.dimensions()
+nlines, ncols = terminal.dimensions()
 
 # Defaults, might be updated while program is running, especially cmd_h:
 

@@ -1,6 +1,8 @@
 piety
 =====
 
+THIS README IS OUT OF DATE, REVISIONS COMING SOON
+
 The **piety** directory contains the Piety operating system code: the
 scheduler, console, shell, and some utilities.
 

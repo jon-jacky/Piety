@@ -2,6 +2,8 @@
 Piety scripts directory
 =======================
 
+THIS README IS OUT OF DATE, REVISIONS COMING SOON
+
 Run applications (from the *samples* directory) using the Piety
 modules (from the *piety* directory).
 

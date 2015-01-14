@@ -1,6 +1,6 @@
 """
-unix_terminal.py - functions to set character mode or line mode
-                    functions to read/write single char or string
+terminal.py - functions to set character mode or line mode,
+               read/write single char or string
 
 This is a platform-dependent module.  It uses the termios and tty
 modules, so it must run on a Unix-like host OS (including Linux and
@@ -14,7 +14,12 @@ http://man7.org/linux/man-pages/man3/termios.3.html
 
 """
 
-import sys, tty, termios
+import sys, tty, termios, subprocess # subprocess just for display dimensions
+
+def dimensions():
+    'Return nlines, ncols. Works on Mac OS X, probably other Unix.'
+    return [ int(n) 
+             for n in subprocess.check_output(['stty','size']).split()]
 
 fd = sys.stdin.fileno() # Isn't sys.stdin always fileno 0 ?
 line_mode_settings = termios.tcgetattr(fd) # in case someone calls restore first
