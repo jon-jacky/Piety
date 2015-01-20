@@ -3,6 +3,7 @@ command.py - Skeleton terminal application.
   Collects a command (string), passes it to a handler (callable) to execute.
   Can collect command without blocking for cooperative multitasking.
   Provides command history, editing similar to Unix readline, Python raw_input.
+  Provides hooks for callbacks for job control.
  Has a main method, python command.py demonstrates most functions.
 """
 
@@ -33,31 +34,37 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, run=None, prompt='> ', handler=echo, 
-                 stop=None, stopcmd='q'):
+    def __init__(self, startup=None, 
+                 prompt='> ', handler=echo, 
+                 stopcmd='q', cleanup=None, suspend=None):
         """
         All arguments are optional, with defaults
-        run - function to call when application starts up or resumes
+        startup - function to call when application starts up or resumes
            for example to initialize screen or ...
           After that, system then prints the command prompt.
           Default does nothing more than print the command prompt.
-          This gets assigned to __call__ function
+          This function gets assigned to this object's __call__ method
         prompt - Prompt string that appears at the start of each line
           Default is '> '
         handler - Function to execute command
           Can be any callable that takes one argument, a string.
           Default just echoes the command.
-        stop - function to call when application exits or suspends
-          for example to clean up screen or ...
-          Called after executing stopcmd (below), default does nothing more
-        stopcmd - Command string to exit or suspend application, after that
-          system then executes stop function (above).  Defaults to 'q'.
+        stopcmd - Command string for function in application to be executed
+          by .handler (above) to exit or suspend. After that, application 
+          executes cleanup (below), then job control may execute suspend(below)
+        cleanup - application function to call when application 
+          exits or suspends for example to clean up screen or ...
+          Called after executing stopcmd (above), default does nothing more
+        suspend - callback function from job control to put application 
+          in the background. Only used when running other commands on the 
+          same terminal.  Runs after stopcmd and cleanup.
         """
         self.prompt = prompt # string to prompt for command 
         self.handler = handler # callable that executes command string
-        self.run = run
+        self.startup = startup
         self.stopcmd = stopcmd
-        self.stop = stop
+        self.cleanup = cleanup
+        self.suspend = suspend
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
@@ -122,12 +129,16 @@ class Command(object):
         return key # caller might check for 'q' quit cmd or ...
 
     # Methods, not directly invoked by keys in keymap
+    def do_foreground(self):
+        pass
 
     def do_command(self):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print # print command output on new line
-        if self.command == self.stopcmd:
+        if '.run(' in self.command: # HACK .run( is from job control in session.py
+            self.handler(self.command) # *not* followed by restart
+        elif self.command == self.stopcmd:
             self.do_stop()
         else:
             self.handler(self.command)
@@ -136,8 +147,10 @@ class Command(object):
     def do_stop(self):
         'Execute optional stop function if it exists, else call handler'
         self.handler(self.stopcmd)        
-        if self.stop:
-            self.stop()
+        if self.cleanup:
+            self.cleanup()
+        if self.suspend:
+            self.suspend()
 
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
@@ -147,19 +160,10 @@ class Command(object):
         terminal.set_char_mode()
 
     def __call__(self):
-        'Execute optional run function if it exists, then restart command line'
-        if self.run:
-            self.run()
+        'Execute startup function if it exists, then restart command line'
+        if self.startup:
+            self.startup()
         self.restart()
-
-    def handle_C_d(self):
-        '^D: stop if command string is empty, otherwise delete character'
-        if not self.command:
-            terminal.set_line_mode()
-            print('^D') # advance line too
-            self.do_stop()
-        else:
-            self.delete_char() # requires display terminal
 
     # All the other methods are invoked via keymap
 
@@ -251,6 +255,15 @@ class Command(object):
             self.point -= 1
             display.backward_char()
 
+    def handle_C_d(self):
+        '^D: stop if command string is empty, otherwise delete character'
+        if not self.command:
+            terminal.set_line_mode()
+            print('^D') # advance line too
+            self.do_stop()
+        else:
+            self.delete_char() # requires display terminal
+
     def delete_char(self):
         self.command = (self.command[:self.point] + self.command[self.point+1:])
         display.delete_char()
@@ -279,7 +292,7 @@ def main():
     while not quit:
         # multi-char control sequences keyboard.up,down don't work here
         k = terminal.getchar()
-        c.handle_key(k) # q command recognized by .stop restores terminal
+        c.handle_key(k) # q command recognized by .stopcmd restores terminal
 
 if __name__ == '__main__':
     main()

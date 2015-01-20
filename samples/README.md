@@ -14,8 +14,8 @@ scheduler.  Each handler must complete its work quickly, then exit.
 The handlers must not block waiting for input (or anything else).
 
 To be a Piety *application*, a program must be self-contained: it must
-not depend on the Piety scheduler (it must not import any Piety
-scheduler modules). Therefore, any of these applications can be used
+not depend on the Piety scheduler (it must not import modules from the
+*piety* directory). Therefore, any of these applications can be used
 without Piety, and could be moved out of the Piety repository to
 another repository.
 
@@ -25,7 +25,8 @@ case, the application runs its *main* function, which replaces the
 Piety scheduler with a loop that gets input using a blocking read
 (usually *raw_input*), then passes it to the handler.  (The *main*
 function cannot be a Piety handler because it blocks waiting for input,
-and does not exit quickly --- it takes over the Python session.)
+and does not exit quickly --- it takes over the Python session until
+the application exits.)
 
 To run these applications with the Piety scheduler, use commands in
 *Piety/scripts*.

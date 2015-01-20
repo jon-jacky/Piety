@@ -2,14 +2,13 @@
 Piety scripts directory
 =======================
 
-THIS README IS OUT OF DATE, REVISIONS COMING SOON
-
-Run applications (from the *samples* directory) using the Piety
-modules (from the *piety* directory).
+The directory contains Python scripts that run applications (from the
+*samples* directory) using the Piety as tasks or jobs under the Piety
+scheduler (from the *piety* directory).
 
 To conveniently use these scripts, this directory should be on your
 execution *PATH*.  Or, its contents should be installed in some
-directory that is on your execution *PATH*.  See *bin/piety_paths*.
+directory that is on your execution *PATH*.  See *bin/paths*.
 
 These scripts are platform independent except for the initial hashbang
 line, which are only effective on a Unix-like host.  On a Unix-like
@@ -17,14 +16,7 @@ host, you can run a script by simply naming it on the command line:
 *piety* etc.  On other systems, you should be able to run them with the
 Python interpreter: *python piety* etc.
 
-These scripts use the *console* module to run command line
-applications, but do not use the Piety scheduler.
-
-- **pyshc**: Runs the *pysh* Python shell.
-
-- **edc**: Runs the *ed* line editor.
-
-- **eddc**: Runs the *edd* display editor.
+AT THIS TIME, SOME SCRIPTS IN THIS DIRECTORY DO NOT WORK - SEE COMMIT MESSAGES
 
 These scripts define Piety tasks, then start the Piety scheduler:
 
@@ -47,4 +39,4 @@ These scripts define Piety tasks, then start the Piety scheduler:
     same editor state, so you can switch back and forth and keep the
     same buffers, cursor position, etc.
 
-Revised December 2014
+Revised January 2015

@@ -60,23 +60,31 @@ This repository contains some notes and experiments in these
 directories.  Each directory contains a *README* file with more
 information.
 
-- **bin**: commands and programs for running Piety on a host operating system
+- **bin**: shell scripts that configure Piety for various platforms
 
 - **doc**: notes and documents
 
-- **piety**: scheduler, console, utilities
+- **piety**: scheduler, tasks and jobs
 
-- **samples**: sample applications to run under the Piety scheduler,
-    including the *pysh* Python shell, the *ed* line editor, and the
-    *edd* display editor.
+- **samples**: sample Python applications to run under the scheduler,
+    including a Python shell, a line editor, and a display editor.
 
-- **scripts**: startup scripts that define tasks, then start the Piety
-    scheduler
+- **scripts**: Python scripts that run applications as tasks or jobs
+    under the Piety sheduler
 
-- **test**: tests for modules in *piety* and *samples*
+- **test**: Shell scripts and Python modules for Pyton tests for
+    modules in *piety* and *samples*
 
-To ensure modularity, modules in *samples* do not import
-modules in *piety*, and vice versa.  Modules in *scripts* import
-modules from both *samples* and *piety*.
+- **unix**: Python modules for running Piety on a Unix-like host.
+     We may add directories for other platforms in the future.
 
-Revised December 2014
+- **vt_terminal**: Python modules for running Piety on a VT-100
+    compatible terminal.  We may add directories for other terminals 
+    in the future.
+
+To ensure modularity, modules in *samples* do not import modules in
+*piety*, and vice versa.  Modules in *scripts* may import modules from
+both *samples* and *piety*.  Any modules may import modules from
+*unix* and *vt_terminal*
+
+Revised January 2015

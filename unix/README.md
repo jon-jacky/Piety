@@ -2,7 +2,7 @@
 Piety unix directory
 ====================
 
-This directory contains for Python modules for running Piety on a
+This directory contains Python modules for running Piety on a
 Unix-like host operating system (including Linux and Mac OS X).
 
 To run Piety on a Unix-like host operating system, put this directory
