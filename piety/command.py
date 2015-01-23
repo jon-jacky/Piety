@@ -62,7 +62,7 @@ class Command(object):
           same terminal.  Runs after stopcmd and cleanup.
         """
         self.prompt = prompt # string to prompt for command 
-        self.reader = reader # callable that reads char(s) to build command string
+        self.reader_body = reader # callable reads char(s) to build command string
         self.handler = handler # callable that executes command string
         self.startup = startup
         self.stopcmd = stopcmd
@@ -119,6 +119,12 @@ class Command(object):
             keyboard.up: self.previous_history,
             keyboard.down: self.next_history,
             }
+
+    def reader(self):
+        'Read char, add to key sequence.  If sequence is complete, handle key'
+        key = self.reader_body() 
+        if key:
+            self.handle_key(key)
 
     def handle_key(self, key):
         'Collect command string and dispatch on command'

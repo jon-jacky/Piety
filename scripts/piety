@@ -1,9 +1,9 @@
+#!/usr/bin/env python
 """
-eddsk.py - Run a pysh Python shell, ed and edd editors in a Session.
+edd - Run pysh Python shell, ed and edd editors in a Session under Piety scheduler
  Use command and key modules instead of Python raw_input to get command line.
- BUT do not use Piety scheduler yet - just use loop.
 
-  $ python -i eddsk.py
+  $ edd
  pysh shell, type any Python statement, exit() or Ctrl-D to exit
  >> console.run(edc)   # run the ed line editor
  ...
@@ -17,15 +17,8 @@ eddsk.py - Run a pysh Python shell, ed and edd editors in a Session.
 """
 
 import sys
-import pysh, ed, edd, command, key, session
+import piety, pysh, ed, edd, command, key, session
 import terminal # for main loop only
-
-quit = False
-
-def pexit():
-    global quit
-    quit = True
-    console.stop()
 
 def banner():
     print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
@@ -33,7 +26,7 @@ def banner():
 # Python shell
 pyshc = command.Command(startup=banner, prompt='>> ', 
                         reader=key.Key(), handler=pysh.mk_shell(), 
-                        stopcmd='exit()', suspend=pexit)
+                        stopcmd='exit()', suspend=piety.quit)
 
 # console session, initially runs Python shell
 # Then use console to run other commands from shell: console.run(edc) etc.
@@ -53,11 +46,9 @@ def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
-    global quit
-    quit = False  # enable main loop, previous exit may have set this True
+    piety.done = False   # enable event loop, previous exit may have set this True
     console.foreground()
-    while not quit:
-        console.handler()
+    piety.run(nevents=0) # start event loop, continue until pysh exit()
 
 if __name__ == '__main__':
     main()
