@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 """
-edd - Run pysh Python shell, ed and edd editors in a Session under Piety scheduler
+piety - Run pysh shell, ed and edd editors in a Session under Piety scheduler
  Use command and key modules instead of Python raw_input to get command line.
+ This script is named piety (with no file type) so no name clash with piety.py
 
-  $ edd
+  $ piety
  pysh shell, type any Python statement, exit() or Ctrl-D to exit
  >> console.run(edc)   # run the ed line editor
  ...
@@ -28,7 +29,7 @@ pyshc = command.Command(startup=banner, prompt='>> ',
                         reader=key.Key(), handler=pysh.mk_shell(), 
                         stopcmd='exit()', suspend=piety.quit)
 
-# console session, initially runs Python shell
+# console session, a Piety task, initially runs Python shell
 # Then use console to run other commands from shell: console.run(edc) etc.
 console = session.Session(name='console', event=sys.stdin, job=pyshc)
 
