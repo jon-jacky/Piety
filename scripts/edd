@@ -1,74 +1,60 @@
-#!/usr/bin/env python
 """
-Run a Piety session with pysh shell, ed line editor, and edd display editor.
- Starts shell with >> prompt, type vt.ed() or vt.edd() to start an editor.
+edd - Run a pysh Python shell, ed and edd editors in a Session.
+ Use command and key modules instead of Python raw_input to get command line.
+ Use Piety scheduler - just use loop
+
+  $ python -i edd
+ pysh shell, type any Python statement, exit() or Ctrl-D to exit
+ >> console.run(edc)   # run the ed line editor
+ ...
+ q                     # exit ed, return to pysh Python shell
+ >> console.run(eddc)  # run the edd display editor
+ ...
+ q
+ >> exit()             # exit from pysh Python shell
+ >>>                   # Back to regular Python shell
+
 """
 
 import sys
+import pysh, ed, edd, command, key, session
+import piety
 
-import terminal
-import key
-import line
-import console
-import pysh
-import piety as p
+quit = False
 
-import ed
-import edd
+def pexit():
+    global quit
+    quit = True
+    console.stop()
 
-class Namespace(object): pass  # use object names as disambigating prefixes
+def banner():
+    print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
 
-t = Namespace() # p.Task objects
-kb = Namespace() # key.Key objects
-vt = Namespace() # console.Console objects
+# Note here we assign pexit to job control suspend arg
+pyshc = command.Command(startup=banner, prompt='>> ', handler=pysh.mk_shell(), 
+                        stopcmd='exit()', suspend=pexit)
 
-# pysh
+console = session.Session(name='console', event=sys.stdin, job=pyshc)
 
-# t.pysh is the task running the vt.pysh console via kb.pysh
-t.pysh= p.Task(name='pysh', event=p.sys.stdin)
+# here we leave default cleanup arg None, but assign callback to suspend arg
+edc = command.Command(prompt='', handler=ed.cmd, 
+                      stopcmd='q', suspend=console.stop) 
 
-# vt.pysh is the console whose command is the pysh shell
-vt.pysh = console.Console(prompt='>> ', command=pysh.mk_shell(), 
-                          resume=p.mk_resume(t.pysh), quit=p.quit,
-                          pause=p.mk_pause(t.pysh, terminal.set_line_mode),
-                          optional_keymap=line.keymap)
+eddc = command.Command(prompt='', startup=edd.init_display, handler=edd.cmd, 
+                       stopcmd='q', cleanup=edd.restore_display,
+                       suspend=console.stop) 
 
-# kb.pysh is the key whose console is vt.pysh
-kb.pysh = key.Key(vt.pysh.handle_key)
+tconsole = piety.Task(name='tconsole', event=sys.stdin, 
+                      handler=console.handle_key)
 
-# now that we have kb object we can assign handler
-t.pysh.handler = kb.pysh.getchar
+# FIXME - doesn't reassign k.handler when foreground is reassigned by session
+# k = key.Key(console.foreground.handle_key)
 
-# ed, note : prompt
-
-def ed_pause():
-    terminal.set_line_mode()
-
-t.ed = p.Task(name='ed', event=p.sys.stdin)
-vt.ed = console.Console(prompt=':', command=ed.cmd,
-                         resume=p.mk_resume(t.ed), quit=ed.q,
-                         pause=p.mk_pause(t.ed),
-                         optional_keymap=line.keymap)
-kb.ed = key.Key(vt.ed.handle_key)
-t.ed.handler = kb.ed.getchar
-
-# edd
-t.edd = p.Task(name='edd', event=p.sys.stdin)
-vt.edd = console.Console(prompt='', command=edd.cmd,
-                         resume=p.mk_resume(t.edd, edd.init_display), 
-                         quit=ed.q,
-                         pause=p.mk_pause(t.edd, edd.restore_display),
-                         optional_keymap=line.keymap)
-kb.edd = key.Key(vt.edd.handle_key)
-t.edd.handler = kb.edd.getchar
 
 def main():
-    'Assign focus to pysh shell, print shell prompt, (re)start scheduler.'
-    vt.pysh()
-    console.Console.continues = True
-    p.done = False # reset, might be resuming after p.exit() 
-    p.run(nevents=0) # loop forever, don't return
-    terminal.set_line_mode()
-
+    piety.done = False # reset, might be resuming after p.exit() 
+    console.foreground() # FIXME?  Is this/should this be necessary?
+    piety.run(nevents=0) # loop forever, don't return
+    
 if __name__ == '__main__':
     main()

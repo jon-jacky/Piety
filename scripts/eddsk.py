@@ -1,9 +1,9 @@
 """
-edds.py - Run a pysh Python shell, ed and edd editors in a Session.
- Use command module instead of Python raw_input to get command line.
- BUT do not use Piety scheduler - just use loop.  Do not use key module either.
+eddsk.py - Run a pysh Python shell, ed and edd editors in a Session.
+ Use command and key modules instead of Python raw_input to get command line.
+ BUT do not use Piety scheduler yet - just use loop.
 
-  $ python -i edds.py
+  $ python -i eddsk.py
  pysh shell, type any Python statement, exit() or Ctrl-D to exit
  >> console.run(edc)   # run the ed line editor
  ...
@@ -30,23 +30,27 @@ def pexit():
 def banner():
     print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
 
-# Note here we assign pexit to job control suspend arg
+# Python shell
 pyshc = command.Command(startup=banner, prompt='>> ', handler=pysh.mk_shell(), 
                         stopcmd='exit()', suspend=pexit)
+pyshk = key.Key(pyshc.handle_key)
+pyshc.reader = pyshk.getchar
 
+# console session, start running Python shell
 console = session.Session(name='console', event=sys.stdin, job=pyshc)
 
-# here we leave default cleanup arg None, but assign callback to suspend arg
+# Line editor
 edc = command.Command(prompt='', handler=ed.cmd, 
                       stopcmd='q', suspend=console.stop) 
+edk = key.Key(edc.handle_key)
+edc.reader = edk.getchar
 
+# Display editor
 eddc = command.Command(prompt='', startup=edd.init_display, handler=edd.cmd, 
                        stopcmd='q', cleanup=edd.restore_display,
                        suspend=console.stop) 
-
-
-# FIXME - doesn't reassign k.handler when foreground is reassigned by session
-# k = key.Key(console.foreground.handle_key)
+eddk = key.Key(eddc.handle_key)
+eddc.reader = eddk.getchar
 
 def main():
     """
@@ -56,10 +60,7 @@ def main():
     quit = False  # enable main loop, previous exit may have set this True
     console.foreground()
     while not quit:
-        # for now skip Key, call console directly
-        # only single-char keys work here, not keyboard arrow keys
-        ch = terminal.getchar()
-        console.handle_key(ch)
-    
+        console.handler()
+
 if __name__ == '__main__':
     main()

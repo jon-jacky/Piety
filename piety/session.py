@@ -5,7 +5,7 @@ session.py - Define Session class, a subclass of Task
                run in a single task.  Session multiplexes the input among them
                 by selecting one job at a time to run in the foreground.
              Example: shell, editor, etc. all get input from keyboard (stdin).
-               so they are multiple jobs in one task.
+               so they are multiple jobs in one console task.
 """
 
 import piety
@@ -40,7 +40,7 @@ class Session(piety.Task):
         self.jobs = collections.deque([job])
         self.foreground = self.jobs[-1] if self.jobs else None
         super(Session, self).__init__(name=name, event=event, 
-                                      handler=self.foreground.handler, 
+                                      handler=self.foreground.reader, 
                                       enabled=enabled)
 
     def run(self, job):
@@ -51,12 +51,8 @@ class Session(piety.Task):
 
     def run_foreground(self):
         'Initialize the foreground job, then prepare to accept input'
-        self.handler = self.foreground.handler
+        self.handler = self.foreground.reader
         self.foreground() # invokes its command.__call__ 
-
-    def handle_key(self, key):
-        'Pass key to foreground handle_key'
-        self.foreground.handle_key(key)
 
     def stop(self):
         'Foreground job says goodbye, stops, new foreground job runs'
@@ -64,7 +60,5 @@ class Session(piety.Task):
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.run_foreground()
-        # else:
-        #   exit from piety scheduler, return to underlying python
 
     

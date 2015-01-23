@@ -34,8 +34,8 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, startup=None, 
-                 prompt='> ', handler=echo, 
+    def __init__(self, startup=None, prompt='> ', 
+                 reader=terminal.getchar , handler=echo, 
                  stopcmd='q', cleanup=None, suspend=None):
         """
         All arguments are optional, with defaults
@@ -46,10 +46,12 @@ class Command(object):
           This function gets assigned to this object's __call__ method
         prompt - Prompt string that appears at the start of each line
           Default is '> '
-        handler - Function to execute command
+        reader - function to call to read char(s) to build command string
+          Default is terminal.getchar, could also read/process multichar sequence
+        handler - function to execute command
           Can be any callable that takes one argument, a string.
           Default just echoes the command.
-        stopcmd - Command string for function in application to be executed
+        stopcmd - command string for function in application to be executed
           by .handler (above) to exit or suspend. After that, application 
           executes cleanup (below), then job control may execute suspend(below)
         cleanup - application function to call when application 
@@ -60,6 +62,7 @@ class Command(object):
           same terminal.  Runs after stopcmd and cleanup.
         """
         self.prompt = prompt # string to prompt for command 
+        self.reader = reader # callable that reads char(s) to build command string
         self.handler = handler # callable that executes command string
         self.startup = startup
         self.stopcmd = stopcmd
@@ -127,10 +130,6 @@ class Command(object):
         else:
             print keyboard.bel, # sound indicates key not handled
         return key # caller might check for 'q' quit cmd or ...
-
-    # Methods, not directly invoked by keys in keymap
-    def do_foreground(self):
-        pass
 
     def do_command(self):
         'Handle the command, then prepare to collect the next command'
