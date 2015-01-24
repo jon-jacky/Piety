@@ -84,9 +84,9 @@ def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
-    piety.done = False   # enable event loop, previous exit may have set this True
-    console.foreground()
-    piety.run(nevents=0) # start event loop, continue until pysh exit()
+    piety.done = False # enable event loop, previous exit may have set this True
+    console.foreground() # print prompt, set terminal char mode
+    piety.run() # start event loop, continue until pysh exit()
 
 if __name__ == '__main__':
     main()

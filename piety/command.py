@@ -228,10 +228,9 @@ class Command(object):
         putlines(self.command) # might be multiple lines
 
     def next_history(self):
-        self.hindex = self.hindex + 1 \
-            if self.hindex < len(self.history)-1 else self.hindex
-        if self.history:
-            self.command = self.history[self.hindex]
+        length = len(self.history)
+        self.hindex = self.hindex + 1 if self.hindex < length else length
+        self.command = self.history[self.hindex] if self.hindex < length else ''
         self.point = len(self.command)
         terminal.putstr('^N\r\n' + self.prompt)  # on new line
         putlines(self.command) # might be multiple lines
