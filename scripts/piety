@@ -4,6 +4,8 @@ piety - Run pysh shell, ed and edd editors in a Session under Piety scheduler
  Use command and key modules instead of Python raw_input to get command line.
  This script is named piety (with no file type) so no name clash with piety.py
 
+To demonstrate the shell and editors:
+
   $ piety
  pysh shell, type any Python statement, exit() or Ctrl-D to exit
  >> console.run(edc)   # run the ed line editor
@@ -13,8 +15,41 @@ piety - Run pysh shell, ed and edd editors in a Session under Piety scheduler
  ...
  q
  >> exit()             # exit from pysh Python shell
- >>>                   # Back to regular Python shell
+ $                     # back to host shell
 
+To exit, then resume the piety session in a single Python session use python -i :
+
+ $ python -i piety
+ ...
+ >> exit()             # exit from pysh Python shell
+ >>>                   # back to host Python shell
+ >>> main()            # restart piety script
+ >>                    # back to pysh Python shell
+ ...
+
+To create, start, pause, resume a Piety task from the shell:
+
+ ...
+ >> w0 = writer.Writer(fname='w0.txt')
+ >> t0 = piety.Task(name='w0',handler=w0.write,event=piety.timeout,enabled=piety.true)
+ ... in another terminal window, tail -f w0.txt shows writer is writing to w0.txt
+ >> piety.tasks()
+ ... shows console and writer tasks 
+ >> t0.enabled = piety.false
+ ... w0.txt stops growing
+ >> t0.enabled = piety.true
+ ... w0.txt resumes growing
+
+
+This script demonstrates how a different keyboard reader can be
+selected for each terminal job.  This script configures the shell and
+display editor jobs using the input reader from the key module, so
+these jobs can use some keys that send multi-character control
+sequences (such the four keyboard arrow keys in the lower right corner
+of the MacBook Pro keyboard).  The line editor is configured with the
+default reader that just handles single-character keycodes, so it
+cannot use those arrow keys, but it can use the alternatives ^F ^B ^N
+^P which send single-character codes.
 """
 
 import sys
@@ -34,7 +69,9 @@ pyshc = command.Command(startup=banner, prompt='>> ',
 console = session.Session(name='console', event=sys.stdin, job=pyshc)
 
 # line editor
-edc = command.Command(prompt='', handler=ed.cmd, reader=key.Key(),
+# Here we don't pass reader argument, instead use default terminal.getchar
+# So edc can only handle single-char keys, not escape sequences like arrow keys
+edc = command.Command(prompt='', handler=ed.cmd, # reader=key.Key(),
                       stopcmd='q', suspend=console.stop) 
 
 # display editor
