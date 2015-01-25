@@ -37,6 +37,7 @@ statement (statements).  On eval and exec:
 
 import sys, traceback
 
+
 main_globals = sys.modules['__main__'].__dict__
 
 def mk_shell(globals=main_globals):
@@ -74,18 +75,27 @@ def mk_shell(globals=main_globals):
 
     return shell
 
+# pysh (unlike standard Python) ignores exit() so we must handle special case here
+
+pexit = False
+
+def exit_pysh():
+    global pexit
+    pexit = True
+
 # Test
 
 def main():
     'Python REPL using home-made pysh shell'
-    pexit = False
+    global pexit
+    pexit = False # previous exit() may have made it True
     pysh = mk_shell()
     print "pysh shell, type any Python statement, exit() to exit"
     while not pexit:
         command = raw_input('>> ')
-        pysh(command) # in pysh exit() does nothing
+        pysh(command)
         if command == 'exit()': # special case - do NOT exit from Python
-            pexit = True
+            exit_pysh()
 
 
 if __name__ == '__main__':

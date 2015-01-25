@@ -1,3 +1,4 @@
+
 """
 command.py - Skeleton terminal application.
   Collects a command (string), passes it to a handler (callable) to execute.
@@ -36,7 +37,7 @@ def putlines(s):
 class Command(object):
     def __init__(self, startup=None, prompt='> ', 
                  reader=terminal.getchar , handler=echo, 
-                 stopcmd='q', cleanup=None, suspend=None):
+                 stopcmd=None, cleanup=None, suspend=None):
         """
         All arguments are optional, with defaults
         startup - function to call when application starts up or resumes
@@ -150,7 +151,10 @@ class Command(object):
             self.restart()
 
     def do_stop(self):
-        'Execute optional stop function if it exists, else call handler'
+        """
+        Call handler for stopcmd, 
+        then call optional cleanup fcn, then call suspend callback - if they exist
+        """
         self.handler(self.stopcmd)        
         if self.cleanup:
             self.cleanup()
@@ -264,7 +268,8 @@ class Command(object):
         if not self.command:
             terminal.set_line_mode()
             print('^D') # advance line too
-            self.do_stop()
+            if self.stopcmd:
+                self.do_stop()
         else:
             self.delete_char() # requires display terminal
 

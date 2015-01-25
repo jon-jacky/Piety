@@ -5,29 +5,19 @@ pyshc.py - Run a pysh Python shell session.
  BUT do not use Piety scheduler.
 """
 
+import terminal # for exit() only
 import pysh, command, key
 
-quit = False
-
-def pexit():
-    global quit
-    quit = True
-
-def banner():
-    print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
-
-pyshc = command.Command(run=banner, prompt='>> ', handler=pysh.mk_shell(), 
-                        stop=pexit, stopcmd='exit()')
-
-k = key.Key(pyshc.handle_key)
+pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell(),
+                        # pysh ignores exit() so we must handle special case here
+                        stopcmd='exit()', cleanup=pysh.exit_pysh)
 
 def main():
     'Python REPL using home-made pysh shell'
-    global quit
-    quit = False  # enable main loop, previous exit may have set this True
+    pysh.pexit = False # previous exit have made it True
     pyshc()
-    while not quit:
-        k.getchar()
-
+    while not pysh.pexit:
+        pyshc.reader() # exit() command sets psysh.pexit = True, forces exit
+            
 if __name__ == '__main__':
     main()
