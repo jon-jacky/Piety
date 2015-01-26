@@ -7,16 +7,16 @@ eddc.py - Run an edd display editor session.
 
 import edd, command, key
 
-eddc = command.Command(run=edd.init_display, prompt='', handler=edd.cmd, 
-                       stop=edd.restore_display, stopcmd='q')
-
-k = key.Key(eddc.handle_key)
+# Here we use Command args rather than calling edd functions in main()
+eddc = command.Command(prompt='', startup=edd.init_display, 
+                       reader=key.Key(), handler=edd.cmd, 
+                       stopcmd='q', cleanup=edd.restore_display)
 
 def main():
-    edd.ed.quit = False # allow restart
+    edd.ed.quit = False # previous quit might have set it True
     eddc()
     while not edd.ed.quit:
-        k.getchar()
+        eddc.reader()   # q command sets edd.ed.quit True, forces exit
 
 if __name__ == '__main__':
     main()

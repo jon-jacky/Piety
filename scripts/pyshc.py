@@ -5,12 +5,11 @@ pyshc.py - Run a pysh Python shell session.
  BUT do not use Piety scheduler.
 """
 
-import terminal # for exit() only
 import pysh, command, key
 
 pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell(),
                         # pysh ignores exit() so we must handle special case here
-                        stopcmd='exit()', cleanup=pysh.exit_pysh)
+                        stopcmd='exit()', suspend=pysh.exit_pysh)
 
 def main():
     'Python REPL using home-made pysh shell'

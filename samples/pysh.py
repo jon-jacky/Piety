@@ -40,6 +40,15 @@ import sys, traceback
 
 main_globals = sys.modules['__main__'].__dict__
 
+
+# pysh (unlike standard Python) ignores exit() so we must handle special case here
+
+pexit = False
+
+def exit_pysh():
+    global pexit
+    pexit = True
+
 def mk_shell(globals=main_globals):
     """
     Returns a handler function with one argument, the command.
@@ -53,7 +62,8 @@ def mk_shell(globals=main_globals):
         This is a closure that includes the globals dictionary 
         """
         if command == 'exit()':  # DON'T exit from underlying Python session
-            return               # here exit() does nothing
+            exit_pysh()    # instead assign pexit variable can be used by caller
+            return
         try: # don't crash out of piety if exception, but print traceback
             try: # try eval, if it fails call exec
                 # exec does not automatically print values,
@@ -75,14 +85,6 @@ def mk_shell(globals=main_globals):
 
     return shell
 
-# pysh (unlike standard Python) ignores exit() so we must handle special case here
-
-pexit = False
-
-def exit_pysh():
-    global pexit
-    pexit = True
-
 # Test
 
 def main():
@@ -94,9 +96,6 @@ def main():
     while not pexit:
         command = raw_input('>> ')
         pysh(command)
-        if command == 'exit()': # special case - do NOT exit from Python
-            exit_pysh()
-
 
 if __name__ == '__main__':
     main()

@@ -225,6 +225,8 @@ class Command(object):
 
     def previous_history(self):
         if self.history:
+            length = len(self.history)
+            self.hindex = self.hindex if self.hindex < length else length-1
             self.command = self.history[self.hindex]
         self.point = len(self.command)
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0

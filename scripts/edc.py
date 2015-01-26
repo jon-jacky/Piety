@@ -7,15 +7,13 @@ edc.py - Run an ed line editor session.
 
 import ed, command, key
 
-edc = command.Command(prompt='', handler=ed.cmd, stopcmd='q')
-
-k = key.Key(edc.handle_key)
+edc = command.Command(prompt='', handler=ed.cmd, reader=key.Key())
 
 def main():
-    ed.quit = False # allow restart
+    ed.quit = False # previous quit might have set it True
     edc()
     while not ed.quit:
-        k.getchar()
+        edc.reader() # q command sets ed.quit True, forces exit
 
 if __name__ == '__main__':
     main()
