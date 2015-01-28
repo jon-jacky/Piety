@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 pyshc.py - Run a pysh Python shell session.
  Use command and key modules instead of Python raw_input to get command line.
@@ -7,15 +6,14 @@ pyshc.py - Run a pysh Python shell session.
 
 import pysh, command, key
 
-pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell(),
-                        # pysh ignores exit() so we must handle special case here
-                        stopcmd='exit()', suspend=pysh.exit_pysh)
+pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell())
 
 def main():
-    'Python REPL using home-made pysh shell'
+    print "pysh shell, type any Python statement, exit() to exit"
     pysh.pexit = False # previous exit have made it True
-    pyshc()
     while not pysh.pexit:
+        if pyshc.new_command:
+            pyshc.restart()
         pyshc.reader() # exit() command sets psysh.pexit = True, forces exit
             
 if __name__ == '__main__':

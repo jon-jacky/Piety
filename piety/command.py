@@ -1,10 +1,8 @@
-
 """
-command.py - Skeleton terminal application.
+command.py - Skeleton command line application.
   Collects a command (string), passes it to a handler (callable) to execute.
-  Can collect command without blocking for cooperative multitasking.
+  Can collect command without blocking, for cooperative multitasking.
   Provides command history, editing similar to Unix readline, Python raw_input.
-  Provides hooks for callbacks for job control.
  Has a main method, python command.py demonstrates most functions.
 """
 
@@ -35,16 +33,9 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, startup=None, prompt='> ', 
-                 reader=terminal.getchar , handler=echo, 
-                 stopcmd=None, cleanup=None, suspend=None):
+    def __init__(self, prompt='> ', reader=terminal.getchar , handler=echo):
         """
         All arguments are optional, with defaults
-        startup - function to call when application starts up or resumes
-           for example to initialize screen or ...
-          After that, system then prints the command prompt.
-          Default does nothing more than print the command prompt.
-          This function gets assigned to this object's __call__ method
         prompt - Prompt string that appears at the start of each line
           Default is '> '
         reader - function to call to read char(s) to build command string
@@ -52,29 +43,17 @@ class Command(object):
         handler - function to execute command
           Can be any callable that takes one argument, a string.
           Default just echoes the command.
-        stopcmd - command string for function in application to be executed
-          by .handler (above) to exit or suspend. After that, application 
-          executes cleanup (below), then job control may execute suspend(below)
-        cleanup - application function to call when application 
-          exits or suspends for example to clean up screen or ...
-          Called after executing stopcmd (above), default does nothing more
-        suspend - callback function from job control to put application 
-          in the background. Only used when running other commands on the 
-          same terminal.  Runs after stopcmd and cleanup.
         """
         self.prompt = prompt # string to prompt for command 
         self.reader_body = reader # callable reads char(s) to build command string
         self.handler = handler # callable that executes command string
-        self.startup = startup
-        self.stopcmd = stopcmd
-        self.cleanup = cleanup
-        self.suspend = suspend
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
+        self.new_command = True # cleared by reader, set again by do_command
 
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
@@ -108,7 +87,7 @@ class Command(object):
             keyboard.delete: self.backward_delete_char,
             keyboard.C_a: self.move_beginning_of_line,
             keyboard.C_b: self.backward_char,
-            keyboard.C_d: self.handle_C_d, # exit or self.delete_char,
+            keyboard.C_d: self.delete_char, # not end-of-transmission/exit
             keyboard.C_e: self.move_end_of_line,
             keyboard.C_f: self.forward_char,
             keyboard.C_k: self.kill_line,
@@ -123,6 +102,7 @@ class Command(object):
 
     def reader(self):
         'Read char, add to key sequence.  If sequence is complete, handle key'
+        self.new_command = False
         key = self.reader_body() 
         if key:
             self.handle_key(key)
@@ -142,24 +122,8 @@ class Command(object):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print # print command output on new line
-        if '.run(' in self.command: # HACK .run( is from job control in session.py
-            self.handler(self.command) # *not* followed by restart
-        elif self.command == self.stopcmd:
-            self.do_stop()
-        else:
-            self.handler(self.command)
-            self.restart()
-
-    def do_stop(self):
-        """
-        Call handler for stopcmd, 
-        then call optional cleanup fcn, then call suspend callback - if they exist
-        """
-        self.handler(self.stopcmd)        
-        if self.cleanup:
-            self.cleanup()
-        if self.suspend:
-            self.suspend()
+        self.handler(self.command)
+        self.new_command = True
 
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
@@ -167,12 +131,6 @@ class Command(object):
         self.point = 0
         terminal.putstr(self.prompt) # prompt does not end with \n
         terminal.set_char_mode()
-
-    def __call__(self):
-        'Execute startup function if it exists, then restart command line'
-        if self.startup:
-            self.startup()
-        self.restart()
 
     # All the other methods are invoked via keymap
 
@@ -265,16 +223,6 @@ class Command(object):
             self.point -= 1
             display.backward_char()
 
-    def handle_C_d(self):
-        '^D: stop if command string is empty, otherwise delete character'
-        if not self.command:
-            terminal.set_line_mode()
-            print('^D') # advance line too
-            if self.stopcmd:
-                self.do_stop()
-        else:
-            self.delete_char() # requires display terminal
-
     def delete_char(self):
         self.command = (self.command[:self.point] + self.command[self.point+1:])
         display.delete_char()
@@ -299,11 +247,12 @@ def main():
     global quit
     quit = False # earlier invocation might have set it True
     c = Command()
-    c()
-    while not quit:
-        # multi-char control sequences keyboard.up,down don't work here
-        k = terminal.getchar()
-        c.handle_key(k) # q command recognized by .stopcmd restores terminal
+    while not quit: # default handler echo sets quit=True when command='q'
+        if c.new_command:
+            c.restart()
+        # default reader terminal.getchar can't handle multi-char control seqs
+        #  like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
+        c.reader()
 
 if __name__ == '__main__':
     main()
