@@ -53,32 +53,32 @@ cannot use those arrow keys, but it can use the alternatives ^F ^B ^N
 """
 
 import sys
-import piety, pysh, ed, edd, command, key, session
+import piety, pysh, ed, edd, job, key, session
 import terminal # for main loop only
 
 def banner():
     print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
 
 # Python shell
-pyshc = command.Command(startup=banner, prompt='>> ', 
-                        reader=key.Key(), handler=pysh.mk_shell(), 
-                        stopcmd='exit()', suspend=piety.quit)
+pyshc = job.Job(startup=banner, prompt='>> ', 
+                reader=key.Key(), handler=pysh.mk_shell(), 
+                stopcmd='exit()', suspend=piety.quit)
 
 # console session, a Piety task, initially runs Python shell
-# Then use console to run other commands from shell: console.run(edc) etc.
+# Then use console to run other jobs from shell: console.run(edc) etc.
 console = session.Session(name='console', event=sys.stdin, job=pyshc)
 
 # line editor
 # Here we don't pass reader argument, instead use default terminal.getchar
 # So edc can only handle single-char keys, not escape sequences like arrow keys
-edc = command.Command(prompt='', handler=ed.cmd, # reader=key.Key(),
-                      stopcmd='q', suspend=console.stop) 
+edc = job.Job(prompt='', handler=ed.cmd, # reader=key.Key(),
+              stopcmd='q', suspend=console.stop) 
 
 # display editor
-eddc = command.Command(prompt='', startup=edd.init_display, 
-                       handler=edd.cmd, reader=key.Key(),
-                       stopcmd='q', cleanup=edd.restore_display,
-                       suspend=console.stop) 
+eddc = job.Job(prompt='', startup=edd.init_display, 
+               handler=edd.cmd, reader=key.Key(),
+               stopcmd='q', cleanup=edd.restore_display,
+               suspend=console.stop) 
 
 def main():
     """

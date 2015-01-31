@@ -243,10 +243,11 @@ class Command(object):
 
 # Test
 
+c = Command()
+
 def main():
     global quit
     quit = False # earlier invocation might have set it True
-    c = Command()
     while not quit: # default handler echo sets quit=True when command='q'
         if c.new_command:
             c.restart()
