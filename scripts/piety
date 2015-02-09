@@ -53,40 +53,72 @@ cannot use those arrow keys, but it can use the alternatives ^F ^B ^N
 """
 
 import sys
-import piety, pysh, ed, edd, job, key, session
+import piety, session, job, command, key, pysh, ed, edd
 import terminal # for main loop only
 
-def banner():
+def pysh_startup():
+    pysh.pexit = False # enable event loop, compare to Job( stop=...) arg below
     print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
 
 # Python shell
-pyshc = job.Job(startup=banner, prompt='>> ', 
-                reader=key.Key(), handler=pysh.mk_shell(), 
-                stopcmd='exit()', suspend=piety.quit)
+
+pyshcc = command.Command(prompt='>> ', reader=key.Key(), 
+                         handler=pysh.mk_shell())
+pyshc = job.Job(application=pyshcc,
+                startup=pysh_startup, 
+                restart=pyshcc.restart,
+                reader=pyshcc.reader, 
+                replaced=(lambda: '.run(' in pyshcc.command),
+                stopped=(lambda: pysh.pexit), 
+                suspend=piety.quit)
 
 # console session, a Piety task, initially runs Python shell
 # Then use console to run other jobs from shell: console.run(edc) etc.
 console = session.Session(name='console', event=sys.stdin, job=pyshc)
 
 # line editor
-# Here we don't pass reader argument, instead use default terminal.getchar
-# So edc can only handle single-char keys, not escape sequences like arrow keys
-edc = job.Job(prompt='', handler=ed.cmd, # reader=key.Key(),
-              stopcmd='q', suspend=console.stop) 
 
+def ed_startup():
+    ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+
+edcc = command.Command(prompt='', reader=key.Key(), handler=ed.cmd)
+
+edc = job.Job(application=edcc,
+              startup=ed_startup, 
+              restart=edcc.restart,
+              reader=edcc.reader,
+              replaced=(lambda: '.run(' in edcc.command),
+              stopped=(lambda: ed.quit), 
+              suspend=console.stop)
+
+#alternatively we could use Command default terminal.getchar for reader
+#alternatively we could check string rather than state variable
+#edc.stop = (lambda: edc.command == 'q') # check command string not state variable
+              
 # display editor
-eddc = job.Job(prompt='', startup=edd.init_display, 
-               handler=edd.cmd, reader=key.Key(),
-               stopcmd='q', cleanup=edd.restore_display,
-               suspend=console.stop) 
+
+def edd_startup():
+    edd.ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    edd.init_display()
+
+eddcc = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
+
+eddc = job.Job(application=eddcc,
+               startup=edd_startup, 
+               restart=eddcc.restart,
+               reader=eddcc.reader,
+               replaced=(lambda: '.run(' in eddcc.command),
+               stopped=(lambda: edd.ed.quit), 
+               cleanup=edd.restore_display,
+               suspend=console.stop)
 
 def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
-    piety.done = False # enable event loop, previous exit may have set this True
-    console.foreground() # print prompt, set terminal char mode
-    piety.run() # start event loop, continue until pysh exit()
+    piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
+    console.foreground.restart()  # print prompt, set terminal char mode
+    piety.run()  # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':
     main()

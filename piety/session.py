@@ -1,11 +1,15 @@
 """
-session.py - Define Session class, a subclass of Task 
-               that manages multiple applications (jobs) in one task.
-              Usually all applications that get input from the same source
-               run in a single task.  Session multiplexes the input among them
-                by selecting one job at a time to run in the foreground.
-             Example: shell, editor, etc. all get input from keyboard (stdin).
-               so they are multiple jobs in one console task.
+session.py - Manage multiple jobs (applications) in one task.
+
+Defines Session class, a subclass of Task.
+
+Usually all applications that get input from the same source run in a
+single task.  Session multiplexes the input among them by selecting
+one job at a time to run in the foreground.
+
+Example: shell, editor, etc. all get input from keyboard (stdin).
+They are multiple jobs in one console session (a task); only one job at
+a time runs in the foreground.
 """
 
 import piety
@@ -13,24 +17,10 @@ import collections
 
 class Session(piety.Task):
     """
-    In one task, manage jobs (applications) that use the same input event
+    Manage multiple jobs (applications) that use the same input event,in one task.
     The collection of jobs is a stack implemented by a deque.
     Job on top of stack runs in foreground (has focus), gets input.
     Top of the stack is the right end of the deque at self.jobs[-1]
-    Typical scenario:
-      start session, stack is empty
-      push shell job on stack and run it
-      repeat:
-        shell command to start application job pushes it on stack and runs it
-        application exits, pop stack and resume running shell job
-      shell job exits, pop stack
-      stack is empty, exit session
-    So the stack usually just holds one or two items
-     but application could command another application to start: push and run
-    After an application exits, its job remains in Python with all its state
-     (though not on the job stack) so it can easily be pushed and run again
-    The purpose of the Session class: an application need not know or assume
-     which application will resume when it exits - this class keeps track.
     """
     def __init__(self, name=None, event=None, job=None, enabled=piety.true):
         """

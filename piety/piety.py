@@ -198,7 +198,7 @@ def task1(): print 'task 1'
 def main():
     t0 = Task(name='task 0', handler=task0, event=timeout)
     t1 = Task(name='task 1', handler=task1, event=timeout)
-    done = False # reset, might be resuming after exit() 
+    done = False # reset, might be resuming after quit() 
     run(nevents=10) # handle 10 clock ticks and exit
     tasks() # show the tasks
 

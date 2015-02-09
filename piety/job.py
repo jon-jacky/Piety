@@ -1,100 +1,69 @@
 """
-job.py - Defines Job, subclass of Command with hooks for job control with Session.
-          Job class provides a uniform API for terminal applications for Session.
-          Enables Session to manage several terminal jobs in a single Piety task.
+job.py - Wrapper for application to provide hooks for job control from Session.
 """
 
-import terminal
-import command
-
-class Job(command.Command):
-    def __init__(self, startup=None, prompt='> ', 
-                 reader=terminal.getchar , handler=command.echo, 
-                 stopcmd='q', cleanup=None, suspend=None):
-        """
-        All arguments are optional, with defaults
-        startup - function to call when application starts up or resumes
-           for example to initialize screen or ...
-          After that, system then prints the command prompt.
-          Default does nothing more than print the command prompt.
-          This function gets assigned to this object's __call__ method
-        prompt - Prompt string that appears at the start of each line
-          Default is '> '
-        reader - function to call to read char(s) to build command string
-          Default is terminal.getchar, could also read/process multichar sequence
-        handler - function to execute command
-          Can be any callable that takes one argument, a string.
-          Default just echoes the command.
-        stopcmd - command string for function in application to be executed
-          by .handler (above) to exit or suspend. After that, application 
-          executes cleanup (below), then job control may execute suspend(below)
-          Default is 'q'.
-        cleanup - application function to call when application 
-          exits or suspends for example to clean up screen or ...
-          Called after executing stopcmd (above), default does nothing more
-        suspend - callback function from job control to put this job
+class Job(object):
+    """
+    Job provides a uniform interface to the application for the
+    Session's job control.  Job also uncouples Session's scheduling and job
+    control from any particular device or event.  Therefore its initializer
+    has a lot of arguments to access application functions.
+    """
+    def __init__(self, application=None, startup=None, restart=None, reader=None, 
+                 replaced=None, stopped=None, cleanup=None, suspend=None):
+        """ 
+        application - required argument, application object.
+          application must have a method named do_command that calls 
+           application's handler on a chunk of input collected by reader.  
+        startup - optional function to call when application starts up or resumes.
+        restart - optional function to put application in the mode where it
+          handles calls to reader and collects input.
+        reader - required function to call to collect input for the application.
+          Session assigns Job's reader to Task's handler when Job gets focus.
+        replaced - required function called by do_command that returns True 
+           when a new application is about to run, replacing the current job.
+        stopped - required function called by do_command that returns True 
+           when application is about to exit. 
+          When stopped is True, this job executes cleanup, then suspend
+        cleanup - optional function to call when application exits or suspends.
+          Called after stop (above) returns True
+        suspend - optional job control function to put this job
           in the background. Used when running other jobs. Runs after cleanup.
         """
+        self.application = application
         self.startup = startup
-        self.stopcmd = stopcmd
+        self.restart = restart
+        self.reader = reader
+        self.do_command_body = application.do_command
+        application.do_command = self.do_command
+        self.replaced = replaced
+        self.stopped = stopped
         self.cleanup = cleanup
         self.suspend = suspend
-        super(Job, self).__init__(prompt=prompt, reader=reader, handler=handler)
 
     def do_command(self):
         'Handle the command, then prepare to collect the next command'
-        terminal.set_line_mode() # resume line mode for command output
-        print # print command output on new line
-        if '.run(' in self.command: # HACK .run( is from job control in session.py
-            self.handler(self.command) # *not* followed by restart
-        elif self.command == self.stopcmd:
+        self.do_command_body() # This is *application* do_command, see above
+        if self.stopped():
             self.do_stop()
-        else:
-            self.handler(self.command)
+        elif not self.replaced() and self.restart:
             self.restart()
+        else:
+            return
 
     def do_stop(self):
-        """
-        Call handler for stopcmd, 
-        then call optional cleanup fcn, then call suspend callback - if they exist
-        """
-        self.handler(self.stopcmd)        
+        'Call optional cleanup fcn, then call suspend callback - if they exist'
         if self.cleanup:
             self.cleanup()
         if self.suspend:
             self.suspend()
 
     def __call__(self):
-        'Execute startup function if it exists, then restart command line'
+        'Execute startup function if it exists, then restart reader'
         if self.startup:
-            self.startup()
-        self.restart()
+            self.startup() 
+        if self.restart:
+            self.restart()
 
-    def handle_C_d(self):
-        '^D: stop if command string is empty, otherwise delete character'
-        if not self.command:
-            terminal.set_line_mode()
-            print('^D') # advance line too
-            if self.stopcmd:
-                self.do_stop()
-        else:
-            self.delete_char() # requires display terminal
-
-    # Many other methods Commmand are invoked via Command keymap
-
-
-# Test
-
-c = Job()
-
-def main():
-    command.quit = False # earlier invocation might have set it True
-    c()
-    while not command.quit:
-        # No need to test new_command and call c.restart - Job handles that
-        # default reader terminal.getchar can't handle multi-char control seqs
-        #  like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
-        c.reader()
-
-if __name__ == '__main__':
-    main()
+# Test has to be in another module that imports this one, 
+#  to avoid creating a dependency on any particular device or event
