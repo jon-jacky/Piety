@@ -22,17 +22,16 @@ class Session(piety.Task):
     Job on top of stack runs in foreground (has focus), gets input.
     Top of the stack is the right end of the deque at self.jobs[-1]
     """
-    def __init__(self, name=None, event=None, job=None, enabled=piety.true):
+    def __init__(self, name=None, event=None, enabled=piety.true):
         """
-        Same args as Task __init__ , except replace handler with job
-        The foreground job's handler becomes the Task handler
+        Same args as Task __init__ , except no handler.
+        Add jobs later, the foreground job's handler becomes the Task handler
         """
-        self.jobs = collections.deque([job])
-        self.foreground = self.jobs[-1] if self.jobs else None
+        self.jobs = collections.deque()
         super(Session, self).__init__(name=name, event=event, 
-                                      handler=self.foreground.reader, 
                                       enabled=enabled)
 
+    # run() the first job before piety.run()
     def run(self, job):
         'Add a new job, put it in the foreground, run it'
         self.jobs.append(job)
@@ -50,5 +49,4 @@ class Session(piety.Task):
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.run_foreground()
-
-    
+        # else ... last job exits, its cleanup method has to handle it.

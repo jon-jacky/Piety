@@ -40,7 +40,6 @@ To create, start, pause, resume a Piety task from the shell:
  >> t0.enabled = piety.true
  ... w0.txt resumes growing
 
-
 This script demonstrates how a different keyboard reader can be
 selected for each terminal job.  This script configures the shell and
 display editor jobs using the input reader from the key module, so
@@ -53,71 +52,49 @@ cannot use those arrow keys, but it can use the alternatives ^F ^B ^N
 """
 
 import sys
-import piety, session, job, command, key, pysh, ed, edd
-import terminal # for main loop only
+import piety, session, job, command, key
 
-def pysh_startup():
-    pysh.pexit = False # enable event loop, compare to Job( stop=...) arg below
-    print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
+# rename modules so we can use original module names as command names
+import pysh as _pysh, ed as _ed, edd as _edd
+
+# Session, a terminal task
+console = session.Session(name='console', event=sys.stdin)
 
 # Python shell
 
-pyshcc = command.Command(prompt='>> ', reader=key.Key(), 
-                         handler=pysh.mk_shell())
-pyshc = job.Job(application=pyshcc,
-                startup=pysh_startup, 
-                restart=pyshcc.restart,
-                reader=pyshcc.reader, 
-                replaced=(lambda: '.run(' in pyshcc.command),
-                stopped=(lambda: pysh.pexit), 
-                suspend=piety.quit)
-
-# console session, a Piety task, initially runs Python shell
-# Then use console to run other jobs from shell: console.run(edc) etc.
-console = session.Session(name='console', event=sys.stdin, job=pyshc)
+pysh = job.Job(session=console, application= 
+               command.Command(prompt='>> ', reader=key.Key(), 
+                               handler=_pysh.mk_shell()),
+               stopped=(lambda: _pysh.pexit), cleanup=piety.quit)
 
 # line editor
 
 def ed_startup():
-    ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    _ed.quit = False # enable event loop, compare to Job( stop=...) arg below
 
-edcc = command.Command(prompt='', reader=key.Key(), handler=ed.cmd)
-
-edc = job.Job(application=edcc,
-              startup=ed_startup, 
-              restart=edcc.restart,
-              reader=edcc.reader,
-              replaced=(lambda: '.run(' in edcc.command),
-              stopped=(lambda: ed.quit), 
-              suspend=console.stop)
-
-#alternatively we could use Command default terminal.getchar for reader
-#alternatively we could check string rather than state variable
-#edc.stop = (lambda: edc.command == 'q') # check command string not state variable
+ed = job.Job(session=console,
+             application=command.Command(prompt='', handler=_ed.cmd),
+             startup=ed_startup, stopped=(lambda: _ed.quit))
               
 # display editor
 
 def edd_startup():
-    edd.ed.quit = False # enable event loop, compare to Job( stop=...) arg below
-    edd.init_display()
+    _edd.ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    _edd.init_display()
 
-eddcc = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
-
-eddc = job.Job(application=eddcc,
+edd = job.Job(session=console, 
+               application=
+               command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
                startup=edd_startup, 
-               restart=eddcc.restart,
-               reader=eddcc.reader,
-               replaced=(lambda: '.run(' in eddcc.command),
-               stopped=(lambda: edd.ed.quit), 
-               cleanup=edd.restore_display,
-               suspend=console.stop)
+               stopped=(lambda: _edd.ed.quit), 
+               cleanup=_edd.restore_display)
 
 def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
-    console.foreground.restart()  # print prompt, set terminal char mode
+    console.run(pysh) # start the first job
     piety.run()  # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':
