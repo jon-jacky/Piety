@@ -3,6 +3,7 @@
 piety.no_defaults - works exactly like piety script, see its header for directions
  
 Like the piety script EXCEPT the calls to the Job initializer use no defaults.
+Also, jobs are named edc and eddc, not just ed and edd.  So console.run(edc) etc.
 """
 
 import sys

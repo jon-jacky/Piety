@@ -62,15 +62,19 @@ console = session.Session(name='console', event=sys.stdin)
 
 # Python shell
 
+def pysh_startup():
+    _pysh.pexit = False # enable pysh event loop, compare to Job stopped= below
+
 pysh = job.Job(session=console, application= 
                command.Command(prompt='>> ', reader=key.Key(), 
                                handler=_pysh.mk_shell()),
-               stopped=(lambda: _pysh.pexit), cleanup=piety.quit)
+               startup=pysh_startup, stopped=(lambda: _pysh.pexit), 
+               cleanup=piety.quit)
 
 # line editor
 
 def ed_startup():
-    _ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    _ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
 ed = job.Job(session=console,
              application=command.Command(prompt='', handler=_ed.cmd),
@@ -79,7 +83,7 @@ ed = job.Job(session=console,
 # display editor
 
 def edd_startup():
-    _edd.ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    _edd.ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
     _edd.init_display()
 
 edd = job.Job(session=console, 
@@ -93,9 +97,9 @@ def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
-    piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
     console.run(pysh) # start the first job
-    piety.run()  # start event loop, continue until pysh >> exit()
+    piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
+    piety.run() # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':
     main()
