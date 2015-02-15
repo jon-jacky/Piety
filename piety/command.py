@@ -2,7 +2,8 @@
 command.py - Skeleton command line application.
   Collects a command (string), passes it to a handler (callable) to execute.
   Can collect command without blocking, for cooperative multitasking.
-  Provides command history, editing similar to Unix readline, Python raw_input.
+  Provides command history, rudimentary in-line editing similar to Unix readline.
+  Provides optional hooks for job control to stop, start, and switch applications.
  Has a main method, python command.py demonstrates most functions.
 """
 
@@ -54,7 +55,11 @@ class Command(object):
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
         self.new_command = True # cleared by reader, set again by do_command
-
+        # job control commands are *not* passed to handler, only to job control
+        # job control commands baked in for now - could add argument later
+        # job control commands are only effective if job control handles them
+        self.job_control = [ keyboard.C_d ] # just ^D for now, could add more
+        
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
         # Update or reassign keymap to use different keys, methods.
@@ -66,7 +71,7 @@ class Command(object):
             #  string.printable: self.self_append_command,
             # This function requires display terminal with cursor addressing:
             string.printable: self.self_insert_command,
-
+            
             # these entries work on a printing terminal
             keyboard.cr: self.accept_line,
             keyboard.C_c: self.interrupt,
@@ -87,7 +92,8 @@ class Command(object):
             keyboard.delete: self.backward_delete_char,
             keyboard.C_a: self.move_beginning_of_line,
             keyboard.C_b: self.backward_char,
-            keyboard.C_d: self.delete_char, # not end-of-transmission/exit
+            keyboard.C_d: self.handle_C_d, # exit or self.delete_char
+            # keyboard.C_d: self.delete_char
             keyboard.C_e: self.move_end_of_line,
             keyboard.C_f: self.forward_char,
             keyboard.C_k: self.kill_line,
@@ -122,7 +128,11 @@ class Command(object):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print # print command output on new line
-        self.handler(self.command)
+        # job control commands are *not* passed to handler, only to job control
+        # job control command are only effective if job control handles them
+        if not self.command in self.job_control:
+            self.handler(self.command)
+        # else self.command will be handled by job control code elsewhere
         self.new_command = True
 
     def restart(self):
@@ -222,6 +232,18 @@ class Command(object):
         if self.point > 0:
             self.point -= 1
             display.backward_char()
+
+    def handle_C_d(self):
+        """
+        ^D: stop if command string is empty, otherwise delete character.
+        ^D stop is effective only if job control is also configured to handle ^D
+        """
+        if not self.command:
+            terminal.putstr('^D') # do_command below sets line mode, advances line
+            self.command = keyboard.C_d # so job control can find it
+            self.do_command() # so job control can handle it
+        else:
+            self.delete_char() # requires display terminal
 
     def delete_char(self):
         self.command = (self.command[:self.point] + self.command[self.point+1:])

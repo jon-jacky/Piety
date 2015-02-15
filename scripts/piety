@@ -8,10 +8,10 @@ To demonstrate the shell and editors:
 
   $ piety
  pysh shell, type any Python statement, exit() or Ctrl-D to exit
- >> console.run(edc)   # run the ed line editor
+ >> console.run(ed)   # run the ed line editor
  ...
  q                     # exit ed, return to pysh Python shell
- >> console.run(eddc)  # run the edd display editor
+ >> console.run(edd)  # run the edd display editor
  ...
  q
  >> exit()             # exit from pysh Python shell
@@ -52,7 +52,7 @@ cannot use those arrow keys, but it can use the alternatives ^F ^B ^N
 """
 
 import sys
-import piety, session, job, command, key
+import piety, session, job, command, keyboard, key
 
 # rename modules so we can use original module names as command names
 import pysh as _pysh, ed as _ed, edd as _edd
@@ -65,10 +65,10 @@ console = session.Session(name='console', event=sys.stdin)
 def pysh_startup():
     _pysh.pexit = False # enable pysh event loop, compare to Job stopped= below
 
-pysh = job.Job(session=console, application= 
-               command.Command(prompt='>> ', reader=key.Key(), 
-                               handler=_pysh.mk_shell()),
-               startup=pysh_startup, stopped=(lambda: _pysh.pexit), 
+pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=_pysh.mk_shell())
+pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
+               # Enable exit on >> exit() or >> ^D
+               stopped=(lambda: _pysh.pexit or pyshc.command == keyboard.C_d), 
                cleanup=piety.quit)
 
 # line editor
