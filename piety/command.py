@@ -3,7 +3,7 @@ command.py - Skeleton command line application.
   Collects a command (string), passes it to a handler (callable) to execute.
   Can collect command without blocking, for cooperative multitasking.
   Provides command history, rudimentary in-line editing similar to Unix readline.
-  Provides optional hooks for job control to stop, start, and switch applications.
+  Provides optional hooks for job control commands that bypass the application.
  Has a main method, python command.py demonstrates most functions.
 """
 
@@ -270,7 +270,8 @@ c = Command()
 def main():
     global quit
     quit = False # earlier invocation might have set it True
-    while not quit: # default handler echo sets quit=True when command='q'
+    # default handler echo sets quit=True when command='q'
+    while not (quit or c.command == keyboard.C_d): 
         if c.new_command:
             c.restart()
         # default reader terminal.getchar can't handle multi-char control seqs

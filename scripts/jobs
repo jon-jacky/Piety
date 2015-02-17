@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+"""
+jobs - like piety script, demonstrate job control but without the piety scheduler.
+
+Just run the console object (the Session instance) directly on top of Python.
+"""
+
+import sys
+import session, job, command, keyboard, key
+
+# rename modules so we can use original module names as command names
+import pysh as _pysh, ed as _ed, edd as _edd
+
+# event loop control
+
+done = False  # can exit on demand
+
+def quit():
+    'Exit from event loop'
+    global done
+    done = True # must reset to False before we can resume
+
+# Session, a terminal task
+console = session.Session(name='console', event=sys.stdin)
+
+# Python shell
+
+def pysh_startup():
+    _pysh.pexit = False # enable pysh event loop, compare to Job stopped= below
+
+pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=_pysh.mk_shell())
+pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
+               # Enable exit on >> exit() or >> ^D
+               stopped=(lambda: _pysh.pexit or pyshc.command == keyboard.C_d), 
+               cleanup=quit)
+
+# line editor
+
+def ed_startup():
+    _ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
+
+ed = job.Job(session=console,
+             application=command.Command(prompt='', handler=_ed.cmd),
+             startup=ed_startup, stopped=(lambda: _ed.quit))
+              
+# display editor
+
+def edd_startup():
+    _edd.ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
+    _edd.init_display()
+
+edd = job.Job(session=console, 
+               application=
+               command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
+               startup=edd_startup, 
+               stopped=(lambda: _edd.ed.quit), 
+               cleanup=_edd.restore_display)
+
+def main():
+    """
+    Run Python REPL and applications using pysh shell in a Session
+    """
+    global done
+    console.run(pysh) # start the first job
+    done = False # reset, might be resuming after pysh.pexit(), quit()
+    while not done:
+        console.handler()  # block waiting for each single character 
+
+if __name__ == '__main__':
+    main()
