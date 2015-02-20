@@ -29,8 +29,7 @@ class Session(piety.Task):
         """
         self.jobs = collections.deque()
         self.foreground = None
-        super(Session, self).__init__(name=name, event=event, 
-                                      enabled=enabled)
+        super(Session, self).__init__(name=name, event=event, enabled=enabled)
 
     def start(self, job):
         'Put job in the foreground, prepare to run it'

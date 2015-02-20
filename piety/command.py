@@ -47,14 +47,14 @@ class Command(object):
         """
         self.prompt = prompt # string to prompt for command 
         self.reader_body = reader # callable reads char(s) to build command string
-        self.handler = handler # callable that executes command string
+        self.handler_body = handler # callable that executes command string
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
-        self.new_command = True # cleared by reader, set again by do_command
+        self.new_command = True # cleared by reader, set again by handler
         # job control commands are *not* passed to handler, only to job control
         # job control commands baked in for now - could add argument later
         # job control commands are only effective if job control handles them
@@ -124,14 +124,14 @@ class Command(object):
             print keyboard.bel, # sound indicates key not handled
         return key # caller might check for 'q' quit cmd or ...
 
-    def do_command(self):
+    def handler(self):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print # print command output on new line
         # job control commands are *not* passed to handler, only to job control
         # job control command are only effective if job control handles them
         if not self.command in self.job_control:
-            self.handler(self.command)
+            self.handler_body(self.command)
         # else self.command will be handled by job control code elsewhere
         self.new_command = True
 
@@ -149,7 +149,7 @@ class Command(object):
     def accept_line(self):
         self.history.append(self.command) # save command in history list
         self.hindex = len(self.history)-1
-        self.do_command()
+        self.handler()
 
     def interrupt(self):
         # raw mode terminal doesn't respond to ^C, must handle here
@@ -239,9 +239,9 @@ class Command(object):
         ^D stop is effective only if job control is also configured to handle ^D
         """
         if not self.command:
-            terminal.putstr('^D') # do_command below sets line mode, advances line
+            terminal.putstr('^D') # handler below sets line mode, advances line
             self.command = keyboard.C_d # so job control can find it
-            self.do_command() # so job control can handle it
+            self.handler() # so job control can handle it
         else:
             self.delete_char() # requires display terminal
 
@@ -270,7 +270,7 @@ c = Command()
 def main():
     global quit
     quit = False # earlier invocation might have set it True
-    # default handler echo sets quit=True when command='q'
+    # default handler echo sets quit=True when command='q', also enable ^D exit
     while not (quit or c.command == keyboard.C_d): 
         if c.new_command:
             c.restart()
