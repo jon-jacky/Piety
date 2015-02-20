@@ -37,13 +37,17 @@ class Command(object):
     def __init__(self, prompt='> ', reader=terminal.getchar , handler=echo):
         """
         All arguments are optional, with defaults
-        prompt - Prompt string that appears at the start of each line
-          Default is '> '
-        reader - function to call to read char(s) to build command string
-          Default is terminal.getchar, could also read/process multichar sequence
-        handler - function to execute command
-          Can be any callable that takes one argument, a string.
-          Default just echoes the command.
+
+        prompt - Prompt string that appears at the start of each line.
+        Default is '> '.
+
+        reader - function to call to read char(s) to build command
+        string. Default is terminal.getchar, could also read/process
+        multichar sequence.
+
+        handler - function to execute command.  Can be any callable
+        that takes one argument, a string.  Default just echoes the
+        command.
         """
         self.prompt = prompt # string to prompt for command 
         self.reader_body = reader # callable reads char(s) to build command string
