@@ -7,8 +7,10 @@ Also, jobs are named edc and eddc, not just ed and edd.  So console.run(edc) etc
 """
 
 import sys
-import piety, session, job, command, key, pysh, ed, edd
-import terminal # for main loop only
+import piety, session, job, command, key
+
+# rename modules so we can use original module names as command names
+import pysh as _pysh, ed as _ed, edd as _edd
 
 # console session, a Piety task, initially runs Python shell
 # Then use console to run other jobs from shell: console.run(edc) etc.
@@ -17,66 +19,56 @@ console = session.Session(name='console', event=sys.stdin)
 # Python shell
 
 def pysh_startup():
-    pysh.pexit = False # enable event loop, compare to Job( stop=...) arg below
+    _pysh.pexit = False # enable event loop, compare to Job( stop=...) arg below
     print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
 
-pyshcc = command.Command(prompt='>> ', reader=key.Key(), 
-                         handler=pysh.mk_shell())
-pyshc = job.Job(session=console,
-                application=pyshcc,
-                startup=pysh_startup, 
-                restart=pyshcc.restart,
-                reader=pyshcc.reader, 
-                handler_name='do_command',
-                replaced=(lambda: '.run(' in pyshcc.command),
-                stopped=(lambda: pysh.pexit),
-                cleanup=piety.quit)
+pyshc = command.Command(prompt='>> ', reader=key.Key(), handler=_pysh.mk_shell())
+pysh = job.Job(session=console,
+               application=pyshc,
+               startup=pysh_startup, 
+               restart=pyshc.restart,
+               reader=pyshc.reader, 
+               handler_name='do_command',
+               stopped=(lambda: _pysh.pexit),
+               cleanup=piety.quit)
 
 # line editor
 
 def ed_startup():
-    ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    _ed.quit = False # enable event loop, compare to Job( stop=...) arg below
 
 # use default Command reader, terminal.getchar
-edcc = command.Command(prompt='', handler=ed.cmd)
-
-edc = job.Job(session=console,
-              application=edcc,
-              startup=ed_startup, 
-              restart=edcc.restart,
-              reader=edcc.reader,
-              handler_name='do_command',
-              replaced=(lambda: '.run(' in edcc.command),
-              stopped=(lambda: ed.quit))
-
-#alternatively we could use Command default terminal.getchar for reader
-#alternatively we could check string rather than state variable
-#edc.stop = (lambda: edc.command == 'q') # check command string not state variable
+edc = command.Command(prompt='', handler=_ed.cmd)
+ed = job.Job(session=console,
+             application=edc,
+             startup=ed_startup, 
+             restart=edc.restart,
+             reader=edc.reader,
+             handler_name='do_command',
+             stopped=(lambda: _ed.quit))
               
 # display editor
 
 def edd_startup():
-    edd.ed.quit = False # enable event loop, compare to Job( stop=...) arg below
-    edd.init_display()
+    _edd.ed.quit = False # enable event loop, compare to Job( stop=...) arg below
+    _edd.init_display()
 
-eddcc = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
-
-eddc = job.Job(session=console,
-               application=eddcc,
-               startup=edd_startup, 
-               restart=eddcc.restart,
-               reader=eddcc.reader,
-               handler_name='do_command',
-               replaced=(lambda: '.run(' in eddcc.command),
-               stopped=(lambda: edd.ed.quit), 
-               cleanup=edd.restore_display)
+eddc = command.Command(prompt='', reader=key.Key(), handler=_edd.cmd)
+edd = job.Job(session=console,
+              application=eddc,
+              startup=edd_startup, 
+              restart=eddc.restart,
+              reader=eddc.reader,
+              handler_name='do_command',
+              stopped=(lambda: _edd.ed.quit), 
+              cleanup=_edd.restore_display)
 
 def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
-    console.run(pyshc) # start the first job
+    pysh() # start the first job
     piety.run()  # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':

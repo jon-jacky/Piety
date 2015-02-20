@@ -28,25 +28,27 @@ class Session(piety.Task):
         Add jobs later, the foreground job's handler becomes the Task handler
         """
         self.jobs = collections.deque()
+        self.foreground = None
         super(Session, self).__init__(name=name, event=event, 
                                       enabled=enabled)
 
-    # run() the first job before piety.run()
-    def run(self, job):
-        'Add a new job, put it in the foreground, run it'
-        self.jobs.append(job)
-        self.foreground = job
-        self.run_foreground()
-
-    def run_foreground(self):
-        'Initialize the foreground job, then prepare to accept input'
-        self.handler = self.foreground.reader
-        self.foreground() # invokes its command.__call__ 
+    def start(self, job):
+        'Put job in the foreground, prepare to run it'
+        # called from new job's __call__ method which calls its own run method
+        if self.foreground:
+            self.foreground.continues = False # previous job does not continue
+        self.jobs.append(job)             # add new job
+        self.foreground = job             # give it the focus
+        self.handler = self.foreground.reader # make its reader this task's handler
+        self.foreground.continues = True  # new job continues
 
     def stop(self):
         'Foreground job says goodbye, stops, new foreground job runs'
         self.jobs.pop()
         if self.jobs:
+            self.foreground.continues = False
             self.foreground = self.jobs[-1]
-            self.run_foreground()
+            self.handler = self.foreground.reader
+            self.foreground.continues = True
+            self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.

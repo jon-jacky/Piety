@@ -97,7 +97,7 @@ def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
-    console.run(pysh) # start the first job
+    pysh() # start the first job
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
     piety.run() # start event loop, continue until pysh >> exit()
 
