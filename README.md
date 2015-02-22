@@ -56,7 +56,7 @@ Recent projects by others in a similar spirit include
 [STEPS](http://www.vpri.org/pdf/tr2011004_steps11.pdf) in other
 languages.
 
-The Piety modules are organized into these [directories](directories.md)
+The Piety modules are organized into these [directories](directories.md).
 
 Revised February 2015
 

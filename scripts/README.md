@@ -14,7 +14,7 @@ or jobs under the Piety scheduler:
     (task) with three jobs: the *pysh* shell, the *ed* line
     editor, and the *edd* display editor.  The docstring (comment header)
     in this script explains how to create and run concurrent file 
-    file writer tasks from the shell.
+    writer tasks from the shell.
 
 - **piety.no_defaults**: Like the *piety* script, except it uses different
    syntax to define jobs, with no default arguments.

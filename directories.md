@@ -2,8 +2,7 @@
 Piety directories
 =================
 
-Piety is organized into these directories.  Each directory contains a
-*README* file with more information.
+Piety is organized into these directories:
 
 - **applications**: miscellaneous applications
 
@@ -13,7 +12,7 @@ Piety is organized into these directories.  Each directory contains a
 
 - **doc**: notes and documents
 
-- **editors*: text editor applications: *ed* line editor and *edd*
+- **editors**: text editor applications: *ed* line editor and *edd*
     display editor
 
 - **scheduler**: modules that define and schedule tasks, jobs, and
