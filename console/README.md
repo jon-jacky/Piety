@@ -13,5 +13,7 @@ Modules used by terminal applications:
 - **key.py**: Collect, store, return single character or
     multi-character key sequences.
 
+For more explanation of *command*, see [here](../doc/command.md).
+
 Revised February 2015
 

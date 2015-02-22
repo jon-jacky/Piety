@@ -8,7 +8,7 @@ the core of the Piety operating system:
 - **job.py**: Wrapper for application to provide hooks for job control
     from *session*.
 
-- **piety.py**: Piety scheduler and even loop.  Defines the *Task*
+- **piety.py**: Piety scheduler and event loop.  Defines the *Task*
    class and *run* function.  To run tasks in Piety, import the
    *piety* module, create some *piety.Task* instances, then call
    *piety.run*.
