@@ -21,11 +21,8 @@ appears, type main():
 
 """
 
-import sys
-from writer import Writer
-
-import console
 import piety
+from writer import Writer
 
 w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
 

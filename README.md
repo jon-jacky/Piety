@@ -56,35 +56,8 @@ Recent projects by others in a similar spirit include
 [STEPS](http://www.vpri.org/pdf/tr2011004_steps11.pdf) in other
 languages.
 
-This repository contains some notes and experiments in these
-directories.  Each directory contains a *README* file with more
-information.
+The Piety modules are organized into these [directories](directories.md)
 
-- **bin**: shell scripts that configure Piety for various platforms
+Revised February 2015
 
-- **doc**: notes and documents
 
-- **piety**: scheduler, tasks and jobs
-
-- **samples**: sample Python applications to run under the scheduler,
-    including a Python shell, a line editor, and a display editor.
-
-- **scripts**: Python scripts that run applications as tasks or jobs
-    under the Piety sheduler
-
-- **test**: Shell scripts and Python modules for Pyton tests for
-    modules in *piety* and *samples*
-
-- **unix**: Python modules for running Piety on a Unix-like host.
-     We may add directories for other platforms in the future.
-
-- **vt_terminal**: Python modules for running Piety on a VT-100
-    compatible terminal.  We may add directories for other terminals 
-    in the future.
-
-To ensure modularity, modules in *samples* do not import modules in
-*piety*, and vice versa.  Modules in *scripts* may import modules from
-both *samples* and *piety*.  Any modules may import modules from
-*unix* and *vt_terminal*
-
-Revised January 2015

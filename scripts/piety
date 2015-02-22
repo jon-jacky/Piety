@@ -8,23 +8,23 @@ To demonstrate the shell and editors:
 
   $ piety
  pysh shell, type any Python statement, exit() or Ctrl-D to exit
- >> console.run(ed)   # run the ed line editor
+ >> ed()   # run the ed line editor
  ...
- q                     # exit ed, return to pysh Python shell
- >> console.run(edd)  # run the edd display editor
+ q         # exit ed, return to pysh Python shell
+ >> edd()  # run the edd display editor
  ...
  q
- >> exit()             # exit from pysh Python shell
- $                     # back to host shell
+ >> exit() # exit from pysh Python shell
+ $         # back to host shell
 
 To exit, then resume the piety session in a single Python session use python -i :
 
  $ python -i piety
  ...
- >> exit()             # exit from pysh Python shell
- >>>                   # back to host Python shell
- >>> main()            # restart piety script
- >>                    # back to pysh Python shell
+ >> exit()  # exit from pysh Python shell
+ >>>        # back to host Python shell
+ >>> main() # restart piety script
+ >>         # back to pysh Python shell
  ...
 
 To create, start, pause, resume a Piety task from the shell:

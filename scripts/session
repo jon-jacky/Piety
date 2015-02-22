@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """
-jobs - like piety script, demonstrate job control but without the piety scheduler.
+session - works exactly like piety script, see its header for directions
 
-Just run the console object (the Session instance) directly on top of Python.
+Like the piety script EXCEPT it doesn't call the Piety scheduler.
+It just runs multiple jobs in a single session.
 """
 
 import sys
@@ -10,15 +11,6 @@ import session, job, command, keyboard, key
 
 # rename modules so we can use original module names as command names
 import pysh as _pysh, ed as _ed, edd as _edd
-
-# event loop control
-
-done = False  # can exit on demand
-
-def quit():
-    'Exit from event loop'
-    global done
-    done = True # must reset to False before we can resume
 
 # Session, a terminal task
 console = session.Session(name='console', event=sys.stdin)
@@ -32,7 +24,7 @@ pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=_pysh.mk_shell(
 pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
                # Enable exit on >> exit() or >> ^D
                stopped=(lambda: _pysh.pexit or pyshc.command == keyboard.C_d), 
-               cleanup=quit)
+               cleanup=_pysh.exit_pysh)
 
 # line editor
 
@@ -61,9 +53,9 @@ def main():
     Run Python REPL and applications using pysh shell in a Session
     """
     global done
-    console.run(pysh) # start the first job
-    done = False # reset, might be resuming after pysh.pexit(), quit()
-    while not done:
+    pysh() # start the first job
+    _pysh.pexit = False # reset, might be resuming after pysh.pexit(), quit()
+    while not _pysh.pexit:
         console.handler()  # block waiting for each single character 
 
 if __name__ == '__main__':
