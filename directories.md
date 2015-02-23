@@ -4,24 +4,25 @@ Piety directories
 
 Piety is organized into these directories:
 
-- **applications**: miscellaneous applications
+- **applications**: miscellaneous applications.
 
-- **bin**: shell scripts that configure Piety for Unix-like platforms
+- **bin**: shell scripts that configure Piety for Unix-like platforms.
 
-- **console**: modules used by terminal applications
+- **console**: modules used by terminal applications, including a pure
+    Python non-blocking alternative to *readline*.
 
-- **doc**: notes and documents
+- **doc**: notes and documents.
 
-- **editors**: text editor applications: *ed* line editor and *edd*
-    display editor
+- **editors**: a line editor inspired by the classic Unix *ed*, and a
+    new display editor *edd*.
 
 - **scheduler**: modules that define and schedule tasks, jobs, and
-    sessions.
+    sessions.  This is the core of the Piety operating system.
 
 - **scripts**: Python scripts that run applications as tasks or jobs
     under the Piety sheduler.
 
-- **shell**: Python shell application: *pysh*
+- **shell**: Python shell, *pysh*.
 
 - **test**: shell scripts and modules that test code in other
      directories.
@@ -33,8 +34,8 @@ Piety is organized into these directories:
     a VT-100 compatible terminal.  We may add directories for other
     terminals in the future.
 
-Each directory contains a *README* file with more information.  The
-rationale for this organization is explained [here](doc/structure.md).
+Each directory contains a *README* file with more information.
+Another page explains the [rationale](doc/structure.md) for this organization.
 
 Revised February 2015
 

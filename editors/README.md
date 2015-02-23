@@ -2,11 +2,12 @@
 editors
 =======
 
-Text editors:
+Text editors, including a line editor inspired by the classic *Unix ed*, and a
+    new display editor *edd*:
 
 - **ed.md**: description of *ed.py*
 
-- **ed.py**: text editor inspired by the classic Unix editor *ed*
+- **ed.py**: line editor inspired by the classic Unix editor *ed*
 
 - **ed.txt**: command summary for *ed.py*
 

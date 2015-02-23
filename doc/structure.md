@@ -42,11 +42,11 @@ We observe these design rules:
   platform to one particular Python interpreter (usually CPython).
 
 - The modules in *scheduler* directory are the core of the Piety
-  operating system.  They must not depend on any specific platform or
-  device, so they must not depend on modules in *unix*, *vt_terminal*,
-  *console* or in any application directories.  (At this writing the
-  *piety* module violates this rule; it depends on the Unix *select*
-  function.  We will fix this.)
+  operating system.  They must not depend on any specific platform,
+  device, or application, so they must not depend on modules in
+  *unix*, *vt_terminal*, *console* or in any application directories.
+  (At this writing the *piety* module violates this rule; it depends
+  on the Unix *select* function.  We will fix this.)
 
 - The modules in the *console* directory are used by terminal
   applications.  They must be platform- and device- independent.  They

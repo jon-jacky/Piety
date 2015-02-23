@@ -1,0 +1,44 @@
+Editing and history command summary for command.py.  Functions are
+defined in each Command object's keymap.  These are in the default keymap.
+
+Dedicated function keys:
+
+ ret  execute command line
+ bs   delete character before cursor
+ del  delete character before cursor
+ left (arrow key) move cursor back one character
+ right (arrow key) move cursor forward one character
+ up   (arrow key) retrieve previous line from history
+ down (arrow key) retrieve next line from history
+
+Control keys: hold down control key while typing the named key, upper or lowercase
+
+ ^A  move cursor to start of line 
+ ^B  move cursor (b)ack one character
+ ^C  interrupt application, write traceback
+ ^D  (d)elete character under cursor; if line is empty, exit application
+ ^E  move cursor to (e)nd of line
+ ^F  move cursor (f)orward one character
+ ^H  delete character before cursor (like bs)
+ ^J  enter newline to create multi-line input, do not execute command
+ ^K  delete (kill) line from cursor to end
+ ^L  redraw line (useful if line has become garbled with control characters)
+ ^M  execute command (like ret)
+ ^N  retrieve (n)ext line from history
+ ^P  retrieve (p)revious line from history
+ ^U  discard line, start over with an empty line
+
+Printing characters are inserted before the cursor.
+Unhandled control characters ring the bell.
+
+^D only exits application if job control has also been programmed to recognize it.
+
+These functions require a display terminal with cursor addressing:
+ left right ^A ^B ^D ^E ^F ^K
+These keys must be removed from the keymap for printing terminals.
+There is an alternate method to put in the keymap to support bs del ^H
+ on printing terminals, by printing \x to indicate x has been deleted.
+
+Revised February 2015
+
+

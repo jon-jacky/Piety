@@ -28,7 +28,8 @@ are not designed to cooperate in this way --- instead they take over
 the Python session, postponing all other tasks.  However, it may be
 possible to adapt some of them.
 
-The following sections describe the modules in the *piety* directory.
+The following sections describe the modules in the *scheduler* directory.
+This is the core of the Piety operating system.
 
 ### piety.py ###
 
