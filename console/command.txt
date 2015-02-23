@@ -1,5 +1,7 @@
-Editing and history command summary for command.py.  Functions are
-defined in each Command object's keymap.  These are in the default keymap.
+Commands to edit the command line and access its history in any
+application that uses console.py.  Similar to Unix readline.
+Functions are assigned to keys in each Command object's keymap.  These
+are in the default keymap.
 
 Dedicated function keys:
 
@@ -40,5 +42,3 @@ There is an alternate method to put in the keymap to support bs del ^H
  on printing terminals, by printing \x to indicate x has been deleted.
 
 Revised February 2015
-
-

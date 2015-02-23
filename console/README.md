@@ -11,7 +11,9 @@ non-blocking alternative to *readline*:
   Provides command history, rudimentary in-line editing similar to Unix readline.
   Provides optional hooks for job control commands that bypass the application.
 
-- **command.txt**: editing and history command summary for *command.py*
+- **command.txt**: command summary for *command.py*, similar to Unix
+   *readline*.  How to edit the command line and access its history
+   in any application the uses *console.py*
 
 - **key.py**: Collect, store, return single character or
     multi-character key sequences.
