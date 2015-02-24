@@ -31,8 +31,9 @@ Piety is organized into these directories:
      We may add directories for other platforms in the future.
 
 - **vt_terminal**: modules for running Piety terminal applications on
-    a VT-100 compatible terminal.  We may add directories for other
-    terminals in the future.
+    a VT-100 compatible terminal or terminal emulator program (for
+    example *xterm*).  We may add directories for other terminal types in
+    the future.
 
 Each directory contains a *README* file with more information.
 Another page explains the [rationale](doc/structure.md) for this organization.
