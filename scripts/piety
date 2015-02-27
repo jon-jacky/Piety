@@ -82,9 +82,9 @@ ed = job.Job(session=console,
               
 # display editor
 
-def edd_startup():
+def edd_startup(*filename, **options):
     _edd.ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
-    _edd.init_display()
+    _edd.init_display(*filename, **options)
 
 edd = job.Job(session=console, 
                application=

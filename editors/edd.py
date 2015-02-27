@@ -17,6 +17,7 @@ nlines, ncols = terminal.dimensions()
 win_1 = 1 # line number on display of first line of buffer text window
 status_h = 1 # height (lines) of buffer status, now just a status line
 cmd_h = 2  # height (lines) of scrolling command region at the bottom
+prompt = '' # command prompt
 
 # The following depend on the preceding, are all updated by functions below:
 
@@ -192,8 +193,18 @@ def update_window(bufname):
     # else input mode, update_display will put cursor at open input line
     display_status(bufname)
 
-def init_display():
-    'Clear and render entire display, set scrolling region, place cursor'
+def init_display(*filename, **options):
+    """
+    Clear and render entire display, set scrolling region, place cursor
+    Process optional arguments: filename, options if present
+    """
+    global prompt, cmd_h
+    if filename:
+        ed.e(filename[0])
+    if 'p' in options:
+        prompt = options['p'] 
+    if 'n' in options:
+        cmd_h = options['n'] 
     calc_layout() # initialize cmd_1, cmd_n etc.
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
@@ -251,19 +262,17 @@ def cmd(line):
 
 line = None # This must be global so text_changed() can test it
 
-def main(scroll_h=cmd_h):
+def main(*filename, **options):
     """
     Top level edd command to invoke from python prompt or command line.
     Won't cooperate with Piety scheduler, calls blocking command raw_input.
-    scroll_h arg sets n of lines in bottom scrolling region, defaults to cmd_h
     """
-    global line, cmd_h
-    cmd_h = scroll_h
-    init_display()
-    line = '' # anything but 'q', must replace 'q' from previous quit
+    global line
     ed.quit = False # allow restart
+    init_display(*filename, **options)
+    line = '' # anything but 'q', must replace 'q' from previous quit
     while not ed.quit:
-        line = raw_input() # blocking. no prompt - make prompt a parameter?
+        line = raw_input(prompt) # blocking
         cmd(line) # no blocking
     restore_display()
 
