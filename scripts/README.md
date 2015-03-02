@@ -3,7 +3,8 @@ scripts
 =======
 
 This directory contains Python scripts that run applications as tasks
-or jobs under the Piety scheduler:
+or jobs under the Piety scheduler.  See docstrings (comment headers)
+and inline comments in each module for directions and explanations:
 
 - **embedded**: Runs the Piety scheduler with two concurrent file writer
    tasks, but without an interactive interpreter.  Shows that Piety
@@ -12,14 +13,13 @@ or jobs under the Piety scheduler:
 
 - **piety**: Runs the Piety scheduler on a single console session
     (task) with three jobs: the *pysh* shell, the *ed* line
-    editor, and the *edd* display editor.  The docstring (comment header)
-    in this script explains how to create and run concurrent file 
-    writer tasks from the shell.
+    editor, and the *edd* display editor.  Demonstrates different
+    techniques for naming, invoking, exiting, editing jobs.
 
-- **piety.no_defaults**: Like the *piety* script, except it uses different
+- **piety.no_defaults**: Similar to  *piety* script, except it uses different
    syntax to define jobs, with no default arguments.
 
-- **session**: Like the *piety* script, except it runs just the console
+- **session**: Similar to *piety* script, except it runs just the console
     session and its three jobs without the Piety scheduler.  
 
 Revised February 2015
