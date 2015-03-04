@@ -98,10 +98,10 @@ def tasks():
         else:
             return oname(e)
         
-    print """  i  name  enabled              n  event            handler
-  -  ----  -------              -  -----            -------"""
+    print """  i     name  enabled              n  event            handler
+  -     ----  -------              -  -----            -------"""
     for t in tasks_list:
-        print '%3d %5s  %-15s  %5d  %-15s  %-15s' % \
+        print '%3d %8s  %-15s  %5d  %-15s  %-15s' % \
             (t.taskno, t.name, oname(t.enabled), 
              ievent[t.event], ename(t.event), oname(t.handler))
 

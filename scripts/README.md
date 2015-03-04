@@ -13,11 +13,13 @@ and inline comments in each module for directions and explanations:
 
 - **piety**: Runs the Piety scheduler on a single console session
     (task) with three jobs: the *pysh* shell, the *ed* line
-    editor, and the *edd* display editor.  Demonstrates different
-    techniques for naming, invoking, exiting, editing jobs.
-
+    editor, and the *edd* display editor.  Also creates (but does 
+    not start) two file writer tasks.  Demonstrates different
+    techniques for naming, invoking, exiting, editing jobs and tasks.
+    
 - **piety.no_defaults**: Similar to  *piety* script, except it uses different
-   syntax to define jobs, with no default arguments.
+   syntax to define jobs, with no default arguments.  Does not create
+   file writer tasks (but they are easy to create "by hand" in the pysh shell).
 
 - **session**: Similar to *piety* script, except it runs just the console
     session and its three jobs without the Piety scheduler.  

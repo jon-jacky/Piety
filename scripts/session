@@ -3,6 +3,7 @@
 piety.no_defaults - similar to piety script, also creates jobs pysh ed edd
  
 Similar to piety script EXCEPT no Piety scheduler - just uses ordinary while loop.
+No piety scheduler, so this runs terminal jobs only; there are no writer tasks.
 
 Some differences from piety script and limitations: 
 Line editor command is ed not edc

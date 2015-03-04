@@ -3,7 +3,9 @@
 piety - Demonstrates how to run applications with the Piety scheduler.
  
 This script runs the pysh shell and the ed and edd editors as jobs in
-a session under the Piety scheduler.  See comments below for more explanation.
+a terminal session under the Piety scheduler.  Also creates but does
+not start two file writer tasks.  See comments below and inline for
+more explanation.
 
 This script start the pysh Python shell, with the prompt >>  (two not three >).
 When editing the pysh command line, control keys and arrow keys work.
@@ -16,11 +18,18 @@ Exit ed with the q command, ^D does not work.
 To start edd display editor: edd() or edd('README.md') or main.edd('README.md') ...
 When editing the edd command line, control keys and arrow keys work.
 Exit edd with the q command or ^D.
+
+To start w0 file writer task: w0.enabled=piety.true, to stop it again ...=...false
+To see the file writing, tail -f w0.txt in another terminal window.  Ditto w1.
+
+To see list of tasks including terminal session and two writers: piety.tasks()
 """
 
 import sys
 import piety, session, job, command, keyboard, key
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
+import writer
+
 
 class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
@@ -84,6 +93,17 @@ edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
 # Make edd.main an alias for edd.__call__ so we can call edd.main(...) using
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
+
+
+# File writer tasks. These are not terminal jobs.
+
+# Create but do not start file writer tasks.
+# Set enabled=...false so these tasks do not run when piety scheduler starts.
+w = writer.Writer(fname='w0.txt') # writes to w0.txt in current directory
+w0 = piety.Task(handler=w.write,event=piety.timeout,enabled=piety.false)
+w1 = piety.Task(name='w1', handler=writer.Writer(fname='w1.txt').write,
+                event=piety.timeout,enabled=piety.false)
+
 
 def main():
     """

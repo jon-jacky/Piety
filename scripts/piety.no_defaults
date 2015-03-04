@@ -8,6 +8,8 @@ Some differences from piety script and limitations:
 Line editor command is ed not edc
 Must call ed() or edd() without arguments, ed('README.md') etc. does not work
 Must exit ed and edd with q, exit pysh with exit(), ^D exit does not work
+Does not create file writer tasks (but they are easy to create "by
+ hand" in the pysh shell).
 """
 
 import sys
