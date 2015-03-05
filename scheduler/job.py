@@ -80,15 +80,15 @@ class Job(object):
         else:  # this job does not continue, instead new job takes over
             return  # do not restart this job
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         'Switch jobs, execute startup function if it exists, then restart reader'
         self.session.start(self)
-        self.run()
+        self.run(*args, **kwargs)
 
-    def run(self):
+    def run(self, *args, **kwargs):
         'Execute startup function if it exists, then restart reader'
         if self.startup:
-            self.startup() 
+            self.startup(*args, **kwargs) 
         if self.restart:
             self.restart()
 

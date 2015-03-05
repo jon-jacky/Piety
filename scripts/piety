@@ -1,61 +1,38 @@
 #!/usr/bin/env python
 """
-piety - Run pysh shell, ed and edd editors in a Session under Piety scheduler
- Use command and key modules instead of Python raw_input to get command line.
- This script is named piety (with no file type) so no name clash with piety.py
+piety - Demonstrates how to run applications with the Piety scheduler.
+ 
+This script runs the pysh shell and the ed and edd editors as jobs in
+a terminal session under the Piety scheduler.  Also creates but does
+not start two file writer tasks.  See comments below and inline for
+more explanation.
 
-To demonstrate the shell and editors:
+This script start the pysh Python shell, with the prompt >>  (two not three >).
+When editing the pysh command line, control keys and arrow keys work.
+Exit the pysh shell with exit() or ^D.
 
-  $ piety
- pysh shell, type any Python statement, exit() or Ctrl-D to exit
- >> ed()   # run the ed line editor
- ...
- q         # exit ed, return to pysh Python shell
- >> edd()  # run the edd display editor
- ...
- q
- >> exit() # exit from pysh Python shell
- $         # back to host shell
+To start ed line editor, use edc not ed: edc() or edc('README.md') etc., 
+When editing the ed command line, control keys work but and arrow keys do not work.
+Exit ed with the q command, ^D does not work.
 
-To exit, then resume the piety session in a single Python session use python -i :
+To start edd display editor: edd() or edd('README.md') or main.edd('README.md') ...
+When editing the edd command line, control keys and arrow keys work.
+Exit edd with the q command or ^D.
 
- $ python -i piety
- ...
- >> exit()  # exit from pysh Python shell
- >>>        # back to host Python shell
- >>> main() # restart piety script
- >>         # back to pysh Python shell
- ...
+To start w0 file writer task: w0.enabled=piety.true, to stop it again ...=...false
+To see the file writing, tail -f w0.txt in another terminal window.  Ditto w1.
 
-To create, start, pause, resume a Piety task from the shell:
-
- ...
- >> w0 = writer.Writer(fname='w0.txt')
- >> t0 = piety.Task(name='w0',handler=w0.write,event=piety.timeout,enabled=piety.true)
- ... in another terminal window, tail -f w0.txt shows writer is writing to w0.txt
- >> piety.tasks()
- ... shows console and writer tasks 
- >> t0.enabled = piety.false
- ... w0.txt stops growing
- >> t0.enabled = piety.true
- ... w0.txt resumes growing
-
-This script demonstrates how a different keyboard reader can be
-selected for each terminal job.  This script configures the shell and
-display editor jobs using the input reader from the key module, so
-these jobs can use some keys that send multi-character control
-sequences (such the four keyboard arrow keys in the lower right corner
-of the MacBook Pro keyboard).  The line editor is configured with the
-default reader that just handles single-character keycodes, so it
-cannot use those arrow keys, but it can use the alternatives ^F ^B ^N
-^P which send single-character codes.
+To see list of tasks including terminal session and two writers: piety.tasks()
 """
 
 import sys
 import piety, session, job, command, keyboard, key
+import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
+import writer
 
-# rename modules so we can use original module names as command names
-import pysh as _pysh, ed as _ed, edd as _edd
+
+class Namespace(object): pass # another way to avoid name clashes
+jobs = Namespace()
 
 # Session, a terminal task
 console = session.Session(name='console', event=sys.stdin)
@@ -63,41 +40,76 @@ console = session.Session(name='console', event=sys.stdin)
 # Python shell
 
 def pysh_startup():
-    _pysh.pexit = False # enable pysh event loop, compare to Job stopped= below
+    pysh.pexit = False # enable pysh event loop, compare to Job stopped= below
 
-pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=_pysh.mk_shell())
-pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
-               # Enable exit on >> exit() or >> ^D
-               stopped=(lambda: _pysh.pexit or pyshc.command == keyboard.C_d), 
-               cleanup=piety.quit)
+# Name the command pyshc to avoid name clash with pysh module
+# Assign reader=key.Key that handles some multicharacter control sequences
+#  so 
+pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=pysh.mk_shell())
+
+# Put pysh job in the jobs namespace to avoid name clash with pysh module
+# stopped=... enables exit on exit() command or ^D
+jobs.pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
+                    stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
+                    cleanup=piety.quit)
 
 # line editor
 
-def ed_startup():
-    _ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
+# startup function handles optional filename argument and optional keyword arg.
+def ed_startup(*filename, **options):
+    if filename:
+        ed.e(filename[0])
+    if 'p' in options:
+        ed.application.prompt = options['p'] 
+    ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
-ed = job.Job(session=console,
-             application=command.Command(prompt='', handler=_ed.cmd),
-             startup=ed_startup, stopped=(lambda: _ed.quit))
+# Name the job edc to avoid name clash with ed module.
+# Use default reader, not key.Key, so multicharacter control sequences
+#  (such as keyboard arrow keys) will not work.
+# Exit with q only, ^D exit is not enabled
+edc = job.Job(session=console,
+              application=command.Command(prompt='', handler=ed.cmd),
+              startup=ed_startup, stopped=(lambda: ed.quit))
               
 # display editor
 
-def edd_startup():
+# startup function handles optional filename argument and optional keyword arg.
+def edd_startup(*filename, **options):
     _edd.ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
-    _edd.init_display()
+    if 'p' in options:
+        edd.application.prompt = options['p'] #edd *not* _edd, Piety command object
+    _edd.init_display(*filename, **options) # _ed.prompt is not used by Piety
 
+# edd module was imported as _edd so we can call the job edd without name clash
 edd = job.Job(session=console, 
-               application=
-               command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
-               startup=edd_startup, 
-               stopped=(lambda: _edd.ed.quit), 
-               cleanup=_edd.restore_display)
+              application=
+              command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
+              startup=edd_startup, 
+              cleanup=_edd.restore_display)
+
+# Enable exit with q or ^D, must use separate statement so application has a name
+edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
+
+# Make edd.main an alias for edd.__call__ so we can call edd.main(...) using
+#  exactly the same syntax as when we import edd.py into Python without Piety
+edd.main = edd.__call__
+
+
+# File writer tasks. These are not terminal jobs.
+
+# Create but do not start file writer tasks.
+# Set enabled=...false so these tasks do not run when piety scheduler starts.
+w = writer.Writer(fname='w0.txt') # writes to w0.txt in current directory
+w0 = piety.Task(handler=w.write,event=piety.timeout,enabled=piety.false)
+w1 = piety.Task(name='w1', handler=writer.Writer(fname='w1.txt').write,
+                event=piety.timeout,enabled=piety.false)
+
 
 def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     """
-    pysh() # start the first job
+    jobs.pysh() # start the first job, recall pysh is in jobs namespace
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
     piety.run() # start event loop, continue until pysh >> exit()
 

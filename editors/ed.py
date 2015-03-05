@@ -458,15 +458,21 @@ def cmd(line):
             ed0.a(o(), line + '\n') # append new line after dot, advance dot
         return
 
-def main():
+prompt = '' # default no prompt
+
+def main(*filename, **options):
     """
     Top level ed command to use at Python prompt.
     This version won't work in Piety, it calls blocking command raw_input
     """
-    global cmd_name, quit
+    global cmd_name, quit, prompt
     quit = False # allow restart
+    if filename:
+        e(filename[0])
+    if 'p' in options:
+        prompt = options['p'] 
     while not quit:
-        line = raw_input() # blocking. no prompt - make prompt a parameter?
+        line = raw_input(prompt) # blocking
         cmd(line) # non-blocking
 
 # Run the editor from the system command line:  python ed.py

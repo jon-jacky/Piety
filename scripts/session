@@ -1,9 +1,14 @@
 #!/usr/bin/env python
 """
-session - works exactly like piety script, see its header for directions
+piety.no_defaults - similar to piety script, also creates jobs pysh ed edd
+ 
+Similar to piety script EXCEPT no Piety scheduler - just uses ordinary while loop.
+No piety scheduler, so this runs terminal jobs only; there are no writer tasks.
 
-Like the piety script EXCEPT it doesn't call the Piety scheduler.
-It just runs multiple jobs in a single session.
+Some differences from piety script and limitations: 
+Line editor command is ed not edc
+Must call ed() or edd() without arguments, ed('README.md') etc. does not work
+Must exit ed and edd with q, exit pysh with exit(), ^D exit does not work
 """
 
 import sys
@@ -55,6 +60,7 @@ def main():
     global done
     pysh() # start the first job
     _pysh.pexit = False # reset, might be resuming after pysh.pexit(), quit()
+    # No Piety scheduler - instead just use an ordinary while loop 
     while not _pysh.pexit:
         console.handler()  # block waiting for each single character 
 

@@ -1,9 +1,15 @@
 #!/usr/bin/env python
 """
-piety.no_defaults - works exactly like piety script, see its header for directions
+piety.no_defaults - similar to piety script, also creates jobs pysh ed edd
  
-Like the piety script EXCEPT the calls to the Job initializer use no defaults.
-Also, jobs are named edc and eddc, not just ed and edd.  So console.run(edc) etc.
+Like the piety script EXCEPT the calls to the Job initializers use no defaults.
+
+Some differences from piety script and limitations: 
+Line editor command is ed not edc
+Must call ed() or edd() without arguments, ed('README.md') etc. does not work
+Must exit ed and edd with q, exit pysh with exit(), ^D exit does not work
+Does not create file writer tasks (but they are easy to create "by
+ hand" in the pysh shell).
 """
 
 import sys
@@ -28,7 +34,7 @@ pysh = job.Job(session=console,
                startup=pysh_startup, 
                restart=pyshc.restart,
                reader=pyshc.reader, 
-               handler_name='do_command',
+               handler_name='handler',
                stopped=(lambda: _pysh.pexit),
                cleanup=piety.quit)
 
@@ -44,7 +50,7 @@ ed = job.Job(session=console,
              startup=ed_startup, 
              restart=edc.restart,
              reader=edc.reader,
-             handler_name='do_command',
+             handler_name='handler',
              stopped=(lambda: _ed.quit))
               
 # display editor
@@ -59,7 +65,7 @@ edd = job.Job(session=console,
               startup=edd_startup, 
               restart=eddc.restart,
               reader=eddc.reader,
-              handler_name='do_command',
+              handler_name='handler',
               stopped=(lambda: _edd.ed.quit), 
               cleanup=_edd.restore_display)
 
