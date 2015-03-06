@@ -71,7 +71,7 @@ remain, so the editing session can be resumed at any time by typing
 *ed.main()* again.
 
 The *ed.main()* function takes one optional positional argument, the
-file name, and one optional keyword argument, the command prompt
+file name, and one optional keyword argument, *p* the command prompt
 string.  Type *ed.main('test.txt')* to begin editing *test.txt*, as if
 you had typed *ed.main()* and then *e('test.txt')*.  Type
 *ed.main(':')* to use a single colon as the command prompt (the
@@ -193,4 +193,4 @@ There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-Revised October 2014
+Revised February 2015

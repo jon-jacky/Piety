@@ -54,14 +54,13 @@ default prompt is the empty string).  Type *edd.main(h=8)* to make an eight line
 scrolling region.  The argument and options can
 appear together, so you can type *edd.main('test.txt', p=':', h=8)*.
 
-By default, the *edd* command region displays just two lines.  But
-this is usually not enough to show all of the output from some *edd*
-commands, for example *n* (list buffers).  Use the *h* option (above)
-to show more lines.  Or, to change the number of lines during an editing session:
-*!edd.cmd_h = 8*.
+By default, the *edd* scrolling command region displays just two
+lines.  But this is usually not enough to show all of the output from
+some *edd* commands, for example *n* (list buffers).  Use the *h*
+option (above) to show more lines.  Or, to change the number of lines
+during an editing session: *!edd.cmd_h = 8*.
 
 **edd** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
 
-Revised October 2014
-
+Revised February 2015
