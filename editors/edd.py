@@ -203,8 +203,8 @@ def init_display(*filename, **options):
         ed.e(filename[0])
     if 'p' in options:
         prompt = options['p'] 
-    if 'n' in options:
-        cmd_h = options['n'] 
+    if 'h' in options:
+        cmd_h = options['h'] 
     calc_layout() # initialize cmd_1, cmd_n etc.
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 

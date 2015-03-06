@@ -45,9 +45,9 @@ The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
 and [http://sam.cat-v.org/](http://sam.cat-v.org/).
 
-**ed.py** can run as a standalone program: *python ed.py*.  But *ed* is
-intended to run in an interactive Python session.  Here is a brief
-example:
+**ed.py** can run as a standalone program: *python ed.py* (it takes no
+command line options or arguments).  But *ed* is intended to run in an
+interactive Python session.  Here is a brief example:
 
     >>> import ed
     >>> ed.main()
@@ -70,9 +70,19 @@ After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by typing
 *ed.main()* again.
 
-In *!command*, the *command* is passed to the Python interpreter, not 
-to the system command shell as in classic *ed*.  Use this
-to execute Python statements without leaving *ed* command mode.
+The *ed.main()* function takes one optional positional argument, the
+file name, and one optional keyword argument, the command prompt
+string.  Type *ed.main('test.txt')* to begin editing *test.txt*, as if
+you had typed *ed.main()* and then *e('test.txt')*.  Type
+*ed.main(':')* to use a single colon as the command prompt (the
+default prompt is the empty string).  The file name and prompt can
+appear together, so you can type *ed.main('test.txt', p=':')*.
+
+In *!command*, the *command* is passed to the Python interpreter, not
+to the system command shell as in classic *ed*.  Use this to execute
+Python statements without leaving *ed* command mode.  For example, you
+can use this to change the command prompt during an editing session:
+*!ed.prompt = ':'*
 
 ## API ##
 
