@@ -73,15 +73,15 @@ remain, so the editing session can be resumed at any time by typing
 The *ed.main()* function takes one optional positional argument, the
 file name, and one optional keyword argument, *p* the command prompt
 string.  Type *ed.main('test.txt')* to begin editing *test.txt*, as if
-you had typed *ed.main()* and then *e('test.txt')*.  Type
-*ed.main(':')* to use a single colon as the command prompt (the
+you had typed *ed.main()* and then *e test.txt*.  Type
+*ed.main(p=':')* to use a single colon as the command prompt (the
 default prompt is the empty string).  The file name and prompt can
 appear together, so you can type *ed.main('test.txt', p=':')*.
 
 In *!command*, the *command* is passed to the Python interpreter, not
 to the system command shell as in classic *ed*.  Use this to execute
 Python statements without leaving *ed* command mode.  For example, you
-can use this to change the command prompt during an editing session:
+can use this to change the command prompt at any time during an editing session:
 *!ed.prompt = ':'*
 
 ## API ##
