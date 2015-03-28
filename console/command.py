@@ -34,7 +34,7 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='> ', reader=terminal.getchar , handler=echo):
+    def __init__(self, prompt='> ', reader=terminal.getchar, handler=echo):
         """
         All arguments are optional, with defaults
 

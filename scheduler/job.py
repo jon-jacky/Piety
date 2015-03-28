@@ -16,9 +16,9 @@ class Job(object):
         The values assigned to most arguments are application
         callables (functions or methods).
 
-        In general it is not necessary that these have values have
+        In general it is not necessary that the application callables have
         particular names, BUT some of the defaults here do assume they
-        have particular names: the ones used in the Command class, so
+        have particular names: the same names used in the Command class, so
         the defaults will work when the application is a Command
         instance, or uses the same method names.  If the application
         does not use these method names, these defaults will not work,

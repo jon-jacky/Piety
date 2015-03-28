@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+"""
+ed.commandline - Run an ed line editor session, wrap ed in CommandLine object
+"""
+
+import ed, commandline
+
+edc = commandline.CommandLine(prompt='',  handler=ed.cmd)
+
+def main():
+    ed.quit = False # previous exit have made it True
+    while not ed.quit:
+        command = raw_input(edc.prompt)
+        edc.reader(command) # exit() sets psysh.pexit = True, forces exit
+            
+if __name__ == '__main__':
+    main()

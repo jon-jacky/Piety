@@ -44,7 +44,6 @@ def pysh_startup():
 
 # Name the command pyshc to avoid name clash with pysh module
 # Assign reader=key.Key that handles some multicharacter control sequences
-#  so 
 pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=pysh.mk_shell())
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
@@ -60,7 +59,7 @@ def ed_startup(*filename, **options):
     if filename:
         ed.e(filename[0])
     if 'p' in options:
-        ed.application.prompt = options['p'] 
+        edc.application.prompt = options['p'] 
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
 # Name the job edc to avoid name clash with ed module.
@@ -111,6 +110,7 @@ def main():
     """
     jobs.pysh() # start the first job, recall pysh is in jobs namespace
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
+                       # FIXME - doesn't pysh_startup do this also?
     piety.run() # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':
