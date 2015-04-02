@@ -77,7 +77,7 @@ edd.stopped=(lambda: _edd.ed.quit)
 edd.main = edd.__call__
 
 #
-# Twisted
+# Twisted, use this instead of the piety scheduler
 #
 
 from twisted.internet import stdio, reactor
