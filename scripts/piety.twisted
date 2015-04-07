@@ -21,6 +21,7 @@ from twisted.protocols import basic
 import piety # we still use Piety Task class, schedule data structure etc.
 import session, job, commandline
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
+from writer import Writer # applications
 
 class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
@@ -81,11 +82,26 @@ edd.stopped=(lambda: _edd.ed.quit)
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
 
+# File writer tasks
+
+w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
+
+# use this for t1.guard
+def alternate():
+    'Return True on every other timeout event.'
+    return bool(piety.ievent[piety.timeout]%2)
+
+# writer tasks assigned guard=(lambda:False) so they don't start running
+t0 = piety.Task(handler=w0.write,event=piety.timeout,enabled=piety.true)
+t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
+
 #
 # Twisted, use this instead of the piety scheduler
 #
 
 class Console(basic.LineReceiver):
+    'Twisted-style handler for input from stdin'
+
     from os import linesep as delimiter
 
     # Must provide methods with these names (override basic.Linereceiver)
@@ -102,6 +118,32 @@ class Console(basic.LineReceiver):
         # interval = adjust_interval(t0, interval) # I think we don't need this
         if pysh.pexit:
             reactor.stop()
+
+class Timeout(object):
+    'Twisted-style timeout handler'
+
+    def __init__(self):
+        self.period = 1 # second, same as embedded script.
+        self.nevents = 10 # same as embedded script
+
+    def handler(self):
+        if False and piety.ievent[piety.timeout] == self.nevents:
+            # Now we use pysh.exit to stop, in Console lineReceived handler
+            reactor.stop()
+        else:
+            # handle scheduled timeout events
+            if piety.timeout in piety.schedule:
+                for t in piety.schedule[piety.timeout]:
+                    if t.enabled():
+                        t.handler()
+            else:
+                pass # if no timeout handler, just continue
+            # count events and schedule next timeout
+            piety.ievent[piety.timeout] += 1
+            interval = self.period # if we got here, full interval has elapsed
+            reactor.callLater(interval, self.handler)
+
+reactor.callWhenRunning(Timeout().handler)  # should this go in main() - ?
 
 def main():
     """
