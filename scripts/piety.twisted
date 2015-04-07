@@ -13,7 +13,12 @@ BUT this only provides rudimentary inline editing: backspace and ^U
 Also, ^D does not exit from editors or shell - it just hangs.
 """
 
-import sys
+import sys # for sys.stdin
+
+from twisted.internet import stdio, reactor
+from twisted.protocols import basic
+
+import piety # we still use Piety Task class, schedule data structure etc.
 import session, job, commandline
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
 
@@ -80,11 +85,11 @@ edd.main = edd.__call__
 # Twisted, use this instead of the piety scheduler
 #
 
-from twisted.internet import stdio, reactor
-from twisted.protocols import basic
-
 class Console(basic.LineReceiver):
     from os import linesep as delimiter
+
+    # Must provide methods with these names (override basic.Linereceiver)
+    # FIXME - is this comment true?
 
     def connectionMade(self):
         jobs.pysh() # start the first Piety job, begin prompting
@@ -93,6 +98,8 @@ class Console(basic.LineReceiver):
     def lineReceived(self, line):
         console.handler(line) #  call Piety Session
         sys.stdout.flush() # show prompt
+        piety.ievent[sys.stdin] += 1 # count events
+        # interval = adjust_interval(t0, interval) # I think we don't need this
         if pysh.pexit:
             reactor.stop()
 
