@@ -28,8 +28,7 @@ To see list of tasks including terminal session and two writers: piety.tasks()
 import sys
 import piety, session, job, command, keyboard, key
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
-import writer
-
+import writer_tasks
 
 class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
@@ -93,16 +92,8 @@ edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
 
-
-# File writer tasks. These are not terminal jobs.
-
-# Create but do not start file writer tasks.
-# Set enabled=...false so these tasks do not run when piety scheduler starts.
-w = writer.Writer(fname='w0.txt') # writes to w0.txt in current directory
-w0 = piety.Task(handler=w.write,event=piety.timeout,enabled=piety.false)
-w1 = piety.Task(name='w1', handler=writer.Writer(fname='w1.txt').write,
-                event=piety.timeout,enabled=piety.false)
-
+# Piety Writer tasks in writer_tasks module don't appear explicitly here - 
+# they are referenced by the piety.schedule data structure
 
 def main():
     """

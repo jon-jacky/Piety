@@ -21,7 +21,7 @@ from twisted.protocols import basic
 import piety # we still use Piety Task class, schedule data structure etc.
 import session, job, commandline
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
-from writer import Writer # applications
+import writer_tasks
 
 class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
@@ -82,18 +82,8 @@ edd.stopped=(lambda: _edd.ed.quit)
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
 
-# File writer tasks
-
-w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
-
-# use this for t1.guard
-def alternate():
-    'Return True on every other timeout event.'
-    return bool(piety.ievent[piety.timeout]%2)
-
-# writer tasks assigned guard=(lambda:False) so they don't start running
-t0 = piety.Task(handler=w0.write,event=piety.timeout,enabled=piety.true)
-t1 = piety.Task(handler=w1.write,event=piety.timeout,enabled=alternate)
+# Piety Writer tasks in writer_tasks module don't appear explicitly here - 
+# they are referenced by the piety.schedule data structure
 
 #
 # Twisted, use this instead of the piety scheduler
@@ -143,13 +133,12 @@ class Timeout(object):
             interval = self.period # if we got here, full interval has elapsed
             reactor.callLater(interval, self.handler)
 
-reactor.callWhenRunning(Timeout().handler)  # should this go in main() - ?
-
 def main():
     """
     Run Python REPL and applications using pysh shell in a Session
     in a non-blocking event loop scheduled by Twisted
     """
+    reactor.callWhenRunning(Timeout().handler)  # should this go in main() - ?
     stdio.StandardIO(Console())
     reactor.run()
 
