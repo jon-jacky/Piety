@@ -43,7 +43,6 @@ def main():
     """
     jobs.pysh() # start the first job, recall pysh is in jobs namespace
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
-                       # FIXME - doesn't pysh_startup do this also?
     piety.run() # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':
