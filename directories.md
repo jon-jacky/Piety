@@ -27,6 +27,9 @@ Piety is organized into these directories:
 - **test**: shell scripts and modules that test code in other
      directories.
 
+- **twisted**: Python scripts that run applications as tasks or jobs
+    under the Twisted reactor instead of the Piety sheduler.
+
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.
 
