@@ -1,28 +1,11 @@
 #!/usr/bin/env python
 """
-piety - Demonstrates how to run applications with the Piety scheduler.
- 
-This script runs the pysh shell and the ed and edd editors as jobs in
-a terminal session under the Piety scheduler.  Also creates but does
-not start two file writer tasks.  See comments below and inline for
-more explanation.
+piety - Uses the Piety scheduler to run the console session with
+  three jobs created by console_tasks, concurrently with the two
+  writer tasks created by writer_tasks.
 
-This script start the pysh Python shell, with the prompt >>  (two not three >).
-When editing the pysh command line, control keys and arrow keys work.
-Exit the pysh shell with exit() or ^D.
-
-To start ed line editor, use edc not ed: edc() or edc('README.md') etc., 
-When editing the ed command line, control keys work but and arrow keys do not work.
-Exit ed with the q command, ^D does not work.
-
-To start edd display editor: edd() or edd('README.md') or main.edd('README.md') ...
-When editing the edd command line, control keys and arrow keys work.
-Exit edd with the q command or ^D.
-
-To start w0 file writer task: w0.enabled=piety.true, to stop it again ...=...false
-To see the file writing, tail -f w0.txt in another terminal window.  Ditto w1.
-
-To see list of tasks including terminal session and two writers: piety.tasks()
+See console_tasks header for directions on how to run the console jobs.
+See writer_tasks header for drections on how to observe the writer tasks.
 """
 
 import piety
@@ -39,7 +22,7 @@ from console_tasks import jobs, edc, edd
 
 def main():
     """
-    Run Python REPL and applications using pysh shell in a Session
+    Run the console session and writer tasks concurrently under the Piety scheduler.
     """
     jobs.pysh() # start the first job, recall pysh is in jobs namespace
     piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()

@@ -1,6 +1,25 @@
 """
-console_tasks.py - Create Piety console jobs and session used by piety script
+console_tasks.py - Creates a console Session instance with three Job instances
+
+The jobs are the pysh shell, the ed line editor, and the edd display
+editor.  The application in each job is a Command instance, each with
+its own reader method, in-line editing, and command history.  This
+module has a main method that runs the session in a simple blocking
+event loop, without the Piety scheduler.
+
+This script start the pysh Python shell, with the prompt >> (two not
+three >).  When editing the pysh command line, control keys and arrow
+keys work.  Exit the pysh shell with exit() or ^D.
+
+To start ed line editor, use edc not ed: edc() or edc('README.md') etc., 
+When editing the ed command line, control keys work but and arrow keys do not work.
+Exit ed with the q command, ^D does not work.
+
+To start edd display editor: edd() or edd('README.md') or main.edd('README.md') ...
+When editing the edd command line, control keys and arrow keys work.
+Exit edd with the q command or ^D.
 """
+
 import sys
 import piety, session, job, command, keyboard, key
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
@@ -66,3 +85,17 @@ edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
 # Make edd.main an alias for edd.__call__ so we can call edd.main(...) using
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
+
+### main method for test and demonstration ###
+
+def main():
+    """
+    Run the console session without the Piety scheduler.
+    Instead just use an ordinary while loop as a simple blocking event loop.
+    """
+    jobs.pysh() # start the first job
+    while not pysh.pexit: # pysh module here, different from jobs.pysh 
+        console.handler()  # block waiting for each single character 
+
+if __name__ == '__main__':
+    main()

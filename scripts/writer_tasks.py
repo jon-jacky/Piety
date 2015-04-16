@@ -1,5 +1,10 @@
 """
 writer_tasks.py - Create Piety Writer tasks used by embedded and embedded.twisted
+
+When the Piety scheduler is running, task t0 writes to file w0.txt on
+every timeout, and task t1 writes to w1.txt on every other timeout.
+
+The shell command: tail -f w0.txt shows the t0 task in action.
 """
 
 import piety # for Piety Task class, schedule data structure etc.
