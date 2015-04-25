@@ -3,12 +3,10 @@
 piety.twisted - Session + Job + CommandLine + pysh, ed, edd + Twisted scheduler
 
 Uses Twisted as the non-blocking scheduler.
-Much like piety script, except use commandline.CommandLine not command.Command
+Much like piety script, except use console_chart_tasks not console_tasks.
 
 Use directions in piety script docstring, in particular use edc(...)
 to start line editor and edd(...) for display editor.
-
-... does it work ... ?
 """
 
 import sys # used in sys.stdout.flush in Console both methods, below

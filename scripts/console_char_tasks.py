@@ -1,5 +1,8 @@
 """
 console_char_tasks.py - Create Piety console jobs, session used by piety.twisted
+
+Uses the *Command* class in the mode where the environment reads the
+input and passes it to the instances.  This is required by Twisted.
 """
 import sys
 import piety, session, job, command, keyboard # , key not used
@@ -71,3 +74,20 @@ edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
 # Make edd.main an alias for edd.__call__ so we can call edd.main(...) using
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
+
+
+# main method for test and demonstration
+
+def main():
+    """
+    Run the console session without the Piety scheduler.
+    Instead just use an ordinary while loop as a simple blocking event loop.
+    """
+    import terminal # not at top level, rest of module does not depend on this
+    jobs.pysh() # start the first job
+    while not pysh.pexit: # pysh module here, different from jobs.pysh 
+        char = terminal.getchar() # block waiting for each single character 
+        console.handler(char)  
+
+if __name__ == '__main__':
+    main()

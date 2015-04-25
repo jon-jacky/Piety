@@ -5,6 +5,10 @@ command.py - Skeleton command line application.
   Provides command history, rudimentary in-line editing similar to Unix readline.
   Provides optional hooks for job control commands that bypass the application.
  Has a main method, python command.py demonstrates most functions.
+
+Command instances can use their reader method to read input, 
+or, alternatively, use their handle_key method to accept input passed from a caller.
+The main method demonstrates both alternatives. 
 """
 
 import sys
@@ -112,13 +116,13 @@ class Command(object):
 
     def reader(self):
         'Read char, add to key sequence.  If sequence is complete, handle key'
-        self.new_command = False
         key = self.reader_body() 
         if key:
             self.handle_key(key)
 
     def handle_key(self, key):
         'Collect command string and dispatch on command'
+        self.new_command = False # handler method below sets new_command = True
         # key arg might be single character or a sequence of characters
         if key in string.printable[:-5]: # exclude \t\n\r\v\f at the end
             self.keymap[string.printable](key)
@@ -272,15 +276,20 @@ class Command(object):
 c = Command()
 
 def main():
+    # Note - default reader terminal.getchar can't handle multi-char control seqs
+    #  like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
     global quit
     quit = False # earlier invocation might have set it True
     # default handler echo sets quit=True when command='q', also enable ^D exit
     while not (quit or c.command == keyboard.C_d): 
-        if c.new_command:
+        if c.new_command: # c.handler sets new_command = True
             c.restart()
-        # default reader terminal.getchar can't handle multi-char control seqs
-        #  like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
+        # Here Command instance reads input characters itself when invoked by caller
         c.reader()
+        # Alternatively, Command instance can accept input characters passed by caller
+        # To demonstrate, comment out previous line and uncomment following lines 
+        #char = terminal.getchar()
+        #c.handle_key(char)
 
 if __name__ == '__main__':
     main()

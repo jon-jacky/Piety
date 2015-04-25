@@ -86,7 +86,8 @@ edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
 
-### main method for test and demonstration ###
+
+# main method for test and demonstration
 
 def main():
     """
