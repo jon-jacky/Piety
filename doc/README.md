@@ -4,8 +4,6 @@ Piety notes and documents
 **Piety** is a notional operating system to be written in Python.
   This directory contains some notes and documents:
 
-- **command.md**: explanation of *Piety/console/command.py*
-
 - **language.md**, language processors for Python.
 
 - **other.md**, pertinent system software and utilities written in
@@ -23,4 +21,4 @@ Piety notes and documents
 - **utilities.md**, system software and utilities written in Python,
     or programmable in Python.
 
-Revised February 2015
+Revised April 2015

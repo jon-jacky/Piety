@@ -1,8 +1,9 @@
 """
 console_char_tasks.py - Create Piety console jobs, session used by piety.twisted
 
-Uses the *Command* class in the mode where the environment reads the
-input and passes it to the instances.  This is required by Twisted.
+Very similar to console_tasks.py, except a caller outside each
+application's Command instance reads and possibly preprocesses the
+input and passes it to that instance's *handle_key* method.
 """
 import sys
 import piety, session, job, command, keyboard # , key not used

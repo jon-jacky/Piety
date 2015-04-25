@@ -6,9 +6,9 @@ command.py - Skeleton command line application.
   Provides optional hooks for job control commands that bypass the application.
  Has a main method, python command.py demonstrates most functions.
 
-Command instances can use their reader method to read input, 
+Command instances can use their reader method to read input for themselves, 
 or, alternatively, use their handle_key method to accept input passed from a caller.
-The main method demonstrates both alternatives. 
+This module's main function demonstrates both alternatives. 
 """
 
 import sys

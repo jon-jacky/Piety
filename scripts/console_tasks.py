@@ -1,11 +1,15 @@
 """
 console_tasks.py - Creates a console Session instance with three Job instances
 
-The jobs are the pysh shell, the ed line editor, and the edd display
-editor.  The application in each job is a Command instance, each with
-its own reader method, in-line editing, and command history.  This
-module has a main method that runs the session in a simple blocking
-event loop, without the Piety scheduler.
+The three jobs are the pysh shell, the ed line editor, and the edd display
+editor.  
+
+The application in each job is a Command instance, each with its own
+reader method, that reads and possibly preprocesses its input.  The
+Command instance also provides in-line editing, and command history.
+
+This module has a main function that runs the session in a simple
+blocking event loop, without the Piety scheduler.
 
 This script start the pysh Python shell, with the prompt >> (two not
 three >).  When editing the pysh command line, control keys and arrow

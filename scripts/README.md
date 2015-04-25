@@ -10,15 +10,17 @@ and explanations:
 - **console_tasks.py**: Creates a console *Session* instance with three
   *Job* instances: the *pysh* shell, the *ed* line editor, and the *edd*
   display editor.  The application in each job is a *Command* instance,
-  each with its own *reader* method. This module is used by the *piety* script. 
+  each with its own *reader* method that reads and possibly preprocesses its input. 
+  This module is used by the *piety* script. 
   It also has a *main* method that
   runs the session in a simple blocking event loop, without the Piety
   scheduler.  
 
-- **console_char_tasks.py**: Like *console_tasks*, but uses the *Command*
-  class in the mode where the environment reads the input and passes it
-  to the instances.  Used with the *piety.twisted* script, and also has its
-  own *main* method to run the session.
+- **console_char_tasks.py**: Like *console_tasks*, but uses the
+  *Command* class in the mode where a caller outside the instance
+  reads and possibly preprocesses the input and passes it to each
+  instance's *handle_key* method.  Used with the *piety.twisted*
+  script, and also has its own *main* method to run the session.
 
 - **embedded**: Runs the Piety scheduler with the two concurrent file
    writer tasks created by *writer_tasks*, but without an interactive
