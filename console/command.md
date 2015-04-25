@@ -5,7 +5,7 @@ Command
 The *command* module contains a skeleton command line application,
 including a pure Python non-blocking alternative to *readline*.
 
-The *command* module defines a class *Command*, with an input method
+The *command* module defines a class *Command*, an input method
 that gets a single character (or a multi-character control sequence)
 typed at the command keyboard, and adds it to a command line
 (usually).  When the input method gets a line terminator character, it
@@ -22,12 +22,14 @@ the input method returns after handling each character.  Other tasks'
 handlers can run between keystrokes, so entering and editing a command
 line does not block other tasks.
 
-There are two alternative input methods.  In the first alternative,
-the input method itself reads characters.  To use this alternative,
-call the *reader* method without arguments.  In the second alternative,
-a caller (outside the *Command* instance) reads the characters
-and passes them to the input method.  To use this alternative, 
-call the *handle_key* method with one string argument.
+There are actually two alternative input methods.  In the first
+alternative, the input method itself reads characters.  To use this
+alternative, call the *reader* method without arguments.  In the
+second alternative, a caller (outside the *Command* instance) reads
+the characters and passes them to the input method.  To use this
+alternative, call the *handle_key* method with one string argument.
+Both alternatives are demonstrated in the *command* module's *main*
+function.
 
 For the first alternative, the default *reader* method reads one
 character at a time.  There is an optional *reader* argument to the
