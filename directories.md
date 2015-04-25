@@ -2,7 +2,7 @@
 Piety directories
 =================
 
-Piety is organized into these directories:
+The Piety repository is organized into these directories:
 
 - **applications**: miscellaneous applications.
 
@@ -20,15 +20,12 @@ Piety is organized into these directories:
     sessions.  This is the core of the Piety operating system.
 
 - **scripts**: Python scripts that run applications as tasks or jobs
-    under the Piety sheduler.
+    under the Piety sheduler or other schedulers (such as Twisted).
 
 - **shell**: Python shell, *pysh*.
 
 - **test**: shell scripts and modules that test code in other
      directories.
-
-- **twisted**: Python scripts that run applications as tasks or jobs
-    under the Twisted reactor instead of the Piety sheduler.
 
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.
@@ -41,5 +38,5 @@ Piety is organized into these directories:
 Each directory contains a *README* file with more information.
 Another page explains the [rationale](doc/structure.md) for this organization.
 
-Revised February 2015
+Revised April 2015
 

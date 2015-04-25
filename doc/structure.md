@@ -26,7 +26,8 @@ We observe these design rules:
   *self_insert_char*, *kill_line* etc.  The bodies of those functions
   can contain platform- and device-specific code.  Modules that depend
   on different platforms and devices go into different directories
-  with other specific names: for example *windows* etc.  But the
+  with other specific names: for example *printing_terminal* or
+  *framebuffer_terminal* etc.  But the
   modules in these directories must also have the same generic module
   names and function names.  Modules that use any of these are not
   platform- or device-dependent because they import modules and call

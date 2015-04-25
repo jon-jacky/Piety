@@ -17,7 +17,8 @@ Piety notes and documents
 
 - **scheduler.md**, explanations of the modules in *Piety/scheduler*
 
-- **structure.md**, explanation of directory organization and modular structure.
+- **structure.md**, explanation of the Piety repository directory
+    organization and modular structure.
 
 - **utilities.md**, system software and utilities written in Python,
     or programmable in Python.
