@@ -22,6 +22,10 @@ The Piety repository is organized into these directories:
 - **scripts**: Python scripts that run applications as tasks or jobs
     under the Piety sheduler or other schedulers (such as Twisted).
 
+- **select**: event loop for running Piety on a Unix-like host,
+    used by modules in the *scheduler* directory.  We may add directories 
+    for other platforms in the future.
+
 - **shell**: Python shell, *pysh*.
 
 - **test**: shell scripts and modules that test code in other

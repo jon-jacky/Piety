@@ -17,13 +17,12 @@ The design minimizes dependencies among modules.
 We observe these design rules:
 
 - Modules that depend on particular platforms (host operating systems)
-  or configurations (devices) are to be avoided, except where
-  necessary.  They must be separated out in directories with specific
+  or configurations (devices) must be separated out in directories with specific
   names that indicate the dependence, for example *unix* or
-  *vt_terminal*.  The modules within these directories must have
-  generic names, for example *terminal*, *keyboard*, *display*.  The
+  *select* or *vt_terminal*.  The modules within these directories must have
+  generic names, for example *terminal*, *eventloop*, *keyboard*, *display*.  The
   functions (etc.)  within these modules must also have generic names:
-  *self_insert_char*, *kill_line* etc.  The bodies of those functions
+  *run*, *self_insert_char*, *kill_line* etc.  The bodies of those functions
   can contain platform- and device-specific code.  Modules that depend
   on different platforms and devices go into different directories
   with other specific names: for example *printing_terminal* or
@@ -42,16 +41,16 @@ We observe these design rules:
   wrap libraries written in other languages.  Those can limit the
   platform to one particular Python interpreter (usually CPython).
 
-- The modules in *scheduler* directory are the core of the Piety
-  operating system.  They must not depend on any specific platform,
-  device, or application, so they must not depend on modules in
-  *unix*, *vt_terminal*, *console* or in any application directories.
-  (At this writing the *piety* module violates this rule; it depends
-  on the Unix *select* function.  We will fix this.)
+- The modules in the *scheduler* directory are the core of the Piety
+  operating system.  They must not depend on any particular devices 
+  (in particular, they cannot require a console).  The must be platform-independent, 
+  but they must necessarily import a platform-dependent event loop.
+  To run Piety on a Unix-like host, it is currently necessary to import 
+  the event loop from the platform-dependent *select* directory.
 
 - The modules in the *console* directory are used by terminal
   applications.  They must be platform- and device- independent.  They
-  must access all terminal functions by importing generically-named
+  must access all terminal functions by importing 
   modules from device-dependent directories such as *unix* and
   *vt_terminal*.
 
@@ -71,6 +70,6 @@ We observe these design rules:
   jobs under the Piety sheduler.  These modules typically use modules
   from the *scheduler*, *console*, and application directories.  They
   can use any modules, but it is good practice to avoid platform- or
-  device-specific code.
+  device-specific code here.
 
-Revised February 2015
+Revised April 2015
