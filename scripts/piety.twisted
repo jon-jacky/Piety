@@ -38,13 +38,11 @@ class Console(basic.LineReceiver):
     def connectionMade(self):
         self.setRawMode() # send data to rawDataReceived rather than lineReceived
         jobs.pysh() # start the first Piety job, begin prompting
-        sys.stdout.flush() # show initial prompt
 
     def rawDataReceived(self, data): # data are one or more chars, not a line
         console.handler(data) #  call Piety Session
-        sys.stdout.flush() # show prompt
         piety.ievent[sys.stdin] += 1 # count events
-        # interval = adjust_interval(t0, interval) # I think we don't need this
+        # interval = adjust_interval(t0, interval) # not needed, Twisted handles this
         if pysh.pexit:
             reactor.stop()
 

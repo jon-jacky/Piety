@@ -69,12 +69,6 @@ def run(schedule, nevents=0):
                 for t in schedule[fd]:
                     if t.enabled():
                         t.handler()
-                        # Without flush here, char doesn't appear on terminal
-                        #  until *next* character is typed at keyboard.
-                        # BUT only when handler is invoked here after select
-                        # When handler is invoked from simple main loop
-                        #  without Piety scheduler, this flush isn't necessary.
-                        sys.stdout.flush() # FIXME? investigate problem
                         break # we consumed data from fd, might be no more
             else:
                 s = fd.readline() # works on stdin, fd.read() hangs

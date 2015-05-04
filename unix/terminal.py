@@ -62,8 +62,8 @@ def getchars(n):
 
 def putstr(s):
     """
-    Print string (can be just one character) on console  
-     with no formatting (unlike Python print).
+    Print string (can be just one character) on console with no
+    formatting (unlike Python print).  Flush to force output immediately.  
     If you want newline, you must explicitly include it in s.
     """
     sys.stdout.write(s)

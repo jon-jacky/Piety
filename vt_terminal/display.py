@@ -1,10 +1,9 @@
 """
 display - Update the terminal display using ANSI control sequences.
-
 """
 
-import sys
-         
+from terminal import putstr # write without newline, flush for immediate output
+
 esc = '\x1B'     # \e does not work 'invalid \x escape'
 csi = esc+'['    # ANSI control sequence introducer
 
@@ -30,8 +29,6 @@ sgr = csi + '%s' + 'm' # set graphic rendition. %s is ;-separated integers like
 clear = 0        # clears attributes (not transparent!)
 white_bg = 47    # gray on mac terminal
 
-putstr = sys.stdout.write # print string without newline at end
-
 def attrs(*attributes):
     """
     Convert variable length arg list of integers to ansi attributes string
@@ -44,8 +41,7 @@ def render(text, *attributes):
     Print text with one or more attributes, each given by separate int arg,
     then clear attributes, but do not print newline.
     """
-    # use write not print, we don't want newline or trailing space
-    sys.stdout.write(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+    putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 # used by line
 
