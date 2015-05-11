@@ -26,17 +26,36 @@ def adjust_interval(t0, interval):
     interval = interval - dt_sec # should never be negative ...
     return interval if interval > 0.0 else period # ... but ...
 
-# Variables used by select in Piety event loop
-inputs = [sys.stdin] # could add to this list
-# This doesn't work - causes run loop to exit without handling other events
-#outputs = [sys.stdout] 
-outputs = [] # for now this works
-exceptions = []
-timeout = -1 # timeout EVENT not interval.  different from any fd.fileno()
+# Used by select in event loop
+inputs, outputs, exceptions = [],[],[]
 
-# Count each kind of event, global for enabling conditions and handlers.
-# key: event, value: number of occurences
-ievent = Counter([sys.stdin,timeout]) 
+timer = -1 # indicates timer input, not timeout interval. Differs from any fd.fileno()
+
+# Count events on each input. key: input, value: number of events on that input
+# This item is global so it can be for enabling conditions and handlers.
+ievent = Counter()
+
+def activate(t):
+    """
+    Activate task t by adding t.input to eventloop inputs list and ievent counter
+    This should only be called after task t has been added to schedule.
+    """
+    if t.input != timer and t.input not in inputs:
+        inputs.append(t.input)
+    if t.input not in ievent:
+        ievent[t.input] = 0
+        
+def deactivate(t):
+    """
+    De-activate task t by deleting t.input from eventloop inputs list and ievent cntr.
+    This should only be called after t has been removed from schedule
+    """
+    # Only remove t.input when no more tasks in schedule use that input
+    if t.input not in schedule:
+        if t.input in inputs:
+            inputs.remove(t.input)
+        if t.input in ievent:
+            del ievent[t.input]
 
 done = False  # can exit on demand
 
@@ -45,19 +64,19 @@ def quit():
     global done
     done = True # must reset to False before we can resume
     
-def run(schedule, nevents=0):
+def run(nevents=0):
     """
     Run the Piety event loop.
     period: event loop period, default 1 sec
-    nevents: number of timeout events to process, then exit run loop.
+    nevents: number of timer events to process, then exit run loop.
               use default nevents=0 
               to process until done=True or unhandled exception
     """
     global ievent # must be global for enabling conditions and handlers
-    maxevents = ievent[timeout] + nevents # when to stop
+    maxevents = ievent[timer] + nevents # when to stop
     interval = period # timeout INTERVAL in seconds, uses global period
     # counts timeout events, for all events ... or sum(ievent.values()) < ..
-    while not done and (not nevents or ievent[timeout] < maxevents):
+    while not done and (not nevents or ievent[timer] < maxevents):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
         t0 = datetime.datetime.now()
@@ -71,19 +90,23 @@ def run(schedule, nevents=0):
                         t.handler()
                         break # we consumed data from fd, might be no more
             else:
-                s = fd.readline() # works on stdin, fd.read() hangs
-                print 'unhandled input from fd %s: %s' % (fd, s)
+                # if schedule is consistent with inputs, this should be unreachable.
+                # if no handler, consume input anway - is this necessary?
+                # s = fd.readline() # FIXME? works on stdin, fd.read() hangs
+                # This module must not assume there is a console - no print allowed
+                # print 'unhandled input from fd %s: %s' % (fd, s)
+                pass
             ievent[fd] += 1
             interval = adjust_interval(t0, interval)
 
         # periodic timeout if no input
         if not (inputready or outputready or exceptready): 
-            if timeout in schedule:
-                for t in schedule[timeout]:
+            if timer in schedule:
+                for t in schedule[timer]:
                     if t.enabled():
                         t.handler()
                         # no break needed - there is no data to consume
             else:
-                pass # if no timeout handler, just continue
+                pass # if no timer handler, just continue
             interval = period # if we got here, full interval has elapsed
-            ievent[timeout] += 1
+            ievent[timer] += 1

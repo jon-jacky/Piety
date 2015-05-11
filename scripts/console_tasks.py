@@ -32,7 +32,7 @@ class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
 
 # Session, a terminal task
-console = session.Session(name='console', event=sys.stdin)
+console = session.Session(name='console', input=sys.stdin)
 
 # Python shell
 

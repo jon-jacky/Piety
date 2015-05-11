@@ -22,14 +22,14 @@ class Session(piety.Task):
     Job on top of stack runs in foreground (has focus), gets input.
     Top of the stack is the right end of the deque at self.jobs[-1]
     """
-    def __init__(self, name=None, event=None, enabled=piety.true):
+    def __init__(self, name=None, input=None, enabled=piety.true):
         """
         Same args as Task __init__ , except no handler.
         Add jobs later, the foreground job's handler becomes the Task handler
         """
         self.jobs = collections.deque()
         self.foreground = None
-        super(Session, self).__init__(name=name, event=event, enabled=enabled)
+        super(Session, self).__init__(name=name, input=input, enabled=enabled)
 
     def start(self, job):
         'Put job in the foreground, prepare to run it'

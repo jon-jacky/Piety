@@ -12,10 +12,17 @@ from collections import defaultdict
 # The eventloop implementation is platform-dependent but its interface is not,
 #  so this piety module is platform-independent.
 # For Unix-like hosts, arrange to import select/eventloop.py
-import eventloop # FIXME? probably better than making scripts import eventloop
+import eventloop
 
-# FIXME? other scripts use these identifiers via piety.timeout etc.
-from eventloop import timeout, done, ievent, quit 
+# Other scripts use these identifiers via piety.run(), piety.timer etc.
+from eventloop import run, quit, done, timer, ievent
+
+# Schedule data structure
+# key, value: input, list of tasks waiting for data at that input
+# Task __init__ puts each new task in this schedule, using activate method
+schedule = defaultdict(list)
+
+eventloop.schedule = schedule # mutable data, share with eventloop module
 
 # Constants used by Task class
 
@@ -26,11 +33,11 @@ class Task(object):
     'Task instances are scheduled and invoked by the Piety scheduler.'
     taskno = 0
 
-    def __init__(self, name=None, event=None, handler=None, enabled=true):
+    def __init__(self, name=None, input=None, handler=None, enabled=true):
         """
-        A Task instance identifies a handler, an event, an enabling
+        A Task instance identifies a handler, an input source, an enabling
         condition, and a name.  The Piety scheduler may
-        invoke the handler when the event occurs and the enabling
+        invoke the handler when input is available and the enabling
         condition is True.  Then the handler runs until it returns (or
         yields) control to the scheduler.  There is no preemption.
 
@@ -43,12 +50,12 @@ class Task(object):
         name - task name. By default, a unique name is constructed
         of the form tN, where N is a small decimal number.         
         
-        event - event which must occur to cause the scheduler to
+        input - source where data must be available to cause the scheduler to
         invoke the handler.  Defaults to None, meaning the handler is
-        never invoked.  In this version the events are the file
+        never invoked.  In this version the inputs are the file-like
         objects watched by the select call in the scheduler's
         event loop, including sys.stdin and possibly others. 
-        Another event is timeout, the periodic select timeout event.
+        Another input is timer, the periodic select timeout input.
 
         handler - callable object to be invoked by the
         scheduler.  Defaults to None, meaning nothing is called.
@@ -57,17 +64,25 @@ class Task(object):
         enabled - enabling condition, a Boolean callable object which
         must return True to cause the scheduler to invoke the handler.
         Defaults to a function that always returns True, meaning the
-        handler may be invoked whenever the event occurs.
+        handler may be invoked whenever data is available at the input.
         """
         self.taskno = Task.taskno # unique task ident
         Task.taskno += 1        
         self.name = name if name else 't%d' % self.taskno
         self.handler = handler
-        self.event = event
+        self.input = input
         self.enabled = enabled
-        tasks_list.append(self)
-        if event:
-            schedule[event].append(self)
+        tasks_list.append(self) # FIXME? redundant with schedule
+        # FIXME? implicitly activate every task on creation - good idea?
+        self.activate()
+
+    def activate(self):
+        schedule[self.input].append(self)
+        eventloop.activate(self) # for select, just adds t.input to select inputs
+
+    def deactivate(self):
+        del schedule[self.input].self
+        eventloop.deactivate(self) # careful, only remove if last task with this input
 
 # Variables and functions for managing tasks
 
@@ -90,43 +105,33 @@ def tasks():
         return name.strip("'<>,")
 
     def ename(e):
-        'Handle special case in event name.'
+        'Handle special case in input name.'
 
-        if e == -1:
-            return 'timeout %s s' % eventloop.period
-            #return 'timeout  ? s' # placeholder if we can't use period
+        if e == timer:
+            return 'timer %s s' % eventloop.period
+            #return 'timer  ? s' # placeholder if we can't use period
         else:
             return oname(e)
         
-    print """  i     name  enabled              n  event            handler
+    print """  i     name  enabled              n  input            handler
   -     ----  -------              -  -----            -------"""
     for t in tasks_list:
         print '%3d %8s  %-15s  %5d  %-15s  %-15s' % \
             (t.taskno, t.name, oname(t.enabled), 
-             ievent[t.event], # ievent imported from eventloop
+             ievent[t.input], # ievent imported from eventloop
              # '  ???', # placeholder if we can't use ievent
-             ename(t.event), oname(t.handler))
+             ename(t.input), oname(t.handler))
 
-# Schedule data structure
-# key: event, value: list of tasks waiting for that event 
-# Task __init__ puts each new task in this schedule
-# (Should that be a separate operation?)
-schedule = defaultdict(list)
-
-# so other modules can call piety.run not eventloop.run
-def run(nevents=0):
-    eventloop.run(schedule, nevents=nevents)
 
 # Test
-
 
 def task0(): print 'task 0'
 def task1(): print 'task 1'
 
 def main():
-    # Here timeout, done, run are all imported by piety from eventloop
-    t0 = Task(name='task 0', handler=task0, event=timeout)
-    t1 = Task(name='task 1', handler=task1, event=timeout)
+    # Here timer, done, run are all imported by piety from eventloop
+    t0 = Task(name='task 0', handler=task0, input=timer)
+    t1 = Task(name='task 1', handler=task1, input=timer)
     done = False # reset, might be resuming after quit() 
     run(nevents=10) # handle 10 clock ticks and exit
     tasks() # show the tasks

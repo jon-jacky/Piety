@@ -54,19 +54,19 @@ class Timeout(object):
         self.nevents = 10 # same as embedded script
 
     def handler(self):
-        if False and piety.ievent[piety.timeout] == self.nevents:
+        if False and piety.ievent[piety.timer] == self.nevents:
             # Now we use pysh.exit to stop, in Console lineReceived handler
             reactor.stop()
         else:
             # handle scheduled timeout events
-            if piety.timeout in piety.schedule:
-                for t in piety.schedule[piety.timeout]:
+            if piety.timer in piety.schedule:
+                for t in piety.schedule[piety.timer]:
                     if t.enabled():
                         t.handler()
             else:
                 pass # if no timeout handler, just continue
             # count events and schedule next timeout
-            piety.ievent[piety.timeout] += 1
+            piety.ievent[piety.timer] += 1
             interval = self.period # if we got here, full interval has elapsed
             reactor.callLater(interval, self.handler)
 
