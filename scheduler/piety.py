@@ -6,7 +6,7 @@ instances, then call piety.run.  More details appear in the docstrings
 below, and in the examples in the scripts directory.
 """
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 # Import the eventloop module for the platform where piety runs
 # The eventloop implementation is platform-dependent but its interface is not,
@@ -14,15 +14,24 @@ from collections import defaultdict
 # For Unix-like hosts, arrange to import select/eventloop.py
 import eventloop
 
-# Other scripts use these identifiers via piety.run(), piety.timer etc.
-from eventloop import run, quit, done, timer, ievent
+# Other scripts use these identifiers via piety.run() etc.
+from eventloop import run, quit
 
 # Schedule data structure
 # key, value: input, list of tasks waiting for data at that input
 # Task __init__ puts each new task in this schedule, using activate method
 schedule = defaultdict(list)
 
-eventloop.schedule = schedule # mutable data, share with eventloop module
+# Count events on each input. key: input, value: number of events on that input
+# This item is global so it can be for enabling conditions and handlers.
+ievent = Counter()
+
+timer = -1 # indicates timer input, not timeout interval. Differs from any fd.fileno()
+
+# Share mutable data structures with eventloop module
+eventloop.schedule = schedule 
+eventloop.ievent = ievent
+eventloop.timer = timer # immutable, but never reassigned so this works too
 
 # Constants used by Task class
 

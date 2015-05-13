@@ -5,12 +5,11 @@ This is a platform-dependent module. It uses the select module, so it
 must run on a Unix-like host OS (including Linux and Mac OS X).  One
 of the select channels is stdin (which I recall does *not* work
 in the Windows version of select).
+
+This is imported by the piety module, then the piety module shares data, see below
 """
 
-import sys
-import datetime
-from select import select
-from collections import Counter
+import datetime, select
 
 # Variables annd functions used in event loop
 
@@ -29,11 +28,12 @@ def adjust_interval(t0, interval):
 # Used by select in event loop
 inputs, outputs, exceptions = [],[],[]
 
-timer = -1 # indicates timer input, not timeout interval. Differs from any fd.fileno()
+# piety module has: import eventloop, then shares these mutable data structures:
+# eventloop.schedule = schedule 
+# eventloop.ievent = ievent
+# eventloop.timer = timer # immutable, but never reassigned so this works too
 
-# Count events on each input. key: input, value: number of events on that input
-# This item is global so it can be for enabling conditions and handlers.
-ievent = Counter()
+# The eventloop API: activate, deactivate, quit, run
 
 def activate(t):
     """
@@ -57,7 +57,7 @@ def deactivate(t):
         if t.input in ievent:
             del ievent[t.input]
 
-done = False  # can exit on demand
+done = False # used by quit() below, does not need to be visible outside this module
 
 def quit():
     'Exit from Piety event loop'
@@ -67,7 +67,6 @@ def quit():
 def run(nevents=0):
     """
     Run the Piety event loop.
-    period: event loop period, default 1 sec
     nevents: number of timer events to process, then exit run loop.
               use default nevents=0 
               to process until done=True or unhandled exception
@@ -80,8 +79,8 @@ def run(nevents=0):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
         t0 = datetime.datetime.now()
-        inputready, outputready, exceptready = select(inputs, outputs,
-                                                      exceptions, interval)
+        inputready, outputready, exceptready = select.select(inputs, outputs,
+                                                             exceptions, interval)
         # inputs
         for fd in inputready:
             if fd in schedule:
