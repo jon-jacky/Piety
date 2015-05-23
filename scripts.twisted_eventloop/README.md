@@ -24,7 +24,7 @@ put the *twisted* directory on your *PYTHONPATH* instead of the
 
 It was necessary to revise some scripts:
 
-- **console_tasks_receiver.py**: Similar to *scripts.twisted/console_tasks_receiver.py*,
+- **console_tasks_receiver_eventloop.py**: Similar to *scripts.twisted/console_tasks_receiver.py*,
   except it also assigns *piety.eventloop.application = console*
   Here *piety.eventloop* is imported from *twisted/eventloop.py*.  This assigment is
   needed to enable Twisted to invoke the intended Piety job.

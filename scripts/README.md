@@ -29,4 +29,7 @@ and explanations:
    syntax to define jobs, with no default arguments.  Does not create
    file writer tasks (but they are easy to create "by hand" in the pysh shell).
 
+- **writer_tasks.py**: Creates writer tasks used by the *embedded* and
+    *piety* scripts.
+
 Revised May 2015
