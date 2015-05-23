@@ -13,7 +13,7 @@ import datetime, select
 
 # Variables annd functions used in event loop
 
-period = 1.000 # seconds, periodic timer for timeout events
+period = 1.000 # FIXME? baked in for now, seconds, periodic timer for timeout events
 
 def adjust_interval(t0, interval):
     """
@@ -73,8 +73,9 @@ def run(nevents=0):
     """
     global ievent # must be global for enabling conditions and handlers
     maxevents = ievent[timer] + nevents # when to stop
-    interval = period # timeout INTERVAL in seconds, uses global period
-    # counts timeout events, for all events ... or sum(ievent.values()) < ..
+    interval = period # timeout interval in seconds, uses global period
+    # Counts only timeout events, for all events use ... or sum(ievent.values()) < ..
+    # Allows multiple run() calls, new nevents each time, ievent keeps counting up
     while not done and (not nevents or ievent[timer] < maxevents):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves

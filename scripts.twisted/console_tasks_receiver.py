@@ -1,9 +1,11 @@
 """
-console_char_tasks.py - Create Piety console jobs, session used by piety.twisted
+console_tasks_receiver.py - Create Piety console jobs, session used by piety.twisted
 
-Very similar to console_tasks.py, except a caller outside each
-application's Command instance reads and possibly preprocesses the
-input and passes it to that instance's *handle_key* method.
+Similar to console_tasks.py, except the application Command instances
+here (pyshc, edc.application, and edd.application) are used in
+receiver mode (not reader mode): a caller outside the instance (here,
+the Twisted framework) reads the input and then passes it to that
+instance's handler, which takes the input as a parameter.
 """
 import sys
 import piety, session, job, command, keyboard # , key not used
@@ -14,6 +16,10 @@ jobs = Namespace()
 
 # Session, a terminal task
 console = session.Session(name='console', input=sys.stdin)
+
+# Failed experiment to work with twisted/eventloop.py and piety.twisted.eventloop
+# Not needed to work with piety.twisted
+#piety.eventloop.application = console
 
 # Python shell
 
