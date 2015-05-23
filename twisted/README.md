@@ -16,4 +16,9 @@ put the *twisted* directory on your *PYTHONPATH* instead of the
 *select* directory.  A convenient way to achieve this is to run tje
 *bin/twisted_paths* command instead of the usual *bin/paths*.
 
+NOTE: At this time *twisted/eventloop.py* only works with tasks that 
+    are triggered by the timeout event, for example in *scripts/embedded*,
+    but it DOES NOT WORK with tasks that use the standard input, for
+    example in *scripts.twisted_eventloop/piety.twisted_eventloop*
+
 Revised May 2015

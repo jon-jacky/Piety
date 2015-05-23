@@ -17,6 +17,11 @@ piety module shares these mutable data structures:
 application script, for example console_char_tasks module that creates console task
 shares this method:
  piety.eventloop.application = console
+
+NOTE: At this time *twisted/eventloop.py* only works with tasks that 
+    are triggered by the timeout event, for example in *scripts/embedded*,
+    but it DOES NOT WORK with tasks that use the standard input, for
+    example in *scripts.twisted_eventloop/piety.twisted_eventloop*
 """
 
 from twisted.internet import stdio, reactor
@@ -33,7 +38,7 @@ class Console(basic.LineReceiver):
         self.setRawMode() # send data to rawDataReceived rather than lineReceived
 
     def rawDataReceived(self, data): # data are one or more chars, not a line
-        # Debug
+        # Debug prints - ttr to track down why this doesn't work
         print 'eventloop module, Console object, rawDataRecieved method'
         print ' self', self
         print ' application', application
