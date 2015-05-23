@@ -15,7 +15,7 @@ is on your execution *PATH*.  See *paths* in this directory:
  your *.profile* or *.bashrc*. 
 
 - **twisted_paths**: similar to *paths*, except it adds the *twisted* 
-  directory instead of the *select* directory to the *PYTHONPATH.  Use
+  directory instead of the *select* directory to the *PYTHONPATH*.  Use
   this command instead of *paths* to use the Twisted event loop instead
   of the usual Piety event loop based on Unix *select*.
 
