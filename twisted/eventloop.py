@@ -19,13 +19,17 @@ shares this method:
  piety.eventloop.application = console
 
 NOTE: At this time *twisted/eventloop.py* only works with tasks that 
-    are triggered by the timeout event, for example in *scripts/embedded*,
-    but it DOES NOT WORK with tasks that use the standard input, for
+    are triggered by the timeout event, for example in *scripts/embedded*
+    and *scripts/eventloop*.  
+    But it DOES NOT WORK with tasks that use the standard input, for
     example in *scripts.twisted_eventloop/piety.twisted_eventloop*
 """
 
 from twisted.internet import stdio, reactor
 from twisted.protocols import basic
+
+# This has to be global in eventloop because piety.tasks() uses it
+period = 1
 
 class Console(basic.LineReceiver):
     'Twisted-style handler for input from stdin'
@@ -38,7 +42,7 @@ class Console(basic.LineReceiver):
         self.setRawMode() # send data to rawDataReceived rather than lineReceived
 
     def rawDataReceived(self, data): # data are one or more chars, not a line
-        # Debug prints - ttr to track down why this doesn't work
+        # Debug prints - try to track down why this DOES NOT WORK
         print 'eventloop module, Console object, rawDataRecieved method'
         print ' self', self
         print ' application', application
@@ -60,7 +64,6 @@ class Timeout(object):
     def __init__(self, nevents):
         # In select/eventloop.py nevents is local arg in piety.run()
         self.nevents = nevents
-        self.period = 1 # FIXME?  baked in for now, could be __init__ arg
         # As in select/eventloop.py
         # Allows multiple run() calls, new nevents each time, ievent keeps counting up
         self.maxevents = ievent[timer] + nevents
@@ -81,7 +84,7 @@ class Timeout(object):
                 pass # if no timeout handler, just continue
             # count events and schedule next timeout
             ievent[timer] += 1
-            interval = self.period # if we got here, full interval has elapsed
+            interval = period # if we got here, full interval has elapsed
             reactor.callLater(interval, self.handler)
 
 # The eventloop API: activate, deactivate, quit, run
@@ -104,9 +107,9 @@ def run(nevents=0): # nevents arg must have the same name as in select/eventloop
               use default nevents=0 
               to process until done=True or unhandled exception
     """
-    print 'eventloop, beginning run()'
-    print ' application', application
-    print ' application.handler', application.handler
+    #print 'eventloop, beginning run()'
+    #print ' application', application
+    #print ' application.handler', application.handler
     reactor.callWhenRunning(Timeout(nevents).handler) 
     stdio.StandardIO(Console())
     reactor.run()
