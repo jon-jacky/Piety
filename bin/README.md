@@ -1,22 +1,23 @@
 
-Piety bin directory
-=====================
+bin
+===
 
-This directory contains shell scripts that configure Piety for
-various platforms.
+Shell scripts that configure Piety on Unix-like platforms.
 
-To conveniently use Piety, this directory should be on your execution
-*PATH*.  Or, its contents should be installed in some directory that
-is on your execution *PATH*.  See *paths* in this directory:
+Put this directory on your execution *PATH*.  Or, install its contents
+in some directory that is on your *PATH* (for details, see *paths* in
+this directory).
 
-- **paths**: assigns paths for running Piety on a Unix-like host with 
-  a VT-100 compatible terminal.  To configure
- Piety, execute this script, or put the commands from this script into
- your *.profile* or *.bashrc*. 
+To select a Piety configuration, execute one of the following
+scripts, or put the commands from the script into your *.profile* or
+*.bashrc*:
 
-- **twisted_paths**: similar to *paths*, except it adds the *twisted* 
-  directory instead of the *select* directory to the *PYTHONPATH*.  Use
+- **paths**: assigns paths for running Piety on a Unix-like host with
+  a VT-100 compatible terminal and the event loop based on *select*.
+
+- **twisted_paths**: similar to *paths*, except it puts the *twisted* 
+  directory instead of the *select* directory on the *PYTHONPATH*.  Use
   this command instead of *paths* to use the Twisted event loop instead
   of the usual Piety event loop based on Unix *select*.
 
-Revised January 2015
+Revised May 2015

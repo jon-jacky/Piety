@@ -2,12 +2,10 @@
 select
 ======
 
-This directory contains an *eventloop* module with a *run* method.
+Non-blocking event loop using Unix *select*.
 
-This is a platform-dependent module because it uses Unix *select*.
+The platform-independent *piety* module can import the *eventloop* module
+from this directory.  The *bin/paths* command puts this directory on the 
+*PYTHONPATH*
 
-The platform-independent *piety* module imports the *eventloop* module
-from this directory to run Piety on Unix-like hosts (including Linux
-and Mac OS X).
-
-Revised April 2015
+Revised May 2015

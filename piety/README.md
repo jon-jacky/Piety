@@ -1,19 +1,11 @@
 
-scheduler
-=========
+piety
+=====
 
-Modules that define and schedule tasks, jobs, and sessions.  This is
-the core of the Piety operating system:
-
-- **piety.py**: Piety scheduler and event loop.  Defines the *Task*
-   class and imports the platform-dependent *run* function.  To run tasks
-   in Piety, import the *piety* module, create some *piety.Task*
-   instances, then call *piety.run*.
-
-- **session.py**: Manage multiple jobs (applications) in one task.
-
-- **job.py**: Wrapper for application to provide hooks for job control
-    from *session*.
+The *piety* module defines *Task*, *Job*, *Session*, *schedule*, and
+*run* (the non-blocking event loop).  This is the core of the Piety
+operating system.  To run tasks in Piety, import the *piety* module,
+create some *piety.Task* instances, then call *piety.run*.
 
 See also the more detailed explanations [here](../doc/scheduler.md).
 

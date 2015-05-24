@@ -16,11 +16,12 @@ The Piety repository is organized into these directories:
 - **editors**: a line editor inspired by the classic Unix *ed*, and a
     new display editor *edd*.
 
-- **scheduler**: modules that define and schedule tasks, jobs, and
-    sessions.  This is the core of the Piety operating system.
+- **piety**: defines *Task*, *Job*, *Session*, *schedule*, and *run*
+    (the non-blocking event loop).  This is the core of the Piety
+    operating system.
 
 - **scripts**: Python scripts that run applications as tasks or jobs
-    under the Piety event loop (or other event loops).
+    under a non-blocking event loop.
 
 - **scripts.twisted**: Python scripts that run applications as tasks or jobs
     under a Twisted event loop coded in the scripts here.
@@ -28,15 +29,15 @@ The Piety repository is organized into these directories:
 - **scripts.twisted_eventloop**: Python scripts that run applications
     as tasks or jobs under the Twisted event loop in the *twisted* directory.
 
-- **select**: Piety event loop using Unix *select*, used by *scheduler/piety.py*
+- **select**: Non-blocking event loop using Unix *select*, used by *piety.run*.
 
 - **shell**: Python shell, *pysh*.
 
 - **test**: shell scripts and modules that test code in other
      directories.
 
-- **twisted**: Twisted event loop used by
-   scripts in *scripts.twisted_eventloop*.
+- **twisted**: Non-blocking event loop using the Twisted reactor, optionally 
+     used by *piety.run*.
 
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.

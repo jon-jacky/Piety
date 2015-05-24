@@ -2,23 +2,16 @@
 twisted
 =======
 
-This directory contains an *eventloop* module that uses the Twisted event loop
-instead of the usual Piety event loop based on Unix *select*.
+Non-blocking event loop using the Twisted reactor.
 
-This is a platform-dependent module because it requires *Twisted*.
+The platform-independent *piety* module can import the *eventloop*
+module from this directory.  The *bin/twisted_paths* command puts this
+directory on the *PYTHONPATH*
 
-The platform-independent *piety* module imports the *eventloop* module
-from this directory to run Piety applications, tasks, and jobs with the 
-Twisted event loop instead of the usual Piety event loop.
-
-To import *twisted/eventloop* instead of the usual *select/eventloop*.
-put the *twisted* directory on your *PYTHONPATH* instead of the
-*select* directory.  A convenient way to achieve this is to run tje
-*bin/twisted_paths* command instead of the usual *bin/paths*.
-
-NOTE: At this time *twisted/eventloop.py* only works with tasks that 
-    are triggered by the timeout event, for example in *scripts/embedded*,
-    but it DOES NOT WORK with tasks that use the standard input, for
-    example in *scripts.twisted_eventloop/piety.twisted_eventloop*
+NOTE: At this time *twisted/eventloop.py* only works with tasks that
+    are triggered by the timeout event, for example in
+    *scripts/embedded* and *scripts/eventloop*.  It DOES NOT WORK with
+    tasks that use the standard input, for example in
+    *scripts.twisted_eventloop/piety.twisted_eventloop*
 
 Revised May 2015
