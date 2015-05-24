@@ -25,14 +25,14 @@ Exit edd with the q command or ^D.
 """
 
 import sys
-import piety, session, job, command, keyboard, key
+import piety, command, keyboard, key
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
 
 class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
 
 # Session, a terminal task
-console = session.Session(name='console', input=sys.stdin)
+console = piety.Session(name='console', input=sys.stdin)
 
 # Python shell
 
@@ -45,9 +45,9 @@ pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=pysh.mk_shell()
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-jobs.pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
-                    stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
-                    cleanup=piety.quit)
+jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh_startup, 
+                      stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
+                      cleanup=piety.quit)
 
 # line editor
 
@@ -63,9 +63,9 @@ def ed_startup(*filename, **options):
 # Use default reader, not key.Key, so multicharacter control sequences
 #  (such as keyboard arrow keys) will not work.
 # Exit with q only, ^D exit is not enabled
-edc = job.Job(session=console,
-              application=command.Command(prompt='', handler=ed.cmd),
-              startup=ed_startup, stopped=(lambda: ed.quit))
+edc = piety.Job(session=console,
+                application=command.Command(prompt='', handler=ed.cmd),
+                startup=ed_startup, stopped=(lambda: ed.quit))
               
 # display editor
 
@@ -77,11 +77,11 @@ def edd_startup(*filename, **options):
     _edd.init_display(*filename, **options) # _ed.prompt is not used by Piety
 
 # edd module was imported as _edd so we can call the job edd without name clash
-edd = job.Job(session=console, 
-              application=
-              command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
-              startup=edd_startup, 
-              cleanup=_edd.restore_display)
+edd = piety.Job(session=console, 
+                application=
+                command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
+                startup=edd_startup, 
+                cleanup=_edd.restore_display)
 
 # Enable exit with q or ^D, must use separate statement so application has a name
 edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)

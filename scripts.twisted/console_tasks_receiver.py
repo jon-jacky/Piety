@@ -8,14 +8,14 @@ the Twisted framework) reads the input and then passes it to that
 instance's handler, which takes the input as a parameter.
 """
 import sys
-import piety, session, job, command, keyboard # , key not used
+import piety, command, keyboard # , key not used
 import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
 
 class Namespace(object): pass # another way to avoid name clashes
 jobs = Namespace()
 
 # Session, a terminal task
-console = session.Session(name='console', input=sys.stdin)
+console = piety.Session(name='console', input=sys.stdin)
 
 # Failed experiment to work with twisted/eventloop.py and piety.twisted.eventloop
 # Not needed to work with piety.twisted
@@ -33,10 +33,10 @@ pyshc = command.Command(prompt='>> ', # reader=key.Key(),  key not used
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-jobs.pysh = job.Job(session=console, application=pyshc, startup=pysh_startup, 
-                    reader=pyshc.handle_key,
-                    stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
-                    cleanup=piety.quit)
+jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh_startup, 
+                      reader=pyshc.handle_key,
+                      stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
+                      cleanup=piety.quit)
 
 # line editor
 
@@ -52,9 +52,9 @@ def ed_startup(*filename, **options):
 # Use default reader, not key.Key, so multicharacter control sequences
 #  (such as keyboard arrow keys) will not work.
 # Exit with q only, ^D exit is not enabled
-edc = job.Job(session=console,
-              application=command.Command(prompt='', handler=ed.cmd),
-              startup=ed_startup, stopped=(lambda: ed.quit))
+edc = piety.Job(session=console,
+                application=command.Command(prompt='', handler=ed.cmd),
+                startup=ed_startup, stopped=(lambda: ed.quit))
 edc.reader = edc.application.handle_key
               
 # display editor
@@ -67,12 +67,12 @@ def edd_startup(*filename, **options):
     _edd.init_display(*filename, **options) # _ed.prompt is not used by Piety
 
 # edd module was imported as _edd so we can call the job edd without name clash
-edd = job.Job(session=console, 
-              application=
-              command.Command(prompt='', # reader=key.Key(), # key not used
-                              handler=_edd.cmd),
-              startup=edd_startup, 
-              cleanup=_edd.restore_display)
+edd = piety.Job(session=console, 
+                application=
+                command.Command(prompt='', # reader=key.Key(), # key not used
+                                handler=_edd.cmd),
+                startup=edd_startup, 
+                cleanup=_edd.restore_display)
 edd.reader = edd.application.handle_key
 
 # Enable exit with q or ^D, must use separate statement so application has a name
