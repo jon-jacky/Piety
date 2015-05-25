@@ -8,7 +8,7 @@ system.  To run tasks in Piety, import the *piety* module, create some
 *piety.Task* instances, then call *piety.run*.
 
 The following sections first provide an overview of tasks in Piety,
-then describe classes in the *piety* module, and finally explain the
+then describe classes in the *piety* module, and finally explain
 the Piety *run* function and how it can use different event loops.
 
 ### Tasks in Piety ###
