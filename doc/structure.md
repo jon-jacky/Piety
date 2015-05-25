@@ -1,75 +1,87 @@
 
-Modular structure and design rules
-==================================
+Modular structure
+=================
 
-The Piety [directories](../directories.md) and modules are designed to
+The Piety [directories](directories.md) and modules are designed to
 enable Piety to run on different platforms and in different
-configurations.  A *platform* is a host operating system or a bare
-machine (including virtual machines), including the Python interpreter
-itself (CPython, PyPy, Micro Python, ...).  A *configuration* is
-a collection of available devices, possibly including a console
-terminal, but also allowing for "headless" configurations with no
-console (as are sometimes used for embedded systems).
+configurations.  
 
-In the following discussion, *use* or *depend on* means *import*.
-The design minimizes dependencies among modules.
+A *platform* is a host operating system or a bare machine (including
+virtual machines), including the Python interpreter itself (CPython,
+PyPy, Micro Python, ...).  A *configuration* is a collection of
+available devices, possibly including a console terminal, but also
+allowing for "headless" configurations with no console (as are
+sometimes used for embedded systems).
 
-We observe these design rules:
+It is possible to customize Piety systems by choosing different
+subsets and combinations of modules.  To adapt to different
+platforms and configurations, there are some modules with the
+same name and same API (but different internals) stored in
+different directories: for example, *select/eventloop.py* and
+*twisted/eventloop.py*.  The chosen module can be included by
+adding its directory to the $PYTHONPATH and excluding the other.
+To help with this, there are commands in the *bin* directory.
+
+In the following discussion, *use* or *depend on* means *import*.  The
+design attempts to avoid unnecessary dependencies among modules.  
 
 - Modules that depend on particular platforms (host operating systems)
-  or configurations (devices) must be separated out in directories with specific
+  or configurations (devices) are separated out in directories with specific
   names that indicate the dependence, for example *unix* or
-  *select* or *vt_terminal*.  The modules within these directories must have
-  generic names, for example *terminal*, *eventloop*, *keyboard*, *display*.  The
-  functions (etc.)  within these modules must also have generic names:
+  *select* or *vt_terminal*.  Functionally-equivalent  
+  modules within these directories 
+  provide the same API.  In particular, these  modules have 
+  the same generic names: *terminal*, *eventloop*, *keyboard*, *display*.
+  The functions (etc.) within these modules also have the same generic names:
   *run*, *self_insert_char*, *kill_line* etc.  The bodies of those functions
-  can contain platform- and device-specific code.  Modules that depend
-  on different platforms and devices go into different directories
-  with other specific names: for example *printing_terminal* or
-  *framebuffer_terminal* etc.  But the
-  modules in these directories must also have the same generic module
-  names and function names.  Modules that use any of these are not
+  can contain platform- and device-specific code.  
+  Modules that use (import) any of these are not
   platform- or device-dependent because they import modules and call
-  functions by their generic names.  Then Piety can be configured for
-  different platforms and devices by including or omitting different
-  subsets of the specialized directories from *PYTHONPATH*.  This can
-  be accomplished by providing appropriate scripts in the *bin*
-  directory.
+  functions by their generic names.   The chosen versions are 
+  selected by placing their directories on the $PYTHONPATH.
 
-- Modules that are not platform- or device-dependent must be written
-  in *pure Python*: They must not use C extensions, or modules that
+- Modules that are not platform- or device-dependent are written
+  in *pure Python*: They do not use C extensions, or modules that
   wrap libraries written in other languages.  Those can limit the
   platform to one particular Python interpreter (usually CPython).
+  A requirement for a particular Python interpreter is an example of
+  a platform dependence.
 
-- The modules in the *scheduler* directory are the core of the Piety
-  operating system.  They must not depend on any particular devices 
-  (in particular, they cannot require a console).  The must be platform-independent, 
-  but they must necessarily import a platform-dependent event loop.
-  To run Piety on a Unix-like host, it is currently necessary to import 
-  the event loop from the platform-dependent *select* directory.
+- The *piety* module in the *piety* directory is the core of the Piety
+  operating system.  It does not depend on any particular devices 
+  (in particular, it does not require a console).  It is platform-independent, 
+  but it must import a platform-dependent *eventloop* module
+  from a directory tha contains one.
+  (Currently, those are the *select* and *twisted* directories.)
+  
+- The *piety* module imports *eventloop*, but *eventloop* uses several
+  data structures defined in *piety*, including *schedule*.  The
+  *piety* module shares these by assigning them to attributes in
+  *eventloop* after it imports that module.
 
 - The modules in the *console* directory are used by terminal
-  applications.  They must be platform- and device- independent.  They
-  must access all terminal functions by importing 
+  applications.  They are platform- and device- independent.  They
+  access all terminal functions by importing 
   modules from device-dependent directories such as *unix* and
   *vt_terminal*.
 
 - The modules in the directories *applications*, *editors*, and *shell*
   are applications (the Python shell is just another application).  An
-  application must not depend on any modules in *scheduler*; in fact,
+  application does not depend on any modules in *scheduler*; in fact,
   it must be able to run without the Piety scheduler.  To demonstrate
-  this, every application must have a *main* method that can be run
+  this, every application has a *main* method that can be run
   from the host's *python* command or in any Python interpreter
-  session.  Applications must also be
+  session.  Applications are also
   platform- and device- independent, by observing the same discipline
   as modules in *console*.  Applications are included in the Piety
   repository just as a convenience, and any application may be removed
   or separated out to a different repository in the future.
 
 - The modules in the *scripts* directory run applications as tasks or
-  jobs under the Piety sheduler.  These modules typically use modules
-  from the *scheduler*, *console*, and application directories.  They
-  can use any modules, but it is good practice to avoid platform- or
-  device-specific code here.
+  jobs under Piety.  These scripts typically use modules
+  from the *piety*, *console*, and application directories.  They
+  can use any modules.  Avoiding platform- or
+  device-specific code in scripts makes it possible for them to be re-used
+  on different systems.
 
-Revised April 2015
+Revised May 2015

@@ -5,8 +5,6 @@ console
 Modules used by terminal applications, including a pure Python
 non-blocking alternative to *readline*:
 
-- **command.md**: explanation of *command.py* and *key.py*.
-
 - **command.py**: Skeleton command line application.
   Collects a command (string), passes it to a handler (callable) to execute.
   Can collect command without blocking, for cooperative multitasking.

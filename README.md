@@ -56,8 +56,7 @@ Recent projects by others in a similar spirit include
 [STEPS](http://www.vpri.org/pdf/tr2011004_steps11.pdf) in other
 languages.
 
-Another page describes the Piety [directories](directories.md) and their contents.
+Another page describes the Piety [directories](doc/directories.md) and
+their contents.
 
 Revised February 2015
-
-

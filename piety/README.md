@@ -93,9 +93,10 @@ imports the *eventloop* module from the directory that is on the
 *PYTHONPATH*.  Commands in the *bin* directory put one or another
 directory on the path.
 
-The *piety* module is tightly coupled to the *eventloop* module it
-imports.  It shares several mutable data structures including its *schedule*
-by assigning them to attributes in *eventloop*.
+The *piety* module imports *eventloop*, but *eventloop* uses several
+data structures defined in *piety*, including *schedule*.  The *piety*
+module shares these by assigning them to attributes in *eventloop*
+after it imports that module.
  
 Revised May 2015
 

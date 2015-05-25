@@ -48,7 +48,7 @@ The Piety repository is organized into these directories:
     the future.
 
 Each directory contains a *README* file with more information.
-Another page explains the [rationale](doc/structure.md) for this organization.
+Another page explains the [rationale](structure.md) for this organization.
 
 Revised May 2015
 
