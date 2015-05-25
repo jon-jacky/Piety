@@ -40,16 +40,16 @@ def true(): return True # always returns True, can say t0.enabled = piety.true
 def false(): return False
     
 class Task(object):
-    'Task instances are scheduled and invoked by the Piety scheduler.'
+    'Task instances are scheduled and invoked by a Piety event loop.'
     taskno = 0
 
     def __init__(self, name=None, input=None, handler=None, enabled=true):
         """
         A Task instance identifies a handler, an input source, an enabling
-        condition, and a name.  The Piety scheduler may
+        condition, and a name.  A Piety event loop may
         invoke the handler when input is available and the enabling
         condition is True.  Then the handler runs until it returns (or
-        yields) control to the scheduler.  There is no preemption.
+        yields) control to the event loop.  There is no preemption.
 
         This constructor creates a Task object and adds it to
         the collection of scheduled tasks.
@@ -60,19 +60,19 @@ class Task(object):
         name - task name. By default, a unique name is constructed
         of the form tN, where N is a small decimal number.         
         
-        input - source where data must be available to cause the scheduler to
+        input - source where data must be available to cause the event loop to
         invoke the handler.  Defaults to None, meaning the handler is
         never invoked.  In this version the inputs are the file-like
-        objects watched by the select call in the scheduler's
+        objects watched by the select call in the
         event loop, including sys.stdin and possibly others. 
         Another input is timer, the periodic select timeout input.
 
         handler - callable object to be invoked by the
-        scheduler.  Defaults to None, meaning nothing is called.
+        event loop.  Defaults to None, meaning nothing is called.
         In this version the handler must have no arguments.
 
         enabled - enabling condition, a Boolean callable object which
-        must return True to cause the scheduler to invoke the handler.
+        must return True to cause the event loop to invoke the handler.
         Defaults to a function that always returns True, meaning the
         handler may be invoked whenever data is available at the input.
         """

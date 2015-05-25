@@ -37,7 +37,7 @@ The Piety repository is organized into these directories:
      directories.
 
 - **twisted**: Non-blocking event loop using the Twisted reactor, optionally 
-     used by *piety.run*.
+     used by *piety.run* and by scripts in *scripts.twisted_eventloop*
 
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.

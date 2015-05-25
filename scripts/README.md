@@ -13,7 +13,7 @@ comments in each module for directions and explanations:
   This module is used by the *piety* script. 
   It also has a *main* method that
   runs the session in a simple blocking event loop (instead of using
-  the Piety non-blocking event loop).
+  one of the non-blocking event loops).
 
 - **embedded**: Uses a non-blocking event loop to run the two concurrent file
    writer tasks created by *writer_tasks*, but without an interactive
