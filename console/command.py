@@ -6,9 +6,11 @@ command.py - Skeleton command line application.
   Provides optional hooks for job control commands that bypass the application.
  Has a main method, python command.py demonstrates most functions.
 
-Command instances can use their reader method to read input for themselves, 
-or, alternatively, use their handle_key method to accept input passed from a caller.
-This module's main function demonstrates both alternatives. 
+A Command instances can work in reader mode where it uses the
+function passed to the reader initializer argument to read input,
+or, alternatively, can work in receiver mode where it uses
+the built-in handle_key method to accept input passed from a caller.
+This module's main function demonstrates both alternatives.
 """
 
 import sys
@@ -284,9 +286,11 @@ def main():
     while not (quit or c.command == keyboard.C_d): 
         if c.new_command: # c.handler sets new_command = True
             c.restart()
-        # Here Command instance reads input characters itself when invoked by caller
+        # Here Command instance works in reader mode:
+        # uses the function passed to its reader argument to read its input.
         c.reader()
-        # Alternatively, Command instance can accept input characters passed by caller
+        # Alternatively, here Command instance works in receiver mode:
+        # uses its built-in handle_key method to accept input passed by caller.
         # To demonstrate, comment out previous line and uncomment following lines 
         #char = terminal.getchar()
         #c.handle_key(char)
