@@ -19,26 +19,26 @@ platforms and configurations, there are some modules with the
 same name and same API (but different internals) stored in
 different directories: for example, *select/eventloop.py* and
 *twisted/eventloop.py*.  The chosen module can be included by
-adding its directory to the $PYTHONPATH and excluding the other.
+adding its directory to the *$PYTHONPATH* and excluding the other.
 To help with this, there are commands in the *bin* directory.
 
 In the following discussion, *use* or *depend on* means *import*.  The
 design attempts to avoid unnecessary dependencies among modules.  
 
 - Modules that depend on particular platforms (host operating systems)
-  or configurations (devices) are separated out in directories with specific
-  names that indicate the dependence, for example *unix* or
-  *select* or *vt_terminal*.  Functionally-equivalent  
-  modules within these directories 
-  provide the same API.  In particular, these  modules have 
-  the same generic names: *terminal*, *eventloop*, *keyboard*, *display*.
-  The functions (etc.) within these modules also have the same generic names:
-  *run*, *self_insert_char*, *kill_line* etc.  The bodies of those functions
-  can contain platform- and device-specific code.  
-  Modules that use (import) any of these are not
-  platform- or device-dependent because they import modules and call
-  functions by their generic names.   The chosen versions are 
-  selected by placing their directories on the $PYTHONPATH.
+  or configurations (devices) are separated out in directories with
+  specific names that indicate the dependence, for example *unix* or
+  *select* or *vt_terminal*.  Functionally-equivalent modules within
+  these directories provide the same API.  In particular, these
+  modules have the same generic names: *terminal*, *eventloop*,
+  *keyboard*, *display*.  The functions (etc.) within these modules
+  also have the same generic names: *run*, *self_insert_char*,
+  *kill_line* etc.  The bodies of those functions can contain
+  platform- and device-specific code.  Modules that use (import) any
+  of these are not platform- or device-dependent because they import
+  modules and call functions by their generic names.  The chosen
+  versions are selected by placing their directories on the
+  *$PYTHONPATH*.
 
 - Modules that are not platform- or device-dependent are written
   in *pure Python*: They do not use C extensions, or modules that
@@ -67,8 +67,8 @@ design attempts to avoid unnecessary dependencies among modules.
 
 - The modules in the directories *applications*, *editors*, and *shell*
   are applications (the Python shell is just another application).  An
-  application does not depend on any modules in *scheduler*; in fact,
-  it must be able to run without the Piety scheduler.  To demonstrate
+  application does not depend on any modules in *piety*; in fact,
+  it must be able to run without the Piety event loop.  To demonstrate
   this, every application has a *main* method that can be run
   from the host's *python* command or in any Python interpreter
   session.  Applications are also
@@ -77,6 +77,9 @@ design attempts to avoid unnecessary dependencies among modules.
   repository just as a convenience, and any application may be removed
   or separated out to a different repository in the future.
 
+- None of the Piety operating system modules in *piety*, *console*, or
+  anywhere else depend on any application modules.
+  
 - The modules in the *scripts* directory run applications as tasks or
   jobs under Piety.  These scripts typically use modules
   from the *piety*, *console*, and application directories.  They
