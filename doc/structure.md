@@ -87,4 +87,7 @@ design attempts to avoid unnecessary dependencies among modules.
   device-specific code in scripts makes it possible for them to be re-used
   on different systems.
 
+- None of the Piety operating system modules or applications depend on any
+  contents of the *scripts* directory
+
 Revised May 2015
