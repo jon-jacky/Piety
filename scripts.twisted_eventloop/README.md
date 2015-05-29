@@ -38,7 +38,8 @@ It was necessary to revise some scripts:
     *piety* scripts.  The same file as *scripts/writer_tasks.py*,
     copied here so it is easy to import.
 
-NOTE: At this time *piety.twisted_eventloop* DOES NOT WORK.
+NOTE: At this time *piety.twisted_eventloop* DOES NOT WORK,
+      Twisted throws exception for unknown reason.
       *twisted/eventloop.py* only works with tasks that 
       are triggered by the timeout event, for example in *scripts/embedded*.
 

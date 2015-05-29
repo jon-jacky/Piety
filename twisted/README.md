@@ -13,5 +13,6 @@ NOTE: At this time *twisted/eventloop.py* only works with tasks that
     *scripts/embedded* and *scripts/eventloop*.  It DOES NOT WORK with
     tasks that use the standard input, for example in
     *scripts.twisted_eventloop/piety.twisted_eventloop*
+    Twisted throws exception for unknown reason.
 
 Revised May 2015

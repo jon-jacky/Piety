@@ -7,7 +7,7 @@ it also assigns piety.eventloop.application = console.
 Here piety.eventloop is actually twisted/eventloop.py, this assigment is
 needed to enable Twisted to invoke the intended Piety job.
 
-Also, this version assigns the console session to piety.eventloop.application
+This DOES NOT WORK - Twisted throws exception for unknown reason
 """
 import sys
 import piety, command, keyboard # , key not used
@@ -19,9 +19,6 @@ jobs = Namespace()
 # Session, a terminal task
 console = piety.Session(name='console', input=sys.stdin)
 
-# Needed to work with twisted/eventloop.py and piety.twisted_eventloop
-# Not needed to work with piety.twisted
-piety.eventloop.application = console
 
 # Python shell
 
@@ -84,6 +81,13 @@ edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
 #  exactly the same syntax as when we import edd.py into Python without Piety
 edd.main = edd.__call__
 
+# Try assigning these in eventloop analogout to scripts.twisted/piety.twisted
+piety.eventloop.application = console
+piety.eventloop.jobs = jobs
+piety.eventloop.pysh = pysh
+piety.eventloop.edc = edc
+piety.eventloop.edd = edd
+# Alas, it doesn't work, Twisted throws exception, reason unknown
 
 # main method for test and demonstration
 

@@ -23,6 +23,7 @@ NOTE: At this time *twisted/eventloop.py* only works with tasks that
     and *scripts/eventloop*.  
     But it DOES NOT WORK with tasks that use the standard input, for
     example in *scripts.twisted_eventloop/piety.twisted_eventloop*
+    Twisted throws exception for unknown reason.
 """
 
 from twisted.internet import stdio, reactor
@@ -43,10 +44,13 @@ class Console(basic.LineReceiver):
 
     def rawDataReceived(self, data): # data are one or more chars, not a line
         # Debug prints - try to track down why this DOES NOT WORK
-        print 'eventloop module, Console object, rawDataRecieved method'
-        print ' self', self
-        print ' application', application
-        print ' application.handler', application.handler
+        #print 'eventloop module, Console object, rawDataRecieved method'
+        #print ' self', self
+        #print ' application', application
+        #print ' application.handler', application.handler
+        # These all print the intended output, for example:
+        #  application.handler <bound method Command.handle_key of <command.Command object at 0x10acc8350>>
+        # Alas, it still doesn't work, Twisted throws exception, reason unknown
         application.handler(data) #  call Piety Session
         ievent[sys.stdin] += 1 # count events
         print 'returned from application.handler, about to exit rawDataRecieved'
