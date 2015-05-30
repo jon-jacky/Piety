@@ -21,8 +21,6 @@ Piety notes and documents
     experiments with motivation similar to Piety.  Several are in
     Python.
 
-- **scheduler.md**, explanations of the modules in *Piety/scheduler*
-
 - **utilities.md**, system software and utilities written in Python,
     or programmable in Python.
 
