@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+"""
+printing - demo Command with keymap modified to support printing terminal
+            we remove ^D from keymap so must exit with ^C
+"""
+
+from command import Command, quit
+from keyboard import bs, delete, C_a, C_b, C_d, C_e, C_f, C_k
+
+c = Command()
+
+# remove from keymap those keys whose functions require a display terminal
+for k in (C_a, C_b, C_e, C_f, C_k):
+    del c.keymap[k]
+
+# reassign backspace and delete to use printing terminal version
+c.keymap[delete] = c.keymap[bs] = c.backward_delete_last_char
+
+def main():
+    quit = False
+    while not (quit or c.command == C_d): 
+        if c.new_command:
+            c.restart()
+        c.reader()
+
+if __name__ == '__main__':
+    main()

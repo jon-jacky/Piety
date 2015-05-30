@@ -19,11 +19,14 @@ non-blocking alternative to Python *raw_input* or Unix *readline*
   *scripts/console_tasks.py* and *scripts.twisted/console_tasks_receiver.py* 
   for more examples.
 
-- **command.txt**: command summary for *command.py*, similar to Unix
+- **command.txt**: Command summary for *command.py*, similar to Unix
    *readline*.  How to edit the command line and access its history
-   in any application the uses *console.py*
+   in any application the uses *console.py*.
 
 - **key.py**: Collect, store, return single character or
     multi-character key sequences.  Can be used as a *reader* by *Command*.
 
-Revised April 2015
+- **printing**: Script to demonstrate *Command* with its *keymap* modified to
+      support a printing terminal.
+
+Revised May 2015
