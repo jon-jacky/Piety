@@ -2,7 +2,7 @@
 command.py - Skeleton command line application.
   Collects a command (string), passes it to a handler (callable) to execute.
   Can collect command without blocking, for cooperative multitasking.
-  Provides command history, rudimentary in-line editing similar to Unix readline.
+  Provides command history, simple in-line editing similar to Unix readline.
   Provides optional hooks for job control commands that bypass the application.
  Has a main method, python command.py demonstrates most functions.
 
@@ -17,16 +17,7 @@ import sys
 import string # for string.printable
 import terminal, keyboard, display
 
-quit = False
-
-def echo(command):
-    'Default handler, print command on console, q exits without printing'
-    global quit
-    if command == 'q':
-        quit = True
-    else:
-        print command
-
+# used by Command to print history to print current 'line' including newlines
 def putlines(s):
     """
     Format and print possibly multi-line string
@@ -40,7 +31,7 @@ def putlines(s):
             terminal.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='> ', reader=terminal.getchar, handler=echo):
+    def __init__(self, prompt='> ', reader=terminal.getchar, handler=None):
         """
         All arguments are optional, with defaults
 
@@ -52,7 +43,7 @@ class Command(object):
         multichar sequence.
 
         handler - function to execute command.  Can be any callable
-        that takes one argument, a string.  Default just echoes the
+        that takes one argument, a string.  Default None (which crashes).
         command.
         """
         self.prompt = prompt # string to prompt for command 
@@ -273,9 +264,23 @@ class Command(object):
          self.command = self.command[:self.point] # point doesn't change
          display.kill_line()
 
+
 # Test
 
-c = Command()
+# WARNING 'quit' is just for test in __main__ here.  Just one 'quit' in module
+# but there are usually several Command instances per session.
+quit = False 
+
+# used as command in __main__
+def echo(command):
+    'Print command on console, q exits without printing'
+    global quit
+    if command == 'q':
+        quit = True
+    else:
+        print command
+
+c = Command(handler=echo)
 
 def main():
     # Note - default reader terminal.getchar can't handle multi-char control seqs
