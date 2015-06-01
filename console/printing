@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 printing - demo Command with keymap modified to support printing terminal
-           Default handler, Just echoes command line, type command 'q' to exit.
+           Handler just echoes command line, type command 'q' to exit.
 """
 
 import command
