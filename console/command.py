@@ -122,13 +122,13 @@ class Command(object):
         elif key in self.keymap:
             self.keymap[key]()
         else:
-            print keyboard.bel, # sound indicates key not handled
+            print(keyboard.bel, end=' ') # sound indicates key not handled
         return key # caller might check for 'q' quit cmd or ...
 
     def handler(self):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
-        print # print command output on new line
+        print() # print command output on new line
         # job control commands are *not* passed to handler, only to job control
         # job control command are only effective if job control handles them
         if not self.command in self.job_control:
@@ -156,7 +156,7 @@ class Command(object):
         # raw mode terminal doesn't respond to ^C, must handle here
         terminal.putstr('^C') 
         terminal.set_line_mode() # on new line...
-        print              # ... otherwise traceback is a mess
+        print()              # ... otherwise traceback is a mess
         raise KeyboardInterrupt
 
     # Simple command editing that works on printing terminals
@@ -278,7 +278,7 @@ def echo(command):
     if command == 'q':
         quit = True
     else:
-        print command
+        print(command)
 
 c = Command(handler=echo)
 

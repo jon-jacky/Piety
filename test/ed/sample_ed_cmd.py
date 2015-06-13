@@ -22,8 +22,8 @@ ed.cmd('w')
 # confirm file got written, read into a different buffer and print
 
 ed.cmd('B test.txt')
-print
+print()
 ed.cmd('1,$p')
 ed.cmd('q')
-print
-print 'Remove test.txt before running this again, to get the same results'
+print()
+print('Remove test.txt before running this again, to get the same results')

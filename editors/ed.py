@@ -63,14 +63,14 @@ def f(*args):
         ed0.f(filename)
         return
     if buf().filename:
-        print buf().filename
+        print(buf().filename)
         return
-    print '? no current filename'
+    print('? no current filename')
 
 def e(*args):
     'read in file, replace buffer contents unless unsaved changes'
     if buf().unsaved:
-        print '? warning: file modified'
+        print('? warning: file modified')
         return
     E(*args)
 
@@ -80,10 +80,10 @@ def E(*args):
     if not filename:
         filename = buf().filename
     if not filename:
-        print '? no current filename'
+        print('? no current filename')
         return
     ed0.r_new(ed0.current, filename) # replace previous current buffer with new
-    print '%s, %d lines' % (filename, S())
+    print('%s, %d lines' % (filename, S()))
 
 def r(*args):
     'Read file contents into buffer after iline'
@@ -93,11 +93,11 @@ def r(*args):
         return # current_filename already printed error msg
     iline = ed0.mk_start(start)
     if not ed0.start_empty_ok(iline): # r command works even for empty buffer
-        print '? invalid address'
+        print('? invalid address')
         return
     S0 = S() # record number of lines now to calc how many we read
     ed0.r(iline, filename)
-    print '%s, %d lines' % (filename, S()-S0)
+    print('%s, %d lines' % (filename, S()-S0))
 
 def b(*args):
     """
@@ -114,15 +114,15 @@ def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
     x, xx, filename, xxx = parse_args(args)
     if not filename:
-        print '? file name'
+        print('? file name')
         return
     buffername = os.path.basename(filename) # may differ from filename
     if buffername in ed0.buffers:
         # FIXME? create new buffername a la emacs name<1>, name<2> etc.
-        print '? buffer name %s already in use' % buffername
+        print('? buffer name %s already in use' % buffername)
         return
     ed0.r_new(buffername, filename)
-    print '%s, %d lines' % (filename, S())
+    print('%s, %d lines' % (filename, S()))
 
 def w(*args):
     'write current buffer contents to file name'
@@ -131,7 +131,7 @@ def w(*args):
     if not filename:
         return # current_filename already printed error msg
     ed0.w(filename)
-    print '%s, %d lines' % (filename, S())
+    print('%s, %d lines' % (filename, S()))
 
 D_count = 0 # number of consecutive times D command has been invoked
 
@@ -141,7 +141,7 @@ def D(*args):
     x, xx, text, xxx = parse_args(args)
     name = text if text else ed0.current
     if name in ed0.buffers and ed0.buffers[name].unsaved and not D_count:
-        print '? unsaved changes, repeat D to delete'
+        print('? unsaved changes, repeat D to delete')
         D_count += 1 # must invoke D twice to confirm, see message below
         return
     DD(*args)
@@ -151,13 +151,13 @@ def DD(*args):
     x, xx, text, xxx = parse_args(args)
     name = text if text else ed0.current
     if not name in ed0.buffers:
-        print '? buffer name'
+        print('? buffer name')
         return
     if name == 'main':
-        print "? Can't delete main buffer"
+        print("? Can't delete main buffer")
         return
     ed0.D(name)
-    print '%s, buffer deleted' % name
+    print('%s, buffer deleted' % name)
 
 # Displaying information
 
@@ -165,25 +165,25 @@ def print_status(bufname, iline):
     'used by e and n, given bufname and iline prints dot, $, filename, unsaved'
     buf = ed0.buffers[bufname]
     loc = '%s/%d' % (iline, len(buf.lines)-1) # don't count empty first line
-    print '%7s  %s%s%-12s  %s' % (loc, 
+    print('%7s  %s%s%-12s  %s' % (loc, 
                                '.' if bufname == ed0.current else ' ',
                                '*' if buf.unsaved else ' ', 
                                bufname, (buf.filename if buf.filename else 
-                                         'no current filename'))
+                                         'no current filename')))
 
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
     start, x, xx, xxx = parse_args(args)
     iline = start if start != None else S() # default $ not .
     if ed0.start_empty_ok(iline): # don't print error message when file is empty
-        print iline
+        print(iline)
     else:
-        print '? invalid address'
+        print('? invalid address')
 
 def n(*args):
     'Print status of all buffers'
-    print """    ./$    Buffer        File
-    ---    ------        ----"""
+    print("""    ./$    Buffer        File
+    ---    ------        ----""")
     for name in ed0.buffers:
         print_status(name, ed0.buffers[name].dot)
     
@@ -194,27 +194,27 @@ def l(*args):
     'Advance dot to iline and print it'
     iline, x, xx, xxx = parse_args(args)
     if not ed0.lines():
-        print '? empty buffer'
+        print('? empty buffer')
         return
     # don't use usual default dot here, instead advance dot
     if iline == None:
         iline = o() + 1
     if not ed0.start_ok(iline):
-        print '? invalid address'
+        print('? invalid address')
         return
-    print ed0.l(iline)
+    print(ed0.l(iline))
 
 def p_lines(ifirst,ilast):
     'Print line numbers ifirst through ilast, inclusive, without arg checking'
-    for iline in xrange(ifirst,ilast+1): # +1 because ifirst,ilast is inclusive
-        print ed0.l(iline)
+    for iline in range(ifirst,ilast+1): # +1 because ifirst,ilast is inclusive
+        print(ed0.l(iline))
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
     istart, jend, x, xx = parse_args(args)
     start, end = ed0.mk_range(istart, jend)
     if not ed0.range_ok(start, end):
-        print '? invalid address'
+        print('? invalid address')
         return
     p_lines(start, end)
     
@@ -224,19 +224,19 @@ def z(*args):
     Leave dot at last line printed. If parameter is present, update buf().npage
     """
     start, x, npage_string, xxx = parse_args(args)
-    print 'start %s, npage_string %s' % (start, npage_string)
+    print('start %s, npage_string %s' % (start, npage_string))
     iline = ed0.mk_start(start)
     if not ed0.start_empty_ok(iline):
-        print '? invalid address'
+        print('? invalid address')
         return
     if npage_string:
         try:
             npage = int(npage_string)
         except:
-            print '? integer expected: %s' % npage_string
+            print('? integer expected: %s' % npage_string)
             return 
         if npage < 1:
-            print '? integer > 1 expected %d' % npage
+            print('? integer > 1 expected %d' % npage)
             return
         buf().npage = npage
     end = iline + buf().npage 
@@ -258,7 +258,7 @@ def ai_cmd(cmd_fcn, args):
     start, x, text, xx = parse_args(args)
     iline = ed0.mk_start(start)
     if not ed0.start_empty_ok(iline): # a, i commands work even for empty buffer
-        print '? invalid address'
+        print('? invalid address')
         return
     if text:
         cmd_fcn(iline, text)
@@ -268,7 +268,7 @@ def d(*args):
     start, end, x, xxx = parse_args(args)
     istart, iend = ed0.mk_range(start, end)
     if not ed0.range_ok(istart, iend):
-        print '? invalid address'
+        print('? invalid address')
         return
     ed0.d(istart, iend)
 
@@ -277,7 +277,7 @@ def c(*args):
     start, end, text, x = parse_args(args)
     istart, iend = ed0.mk_range(start, end)
     if not ed0.range_ok(istart, iend):
-        print '? invalid address'
+        print('? invalid address')
         return
     ed0.c(istart,iend,text)
         
@@ -290,13 +290,13 @@ def s(*args):
     start, end, old, params = parse_args(args)
     istart, iend = ed0.mk_range(start, end)
     if not ed0.range_ok(istart, iend):
-        print '? invalid address'
+        print('? invalid address')
         return
     # params might be [ new, glbl ]
     if old and len(params) > 0 and isinstance(params[0],str):
         new = params[0]
     else:
-        print '? /old/new/'
+        print('? /old/new/')
         return
     if len(params) > 1:
         glbl = bool(params[1])
@@ -379,7 +379,7 @@ def parse_cmd(cmd_string):
         if tail and tail[0] == ',': # addr separator, next addr NOT optional
             jend, tail = match_address(tail[1:])
             if jend == None:
-                print '? end address expected at %s' % tail
+                print('? end address expected at %s' % tail)
                 return 'ERROR', istart, jend, params
     # look for cmd_string, NOT optional
     if tail and tail[0] in ed_cmds:
@@ -390,7 +390,7 @@ def parse_cmd(cmd_string):
     elif tail[0] == '=':
         cmd_name = 'A'
     else:
-        print '? command expected at %s' % tail
+        print('? command expected at %s' % tail)
         return 'ERROR', istart, jend, params
     # special handling for commands that must be repeated to confirm
     D_count = 0 if cmd_name != 'D' else D_count
@@ -435,7 +435,7 @@ def cmd(line):
             istart, jend, x, xxx = parse_args(args) # might be int or None
             input_line, end_line = ed0.mk_range(istart, jend) # int only
             if not ed0.range_ok(input_line, end_line):
-                print '? invalid address'
+                print('? invalid address')
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf().dot = input_line
@@ -445,9 +445,9 @@ def cmd(line):
                 ed0.d(input_line, end_line) # updates buf().dot
                 buf().dot = input_line - 1
             else:
-                print '? command not supported in input mode: %s' % cmd_name
+                print('? command not supported in input mode: %s' % cmd_name)
         else:
-            print '? command not implemented: %s' % cmd_name
+            print('? command not implemented: %s' % cmd_name)
         return
     else: # input mode for a,i,c commands that collect text
         if line == '.':
@@ -472,7 +472,7 @@ def main(*filename, **options):
     if 'p' in options:
         prompt = options['p'] 
     while not quit:
-        line = raw_input(prompt) # blocking
+        line = input(prompt) # blocking
         cmd(line) # non-blocking
 
 # Run the editor from the system command line:  python ed.py

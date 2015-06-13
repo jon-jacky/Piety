@@ -123,14 +123,14 @@ def tasks():
         else:
             return oname(e)
         
-    print """  i     name  enabled              n  input            handler
-  -     ----  -------              -  -----            -------"""
+    print("""  i     name  enabled              n  input            handler
+  -     ----  -------              -  -----            -------""")
     for t in tasks_list:
-        print '%3d %8s  %-15s  %5d  %-15s  %-15s' % \
+        print('%3d %8s  %-15s  %5d  %-15s  %-15s' % \
             (t.taskno, t.name, oname(t.enabled), 
              ievent[t.input], # ievent imported from eventloop
              # '  ???', # placeholder if we can't use ievent
-             ename(t.input), oname(t.handler))
+             ename(t.input), oname(t.handler)))
 
 
 class Session(Task):
@@ -269,8 +269,8 @@ class Job(object):
 
 # Test
 
-def task0(): print 'task 0'
-def task1(): print 'task 1'
+def task0(): print('task 0')
+def task1(): print('task 1')
 
 def main():
     # Here timer, done, run are all imported by piety from eventloop

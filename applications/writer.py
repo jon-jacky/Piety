@@ -76,7 +76,7 @@ def main():
     w = Writer(fname='w.txt')
     for i in range(10):
         w.write()
-    print('See output in w.txt')  # works in Python 2 and 3
+    print('See output in w.txt')
 
 if __name__ == '__main__':
     main()

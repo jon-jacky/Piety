@@ -9,7 +9,7 @@ import pysh, command, key
 pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell())
 
 def main():
-    print "pysh shell, type any Python statement, exit() to exit"
+    print("pysh shell, type any Python statement, exit() to exit")
     pysh.pexit = False # previous exit have made it True
     while not pysh.pexit:
         if pyshc.new_command:

@@ -35,6 +35,6 @@ test_cmd(a, 'Add second line to one-line buffer', 'Line 2')
 test_cmd(c, 'Change last line in two-line buffer', 'Changed line 2')
 test_cmd(c, 'Change first line in two-line buffer', 1, 'Changed line 1')
 
-print """# Remove test_ed_small.txt and test_ed_small_2.txt
+print("""# Remove test_ed_small.txt and test_ed_small_2.txt
 # before running this script again, to obtain the same result
-"""
+""")

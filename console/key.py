@@ -62,7 +62,7 @@ class Key(object):
 def main():
     'Demonstrate Key class'
     key = Key()
-    print '> ',
+    print('> ', end=' ')
     terminal.set_char_mode()
     line = ''
     k = '' # anything but cr
@@ -71,8 +71,8 @@ def main():
         line += k
         terminal.putstr(k)
     terminal.set_line_mode()
-    print 
-    print [ c for c in line ] # show any esc or other unprintables
+    print() 
+    print([ c for c in line ]) # show any esc or other unprintables
 
 if __name__ == '__main__':
     main()

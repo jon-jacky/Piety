@@ -17,7 +17,7 @@ It is possible to customize Piety systems by choosing different
 subsets and combinations of modules.  To adapt to different
 platforms and configurations, there are some modules with the
 same name and same API (but different internals) stored in
-different directories: for example, *select/eventloop.py* and
+different directories: for example, we might have *select/eventloop.py* and
 *twisted/eventloop.py*.  The chosen module can be included by
 adding its directory to the *$PYTHONPATH* and excluding the other.
 To help with this, there are commands in the *bin* directory.
@@ -52,7 +52,7 @@ design attempts to avoid unnecessary dependencies among modules.
   (in particular, it does not require a console).  It is platform-independent, 
   but it must import a platform-dependent *eventloop* module
   from a directory tha contains one.
-  (Currently, those are the *select* and *twisted* directories.)
+  (Currently, that is the *select* directory.)
   
 - The *piety* module imports *eventloop*, but *eventloop* uses several
   data structures defined in *piety*, including *schedule*.  The

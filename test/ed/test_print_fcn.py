@@ -3,7 +3,7 @@ Test redirecting printing with file=... arg
 """
 # https://docs.python.org/2.7/library/functions.html#print
 # says this works since 2.6
-from __future__ import print_function
+
 
 import sys
 

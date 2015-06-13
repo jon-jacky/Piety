@@ -13,23 +13,23 @@ Does not create file writer tasks (but they are easy to create "by
 """
 
 import sys
-import piety, session, job, command, key
+import piety, command, key
 
 # rename modules so we can use original module names as command names
 import pysh as _pysh, ed as _ed, edd as _edd
 
 # console session, a Piety task, initially runs Python shell
 # Then use console to run other jobs from shell: console.run(edc) etc.
-console = session.Session(name='console', event=sys.stdin)
+console = piety.Session(name='console', input=sys.stdin)
 
 # Python shell
 
 def pysh_startup():
     _pysh.pexit = False # enable event loop, compare to Job( stop=...) arg below
-    print "pysh shell, type any Python statement, exit() or Ctrl-D to exit"
+    print("pysh shell, type any Python statement, exit() or Ctrl-D to exit")
 
 pyshc = command.Command(prompt='>> ', reader=key.Key(), handler=_pysh.mk_shell())
-pysh = job.Job(session=console,
+pysh = piety.Job(session=console,
                application=pyshc,
                startup=pysh_startup, 
                restart=pyshc.restart,
@@ -45,7 +45,7 @@ def ed_startup():
 
 # use default Command reader, terminal.getchar
 edc = command.Command(prompt='', handler=_ed.cmd)
-ed = job.Job(session=console,
+ed = piety.Job(session=console,
              application=edc,
              startup=ed_startup, 
              restart=edc.restart,
@@ -60,7 +60,7 @@ def edd_startup():
     _edd.init_display()
 
 eddc = command.Command(prompt='', reader=key.Key(), handler=_edd.cmd)
-edd = job.Job(session=console,
+edd = piety.Job(session=console,
               application=eddc,
               startup=edd_startup, 
               restart=eddc.restart,

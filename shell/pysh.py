@@ -73,13 +73,13 @@ def mk_shell(globals=main_globals):
                 if result == None:
                     pass
                 elif isinstance(result,str):
-                    print "'"+result+"'"
+                    print("'"+result+"'")
                 else:
-                    print result
+                    print(result)
                 # statements (not exprs) like x = 42 crash eval
                 #  with syntax error, so use exec for those
             except SyntaxError:
-                exec command in globals
+                exec(command, globals)
         except BaseException as e:
           traceback.print_exc() # looks just like unhandled exception
 
@@ -92,9 +92,9 @@ def main():
     global pexit
     pexit = False # previous exit() may have made it True
     pysh = mk_shell()
-    print "pysh shell, type any Python statement, exit() to exit"
+    print("pysh shell, type any Python statement, exit() to exit")
     while not pexit:
-        command = raw_input('>> ')
+        command = input('>> ')
         pysh(command)
 
 if __name__ == '__main__':

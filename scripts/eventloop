@@ -4,8 +4,8 @@ eventloop script - demo piety and eventloop modules
 """
 import piety # includes from eventloop import *
 
-def task0(): print 'task 0'
-def task1(): print 'task 1'
+def task0(): print('task 0')
+def task1(): print('task 1')
 
 def main():
     # Here timeout, done, run are all imported by piety from eventloop

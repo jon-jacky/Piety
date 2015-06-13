@@ -111,24 +111,24 @@ def locate_window(bufname):
     buf = ed.buffer(bufname)
     buf_S = len(buf.lines)-1
     # Visible segment is at top of buffer, begins at first line
-    if buf.dot < win_h/2 or buf_S <= win_h: # win_h/2 python 2 integer division
+    if buf.dot < win_h//2 or buf_S <= win_h: # // is python 3 "floor division"
         seg_1 = 1  
         seg_n = min(win_h, buf_S)
     # Visible segment is at bottom of buffer, ends at last line
-    elif buf_S - buf.dot < win_h/2 and buf_S >= win_h: 
+    elif buf_S - buf.dot < win_h//2 and buf_S >= win_h: 
         seg_1 = buf_S - (win_h - 1)
         seg_n = buf_S
     # Visible segment is centered on dot
     else:
-        seg_1 = buf.dot - win_h/2  
+        seg_1 = buf.dot - win_h//2  # must use // floor division here
         seg_n = seg_1 + (win_h - 1)
 
 def display_lines(buf, first, last):
     'Display lines in buf numbered first through last '
     for line in buf.lines[first:last+1]: # slice, upper limit excluded
-        print line.rstrip()[:ncols-1], # remove \n, truncate don't wrap
+        print(line.rstrip()[:ncols-1], end=' ') # remove \n, truncate don't wrap
         display.kill_line() # erase from cursor to end
-        print # advance to next line
+        print() # advance to next line
     
 def display_window(bufname):
     """
@@ -145,11 +145,11 @@ def display_window(bufname):
     else: # input mode and this window displays current buffer around dot
         display_lines(buf, seg_1, ed.o())
         display.kill_whole_line() # open line for input
-        print # next line
+        print() # next line
         display_lines(buf, ed.o()+1, seg_n-1)
     for line in range(blank_h if ed.command_mode else blank_h - 1):
         display.kill_whole_line()
-        print
+        print()
 
 def locate_cursor(bufname):
     """
@@ -272,7 +272,7 @@ def main(*filename, **options):
     init_display(*filename, **options)
     line = '' # anything but 'q', must replace 'q' from previous quit
     while not ed.quit:
-        line = raw_input(prompt) # blocking
+        line = input(prompt) # blocking
         cmd(line) # no blocking
     restore_display()
 

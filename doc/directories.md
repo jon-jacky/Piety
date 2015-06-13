@@ -23,21 +23,12 @@ The Piety repository is organized into these directories:
 - **scripts**: Python scripts that run applications as tasks or jobs
     under a non-blocking event loop.
 
-- **scripts.twisted**: Python scripts that run applications as tasks or jobs
-    under a Twisted event loop coded in the scripts here.
-
-- **scripts.twisted_eventloop**: Python scripts that run applications
-    as tasks or jobs under the Twisted event loop in the *twisted* directory.
-
 - **select**: Non-blocking event loop using Unix *select*, used by *piety.run*.
 
 - **shell**: Python shell, *pysh*.
 
 - **test**: shell scripts and modules that test code in other
      directories.
-
-- **twisted**: Non-blocking event loop using the Twisted reactor, optionally 
-     used by *piety.run* and by scripts in *scripts.twisted_eventloop*
 
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.
@@ -50,5 +41,5 @@ The Piety repository is organized into these directories:
 Each directory contains a *README* file with more information.
 Another page explains the [rationale](modules.md) for this organization.
 
-Revised May 2015
+Revised June 2015
 

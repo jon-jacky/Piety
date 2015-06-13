@@ -19,7 +19,7 @@ w()
 # confirm file got written, read into a different buffer and print
 
 B('test.txt')
-print
+print()
 p(1,S())
-print
-print 'Remove test.txt before running this again, to get the same results'
+print()
+print('Remove test.txt before running this again, to get the same results')

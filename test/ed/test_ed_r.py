@@ -13,22 +13,22 @@ a("""Line 0
 Line 1
 Line 2""")
 p(1,S())
-print
+print()
 
 b()
-print
+print()
 
 r()
-print
+print()
 
 r(101,"rtest0.txt")
-print
+print()
 
 r("rtest0.txt")
-print
+print()
 p(1,S())
-print
+print()
 
 r(1,"rtest1.txt")
-print
+print()
 p(1,S())

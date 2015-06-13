@@ -12,40 +12,40 @@ Again we mention ed.  This is test of ed.
 In this line there is no mention of it.
 In this line there is a single mention of ed.
 And in this last line we mention ed, then ed again, twice altogether.""")
-print
+print()
 
 p(1,S())
-print
+print()
 
 p()
-print
+print()
 
 # Try all combinations of args
 
 s('ed','emacs',True)
 p()
-print
+print()
 
 s('emacs','vi')
 p()
-print
+print()
 
 s(1,'ed','emacs',True)
 p()
-print
+print()
 
 s(1,'emacs','vi')
 p()
-print
+print()
 
 s(1,'emacs','ed',True)
 p(1)
-print
+print()
 
 s(2,4,'ed','vi',True)
 p(1,S())
-print
+print()
 
 s(2,4,'vi','emacs')
 p(1,S())
-print
+print()

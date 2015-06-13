@@ -12,21 +12,21 @@ from test_cmd import test_cmd
 
 test_cmd(b, 'create buffer', 'new.txt')
 
-print "> n() # print buffers"
+print("> n() # print buffers")
 n()
-print
+print()
 
 test_cmd(r, 'read file into empty buffer', 'test_cmd.py')
 
-print "> l(10) # advance to line 9 and print it"
+print("> l(10) # advance to line 9 and print it")
 l(10)
-print
+print()
 
 test_cmd(r, 'read file into middle of buffer', 'README.md.txt')
 
-print "> p() # print the current line"
+print("> p() # print the current line")
 p()
-print
+print()
 
 test_cmd(c, 'change the current line', '### This is the changed line ###')
 

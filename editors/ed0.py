@@ -182,7 +182,7 @@ def D(name):
     global current
     del buffers[name]
     if name == current: # pick a new current buffer
-        keys = buffers.keys()
+        keys = list(buffers.keys())
         current = keys[0] if keys else None
 
 # displaying and navigating text

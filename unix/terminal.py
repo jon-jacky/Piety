@@ -80,8 +80,8 @@ def main():
         putstr(c)
         line += c
     set_line_mode() # return to normal mode
-    print
-    print line
+    print()
+    print(line)
 
 if __name__ == '__main__':
     main()

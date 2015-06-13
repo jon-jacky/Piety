@@ -5,93 +5,93 @@ test_ed_D.py - test D and X delete buffer commands
 
 from ed import *
 
-print' Test D with unsaved changes, then X on current buffer'
-print
+print(' Test D with unsaved changes, then X on current buffer')
+print()
 
-print "B('new.txt')"
+print("B('new.txt')")
 B('new.txt')
-print
+print()
 
-print "i('Here is a line')"
+print("i('Here is a line')")
 i('Here is a line')
-print
+print()
 
-print "n()"
+print("n()")
 n()
-print
+print()
 
-print "D()"
+print("D()")
 D()
-print
+print()
 
-print "X()"
+print("X()")
 X()
-print
+print()
 
-print "n()"
+print("n()")
 n()
-print
+print()
 
 
-print' Test D with saved changes on current buffer'
-print
+print(' Test D with saved changes on current buffer')
+print()
 
-print "B('new1.txt')"
+print("B('new1.txt')")
 B('new1.txt')
-print
+print()
 
-print "i('Here is a line')"
+print("i('Here is a line')")
 i('Here is a line')
-print
+print()
 
-print "n()"
+print("n()")
 n()
-print
+print()
 
-print "w()"
+print("w()")
 w()
-print
+print()
 
-print "D()"
+print("D()")
 D()
-print
+print()
 
-print "n()"
+print("n()")
 n()
-print
+print()
 
 
-print 'Test D with saved changes on a different buffer'
-print
+print('Test D with saved changes on a different buffer')
+print()
 
-print "B('new2.txt')"
+print("B('new2.txt')")
 B('new2.txt')
-print
+print()
 
-print "i('Here is a line')"
+print("i('Here is a line')")
 i('Here is a line')
-print
+print()
 
-print "n()"
+print("n()")
 n()
-print
+print()
 
-print "w()"
+print("w()")
 w()
-print
+print()
 
-print "b('main')"
+print("b('main')")
 b('main')
-print "n()"
+print("n()")
 n()
-print
+print()
 
-print "D('new2.txt')"
+print("D('new2.txt')")
 D('new2.txt')
-print
+print()
 
-print "n()"
+print("n()")
 n()
-print
+print()
 
-print "Remove new1.txt, new2.txt before running script again to obtain same results"
+print("Remove new1.txt, new2.txt before running script again to obtain same results")
