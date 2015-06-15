@@ -40,6 +40,8 @@ same, and is described in a completely rewritten man page at
 [http://plan9.bell-labs.com/magic/man2html/1/ed](http://plan9.bell-labs.com/magic/man2html/1/ed)
 and
 [http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
+There is a brief tutorial at a recent [blog](http://blog.sanctum.geek.nz/actually-using-ed/), with more comments and links
+at [HN](https://news.ycombinator.com/item?id=4120513).
 
 The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
