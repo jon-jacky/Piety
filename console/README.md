@@ -3,7 +3,7 @@ console
 =======
 
 Modules used by terminal applications, including a pure Python
-non-blocking alternative to Python *raw_input* or Unix *readline* 
+non-blocking alternative to Python *input* or Unix *readline* 
 
 - **command.py**: Skeleton command line application.  Collects a
   command (string), passes it to a handler (callable) to execute.  Can
@@ -29,4 +29,4 @@ non-blocking alternative to Python *raw_input* or Unix *readline*
 - **printing**: Script to demonstrate *Command* with its *keymap* modified to
       support a printing terminal.
 
-Revised May 2015
+Revised June 2015

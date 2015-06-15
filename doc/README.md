@@ -21,7 +21,9 @@ Piety notes and documents
     experiments with motivation similar to Piety.  Several are in
     Python.
 
+- **python3.md**, notes about the conversion from Python 2 to Python 3.
+
 - **utilities.md**, system software and utilities written in Python,
     or programmable in Python.
 
-Revised May 2015
+Revised June 2015

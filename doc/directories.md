@@ -9,7 +9,7 @@ The Piety repository is organized into these directories:
 - **bin**: shell scripts that configure Piety for Unix-like platforms.
 
 - **console**: modules used by terminal applications, including a pure
-    Python non-blocking alternative to *readline* and *raw_input*.
+    Python non-blocking alternative to *readline* and *input*.
 
 - **doc**: notes and documents.
 
