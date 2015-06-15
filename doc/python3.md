@@ -54,7 +54,7 @@ floor division operator *//* (so *1//2* produces *0*).
 The *2to3* program does not automatically replace */* with the new
 *//* operator in integer division; it does not even warn where the
 behavior may have changed.  When testing the converted program
-*edd.py*, we found three lines where the intended behvior requires
+*edd.py*, we found three lines where the intended behavior requires
 floor division, for example:
 
         seg_1 = buf.dot - win_h//2  # must use // floor division here
