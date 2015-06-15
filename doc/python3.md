@@ -5,7 +5,7 @@ Python 3
 **Piety** is written in Python 3.  Piety was developed in Python 2
 through May 2015.  The final Python 2 version is stored in this
 repository under the *python2* tag.  Python 3 development in *master*
-and other branches began in June 2015.
+and other branches began in June 2015, using version 3.4.3.
 
 This page describes the Python 2 to Python 3 conversion.
 
@@ -21,6 +21,7 @@ program.  Almost all of the changes merely added parentheses to
 *print* statements.  In addition, the *2to3* program made these
 changes:
 
+```
   --- editors/ed0.py	    (original)
   +++ editors/ed0.py	    (refactored)
   ...      ...
@@ -35,6 +36,7 @@ changes:
   ...
   -        command = raw_input('>> ')
   +        command = input('>> ')
+```
 
 The *2to3* program also replaced *raw_input* with *input* in *ed.py*
 and *edd.py*.  Those were the only changes made by *2to3*.  Some
