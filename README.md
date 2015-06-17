@@ -59,4 +59,9 @@ languages.
 Another page describes the Piety [directories](doc/directories.md) and
 their contents.
 
-Revised February 2015
+Piety is written in Python 3 since June 2015.  Earlier work is saved
+in this repository in the *python2* tag.  The conversion is described
+[here](doc/python3.md).
+
+
+Revised June 2015
