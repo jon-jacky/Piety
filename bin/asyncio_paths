@@ -1,0 +1,16 @@
+# Assign paths to run Piety out of Piety/ development directories.
+# Must set both execution path for commands and Python path for modules.
+# If you install Piety, commands and modules may go to some standard place
+#  and you will no longer need these assignments.
+
+# define $PIETY, this definition assumes you have ~/Piety
+export PIETY=$HOME/Piety 
+
+# execution path to bin, to run Piety commands: piety, possibly others
+export PATH=$PIETY/bin:$PIETY/scripts:$PATH
+
+# Python path for Piety on a Unix-like host with a VT100-compatible terminal
+#  and asyncio-based event loop.
+# For other platforms, replace unix, vt_terminal and/or select in this path.
+# Recall that scripts import from applications and editors
+export PYTHONPATH=$PIETY/applications:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shell:$PIETY/unix:$PIETY/vt_terminal:$PIETY/asyncio:$PYTHONPATH
