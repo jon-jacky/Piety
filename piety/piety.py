@@ -7,7 +7,7 @@ instances, then call piety.run.  More details appear in the docstrings
 below, in the examples in the scripts directory, and in piety.md.
 """
 
-import collections # for Counter, defaultdict, deque
+import collections # for deque
 
 # Import the eventloop module for the platform where piety runs
 # The eventloop implementation is platform-dependent but its interface is not,
@@ -18,21 +18,7 @@ import eventloop
 # Other scripts use these identifiers via piety.run() etc.
 from eventloop import run, quit
 
-# Schedule data structure
-# key, value: input, list of tasks waiting for data at that input
-# Task __init__ puts each new task in this schedule, using activate method
-schedule = collections.defaultdict(list)
-
-# Count events on each input. key: input, value: number of events on that input
-# This item is global so it can be for enabling conditions and handlers.
-ievent = collections.Counter()
-
-timer = -1 # indicates timer input, not timeout interval. Differs from any fd.fileno()
-
-# Share mutable data structures with eventloop module
-eventloop.schedule = schedule 
-eventloop.ievent = ievent
-eventloop.timer = timer # immutable, but never reassigned so this works too
+from schedule import schedule, ievent, timer
 
 # Constants used by Task class
 
@@ -88,11 +74,15 @@ class Task(object):
 
     def activate(self):
         schedule[self.input].append(self)
-        eventloop.activate(self) # for select, just adds t.input to select inputs
+        if input not in ievent:
+            ievent[input] = 0
+        eventloop.activate(self)
 
     def deactivate(self):
         del schedule[self.input].self
-        eventloop.deactivate(self) # careful, only remove if last task with this input
+        if t.input not in schedule and t.input in ievent:
+            del ievent[t.input]
+        eventloop.deactivate(self) # only remove if last task with this input
 
 # Variables and functions for managing tasks
 

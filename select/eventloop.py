@@ -10,6 +10,7 @@ This is imported by the piety module, then the piety module shares data, see bel
 """
 
 import datetime, select
+from schedule import schedule, ievent, timer, handler
 
 # Variables annd functions used in event loop
 
@@ -28,11 +29,6 @@ def adjust_interval(t0, interval):
 # Used by select in event loop
 inputs, outputs, exceptions = [],[],[]
 
-# piety module has: import eventloop, then shares these mutable data structures:
-# eventloop.schedule = schedule 
-# eventloop.ievent = ievent
-# eventloop.timer = timer # immutable, but never reassigned so this works too
-
 # The eventloop API: activate, deactivate, quit, run
 
 def activate(t):
@@ -42,8 +38,6 @@ def activate(t):
     """
     if t.input != timer and t.input not in inputs:
         inputs.append(t.input)
-    if t.input not in ievent:
-        ievent[t.input] = 0
         
 def deactivate(t):
     """
@@ -54,8 +48,6 @@ def deactivate(t):
     if t.input not in schedule:
         if t.input in inputs:
             inputs.remove(t.input)
-        if t.input in ievent:
-            del ievent[t.input]
 
 done = False # used by quit() below, does not need to be visible outside this module
 
@@ -82,31 +74,13 @@ def run(nevents=0):
         t0 = datetime.datetime.now()
         inputready, outputready, exceptready = select.select(inputs, outputs,
                                                              exceptions, interval)
+
         # inputs
         for fd in inputready:
-            if fd in schedule:
-                for t in schedule[fd]:
-                    if t.enabled():
-                        t.handler()
-                        break # we consumed data from fd, might be no more
-            else:
-                # if schedule is consistent with inputs, this should be unreachable.
-                # if no handler, consume input anway - is this necessary?
-                # s = fd.readline() # FIXME? works on stdin, fd.read() hangs
-                # This module must not assume there is a console - no print allowed
-                # print 'unhandled input from fd %s: %s' % (fd, s)
-                pass
-            ievent[fd] += 1
+            handler(fd)
             interval = adjust_interval(t0, interval)
 
         # periodic timeout if no input
         if not (inputready or outputready or exceptready): 
-            if timer in schedule:
-                for t in schedule[timer]:
-                    if t.enabled():
-                        t.handler()
-                        # no break needed - there is no data to consume
-            else:
-                pass # if no timer handler, just continue
+            handler(timer)
             interval = period # if we got here, full interval has elapsed
-            ievent[timer] += 1
