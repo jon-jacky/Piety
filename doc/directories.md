@@ -6,6 +6,9 @@ The Piety repository is organized into these directories:
 
 - **applications**: miscellaneous applications.
 
+- **asyncio**: Non-blocking event loop using Python 3 *asyncio*, used
+   by *piety.run*.  An alternative to *select* (below).
+
 - **bin**: shell scripts that configure Piety for Unix-like platforms.
 
 - **console**: modules used by terminal applications, including a pure
@@ -21,9 +24,10 @@ The Piety repository is organized into these directories:
     operating system.
 
 - **scripts**: Python scripts that run applications as tasks or jobs
-    under a non-blocking event loop.
+    under a non-blocking event loop
 
 - **select**: Non-blocking event loop using Unix *select*, used by *piety.run*.
+   An alternative to *asyncio* (above).
 
 - **shell**: Python shell, *pysh*.
 

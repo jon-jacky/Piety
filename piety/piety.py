@@ -18,10 +18,10 @@ import eventloop
 # Other scripts use these identifiers via piety.run() etc.
 from eventloop import run, quit
 
+# These used to be defined here, continue to say timer not schedule.timer etc.
 from schedule import schedule, ievent, timer
 
 # Constants used by Task class
-
 def true(): return True # always returns True, can say t0.enabled = piety.true
 def false(): return False
     
