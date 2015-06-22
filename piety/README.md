@@ -2,14 +2,14 @@
 piety
 =====
 
-The *piety* module *Task*, *Job*, *Session*, and *run*.  It imports
+The *piety* module defines *Task*, *Job*, *Session*, and *run*.  It imports
 the *schedule* and *eventloop* modules.  These are the core of the
 Piety operating system.  To run tasks in Piety, import the *piety*
 module, create some *piety.Task* instances, then call *piety.run*.
 
-The following sections first provide an overview of tasks in Piety,
-then describe classes in the *piety* module, and finally explain the
-Piety *run* function and how it uses the *schedule* and *eventloop*
+The following sections provide an overview of tasks in Piety,
+describe the classes in the *piety* module, describe the
+Piety *run* function, and explain how it uses the *schedule* and *eventloop*
 modules.
 
 ### Tasks in Piety ###
@@ -86,7 +86,7 @@ have a lot of arguments to access application methods.
 The *run* function in the *piety* module is the non-blocking event
 loop for a Piety session.  
 
-The *run* function is not defined in the *piety* module.  Instead,
+The *run* function is not defined inline in the *piety* module.  Instead,
 *piety* imports *run* from a separate *eventloop* module.  This
 enables the platform-independent *piety* module to use different
 *eventloop* modules.  The *eventloop* modules can be

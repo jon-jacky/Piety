@@ -91,4 +91,4 @@ design attempts to minimize dependencies among modules.
 - None of the Piety operating system modules or applications depend on any
   contents of the *scripts* directory
 
-Revised May 2015
+Revised June 2015
