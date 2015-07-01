@@ -18,14 +18,15 @@ import writer_tasks
 # and the session is also referenced in piety.schedule
 # Must import identifiers used below and in pysh shell
 # It seems pysh shell command line sees same scope as code in this module
-from console_tasks import jobs, edc, edd
+from console_tasks import jobs, edc, edd, pysh
 
 def main():
     """
-    Run the console session and writer tasks concurrently under the Piety scheduler.
+    Run the console session and writer tasks concurrently under the event loop
     """
+    piety.resume() # reset, might be resuming after piety.quit()
+    # jobs.pysh() runs its startup() calls pysh_startup() sets pysh.pexit=False
     jobs.pysh() # start the first job, recall pysh is in jobs namespace
-    piety.done = False # reset, might be resuming after pysh.pexit(), piety.quit()
     piety.run() # start event loop, continue until pysh >> exit()
 
 if __name__ == '__main__':

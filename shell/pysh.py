@@ -43,7 +43,12 @@ main_globals = sys.modules['__main__'].__dict__
 
 # pysh (unlike standard Python) ignores exit() so we must handle special case here
 
+# FIXME - make these three names regular and consistent with similar modules
 pexit = False
+
+def pysh_startup():
+    global pexit
+    pysh.pexit = False
 
 def exit_pysh():
     global pexit

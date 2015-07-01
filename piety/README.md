@@ -2,14 +2,15 @@
 piety
 =====
 
-The *piety* module defines *Task*, *Job*, *Session*, and *run* (the
-non-blocking event loop).  It is the core of the Piety operating
-system.  To run tasks in Piety, import the *piety* module, create some
-*piety.Task* instances, then call *piety.run*.
+The *piety* module defines *Task*, *Job*, *Session*, and *run*.  It imports
+the *schedule* and *eventloop* modules.  These are the core of the
+Piety operating system.  To run tasks in Piety, import the *piety*
+module, create some *piety.Task* instances, then call *piety.run*.
 
-The following sections first provide an overview of tasks in Piety,
-then describe classes in the *piety* module, and finally explain
-the Piety *run* function and how it can use different event loops.
+The following sections provide an overview of tasks in Piety,
+describe the classes in the *piety* module, describe the
+Piety *run* function, and explain how it uses the *schedule* and *eventloop*
+modules.
 
 ### Tasks in Piety ###
 
@@ -80,23 +81,31 @@ application for the *Session*'s job control. *Job* also uncouples
 event (such as the terminal). Therefore its initializer has to
 have a lot of arguments to access application methods.
 
-### Event Loop ###
+### Event Loop: run function, eventloop and schedule modules ###
 
-The *run* function in the *piety* module is the event loop for a Piety session.
+The *run* function in the *piety* module is the non-blocking event
+loop for a Piety session.  
 
-The *run* function is not defined in the *piety* module.  Instead,
-*piety* imports *run* from an *eventloop* module.  This enables
-*piety* to use different event loops.  At this time the usual event
-loop is in *select/eventloop.py*; it uses the Unix *select* call.  Another
-event loop in *twisted/eventloop.py* uses the Twisted reactor.  Piety 
-imports the *eventloop* module from the directory that is on the
-*PYTHONPATH*.  Commands in the *bin* directory put one or another
-directory on the path.
+The *run* function is not defined inline in the *piety* module.  Instead,
+*piety* imports *run* from a separate *eventloop* module.  This
+enables the platform-independent *piety* module to use different
+*eventloop* modules.  The *eventloop* modules can be
+platform-dependent, so they are not present in this directory.
 
-The *piety* module imports *eventloop*, but *eventloop* uses several
-data structures defined in *piety*, including *schedule*.  The *piety*
-module shares these by assigning them to attributes in *eventloop*
-after it imports that module.
+There are several *eventloop* modules in different directories.  The
+event loop in *select/eventloop.py* uses the Unix *select* call.
+Another event loop in *asyncio/eventloop.py* uses the Python 3
+*asyncio* module.  (Under the *python2* tag there is a
+*twisted/eventloop.py* that uses the Twisted reactor.)  Piety imports
+the *eventloop* module from the directory that is on the *PYTHONPATH*.
+Commands in the *bin* directory put one or another directory on the
+path.
+
+The *piety* module imports *eventloop*.  Both modules import the
+*schedule* module in this directory.  The platform-independent
+*schedule* module avoids duplicating code in the *eventloop* modules
+and separates the platform-independent code in this directory from 
+platform-dependent code in the *eventloop* modules.
  
-Revised May 2015
+Revised June 2015
 

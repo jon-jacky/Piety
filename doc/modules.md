@@ -17,13 +17,13 @@ It is possible to customize Piety systems by choosing different
 subsets and combinations of modules.  To adapt to different
 platforms and configurations, there are some modules with the
 same name and same API (but different internals) stored in
-different directories: for example, we might have *select/eventloop.py* and
-*twisted/eventloop.py*.  The chosen module can be included by
+different directories: for example, we have *select/eventloop.py* and
+*asyncio/eventloop.py*.  The chosen module can be included by
 adding its directory to the *$PYTHONPATH* and excluding the other.
 To help with this, there are commands in the *bin* directory.
 
 In the following discussion, *use* or *depend on* means *import*.  The
-design attempts to avoid unnecessary dependencies among modules.  
+design attempts to minimize dependencies among modules.
 
 - Modules that depend on particular platforms (host operating systems)
   or configurations (devices) are separated out in directories with
@@ -48,16 +48,17 @@ design attempts to avoid unnecessary dependencies among modules.
   a platform dependence.
 
 - The *piety* module in the *piety* directory is the core of the Piety
-  operating system.  It does not depend on any particular devices 
-  (in particular, it does not require a console).  It is platform-independent, 
-  but it must import a platform-dependent *eventloop* module
-  from a directory tha contains one.
-  (Currently, that is the *select* directory.)
-  
-- The *piety* module imports *eventloop*, but *eventloop* uses several
-  data structures defined in *piety*, including *schedule*.  The
-  *piety* module shares these by assigning them to attributes in
-  *eventloop* after it imports that module.
+  operating system.  It does not depend on any particular devices (in
+  particular, it does not require a console).  It is
+  platform-independent, but it must import a platform-dependent
+  *eventloop* module from a directory that contains one (currently,
+  from the *select* or *asyncio* directory).  
+
+- The *piety* module and all the *eventloop* modules import
+  *schedule*.  The platform-independent *schedule* module avoids
+  duplicating code in the *eventloop* modules and separates
+  platform-independent code from the platform-dependent code in the
+  *eventloop* modules.
 
 - The modules in the *console* directory are used by terminal
   applications.  They are platform- and device- independent.  They
@@ -65,15 +66,15 @@ design attempts to avoid unnecessary dependencies among modules.
   modules from device-dependent directories such as *unix* and
   *vt_terminal*.
 
-- The modules in the directories *applications*, *editors*, and *shell*
-  are applications (the Python shell is just another application).  An
-  application does not depend on any modules in *piety*; in fact,
-  it must be able to run without the Piety event loop.  To demonstrate
-  this, every application has a *main* method that can be run
-  from the host's *python* command or in any Python interpreter
-  session.  Applications are also
-  platform- and device- independent, by observing the same discipline
-  as modules in *console*.  Applications are included in the Piety
+- The modules in the directories *applications*, *editors*, and
+  *shell* are applications (the Python shell is just another
+  application).  An application does not depend on any modules in
+  *piety*; in fact, it must be able to run without the Piety event loop.
+  To demonstrate this, every application can be run from the host's
+  *python* command or in any Python interpreter session (by invoking the
+  application's *main* function, for example).  Applications are also
+  platform- and device- independent, by observing the same discipline as
+  modules in *console*.  Applications are included in the Piety
   repository just as a convenience, and any application may be removed
   or separated out to a different repository in the future.
 
@@ -90,4 +91,4 @@ design attempts to avoid unnecessary dependencies among modules.
 - None of the Piety operating system modules or applications depend on any
   contents of the *scripts* directory
 
-Revised May 2015
+Revised June 2015

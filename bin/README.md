@@ -15,9 +15,9 @@ scripts, or put the commands from the script into your *.profile* or
 - **paths**: assigns paths for running Piety on a Unix-like host with
   a VT-100 compatible terminal and the event loop based on *select*.
 
-- **twisted_paths**: similar to *paths*, except it puts the *twisted* 
+- **asyncio_paths**: similar to *paths*, except it puts the *asyncio* 
   directory instead of the *select* directory on the *PYTHONPATH*.  Use
-  this command instead of *paths* to use the Twisted event loop instead
-  of the usual Piety event loop based on Unix *select*.
+  this command instead of *paths* to use the *asyncio* event loop instead
+  of the event loop based on Unix *select*.
 
-Revised May 2015
+Revised June 2015
