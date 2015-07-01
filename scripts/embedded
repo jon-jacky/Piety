@@ -23,12 +23,10 @@ appears, type main():
 
 import piety, writer_tasks 
 
-# Piety Writer tasks in writer_tasks module don't appear explicitly here - 
-# they are referenced by the piety.schedule data structure
+# Piety Writer tasks in writer_tasks module don't appear explicitly here
 
 def main():
-    '(re)start piety with writer tasks'
-    piety.done = False # reset, might be resuming after piety.exit() 
+    # we don't need to assign piety.done because we use nevents instead
     piety.run(nevents=10) # handle 10 clock ticks and exit
 
 if __name__ == '__main__':

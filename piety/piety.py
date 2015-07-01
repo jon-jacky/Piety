@@ -16,7 +16,7 @@ import collections # for deque
 import eventloop
 
 # Other scripts use these identifiers via piety.run() etc.
-from eventloop import run, quit
+from eventloop import run, quit, resume
 
 # These used to be defined here, continue to say timer not schedule.timer etc.
 from schedule import schedule, ievent, timer
@@ -256,17 +256,17 @@ class Job(object):
             self.cleanup()
         self.session.stop()
 
-
 # Test
 
 def task0(): print('task 0')
 def task1(): print('task 1')
 
 def main():
-    # Here timer, done, run are all imported by piety from eventloop
+    # We don't want to create these tasks *except* during this test
+    # Creates a pair of tasks each time main() is called
     t0 = Task(name='task 0', handler=task0, input=timer)
     t1 = Task(name='task 1', handler=task1, input=timer)
-    done = False # reset, might be resuming after quit() 
+    # we don't need to assign piety.done because we use nevents instead
     run(nevents=10) # handle 10 clock ticks and exit
     tasks() # show the tasks
 

@@ -54,11 +54,16 @@ def quit():
     global done
     done = True # must reset to False before we can resume
 
+def resume():
+    'Resume Piety event loop'
+    global done
+    done = False
+
 def run(nevents=0): # nevents arg must have same name as in select/eventloop.py
     global maxevents, loop_nevents # global so handle_timeout can see them
     maxevents = ievent[timer] + nevents # ievent includes previous calls to run
     loop_nevents = nevents
     loop.call_soon(timeout_handler) # start recurring timeout
     loop.run_forever()
-    loop.close() # does this mean we can't run() from main again?
+    # loop.close() # FIXME this means we can't run() from script main() again
 

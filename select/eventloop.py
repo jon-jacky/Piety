@@ -55,6 +55,11 @@ def quit():
     'Exit from Piety event loop'
     global done
     done = True # must reset to False before we can resume
+
+def resume():
+    'Resume Piety event loop'
+    global done
+    done = False
     
 def run(nevents=0):
     """

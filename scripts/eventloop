@@ -2,16 +2,14 @@
 """
 eventloop script - demo piety and eventloop modules
 """
-import piety # includes from eventloop import *
-
-def task0(): print('task 0')
-def task1(): print('task 1')
+import piety # piety imports eventloop
+             
+# piety defines task0, task1 for its own test
+t0 = piety.Task(name='task 0', handler=piety.task0, input=piety.timer)
+t1 = piety.Task(name='task 1', handler=piety.task1, input=piety.timer)
 
 def main():
-    # Here timeout, done, run are all imported by piety from eventloop
-    t0 = piety.Task(name='task 0', handler=task0, input=piety.timer)
-    t1 = piety.Task(name='task 1', handler=task1, input=piety.timer)
-    piety.done = False # reset, might be resuming after quit() 
+    # we don't need to assign piety.done because we use nevents instead
     piety.run(nevents=10) # handle 10 clock ticks and exit
     piety.tasks() # show the tasks
 
