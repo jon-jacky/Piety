@@ -18,6 +18,20 @@ ievent = collections.Counter()
 timer = -1 # indicates timer input, not timeout interval
            # differs from any fd.fileno()
 
+period = 1.0 # seconds, piety.tasks() also uses this
+
+running = False # used in timeout_handler and also by start, stop below
+                  
+def start():
+    'Start or resume Piety event loop'
+    global running
+    running = True
+
+def stop():
+    'Stop Piety event loop'
+    global running
+    running = False
+
 def handler(input):
     """
     Call the handlers for all the enabled tasks waiting for the input.

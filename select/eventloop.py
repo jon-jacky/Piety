@@ -10,27 +10,21 @@ This is imported by the piety module, then the piety module shares data, see bel
 """
 
 import datetime, select
-from schedule import schedule, ievent, timer, handler
-
-# Variables annd functions used in event loop
-
-# This has to be global in eventloop because piety.tasks() uses it
-period = 1.000 # FIXME? baked in for now, seconds, periodic timer for timeout events
+from schedule import handler, ievent, timer, start, stop
+import schedule # for schedule, period, running
 
 def adjust_interval(t0, interval):
-    """
-    Adjust timeout to occur after with the same interval despite delay
-    """
+    'Adjust timeout to occur after with the same interval despite delay'
     t1 = datetime.datetime.now()
     dt = t1 - t0
     dt_sec = dt.seconds + 0.000001*dt.microseconds
     interval = interval - dt_sec # should never be negative ...
-    return interval if interval > 0.0 else period # ... but ...
+    return interval if interval > 0.0 else schedule.period # ... but ...
 
 # Used by select in event loop
 inputs, outputs, exceptions = [],[],[]
 
-# The eventloop API: activate, deactivate, quit, run
+# The eventloop API: activate, deactivate, start, stop
 
 def activate(t):
     """
@@ -46,34 +40,21 @@ def deactivate(t):
     This should only be called after t has been removed from schedule
     """
     # Only remove t.input when no more tasks in schedule use that input
-    if t.input not in schedule:
+    if t.input not in schedule.schedule:
         if t.input in inputs:
             inputs.remove(t.input)
-
-done = False # used by quit() below, does not need to be visible outside this module
-
-def quit():
-    'Exit from Piety event loop'
-    global done
-    done = True # must reset to False before we can resume
-
-def resume():
-    'Resume Piety event loop'
-    global done
-    done = False
     
 def run(nevents=0):
     """
     Run the Piety event loop.
     nevents: number of timer events to process, then exit run loop.
-               if nevents not 0, runs even if done==True
-             Use default nevents=0 
-               to process until done==True or unhandled exception
+     If nevents not 0, runs even if running==False
+     Use default nevents=0 to process until running==False or unhandled exception
     """
-    resume() # in case an earlier call to run() called quit() and set done=True
+    start()
     maxevents = ievent[timer] + nevents # ievent includes previous calls to run()
-    interval = period # timeout interval in seconds, uses global period
-    while not done and (not nevents or ievent[timer] < maxevents):
+    interval = schedule.period # timeout interval in seconds, uses global period
+    while schedule.running or (nevents and ievent[timer] < maxevents):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
         t0 = datetime.datetime.now()
@@ -87,4 +68,4 @@ def run(nevents=0):
         # periodic timeout if no input
         if not (inputready or outputready or exceptready): 
             handler(timer)
-            interval = period # if we got here, full interval has elapsed
+            interval = schedule.period # if we got here, full interval has elapsed

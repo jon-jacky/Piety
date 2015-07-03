@@ -2,27 +2,14 @@
 eventloop.py using asyncio as an alternative to select
 """
 
-import asyncio
-import datetime
-from schedule import schedule, ievent, timer, handler
+import asyncio, datetime
+from schedule import handler, ievent, timer, start, stop
+import schedule # for schedule, period, running
 
 # create loop here to persist across multiple calls to run()
 loop = asyncio.get_event_loop()
 
-# This has to be global in eventloop because piety.tasks() uses it
-period = 1.0 # seconds
-
-done = False # used in timeout_handler and also by quit() below
-             # does not need to be visible outside this module
-
-def timeout_handler(nevents, maxevents):
-    if done or (nevents and ievent[timer] >= maxevents):
-        loop.stop()
-    else:
-        handler(timer)
-        loop.call_later(period, timeout_handler, nevents, maxevents)
-
-# piety eventloop API: activate, deactivate, quit, run
+# piety eventloop API: activate, deactivate, run
 
 def activate(t):
     """
@@ -38,30 +25,28 @@ def deactivate(t):
     Here we assume piety has already removed task t from schedule.
     Only remove t.input from loop when no more tasks in schedule use t.input
     """
-    if t.input not in schedule:
+    if t.input not in schedule.schedule:
         loop.remove_reader(t.input)
 
-def quit():
-    'Exit from Piety event loop'
-    global done
-    done = True # must reset to False before we can resume
-
-def resume():
-    'Resume Piety event loop'
-    global done
-    done = False
+# callback for loop.call_soon
+def timeout_handler(nevents, maxevents):
+    'Recurring timeout, in loop.call_later it rescheduls itself'
+    if not schedule.running or (nevents and ievent[timer] >= maxevents):
+        loop.stop()
+    else:
+        handler(timer)
+        loop.call_later(schedule.period, timeout_handler, nevents, maxevents)
 
 def run(nevents=0): # nevents arg must have same name as in select/eventloop.py
     """
     Run the Piety event loop.
     nevents: number of timer events to process, then exit run loop.
-               if nevents not 0, runs even if done==True
-             Use default nevents=0 
-               to process until done==True or unhandled exception
+     If nevents not 0, runs even if running==False
+     Use default nevents=0 to process until running==False or unhandled exception
     """
-    resume() # in case an earlier call to run() called quit() and set done=True
-    # if nevents not 0, runs even if done==True
-    maxevents = ievent[timer] + nevents # ievent includes previous calls to run()
+    start()
+    # ievent includes previous calls to run()
+    maxevents = ievent[timer] + nevents 
     loop.call_soon(timeout_handler, nevents, maxevents) # start recurring timeout
     loop.run_forever()
     # loop.close() # Not! this would prevent run() from script main() again

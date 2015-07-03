@@ -48,7 +48,7 @@ pexit = False
 
 def pysh_startup():
     global pexit
-    pysh.pexit = False
+    pexit = False
 
 def exit_pysh():
     global pexit

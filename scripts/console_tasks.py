@@ -34,20 +34,15 @@ jobs = Namespace()
 # Session, a terminal task
 console = piety.Session(name='console', input=sys.stdin)
 
-# Python shell
-
-def pysh_startup():
-    pysh.pexit = False # enable pysh event loop, compare to Job stopped= below
-
-# Name the command pyshc to avoid name clash with pysh module
+# Python shell.  Name the command pyshc to avoid name clash with pysh module
 # Assign reader=key.Key that handles some multicharacter control sequences
 pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=pysh.mk_shell())
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh_startup, 
+jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh.pysh_startup, 
                       stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
-                      cleanup=piety.quit)
+                      cleanup=piety.stop)
 
 # line editor
 
