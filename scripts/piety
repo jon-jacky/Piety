@@ -21,13 +21,11 @@ import writer_tasks
 from console_tasks import jobs, edc, edd, pysh
 
 def main():
-    """
-    Run the console session and writer tasks concurrently under the event loop
-    """
-    piety.resume() # reset, might be resuming after piety.quit()
-    # jobs.pysh() runs its startup() calls pysh_startup() sets pysh.pexit=False
+    'Run the console session and writer tasks concurrently under the event loop'
+    # jobs.pysh() runs its startup() which calls pysh.pysh_startup() sets pysh.pexit=False
     jobs.pysh() # start the first job, recall pysh is in jobs namespace
-    piety.run() # start event loop, continue until pysh >> exit()
+    # piety.run() calls its piety.resume() which sets eventloop.done=False
+    piety.run() # start event loop, continue until pysh >> exit() triggers piety.quit()
 
 if __name__ == '__main__':
     main()

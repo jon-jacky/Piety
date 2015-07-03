@@ -52,7 +52,16 @@ def resume():
     done = False
 
 def run(nevents=0): # nevents arg must have same name as in select/eventloop.py
-    maxevents = ievent[timer] + nevents # ievent includes previous calls to run
+    """
+    Run the Piety event loop.
+    nevents: number of timer events to process, then exit run loop.
+               if nevents not 0, runs even if done==True
+             Use default nevents=0 
+               to process until done==True or unhandled exception
+    """
+    resume() # in case an earlier call to run() called quit() and set done=True
+    # if nevents not 0, runs even if done==True
+    maxevents = ievent[timer] + nevents # ievent includes previous calls to run()
     loop.call_soon(timeout_handler, nevents, maxevents) # start recurring timeout
     loop.run_forever()
     # loop.close() # Not! this would prevent run() from script main() again

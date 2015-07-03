@@ -66,20 +66,19 @@ def run(nevents=0):
     """
     Run the Piety event loop.
     nevents: number of timer events to process, then exit run loop.
-              use default nevents=0 
-              to process until done=True or unhandled exception
+               if nevents not 0, runs even if done==True
+             Use default nevents=0 
+               to process until done==True or unhandled exception
     """
-    maxevents = ievent[timer] + nevents # when to stop
+    resume() # in case an earlier call to run() called quit() and set done=True
+    maxevents = ievent[timer] + nevents # ievent includes previous calls to run()
     interval = period # timeout interval in seconds, uses global period
-    # Counts only timeout events, for all events use ... or sum(ievent.values()) < ..
-    # Allows multiple run() calls, new nevents each time, ievent keeps counting up
     while not done and (not nevents or ievent[timer] < maxevents):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
         t0 = datetime.datetime.now()
         inputready, outputready, exceptready = select.select(inputs, outputs,
                                                              exceptions, interval)
-
         # inputs
         for fd in inputready:
             handler(fd)
