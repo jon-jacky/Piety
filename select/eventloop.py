@@ -14,6 +14,7 @@ from schedule import schedule, ievent, timer, handler
 
 # Variables annd functions used in event loop
 
+# This has to be global in eventloop because piety.tasks() uses it
 period = 1.000 # FIXME? baked in for now, seconds, periodic timer for timeout events
 
 def adjust_interval(t0, interval):
@@ -33,7 +34,7 @@ inputs, outputs, exceptions = [],[],[]
 
 def activate(t):
     """
-    Activate task t by adding t.input to eventloop inputs list and ievent counter
+    Activate task t by adding t.input to eventloop inputs list
     This should only be called after task t has been added to schedule.
     """
     if t.input != timer and t.input not in inputs:
@@ -41,7 +42,7 @@ def activate(t):
         
 def deactivate(t):
     """
-    De-activate task t by deleting t.input from eventloop inputs list and ievent cntr.
+    De-activate task t by deleting t.input from eventloop inputs list
     This should only be called after t has been removed from schedule
     """
     # Only remove t.input when no more tasks in schedule use that input
@@ -68,7 +69,6 @@ def run(nevents=0):
               use default nevents=0 
               to process until done=True or unhandled exception
     """
-    global ievent # must be global for enabling conditions and handlers
     maxevents = ievent[timer] + nevents # when to stop
     interval = period # timeout interval in seconds, uses global period
     # Counts only timeout events, for all events use ... or sum(ievent.values()) < ..

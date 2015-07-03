@@ -6,9 +6,8 @@ import asyncio
 import datetime
 from schedule import schedule, ievent, timer, handler
 
+# create loop here to persist across multiple calls to run()
 loop = asyncio.get_event_loop()
-
-t0 = datetime.datetime.now()
 
 # This has to be global in eventloop because piety.tasks() uses it
 period = 1.0 # seconds
@@ -16,19 +15,12 @@ period = 1.0 # seconds
 done = False # used in timeout_handler and also by quit() below
              # does not need to be visible outside this module
 
-# FIXME?  Couldn't these be args to timeout_handler instead of global?
-loop_nevents = 0  # 0 means run forever, may be reassigned by run() below
-maxevents    = 0  # maxevents includes events from previous calls to run()
-
-def timeout_handler():
-    #print 'done %s, loop_nevents %s, ievent[timer] %s, maxevents %s' % \
-    #     (done,loop_nevents,ievent[timer], maxevents) # DEBUG
-    if done or (loop_nevents and ievent[timer] >= maxevents):
+def timeout_handler(nevents, maxevents):
+    if done or (nevents and ievent[timer] >= maxevents):
         loop.stop()
-        # We also use pysh.exit to stop, in Console lineReceived handler
     else:
         handler(timer)
-        loop.call_later(period, timeout_handler)
+        loop.call_later(period, timeout_handler, nevents, maxevents)
 
 # piety eventloop API: activate, deactivate, quit, run
 
@@ -60,10 +52,7 @@ def resume():
     done = False
 
 def run(nevents=0): # nevents arg must have same name as in select/eventloop.py
-    global maxevents, loop_nevents # global so handle_timeout can see them
     maxevents = ievent[timer] + nevents # ievent includes previous calls to run
-    loop_nevents = nevents
-    loop.call_soon(timeout_handler) # start recurring timeout
+    loop.call_soon(timeout_handler, nevents, maxevents) # start recurring timeout
     loop.run_forever()
-    # loop.close() # FIXME this means we can't run() from script main() again
-
+    # loop.close() # Not! this would prevent run() from script main() again
