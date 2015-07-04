@@ -9,12 +9,13 @@ import pysh, command, key
 pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell())
 
 def main():
+    'Python REPL using home-made pysh shell'
+    pysh.start()
     print("pysh shell, type any Python statement, exit() to exit")
-    pysh.pexit = False # previous exit have made it True
-    while not pysh.pexit:
+    while pysh.running:
         if pyshc.new_command:
             pyshc.restart()
-        pyshc.reader() # exit() command sets psysh.pexit = True, forces exit
+        pyshc.reader() # exit() command sets pysh.running = False, forces exit
             
 if __name__ == '__main__':
     main()

@@ -55,7 +55,7 @@ design attempts to minimize dependencies among modules.
   from the *select* or *asyncio* directory).  
 
 - The *piety* module and all the *eventloop* modules import
-  *schedule*.  The platform-independent *schedule* module avoids
+  *cycle*.  The platform-independent *cycle* module avoids
   duplicating code in the *eventloop* modules and separates
   platform-independent code from the platform-dependent code in the
   *eventloop* modules.
