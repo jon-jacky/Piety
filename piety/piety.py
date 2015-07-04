@@ -18,9 +18,9 @@ import eventloop # for activate, deactivate, to distinguish from same local here
 # Other scripts use these identifiers via piety.run() etc.
 from eventloop import run, start, stop
 
-# These used to be defined here, continue to say timer not schedule.timer etc.
-from schedule import ievent, timer
-import schedule # for schedule, period
+# These used to be defined here, continue to say timer not cycle.timer etc.
+from cycle import schedule, ievent, timer
+import cycle # must use cycle.period, because immutable ...
 
 # Constants used by Task class
 def true(): return True # always returns True, can say t0.enabled = piety.true
@@ -74,14 +74,14 @@ class Task(object):
         self.activate()
 
     def activate(self):
-        schedule.schedule[self.input].append(self)
+        schedule[self.input].append(self)
         if input not in ievent:
             ievent[input] = 0
         eventloop.activate(self)
 
     def deactivate(self):
-        del schedule.schedule[self.input].self
-        if t.input not in schedule.schedule and t.input in ievent:
+        del schedule[self.input].self
+        if t.input not in schedule and t.input in ievent:
             del ievent[t.input]
         eventloop.deactivate(self) # only remove if last task with this input
 
@@ -109,7 +109,7 @@ def tasks():
         'Handle special case in input name.'
 
         if e == timer:
-            return 'timer %s s' % schedule.period
+            return 'timer %s s' % cycle.period
             #return 'timer  ? s' # placeholder if we can't use period
         else:
             return oname(e)

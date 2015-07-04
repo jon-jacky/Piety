@@ -10,8 +10,8 @@ This is imported by the piety module, then the piety module shares data, see bel
 """
 
 import datetime, select
-from schedule import handler, ievent, timer, start, stop
-import schedule # for schedule, period, running
+from cycle import schedule, handler, ievent, timer, start, stop
+import cycle # must use cycle.period, cycle.running, because immutable ...
 
 def adjust_interval(t0, interval):
     'Adjust timeout to occur after with the same interval despite delay'
@@ -19,7 +19,7 @@ def adjust_interval(t0, interval):
     dt = t1 - t0
     dt_sec = dt.seconds + 0.000001*dt.microseconds
     interval = interval - dt_sec # should never be negative ...
-    return interval if interval > 0.0 else schedule.period # ... but ...
+    return interval if interval > 0.0 else cycle.period # ... but ...
 
 # Used by select in event loop
 inputs, outputs, exceptions = [],[],[]
@@ -40,7 +40,7 @@ def deactivate(t):
     This should only be called after t has been removed from schedule
     """
     # Only remove t.input when no more tasks in schedule use that input
-    if t.input not in schedule.schedule:
+    if t.input not in schedule:
         if t.input in inputs:
             inputs.remove(t.input)
     
@@ -53,8 +53,8 @@ def run(nevents=0):
     """
     start()
     maxevents = ievent[timer] + nevents # ievent includes previous calls to run()
-    interval = schedule.period # timeout interval in seconds, uses global period
-    while schedule.running or (nevents and ievent[timer] < maxevents):
+    interval = cycle.period # timeout interval in seconds
+    while cycle.running or (nevents and ievent[timer] < maxevents):
         # Python select doesn't assign time remaining to timeout argument
         # so we have to time it ourselves
         t0 = datetime.datetime.now()
@@ -68,4 +68,4 @@ def run(nevents=0):
         # periodic timeout if no input
         if not (inputready or outputready or exceptready): 
             handler(timer)
-            interval = schedule.period # if we got here, full interval has elapsed
+            interval = cycle.period # if we got here, full interval has elapsed

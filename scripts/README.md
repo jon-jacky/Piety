@@ -23,19 +23,14 @@ comments in each module for directions and explanations:
 - **eventloop**: Uses a non-blocking event loop to run two trivial tasks.  
   Demonstrates that Piety can use different event loops, the usual 
   *select/eventloop.py* or *twisted/eventloop.py*.  Redefine *PYTHONPATH*
-  with *bin/paths* or *bin/twisted_paths* to select an event loop.
+  with *bin/paths* or *bin/asyncio_paths* to select an event loop.
   The *embedded* script (above) can also use different event loops.
 
 - **piety**: Uses a non-blocking event loop to run the console session with
   three jobs created by *console_tasks*, concurrently with the two
-  writer tasks created by *writer_tasks*.  Works with the *select* event 
-  loop only.
-
-- **piety.no_defaults**: Similar to  *piety* script, except it uses different
-   syntax to define jobs, with no default arguments.  Does not create
-   file writer tasks (but they are easy to create "by hand" in the pysh shell).
+  writer tasks created by *writer_tasks*.
 
 - **writer_tasks.py**: Creates writer tasks used by the *embedded* and
     *piety* scripts.
 
-Revised May 2015
+Revised July 2015

@@ -40,8 +40,8 @@ pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=pysh.mk_shell()
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh.pysh_startup, 
-                      stopped=(lambda: pysh.pexit or pyshc.command == keyboard.C_d), 
+jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh.start,
+                      stopped=(lambda: not pysh.running or pyshc.command == keyboard.C_d), 
                       cleanup=piety.stop)
 
 # line editor
@@ -94,7 +94,7 @@ def main():
     Instead just use an ordinary while loop as a simple blocking event loop.
     """
     jobs.pysh() # start the first job
-    while not pysh.pexit: # pysh module here, different from jobs.pysh 
+    while pysh.running: # pysh module here, different from jobs.pysh 
         console.handler()  # block waiting for each single character 
 
 if __name__ == '__main__':

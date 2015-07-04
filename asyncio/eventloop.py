@@ -3,8 +3,8 @@ eventloop.py using asyncio as an alternative to select
 """
 
 import asyncio, datetime
-from schedule import handler, ievent, timer, start, stop
-import schedule # for schedule, period, running
+from cycle import schedule, handler, ievent, timer, start, stop
+import cycle # must use cycle.period, cycle.running, because immutable ...
 
 # create loop here to persist across multiple calls to run()
 loop = asyncio.get_event_loop()
@@ -25,17 +25,17 @@ def deactivate(t):
     Here we assume piety has already removed task t from schedule.
     Only remove t.input from loop when no more tasks in schedule use t.input
     """
-    if t.input not in schedule.schedule:
+    if t.input not in schedule:
         loop.remove_reader(t.input)
 
 # callback for loop.call_soon
 def timeout_handler(nevents, maxevents):
     'Recurring timeout, in loop.call_later it rescheduls itself'
-    if not schedule.running or (nevents and ievent[timer] >= maxevents):
+    if not cycle.running or (nevents and ievent[timer] >= maxevents):
         loop.stop()
     else:
         handler(timer)
-        loop.call_later(schedule.period, timeout_handler, nevents, maxevents)
+        loop.call_later(cycle.period, timeout_handler, nevents, maxevents)
 
 def run(nevents=0): # nevents arg must have same name as in select/eventloop.py
     """

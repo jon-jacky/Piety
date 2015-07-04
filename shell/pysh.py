@@ -37,22 +37,21 @@ statement (statements).  On eval and exec:
 
 import sys, traceback
 
-
 main_globals = sys.modules['__main__'].__dict__
-
 
 # pysh (unlike standard Python) ignores exit() so we must handle special case here
 
-# FIXME - make these three names regular and consistent with similar modules
-pexit = False
+running = False
+                  
+def start():
+    'Start or resume pysh REPL'
+    global running
+    running = True
 
-def pysh_startup():
-    global pexit
-    pexit = False
-
-def exit_pysh():
-    global pexit
-    pexit = True
+def stop():
+    'Stop pysh REPL'
+    global running
+    running = False
 
 def mk_shell(globals=main_globals):
     """
@@ -67,7 +66,7 @@ def mk_shell(globals=main_globals):
         This is a closure that includes the globals dictionary 
         """
         if command == 'exit()':  # DON'T exit from underlying Python session
-            exit_pysh()    # instead assign pexit variable can be used by caller
+            stop()    # instead assign running variable, can be used by caller
             return
         try: # don't crash out of piety if exception, but print traceback
             try: # try eval, if it fails call exec
@@ -94,11 +93,10 @@ def mk_shell(globals=main_globals):
 
 def main():
     'Python REPL using home-made pysh shell'
-    global pexit
-    pexit = False # previous exit() may have made it True
+    start()
     pysh = mk_shell()
     print("pysh shell, type any Python statement, exit() to exit")
-    while not pexit:
+    while running:
         command = input('>> ')
         pysh(command)
 
