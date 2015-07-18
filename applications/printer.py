@@ -2,50 +2,38 @@
 printer.py - print to various destinations to demonstrate interleaving
               concurrency.
 
-Defines class Printer, with a method that prints a single line on any
-object that provides a write method.
+Defines class Timestamp, with a method that returns a single line including
+a name, sequence number, the current time.  The name is an __init__ arg,
+and the seqno starts at 0 and advances each time the method is called.
 
-By default, this line contains sequence number, name, timestamp.  A different
-function to generate the line in some other form can be passed as an
-optional argument to the constructor.
-
-Multiple Printer instances can run concurrently, with the output of
-each written to its own destination.
+Multiple Timestamp instances can run concurrently, with the output of
+each printed to its own destination.
 """
 
 import sys, datetime
 
-class Printer(object):
+class Timestamp(object):
     """
-    Print to demonstrate interleaving concurrency, see module header
+    Has a makeline method that returns a single line including
+     a sequence number, label, and the current time.  
+    The sequence number starts at 0 and advances on each call to makeline
+    The label is an __init__ arg
     """
-    def __init__(self, destination=sys.stdout, name='main.txt', makeline=None):
-        """ 
-        Creates a Printer instance.  All argument are keyword args with defaults.
-        destination - object to print on, default prints on stdout
-        name - string passed to makeline function (next arg), default main.txt
-        makeline - function that returns line to print, takes two required args
-                    seqno and name.  Default also generates a timestamp.
-        """
-        self.destination = destination
+
+    def __init__(self, label='main.txt'):
+        'label - string printed in every line, default main.txt'
         self.seqno = 0
-        self.name = name
-        self.makeline = makeline if makeline else self.default_makeline
-        
-    def default_makeline(self, seqno, name):
+        self.label = label
+
+    def makeline(self):
         """ 
-        returns a line with sequence number, name, and also timestamp:
+        returns a line with sequence number, label, and also timestamp:
          5 main.txt 2013-07-13 11:32:42.231009
         """
         # no trailing \n, print adds that by default
-        return '%6d %s %s' % (seqno, name, datetime.datetime.now())
-
-    def print(self):
-        'print single line to the destination, increment sequence number'
-        # Buffer requires final \n, but we can't add it with default print end=
-        s = self.makeline(self.seqno, self.name) + '\n'
-        print(s, file=self.destination, end='')
+        s =  '%6d %s %s' % (self.seqno, self.label, datetime.datetime.now())
         self.seqno += 1
+        return s
 
 # For test
 
@@ -76,28 +64,24 @@ class Buffer(object):
 
 # Test
 
-pr0, pr1 = Printer(name='pr0'), Printer(name='pr1')
+ts0, ts1 = Timestamp(label='ts0'), Timestamp(label='ts1')
 
 buf0, buf1 = Buffer(), Buffer()
-prbuf0 = Printer(destination=buf0, name='prbuf0')
-prbuf1 = Printer(destination=buf1, name='prbuf1')
 
 def main():
-    print("""Two printers interleaving, each printing five lines to stdout
-""")
+    print('Two printers interleaving, each printing five lines to stdout')
     for i in range(5):
-        pr0.print()
-        pr1.print()
-    print("""
-Two printers interleaving, each printing five lines to different buffer
- then print each buffer in turn
-""")
+        print(ts0.makeline()) # no file=... print to stdout
+        print(ts1.makeline())
+    print("""Two printers interleaving, each printing five lines to different buffer
+ then print each buffer in turn""")
+    # first print to both buffers
     for i in range(5):
-        prbuf0.print()
-        prbuf1.print()
+        print(ts0.makeline(), file=buf0) # use file=... print to buffer
+        print(ts1.makeline(), file=buf1)
+    # then print contents of each buffer
     for line in buf0.lines:
         print(line.rstrip()) # buffer contents already include final \n
-    print()
     for line in buf1.lines:
         print(line.rstrip()) 
 
