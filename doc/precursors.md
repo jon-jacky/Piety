@@ -84,6 +84,8 @@ Here are some examples.
 | [eLua](http://www.eluaproject.net/doc/v0.8/en_arch_overview.html) | R | 2011? -- | Lua, C | Bare machine | [eLuaBrain](http://eluabrain.blogspot.fr/) (Cortex-M3) and many more | "embedded software ... with the power of Lua ... on a wide range of microcontroller architectures" |
 | [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | P | 2011 -- | Lua (SafeLua) | Bare machine, Native OS, Sandbox |  Linux | "customizable light-weight sandboxes ... run untrusted code safely" | 
 | [luakernel](https://github.com/ers35/luakernel), also at [HN](https://news.ycombinator.com/item?id=8486178) | P | 2014 | Lua | Bare machine | x86 | "Lua + SQLite running on bare metal x86" "file primitive ... purely in Lua ... a pre-initialized ramfs" "lua coroutines as the core of the scheduling" |
+| [Node9](https://github.com/jvburnes/node9/blob/master/doc/node9-hackers-guide.txt), also [lua-users](http://lua-users.org/lists/lua-l/2015-06/msg00311.html) and [HN](https://news.ycombinator.com/item?id=9704517) | P | 2015 | Lua, C | Host OS | OS X now, Linux etc. possible | Inferno implemented with Lua, LuaJIT, libuv. "Build your distributed applications by linking your compute nodes ...
+ over the Inferno/Plan9 9p resource sharing system." |
 | [ES Operating System](http://code.google.com/p/es-operating-system/), also [here](http://code.google.com/p/es-operating-system/wiki/XV_Semana_Informatica) | P | 2004 -- | Javascript ("ECMAScript"), C++ | Bare machine | x86 | "pure component operating system ... components written in C++ can be seamlessly controlled from ECMAScript" |
 | [Lively Kernel](http://www.svgopen.org/2008/papers/93-The_Lively_Kernel_Web_Application_Framework/), also [here](http://www.lively-kernel.org/)  | R | 2008 -- | Javascript | Sandbox | Web browser | "An IDE ... self-supporting ... inside the browser without any external tools" |
 | [OS.js](http://andersevenrud.github.com/OS.js/) | P | 2012 -- | Javascript | Sandbox | WebKit and Gecko based browsers | "Cloud/Web Desktop platform" | 
@@ -139,14 +141,15 @@ The "bare machine" might actually be virtual machine or emulator
 such as QEMU or Bochs.
 
 * **Virtual Machine** Similar to Bare machine, but the system is
-designed from the beginning to be deployed only on VMs.
+designed from the beginning to be deployed only on VMs.  Such systems
+are sometimes called *unikernels*.
 
 * **OS components** The system runs on a minimal OS built from
 components chosen from a collection such as [Flux OSKit](http://www.cs.utah.edu/flux/oskit/) or [Rump Kernel](https://github.com/rumpkernel/wiki/wiki).
 
 * **Native OS** The system runs on top of a conventional OS.
 Programmers and users working in the favored language can mostly avoid
-the conventional OS.
+the conventional OS.  Such systems are sometimes called *hosted OS*.
 
 * **Sandbox** The system runs on top of a conventional OS, in a
 self-contained environment where most of the the host's facilities are
