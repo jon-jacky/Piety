@@ -47,14 +47,14 @@ buf0, buf1 = Buffer(), Buffer()
 def main():
     print('Two generators interleaving, each printing five lines to stdout')
     for i in range(5):
-        print(ts0.__next__()) # no file=... print to stdout
-        print(ts1.__next__())
+        print(next(ts0)) # no file=... print to stdout
+        print(next(ts1))
     print("""Two generators interleaving, each printing five lines to different buffer
  then print each buffer in turn""")
     # first print to both buffers
     for i in range(5):
-        print(ts0.__next__(), file=buf0) # use file=... print to buffer
-        print(ts1.__next__(), file=buf1)
+        print(next(ts0), file=buf0) # use file=... print to buffer
+        print(next(ts1), file=buf1)
     # then print contents of each buffer
     for line in buf0.lines:
         print(line.rstrip()) # buffer contents already include final \n
