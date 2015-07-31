@@ -65,25 +65,27 @@ class Buffer(object):
 
 # Test
 
-ts0, ts1 = Timestamp(label='ts0'), Timestamp(label='ts1')
-
-buf0, buf1 = Buffer(), Buffer()
-
 def main():
+
     print('Two printers interleaving, each printing five lines to stdout')
+    ts0, ts1 = Timestamp(label='ts0'), Timestamp(label='ts1')
     for i in range(5):
         print(ts0()) # no file=... print to stdout
         print(ts1())
+
     print("""Two printers interleaving, each printing five lines to different buffer
  then print each buffer in turn""")
     # first print to both buffers
+    buf2, buf3 = Buffer(), Buffer()
+    ts2, ts3 = Timestamp(label='ts2'), Timestamp(label='ts3')
     for i in range(5):
-        print(ts0(), file=buf0) # use file=... print to buffer
-        print(ts1(), file=buf1)
+        print(ts2(), file=buf2) # use file=... print to buffer
+        print(ts3(), file=buf3)
+
     # then print contents of each buffer
-    for line in buf0.lines:
+    for line in buf2.lines:
         print(line.rstrip()) # buffer contents already include final \n
-    for line in buf1.lines:
+    for line in buf3.lines:
         print(line.rstrip()) 
 
 if __name__ == '__main__':
