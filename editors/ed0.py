@@ -28,6 +28,28 @@ class Buffer(object):
         self.unsaved = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
         self.npage = 22 # page length used, optionally set by z scroll command
+        self.end_phase = False # used by write method, see explanation below
+        self.undisplayed = False # True if buffer may contain undisplayed changes
+                                 # FIXME? only used by edd, maybe shouldn't be here
+
+    # Invoked by print(s, file=buffer), writes s to buffer
+    # Experiments show that this Python print calls Buffer write *twice*,
+    # first write for the contents s, second write for end string
+    # even when end string is default \n or empty ''     
+    # So here we alternate reading contents and discarding end string
+    def write(self, s):
+        #print([c for c in s]) # DEBUG reveals second write for end string
+        #print('end_phase %s' % self.end_phase) # DEBUG
+        if self.end_phase:
+            # ignore the end string, ed0 buffer lines must end with \n
+            # self.lines.append(self.contents) # already  includes final'\n'
+            a(self.dot, self.contents) # append command, advances dot
+        else:
+            # store contents string until we get end string
+            self.contents = s
+        self.end_phase = not self.end_phase # False True False ...
+        self.undisplayed = True
+
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 

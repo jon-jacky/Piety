@@ -1,5 +1,5 @@
 """
-schedule.py - Data and functions used by both piety and eventloop modules.
+cycle.py - Data and functions used by piety module and all eventloop modules.
 
 This module is platform-independent, but it is imported by the
 platform-dependent eventloop modules.

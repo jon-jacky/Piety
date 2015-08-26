@@ -53,7 +53,7 @@ def file_changed():
     'Current buffer changed or different file loaded in current buffer'
     return ed.bufname() != bufname0 or ed.buf().filename != filename0
 
-def text_changed():
+def text_cmd():
     'Buffer text contents changed in buffer segment visible in window'
     return ed.cmd_name in 'aicds' # append, insert, change, delete, substitute
     
@@ -219,8 +219,11 @@ def update_display():
     if layout_changed():
         init_display()
     # New contents or cursor outside window, redisplay window and cursor
-    elif file_changed() or text_changed() or cursor_elsewhere():
+    elif (file_changed() or text_cmd() or cursor_elsewhere() 
+          or ed.buf().undisplayed): # maybe write updates buffer that isn't current
+                                # maybe write updates buffer away from dot
         update_window(ed.bufname())
+        ed.buf().undisplayed = False #maybe write updates buffer that isn't current
         if ed.command_mode:
             display.put_cursor(cmd_n, 1) # line at bottom
         else: # input mode and window shows current buffer around dot
@@ -260,7 +263,7 @@ def cmd(line):
         traceback.print_exc() # looks just like unhandled exception
         exit()
 
-line = None # This must be global so text_changed() can test it
+line = None # This must be global so text_cmd() can test it (BUT it doesn't!?)
 
 def main(*filename, **options):
     """
