@@ -1,4 +1,4 @@
- Test D with unsaved changes, then X on current buffer
+ Test D with unsaved changes, then repeat D on current buffer
 
 B('new.txt')
 new.txt, 0 lines
@@ -8,13 +8,14 @@ i('Here is a line')
 n()
     ./$    Buffer        File
     ---    ------        ----
-    0/0    main          no current filename
     1/1  .*new.txt       new.txt
+    0/0    main          no current filename
 
 D()
-? unsaved changes, use X to delete
+? unsaved changes, repeat D to delete
 
-X()
+D() again
+new.txt, buffer deleted
 
 n()
     ./$    Buffer        File
@@ -38,6 +39,7 @@ w()
 new1.txt, 1 lines
 
 D()
+new1.txt, buffer deleted
 
 n()
     ./$    Buffer        File
@@ -54,8 +56,8 @@ i('Here is a line')
 n()
     ./$    Buffer        File
     ---    ------        ----
-    0/0    main          no current filename
     1/1  .*new2.txt      new2.txt
+    0/0    main          no current filename
 
 w()
 new2.txt, 1 lines
@@ -64,10 +66,11 @@ b('main')
 n()
     ./$    Buffer        File
     ---    ------        ----
-    0/0  . main          no current filename
     1/1    new2.txt      new2.txt
+    0/0  . main          no current filename
 
 D('new2.txt')
+new2.txt, buffer deleted
 
 n()
     ./$    Buffer        File

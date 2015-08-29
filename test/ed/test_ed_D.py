@@ -5,7 +5,7 @@ test_ed_D.py - test D and X delete buffer commands
 
 from ed import *
 
-print(' Test D with unsaved changes, then X on current buffer')
+print(' Test D with unsaved changes, then repeat D on current buffer')
 print()
 
 print("B('new.txt')")
@@ -24,8 +24,8 @@ print("D()")
 D()
 print()
 
-print("X()")
-X()
+print("D() again")
+D()
 print()
 
 print("n()")

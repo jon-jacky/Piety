@@ -2,8 +2,8 @@
 ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 
 This module provides both the classic command interface and the public
-Python API.  It imports another module, ed0.py, which provides the
-core: data structures and the internal API.
+Python API.  It imports buffer.py which defines the Buffer class that
+provides the core data structure and the internal API.
 
 For more explanation see ed.md, ed.txt, the docstrings here, and the tests
 in test/ed/
@@ -79,10 +79,16 @@ def b_new(name):
     buffers[name] = buf # replace buffers[name] if it already exists
     current = name
 
-def b(name):
-    'Set current buffer to name.  If no buffer with that name, create one'
-    global current
-    if name in buffers:
+def b(*args):
+    """
+    Set current buffer to name.  If no buffer with that name, create one.
+    If no name given, print the name of the current buffer.
+    """
+    global current, buf
+    x, xx, name, xxx = parse_args(args)
+    if not name:
+        print_status(current, o())
+    elif name in buffers:
         current = name
         buf = buffers[current]
     else:
@@ -94,15 +100,6 @@ def r_new(buffername, filename):
     buf.filename = filename
     r(0, filename)
     buf.unsaved = False # insert in r sets unsaved = True, this is exception
-
-def D(name):
-    'Delete the named buffer'
-    global current, buf
-    del buffers[name]
-    if name == current: # pick a new current buffer
-        keys = list(buffers.keys())
-        current = keys[0] if keys else None
-        buf = buffers[current]
 
 def f(*args):
     'set default filename, if filename not specified print current filename'
@@ -146,17 +143,6 @@ def r(*args):
     buf.r(iline, filename)
     print('%s, %d lines' % (filename, S()-S0))
 
-def b(*args):
-    """
-    Set current buffer to name.  If no buffer with that name, create one.
-    If no name given, print the name of the current buffer.
-    """
-    x, xx, buffername, xxx = parse_args(args)
-    if not buffername:
-        print_status(current, o())
-        return
-    buf.b(buffername)
-
 def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
     x, xx, filename, xxx = parse_args(args)
@@ -194,16 +180,21 @@ def D(*args):
 
 def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
+    global current, buf
     x, xx, text, xxx = parse_args(args)
     name = text if text else current
     if not name in buffers:
         print('? buffer name')
-        return
-    if name == 'main':
+    elif name == 'main':
         print("? Can't delete main buffer")
         return
-    buf.D(name)
-    print('%s, buffer deleted' % name)
+    else:
+        del buffers[name]
+        if name == current: # pick a new current buffer
+            keys = list(buffers.keys())
+            current = keys[0] if keys else None
+            buf = buffers[current]
+        print('%s, buffer deleted' % name)
 
 
 # Displaying information
