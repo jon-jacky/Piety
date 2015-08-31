@@ -43,7 +43,7 @@ def save_parameters():
     'Save window parameters before ed cmd so we can test for changes after'
     global cmd_h0, bufname0, filename0, cursor_i0, cursor_ch0
     cmd_h0, bufname0, filename0, cursor_i0, cursor_ch0 = \
-        cmd_h, ed.bufname(), ed.buf().filename, cursor_i, cursor_ch
+        cmd_h, ed.current, ed.buf.filename, cursor_i, cursor_ch
 
 def layout_changed():
     'Window dimensions or locations changed'
@@ -51,7 +51,7 @@ def layout_changed():
 
 def file_changed():
     'Current buffer changed or different file loaded in current buffer'
-    return ed.bufname() != bufname0 or ed.buf().filename != filename0
+    return ed.current != bufname0 or ed.buf.filename != filename0
 
 def text_cmd():
     'Buffer text contents changed in buffer segment visible in window'
@@ -64,7 +64,7 @@ def cursor_moved():
 def cursor_elsewhere():
     'Cursor lies outside segment of buffer visible in window'
     # buf() is okay here, this can only be called on current buffer
-    dot_i = ed.buf().dot # line number of cursor in buffer (not screen)
+    dot_i = ed.buf.dot # line number of cursor in buffer (not screen)
     return (not seg_1 <= dot_i <= seg_n) if dot_i else False
 
 def calc_layout():
@@ -82,19 +82,19 @@ def calc_layout():
     seg_1 = 1 
     seg_n = min(win_h, ed.S()) # FIXME? ed.S() is for current buffer
     # adjust page size used with z Z X commands
-    ed.buf().npage = win_h - 1
+    ed.buf.npage = win_h - 1
 
 # Following functions take bufname arg, might be extended to multiple windows
 
 def display_status(bufname):
     'Starting on status_1 line, print information about named buffer.'
     # based on print_status in ed, but full window width
-    buf = ed.buffer(bufname)
+    buf = ed.buffers[bufname]
     # later, maybe optimize by printing these fields separately
     loc = '%s/%d' % (buf.dot, len(buf.lines)-1) # don't count empty first line
     filename_str = buf.filename if buf.filename else 'no current filename'
     status = '%7s  %s%s%-12s  %s' % (loc, 
-                               '.' if bufname == ed.bufname() else ' ',
+                               '.' if bufname == ed.current else ' ',
                                '*' if buf.unsaved else ' ', 
                                bufname, filename_str)
     status += (ncols - (25 + len(filename_str)))*' ' # bg_color all ncols
@@ -108,7 +108,7 @@ def locate_window(bufname):
     Center window on dot if possible, otherwise show top or bottom of buffer
     """
     global seg_1, seg_n
-    buf = ed.buffer(bufname)
+    buf = ed.buffers[bufname]
     buf_S = len(buf.lines)-1
     # Visible segment is at top of buffer, begins at first line
     if buf.dot < win_h//2 or buf_S <= win_h: # // is python 3 "floor division"
@@ -136,7 +136,7 @@ def display_window(bufname):
     If space remains in window, pad with empty lines to win_h
     If in input mode, open line where text will be typed
     """
-    buf = ed.buffer(bufname)
+    buf = ed.buffers[bufname]
     seg_h = seg_n - seg_1 + 1 # lines in segment, usually same as win_h
     blank_h = win_h - seg_h   # n of padding empty lines at window bottom
     display.put_cursor(win_1,1)  # cursor to window top
@@ -157,7 +157,7 @@ def locate_cursor(bufname):
     Also update cursor_ch, the cursor character - we need to erase it later
     """
     global cursor_i, cursor_ch, cursor_chx
-    buf = ed.buffer(bufname)
+    buf = ed.buffers[bufname]
     if len(buf.lines)-1: # buffer not empty, don't count empty first line at index 0
         # cursor_ch is character at start of line that cursor overwrites
         cursor_ch = buf.lines[buf.dot][0]
@@ -208,22 +208,22 @@ def init_display(*filename, **options):
     calc_layout() # initialize cmd_1, cmd_n etc.
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
-    update_window(ed.bufname())
+    update_window(ed.current)
     display.set_scroll(cmd_1, cmd_n) 
     display.put_cursor(cmd_n, 1) # bottom line
 
 def update_display():
     'Show window, cursor, status line.  Set scroll to input region, place cursor'
-    locate_cursor(ed.bufname()) # assign new cursor_i, cursor_ch
+    locate_cursor(ed.current) # assign new cursor_i, cursor_ch
     # recalculate layout and redisplay everything
     if layout_changed():
         init_display()
     # New contents or cursor outside window, redisplay window and cursor
     elif (file_changed() or text_cmd() or cursor_elsewhere() 
-          or ed.buf().undisplayed): # maybe write updates buffer that isn't current
+          or ed.buf.undisplayed): # maybe write updates buffer that isn't current
                                 # maybe write updates buffer away from dot
-        update_window(ed.bufname())
-        ed.buf().undisplayed = False #maybe write updates buffer that isn't current
+        update_window(ed.current)
+        ed.buf.undisplayed = False #maybe write updates buffer that isn't current
         if ed.command_mode:
             display.put_cursor(cmd_n, 1) # line at bottom
         else: # input mode and window shows current buffer around dot
@@ -232,7 +232,7 @@ def update_display():
     elif cursor_moved():
         erase_cursor()
         display_cursor()
-        display_status(ed.bufname()) # FIXME? could write line number only
+        display_status(ed.current) # FIXME? could write line number only
         display.put_cursor(cmd_n, 1)
     else:
         pass # no changes to display
@@ -249,9 +249,9 @@ def cmd(line):
         save_parameters() # before ed.cmd
         # special cases, command synonyms
         if line == 'Z': # move cursor forward a page
-            ed.cmd('+%dp' % ed.buf().npage) 
+            ed.cmd('+%dp' % ed.buf.npage) 
         elif line == 'X': # backward a page
-            ed.cmd('-%dp' % ed.buf().npage) 
+            ed.cmd('-%dp' % ed.buf.npage) 
         elif line == ' ': # backward a line
             ed.cmd('-1p')
         # RET in ed already moves forward a line
