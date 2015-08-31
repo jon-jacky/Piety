@@ -1,8 +1,8 @@
 test_ed_small.txt, 0 lines
 Line i
-? address out of range
+? invalid address
 Line a
-? address out of range
+? invalid address
 Line i
 Line i
 Line i

@@ -34,6 +34,7 @@ def parse_args(args):
         text = None 
     return start, end, text, params # params might still be non-empty
 
+
 # central data structure and variables
 
 buffers = dict() #  dict from buffer names (strings) to Buffer instances
@@ -53,7 +54,20 @@ def o():
 
 def S():
     'Return index of the last line, 0 if the buffer is empty'
-    return len(buf.lines)-1 # don't count empty first line at index 0
+    return buf.S()
+
+
+# search
+
+def F(pattern):
+    """Forward Search for pattern, 
+    return line number where found, dot if not found"""
+    return buf.F(pattern)
+
+def R(pattern):
+    """Backward search for pattern, 
+    return line number where found, dot if not found"""
+    return buf.R(pattern)
 
 
 # buffers and files
@@ -187,7 +201,6 @@ def DD(*args):
         print('? buffer name')
     elif name == 'main':
         print("? Can't delete main buffer")
-        return
     else:
         del buffers[name]
         if name == current: # pick a new current buffer
@@ -201,12 +214,12 @@ def DD(*args):
 
 def print_status(bufname, iline):
     'used by e and n, given bufname and iline prints dot, $, filename, unsaved'
-    buf = buffers[bufname]
-    loc = '%s/%d' % (iline, len(buf.lines)-1) # don't count empty first line
+    ibuf = buffers[bufname] # avoid name confusion with global buf
+    loc = '%s/%d' % (iline, len(ibuf.lines)-1) # don't count empty first line
     print('%7s  %s%s%-12s  %s' % (loc, 
                                '.' if bufname == current else ' ',
-                               '*' if buf.unsaved else ' ', 
-                               bufname, (buf.filename if buf.filename else 
+                               '*' if ibuf.unsaved else ' ', 
+                               bufname, (ibuf.filename if ibuf.filename else 
                                          'no current filename')))
 
 def A(*args):
@@ -467,20 +480,24 @@ def cmd(line):
             tokens = tuple([ t for t in items if t != None ])
         cmd_name, args = tokens[0], tokens[1:]
         if cmd_name in complete_cmds:
-            globals()[cmd_name](*args) # dict from name (string) to object (function)
+            globals()[cmd_name](*args) # dict from name (string) to object (fcn)
         elif cmd_name in input_cmds:
             command_mode = False # enter input mode
+            # Instead of using buf.a, i, c, we handle input mode cmds inline here
             # We will add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once.
             istart, jend, x, xxx = parse_args(args) # might be int or None
             input_line, end_line = buf.mk_range(istart, jend) # int only
-            if not buf.range_ok(input_line, end_line):
+            if not (buf.start_empty_ok(input_line) if cmd_name in 'ai'
+                    else buf.range_ok(input_line, end_line)):
                 print('? invalid address')
+                command_mode = True
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = input_line
-            elif cmd_name == 'i' and input_line > 0:
-                buf.dot = input_line - 1 # so we can a(ppend) instead of i(nsert)
+            elif cmd_name == 'i': #and input_line >0: NOT! can insert in empty file
+                buf.dot = input_line - 1 if input_line > 0 else 0 
+                # so we can a(ppend) instead of i(nsert)
             elif cmd_name == 'c': # c(hange) command deletes changed lines first
                 buf.d(input_line, end_line) # updates buf.dot
                 buf.dot = input_line - 1

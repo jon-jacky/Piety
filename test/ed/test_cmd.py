@@ -10,7 +10,7 @@ def test_cmd(f, descrip, *args):
     f(*args) if args != ((),) else f() # empty args special case
     print("> b() # print buffer status")
     b()
-    if buf().lines:
+    if buf.lines:
         print("> p() # print the current line")
         p()
     saved_dot = o() # save dot because...
@@ -19,5 +19,5 @@ def test_cmd(f, descrip, *args):
     print("> p(1,S())   # print the entire buffer")
     p(1,S())
     print()
-    buf().dot = saved_dot # put it back where it was, undo effect of p(...)
+    buf.dot = saved_dot # put it back where it was, undo effect of p(...)
 
