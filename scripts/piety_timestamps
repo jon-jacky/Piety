@@ -34,7 +34,20 @@ ts2buf = con.ed.buffers['ts2']
 # add content to timestamp buffers
 print(next(ts1), file=ts1buf)
 print(next(ts2), file=ts2buf)
-    
+
+# define timestamp handlers and tasks
+
+# use this for ts2task.guard - copied from writer_tasks.py
+def alternate():
+    'Return True on every other timeout event.'
+    return bool(piety.ievent[piety.timer]%2)
+
+ts1handler = (lambda: print(next(ts1),file=ts1buf))    
+ts2handler = (lambda: print(next(ts2),file=ts2buf))    
+
+ts1task = piety.Task(handler=ts1handler, input=piety.timer, enabled=piety.true)
+ts2task = piety.Task(handler=ts2handler, input=piety.timer, enabled=alternate)
+
 def main():
     'Run the console session and writer tasks concurrently under the event loop'
     # con.job.pysh() runs its startup(), calls pysh.start() sets pysh.running=True

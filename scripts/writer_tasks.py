@@ -17,6 +17,5 @@ def alternate():
     'Return True on every other timeout event.'
     return bool(piety.ievent[piety.timer]%2)
 
-# writer tasks assigned guard=(lambda:False) so they don't start running
 t0 = piety.Task(handler=w0.write,input=piety.timer,enabled=piety.true)
 t1 = piety.Task(handler=w1.write,input=piety.timer,enabled=alternate)
