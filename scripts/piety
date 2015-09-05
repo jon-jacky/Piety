@@ -13,19 +13,18 @@ import piety
 # Writer tasks in writer_tasks module don't appear explicitly here - 
 # they are referenced by the piety.schedule data structure used by piety.run
 import writer_tasks
+import console_tasks as con
 
-# Likewise, console jobs and session are referenced in console_tasks.jobs,
-# and the session is also referenced in piety.schedule
-# Must import identifiers used below and in pysh shell
-# It seems pysh shell command line sees same scope as code in this module
-from console_tasks import jobs, edc, edd, pysh
+# command aliases
+ed = con.job.ed # no name clash with con.ed module
+edd = con.job.edd
 
 def main():
     'Run the console session and writer tasks concurrently under the event loop'
-    # jobs.pysh() runs its startup() which calls pysh.start() sets pysh.running=True
-    jobs.pysh() # start the first job, recall pysh is in jobs namespace
+    # con.job.pysh() runs its startup(), calls pysh.start() sets pysh.running=True
+    con.job.pysh() # start the first job, recall pysh is in jobs namespace
     # piety.run() calls its piety.start() which sets eventloop.running=True
-    piety.run() # start event loop, continue until pysh >> exit() triggers piety.stop()
+    piety.run() # start event loop, until pysh >> exit() triggers piety.stop()
 
 if __name__ == '__main__':
     main()

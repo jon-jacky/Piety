@@ -11,80 +11,72 @@ Command instance also provides in-line editing, and command history.
 This module has a main function that runs the session in a simple
 blocking event loop, without the Piety scheduler.
 
-This script start the pysh Python shell, with the prompt >> (two not
-three >).  When editing the pysh command line, control keys and arrow
-keys work.  Exit the pysh shell with exit() or ^D.
+This script starts the non-blocking pysh Python shell, with the prompt
+>> (two not three >).  When editing the pysh command line, control
+keys and arrow keys work.  Exit the pysh shell with exit() or ^D.
 
-To start ed line editor, use edc not ed: edc() or edc('README.md') etc., 
-When editing the ed command line, control keys work but and arrow keys do not work.
-Exit ed with the q command, ^D does not work.
+To start the ed line editor, use ed: ed() or ed('README.md') etc.
 
-To start edd display editor: edd() or edd('README.md') or main.edd('README.md') ...
-When editing the edd command line, control keys and arrow keys work.
-Exit edd with the q command or ^D.
+To start the edd display editor: edd() or edd('README.md') or main.edd('README.md')
+
+When editing the ed or edd command line, control keys and arrow keys work.
+Exit ed or edd with the q command or ^D.
 """
 
 import sys
 import piety, command, keyboard, key
-import pysh, ed, edd as _edd # rename edd module so we can use edd as job name
+import pysh, ed, edd
 
-class Namespace(object): pass # another way to avoid name clashes
-jobs = Namespace()
+class Namespace(object): pass 
+job = Namespace() # avoid name clashes between job names and  module names
+cmd = Namespace() # ditto for command names
 
 # Session, a terminal task
 console = piety.Session(name='console', input=sys.stdin)
 
-# Python shell.  Name the command pyshc to avoid name clash with pysh module
-# Assign reader=key.Key that handles some multicharacter control sequences
-pyshc = command.Command(prompt='>> ', reader=key.Key(),  handler=pysh.mk_shell())
+# Python shell
+
+# Put pysh command in cmd namespace to avoid name clash with pysh module
+# here assign reader=key.Key that handles some multicharacter control sequences
+cmd.pysh = command.Command(prompt='>> ', reader=key.Key(),  
+                           handler=pysh.mk_shell())
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-jobs.pysh = piety.Job(session=console, application=pyshc, startup=pysh.start,
-                      stopped=(lambda: not pysh.running or pyshc.command == keyboard.C_d), 
+job.pysh = piety.Job(session=console, application=cmd.pysh, startup=pysh.start,
+                      stopped=(lambda: not pysh.running 
+                               or cmd.pysh.command == keyboard.C_d), 
                       cleanup=piety.stop)
 
 # line editor
+
+cmd.ed = command.Command(prompt='', reader=key.Key(),  handler=ed.cmd)
 
 # startup function handles optional filename argument and optional keyword arg.
 def ed_startup(*filename, **options):
     if filename:
         ed.e(filename[0])
     if 'p' in options:
-        edc.application.prompt = options['p'] 
+        ed.prompt = options['p'] 
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
-# Name the job edc to avoid name clash with ed module.
-# Use default reader, not key.Key, so multicharacter control sequences
-#  (such as keyboard arrow keys) will not work.
-# Exit with q only, ^D exit is not enabled
-edc = piety.Job(session=console,
-                application=command.Command(prompt='', handler=ed.cmd),
-                startup=ed_startup, stopped=(lambda: ed.quit))
+job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup, 
+                   stopped=(lambda: ed.quit or cmd.ed.command == keyboard.C_d))
               
 # display editor
 
+cmd.edd = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
+
 # startup function handles optional filename argument and optional keyword arg.
 def edd_startup(*filename, **options):
-    _edd.ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
     if 'p' in options:
-        edd.application.prompt = options['p'] #edd *not* _edd, Piety command object
-    _edd.init_display(*filename, **options) # _ed.prompt is not used by Piety
+        ed.prompt = options['p']
+    edd.init_display(*filename, **options)
+    ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
 
-# edd module was imported as _edd so we can call the job edd without name clash
-edd = piety.Job(session=console, 
-                application=
-                command.Command(prompt='', reader=key.Key(), handler=_edd.cmd),
-                startup=edd_startup, 
-                cleanup=_edd.restore_display)
-
-# Enable exit with q or ^D, must use separate statement so application has a name
-edd.stopped=(lambda: _edd.ed.quit or edd.application.command == keyboard.C_d)
-
-# Make edd.main an alias for edd.__call__ so we can call edd.main(...) using
-#  exactly the same syntax as when we import edd.py into Python without Piety
-edd.main = edd.__call__
-
+job.edd = piety.Job(session=console, application=cmd.edd, startup=edd_startup, 
+                    stopped=(lambda: ed.quit or cmd.edd.command == keyboard.C_d),
+                    cleanup=edd.restore_display)
 
 # main method for test and demonstration
 
@@ -93,8 +85,8 @@ def main():
     Run the console session without the Piety scheduler.
     Instead just use an ordinary while loop as a simple blocking event loop.
     """
-    jobs.pysh() # start the first job
-    while pysh.running: # pysh module here, different from jobs.pysh 
+    job.pysh() # start the first job
+    while pysh.running: # pysh module here, different from job.pysh 
         console.handler()  # block waiting for each single character 
 
 if __name__ == '__main__':

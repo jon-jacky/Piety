@@ -44,7 +44,7 @@ command, execute other Python statements, then resume by typing
 state as you left it.
 
 
-The *ed.main()* function takes one optional positional argument, the
+The *edd.main()* function takes one optional positional argument, the
 file name, and two optional keyword arguments, *p* the command prompt
 string and *h* the number of lines (height) of the scrolling command
 region.  Type *edd.main('test.txt')* to begin editing *test.txt*, as if
@@ -63,4 +63,4 @@ at any time during an editing session: *!edd.cmd_h = 8*.
 **edd** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
 
-Revised February 2015
+Revised September 2015

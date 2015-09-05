@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+"""
+piety_timestamps - Uses the Piety scheduler to run the console session with
+  three jobs created by console_tasks, concurrently with the two
+  timestamp tasks.  The timestamp tasks write to editor buffers.
+
+"""
+import piety
+import timestamp
+import console_tasks as con
+
+# command aliases
+ed = con.job.ed # no name clash with con.ed module
+edd = con.job.edd
+
+# add content to main buffer
+# we haven't started edd yet, window not initialized, use con.ed commands
+con.ed.cmd('i')
+con.ed.cmd('This is the main buffer')
+con.ed.cmd('.')
+
+# create timestamp generators
+ts1 = timestamp.timestamp('ts1')
+ts2 = timestamp.timestamp('ts2')
+
+# create buffers for timestamp messages
+con.ed.cmd('b ts1')
+con.ed.cmd('b ts2')
+
+# aliases for timestamp buffers
+ts1buf = con.ed.buffers['ts1']
+ts2buf = con.ed.buffers['ts2']
+
+# add content to timestamp buffers
+print(next(ts1), file=ts1buf)
+print(next(ts2), file=ts2buf)
+    
+def main():
+    'Run the console session and writer tasks concurrently under the event loop'
+    # con.job.pysh() runs its startup(), calls pysh.start() sets pysh.running=True
+    con.job.pysh() # start the first job, recall pysh is in jobs namespace
+    # piety.run() calls its piety.start() which sets eventloop.running=True
+    piety.run() # start event loop, until pysh >> exit() triggers piety.stop()
+
+if __name__ == '__main__':
+    main()
