@@ -16,7 +16,8 @@ import writer_tasks
 import console_tasks as con
 
 # command aliases
-ed = con.job.ed # no name clash with con.ed module
+pysh = con.job.pysh # no name clash with con.pysh module
+ed = con.job.ed 
 edd = con.job.edd
 
 def main():

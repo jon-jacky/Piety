@@ -19,7 +19,7 @@ import os.path
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and metadata'
-    def __init__(self):
+    def __init__(self, update=None):
         'New text buffer'
         # Buffer always contains empty line at index 0, never used or printed
         self.lines = [''] # text in current buffer, a list of strings
@@ -29,8 +29,7 @@ class Buffer(object):
         self.pattern = '' # search string - default '' matches any line
         self.npage = 22 # page length used, optionally set by z scroll command
         self.end_phase = False # used by write method, see explanation below
-        self.undisplayed = False # True if buffer may contain undisplayed changes
-                                 # FIXME? only used by edd, maybe shouldn't be here
+        self.update = update # call from write method to update display
 
     # line addresses
 
@@ -198,4 +197,5 @@ class Buffer(object):
             # store contents string until we get end string
             self.contents = s
         self.end_phase = not self.end_phase # alternates False True False ...
-        self.undisplayed = True # FIXME?
+        if self.update:
+            self.update()

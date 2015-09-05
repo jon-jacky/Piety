@@ -5,12 +5,15 @@ piety_timestamps - Uses the Piety scheduler to run the console session with
   timestamp tasks.  The timestamp tasks write to editor buffers.
 
 """
+
+import terminal, display
 import piety
 import timestamp
 import console_tasks as con
 
 # command aliases
-ed = con.job.ed # no name clash with con.ed module
+pysh = con.job.pysh # no name clash with con.pysh module
+ed = con.job.ed 
 edd = con.job.edd
 
 # add content to main buffer
@@ -30,6 +33,20 @@ con.ed.cmd('b ts2')
 # aliases for timestamp buffers
 ts1buf = con.ed.buffers['ts1']
 ts2buf = con.ed.buffers['ts2']
+
+# window update function
+
+def update(buf):
+    if con.console.foreground == edd and con.ed.buf == buf:
+        terminal.set_line_mode()
+        con.edd.update_window(con.ed.current)
+        # restore cursor to edd cmd line (bottom of scroll region), editing point
+        display.put_cursor(con.edd.cmd_n, con.cmd.edd.point+1) 
+        terminal.set_char_mode() # FIXME should restore whatever was before
+        
+# add window update callbacks to timestamp buffers
+ts1buf.update = (lambda: update(ts1buf))
+ts2buf.update = (lambda: update(ts2buf))
 
 # add content to timestamp buffers
 print(next(ts1), file=ts1buf)

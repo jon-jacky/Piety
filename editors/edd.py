@@ -219,11 +219,8 @@ def update_display():
     if layout_changed():
         init_display()
     # New contents or cursor outside window, redisplay window and cursor
-    elif (file_changed() or text_cmd() or cursor_elsewhere() 
-          or ed.buf.undisplayed): # maybe write updates buffer that isn't current
-                                # maybe write updates buffer away from dot
+    elif file_changed() or text_cmd() or cursor_elsewhere():
         update_window(ed.current)
-        ed.buf.undisplayed = False #maybe write updates buffer that isn't current
         if ed.command_mode:
             display.put_cursor(cmd_n, 1) # line at bottom
         else: # input mode and window shows current buffer around dot
