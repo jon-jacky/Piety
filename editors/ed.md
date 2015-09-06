@@ -155,11 +155,21 @@ blocking, and then passes that line to *ed.cmd*.
 Python API described above, including command line parsing, argument
 checking, and error messages.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
-**ed.py** imports *ed0.py*, which provides the core: the data
-structures and the internal API for updating them, where each function
-has a fixed argument list, provides no error checking, and no error
-messages or progress messages.  *ed0.py* does not access the
-console, but updates buffers and reads and writes files.
+**ed.py** imports *buffer.py*, which provides the *Buffer* class,
+which defines the core data structure and the internal API for
+updating it.  Many *Buffer* methods correspond to functions in the
+API, but here each method has a fixed argument list, provides no error
+checking, and no error messages or progress messages.  The *Buffer*
+class does not access the console, but updates text buffers and reads
+and writes files.
+
+The *Buffer* class provides a *write* method so other code can update
+text buffers without using the *ed.py* user interface or API, by
+calling the standard Python *print* function.  The *Buffer* class has
+an *update* attribute which can optionally be assigned to a callable
+that may be used by the *write* method to update a display (for
+example).
+
 
 ## Limitations ##
 
@@ -195,4 +205,4 @@ There is no way to move text from one buffer to another.  This might
 be fixed in the future by defining extensions to the move and copy
 commands, *m* and *t*.
 
-Revised February 2015
+Revised September 2015
