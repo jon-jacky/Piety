@@ -15,12 +15,20 @@ This script starts the non-blocking pysh Python shell, with the prompt
 >> (two not three >).  When editing the pysh command line, control
 keys and arrow keys work.  Exit the pysh shell with exit() or ^D.
 
-To start the ed line editor, use ed: ed() or ed('README.md') etc.
+To start the ed line editor: ed(), ed('README.md'), ed('README.md',
+p=':') etc.  Both command arguments, the file name and the ed command
+prompt character, are optional.  You can also use ed.main() etc.
 
-To start the edd display editor: edd() or edd('README.md') or main.edd('README.md')
+To start the edd display editor: edd(), edd('README.md',h=12,p=':')
+etc.  All three command arguments, the file name, the edd command
+prompt character, and the scrolling command region height in lines,
+are optional.  You can also use edd.main() etc.
 
-When editing the ed or edd command line, control keys and arrow keys work.
 Exit ed or edd with the q command or ^D.
+
+When editing the ed or edd command line, control keys and arrow keys work,
+see console/command.txt
+
 """
 
 import sys
@@ -58,8 +66,6 @@ def ed_startup(*filename, **options):
         ed.e(filename[0])
     if 'p' in options:
         cmd.ed.prompt = options['p']  # ed.prompt is not used by Piety
-        # FIXME? earlier version: edc.application.prompt = options['p'] 
-        # where edc was the job, called job.ed here (immedidately below)
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
 job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup, 
@@ -73,10 +79,6 @@ cmd.edd = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
 def edd_startup(*filename, **options):
     if 'p' in options:
         cmd.edd.prompt = options['p'] # edd.prompt is not used by Piety
-        # FIXME? earlier version: edd.application.prompt = options['p'] 
-        # where edd was the job not the module, called job.ed here (below)
-        # in stoppped= we have cmd.edd replacing old edd.application
-        # also had comment  
     edd.init_display(*filename, **options)
     ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
 

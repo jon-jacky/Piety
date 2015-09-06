@@ -10,7 +10,7 @@ comments in each module for directions and explanations:
   *Job* instances: the *pysh* shell, the *ed* line editor, and the *edd*
   display editor.  The application in each job is a *Command* instance,
   each with its own *reader* method that reads and possibly preprocesses its input. 
-  This module is used by the *piety* script. 
+  This module is used by the *piety* and *piety_timestamps* scripts.
   It also has a *main* method that
   runs the session in a simple blocking event loop (instead of using
   one of the non-blocking event loops).
@@ -30,7 +30,14 @@ comments in each module for directions and explanations:
   three jobs created by *console_tasks*, concurrently with the two
   writer tasks created by *writer_tasks*.
 
+- **piety_timestamps**: Uses a non-blocking event loop to run the
+  console session with three jobs created by *console_tasks*,
+  concurrently with the two timestamp tasks created in this script.
+  The timestamp tasks write to editor buffers named *ts1* and *ts2*.
+  Display these buffers using the *edd* display editor commands *b ts1*
+  and *b ts2* to see the buffers update as each timestamp is written.
+
 - **writer_tasks.py**: Creates writer tasks used by the *embedded* and
     *piety* scripts.
 
-Revised July 2015
+Revised September 2015
