@@ -57,7 +57,9 @@ def ed_startup(*filename, **options):
     if filename:
         ed.e(filename[0])
     if 'p' in options:
-        ed.prompt = options['p'] 
+        cmd.ed.prompt = options['p']  # ed.prompt is not used by Piety
+        # FIXME? earlier version: edc.application.prompt = options['p'] 
+        # where edc was the job, called job.ed here (immedidately below)
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
 job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup, 
@@ -70,7 +72,11 @@ cmd.edd = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
 # startup function handles optional filename argument and optional keyword arg.
 def edd_startup(*filename, **options):
     if 'p' in options:
-        ed.prompt = options['p']
+        cmd.edd.prompt = options['p'] # edd.prompt is not used by Piety
+        # FIXME? earlier version: edd.application.prompt = options['p'] 
+        # where edd was the job not the module, called job.ed here (below)
+        # in stoppped= we have cmd.edd replacing old edd.application
+        # also had comment  
     edd.init_display(*filename, **options)
     ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
 

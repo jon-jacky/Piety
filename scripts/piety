@@ -17,8 +17,13 @@ import console_tasks as con
 
 # command aliases
 pysh = con.job.pysh # no name clash with con.pysh module
-ed = con.job.ed 
-edd = con.job.edd
+ed = con.job.ed     # invoke ed with ed() or ed('README.md', p=':') etc.
+edd = con.job.edd   # invoke edd with edd() or edd('README.md', h=12, p=':') etc.
+
+# more command aliases
+# if you prefer ed.main() and ed.main('README.md') to ed() and ed('README.md') etc.
+ed.main = ed.__call__
+edd.main = edd.__call__
 
 def main():
     'Run the console session and writer tasks concurrently under the event loop'

@@ -160,9 +160,10 @@ def locate_cursor(bufname):
     buf = ed.buffers[bufname]
     if len(buf.lines)-1: # buffer not empty, don't count empty first line at index 0
         # cursor_ch is character at start of line that cursor overwrites
-        cursor_ch = buf.lines[buf.dot][0]
+        cursor_line = buf.lines[buf.dot]
+        cursor_ch = cursor_line[0] if cursor_line else ''
         # To ensure cursor on space or empty line is visible, use cursor_chx
-        cursor_chx = '_' if cursor_ch in (' ','\n') else cursor_ch
+        cursor_chx = '_' if cursor_ch in ('',' ','\n') else cursor_ch
         cursor_i = win_1 + (buf.dot - seg_1)
         cursor_i = cursor_i if win_1 <= cursor_i <= win_1 + win_h - 1 else 0
     else:

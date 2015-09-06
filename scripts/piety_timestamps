@@ -16,6 +16,11 @@ pysh = con.job.pysh # no name clash with con.pysh module
 ed = con.job.ed 
 edd = con.job.edd
 
+# more command aliases
+# if you prefer ed.main() and ed.main('README.md') to ed() and ed('README.md') etc.
+ed.main = ed.__call__
+edd.main = edd.__call__
+
 # add content to main buffer
 # we haven't started edd yet, window not initialized, use con.ed commands
 con.ed.cmd('i')
