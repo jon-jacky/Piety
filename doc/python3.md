@@ -76,7 +76,8 @@ line.
 Some of the scripts under the *test* directory are shell scripts that
 invoke Python, for example: *python -c "import ed; ed.main()"*.  To
 run these scripts with Python 3, we edit them to replace the *python*
-command: *python3 -c ...* etc.  (The edited scripts are not stored in
-this repository.)
+command: *python3 -c ...* etc.  Some of the edited scripts are stored
+in this repository, indicated by a final *3* in the file base name:
+*sample3.sh* etc.
 
-Revised June 2015
+Revised September 2015

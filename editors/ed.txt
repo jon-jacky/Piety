@@ -45,7 +45,7 @@ Line addresses:
 
 Command format:
 
- start,endCparameters
+ start,endC parameters
 
  All fields are optional, with helpful defaults.
  Here C is command name, all names are one character, default is l.
@@ -54,6 +54,7 @@ Command format:
  If only start is present, command applies to that line.  
  If both are absent, most commands apply to the current line.
  Most commands move the current line to the last affected line.
+ Parameters may be separated from command name C by zero or more spaces
  Parameters may be file or buffer names, search/replace strings, ...
  All commands are terminated by RETURN (including the empty command).
  a,i,c enter input mode, where you type lines of text to add to buffer.
@@ -61,3 +62,4 @@ Command format:
 
 For more information, type man ed on any Unix-like system.
 
+Revised September 2015
