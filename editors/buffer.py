@@ -1,5 +1,5 @@
 """
-buffer.py - defines Buffer class for editor buffers.
+buffer.py - Buffer class for text editors
 
 Many of the methods in the Buffer class correspond to ed commands
 and the ed.py API.

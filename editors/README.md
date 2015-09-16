@@ -25,4 +25,6 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
     the *console* directory to get the commmand line, instead of Python
     *raw_input*.
 
+- **window.py**: defines Window class used by *edd.py*
+
 Revised September 2015

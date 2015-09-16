@@ -1,6 +1,7 @@
 """
 edd - display editor based on the line editor ed.py.  
-  Described in ed.md.  To run: python edd.py or import edd then edd.main()
+
+Described in ed.md etc.  To run: python3 edd.py or import edd then edd.main()
 """
 
 import traceback
