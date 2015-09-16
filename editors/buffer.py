@@ -29,8 +29,9 @@ import os.path
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and metadata'
-    def __init__(self, update=None):
+    def __init__(self, name, update=None):
         'New text buffer'
+        self.name = name
         # Buffer always contains empty line at index 0, never used or printed
         self.lines = [''] # text in current buffer, a list of strings
         self.dot = 0 # index of current line, 0 when buffer is empty

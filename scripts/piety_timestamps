@@ -53,8 +53,8 @@ ts2buf = con.ed.buffers['ts2']
 def update(buf):
     if con.console.foreground == edd and con.ed.buf == buf:
         terminal.set_line_mode()
-        con.edd.update_window(con.ed.current)
-        # restore cursor to edd cmd line (bottom of scroll region), editing point
+        con.edd.win.update_window(True) # command mode not insert mode
+        # restore cursor to edd cmd line (bottom of scroll region), edit point
         display.put_cursor(con.edd.cmd_n, con.cmd.edd.point+1) 
         terminal.set_char_mode() # FIXME should restore whatever was before
         

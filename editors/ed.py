@@ -42,7 +42,7 @@ buffers = dict() #  dict from buffer names (strings) to Buffer instances
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
 current = 'main'
-buf = buffer.Buffer()  
+buf = buffer.Buffer(current)  
 buffers[current] = buf 
 
 
@@ -89,7 +89,7 @@ def current_filename(filename):
 def b_new(name):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer()
+    buf = buffer.Buffer(name)
     buffers[name] = buf # replace buffers[name] if it already exists
     current = name
 
