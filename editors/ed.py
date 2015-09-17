@@ -9,9 +9,11 @@ For more explanation see ed.md, ed.txt, the docstrings here, and the tests
 in test/ed/
 """
 
-import re, os
+import re, os, sys
 import pysh  # provides embedded Python shell for ! command
 import buffer
+
+destination = sys.stdout # can redirect l z cmd output to os.devnull etc.
 
 # arg lists, defaults, range checking
 
@@ -253,12 +255,12 @@ def l(*args):
     if not buf.start_ok(iline):
         print('? invalid address')
         return
-    print(buf.l(iline))
+    print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
 
 def p_lines(ifirst,ilast):
     'Print line numbers ifirst through ilast, inclusive, without arg checking'
     for iline in range(ifirst,ilast+1): # +1 because ifirst,ilast is inclusive
-        print(buf.l(iline))
+        print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
@@ -275,7 +277,7 @@ def z(*args):
     Leave dot at last line printed. If parameter is present, update buf.npage
     """
     start, x, npage_string, xxx = parse_args(args)
-    print('start %s, npage_string %s' % (start, npage_string))
+    #print('start %s, npage_string %s' % (start, npage_string))#DEBUG
     iline = buf.mk_start(start)
     if not buf.start_empty_ok(iline):
         print('? invalid address')

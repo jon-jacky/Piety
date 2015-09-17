@@ -4,8 +4,12 @@ edd - display editor based on the line editor ed.py.
 Described in ed.md etc.  To run: python3 edd.py or import edd then edd.main()
 """
 
-import traceback
+import traceback, os
 import terminal, display, window, ed
+
+# suppress output from ed l z commands to scrolling command region
+null = open(os.devnull, 'w')
+ed.destination = null
 
 # Position display elements.  For now, just two regions from top to bottom:
 #  1. text buffer window including buffer status line(s)
@@ -138,7 +142,6 @@ def cmd(line):
         restore_display() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         exit()
-
 
 def main(*filename, **options):
     """
