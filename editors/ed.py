@@ -377,6 +377,9 @@ number = re.compile(r'(\d+)')
 fwdnumber = re.compile(r'\+(\d+)')
 bkdnumber = re.compile(r'\-(\d+)')
 bkdcnumber = re.compile(r'\^(\d+)')
+plusnumber = re.compile(r'(\++)')
+minusnumber = re.compile(r'(\-+)')
+caratnumber = re.compile(r'(\^+)')
 fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
@@ -408,6 +411,15 @@ def match_address(cmd_string):
     m = bkdcnumber.match(cmd_string) # ^digits, relative line number backward
     if m:
         return o() - int(m.group(1)), cmd_string[m.end():]
+    m = plusnumber.match(cmd_string) # + or ++ or +++ ...
+    if m:
+        return o() + len(m.group(0)), cmd_string[m.end():]
+    m = minusnumber.match(cmd_string) # digits, the line number
+    if m:
+        return o() - len(m.group(0)), cmd_string[m.end():]
+    m = caratnumber.match(cmd_string) # digits, the line number
+    if m:
+        return o() - len(m.group(0)), cmd_string[m.end():]
     m = fwdsearch.match(cmd_string)  # /text/ or // - forward search
     if m: 
         return buf.F(m.group(1)), cmd_string[m.end():]

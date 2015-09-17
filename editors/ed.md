@@ -23,7 +23,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** supports these line address forms from classic *ed*:
 
- *number . , ; % $ /text/ // ?text? ?? +number -number ^number* (but not bare *+ - ^*)
+ *number . , ; % $ /text/ // ?text? ?? +number -number ^number* also *+ ++ ... - -- ... ^ ^^ ...*
 
 
 **ed.py** also supports these commands from *sam*:
@@ -180,14 +180,17 @@ future.
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
 
-**ed.py** does not support these classic *ed* address forms: *+ - ^ 'c*.
-Some of these might be supported in the future
-(*+number -number ^number* are already supported).
+**ed.py** does not support this classic *ed* address form: *'c*.
+It might be supported in the future.
 
 **ed.py** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).
 
 **ed.py** does not support the classic *ed* iteration commands *g G v V*.
+
+**ed.py** does not warn about the quit command *q* when there are
+unsaved buffers, because the session with all its buffers can be
+resumed by calling *ed.main()* at the Python interpreter prompt again.
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular

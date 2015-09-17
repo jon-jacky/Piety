@@ -126,9 +126,7 @@ def cmd(line):
     try:
         save_parameters() # before ed.cmd
         # special cases, command synonyms
-        if line == 'Z': # move cursor forward a page
-            ed.cmd('+%dp' % ed.buf.npage) 
-        elif line == 'X': # backward a page
+        if line == 'Z': # move cursor backward a page
             ed.cmd('-%dp' % ed.buf.npage) 
         elif line == ' ': # backward a line
             ed.cmd('-1p')

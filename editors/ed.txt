@@ -35,6 +35,10 @@ Line addresses:
  <n> (number) line number (starting at 1 not 0)
  +<n> n lines after dot
  -<n> n lines before dot
+ ^<n> n lines before dot
+ + ++ +++ ...  one, two, three lines after dot, etc.
+ - -- --- ...  one, two, three lines before dot, etc.
+ ^ ^^ ^^^ ...  one, two, three lines before dot, etc.
  /text/ forward search, next line containing text
  //     forward search, using previous search text
  ?text? backward search, nearest previous line containing text

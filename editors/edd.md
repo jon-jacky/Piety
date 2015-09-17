@@ -28,10 +28,11 @@ type a period at the start of a line to exit input mode.  Then *edd*
 puts the cursor back in the command region for you to type another
 command.
 
-**edd** provides a few new commands (not in *ed.py*) to make it easy
-to move around the buffer (by changing the current line): *Z* pages
-forward, *X* pages backward, and *space* moves backward one line.  The
-*ed.py* empty command (just type *RETURN*) moves forward one line.
+**edd** provides two new commands (not in *ed.py*) to make it easy to
+move around in the buffer (by changing the current line): *space*
+moves backward one line, and *Z* (upper case) pages backward.  Recall
+that the *ed.py* empty command (just type *RETURN*) moves forward one
+line, and *z* (lower case) pages forward.
 
 You can execute any Python statement at the *edd* command line by
 preceding it with the *!* character, for example *!dir(edd)*.
