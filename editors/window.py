@@ -38,22 +38,24 @@ class Window(object):
         self.cursor_i = None # line number of current buffer's dot on display
         self.cursor_ch = None # character that cursor overwrites
         self.cursor_chx = None # same as cursor_ch except when that is blank
+        self.cursor_i0 = None # previous value of cursor_i
+        self.cursor_ch0 = None # previous value of cursor_ch
 
-    def at_top_segment(self, buf_S):
+    def at_top_segment(self):
         """
         dot is in segment at beginning of buffer that fits in window,
         so visible segment is at top of buffer, begins at first line.
-        buf_S is $, line number of last line in buffer.
         """
+        buf_S = len(self.buf.lines)-1 # last line in buffer
         # // is python 3 "floor division"
         return (self.buf.dot < self.win_hl//2 or buf_S <= self.win_hl)
 
-    def at_bottom_segment(self, buf_S):
+    def at_bottom_segment(self):
         """
         dot is in segment at end of buffer that fits in window,
         so visible segment is at bottom of buffer, ends at last line.
-        buf_S is $, line number of last line in buffer.
         """
+        buf_S = len(self.buf.lines)-1 # last line in buffer
         return (buf_S - self.buf.dot < self.win_hl//2 and buf_S >= self.win_hl)
 
     def at_bottom_line(self):
@@ -92,10 +94,10 @@ class Window(object):
         Center window on dot if possible,otherwise show top or bottom of buffer
         """
         buf_S = len(self.buf.lines)-1
-        if self.at_top_segment(buf_S):
+        if self.at_top_segment():
             self.seg_1 = 1  
             self.seg_n = min(self.win_hl, buf_S)
-        elif self.at_bottom_segment(buf_S):
+        elif self.at_bottom_segment():
             self.seg_1 = buf_S - (self.win_hl - 1)
             self.seg_n = buf_S
         else: # visible segment is centered on dot
@@ -143,11 +145,11 @@ class Window(object):
         return ((not self.seg_1 <= self.buf.dot <= self.seg_n) 
                 if self.buf.dot else False)
     
-    def cursor_moved(self, cursor_i0):
+    def cursor_moved(self):
         """
         Cursor moved to a different line in the buffer (than cursor_i0)
         """
-        return self.cursor_i != cursor_i0
+        return self.cursor_i != self.cursor_i0
 
     def locate_cursor(self):
         """
@@ -156,6 +158,8 @@ class Window(object):
         Also update self.cursor_ch, the cursor character,
          because we will need to erase it later.
         """
+        self.cursor_i0 = self.cursor_i # save previous values
+        self.cursor_ch0 = self.cursor_ch
         # buffer not empty, don't count empty first line at index 0
         if len(self.buf.lines)-1: 
             # self.cursor_ch is char at start of line that cursor overwrites
@@ -176,20 +180,20 @@ class Window(object):
 
     def display_cursor(self):
         """
-        Display cursor at start of display line self.cursor_i.
+        Display cursor at start of display line
         """
         if self.cursor_i:
             display.put_cursor(self.cursor_i, 1) 
             display.render(self.cursor_chx, display.white_bg) # no blink, noisy
 
-    def erase_cursor(self, cursor_i0, cursor_ch0):
+    def erase_cursor(self):
         """
-        At start of display line cursor_i0, replace cursor with saved char.
+        At start of previous display line, replace cursor with saved char.
         """
-        if cursor_i0: # FIXME cursor_i0 is an edd.py global
+        if self.cursor_i0: # FIXME cursor_i0 is an edd.py global
             # if line is empty must use ' ' to overwrite '_'
-            ch = cursor_ch0 if not cursor_ch0 == '\n' else ' '
-            display.put_cursor(cursor_i0, 1)
+            ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
+            display.put_cursor(self.cursor_i0, 1)
             display.render(ch, display.clear)
 
     def set_input_cursor(self):

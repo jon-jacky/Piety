@@ -33,19 +33,16 @@ win_h = None # total number of lines in all windows (vertical stack)
 win = None # assign window to this in init_display, below
 
 # Values saved before ed command so we can test for changes after
-(cmd_h0, current0, filename0, cursor_i0, cursor_ch0) = (None, None, None, 
-                                                        None, None)
+(cmd_h0, current0, filename0) = (None, None, None)
 
 def save_parameters():
     'Save window parameters before ed cmd so we can test for changes after'
-    global cmd_h0, current0, filename0, cursor_i0, cursor_ch0
-    cmd_h0, current0, filename0, cursor_i0, cursor_ch0 = \
-        cmd_h, ed.current, ed.buf.filename, win.cursor_i, win.cursor_ch
+    global cmd_h0, current0, filename0
+    cmd_h0, current0, filename0 = cmd_h, ed.current, ed.buf.filename
 
 def print_saved():
     'for debug prints'
-    print('cmd_h0 %s, current0 %s, filename0 %s, cursor_i0 %s, cursor_ch0 %s' %
-          (cmd_h0, current0, filename0, cursor_i0, cursor_ch0))
+    print('cmd_h0 %s, current0 %s, filename0' % (cmd_h0, current0, filename0))
 
 def layout_changed():
     'Window dimensions or locations changed'
@@ -107,8 +104,8 @@ def update_display():
         if ed.command_mode:
             set_command_cursor() # scrolling-region cursor for command entry
     # Cursor remained in window, move cursor only
-    elif win.cursor_moved(cursor_i0):
-        win.erase_cursor(cursor_i0, cursor_ch0)
+    elif win.cursor_moved():
+        win.erase_cursor()
         win.display_cursor()
         win.display_status()
         set_command_cursor()
