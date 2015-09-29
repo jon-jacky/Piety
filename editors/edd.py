@@ -11,8 +11,10 @@ import terminal, display, window, ed
 null = open(os.devnull, 'w')
 ed.destination = null
 
+prompt = '' # command prompt
+
 # Position display elements.  For now, just two regions from top to bottom:
-#  1. text buffer window including buffer status line(s)
+#  1. Frame, holds all text buffer window including buffer status line(s)
 #  2. scrolling command input region
 # Line numbers on display and in each element are 1-based as in ed and ansi.
 
@@ -20,17 +22,16 @@ nlines, ncols = terminal.dimensions()
 
 # Defaults, might be updated while program is running, especially cmd_h:
 
-prompt = '' # command prompt
-
 win_1 = 1 # line number on display of first line of first window
 status_h = 1 # height (lines) of buffer status, now just a status line
              # for now this must be the same for all windows
 cmd_h = 2  # height (lines) of scrolling command region at the bottom
 cmd_1 = None # line num on display of 1st line of scrolling command region
 cmd_n = None #  " bottom "
-win_h = None # total number of lines in all windows (vertical stack)
+win_h = None # total number of lines in frame, all windows (vertical stack)
 
-win = None # assign window to this in init_display, below
+# Frame
+frame = list() # list of windows
 
 # Values saved before ed command so we can test for changes after
 (cmd_h0, current0, filename0) = (None, None, None)
@@ -44,8 +45,8 @@ def print_saved():
     'for debug prints'
     print('cmd_h0 %s, current0 %s, filename0' % (cmd_h0, current0, filename0))
 
-def layout_changed():
-    'Window dimensions or locations changed'
+def frame_changed():
+    'Frame dimensions or locations changed'
     return cmd_h != cmd_h0 # only one window for now
 
 def file_changed():
@@ -56,7 +57,7 @@ def text_cmd():
     'Buffer text contents changed in buffer segment visible in window'
     return ed.cmd_name in 'aicds' # append, insert, change, delete, substitute
 
-def calc_layout():
+def calc_frame():
     'Calculate dimensions and location of window'
     # Currently there is only one window
     # scrolling command region at the bottom
@@ -70,7 +71,16 @@ def set_command_cursor():
     'Put cursor at input line in scrolling command region'
     display.put_cursor(cmd_n, 1) # bottom line
 
-def init_display(*filename, **options):
+def display_frame():
+    # called from init_session and update_frame
+    display.put_cursor(1,1) # origin, upper left corner
+    display.erase_display() 
+    win = frame[0] # FIXME just one window for now
+    win.update_window(ed.command_mode) # just one window
+    display.set_scroll(cmd_1, cmd_n) 
+    set_command_cursor()
+
+def init_session(*filename, **options):
     """
     Clear and render entire display, set scrolling region, place cursor
     Process optional arguments: filename, options if present
@@ -82,21 +92,26 @@ def init_display(*filename, **options):
         prompt = options['p'] 
     if 'h' in options:
         cmd_h = options['h'] 
-    calc_layout() # initialize cmd_1, cmd_n etc.
-    display.put_cursor(1,1) # origin, upper left corner
-    display.erase_display() 
-    # Initially there is just one window displaying 'main' buffer
-    win = window.Window(ed.buf, win_1, win_h, ncols) 
-    win.update_window(ed.command_mode)
-    display.set_scroll(cmd_1, cmd_n) 
-    set_command_cursor()
+    # must calc frame before we create first window
+    calc_frame() # initialize cmd_1, cmd_n etc.
+    win = window.Window(ed.buf, win_1, win_h, ncols) # create first window
+    frame.append(win) # add first window to frame, possibly more to come
+    display_frame()
+
+def update_frame():
+    'like init_session but no args and no window creation'
+    calc_frame() # recalculate cmd_1, cmd_n, cmd_h
+    win = frame[0] # FIXME just one window for now
+    win.resize(win_1, win_h, ncols)
+    display_frame()
 
 def update_display():
     'Show window, cursor, status line. Set scroll to input region,place cursor'
+    win = frame[0]  # FIXME just one window for now
     win.locate_cursor() # assign new cursor_i
-    # recalculate layout and redisplay everything
-    if layout_changed():
-        init_display()
+    # recalculate frame and redisplay everything
+    if frame_changed():
+        update_frame()
     # New contents or cursor outside window, redisplay window and cursor
     elif file_changed() or text_cmd() or win.cursor_elsewhere():
         win.update_window(ed.command_mode)
@@ -131,6 +146,7 @@ def cmd(line):
         else:
             ed.cmd(line) # non-blocking
         if ed.cmd_name in 'bBeED':
+            win = frame[0] # FIXME just one window for now
             win.buf = ed.buf # ed.buf might have changed
         update_display()
     except BaseException as e:
@@ -144,7 +160,7 @@ def main(*filename, **options):
     Won't cooperate with Piety scheduler, calls blocking command raw_input.
     """
     ed.quit = False # allow restart
-    init_display(*filename, **options)
+    init_session(*filename, **options)
     while not ed.quit:
         line = input(prompt) # blocking
         cmd(line) # no blocking

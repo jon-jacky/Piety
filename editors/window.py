@@ -22,24 +22,31 @@ class Window(object):
         """
         self.buf = buf
         #self.dot = buf.dot # FIXME, add later, might differ from self.buf.dot
-        self.win_1 = win_1 # line number on display of 1st line of this window
-        self.win_h = win_h # number of lines in this window including status
-        self.ncols = ncols # max number of chars in a line
-        # There are also edd.py global win_h: total lines in all windows
         # status_h is height of status region in lines, usually 1
         self.status_h = 1 # height (lines) of window status region(status line)
-        self.win_hl = self.win_h - self.status_h #window lines excluding status
-        # status_1 is line num on display of 1st line of status region
-        self.status_1 = self.win_1 + self.win_hl # first line after buffer text
+        self.resize(win_1, win_h, ncols)
         # self.seg_1,seg_n are indices in buffer of 1st,last lines in window
         self.seg_1 = 1 # index in buffer of first line displayed in window
         self.seg_n = min(self.win_hl, len(self.buf.lines)-1) # index last line
-        self.buf.npage = self.win_hl # page size for z Z X cmds
         self.cursor_i = None # line number of current buffer's dot on display
         self.cursor_ch = None # character that cursor overwrites
         self.cursor_chx = None # same as cursor_ch except when that is blank
         self.cursor_i0 = None # previous value of cursor_i
         self.cursor_ch0 = None # previous value of cursor_ch
+
+    def resize(self, win_1, win_h, ncols):
+        """
+        Assign window dimensions
+        """
+        self.win_1 = win_1 # line number on display of 1st line of this window
+        self.win_h = win_h # number of lines in this window including status
+        self.ncols = ncols # max number of chars in a line
+        # There are also edd.py global win_h: total lines in all windows
+        self.win_hl = self.win_h - self.status_h #window lines excluding status
+        # status_1 is line num on display of 1st line of status region
+        self.status_1 = self.win_1 + self.win_hl # first line after buffer text
+        self.buf.npage = self.win_hl # page size for z Z cmds
+        # FIXME seg_1, seg_n - is that locate_segment? call here or outside?
 
     def at_top_segment(self):
         """
@@ -211,6 +218,7 @@ class Window(object):
         self.locate_cursor() # *re*assign new self.cursor_i, cursor_ch
         self.display_window(command_mode)
         self.display_status()
+        # must set cursor after display_status so input mode text entry works
         if command_mode:
             self.display_cursor() # window cursor to indicate dot
         else: # input mode
