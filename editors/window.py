@@ -1,15 +1,25 @@
 """
-window.py - Window class for display editors
+window.py - Window class for line-oriented display editors.
 
+This module assumes each window will display the contents of a text
+buffer similar to the one defined by our Buffer class, where the
+buffer contents is named lines, which is a list of strings (each
+string is a line of text in the buffer), and there is a current 
+line (the text insertion point) named dot.
+
+However this assumption about the text buffer is implicit.  This
+module does not import our Buffer module, and there is no checking
+that the arguments of the methods here are consistent with our
+assumptions.
 """
 
 import display
 
 class Window(object):
     """
-    Window class for display editors.
+    Window class for line-oriented display editors.
     A window displays a range of lines (segment) from a text buffer.
-    A window may display a cursor to indicate a specific line (dot) in buffer.
+    A window may display a cursor to indicate a specific line in the buffer.
     A window may include a status region with information about the buffer.
     """
     def __init__(self, buf, win_1, win_h, ncols):
@@ -36,7 +46,7 @@ class Window(object):
 
     def resize(self, win_1, win_h, ncols):
         """
-        Assign window dimensions
+        Assign, recalculate window dimensions
         """
         self.win_1 = win_1 # line number on display of 1st line of this window
         self.win_h = win_h # number of lines in this window including status
@@ -46,7 +56,8 @@ class Window(object):
         # status_1 is line num on display of 1st line of status region
         self.status_1 = self.win_1 + self.win_hl # first line after buffer text
         self.buf.npage = self.win_hl # page size for z Z cmds
-        # FIXME seg_1, seg_n - is that locate_segment? call here or outside?
+        # seg_1, seg_n assigned in locate_segment, called from update_window.
+        # seg_1, seg_n are also reassigned when dot moves.
 
     def at_top_segment(self):
         """
@@ -73,25 +84,6 @@ class Window(object):
         seg_h = self.seg_n - self.seg_1 + 1 # lines in segment, maybe < win_hl
         return (self.buf.dot == buf_S and self.seg_n == buf_S 
                 and seg_h == self.win_hl)
-
-    def display_status(self):
-        """
-        Print information about window's buffer in window's status line.
-        """
-        # later, maybe optimize by printing these fields separately
-        loc = '%s/%d' % (self.buf.dot, len(self.buf.lines)-1)
-        # don't count empty first line
-        filename_str = (self.buf.filename if self.buf.filename
-                        else 'no current filename')
-        status = '%7s  %s%s%-12s  %s' % (loc, 
-                                         ' ', # can't get ed.current now
-                                         #'.' if self.buf.name == ed.current 
-                                         #  else ' ',
-                                         '*' if self.buf.unsaved else ' ', 
-                                         self.buf.name, filename_str)
-        status += (self.ncols - (25 + len(filename_str)))*' ' # all bg_color
-        display.put_cursor(self.status_1, 1)
-        display.render(status, display.white_bg) # white_bg is gray on mac term
 
     def locate_segment(self):
         """
@@ -145,6 +137,25 @@ class Window(object):
             display.kill_whole_line()
             print()
 
+    def display_status(self):
+        """
+        Print information about window's buffer in window's status line.
+        """
+        # later, maybe optimize by printing these fields separately
+        loc = '%s/%d' % (self.buf.dot, len(self.buf.lines)-1)
+        # don't count empty first line
+        filename_str = (self.buf.filename if self.buf.filename
+                        else 'no current filename')
+        status = '%7s  %s%s%-12s  %s' % (loc, 
+                                         ' ', # can't get ed.current now
+                                         #'.' if self.buf.name == ed.current 
+                                         #  else ' ',
+                                         '*' if self.buf.unsaved else ' ', 
+                                         self.buf.name, filename_str)
+        status += (self.ncols - (25 + len(filename_str)))*' ' # all bg_color
+        display.put_cursor(self.status_1, 1)
+        display.render(status, display.white_bg) # white_bg is gray on mac term
+        
     def cursor_elsewhere(self):
         """
         dot lies outside segment of buffer visible in window
@@ -209,7 +220,7 @@ class Window(object):
         """
         display.put_cursor(self.cursor_i + (0 if self.at_bottom_line() else 1),
                            1) # open line after dot
-        
+
     def update_window(self, command_mode):
         """
         Locate and display the window including its status line and cursor.

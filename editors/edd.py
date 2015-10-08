@@ -23,15 +23,18 @@ prompt = '' # command prompt
 nlines, ncols = terminal.dimensions()
 
 # Default dimensions, might be updated while edd is running, especially cmd_h:
-
-win = None # single window instance will go here
-
 win_1 = 1 # line number on display of first line of window
-win_h = None # total number of lines in window
 status_h = 1 # height (lines) of buffer status, now just a status line
 cmd_h = 2  # height (lines) of scrolling command region at the bottom
+
+# These will assigned by calc_frame called from init_session
+# because cmd_h might be reassigned by init_session
+win_h = None # total number of lines in window
 cmd_1 = None # line num on display of 1st line of scrolling command region
 cmd_n = None #  " bottom "
+
+# single window win is assigned from init_session after cmd_h etc. are assigned
+win = None # single window instance will go here
 
 # Values saved before ed command so we can test for changes after
 (cmd_h0, current0, filename0) = (None, None, None)
@@ -97,8 +100,8 @@ def init_session(*filename, **options):
         prompt = options['p'] 
     if 'h' in options:
         cmd_h = options['h'] 
-    # must calc frame before we create window
-    calc_frame() # initialize cmd_1, cmd_n etc.
+    # must calc_frame to get window dimensions before we create win
+    calc_frame() # assign win_h etc.
     win = window.Window(ed.buf, win_1, win_h, ncols)
     display_frame()
 

@@ -1,28 +1,34 @@
 """
-buffer.py - Buffer class for text editors
+buffer.py - Buffer class for line-oriented text editors
+
+In this buffer class, the text in the buffer is a list of strings
+named 'lines' where each string in the list is a single line of text
+in the buffer, and there is a current line named 'dot' which is the
+text insertion point.
 
 Many of the methods in the Buffer class correspond to ed commands
 and the ed.py API.
+
+The API (method calls) here use the classic Unix ed conventions for
+indexing and range (which are unlike Python): The index of the first
+line is 1, the index of the last line is the same as the number of
+lines (the length of the buffer in lines), and range i,j includes the
+last line with index j (so the range i,i is just the line i, but it is
+not empty).
 
 In this class each method has a fixed (positional) argument list,
 provides no error checking, and no error messages or progress
 messages.  This class has no print statements, and does not read or write at
 the console.  This class only updates buffers and reads and writes files.
 
-This API uses the classic Unix ed conventions for indexing and range
-(which are unlike Python): The index of the first line is 1, the index
-of the last line is the same as the number of lines (the length of the
-buffer in lines), and range i,j includes the last line with index j
-(so the range i,i is just the line i, but it is not empty).
-
-The Buffer class provides a write method so other code can update
-text buffers without using the ed.py user interface or API, by
-calling the standard Python print function.
+This Buffer class provides a write method so other code can update
+text buffers without using the ed.py user interface or API, simply
+calling the standard Python print function, with the file=... optional
+argument pointing to the buffer.
 
 The Buffer class has an attribute named update which can optionally be
 assigned to a callable that may be used by the write method to update
 a display (for example).
-
 """
 
 import os.path

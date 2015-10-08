@@ -119,7 +119,7 @@ def r_new(buffername, filename):
 
 def f(*args):
     'set default filename, if filename not specified print current filename'
-    x, xx, filename, xxx = parse_arg(args)
+    x, xx, filename, xxx = parse_args(args)
     if filename:
         buf.f(filename)
         return
