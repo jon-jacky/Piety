@@ -13,7 +13,7 @@ the Python prompt or write editing scripts in Python.
 cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** provides the command line and internals for the display editor
-  [edd](edd.md).
+  [edsel](edsel.md).
 
 ## Commands ##
 

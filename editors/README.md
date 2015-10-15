@@ -3,9 +3,9 @@ editors
 =======
 
 Text editors, including a line editor inspired by the classic *Unix ed*, and a
-    new display editor *edd*:
+    new display editor *edsel*:
 
-- **buffer.py**: defines Buffer class used by *ed.py* and *edd.py*
+- **buffer.py**: defines Buffer class used by *ed.py* and *edsel.py*
 
 - **ed.md**: description of *ed.py*
 
@@ -17,14 +17,14 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
     the *console* directory to get the commmand line, instead of Python
     *raw_input*.
 
-- **edd.py**: display editor based on *ed.py*.
+- **edsel.py**: display editor based on *ed.py*.
 
-- **edd.md**: description of *edd.py*
+- **edsel.md**: description of *edsel.py*
 
-- **eddc.py**: *edd.py*, using the *command* and *key* modules from
+- **edselc.py**: *edsel.py*, using the *command* and *key* modules from
     the *console* directory to get the commmand line, instead of Python
     *raw_input*.
 
-- **window.py**: defines Window class used by *edd.py*
+- **window.py**: defines Window class used by *edsel.py*
 
-Revised September 2015
+Revised October 2015

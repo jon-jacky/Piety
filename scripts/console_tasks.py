@@ -1,7 +1,7 @@
 """
 console_tasks.py - Creates a console Session instance with three Job instances
 
-The three jobs are the pysh shell, the ed line editor, and the edd display
+The three jobs are the pysh shell, the ed line editor, and the edsel display
 editor.  
 
 The application in each job is a Command instance, each with its own
@@ -19,21 +19,21 @@ To start the ed line editor: ed(), ed('README.md'), ed('README.md',
 p=':') etc.  Both command arguments, the file name and the ed command
 prompt character, are optional.  You can also use ed.main() etc.
 
-To start the edd display editor: edd(), edd('README.md',h=12,p=':')
-etc.  All three command arguments, the file name, the edd command
+To start the edsel display editor: edsel(), edsel('README.md',h=12,p=':')
+etc.  All three command arguments, the file name, the edsel command
 prompt character, and the scrolling command region height in lines,
-are optional.  You can also use edd.main() etc.
+are optional.  You can also use edsel.main() etc.
 
-Exit ed or edd with the q command or ^D.
+Exit ed or edsel with the q command or ^D.
 
-When editing the ed or edd command line, control keys and arrow keys work,
+When editing the ed or edsel command line, control keys and arrow keys work,
 see console/command.txt
 
 """
 
 import sys
 import piety, command, keyboard, key
-import pysh, ed, edd
+import pysh, ed, edsel
 
 class Namespace(object): pass 
 job = Namespace() # avoid name clashes between job names and  module names
@@ -73,18 +73,18 @@ job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup,
               
 # display editor
 
-cmd.edd = command.Command(prompt='', reader=key.Key(), handler=edd.cmd)
+cmd.edsel = command.Command(prompt='', reader=key.Key(), handler=edsel.cmd)
 
 # startup function handles optional filename argument and optional keyword arg.
-def edd_startup(*filename, **options):
+def edsel_startup(*filename, **options):
     if 'p' in options:
-        cmd.edd.prompt = options['p'] # edd.prompt is not used by Piety
-    edd.init_display(*filename, **options)
+        cmd.edsel.prompt = options['p'] # edsel.prompt is not used by Piety
+    edsel.init_session(*filename, **options)
     ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
 
-job.edd = piety.Job(session=console, application=cmd.edd, startup=edd_startup, 
-                    stopped=(lambda: ed.quit or cmd.edd.command == keyboard.C_d),
-                    cleanup=edd.restore_display)
+job.edsel = piety.Job(session=console, application=cmd.edsel, startup=edsel_startup, 
+                    stopped=(lambda: ed.quit or cmd.edsel.command == keyboard.C_d),
+                    cleanup=edsel.restore_display)
 
 # main method for test and demonstration
 

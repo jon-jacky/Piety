@@ -5,14 +5,14 @@ piety_timestamps - Uses the Piety scheduler to run the console session
   timestamp tasks created here. 
 
 The timestamp tasks write to editor buffers named ts1 and ts2.
-Display these buffers using the edd display editor commands 'b ts1'
+Display these buffers using the edsel display editor commands 'b ts1'
 and 'b ts2' to see the buffers update as each timestamp is written.
 
 The code that writes to the editor buffers demonstrates how to use 
 the Buffer class write method and update attribute.
 
 See console_tasks header for directions on how to run the console jobs
-including the edd editor.
+including the edsel editor.
 """
 
 import terminal, display
@@ -23,15 +23,15 @@ import console_tasks as con
 # command aliases
 pysh = con.job.pysh # no name clash with con.pysh module
 ed = con.job.ed 
-edd = con.job.edd
+edsel = con.job.edsel
 
 # more command aliases
 # if you prefer ed.main() and ed.main('README.md') to ed() and ed('README.md') etc.
 ed.main = ed.__call__
-edd.main = edd.__call__
+edsel.main = edsel.__call__
 
 # add content to main buffer
-# we haven't started edd yet, window not initialized, use con.ed commands
+# we haven't started edsel yet, window not initialized, use con.ed commands
 con.ed.cmd('i')
 con.ed.cmd('This is the main buffer')
 con.ed.cmd('.')
@@ -51,11 +51,11 @@ ts2buf = con.ed.buffers['ts2']
 # window update function
 
 def update(buf):
-    if con.console.foreground == edd and con.ed.buf == buf:
+    if con.console.foreground == edsel and con.ed.buf == buf:
         terminal.set_line_mode()
-        con.edd.win.update_window(True) # command mode not insert mode
-        # restore cursor to edd cmd line (bottom of scroll region), edit point
-        display.put_cursor(con.edd.cmd_n, con.cmd.edd.point+1) 
+        con.edsel.win.update_window(True) # command mode not insert mode
+        # restore cursor to edsel cmd line (bottom of scroll region), edit point
+        display.put_cursor(con.edsel.cmd_n, con.cmd.edsel.point+1) 
         terminal.set_char_mode() # FIXME should restore whatever was before
         
 # add window update callbacks to timestamp buffers
