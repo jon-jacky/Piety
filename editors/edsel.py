@@ -7,10 +7,6 @@ Described in ed.md etc.  To run: python3 edd.py or import edd then edd.main()
 import traceback, os
 import terminal, display, window, ed
 
-# suppress output from ed l z commands to scrolling command region
-null = open(os.devnull, 'w')
-ed.destination = null
-
 prompt = '' # command prompt
 
 # The frame is the entire region on the display occupied by the editor,
@@ -100,6 +96,7 @@ def init_session(*filename, **options):
         prompt = options['p'] 
     if 'h' in options:
         cmd_h = options['h'] 
+    ed.discard_printing() # suppress ed output to scrolling command region
     # must calc_frame to get window dimensions before we create win
     calc_frame() # assign win_h etc.
     win = window.Window(ed.buf, win_1, win_h, ncols)

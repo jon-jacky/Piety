@@ -13,7 +13,21 @@ import re, os, sys
 import pysh  # provides embedded Python shell for ! command
 import buffer
 
-destination = sys.stdout # can redirect l z cmd output to os.devnull etc.
+# edsel display editor suppresses output from ed p l z commands to scrolling cmd region
+# because edsel shows the lines in the display window.
+
+destination = sys.stdout # send output from p l z commands to scrolling command region
+null = open(os.devnull, 'w')
+
+def discard_printing():
+    'suppress output from ed p l z commands to scrolling command region'
+    global destination
+    destination = null
+
+def show_printing():
+    'Restore output from ed p l z commands to scrolling command region'
+    global destination
+    destination = sys.stdout 
 
 # arg lists, defaults, range checking
 

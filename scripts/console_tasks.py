@@ -66,6 +66,7 @@ def ed_startup(*filename, **options):
         ed.e(filename[0])
     if 'p' in options:
         cmd.ed.prompt = options['p']  # ed.prompt is not used by Piety
+    ed.show_printing() # restore output from ed p l z commands to scrolling cmd region
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
 job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup, 
