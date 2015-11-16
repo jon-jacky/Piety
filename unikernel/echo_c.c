@@ -4,11 +4,13 @@
 
 int main()
 {
-  char command [80];
-  while (command[0] != 'q') {
+  char string[80];
+  char *result = "Anything but NULL";
+  while (result != NULL) {
     printf (">> ");
-    gets (command);
-    printf ("%s\n", command);
+    result = fgets(string,80,stdin); /* returns null pointer if EOF */
+    if (result != NULL) printf ("%s", string);  
   }
+  printf("EOF\n");
   return 0;
 }
