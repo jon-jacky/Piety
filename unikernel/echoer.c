@@ -1,4 +1,4 @@
-/* echo_c.c - an echo program in C, test reading from stdin in rump kernel */
+/* echoer.c - test reading from stdin in rump kernel */
 
 #include <stdio.h>
 
