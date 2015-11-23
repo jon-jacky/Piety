@@ -53,12 +53,13 @@ def parse_args(args):
 
 # central data structure and variables
 
-buffers = dict() #  dict from buffer names (strings) to Buffer instances
-
+buffers = dict() # dict from buffer names (strings) to Buffer instances
+deleted = list() # most recently deleted lines from any buffer, for yank command
+                 
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
 current = 'main'
-buf = buffer.Buffer(current)  
+buf = buffer.Buffer(current, caller=sys.modules[__name__]) # caller = this module  
 buffers[current] = buf 
 
 
@@ -105,7 +106,7 @@ def current_filename(filename):
 def b_new(name):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer(name)
+    buf = buffer.Buffer(name, caller=sys.modules[__name__]) # caller = this module
     buffers[name] = buf # replace buffers[name] if it already exists
     current = name
 
@@ -372,6 +373,14 @@ def s(*args):
         glbl = False # default
     buf.s(istart, iend, old, new, glbl)
 
+def y(*args):
+    'Insert most recently deleted lines before start'
+    start, x, xx, xxx = parse_args(args)
+    istart = buf.mk_start(start)
+    if not (0 <= istart <= buf.S()+1): # allow +y at $ to append to buffer
+        print('? invalid address')
+        return
+    buf.y(istart)
 
 # command mode
 
@@ -382,7 +391,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'deEflpqrswzbBDnA' # commands that do not require further input
+complete_cmds = 'deEflpqrswzbBDnAy' # commands that do not require further input
 input_cmds = 'aic' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 

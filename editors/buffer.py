@@ -35,7 +35,7 @@ import os.path
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and metadata'
-    def __init__(self, name, update=None):
+    def __init__(self, name, update=None, caller=None):
         'New text buffer'
         self.name = name
         # Buffer always contains empty line at index 0, never used or printed
@@ -47,6 +47,10 @@ class Buffer(object):
         self.npage = 22 # page length used, optionally set by z scroll command
         self.end_phase = False # used by write method, see explanation below
         self.update = update # call from write method to update display
+        # caller is the module which created this Buffer instance
+        # used for referencing data that must be global to all buffers
+        # for example the buffer of deleted text used by the yank command
+        self.caller = caller 
 
     # line addresses
 
@@ -174,6 +178,7 @@ class Buffer(object):
     def d(self, start, end):
         """Delete text from start up to end, 
         set dot to first line after deletes or last line in buffer"""
+        self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
         self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -216,3 +221,10 @@ class Buffer(object):
         self.end_phase = not self.end_phase # alternates False True False ...
         if self.update:
             self.update()
+
+    def y(self, iline):
+        'Insert most recently deleted lines before iline, update dot to last inserted line'
+        # based on def i ... above
+        # iline at initial empty line with index 0 is a special case, must append
+        self.insert(iline if iline else iline+1, self.caller.deleted)
+        # FIXME - how to append at end of buffer?
