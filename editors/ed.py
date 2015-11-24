@@ -55,6 +55,7 @@ def parse_args(args):
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 deleted = list() # most recently deleted lines from any buffer, for yank command
+mark = dict() # dict from single-char mark to (line, buffer) 
                  
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
@@ -382,6 +383,20 @@ def y(*args):
         return
     buf.y(istart)
 
+def k(*args):
+    """
+    Mark addressed line in this buffer with character c (the command parameter),
+    to use with 'c address form.  'c address identifies both buffer and line.
+    """
+    start, x, param, xx = parse_args(args)
+    istart = buf.mk_start(start)
+    if not buf.start_ok(istart):
+        print('? invalid address')
+        return
+    c = param[0]
+    mark[c] = (istart, buf)
+    print("Mark %s set at line %d in buffer %s" % (c, istart, current))
+
 # command mode
 
 quit = False
@@ -391,7 +406,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'deEflpqrswzbBDnAy' # commands that do not require further input
+complete_cmds = 'deEflpqrswzbBDnAyk' # commands that do not require further input
 input_cmds = 'aic' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
