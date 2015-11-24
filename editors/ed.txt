@@ -19,6 +19,7 @@ ed.py summary.  Commands from classic ed:
  r read named file, insert lines at current position
  s substitute (search/replace) in lines
  w write lines to file (default is entire buffer)
+ y insert the text most recently deleted by the d command (from any buffer)
  z print a page of lines
 
 Commands from sam:

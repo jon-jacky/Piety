@@ -30,6 +30,12 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
  *b B D n*
 
+**ed.py** also adds a *y* (yank) command that inserts the text most
+recently deleted by the *d* command (possibly from a different
+buffer).  A *d* command followed by *y* commands can achieve the
+effect of the classic *ed* *m* (move) and *t* (transfer, or copy)
+commands, and can also move text to another buffer.
+
 Here is a [command summary](ed.txt).
 
 Classic *ed* is described in many books: *The Unix Programming
@@ -192,6 +198,10 @@ printing the current line after any command).
 unsaved buffers, because the session with all its buffers can be
 resumed by calling *ed.main()* at the Python interpreter prompt again.
 
+**ed.py** always prints the error message following the *?* character.
+There is no way to suppress printing the error messages as in classic
+*ed*.
+
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
 expression.  Regular expressions might be supported in the future.
@@ -204,8 +214,5 @@ end).
 The *B* (and *D*) commands accept only one file (or buffer) name argument, 
 not multiple names as in *sam*.
 
-There is no way to move text from one buffer to another.  This might
-be fixed in the future by defining extensions to the move and copy
-commands, *m* and *t*.
 
-Revised September 2015
+Revised November 2015
