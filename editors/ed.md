@@ -32,8 +32,8 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** also adds a *y* (yank) command that inserts the text most
 recently deleted by the *d* command (possibly from a different
-buffer).  A *d* command followed by *y* commands can achieve the
-effect of the classic *ed* *m* (move) and *t* (transfer, or copy)
+buffer).  A *d* command followed by one or two *y* commands can achieve the
+effect of the classic *ed* *m* (move) or *t* (transfer, or copy)
 commands, and can also move text to another buffer.
 
 Here is a [command summary](ed.txt).

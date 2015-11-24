@@ -393,7 +393,7 @@ def k(*args):
     if not buf.start_ok(istart):
         print('? invalid address')
         return
-    c = param[0]
+    c = param[0] if param else '' # empty string indicates emacs-style mark
     mark[c] = (istart, buf)
     print("Mark %s set at line %d in buffer %s" % (c, istart, current))
 
