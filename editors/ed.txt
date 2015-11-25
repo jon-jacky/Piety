@@ -13,6 +13,7 @@ ed.py summary.  Commands from classic ed:
  E read file into buffer, replace contents even if unsaved changes
  f change file name for current buffer
  i insert lines (enter input mode)
+ k mark addressed line with single character label
  l go to addressed line and print (default next line)
  p print lines
  q quit (exit editor)
@@ -30,12 +31,13 @@ Commands from sam:
 
 Commands inspired by emacs:
  
- y insert the text most recently deleted by the d command (from any buffer)
+ y insert the lines most recently deleted by the d command (from any buffer)
 
 Line addresses:
 
  . current line, called dot (default for most commands)
  $ last line
+ 'c line marked with label c by k command
  <n> (number) line number (starting at 1 not 0)
  +<n> n lines after dot
  -<n> n lines before dot

@@ -19,12 +19,11 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** supports these commands from classic *ed*:
 
- *= ! a c d e E f i l p q r s w z*
+ *= ! a c d e E f i k l p q r s w z*
 
 **ed.py** supports these line address forms from classic *ed*:
 
- *number . , ; % $ /text/ // ?text? ?? +number -number ^number* also *+ ++ ... - -- ... ^ ^^ ...*
-
+ *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
 
 **ed.py** also supports these commands from *sam*:
 
@@ -183,11 +182,13 @@ example).
 *H h j k m n P Q t u wq W*.  Some of these might be supported in the
 future.
 
+**ed.py** does not currently support the classic *ed* *m* (move) or *t*
+(transfer, or copy) commands.  Instead, the same effect can be achieved by a
+*d* command followed by one or two *y* commands.  These alternatives
+can also move or copy text to another buffer.
+
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
-
-**ed.py** does not support this classic *ed* address form: *'c*.
-It might be supported in the future.
 
 **ed.py** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).

@@ -51,6 +51,7 @@ class Buffer(object):
         # used for referencing data that must be global to all buffers
         # for example the buffer of deleted text used by the yank command
         self.caller = caller 
+        self.mark = dict() # dict from mark char to line number, for 'c addresses
 
     # line addresses
 

@@ -55,7 +55,6 @@ def parse_args(args):
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 deleted = list() # most recently deleted lines from any buffer, for yank command
-mark = dict() # dict from single-char mark to (line, buffer) 
                  
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
@@ -393,8 +392,11 @@ def k(*args):
     if not buf.start_ok(istart):
         print('? invalid address')
         return
-    c = param[0] if param else '' # empty string indicates emacs-style mark
-    mark[c] = (istart, buf)
+    if not (param and param[0].islower()):
+        print('? k requires single lower case character parameter')
+        return
+    c = param[0]
+    buf.mark[c] = istart
     print("Mark %s set at line %d in buffer %s" % (c, istart, current))
 
 # command mode
@@ -421,6 +423,7 @@ caratnumber = re.compile(r'(\^+)')
 fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
+mark = re.compile(r"'([a-z])")  # 'c, ed mark with single lc char label
 
 def match_address(cmd_string):
     """
@@ -464,7 +467,11 @@ def match_address(cmd_string):
     m = bkdsearch.match(cmd_string)  # ?text? or ?? - backward search
     if m: 
         return buf.R(m.group(1)), cmd_string[m.end():]
-    # FIXME - also handle -n +n 'c 
+    m = mark.match(cmd_string) # 'c mark with single lc char label
+    if m: 
+        c = m.group(1)
+        i = buf.mark[c] if c in buf.mark else -9999 # invalid address
+        return i, cmd_string[m.end():] 
     return None, cmd_string
 
 def parse_cmd(cmd_string):
