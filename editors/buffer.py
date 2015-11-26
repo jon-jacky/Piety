@@ -130,8 +130,13 @@ class Buffer(object):
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
-        self.dot = iline + len(lines)-1
+        nlines = len(lines)
+        self.dot = iline + nlines - 1
         self.unsaved = True # usually the right thing but ed.B and E override it.
+        # adjust line numbers for marks below the insertion point
+        for c in self.mark:
+            if self.mark[c] >= iline:
+                self.mark[c] += nlines
 
     # files
 
@@ -187,6 +192,12 @@ class Buffer(object):
             self.dot = min(start,self.S()) # S() if we deleted end of buffer
         else:
             self.dot = 0
+        # adjust line numbers for marks below the deletion point
+        nlines = end - start + 1
+        for c in self.mark:
+            if self.mark[c] > start:
+                self.mark[c] -= nlines
+
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string'

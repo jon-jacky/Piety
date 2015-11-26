@@ -29,11 +29,11 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
  *b B D n*
 
-**ed.py** also adds a *y* (yank) command that inserts the text most
+**ed.py** also adds a *y* (yank) command that inserts the lines most
 recently deleted by the *d* command (possibly from a different
 buffer).  A *d* command followed by one or two *y* commands can achieve the
 effect of the classic *ed* *m* (move) or *t* (transfer, or copy)
-commands, and can also move text to another buffer.
+commands, and can also move lines to another buffer.
 
 Here is a [command summary](ed.txt).
 
@@ -179,13 +179,13 @@ example).
 ## Limitations ##
 
 **ed.py** does not support these classic *ed* commands: 
-*H h j k m n P Q t u wq W*.  Some of these might be supported in the
+*H h j m n P Q t u wq W*.  Some of these might be supported in the
 future.
 
 **ed.py** does not currently support the classic *ed* *m* (move) or *t*
 (transfer, or copy) commands.  Instead, the same effect can be achieved by a
 *d* command followed by one or two *y* commands.  These alternatives
-can also move or copy text to another buffer.
+can also move or copy lines to another buffer.
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
