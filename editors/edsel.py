@@ -1,7 +1,7 @@
 """
-edd - display editor based on the line editor ed.py.  
+edsel - display editor based on the line editor ed.py.  
 
-Described in ed.md etc.  To run: python3 edd.py or import edd then edd.main()
+Described in ed.md and edsel.md.  To run: python3 edsel.py or import edsel then edsel.main()
 """
 
 import traceback, os
@@ -18,7 +18,7 @@ prompt = '' # command prompt
 
 nlines, ncols = terminal.dimensions()
 
-# Default dimensions, might be updated while edd is running, especially cmd_h:
+# Default dimensions, might be updated while edsel is running, especially cmd_h:
 win_1 = 1 # line number on display of first line of window
 status_h = 1 # height (lines) of buffer status, now just a status line
 cmd_h = 2  # height (lines) of scrolling command region at the bottom
@@ -151,7 +151,7 @@ def cmd(line):
 
 def main(*filename, **options):
     """
-    Top level edd command to invoke from python prompt or command line.
+    Top level edsel command to invoke from python prompt or command line.
     Won't cooperate with Piety scheduler, calls blocking command raw_input.
     """
     ed.quit = False # allow restart
@@ -161,6 +161,6 @@ def main(*filename, **options):
         cmd(line) # no blocking
     restore_display()
 
-# Run the editor from the system command line: python edd.py
+# Run the editor from the system command line: python edsel.py
 if __name__ == '__main__':
     main()

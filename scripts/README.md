@@ -38,10 +38,10 @@ comments in each module for directions and explanations:
   console session with three jobs created by *console_tasks*,
   concurrently with the two timestamp tasks created in this script.
   The timestamp tasks write to editor buffers named *ts1* and *ts2*.
-  Display these buffers using the *edd* display editor commands *b ts1*
+  Display these buffers using the *edsel* display editor commands *b ts1*
   and *b ts2* to see the buffers update as each timestamp is written.
 
 - **writer_tasks.py**: Creates writer tasks used by the *embedded* and
     *piety* scripts.
 
-Revised October 2015
+Revised November 2015

@@ -13,18 +13,18 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
 
 - **ed.txt**: command summary for *ed.py*
 
-- **edc.py**: *ed.py*, using the *command* and *key* modules from
-    the *console* directory to get the commmand line, instead of Python
-    *raw_input*.
+- **edc.py**: *ed.py*, using the *command* and *key* modules from the
+    *console* directory to get the commmand line one character at a time,
+    instead of Python *input*.
 
 - **edsel.py**: display editor based on *ed.py*.
 
 - **edsel.md**: description of *edsel.py*
 
-- **edselc.py**: *edsel.py*, using the *command* and *key* modules from
-    the *console* directory to get the commmand line, instead of Python
-    *raw_input*.
+- **edselc.py**: *edsel.py*, using the *command* and *key* modules
+    from the *console* directory to get the commmand line one character at a time, 
+    instead of Python *input*.
 
 - **window.py**: defines Window class used by *edsel.py*
 
-Revised October 2015
+Revised November 2015

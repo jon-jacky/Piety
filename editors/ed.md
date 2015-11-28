@@ -19,7 +19,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** supports these commands from classic *ed*:
 
- *= ! a c d e E f i k l p q r s w z*
+ *= ! a c d e E f i k l m p q r s t w z*
 
 **ed.py** supports these line address forms from classic *ed*:
 
@@ -179,13 +179,8 @@ example).
 ## Limitations ##
 
 **ed.py** does not support these classic *ed* commands: 
-*H h j m n P Q t u wq W*.  Some of these might be supported in the
+*H h j n P Q u wq W x*.  Some of these might be supported in the
 future.
-
-**ed.py** does not currently support the classic *ed* *m* (move) or *t*
-(transfer, or copy) commands.  Instead, the same effect can be achieved by a
-*d* command followed by one or two *y* commands.  These alternatives
-can also move or copy lines to another buffer.
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).

@@ -17,7 +17,7 @@ The Piety repository is organized into these directories:
 - **doc**: notes and documents.
 
 - **editors**: a line editor inspired by the classic Unix *ed*, and a
-    new display editor *edd*.
+    new display editor *edsel*.
 
 - **piety**: defines *Task*, *Job*, *Session*, *schedule*, and *run*
     (the non-blocking event loop).  This is the core of the Piety
@@ -45,5 +45,5 @@ The Piety repository is organized into these directories:
 Each directory contains a *README* file with more information.
 Another page explains the [rationale](modules.md) for this organization.
 
-Revised June 2015
+Revised November 2015
 

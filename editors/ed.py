@@ -330,7 +330,7 @@ def ai_cmd(cmd_fcn, args):
         print('? invalid address')
         return
     if text:
-        cmd_fcn(iline, text)
+        cmd_fcn(iline, text) # cmd_fcn is buf.a or buf.i
 
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
@@ -374,13 +374,13 @@ def s(*args):
     buf.s(istart, iend, old, new, glbl)
 
 def y(*args):
-    'Insert most recently deleted lines before start'
-    start, x, xx, xxx = parse_args(args)
-    istart = buf.mk_start(start)
-    if not (0 <= istart <= buf.S()+1): # allow +y at $ to append to buffer
+    'Insert most recently deleted lines *before* destination line address'
+    dest, x, xx, xxx = parse_args(args)
+    idest = buf.mk_start(dest)
+    if not (0 <= idest <= buf.S()+1): # allow +y at $ to append to buffer
         print('? invalid address')
         return
-    buf.y(istart)
+    buf.y(idest)
 
 def k(*args):
     """
@@ -399,6 +399,28 @@ def k(*args):
     buf.mark[c] = istart
     print("Mark %s set at line %d in buffer %s" % (c, istart, current))
 
+def m(*args):
+    'move lines to after destination line'
+    mt_cmd(buf.m, args)
+
+def t(*args):
+    'transfer (copy) lines to after destination line'
+    mt_cmd(buf.t, args)
+
+def mt_cmd(cmd_fcn, args):
+    'move or transfer (copy) lines to after destination line'
+    start, end, destination, x = parse_args(args)
+    istart, iend = buf.mk_range(start, end)
+    if not buf.range_ok(istart, iend):
+        print('? invalid address')
+        return
+    idest, tail = match_address(destination)
+    # idest can be 0 because lines are moved to *after* idest
+    if not buf.start_empty_ok(idest):
+        print('? invalid destination address')
+        return
+    cmd_fcn(istart, iend, idest) # cmd_fcn is buf.m or buf.t
+
 # command mode
 
 quit = False
@@ -408,7 +430,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'deEflpqrswzbBDnAyk' # commands that do not require further input
+complete_cmds = 'deEflpqrswzbBDnAykmt' # commands that do not require further input
 input_cmds = 'aic' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 

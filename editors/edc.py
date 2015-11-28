@@ -1,7 +1,7 @@
 """
 edc.py - Run an ed line editor session.
- Use command and key modules instead of Python raw_input to get command line.
- BUT do not use Piety scheduler.
+ Use command and key modules instead of Python input to get command line
+ one character at a time.  BUT do not use Piety scheduler.
 """
 
 import ed, command, key

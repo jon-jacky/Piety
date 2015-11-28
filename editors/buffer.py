@@ -41,7 +41,7 @@ class Buffer(object):
         # Buffer always contains empty line at index 0, never used or printed
         self.lines = [''] # text in current buffer, a list of strings
         self.dot = 0 # index of current line, 0 when buffer is empty
-        self.filename = None # filename (string) 
+        self.filename = None # name of file (string) to read/write buffer contents
         self.unsaved = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
         self.npage = 22 # page length used, optionally set by z scroll command
@@ -49,7 +49,7 @@ class Buffer(object):
         self.update = update # call from write method to update display
         # caller is the module which created this Buffer instance
         # used for referencing data that must be global to all buffers
-        # for example the buffer of deleted text used by the yank command
+        # for example the buffer of deleted lines used by the yank method
         self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
 
@@ -198,7 +198,6 @@ class Buffer(object):
             if self.mark[c] > start:
                 self.mark[c] -= nlines
 
-
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string'
         self.d(start,end)
@@ -235,8 +234,17 @@ class Buffer(object):
             self.update()
 
     def y(self, iline):
-        'Insert most recently deleted lines before iline, update dot to last inserted line'
+        'Insert most recently deleted lines *before* iline, update dot to last inserted line'
         # based on def i ... above
-        # iline at initial empty line with index 0 is a special case, must append
-        self.insert(iline if iline else iline+1, self.caller.deleted)
-        # FIXME - how to append at end of buffer?
+        self.insert(iline if iline > 0 else iline+1, self.caller.deleted)
+
+    def t(self, istart, iend, idest):
+        'transfer (copy) lines to after destination line'
+        self.insert(idest if idest == 0 else idest+1, self.lines[istart:iend+1])
+        
+    def m(self, istart, iend, idest):
+        'move lines to after destination line'
+        self.d(istart, iend) # d changes line numbers, must adjust below
+        self.y(idest+1 if idest < istart else idest+1-(iend-istart+1))
+
+
