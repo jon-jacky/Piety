@@ -132,7 +132,8 @@ class Window(object):
                                self.buf.dot) # leave space at dot
             display.kill_whole_line() # open line for input
             print() # next line
-            self.display_lines(self.buf.dot+1, self.seg_n-1)
+            self.display_lines(self.buf.dot+1, 
+                               self.seg_n - (0 if self.at_top_segment() else 1))
         for line in range(blank_h if command_mode else blank_h - 1):
             display.kill_whole_line()
             print()
