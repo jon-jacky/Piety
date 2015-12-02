@@ -13,19 +13,19 @@ import re, os, sys
 import pysh  # provides embedded Python shell for ! command
 import buffer
 
-# edsel display editor suppresses output from ed p l z commands to scrolling cmd region
+# edsel display editor suppresses output from ed l z commands to scrolling cmd region
 # because edsel shows the lines in the display window.
 
-destination = sys.stdout # send output from p l z commands to scrolling command region
+destination = sys.stdout # send output from l z commands to scrolling command region
 null = open(os.devnull, 'w')
 
 def discard_printing():
-    'suppress output from ed p l z commands to scrolling command region'
+    'suppress output from ed l z commands to scrolling command region'
     global destination
     destination = null
 
 def show_printing():
-    'Restore output from ed p l z commands to scrolling command region'
+    'Restore output from ed l z commands to scrolling command region'
     global destination
     destination = sys.stdout 
 
@@ -272,10 +272,10 @@ def l(*args):
         return
     print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
 
-def p_lines(ifirst,ilast):
+def p_lines(ifirst, ilast, destination): # arg here shadows global destination
     'Print line numbers ifirst through ilast, inclusive, without arg checking'
     for iline in range(ifirst,ilast+1): # +1 because ifirst,ilast is inclusive
-        print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
+        print(buf.l(iline), file=destination) # file can be null or stdout or ...
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
@@ -284,7 +284,7 @@ def p(*args):
     if not buf.range_ok(start, end):
         print('? invalid address')
         return
-    p_lines(start, end)
+    p_lines(start, end, sys.stdout) # print unconditionally
     
 def z(*args):
     """
@@ -309,7 +309,7 @@ def z(*args):
         buf.npage = npage
     end = iline + buf.npage 
     end = end if end <= S() else S()
-    p_lines(iline, end)
+    p_lines(iline, end, destination) # global destination might be null
 
 
 # Adding, changing, and deleting text
