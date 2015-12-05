@@ -33,8 +33,12 @@ def show_printing():
 
 def parse_args(args):
     """
-    Parse variable-length argument list, all arguments optional
-    Return start, end: int or None, text: str or None, params: list. might be []
+    Parse variable-length argument list where all arguments optional.
+    Return fixed length tuple: start, end, text, params 
+    start, end are line numbers, for example the first and last line of a region.
+    When present, start and end are int, both might be absent, indicated by None.
+    text is the first token in the parameter list, str or None if absent
+    params is the parameter list, [] if absent.
     """
     # get 2, 1, or 0 optional line numbers from head of args list
     if len(args) > 1 and isinstance(args[0],int) and isinstance(args[1],int):
@@ -50,7 +54,6 @@ def parse_args(args):
         text = None 
     return start, end, text, params # params might still be non-empty
 
-
 # central data structure and variables
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
@@ -62,7 +65,6 @@ current = 'main'
 buf = buffer.Buffer(current, caller=sys.modules[__name__]) # caller = this module  
 buffers[current] = buf 
 
-
 # line addresses
 
 def o():
@@ -73,6 +75,22 @@ def S():
     'Return index of the last line, 0 if the buffer is empty'
     return buf.S()
 
+def k(*args):
+    """
+    Mark addressed line in this buffer with character c (the command parameter),
+    to use with 'c address form.  'c address identifies both buffer and line.
+    """
+    iline, x, marker, xx = parse_args(args)
+    iline = buf.mk_iline(iline)
+    if not buf.iline_ok(iline):
+        print('? invalid address')
+        return
+    if not (marker and marker[0].islower()):
+        print('? k requires single lower case character parameter')
+        return
+    c = marker[0]
+    buf.mark[c] = iline
+    print("Mark %s set at line %d in buffer %s" % (c, iline, current))
 
 # search
 
@@ -85,7 +103,6 @@ def R(pattern):
     """Backward search for pattern, 
     return line number where found, dot if not found"""
     return buf.R(pattern)
-
 
 # buffers and files
 
@@ -116,14 +133,14 @@ def b(*args):
     If no name given, print the name of the current buffer.
     """
     global current, buf
-    x, xx, name, xxx = parse_args(args)
-    if not name:
+    x, xx, bufname, xxx = parse_args(args)
+    if not bufname:
         print_status(current, o())
-    elif name in buffers:
-        current = name
+    elif bufname in buffers:
+        current = bufname
         buf = buffers[current]
     else:
-        b_new(name)
+        b_new(bufname)
 
 def r_new(buffername, filename):
     'Create new buffer, Read in file contents'
@@ -162,12 +179,12 @@ def e(*args):
 
 def r(*args):
     'Read file contents into buffer after iline'
-    start, x, name, xx = parse_args(args)
-    filename = current_filename(name)
+    iline, x, fname, xx = parse_args(args)
+    filename = current_filename(fname)
     if not filename:
         return # current_filename already printed error msg
-    iline = buf.mk_start(start)
-    if not buf.start_empty_ok(iline): # r command works even for empty buffer
+    iline = buf.mk_iline(iline)
+    if not buf.iline_empty_ok(iline): # r command works even for empty buffer
         print('? invalid address')
         return
     S0 = S() # record number of lines now to calc how many we read
@@ -189,8 +206,8 @@ def B(*args):
 
 def w(*args):
     'write current buffer contents to file name'
-    x, xx, name, xxx = parse_args(args)
-    filename = current_filename(name)
+    x, xx, fname, xxx = parse_args(args)
+    filename = current_filename(fname)
     if not filename:
         return # current_filename already printed error msg
     buf.w(filename)
@@ -201,8 +218,8 @@ D_count = 0 # number of consecutive times D command has been invoked
 def D(*args):
     'Delete the named buffer, if unsaved changes print message and exit'
     global D_count
-    x, xx, text, xxx = parse_args(args)
-    name = text if text else current
+    x, xx, bufname, xxx = parse_args(args)
+    name = bufname if bufname else current
     if name in buffers and buffers[name].unsaved and not D_count:
         print('? unsaved changes, repeat D to delete')
         D_count += 1 # must invoke D twice to confirm, see message below
@@ -212,8 +229,8 @@ def D(*args):
 def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
     global current, buf
-    x, xx, text, xxx = parse_args(args)
-    name = text if text else current
+    x, xx, bufname, xxx = parse_args(args)
+    name = bufname if bufname else current
     if not name in buffers:
         print('? buffer name')
     elif name == 'main':
@@ -225,7 +242,6 @@ def DD(*args):
             current = keys[0] if keys else None
             buf = buffers[current]
         print('%s, buffer deleted' % name)
-
 
 # Displaying information
 
@@ -241,9 +257,9 @@ def print_status(bufname, iline):
 
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
-    start, x, xx, xxx = parse_args(args)
-    iline = start if start != None else S() # default $ not .
-    if buf.start_empty_ok(iline): # don't print error message when file is empty
+    iline, x, xx, xxx = parse_args(args)
+    iline = iline if iline != None else S() # default $ not .
+    if buf.iline_empty_ok(iline): # don't print error message when file is empty
         print(iline)
     else:
         print('? invalid address')
@@ -255,7 +271,6 @@ def n(*args):
     for name in buffers:
         print_status(name, buffers[name].dot)
     
-
 # Displaying and navigating text
     
 def l(*args):
@@ -267,7 +282,7 @@ def l(*args):
     # don't use usual default dot here, instead advance dot
     if iline == None:
         iline = o() + 1
-    if not buf.start_ok(iline):
+    if not buf.iline_ok(iline):
         print('? invalid address')
         return
     print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
@@ -279,8 +294,8 @@ def p_lines(ifirst, ilast, destination): # arg here shadows global destination
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
-    istart, jend, x, xx = parse_args(args)
-    start, end = buf.mk_range(istart, jend)
+    start, end, x, xx = parse_args(args)
+    start, end = buf.mk_range(start, end)
     if not buf.range_ok(start, end):
         print('? invalid address')
         return
@@ -291,10 +306,10 @@ def z(*args):
     Scroll: print buf.npage lines starting at iline.
     Leave dot at last line printed. If parameter is present, update buf.npage
     """
-    start, x, npage_string, xxx = parse_args(args)
+    iline, x, npage_string, xxx = parse_args(args)
     #print('start %s, npage_string %s' % (start, npage_string))#DEBUG
-    iline = buf.mk_start(start)
-    if not buf.start_empty_ok(iline):
+    iline = buf.mk_iline(iline)
+    if not buf.iline_empty_ok(iline):
         print('? invalid address')
         return
     if npage_string:
@@ -311,8 +326,17 @@ def z(*args):
     end = end if end <= S() else S()
     p_lines(iline, end, destination) # global destination might be null
 
-
 # Adding, changing, and deleting text
+
+def ai_cmd(cmd_fcn, args):
+    'a(ppend) or i(nsert) command'
+    iline, x, lines, xx = parse_args(args)
+    iline = buf.mk_iline(iline)
+    if not buf.iline_empty_ok(iline): # a, i commands work even for empty buffer
+        print('? invalid address')
+        return
+    if lines:
+        cmd_fcn(iline, lines) # cmd_fcn is buf.a or buf.i
 
 def a(*args):
     'Append lines from string after  iline, update dot to last appended line'
@@ -322,33 +346,23 @@ def i(*args):
     'Insert lines from string before iline, update dot to last inserted line'
     ai_cmd(buf.i, args)
 
-def ai_cmd(cmd_fcn, args):
-    'a(ppend) or i(nsert) command'
-    start, x, text, xx = parse_args(args)
-    iline = buf.mk_start(start)
-    if not buf.start_empty_ok(iline): # a, i commands work even for empty buffer
-        print('? invalid address')
-        return
-    if text:
-        cmd_fcn(iline, text) # cmd_fcn is buf.a or buf.i
-
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
     start, end, x, xxx = parse_args(args)
-    istart, iend = buf.mk_range(start, end)
-    if not buf.range_ok(istart, iend):
+    start, end = buf.mk_range(start, end)
+    if not buf.range_ok(start, end):
         print('? invalid address')
         return
-    buf.d(istart, iend)
+    buf.d(start, end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
-    start, end, text, x = parse_args(args)
-    istart, iend = buf.mk_range(start, end)
-    if not buf.range_ok(istart, iend):
+    start, end, lines, x = parse_args(args)
+    start, end = buf.mk_range(start, end)
+    if not buf.range_ok(start, end):
         print('? invalid address')
         return
-    buf.c(istart,iend,text)
+    buf.c(start,end,lines)
         
 def s(*args):
     """
@@ -357,8 +371,8 @@ def s(*args):
     in each line.  Otherwise substitute all occurrences in each line
     """
     start, end, old, params = parse_args(args)
-    istart, iend = buf.mk_range(start, end)
-    if not buf.range_ok(istart, iend):
+    start, end = buf.mk_range(start, end)
+    if not buf.range_ok(start, end):
         print('? invalid address')
         return
     # params might be [ new, glbl ]
@@ -371,33 +385,30 @@ def s(*args):
         glbl = bool(params[1])
     else:
         glbl = False # default
-    buf.s(istart, iend, old, new, glbl)
+    buf.s(start, end, old, new, glbl)
 
 def y(*args):
     'Insert most recently deleted lines *before* destination line address'
-    dest, x, xx, xxx = parse_args(args)
-    idest = buf.mk_start(dest)
-    if not (0 <= idest <= buf.S()+1): # allow +y at $ to append to buffer
+    iline, x, xx, xxx = parse_args(args)
+    iline = buf.mk_iline(iline)
+    if not (0 <= iline <= buf.S()+1): # allow +y at $ to append to buffer
         print('? invalid address')
         return
-    buf.y(idest)
+    buf.y(iline)
 
-def k(*args):
-    """
-    Mark addressed line in this buffer with character c (the command parameter),
-    to use with 'c address form.  'c address identifies both buffer and line.
-    """
-    start, x, param, xx = parse_args(args)
-    istart = buf.mk_start(start)
-    if not buf.start_ok(istart):
+def mt_cmd(cmd_fcn, args):
+    'move or transfer (copy) lines to after destination line'
+    start, end, destination, xxx = parse_args(args)
+    start, end = buf.mk_range(start, end)
+    if not buf.range_ok(start, end):
         print('? invalid address')
         return
-    if not (param and param[0].islower()):
-        print('? k requires single lower case character parameter')
+    dest, xxx = match_address(destination)
+    # dest can be 0 because lines are moved to *after* dest
+    if not buf.iline_empty_ok(dest):
+        print('? invalid destination address')
         return
-    c = param[0]
-    buf.mark[c] = istart
-    print("Mark %s set at line %d in buffer %s" % (c, istart, current))
+    cmd_fcn(start, end, dest) # cmd_fcn is buf.m or buf.t
 
 def m(*args):
     'move lines to after destination line'
@@ -406,20 +417,6 @@ def m(*args):
 def t(*args):
     'transfer (copy) lines to after destination line'
     mt_cmd(buf.t, args)
-
-def mt_cmd(cmd_fcn, args):
-    'move or transfer (copy) lines to after destination line'
-    start, end, destination, x = parse_args(args)
-    istart, iend = buf.mk_range(start, end)
-    if not buf.range_ok(istart, iend):
-        print('? invalid address')
-        return
-    idest, tail = match_address(destination)
-    # idest can be 0 because lines are moved to *after* idest
-    if not buf.start_empty_ok(idest):
-        print('? invalid destination address')
-        return
-    cmd_fcn(istart, iend, idest) # cmd_fcn is buf.m or buf.t
 
 # command mode
 
@@ -434,7 +431,7 @@ complete_cmds = 'deEflpqrswzbBDnAykmt' # commands that do not require further in
 input_cmds = 'aic' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
-# regular expressions for command parts, no spaces allowed
+# regular expressions for line address forms and other command parts
 number = re.compile(r'(\d+)')
 fwdnumber = re.compile(r'\+(\d+)')
 bkdnumber = re.compile(r'\-(\d+)')
@@ -449,8 +446,10 @@ mark = re.compile(r"'([a-z])")  # 'c, ed mark with single lc char label
 
 def match_address(cmd_string):
     """
-    return line number at start of cmd_string (None of not found), 
-     and rest of cmd_string
+    Return line number for address at start of cmd_string (None of not found), 
+     and rest of cmd_string.
+    This is where we convert the various line address forms to line numbers.
+    All other code in this module and the buffer module uses line numbers only.
     """
     if cmd_string == '':
         return None, '' 
@@ -500,21 +499,21 @@ def parse_cmd(cmd_string):
     """
     Parses cmd_string, returns multiple values in this order:
      cmd_name - single-character command name
-     istart, jend - integer line numbers 
+     start, end - integer line numbers 
      params - string containing other command parameters
     All are optional except cmd_name, assigns None if item is not present
     """
     global D_count
-    cmd_name, istart, jend, params = None, None, None, None
-    # look for start addr, optional. if no match istart,tail == None,cmd_string
-    istart, tail = match_address(cmd_string)
+    cmd_name, start, end, params = None, None, None, None
+    # look for start addr, optional. if no match start,tail == None,cmd_string
+    start, tail = match_address(cmd_string)
     # look for end address, optional
-    if istart != None:
+    if start != None:
         if tail and tail[0] == ',': # addr separator, next addr NOT optional
-            jend, tail = match_address(tail[1:])
-            if jend == None:
+            end, tail = match_address(tail[1:])
+            if end == None:
                 print('? end address expected at %s' % tail)
-                return 'ERROR', istart, jend, params
+                return 'ERROR', start, end, params
     # look for cmd_string, NOT optional
     if tail and tail[0] in ed_cmds:
         cmd_name, params = tail[0], tail[1:].strip()
@@ -525,16 +524,16 @@ def parse_cmd(cmd_string):
         cmd_name = 'A'
     else:
         print('? command expected at %s' % tail)
-        return 'ERROR', istart, jend, params
+        return 'ERROR', start, end, params
     # special handling for commands that must be repeated to confirm
     D_count = 0 if cmd_name != 'D' else D_count
     # command-specific parameter parsing
     if cmd_name == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
-        return cmd_name, istart, jend, old, new, glbl
+        return cmd_name, start, end, old, new, glbl
     # all other commands, no special parameter parsing
     else:
-        return cmd_name, istart, jend, params if params else None 
+        return cmd_name, start, end, params if params else None 
 
 # state variables that must persist between ed_cmd invocations during input mode
 command_mode = True # alternates with input mode used by a,i,c commands
@@ -567,21 +566,21 @@ def cmd(line):
             # Instead of using buf.a, i, c, we handle input mode cmds inline here
             # We will add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once.
-            istart, jend, x, xxx = parse_args(args) # might be int or None
-            input_line, end_line = buf.mk_range(istart, jend) # int only
-            if not (buf.start_empty_ok(input_line) if cmd_name in 'ai'
-                    else buf.range_ok(input_line, end_line)):
+            start, end, x, xxx = parse_args(args) # might be int or None
+            start, end = buf.mk_range(start, end) # int only
+            if not (buf.iline_empty_ok(start) if cmd_name in 'ai'
+                    else buf.range_ok(start, end)):
                 print('? invalid address')
                 command_mode = True
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
-                buf.dot = input_line
-            elif cmd_name == 'i': #and input_line >0: NOT! can insert in empty file
-                buf.dot = input_line - 1 if input_line > 0 else 0 
+                buf.dot = start
+            elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
+                buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
             elif cmd_name == 'c': # c(hange) command deletes changed lines first
-                buf.d(input_line, end_line) # updates buf.dot
-                buf.dot = input_line - 1
+                buf.d(start, end) # updates buf.dot
+                buf.dot = start - 1
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:

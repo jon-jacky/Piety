@@ -53,6 +53,28 @@ class Buffer(object):
         self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
 
+    # For other programs (besides editors) to write into buffers
+
+    # The call print(s, file=buffer), invokes this code to write s to buffer
+    # Experiments show that this Python print calls Buffer write *twice*,
+    # first write for the contents s, second write for end string
+    # even when end string is default \n or empty ''     
+    # So here we alternate reading contents and discarding end string
+    def write(self, s):
+        'Invoked by print(s, file=buffer), writes s to buffer'
+        #print([c for c in s]) # DEBUG reveals second write for end string
+        #print('end_phase %s' % self.end_phase) # DEBUG
+        if self.end_phase:
+            # ignore the end string, ed0 buffer lines must end with \n
+            # self.lines.append(self.contents) # already  includes final'\n'
+            self.a(self.dot, self.contents) # append command, advances dot
+        else:
+            # store contents string until we get end string
+            self.contents = s
+        self.end_phase = not self.end_phase # alternates False True False ...
+        if self.update:
+            self.update()
+
     # line addresses
 
     def S(self):
@@ -60,23 +82,24 @@ class Buffer(object):
         return len(self.lines)-1 # don't count empty first line at index 0
 
     # defaults and range checking, depend on indexing and range conventions
+    # mk_ functions replace None missing arguments with default line numbers
 
-    def mk_start(self, start):
-        'Return start if given, else default dot, 0 if buffer is empty'
-        return start if start != None else self.dot
+    def mk_iline(self, iline):
+        'Return iline if given, else default dot, 0 if buffer is empty'
+        return iline if iline != None else self.dot
 
     def mk_range(self, start, end):
         """Return start, end if given, 
         else return defaults, calc default end from start"""
-        istart = self.mk_start(start)
-        return istart, end if end != None else istart
+        start = self.mk_iline(start)
+        return start, end if end != None else start
 
-    def start_ok(self, iline):
+    def iline_ok(self, iline):
         """Return True if iline address is in buffer, always False for empty buffer
         Used by most commands, which don't make sense for an empty buffer"""
         return (0 < iline <= self.S()) 
 
-    def start_empty_ok(self, iline):
+    def iline_empty_ok(self, iline):
         """Return True if iline address is in buffer, or iline is 0 for start 
         Used by commands which make sense for an empty buffer: insert, append, read
         """
@@ -84,7 +107,7 @@ class Buffer(object):
 
     def range_ok(self, start, end):
         'Return True if start and end are in buffer, and start does not follow end'
-        return self.start_ok(start) and self.start_ok(end) and start <= end
+        return self.iline_ok(start) and self.iline_ok(end) and start <= end
 
     # search
 
@@ -213,38 +236,16 @@ class Buffer(object):
                 self.dot = i
                 self.unsaved = True
 
-    # Invoked by print(s, file=buffer), writes s to buffer
-    # Experiments show that this Python print calls Buffer write *twice*,
-    # first write for the contents s, second write for end string
-    # even when end string is default \n or empty ''     
-    # So here we alternate reading contents and discarding end string
-    def write(self, s):
-        'Invoked by print(s, file=buffer), writes s to buffer'
-        #print([c for c in s]) # DEBUG reveals second write for end string
-        #print('end_phase %s' % self.end_phase) # DEBUG
-        if self.end_phase:
-            # ignore the end string, ed0 buffer lines must end with \n
-            # self.lines.append(self.contents) # already  includes final'\n'
-            self.a(self.dot, self.contents) # append command, advances dot
-        else:
-            # store contents string until we get end string
-            self.contents = s
-        self.end_phase = not self.end_phase # alternates False True False ...
-        if self.update:
-            self.update()
-
     def y(self, iline):
         'Insert most recently deleted lines *before* iline, update dot to last inserted line'
         # based on def i ... above
         self.insert(iline if iline > 0 else iline+1, self.caller.deleted)
 
-    def t(self, istart, iend, idest):
+    def t(self, start, end, dest):
         'transfer (copy) lines to after destination line'
-        self.insert(idest if idest == 0 else idest+1, self.lines[istart:iend+1])
+        self.insert(dest if dest == 0 else dest+1, self.lines[start:end+1])
         
-    def m(self, istart, iend, idest):
+    def m(self, start, end, dest):
         'move lines to after destination line'
-        self.d(istart, iend) # d changes line numbers, must adjust below
-        self.y(idest+1 if idest < istart else idest+1-(iend-istart+1))
-
-
+        self.d(start, end) # d changes line numbers, must adjust below
+        self.y(dest+1 if dest < start else dest+1-(end-start+1))
