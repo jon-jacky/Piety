@@ -54,6 +54,46 @@ def parse_args(args):
         text = None 
     return start, end, text, params # params might still be non-empty
 
+# parse_check_ functions are used by most commands to parse args,
+# replace missing args by defaults, check args, and print error messages
+
+def parse_check_line(ok0, args):
+    'Building block for parse_check_... functions'
+    iline, x, param, xx = parse_args(args)
+    iline = buf.mk_iline(iline)
+    valid = buf.iline_ok0(iline) if ok0 else buf.iline_ok(iline)
+    if not valid:
+        print('? invalid address')
+    return valid, iline, param
+
+def parse_check_iline(args):
+    'for commands that use one line address where 0 is not valid: k z'
+    return parse_check_line(False, args)
+
+def parse_check_iline0(args):
+    'for commands that use one line address where 0 is valid: k z'
+    return parse_check_line(True, args)
+
+def parse_check_range(args):
+    'for cmds that can affect a range of lines: p d c s'
+    start, end, param, param_list = parse_args(args)
+    start, end = buf.mk_range(start, end)
+    valid = buf.range_ok(start, end)
+    if not valid:
+        print('? invalid address')
+    return valid, start, end, param, param_list
+
+def parse_check_range_dest(args):
+    'for cmds that can affect a range of lines and a destination: m t'
+    valid, start, end, destination, x = parse_check_range(args)
+    if valid:
+        dest, x = match_address(destination)
+        # dest can be 0 because lines are moved to *after* dest
+        dest_valid = buf.iline_ok0(dest)
+        if not dest_valid:
+            print('? invalid destination address')
+            return (valid and dest_valid), start, end, dest
+
 # central data structure and variables
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
@@ -80,17 +120,11 @@ def k(*args):
     Mark addressed line in this buffer with character c (the command parameter),
     to use with 'c address form.  'c address identifies both buffer and line.
     """
-    iline, x, marker, xx = parse_args(args)
-    iline = buf.mk_iline(iline)
-    if not buf.iline_ok(iline):
-        print('? invalid address')
-        return
-    if not (marker and marker[0].islower()):
-        print('? k requires single lower case character parameter')
-        return
-    c = marker[0]
-    buf.mark[c] = iline
-    print("Mark %s set at line %d in buffer %s" % (c, iline, current))
+    valid, iline, marker = parse_check_iline(args)
+    if valid:
+        c = marker[0]
+        buf.mark[c] = iline
+        print("Mark %s set at line %d in buffer %s" % (c, iline, current))
 
 # search
 
@@ -179,17 +213,13 @@ def e(*args):
 
 def r(*args):
     'Read file contents into buffer after iline'
-    iline, x, fname, xx = parse_args(args)
-    filename = current_filename(fname)
-    if not filename:
-        return # current_filename already printed error msg
-    iline = buf.mk_iline(iline)
-    if not buf.iline_empty_ok(iline): # r command works even for empty buffer
-        print('? invalid address')
-        return
-    S0 = S() # record number of lines now to calc how many we read
-    buf.r(iline, filename)
-    print('%s, %d lines' % (filename, S()-S0))
+    valid, iline, fname = parse_check_iline0(args)
+    if valid:
+        filename = current_filename(fname)
+        if filename:
+            S0 = S()
+            buf.r(iline, filename)
+            print('%s, %d lines' % (filename, S()-S0))
 
 def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
@@ -208,10 +238,9 @@ def w(*args):
     'write current buffer contents to file name'
     x, xx, fname, xxx = parse_args(args)
     filename = current_filename(fname)
-    if not filename:
-        return # current_filename already printed error msg
-    buf.w(filename)
-    print('%s, %d lines' % (filename, S()))
+    if filename: # if not, current_filename printed error msg
+        buf.w(filename)
+        print('%s, %d lines' % (filename, S()))
 
 D_count = 0 # number of consecutive times D command has been invoked
 
@@ -259,7 +288,7 @@ def A(*args):
     ' = in command mode, print the line number of the addressed line'
     iline, x, xx, xxx = parse_args(args)
     iline = iline if iline != None else S() # default $ not .
-    if buf.iline_empty_ok(iline): # don't print error message when file is empty
+    if buf.iline_ok0(iline): # don't print error message when file is empty
         print(iline)
     else:
         print('? invalid address')
@@ -287,82 +316,63 @@ def l(*args):
         return
     print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
 
-def p_lines(ifirst, ilast, destination): # arg here shadows global destination
-    'Print line numbers ifirst through ilast, inclusive, without arg checking'
-    for iline in range(ifirst,ilast+1): # +1 because ifirst,ilast is inclusive
+def p_lines(start, end, destination): # arg here shadows global destination
+    'Print lines start through end, inclusive, at destination'
+    for iline in range(start, end+1): # +1 because start,end is inclusive
         print(buf.l(iline), file=destination) # file can be null or stdout or ...
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
-    start, end, x, xx = parse_args(args)
-    start, end = buf.mk_range(start, end)
-    if not buf.range_ok(start, end):
-        print('? invalid address')
-        return
-    p_lines(start, end, sys.stdout) # print unconditionally
+    valid, start, end, x, xx = parse_check_range(args)
+    if valid:
+        p_lines(start, end, sys.stdout) # print unconditionally
     
 def z(*args):
     """
     Scroll: print buf.npage lines starting at iline.
     Leave dot at last line printed. If parameter is present, update buf.npage
     """
-    iline, x, npage_string, xxx = parse_args(args)
-    #print('start %s, npage_string %s' % (start, npage_string))#DEBUG
-    iline = buf.mk_iline(iline)
-    if not buf.iline_empty_ok(iline):
-        print('? invalid address')
-        return
-    if npage_string:
-        try:
-            npage = int(npage_string)
-        except:
-            print('? integer expected: %s' % npage_string)
-            return 
-        if npage < 1:
-            print('? integer > 1 expected %d' % npage)
-            return
-        buf.npage = npage
-    end = iline + buf.npage 
-    end = end if end <= S() else S()
-    p_lines(iline, end, destination) # global destination might be null
+    valid, iline, npage_string = parse_check_iline(args)
+    if valid: 
+        if npage_string:
+            try:
+                npage = int(npage_string)
+            except:
+                print('? integer expected: %s' % npage_string)
+                return 
+            if npage < 1:
+                print('? integer > 1 expected %d' % npage)
+                return
+            buf.npage = npage
+        end = iline + buf.npage 
+        end = end if end <= S() else S()
+        p_lines(iline, end, destination) # global destination might be null
 
 # Adding, changing, and deleting text
 
-def ai_cmd(cmd_fcn, args):
-    'a(ppend) or i(nsert) command'
-    iline, x, lines, xx = parse_args(args)
-    iline = buf.mk_iline(iline)
-    if not buf.iline_empty_ok(iline): # a, i commands work even for empty buffer
-        print('? invalid address')
-        return
-    if lines:
-        cmd_fcn(iline, lines) # cmd_fcn is buf.a or buf.i
-
 def a(*args):
     'Append lines from string after  iline, update dot to last appended line'
-    ai_cmd(buf.a, args)
+    valid, iline, lines = parse_check_iline0(args)
+    if valid and lines:
+        buf.a(iline, lines)
 
 def i(*args):
     'Insert lines from string before iline, update dot to last inserted line'
-    ai_cmd(buf.i, args)
+    valid, iline, lines = parse_check_iline0(args)
+    if valid and lines:
+        buf.i(iline, lines)
 
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
-    start, end, x, xxx = parse_args(args)
-    start, end = buf.mk_range(start, end)
-    if not buf.range_ok(start, end):
-        print('? invalid address')
-        return
-    buf.d(start, end)
+    valid, start, end, x, xx = parse_check_range(args)
+    if valid:
+        buf.d(start, end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
-    start, end, lines, x = parse_args(args)
-    start, end = buf.mk_range(start, end)
-    if not buf.range_ok(start, end):
-        print('? invalid address')
-        return
-    buf.c(start,end,lines)
+    valid, start, end, lines, xx = parse_check_range(args)
+    if valid:
+        buf.c(start,end,lines)
         
 def s(*args):
     """
@@ -370,22 +380,31 @@ def s(*args):
     When glbl is False (the default), substitute only the first occurrence 
     in each line.  Otherwise substitute all occurrences in each line
     """
-    start, end, old, params = parse_args(args)
-    start, end = buf.mk_range(start, end)
-    if not buf.range_ok(start, end):
-        print('? invalid address')
-        return
-    # params might be [ new, glbl ]
-    if old and len(params) > 0 and isinstance(params[0],str):
-        new = params[0]
-    else:
-        print('? /old/new/')
-        return
-    if len(params) > 1:
-        glbl = bool(params[1])
-    else:
-        glbl = False # default
-    buf.s(start, end, old, new, glbl)
+    valid, start, end, old, params = parse_check_range(args)
+    if valid:
+        # params might be [ new, glbl ]
+        if old and len(params) > 0 and isinstance(params[0],str):
+            new = params[0]
+        else:
+            print('? /old/new/')
+            return
+        if len(params) > 1:
+            glbl = bool(params[1])
+        else:
+            glbl = False # default
+        buf.s(start, end, old, new, glbl)
+
+def m(*args):
+    'move lines to after destination line'
+    valid, start, end, dest = parse_check_range_dest(args)
+    if valid:
+        buf.m(start, end, dest)
+
+def t(*args):
+    'transfer (copy) lines to after destination line'
+    valid, start, end, dest = parse_check_range_dest(args)
+    if valid:
+        buf.t(start, end, dest)
 
 def y(*args):
     'Insert most recently deleted lines *before* destination line address'
@@ -395,28 +414,6 @@ def y(*args):
         print('? invalid address')
         return
     buf.y(iline)
-
-def mt_cmd(cmd_fcn, args):
-    'move or transfer (copy) lines to after destination line'
-    start, end, destination, xxx = parse_args(args)
-    start, end = buf.mk_range(start, end)
-    if not buf.range_ok(start, end):
-        print('? invalid address')
-        return
-    dest, xxx = match_address(destination)
-    # dest can be 0 because lines are moved to *after* dest
-    if not buf.iline_empty_ok(dest):
-        print('? invalid destination address')
-        return
-    cmd_fcn(start, end, dest) # cmd_fcn is buf.m or buf.t
-
-def m(*args):
-    'move lines to after destination line'
-    mt_cmd(buf.m, args)
-
-def t(*args):
-    'transfer (copy) lines to after destination line'
-    mt_cmd(buf.t, args)
 
 # command mode
 
@@ -568,7 +565,7 @@ def cmd(line):
             # *unlike* in Python API where we pass multiple input lines at once.
             start, end, x, xxx = parse_args(args) # might be int or None
             start, end = buf.mk_range(start, end) # int only
-            if not (buf.iline_empty_ok(start) if cmd_name in 'ai'
+            if not (buf.iline_ok0(start) if cmd_name in 'ai'
                     else buf.range_ok(start, end)):
                 print('? invalid address')
                 command_mode = True

@@ -54,7 +54,7 @@ def file_changed():
 
 def text_cmd():
     'Buffer text contents changed in buffer segment visible in window'
-    return ed.cmd_name in 'aicdsymt' # append, insert, change, delete, substitute, yank,m,t
+    return ed.cmd_name in 'aicdsymtr' # append, insert, change, delete, substitute, yank etc.
 
 def calc_frame():
     'Calculate dimensions and location of window and scrolling command region'

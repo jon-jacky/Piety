@@ -99,7 +99,7 @@ class Buffer(object):
         Used by most commands, which don't make sense for an empty buffer"""
         return (0 < iline <= self.S()) 
 
-    def iline_empty_ok(self, iline):
+    def iline_ok0(self, iline):
         """Return True if iline address is in buffer, or iline is 0 for start 
         Used by commands which make sense for an empty buffer: insert, append, read
         """
