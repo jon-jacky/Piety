@@ -54,8 +54,8 @@ def parse_args(args):
         text = None 
     return start, end, text, params # params might still be non-empty
 
-# parse_check_ functions are used by most commands to parse args,
-# replace missing args by defaults, check args, and print error messages
+# parse_check_ functions used by many commands to parse line address args,
+# replace missing args by defaults, check args, and print error messages.
 
 def parse_check_line(ok0, args):
     'Building block for parse_check_... functions'
@@ -71,7 +71,7 @@ def parse_check_iline(args):
     return parse_check_line(False, args)
 
 def parse_check_iline0(args):
-    'for commands that use one line address where 0 is valid: k z'
+    'for commands that use one line address where 0 is valid: r a i'
     return parse_check_line(True, args)
 
 def parse_check_range(args):
