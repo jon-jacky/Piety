@@ -85,16 +85,22 @@ def parse_check_range(args):
 
 def parse_check_range_dest(args):
     'for cmds that can affect a range of lines and a destination: m t'
-    valid, start, end, destination, x = parse_check_range(args)
+    valid, start, end, dest, x = parse_check_range(args)
     if valid:
-        dest, x = match_address(destination)
+        dest, x = match_address(dest)
         # dest can be 0 because lines are moved to *after* dest
         dest_valid = buf.iline_ok0(dest)
         if not dest_valid:
             print('? invalid destination address')
-            return (valid and dest_valid), start, end, dest
+    return (valid and dest_valid), start, end, dest
 
 # central data structure and variables
+
+# Each ed command is implemented by a function with the same
+# one-letter name, whose arguments are the same as the ed command
+# args.  The current buffer is used by many of these functions but to
+# make the API similar to ed commands, it cannot appear as an arg. 
+# So the current buffer, buf, must be global.
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 deleted = list() # most recently deleted lines from any buffer, for yank command
@@ -137,8 +143,6 @@ def R(pattern):
     """Backward search for pattern, 
     return line number where found, dot if not found"""
     return buf.R(pattern)
-
-# buffers and files
 
 def current_filename(filename):
     """
