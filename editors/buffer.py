@@ -205,7 +205,7 @@ class Buffer(object):
         self.insert(iline if iline else iline+1, string.splitlines(True))
 
     def d(self, start, end):
-        """Delete text from start up to end, 
+        """Delete text from start up through end, 
         set dot to first line after deletes or last line in buffer"""
         self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
         self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
@@ -215,11 +215,18 @@ class Buffer(object):
             self.dot = min(start,self.S()) # S() if we deleted end of buffer
         else:
             self.dot = 0
-        # adjust line numbers for marks below the deletion point
         nlines = end - start + 1
-        for c in self.mark:
-            if self.mark[c] > start:
+        new_mark = dict() # can't change mark dict size during iteration
+        self.caller.deleted_mark = dict() 
+        for c in self.mark: 
+            if (start <= self.mark[c] <= end): # save marks from deleted lines
+                self.caller.deleted_mark[c] = self.mark[c]-start+1
+            else:
+                new_mark[c] = self.mark[c] # save marks *not* in region
+        for c in new_mark: # adjust marks below deleted lines
+            if self.mark[c] > end:
                 self.mark[c] -= nlines
+        self.mark = new_mark
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string'
@@ -240,10 +247,14 @@ class Buffer(object):
         'Insert most recently deleted lines *before* iline, update dot to last inserted line'
         # based on def i ... above
         self.insert(iline if iline > 0 else iline+1, self.caller.deleted)
+        # restore marks, if any
+        for c in self.caller.deleted_mark:
+            if c not in self.mark: # do not replace existing marks
+                self.mark[c] = self.caller.deleted_mark[c]+iline-1
 
     def t(self, start, end, dest):
         'transfer (copy) lines to after destination line'
-        self.insert(dest if dest == 0 else dest+1, self.lines[start:end+1])
+        self.insert(dest+1, self.lines[start:end+1])
         
     def m(self, start, end, dest):
         'move lines to after destination line'

@@ -91,7 +91,7 @@ def parse_check_range_dest(args):
         # dest can be 0 because lines are moved to *after* dest
         dest_valid = buf.iline_ok0(dest)
         if not dest_valid:
-            print('? invalid destination address')
+            print('? invalid destination')
     return (valid and dest_valid), start, end, dest
 
 # central data structure and variables
@@ -104,6 +104,7 @@ def parse_check_range_dest(args):
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 deleted = list() # most recently deleted lines from any buffer, for yank command
+deleted_mark = list() # markers for deleted lines, for yank command
                  
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
@@ -402,6 +403,9 @@ def m(*args):
     'move lines to after destination line'
     valid, start, end, dest = parse_check_range_dest(args)
     if valid:
+        if (start <= dest <= end):
+            print('? invalid destination')
+            return
         buf.m(start, end, dest)
 
 def t(*args):
