@@ -30,5 +30,6 @@ e line20.txt
 16y
 !ed.buf.mark
 ,p
+q
 END
 

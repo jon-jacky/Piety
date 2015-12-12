@@ -34,7 +34,7 @@ def show_printing():
 def parse_args(args):
     """
     Parse variable-length argument list where all arguments optional.
-    Return fixed length tuple: start, end, text, params 
+o    Return fixed length tuple: start, end, text, params 
     start, end are line numbers, for example the first and last line of a region.
     When present, start and end are int, both might be absent, indicated by None.
     text is the first token in the parameter list, str or None if absent
@@ -54,14 +54,49 @@ def parse_args(args):
         text = None 
     return start, end, text, params # params might still be non-empty
 
+# The commands and API for ed.py use the classic Unix ed conventions for
+# indexing and range (which are unlike Python): The index of the first
+# line is 1, the index of the last line is the same as the number of
+# lines (the length of the buffer in lines), and range i,j includes the
+# last line with index j (so the range i,i is just the line i, but it is
+# not empty).
+
+# Defaults and range checking, use the indexing and range conventions above.
+# mk_ functions replace None missing arguments with default line numbers
+
+def mk_iline(iline):
+    'Return iline if given, else default dot, 0 if buffer is empty'
+    return iline if iline != None else buf.dot
+
+def mk_range(start, end):
+    """Return start, end if given, 
+    else return defaults, calc default end from start"""
+    start = mk_iline(start)
+    return start, end if end != None else start
+
+def iline_ok(iline):
+    """Return True if iline address is in buffer, always False for empty buffer
+    Used by most commands, which don't make sense for an empty buffer"""
+    return (0 < iline <= buf.S()) 
+
+def iline_ok0(iline):
+    """Return True if iline address is in buffer, or iline is 0 for start 
+    Used by commands which make sense for an empty buffer: insert, append, read
+    """
+    return (0 <= iline <= buf.S())
+
+def range_ok(start, end):
+    'Return True if start and end are in buffer, and start does not follow end'
+    return iline_ok(start) and iline_ok(end) and start <= end
+
 # parse_check_ functions used by many commands to parse line address args,
 # replace missing args by defaults, check args, and print error messages.
 
 def parse_check_line(ok0, args):
     'Building block for parse_check_... functions'
     iline, x, param, xx = parse_args(args)
-    iline = buf.mk_iline(iline)
-    valid = buf.iline_ok0(iline) if ok0 else buf.iline_ok(iline)
+    iline = mk_iline(iline)
+    valid = iline_ok0(iline) if ok0 else iline_ok(iline)
     if not valid:
         print('? invalid address')
     return valid, iline, param
@@ -77,8 +112,8 @@ def parse_check_iline0(args):
 def parse_check_range(args):
     'for cmds that can affect a range of lines: p d c s'
     start, end, param, param_list = parse_args(args)
-    start, end = buf.mk_range(start, end)
-    valid = buf.range_ok(start, end)
+    start, end = mk_range(start, end)
+    valid = range_ok(start, end)
     if not valid:
         print('? invalid address')
     return valid, start, end, param, param_list
@@ -89,7 +124,7 @@ def parse_check_range_dest(args):
     if valid:
         dest, x = match_address(dest)
         # dest can be 0 because lines are moved to *after* dest
-        dest_valid = buf.iline_ok0(dest)
+        dest_valid = iline_ok0(dest)
         if not dest_valid:
             print('? invalid destination')
     return (valid and dest_valid), start, end, dest
@@ -293,7 +328,7 @@ def A(*args):
     ' = in command mode, print the line number of the addressed line'
     iline, x, xx, xxx = parse_args(args)
     iline = iline if iline != None else S() # default $ not .
-    if buf.iline_ok0(iline): # don't print error message when file is empty
+    if iline_ok0(iline): # don't print error message when file is empty
         print(iline)
     else:
         print('? invalid address')
@@ -316,7 +351,7 @@ def l(*args):
     # don't use usual default dot here, instead advance dot
     if iline == None:
         iline = o() + 1
-    if not buf.iline_ok(iline):
+    if not iline_ok(iline):
         print('? invalid address')
         return
     print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
@@ -417,7 +452,7 @@ def t(*args):
 def y(*args):
     'Insert most recently deleted lines *before* destination line address'
     iline, x, xx, xxx = parse_args(args)
-    iline = buf.mk_iline(iline)
+    iline = mk_iline(iline)
     if not (0 <= iline <= buf.S()+1): # allow +y at $ to append to buffer
         print('? invalid address')
         return
@@ -572,9 +607,9 @@ def cmd(line):
             # We will add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once.
             start, end, x, xxx = parse_args(args) # might be int or None
-            start, end = buf.mk_range(start, end) # int only
-            if not (buf.iline_ok0(start) if cmd_name in 'ai'
-                    else buf.range_ok(start, end)):
+            start, end = mk_range(start, end) # int only
+            if not (iline_ok0(start) if cmd_name in 'ai'
+                    else range_ok(start, end)):
                 print('? invalid address')
                 command_mode = True
             # assign dot to prepare for input mode, where we a(ppend) each line

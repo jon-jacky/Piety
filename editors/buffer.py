@@ -81,34 +81,6 @@ class Buffer(object):
         'like ed $, Return index of the last line, 0 if the buffer is empty'
         return len(self.lines)-1 # don't count empty first line at index 0
 
-    # defaults and range checking, depend on indexing and range conventions
-    # mk_ functions replace None missing arguments with default line numbers
-
-    def mk_iline(self, iline):
-        'Return iline if given, else default dot, 0 if buffer is empty'
-        return iline if iline != None else self.dot
-
-    def mk_range(self, start, end):
-        """Return start, end if given, 
-        else return defaults, calc default end from start"""
-        start = self.mk_iline(start)
-        return start, end if end != None else start
-
-    def iline_ok(self, iline):
-        """Return True if iline address is in buffer, always False for empty buffer
-        Used by most commands, which don't make sense for an empty buffer"""
-        return (0 < iline <= self.S()) 
-
-    def iline_ok0(self, iline):
-        """Return True if iline address is in buffer, or iline is 0 for start 
-        Used by commands which make sense for an empty buffer: insert, append, read
-        """
-        return (0 <= iline <= self.S())
-
-    def range_ok(self, start, end):
-        'Return True if start and end are in buffer, and start does not follow end'
-        return self.iline_ok(start) and self.iline_ok(end) and start <= end
-
     # search
 
     def search_buf(self, forward):
