@@ -25,6 +25,9 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
     from the *console* directory to get the commmand line one character at a time, 
     instead of Python *input*.
 
+- **line5.txt, line20.txt**: sample text files for experimenting with
+    the editor.
+
 - **window.py**: defines Window class used by *edsel.py*
 
 Revised November 2015

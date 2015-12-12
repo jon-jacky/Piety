@@ -216,16 +216,16 @@ class Buffer(object):
         else:
             self.dot = 0
         nlines = end - start + 1
-        new_mark = dict() # can't change mark dict size during iteration
+        # new_mark needed because we can't remove items from dict as we iterate
+        new_mark = dict() # new_mark is self.mark without marks at deleted lines
         self.caller.deleted_mark = dict() 
         for c in self.mark: 
             if (start <= self.mark[c] <= end): # save marks from deleted lines
                 self.caller.deleted_mark[c] = self.mark[c]-start+1
             else:
-                new_mark[c] = self.mark[c] # save marks *not* in region
-        for c in new_mark: # adjust marks below deleted lines
-            if self.mark[c] > end:
-                self.mark[c] -= nlines
+                # adjust marks below deleted lines
+                markc = self.mark[c]
+                new_mark[c] = markc if markc < end else markc - nlines
         self.mark = new_mark
 
     def c(self, start, end, string):

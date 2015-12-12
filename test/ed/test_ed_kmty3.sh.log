@@ -1,0 +1,96 @@
+line20.txt, 20 lines
+Mark a set at line 3 in buffer main
+Mark b set at line 5 in buffer main
+Mark c set at line 7 in buffer main
+Mark d set at line 9 in buffer main
+Mark e set at line 15 in buffer main
+Mark f set at line 18 in buffer main
+{'a': 3, 'd': 9, 'b': 5, 'e': 15, 'c': 7, 'f': 18}
+{'a': 10, 'd': 6, 'b': 12, 'f': 18, 'c': 4, 'e': 15}
+line03
+line05
+line01
+line02
+line06
+line07
+line08
+line09
+line10
+line11
+line12
+line03
+line04
+line05
+line13
+line14
+line15
+line16
+line17
+line18
+line19
+line20
+{'a': 13, 'd': 9, 'b': 15, 'f': 21, 'c': 7, 'e': 18}
+line03
+line04
+line05
+line01
+line02
+line06
+line07
+line08
+line09
+line10
+line11
+line12
+line03
+line04
+line05
+line13
+line14
+line15
+line16
+line17
+line18
+line19
+line20
+line03
+line04
+line05
+line03
+line05
+line07
+line09
+line15
+line18
+['line03\n', 'line04\n', 'line05\n']
+{'a': 1, 'b': 3}
+{'a': 13, 'd': 9, 'b': 15, 'f': 24, 'c': 7, 'e': 21}
+line03
+line04
+line05
+line01
+line02
+line06
+line07
+line08
+line09
+line10
+line11
+line12
+line03
+line04
+line05
+line03
+line04
+line05
+line13
+line14
+line15
+line16
+line17
+line18
+line19
+line20
+line03
+line04
+line05
