@@ -369,8 +369,10 @@ def p(*args):
     
 def z(*args):
     """
-    Scroll: print buf.npage lines starting at iline.
-    Leave dot at last line printed. If parameter is present, update buf.npage
+    Scroll: print buf.npage lines, scroll backwards if npage is negative.
+    If parameter is present, update buf.npage
+    If npage is non-negative, start at iline, leave dot at last line printed.
+    if npage is negative, start at iline + npage, leave dot at first line printed.
     """
     valid, iline, npage_string = parse_check_iline(args)
     if valid: 
@@ -380,13 +382,17 @@ def z(*args):
             except:
                 print('? integer expected: %s' % npage_string)
                 return 
-            if npage < 1:
-                print('? integer > 1 expected %d' % npage)
-                return
             buf.npage = npage
-        end = iline + buf.npage 
+        if buf.npage >= 0:
+            end = iline + buf.npage 
+        else:
+            end = iline
+            iline += buf.npage # npage negative, go backward
+            iline = iline if iline > 0 else 1
         end = end if end <= S() else S()
         p_lines(iline, end, destination) # global destination might be null
+        if buf.npage < 0:
+            buf.dot = iline
 
 # Adding, changing, and deleting text
 

@@ -133,14 +133,7 @@ def cmd(line):
     # try/except ensures we restore display, especially scrolling
     try:
         save_parameters() # before ed.cmd
-        # special cases, command synonyms
-        if line == 'Z': # move cursor backward a page
-            ed.cmd('-%dp' % ed.buf.npage) 
-        elif line == ' ': # backward a line
-            ed.cmd('-1p')
-        # RET in ed already moves forward a line
-        else:
-            ed.cmd(line) # non-blocking
+        ed.cmd(line) # non-blocking
         if ed.cmd_name in 'bBeED':
             win.buf = ed.buf # ed.buf might have changed
         update_display()

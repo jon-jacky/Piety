@@ -28,12 +28,6 @@ type a period at the start of a line to exit input mode.  Then *edsel*
 puts the cursor back in the command region for you to type another
 command.
 
-**edsel** provides two new commands (not in *ed.py*) to make it easy to
-move around in the buffer (by changing the current line): *space*
-moves backward one line, and *Z* (upper case) pages backward.  Recall
-that the *ed.py* empty command (just type *RETURN*) moves forward one
-line, and *z* (lower case) pages forward.
-
 You can execute any Python statement at the *edsel* command line by
 preceding it with the *!* character, for example *!dir(edsel)*.
 
