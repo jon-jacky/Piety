@@ -380,7 +380,7 @@ def z(*args):
             try:
                 npage = int(npage_string)
             except:
-                print('? integer expected: %s' % npage_string)
+                print('? integer expected at %s' % npage_string)
                 return 
             buf.npage = npage
         if buf.npage >= 0:

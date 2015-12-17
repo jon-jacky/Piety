@@ -29,8 +29,9 @@ win_h = None # total number of lines in window
 cmd_1 = None # line num on display of 1st line of scrolling command region
 cmd_n = None #  " bottom "
 
-# single window win is assigned from init_session after cmd_h etc. are assigned
-win = None # single window instance will go here
+# first window is assigned from init_session after cmd_h etc. are assigned
+win = None # current window
+windows = list() # list of windows, always windows[0] == win, the current window
 
 # Values saved before ed command so we can test for changes after
 (cmd_h0, current0, filename0) = (None, None, None)
@@ -72,7 +73,9 @@ def display_frame():
     # called from init_session and update_frame
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
-    win.update_window(ed.command_mode)
+    win.update_window(ed.command_mode) # can only edit in current window
+    for w in windows[1:]:
+        w.update_window(True) # command mode, never input mode
     display.set_scroll(cmd_1, cmd_n) 
     set_command_cursor()
 
@@ -81,7 +84,7 @@ def update_frame():
     Call when frame dimensions may have changed.
     """
     calc_frame() # recalculate global cmd_1 cmd_n win_h
-    win.resize(win_1, win_h, ncols)
+    win.resize(win_1, win_h, ncols) # FIXME - multiple windows won't work
     display_frame()
 
 def init_session(*filename, **options):
@@ -100,6 +103,7 @@ def init_session(*filename, **options):
     # must calc_frame to get window dimensions before we create win
     calc_frame() # assign win_h etc.
     win = window.Window(ed.buf, win_1, win_h, ncols)
+    windows.append(win) # establish win == windows[0], invariant
     display_frame()
 
 def update_display():
@@ -128,14 +132,59 @@ def restore_display():
     display.set_scroll_all()
     display.put_cursor(nlines,1)
 
+def o_cmd(line):
+    """
+    window commands - handled here in edsel, not in ed
+    This function defines a simple tiling window manager.
+    For now there is just one vertical stack of windows in the frame.
+    """
+    global win, win_h, win_1  # FIXME can't we un-globalize these?
+    param_string = line.lstrip()[1:].lstrip()
+    if not param_string:
+        print('o: switch to next window, not implemented') # FIXME placeholder
+        return
+    else:
+        try:
+            param = int(param_string)
+            if param == 1:
+                print('o1: return to single window')
+                del windows[1:]
+                win.resize(win_1, win_h, ncols)
+                display_frame()
+                return
+            elif param == 2:
+                print('o2: split window, horizontal')
+                # put the new window at the top so its win_1 is the same
+                old_win_h = win.seg_n - win.seg_1 + 1 + win.status_h # FIXME? property?
+                new_win_h = old_win_h // 2 # integer division
+                win.resize(win_1 + new_win_h, old_win_h - new_win_h, ncols) # old window
+                win = window.Window(ed.buf, win_1, new_win_h, ncols) # new window
+                windows.insert(0, win) 
+                win = windows[0] # maintain win == windows[0], invariant
+                display_frame()
+                return
+            elif param == 3:
+                print('o3: split window, vertical, not implemented') # FIXME placeholder
+                return
+            else:
+                print('oN, N > 3: change current window to N lines or cols, not implemented') # FIXME
+                return
+        except:
+            print('? integer expected at %s' % param_string)
+            return 
+
 def cmd(line):
     'Process one command line without blocking.'
     # try/except ensures we restore display, especially scrolling
     try:
         save_parameters() # before ed.cmd
-        ed.cmd(line) # non-blocking
-        if ed.cmd_name in 'bBeED':
-            win.buf = ed.buf # ed.buf might have changed
+        # intercept special commands used by edsel only, not ed
+        if line.lstrip().startswith('o'):
+            o_cmd(line) # window commands
+        else:
+            ed.cmd(line) # non-blocking
+            if ed.cmd_name in 'bBeED':
+                win.buf = ed.buf # ed.buf might have changed
         update_display()
     except BaseException as e:
         restore_display() # so we can see entire traceback 
