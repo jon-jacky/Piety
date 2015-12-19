@@ -132,28 +132,32 @@ def restore_display():
     display.set_scroll_all()
     display.put_cursor(nlines,1)
 
-def o_cmd(line):
+def o(line):
     """
-    window commands - handled here in edsel, not in ed
-    This function defines a simple tiling window manager.
+    Window commands - these are not ed commands, they are handled here.
     For now there is just one vertical stack of windows in the frame.
     """
-    global win, win_h, win_1  # FIXME can't we un-globalize these?
+    global win, win_h, win_1  # FIXME can we un-globalize these?
     param_string = line.lstrip()[1:].lstrip()
+    # o: switch to next window
     if not param_string:
-        print('o: switch to next window, not implemented') # FIXME placeholder
+        windows.append(win) # move current window to the end
+        del windows[0]
+        win = windows[0] # maintain win == windows[0], invariant
+        ed.b(win.buf.name) # change current buffer
+        display_frame()
         return
     else:
         try:
             param = int(param_string)
+            # o1: return to single window
             if param == 1:
-                print('o1: return to single window')
                 del windows[1:]
                 win.resize(win_1, win_h, ncols)
                 display_frame()
                 return
+            # o2: split window, horizontal
             elif param == 2:
-                print('o2: split window, horizontal')
                 # put the new window at the top so its win_1 is the same
                 old_win_h = win.seg_n - win.seg_1 + 1 + win.status_h # FIXME? property?
                 new_win_h = old_win_h // 2 # integer division
@@ -163,11 +167,8 @@ def o_cmd(line):
                 win = windows[0] # maintain win == windows[0], invariant
                 display_frame()
                 return
-            elif param == 3:
-                print('o3: split window, vertical, not implemented') # FIXME placeholder
-                return
+            # maybe more options later ...
             else:
-                print('oN, N > 3: change current window to N lines or cols, not implemented') # FIXME
                 return
         except:
             print('? integer expected at %s' % param_string)
@@ -180,7 +181,7 @@ def cmd(line):
         save_parameters() # before ed.cmd
         # intercept special commands used by edsel only, not ed
         if line.lstrip().startswith('o'):
-            o_cmd(line) # window commands
+            o(line) # window commands
         else:
             ed.cmd(line) # non-blocking
             if ed.cmd_name in 'bBeED':
