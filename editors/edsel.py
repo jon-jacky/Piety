@@ -29,11 +29,21 @@ cmd_1 = None # line number on display of first line of scrolling command region
 cmd_n = None #  " bottom "
 
 # first window is assigned from init_session after cmd_h etc. are assigned
+win_i = None # current window index
 win = None # current window
-windows = list() # list of windows, always windows[0] == win, the current window
+windows = list() # list of windows, windows[win_i] is the current window
 
-# Values saved before ed command so we can test for changes after
-(cmd_h0, current0, filename0) = (None, None, None)
+# Values saved before ed command so we can test for changes after, or use them
+(cmd_h0, current0, filename0, win0) = (None, None, None, None)
+
+# flags for update_display
+set_other_window = False
+set_single_window = False
+split_window = False
+
+def clear_flags():
+    global set_other_window, set_single_window, split_window
+    set_other_window, set_single_window, split_window = False, False, False
 
 def save_parameters():
     'Save frame + window info before ed cmd so we can test for changes after'
@@ -69,21 +79,23 @@ def set_command_cursor():
     'Put cursor at input line in scrolling command region'
     display.put_cursor(cmd_n, 1) # last line on display
 
+def update_windows():
+    'redraw all windows, called by display_frame, for example after frame resize'
+    for w in windows:
+        w.update_window(False) # no windows could be in insert mode at this time
+
 def display_frame():
     'Clear and update the entire frame'
     # called from init_session and update_frame
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
-    win.update_window(ed.command_mode) # can only edit in current window
-    for w in windows[1:]:     # update other windows, dimensions changed
-        w.update_window(True) # command mode, never input mode
+    update_windows()
     display.set_scroll(cmd_1, cmd_n) 
     set_command_cursor()
 
 def update_frame():
-    """
-    Recalculate frame and all window dimensions, then display all.
-    """
+    'Recalculate frame and all window dimensions, then display all.'
+    # Makes all windows (almost) the same height, unlike after o2 command
     calc_frame() # recalculate global cmd_1 cmd_n windows_h
     nwindows = len(windows)
     win_h0 = windows_h // nwindows # integer division
@@ -97,7 +109,7 @@ def init_session(*filename, **options):
     Clear and render entire display, set scrolling region, place cursor.
     Process optional arguments: filename, options if present.
     """
-    global prompt, cmd_h, win
+    global prompt, cmd_h, win, win_i
     if filename:
         ed.e(filename[0])
     if 'p' in options:
@@ -108,31 +120,52 @@ def init_session(*filename, **options):
     # must calc_frame to get window dimensions before we create win
     calc_frame() # assign windows_h etc.
     win = window.Window(ed.buf, frame_top, windows_h, ncols) # one big window
-    windows.append(win) # establish win == windows[0], invariant
+    windows.append(win) 
+    win_i = 0 # Now win == windows[win_i]
     display_frame()
 
-def update_windows():
+
+def update_display():
     """
-    Update windows and cursor, set scroll to input region, place cursor,
-    Update entire frame if needed
+    Check for any needed display updates.  If there are any, do them'
+    All the display update case analysis is in this function.  
     """
+    cursor_at_command  = True
+    if frame_changed(): # update all windows and cursor
+        update_frame()  # calls display_frame, which calls update_windows
+        return
     win.locate_cursor() # assign new cursor_i
-    # update current window contents and cursor
-    if file_changed() or text_cmd() or win.cursor_elsewhere():
-        win.update_window(ed.command_mode)
-        # update_window manages in-window display cursor and input cursor
+    if set_other_window:
+        # move cursor to new current window, don't update window content
+        win0.locate_cursor()
+        win0.erase_cursor()
+        win.display_cursor()
+        cursor_at_command = False
+    elif (file_changed() or text_cmd() or win.cursor_elsewhere() 
+        or set_single_window or split_window):
+        # update current window contents and cursor
+        win.update_window(not ed.command_mode) # insert mode
         if ed.command_mode:
-            set_command_cursor() # scrolling-region cursor for command entry
-    # update cursor only in current window
+            win.display_cursor() # dot cursor in window
+        if split_window: 
+        #  win0 is former current window, delete cursor then update
+            win0.locate_cursor()
+            win0.erase_cursor()
+            win0.update_window(not ed.command_mode)
+        cursor_at_command = False
     elif win.cursor_moved():
+        # update cursor only in current window, don't update window content
         win.erase_cursor()
         win.display_cursor()
         win.display_status()
-        set_command_cursor()
-    # FIXME: contents change in window other than the current window
+        cursor_at_command = False
+    # FIXME: more cases - contents change in window other than the current window
     #  can happen when multiple windows view the same buffer
-    else:
-        pass # no changes to display
+    else: 
+        # some commands do not affect windows: A b (with no args) f k n w 
+        pass
+    if ed.command_mode and not cursor_at_command:
+        set_command_cursor()
 
 def restore_display():
     'Restore full-screen scrolling, cursor to bottom.'
@@ -144,39 +177,45 @@ def o(line):
     Window commands - these are not ed commands, they are handled here.
     For now there is just one vertical stack of windows in the frame.
     """
-    global win, windows_h, frame_top
+    global win, win_i, win0, \
+        set_other_window, set_single_window, split_window
     param_string = line.lstrip()[1:].lstrip()
     # o: switch to next window
     if not param_string:
-        windows.append(win) # move current window to the end
-        del windows[0]
-        win = windows[0] # maintain win == windows[0], invariant
+        win_i = win_i+1 if win_i+1 < len(windows) else 0
+        win0 = win
+        win = windows[win_i] 
         ed.b(win.buf.name) # change current buffer
-        display_frame()
+        set_other_window = True
         return
     else:
         try:
             param = int(param_string)
             # o1: return to single window
             if param == 1:
-                del windows[1:]
+                # delete all but current window
+                del windows[:win_i]   
+                del windows[win_i+1:]
+                win_i = 0
+                win = windows[win_i]
                 win.resize(frame_top, windows_h, ncols) # one big window
-                display_frame()
+                set_single_window = True
                 return
-            # o2: split window, horizontal
+        # o2: split window, horizontal
             elif param == 2:
                 # put the new window at the top
                 new_win_h = win.win_h // 2 # integer division
                 win.resize(frame_top + new_win_h, win.win_h - new_win_h, ncols) # old window
+                win0 = win
                 win = window.Window(ed.buf, frame_top, new_win_h, ncols) # new window
-                windows.insert(0, win) 
-                win = windows[0] # maintain win == windows[0], invariant
-                display_frame()
+                windows.insert(win_i, win)
+                win = windows[win_i] # no need to adjust win_i after insert
+                split_window = True
                 return
             # maybe more options later
             else:
                 return
-        except:
+        except ValueError:
             print('? integer expected at %s' % param_string)
             return 
 
@@ -192,10 +231,8 @@ def cmd(line):
             ed.cmd(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
-        if frame_changed():
-            update_frame()
-        else:
-            update_windows()
+        update_display() # contains all update logic, may do nothing
+        clear_flags() # flags used by update_display, maybe set above
     except BaseException as e:
         restore_display() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception

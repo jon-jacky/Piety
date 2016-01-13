@@ -1,7 +1,7 @@
 """
 window.py - Window class for line-oriented display editors.
 
-This module assumes each window will display the contents of a text
+This module assumes each window displays the contents of a text
 buffer similar to the one defined by our Buffer class, where the
 buffer contents is named lines, which is a list of strings (each
 string is a line of text in the buffer), and there is a current 
@@ -34,7 +34,7 @@ class Window(object):
         #self.dot = buf.dot # FIXME, add later, might differ from self.buf.dot
         # status_h is height of status region in lines, usually 1
         self.status_h = 1 # height (lines) of window status region(status line)
-        self.resize(win_1, win_h, ncols)
+        self.resize(win_1, win_h, ncols) # assigns self.win_1 .win_h .ncols
         # self.seg_1,seg_n are indices in buffer of 1st,last lines in window
         self.seg_1 = 1 # index in buffer of first line displayed in window
         self.seg_n = min(self.win_hl, len(self.buf.lines)-1) # index last line
@@ -45,9 +45,7 @@ class Window(object):
         self.cursor_ch0 = None # previous value of cursor_ch
 
     def resize(self, win_1, win_h, ncols):
-        """
-        Assign, recalculate window dimensions
-        """
+        'Assign, recalculate window dimensions'
         self.win_1 = win_1 # line number on display of 1st line of this window
         self.win_h = win_h # number of lines in this window including status
         self.ncols = ncols # max number of chars in a line
@@ -77,9 +75,7 @@ class Window(object):
         return (buf_S - self.buf.dot < self.win_hl//2 and buf_S >= self.win_hl)
 
     def at_bottom_line(self):
-        """
-        dot is at last line in buffer and is last line in full window.
-        """
+        'dot is at last line in buffer and is last line in full window.'
         buf_S = len(self.buf.lines)-1 # last line in buffer
         seg_h = self.seg_n - self.seg_1 + 1 # lines in segment, maybe < win_hl
         return (self.buf.dot == buf_S and self.seg_n == buf_S 
@@ -114,34 +110,32 @@ class Window(object):
             display.kill_line() # erase from cursor to end
             print() # advance to next line
 
-    def display_window(self, command_mode):
+    def display_window(self, insert_mode):
         """
         Start on win_1 line, display buffer lines self.seg_1 .. self.seg_n 
         If space remains in window, pad with empty lines to self.win_h
-        If in input mode (not command mode), open line where text will be typed
+        If in insert mode (not command mode), open line where text will be typed
         """
         # lines in segment, usually same as self.win_hl, less if small buffer
         seg_h = self.seg_n - self.seg_1 + 1 
         # n of padding empty lines at window bottom, > 0 when small buffer
         blank_h = self.win_hl - seg_h   
         display.put_cursor(self.win_1,1)  # cursor to window top
-        if command_mode:
-            self.display_lines(self.seg_1, self.seg_n)
-        else: # input mode, this window displays current buffer around dot
+        if insert_mode: # open line at dot to insert new text
             self.display_lines(self.seg_1 +(1 if self.at_bottom_line() else 0),
                                self.buf.dot) # leave space at dot
-            display.kill_whole_line() # open line for input
+            display.kill_whole_line() # open line to insert new text
             print() # next line
             self.display_lines(self.buf.dot+1, 
                                self.seg_n - (0 if self.at_top_segment() else 1))
-        for line in range(blank_h if command_mode else blank_h - 1):
+        else: # not insert_mode - no open line at dot
+            self.display_lines(self.seg_1, self.seg_n)
+        for line in range(blank_h if not insert_mode else blank_h - 1):
             display.kill_whole_line()
             print()
 
     def display_status(self):
-        """
-        Print information about window's buffer in window's status line.
-        """
+        "Print information about window's buffer in window's status line."
         # later, maybe optimize by printing these fields separately
         loc = '%s/%d' % (self.buf.dot, len(self.buf.lines)-1)
         # don't count empty first line
@@ -158,16 +152,12 @@ class Window(object):
         display.render(status, display.white_bg) # white_bg is gray on mac term
         
     def cursor_elsewhere(self):
-        """
-        dot lies outside segment of buffer visible in window
-        """
+        'dot lies outside segment of buffer visible in window'
         return ((not self.seg_1 <= self.buf.dot <= self.seg_n) 
                 if self.buf.dot else False)
     
     def cursor_moved(self):
-        """
-        Cursor moved to a different line in the buffer (than cursor_i0)
-        """
+        'Cursor moved to a different line in the buffer (than cursor_i0)'
         return self.cursor_i != self.cursor_i0
 
     def locate_cursor(self):
@@ -198,41 +188,30 @@ class Window(object):
             self.cursor_ch = ''
 
     def display_cursor(self):
-        """
-        Display cursor at start of display line
-        """
+        'Display cursor at start of display line'
         if self.cursor_i:
             display.put_cursor(self.cursor_i, 1) 
-            display.render(self.cursor_chx, display.white_bg) # no blink, noisy
+            display.render(self.cursor_chx, display.white_bg) # no blink
 
     def erase_cursor(self):
-        """
-        At start of previous display line, replace cursor with saved char.
-        """
+        'At start of previous display line, replace cursor with saved char.'
         if self.cursor_i0: # FIXME cursor_i0 is an edd.py global
             # if line is empty must use ' ' to overwrite '_'
             ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
             display.put_cursor(self.cursor_i0, 1)
             display.render(ch, display.clear)
 
-    def set_input_cursor(self):
-        """
-        Position cursor at start of window line for insert append change cmds.
-        """
+    def set_insert_cursor(self):
+        'Position cursor at start of open line after dot for insert append change cmds.'
         display.put_cursor(self.cursor_i + (0 if self.at_bottom_line() else 1),
                            1) # open line after dot
 
-    def update_window(self, command_mode):
-        """
-        Locate and display the window including its status line and cursor.
-        """
+    def update_window(self, insert_mode):
+        'Locate and display the window including its status line and cursor.'
         self.locate_segment() # assign new self.seg_1, self.seg_n
         self.locate_cursor() # *re*assign new self.cursor_i, cursor_ch
-        self.display_window(command_mode)
+        self.display_window(insert_mode)
         self.display_status()
-        # must set cursor after display_status so input mode text entry works
-        if command_mode:
-            self.display_cursor() # window cursor to indicate dot
-        else: # input mode
-            self.set_input_cursor() # window cursor for text entry
-        # caller manages out-of-window cursor for command entry
+        if insert_mode: # must set insert cursor *after* display_status
+            self.set_insert_cursor() # window cursor for text entry
+        # but no self.display_cursor() - leave it to caller 
