@@ -322,7 +322,7 @@ def print_status(bufname, iline):
                                '.' if bufname == current else ' ',
                                '*' if ibuf.unsaved else ' ', 
                                bufname, (ibuf.filename if ibuf.filename else 
-                                         'no current filename')))
+                                         'no file')))
 
 def A(*args):
     ' = in command mode, print the line number of the addressed line'

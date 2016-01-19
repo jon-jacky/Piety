@@ -80,7 +80,7 @@ def set_command_cursor():
     display.put_cursor(cmd_n, 1) # last line on display
 
 def update_windows():
-    'redraw all windows, called by display_frame, for example after frame resize'
+    'Redraw all windows, called by display_frame, for example after frame resize.'
     for w in windows:
         w.update_window(False) # no windows could be in insert mode at this time
 
@@ -126,10 +126,7 @@ def init_session(*filename, **options):
 
 
 def update_display():
-    """
-    Check for any needed display updates.  If there are any, do them'
-    All the display update case analysis is in this function.  
-    """
+    'Check for any needed display updates.  If there are any, do them.'
     cursor_at_command  = True
     if frame_changed(): # update all windows and cursor
         update_frame()  # calls display_frame, which calls update_windows
@@ -148,10 +145,19 @@ def update_display():
         if ed.command_mode:
             win.display_cursor() # dot cursor in window
         if split_window: 
-        #  win0 is former current window, delete cursor then update
+            # win0 is former current window, delete cursor then update
             win0.locate_cursor()
             win0.erase_cursor()
             win0.update_window(not ed.command_mode)
+        else: 
+            # other non-current windows might show the same buffer
+            for w in windows:
+                if w != win and w.buf == win.buf:
+                    # many of these updates will change nothing
+                    # could add stronger conditions here
+                    w.update_window(not ed.command_mode)
+                    if not ed.command_mode:
+                        win.set_insert_cursor()
         cursor_at_command = False
     elif win.cursor_moved():
         # update cursor only in current window, don't update window content
@@ -159,8 +165,6 @@ def update_display():
         win.display_cursor()
         win.display_status()
         cursor_at_command = False
-    # FIXME: more cases - contents change in window other than the current window
-    #  can happen when multiple windows view the same buffer
     else: 
         # some commands do not affect windows: A b (with no args) f k n w 
         pass
@@ -173,19 +177,19 @@ def restore_display():
     display.put_cursor(nlines,1)
 
 def o(line):
-    """
-    Window commands - these are not ed commands, they are handled here.
-    For now there is just one vertical stack of windows in the frame.
-    """
+    'Window commands.  These are handled here, they are not not passed to ed.'
+    # For now there is just one vertical stack of windows in the frame.
     global win, win_i, win0, \
         set_other_window, set_single_window, split_window
     param_string = line.lstrip()[1:].lstrip()
     # o: switch to next window
     if not param_string:
+        win.dot = win.buf.dot # save
         win_i = win_i+1 if win_i+1 < len(windows) else 0
         win0 = win
         win = windows[win_i] 
         ed.b(win.buf.name) # change current buffer
+        win.buf.dot = win.dot # restore
         set_other_window = True
         return
     else:
@@ -201,11 +205,12 @@ def o(line):
                 win.resize(frame_top, windows_h, ncols) # one big window
                 set_single_window = True
                 return
-        # o2: split window, horizontal
+            # o2: split window, horizontal
             elif param == 2:
                 # put the new window at the top
                 new_win_h = win.win_h // 2 # integer division
                 win.resize(frame_top + new_win_h, win.win_h - new_win_h, ncols) # old window
+                win.dot = win.buf.dot # save
                 win0 = win
                 win = window.Window(ed.buf, frame_top, new_win_h, ncols) # new window
                 windows.insert(win_i, win)

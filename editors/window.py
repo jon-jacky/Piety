@@ -31,7 +31,7 @@ class Window(object):
         ncols - maximum number of characters in a line
         """
         self.buf = buf
-        #self.dot = buf.dot # FIXME, add later, might differ from self.buf.dot
+        self.dot = self.buf.dot # saves dot when this window is not current
         # status_h is height of status region in lines, usually 1
         self.status_h = 1 # height (lines) of window status region(status line)
         self.resize(win_1, win_h, ncols) # assigns self.win_1 .win_h .ncols
@@ -140,7 +140,7 @@ class Window(object):
         loc = '%s/%d' % (self.buf.dot, len(self.buf.lines)-1)
         # don't count empty first line
         filename_str = (self.buf.filename if self.buf.filename
-                        else 'no current filename')
+                        else 'no file')
         status = '%7s  %s%s%-12s  %s' % (loc, 
                                          ' ', # can't get ed.current now
                                          #'.' if self.buf.name == ed.current 
@@ -195,7 +195,7 @@ class Window(object):
 
     def erase_cursor(self):
         'At start of previous display line, replace cursor with saved char.'
-        if self.cursor_i0: # FIXME cursor_i0 is an edd.py global
+        if self.cursor_i0:
             # if line is empty must use ' ' to overwrite '_'
             ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
             display.put_cursor(self.cursor_i0, 1)
