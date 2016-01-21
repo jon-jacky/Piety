@@ -127,11 +127,12 @@ def init_session(*filename, **options):
 
 def update_display():
     'Check for any needed display updates.  If there are any, do them.'
+    win.dot = win.buf.dot # dot may or may not have changed, update anyway
     cursor_at_command  = True
     if frame_changed(): # update all windows and cursor
         update_frame()  # calls display_frame, which calls update_windows
         return
-    win.locate_cursor() # assign new cursor_i
+    win.locate_cursor() # assign new cursor_i, only in current winow
     if set_other_window:
         # move cursor to new current window, don't update window content
         win0.locate_cursor()
@@ -154,7 +155,7 @@ def update_display():
             for w in windows:
                 if w != win and w.buf == win.buf:
                     # many of these updates will change nothing
-                    # could add stronger conditions here
+                    # could add stronger conditions here someday
                     w.update_window(not ed.command_mode)
                     if not ed.command_mode:
                         win.set_insert_cursor()

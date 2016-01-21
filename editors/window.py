@@ -31,7 +31,8 @@ class Window(object):
         ncols - maximum number of characters in a line
         """
         self.buf = buf
-        self.dot = self.buf.dot # saves dot when this window is not current
+        # Initialize but never update self.dot here, this window might not be current
+        self.dot = self.buf.dot 
         # status_h is height of status region in lines, usually 1
         self.status_h = 1 # height (lines) of window status region(status line)
         self.resize(win_1, win_h, ncols) # assigns self.win_1 .win_h .ncols
@@ -64,7 +65,7 @@ class Window(object):
         """
         buf_S = len(self.buf.lines)-1 # last line in buffer
         # // is python 3 "floor division"
-        return (self.buf.dot < self.win_hl//2 or buf_S <= self.win_hl)
+        return (self.dot < self.win_hl//2 or buf_S <= self.win_hl)
 
     def at_bottom_segment(self):
         """
@@ -72,13 +73,13 @@ class Window(object):
         so visible segment is at bottom of buffer, ends at last line.
         """
         buf_S = len(self.buf.lines)-1 # last line in buffer
-        return (buf_S - self.buf.dot < self.win_hl//2 and buf_S >= self.win_hl)
+        return (buf_S - self.dot < self.win_hl//2 and buf_S >= self.win_hl)
 
     def at_bottom_line(self):
         'dot is at last line in buffer and is last line in full window.'
         buf_S = len(self.buf.lines)-1 # last line in buffer
         seg_h = self.seg_n - self.seg_1 + 1 # lines in segment, maybe < win_hl
-        return (self.buf.dot == buf_S and self.seg_n == buf_S 
+        return (self.dot == buf_S and self.seg_n == buf_S 
                 and seg_h == self.win_hl)
 
     def locate_segment(self):
@@ -96,7 +97,7 @@ class Window(object):
             self.seg_1 = buf_S - (self.win_hl - 1)
             self.seg_n = buf_S
         else: # visible segment is centered on dot
-            self.seg_1 = self.buf.dot - self.win_hl//2 # floor division
+            self.seg_1 = self.dot - self.win_hl//2 # floor division
             self.seg_n = self.seg_1 + (self.win_hl - 1)
 
     def display_lines(self, first, last):
@@ -123,10 +124,10 @@ class Window(object):
         display.put_cursor(self.win_1,1)  # cursor to window top
         if insert_mode: # open line at dot to insert new text
             self.display_lines(self.seg_1 +(1 if self.at_bottom_line() else 0),
-                               self.buf.dot) # leave space at dot
+                               self.dot) # leave space at dot
             display.kill_whole_line() # open line to insert new text
             print() # next line
-            self.display_lines(self.buf.dot+1, 
+            self.display_lines(self.dot+1, 
                                self.seg_n - (0 if self.at_top_segment() else 1))
         else: # not insert_mode - no open line at dot
             self.display_lines(self.seg_1, self.seg_n)
@@ -137,7 +138,7 @@ class Window(object):
     def display_status(self):
         "Print information about window's buffer in window's status line."
         # later, maybe optimize by printing these fields separately
-        loc = '%s/%d' % (self.buf.dot, len(self.buf.lines)-1)
+        loc = '%s/%d' % (self.dot, len(self.buf.lines)-1)
         # don't count empty first line
         filename_str = (self.buf.filename if self.buf.filename
                         else 'no file')
@@ -153,8 +154,8 @@ class Window(object):
         
     def cursor_elsewhere(self):
         'dot lies outside segment of buffer visible in window'
-        return ((not self.seg_1 <= self.buf.dot <= self.seg_n) 
-                if self.buf.dot else False)
+        return ((not self.seg_1 <= self.dot <= self.seg_n) 
+                if self.dot else False)
     
     def cursor_moved(self):
         'Cursor moved to a different line in the buffer (than cursor_i0)'
@@ -172,13 +173,13 @@ class Window(object):
         # buffer not empty, don't count empty first line at index 0
         if len(self.buf.lines)-1: 
             # self.cursor_ch is char at start of line that cursor overwrites
-            cursor_line = self.buf.lines[self.buf.dot]
+            cursor_line = self.buf.lines[self.dot]
             self.cursor_ch = cursor_line[0] if cursor_line else ''
             # To ensure cursor on space or empty line is visible, 
             #  use self.cursor_chx
             self.cursor_chx = ('_' if self.cursor_ch in ('',' ','\n') 
                                else self.cursor_ch)
-            self.cursor_i = self.win_1 + (self.buf.dot - self.seg_1)
+            self.cursor_i = self.win_1 + (self.dot - self.seg_1)
             self.cursor_i = (self.cursor_i 
                              if (self.win_1 <= self.cursor_i 
                                  <= self.win_1 + self.win_hl -1)
