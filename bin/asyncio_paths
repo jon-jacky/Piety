@@ -13,4 +13,4 @@ export PATH=$PIETY/bin:$PIETY/scripts:$PATH
 #  and asyncio-based event loop.
 # For other platforms, replace unix, vt_terminal and/or select in this path.
 # Recall that scripts import from applications and editors
-export PYTHONPATH=$PIETY/applications:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shell:$PIETY/unix:$PIETY/vt_terminal:$PIETY/asyncio:$PYTHONPATH
+export PYTHONPATH=$PIETY/applications:$PIETY/util:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shell:$PIETY/unix:$PIETY/vt_terminal:$PIETY/asyncio:$PYTHONPATH

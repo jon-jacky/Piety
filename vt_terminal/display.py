@@ -2,7 +2,7 @@
 display - Update the terminal display using ANSI control sequences.
 """
 
-from terminal import putstr # write without newline, flush for immediate output
+from util import putstr # write without newline, flush for immediate output
 
 esc = '\x1B'     # \e does not work 'invalid \x escape'
 csi = esc+'['    # ANSI control sequence introducer

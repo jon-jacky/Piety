@@ -15,7 +15,7 @@ This module's main function demonstrates both alternatives.
 
 import sys
 import string # for string.printable
-import terminal, keyboard, display
+import util, terminal, keyboard, display
 
 # used by Command to print history to print current 'line' including newlines
 def putlines(s):
@@ -26,9 +26,9 @@ def putlines(s):
     lines = s.splitlines()
     lastline = len(lines) - 1 # index of last line
     for iline, line in enumerate(lines):
-        terminal.putstr(line)
+        util.putstr(line)
         if iline < lastline:
-            terminal.putstr('\r\n')
+            util.putstr('\r\n')
 
 class Command(object):
     def __init__(self, prompt='> ', reader=terminal.getchar, handler=None):
@@ -140,7 +140,7 @@ class Command(object):
         'Clear command string, print command prompt, set single-char mode'
         self.command = str()
         self.point = 0
-        terminal.putstr(self.prompt) # prompt does not end with \n
+        util.putstr(self.prompt) # prompt does not end with \n
         terminal.set_char_mode()
 
     # All the other methods are invoked via keymap
@@ -154,7 +154,7 @@ class Command(object):
 
     def interrupt(self):
         # raw mode terminal doesn't respond to ^C, must handle here
-        terminal.putstr('^C') 
+        util.putstr('^C') 
         terminal.set_line_mode() # on new line...
         print()              # ... otherwise traceback is a mess
         raise KeyboardInterrupt
@@ -165,7 +165,7 @@ class Command(object):
         'Append last character on line, works on printing terminals'
         self.command += key
         self.point += 1
-        terminal.putstr(key)
+        util.putstr(key)
 
     def backward_delete_last_char(self):
         'Delete last character on line, works on printing terminals'
@@ -173,22 +173,22 @@ class Command(object):
             ch = self.command[-1]
             self.command = self.command[:-1]
             self.point -= 1
-            # terminal.putstr('^H') # omit, it is more helpful to echo
-            terminal.putstr('\\%s' % ch) # echo \c where c is deleted char
+            # util.putstr('^H') # omit, it is more helpful to echo
+            util.putstr('\\%s' % ch) # echo \c where c is deleted char
 
     def redraw_current_line(self):
-        terminal.putstr('^L\r\n' + self.prompt)  # on new line
+        util.putstr('^L\r\n' + self.prompt)  # on new line
         putlines(self.command) # might be multiple lines
 
     def line_discard(self): # name like gnu readline unix-line-discard
         self.command = str() 
         self.point = 0
-        terminal.putstr('^U\r\n' + self.prompt)
+        util.putstr('^U\r\n' + self.prompt)
 
     def newline(self):
         self.command += '\n'
         self.point += 1
-        terminal.putstr('^J\r\n' + self.continuation)
+        util.putstr('^J\r\n' + self.continuation)
 
     # Command history, works on printing terminals
 
@@ -199,7 +199,7 @@ class Command(object):
             self.command = self.history[self.hindex]
         self.point = len(self.command)
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
-        terminal.putstr('^P\r\n' + self.prompt) # on new line
+        util.putstr('^P\r\n' + self.prompt) # on new line
         putlines(self.command) # might be multiple lines
 
     def next_history(self):
@@ -207,7 +207,7 @@ class Command(object):
         self.hindex = self.hindex + 1 if self.hindex < length else length
         self.command = self.history[self.hindex] if self.hindex < length else ''
         self.point = len(self.command)
-        terminal.putstr('^N\r\n' + self.prompt)  # on new line
+        util.putstr('^N\r\n' + self.prompt)  # on new line
         putlines(self.command) # might be multiple lines
 
     # Command editing that requires a display terminal with cursor addressing
@@ -240,7 +240,7 @@ class Command(object):
         ^D stop is effective only if job control is also configured to handle ^D
         """
         if not self.command:
-            terminal.putstr('^D') # handler below sets line mode, advances line
+            util.putstr('^D') # handler below sets line mode, advances line
             self.command = keyboard.C_d # so job control can find it
             self.handler() # so job control can handle it
         else:

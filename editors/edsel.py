@@ -5,7 +5,8 @@ Described in ed.md and edsel.md.  To run: python3 edsel.py or import edsel then 
 """
 
 import traceback, os
-import terminal, display, window, ed
+import terminal_util, display, window, ed
+import time # only used for sleep() in do_cmds
 
 prompt = '' # command prompt
 
@@ -17,7 +18,7 @@ prompt = '' # command prompt
 #  2. scrolling command input region
 # Line numbers on display and in each region are 1-based as in ed and ansi.
 
-nlines, ncols = terminal.dimensions() # frame_h, frame_w = nlines, ncols
+nlines, ncols = terminal_util.dimensions() # frame_h, frame_w = nlines, ncols
 
 # Default frame dimensions, might be updated while running, especially cmd_h:
 frame_top = 1 # line number on display of first line of frame
@@ -243,6 +244,12 @@ def cmd(line):
         restore_display() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         exit()
+
+def do_cmds(lines):
+    'Execute the commands in lines, a list of lines, one command per line.'
+    for line in lines:
+        cmd(line.rstrip()) # remove terminal \n etc.
+        time.sleep(0.2) # sec, make updates slow enough to see
 
 def main(*filename, **options):
     """

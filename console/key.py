@@ -7,7 +7,7 @@ key.py - Collect, store, return single character or multi-character key sequence
         Has a main method, python key.py demonstrates most functions.
 """
 
-import terminal, keyboard
+import util, terminal, keyboard
 
 class Key(object): 
     """
@@ -62,14 +62,14 @@ class Key(object):
 def main():
     'Demonstrate Key class'
     key = Key()
-    print('> ', end=' ')
+    util.putstr('> ')
     terminal.set_char_mode()
     line = ''
     k = '' # anything but cr
     while k != keyboard.cr:
         k = key()
         line += k
-        terminal.putstr(k)
+        util.putstr(k)
     terminal.set_line_mode()
     print() 
     print([ c for c in line ]) # show any esc or other unprintables

@@ -37,6 +37,10 @@ The Piety repository is organized into these directories:
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.
 
+- **util**: miscellaneous utilities that are not
+    platform-dependent or configuration-dependent, that are used by
+    modules in more than one directory.
+
 - **vt_terminal**: modules for running Piety terminal applications on
     a VT-100 compatible terminal or terminal emulator program (for
     example *xterm*).  We may add directories for other terminal types in
@@ -45,5 +49,6 @@ The Piety repository is organized into these directories:
 Each directory contains a *README* file with more information.
 Another page explains the [rationale](modules.md) for this organization.
 
-Revised November 2015
+Revised January 2016
+
 

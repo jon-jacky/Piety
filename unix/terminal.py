@@ -14,12 +14,8 @@ http://man7.org/linux/man-pages/man3/termios.3.html
 
 """
 
-import sys, tty, termios, subprocess # subprocess just for display dimensions
-
-def dimensions():
-    'Return nlines, ncols. Works on Mac OS X, probably other Unix.'
-    return [ int(n) 
-             for n in subprocess.check_output(['stty','size']).split()]
+import sys, tty, termios
+from util import putstr
 
 fd = sys.stdin.fileno() # Isn't sys.stdin always fileno 0 ?
 line_mode_settings = termios.tcgetattr(fd) # in case someone calls restore first
@@ -41,7 +37,6 @@ def set_char_mode():
     # see http://hg.python.org/cpython/file/1dc925ee441a/Lib/tty.py
     tty.setraw(fd)
 
-
 def set_line_mode():
     """
     restore sys.input to line mode
@@ -59,15 +54,6 @@ def getchars(n):
     Get up to n characters from console keyboard, without waiting for RETURN
     """
     return sys.stdin.read(n)
-
-def putstr(s):
-    """
-    Print string (can be just one character) on console with no
-    formatting (unlike Python print).  Flush to force output immediately.  
-    If you want newline, you must explicitly include it in s.
-    """
-    sys.stdout.write(s)
-    sys.stdout.flush() # otherwise s doesn't appear until user types input
 
 # Test
 
