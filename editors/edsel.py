@@ -246,9 +246,15 @@ def cmd(line):
         exit()
 
 def do_cmds(lines):
-    'Execute the commands in lines, a list of lines, one command per line.'
+    """
+    Execute the commands in lines, a list of lines, one command per line.
+    Use this function to execute a script of editing commands in a buffer:
+     !do_cmds(ed.buffers['sample.ed'.lines])
+    """
     for line in lines:
-        cmd(line.rstrip()) # remove terminal \n etc.
+        line1 = line.rstrip() # remove terminal \n
+        print(line1) # prev update_display put cursor in cmd region
+        cmd(line1) 
         time.sleep(0.2) # sec, make updates slow enough to see
 
 def main(*filename, **options):
