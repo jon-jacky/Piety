@@ -12,5 +12,7 @@ ed() enters ed command mode.  By default, there is no command prompt.
 To quit input mode, type a period by itself at the start of a line.
 .
 w
-
+B test.txt
+1,$p
+	
 !# Remove test.txt before running this again, to get the same results

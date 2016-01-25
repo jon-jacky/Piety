@@ -322,7 +322,7 @@ def print_status(bufname, iline):
                                '.' if bufname == current else ' ',
                                '*' if ibuf.unsaved else ' ', 
                                bufname, (ibuf.filename if ibuf.filename else 
-                                         'no file')))
+                                         'no current filename')))
 
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
@@ -640,6 +640,17 @@ def cmd(line):
             # BUT buf.a requires \n at end of each line
             buf.a(o(), line + '\n') # append new line after dot, advance dot
         return
+
+def do_cmds(lines):
+    """
+    Execute the commands in lines, a list of lines, one command per line.
+    Use this function to execute a script of editing commands in a buffer:
+     !do_cmds(buffers['sample.ed'.lines])
+    """
+    for line in lines:
+        line1 = line.rstrip() # remove terminal \n
+        print(line1)
+        cmd(line1) 
 
 prompt = '' # default no prompt
 
