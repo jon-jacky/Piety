@@ -6,7 +6,6 @@ Described in ed.md and edsel.md.  To run: python3 edsel.py or import edsel then 
 
 import traceback, os
 import terminal_util, display, window, ed
-import time # only used for sleep() in do_cmds
 
 prompt = '' # command prompt
 
@@ -117,7 +116,6 @@ def init_session(*filename, **options):
         prompt = options['p'] 
     if 'h' in options:
         cmd_h = options['h'] 
-    ed.discard_printing() # suppress ed output to scrolling command region
     # must calc_frame to get window dimensions before we create win
     calc_frame() # assign windows_h etc.
     win = window.Window(ed.buf, frame_top, windows_h, ncols) # one big window
@@ -245,17 +243,11 @@ def cmd(line):
         traceback.print_exc() # looks just like unhandled exception
         exit()
 
-def do_cmds(lines):
-    """
-    Execute the commands in lines, a list of lines, one command per line.
-    Use this function to execute a script of editing commands in a buffer:
-     !do_cmds(ed.buffers['sample.ed'.lines])
-    """
-    for line in lines:
-        line1 = line.rstrip() # remove terminal \n
-        print(line1) # prev update_display put cursor in cmd region
-        cmd(line1) 
-        time.sleep(0.2) # sec, make updates slow enough to see
+# Configure ed (imported above) to work with edsel
+# Suppress printing ed l z command output to scrolling command region
+ed.print_lz_destination = open(os.devnull, 'w') # discard output
+# In ed x command use edsel.cmd in this module that calls update_display
+ed.x_cmd_fcn = cmd 
 
 def main(*filename, **options):
     """

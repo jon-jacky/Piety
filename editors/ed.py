@@ -12,29 +12,24 @@ in test/ed/
 import re, os, sys
 import pysh  # provides embedded Python shell for ! command
 import buffer
+import time # only used for sleep() in do_cmds, FIXME write piety.sleep
 
-# edsel display editor suppresses output from ed l z commands to scrolling cmd region
-# because edsel shows the lines in the display window.
-
-destination = sys.stdout # send output from l z commands to scrolling command region
-null = open(os.devnull, 'w')
-
-def discard_printing():
-    'suppress output from ed l z commands to scrolling command region'
-    global destination
-    destination = null
-
-def show_printing():
-    'Restore output from ed l z commands to scrolling command region'
-    global destination
-    destination = sys.stdout 
+# Hook for edsel display editor to configure ed printing behavior:
+# Edsel assigns assigns print_lz_destination to null 
+# to suppress printing from ed l z commands to scrolling command region,
+# because edsel already shows those lines in the display window.
+print_lz_destination = sys.stdout  # In ed, l and z commands print
 
 # arg lists, defaults, range checking
 
+# We parse twice, to provide both command strings and new Python API
+# Here parse_args parses variable-length argument lists for Python API
+# Below parse_cmd parses traditional ed command strings
+
 def parse_args(args):
     """
-    Parse variable-length argument list where all arguments optional.
-o    Return fixed length tuple: start, end, text, params 
+    Parse variable-length argument list for new Python API, all args are optional.
+    Return fixed length tuple: start, end, text, params 
     start, end are line numbers, for example the first and last line of a region.
     When present, start and end are int, both might be absent, indicated by None.
     text is the first token in the parameter list, str or None if absent
@@ -354,7 +349,7 @@ def l(*args):
     if not iline_ok(iline):
         print('? invalid address')
         return
-    print(buf.l(iline), file=destination) # can redirect to os.devnull etc.
+    print(buf.l(iline), file=print_lz_destination) # destination might be null
 
 def p_lines(start, end, destination): # arg here shadows global destination
     'Print lines start through end, inclusive, at destination'
@@ -390,7 +385,7 @@ def z(*args):
             iline += buf.npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= S() else S()
-        p_lines(iline, end, destination) # global destination might be null
+        p_lines(iline, end, print_lz_destination) # destination might be null
         if buf.npage < 0:
             buf.dot = iline
 
@@ -473,8 +468,8 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'deEflpqrswzbBDnAykmt' # commands that do not require further input
-input_cmds = 'aic' # commands that use input mode to collect text
+complete_cmds = 'AbBdDeEfklmnpqrstwxXyz' # commands that do not require further input
+input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
 # regular expressions for line address forms and other command parts
@@ -543,7 +538,7 @@ def match_address(cmd_string):
 
 def parse_cmd(cmd_string):
     """
-    Parses cmd_string, returns multiple values in this order:
+    Parses traditional ed cmd_string, returns multiple values in this order:
      cmd_name - single-character command name
      start, end - integer line numbers 
      params - string containing other command parameters
@@ -579,7 +574,8 @@ def parse_cmd(cmd_string):
         return cmd_name, start, end, old, new, glbl
     # all other commands, no special parameter parsing
     else:
-        return cmd_name, start, end, params if params else None 
+        # return each space-separated parameter as separate argument in sequence
+        return (cmd_name, start, end) + (tuple(params.split() if params else ()))
 
 # state variables that must persist between ed_cmd invocations during input mode
 command_mode = True # alternates with input mode used by a,i,c commands
@@ -596,7 +592,10 @@ def cmd(line):
     # state variables that must persist between cmd invocations during input mode
     global command_mode, cmd_name, args
     if command_mode:
-        if line and line[0] == '!': # special case - not a 1-char cmd_name
+        # special prefix characters, don't parse these lines
+        if line and line[0] == '#': # comment
+            return 
+        if line and line[0] == '!': 
             pysh(line[1:]) # execute Python expression or statement
             return
         items = parse_cmd(line)
@@ -641,16 +640,83 @@ def cmd(line):
             buf.a(o(), line + '\n') # append new line after dot, advance dot
         return
 
-def do_cmds(lines):
+def do_cmds(cmd, lines, echo, delay):
     """
-    Execute the commands in lines, a list of lines, one command per line.
-    Use this function to execute a script of editing commands in a buffer:
-     !do_cmds(buffers['sample.ed'.lines])
+    Execute a sequence of command lines.
+     cmd - function to call on each line to execute one command
+     lines - list of lines, one command per line
+     echo - if True, print each line before executing it
+     delay - if not None, wait delay seconds after printing each line
+    This function *blocks* each time it reaches time.sleep(delay)
     """
     for line in lines:
         line1 = line.rstrip() # remove terminal \n
-        print(line1)
+        if echo: 
+            print(line1)
         cmd(line1) 
+        if delay and delay > 0:
+            time.sleep(delay)
+
+falses, trues = ('0','f','F','False'), ('1','t','T','True')
+booleans = falses + trues
+
+def parse_echo_delay(params):
+    'Parse echo and delay from params, a sequence of 0, 1, or 2 strings'
+    valid, echo, delay = True, None, None
+    if params:
+        if params[0] in booleans:
+            echo = False if params[0] in falses else True
+        else:
+            print('%s ? echo, 0 f F False or 1 t T True expected' % params[0])
+            valid = False
+        if len(params) > 1:
+            try:
+                delay = float(params[1])
+            except ValueError:
+                print('%s ? delay, float expected' % params[1])
+                valid = False
+    return valid, echo, delay
+
+# Hook for edsel display editor to configure ed x behavior:
+# Edsel assigns x_cmd_fcn to edsel.cmd, which calls update_display.  
+x_cmd_fcn = cmd  # In ed, x command only prints in command region
+
+def x(*args):
+    """
+    Execute ed commands in another buffer: x(bufname, echo, delay)
+     No start, end arugments - the range is always the entire buffer.
+     bufname is not optional - it cannot be the current buffer.
+     echo - optional, default True; delay - optional, default 0.2 sec
+    """
+    x, xx, bufname, params = parse_args(args)
+    if not bufname or (bufname and bufname not in buffers):
+        print('? buffer name')
+        return
+    else:
+        valid, echo, delay = parse_echo_delay(params)
+        if valid:
+            echo = echo if echo != None else True
+            delay = delay if delay != None else 0.2
+            do_cmds(x_cmd_fcn, buffers[bufname].lines[1:], echo, delay)
+            # cmds in buffer advance dot
+
+def X(*args):
+    """
+    Execute Python statements in the current buffer: X(start, end, echo, delay)
+     start, end default to dot, so X command without range single-steps through buffer.
+     echo - optional, default False; delay - optional, default no delay
+    Leaves dot at last line executed, to single-step through file, repeat +X
+    """
+    valid, start, end, echo, delay_singleton = parse_check_range(args) # no bufname
+    if valid:
+        # delay if present is in a singleton tuple. If echo is absent, so is delay
+        params = (echo,)+delay_singleton if echo else ()
+        params_valid, echo, delay = parse_echo_delay(params)
+        if params_valid:
+            echo = echo if echo != None else False
+            delay = delay if delay != None else None
+            do_cmds(pysh, buffers[current].lines[start:end+1], echo, delay)
+            buffers[current].dot = end 
 
 prompt = '' # default no prompt
 

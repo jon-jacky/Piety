@@ -1,5 +1,5 @@
-!# test_ed.ed - Same operations as test_ed.py but commands not API calls here
-
+# test_ed.ed - Same operations as test_ed.py but commands not API calls here
+#
 B 42
 B test_ed.txt
 B ed.py.txt
@@ -68,5 +68,5 @@ p
 .,$d
 p
 1,$p
-
-#!Remove test_ed.txt before running this script again, to obtain the same result
+#
+#Remove test_ed.txt before running this script again, to obtain the same result

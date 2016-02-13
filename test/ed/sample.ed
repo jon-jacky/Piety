@@ -1,7 +1,7 @@
-!# sample3.ed - test ed.py or edsel.py command mode and input mode  with example from ed.md
-!#              additional commands confirm file got written and show its contents
-!#              This is simply a file of ed commands, to be run from an editor buffer
-
+# sample3.ed - Test ed.py or edsel.py with example from ed.md.
+#  Additional commands confirm file got written and show its contents.
+#  This is simply a file of ed commands, to be run from an editor buffer.
+#
 e test.txt
 a
 ed() enters ed command mode.  By default, there is no command prompt.
@@ -14,5 +14,5 @@ To quit input mode, type a period by itself at the start of a line.
 w
 B test.txt
 1,$p
-	
-!# Remove test.txt before running this again, to get the same results
+#
+# Remove test.txt before running this again, to get the same results
