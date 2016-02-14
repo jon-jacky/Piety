@@ -64,6 +64,7 @@ few additoonal commands for managing windows:
 - **o1** deletes all windows except the current window. 
 
 - **o** moves the focus to the next window, which becomes the current window.
+  The buffer in that window becomes the current buffer.
 
 ## Running edsel ##
 
