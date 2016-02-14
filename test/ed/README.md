@@ -14,10 +14,16 @@ commands from the file.  To execute these tests, run them as shell
 scripts.
 
 The *.ed* files also test command mode.  They contain sequences of
-*ed* commands, the same commands as in the corresponding *.sh* files,
-but without the *q* (quit) command.  To execute the test in an *.ed*
-file, load it into *ed* buffer using an *e*, *r*, or *B* command, then
-run the test by calling the *do_cmds* API call on the buffer contents.
+*ed* commands, the same *ed* commands as in the corresponding *.sh*
+files, but without any shell commands and without the *ed* *q* (quit)
+command.  To execute the test in an *.ed* file, load it into an *ed*
+buffer using an *e*, *r*, or *B* command: *B sample.ed*, for example.
+Then change back to the *main* buffer with *b main* and execute the
+test in that buffer with the *x* command: *x sample.ed*.  Each command
+echoes as it executes, then there is a short delay before the
+next command.  The echo and delay can be adjusted or
+suppressed by two optional *x* parameters that follow the buffer name:
+*x sample.ed 0 0* suppresses both echo and delay.
 
 The *.log* files are output from *python test_ed.py > test_ed.log*,
 *./test_ed.sh > test_ed.sh.log* etc.  The contents of the *.log* file
@@ -37,4 +43,4 @@ with the corresponding names.   The contents of the *.txt.save* file
 in this repository should be the same as the *.txt* file you get when you
 run that test script on your recent version of *ed.py*.
 
-Revised January 2016
+Revised February 2016

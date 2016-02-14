@@ -25,15 +25,19 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
  *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
 
-**ed.py** also supports these commands from *sam*:
+**ed.py** supports these commands from *sam*:
 
  *b B D n*
 
-**ed.py** also adds a *y* (yank) command that inserts the lines most
-recently deleted by the *d* command (possibly from a different
-buffer).  A *d* command followed by one or two *y* commands can achieve the
-effect of the classic *ed* *m* (move) or *t* (transfer, or copy)
-commands, and can also move lines to another buffer.
+**ed.py** also adds some new commands:
+
+ *x X y*
+
+The *x* and *X* commands execute *ed* commands or Python statements 
+from an editor buffer, to support scripting and testing.
+
+The *y* (yank) command inserts the lines most recently deleted by the
+*d* command (possibly from a different buffer).  
 
 Here is a [command summary](ed.txt).
 
@@ -175,8 +179,7 @@ an *update* attribute which can optionally be assigned to a callable
 that may be used by the *write* method to update a display (for
 example).
 
-
-## Limitations ##
+## Limitations and differences from classic ed ##
 
 **ed.py** does not support these classic *ed* commands: 
 *H h j n P Q u wq W x*.  Some of these might be supported in the
@@ -184,6 +187,9 @@ future.
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
+
+**ed.py** supports a new command *x* (execute *ed* commands in buffer)
+instead of the classic *ed* command *x* (prompt for encryption key).
 
 **ed.py** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).
@@ -210,5 +216,31 @@ end).
 The *B* (and *D*) commands accept only one file (or buffer) name argument, 
 not multiple names as in *sam*.
 
+In *!command*, the *command* is passed to the Python interpreter, not
+to the system command shell as in classic *ed*.  
 
-Revised November 2015
+
+## Commands not present in classic ed ##
+
+The *x* and *X* commands execute *ed* commands or Python statements 
+from an editor buffer, to support scripting and testing.
+
+The *x* command requires the buffer name parameter, it cannot execute
+*ed* commands in the current buffer.  It ignores any line address
+arguments; it always executes the entire buffer.  The *X* command has
+no buffer name parameter; it always executes Python statements in the current
+buffer.  It only executes the statements specified by the line address
+arguments, which, if absent, default to the current line (called
+*dot*).  Both *x* and *X* take optional parameters echo (boolean) and
+delay (float), which are helpful for visualizing execution.  With *x*
+the defaults are echo *True* and delay 0.2 sec, with *X* defaults are
+*False* and no delay.
+
+The *y* (yank) command inserts the lines most recently deleted by the
+*d* command (possibly from a different buffer).  A *d* command
+followed by one or two *y* commands can achieve the effect of the
+classic *ed* *m* (move) or *t* (transfer, or copy) commands, and can
+also move lines to another buffer.
+
+
+Revised February 2016
