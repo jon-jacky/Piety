@@ -82,12 +82,12 @@ commands, for example *n* (list buffers).  To change the number of
 lines at any time during an editing session, for example to 8 lines,
 type a Python command like this: *!cmd_h = 8*
 
-When you use the *x* command to execute an *.ed* script, you can see
-the window contents update as the test runs.  Each command echoes in
-the scrolling command region, followed by a short delay so you can
-observe its effect.  The echo and delay can be adjusted or suppressed
-by two optional *x* parameters that follow the buffer name: echo
-(boolean) and delay (float), which default to *True* and *0.2*
+When you use the *x* command to execute *ed* commands from a buffer,
+you can see window contents update as the commands run.  Each command
+echoes in the scrolling command region, followed by a short delay so
+you can observe its effect.  The echo and delay can be adjusted or
+suppressed by two optional *x* parameters that follow the buffer name:
+echo (boolean) and delay (float), which default to *True* and *0.2*
 seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
 
 ## Running edsel ##
