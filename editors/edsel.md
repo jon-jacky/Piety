@@ -21,19 +21,22 @@ command to adjust the size of the command region (along with the
 frame) to retain more (or fewer) lines.
 
 When *edsel* starts, the frame is filled by one window that shows the
-contents of the *main* buffer.  When an *ed* command changes the current
-buffer, the window updates to display the new current buffer.  The window
-always shows the current line where text is inserted and changed.
+contents of the *main* buffer.  This is the *current window* - the
+window that has the keyboard focus.  When an *ed* command changes the
+current buffer, the current window updates to display the new current
+buffer.  *edsel* updates the current window to ensure that it always
+shows the *current line* (also called *dot*) in the current buffer,
+where text is inserted and changed.
 
 There is a command to add a new window by splitting the current
 window.  Initially both windows show the same contents, both including
 the current line in the current buffer.  Only one window remains the
 current window.  The cursor (at the text insertion point) only appears
-in this window.  The other window remembers where its cursor was, so
-it can restore it if the focus returns.  As editing proceeds, the
-location and buffer displayed in the current window may change.
+in the current window.  The other window remembers where its cursor
+was, so it can be restored if this window becomes the new current
+window.
 
-There are commands delete windows, and to switch the keyboard focus to
+There are commands delete windows, and to switch the focus to
 the next window, which becomes the new current window.
 
 Each window has a status line at its bottom that shows the line
@@ -48,7 +51,7 @@ name of the file where the buffer contents would be written.
 **edsel** provides all of the [commands](ed.txt) of *ed*.  Most
 updates in *edsel* windows are side effects of *ed* commands as they
 move the current line around in the buffer, change buffer contents, or
-select a different buffer.
+select a different current buffer.
 
 When you type a command *a*, *i*, or *c* that enters *input mode*,
 *edsel* opens a line in the window at the insertion point and puts the
@@ -79,8 +82,9 @@ few additional commands for managing windows:
 By default, the *edsel* command region displays just two lines.  This
 is usually not enough to show all of the output from some *ed*
 commands, for example *n* (list buffers).  To change the number of
-lines at any time during an editing session, for example to 8 lines,
-type a Python command like this: *!cmd_h = 8*
+lines at any time during an editing session, type a Python statement that
+assigns the *cmd_h* variable.  For example, to set the region to 8 lines,
+type this: *!cmd_h = 8*
 
 When you use the *x* command to execute *ed* commands from a buffer,
 you can see window contents update as the commands run.  Each command
@@ -97,7 +101,8 @@ is intended to run in an interactive python sesson: *import edsel* then
 *edsel.main()*.  In that case, you can suspend *edsel* by typing its *q*
 command, execute other Python statements, then resume by typing
 *edsel.main()* again.  You will find all your buffers and other editor
-state as you left it.
+state as you left it.  (You can also begin a restartable *edsel* session
+by the command *python -i edsel.py*.)
 
 The *edsel.main()* function takes one optional positional argument, the
 file name, and two optional keyword arguments, *p* the command prompt
