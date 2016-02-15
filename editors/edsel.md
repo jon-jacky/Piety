@@ -32,7 +32,8 @@ There is a command to add a new window by splitting the current
 window.  Initially both windows show the same contents, both including
 the current line in the current buffer.  Only one window remains the
 current window.  The cursor (at the text insertion point) only appears
-in the current window.  
+in the current window.  It is possible to have two or more windows viewing
+different locations (or the same location) in the same buffer.
 
 There are commands delete windows, and to switch the focus to the next
 window, which becomes the new current window.  The previous window
