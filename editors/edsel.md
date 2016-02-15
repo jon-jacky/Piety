@@ -32,17 +32,19 @@ There is a command to add a new window by splitting the current
 window.  Initially both windows show the same contents, both including
 the current line in the current buffer.  Only one window remains the
 current window.  The cursor (at the text insertion point) only appears
-in the current window.  The other window remembers where its cursor
-was, so it can be restored if this window becomes the new current
-window.
+in the current window.  
 
-There are commands delete windows, and to switch the focus to
-the next window, which becomes the new current window.
+There are commands delete windows, and to switch the focus to the next
+window, which becomes the new current window.  The previous window
+saves its cursor location and its cursor disappears.  The buffer
+displayed in the new current window becomes the new current buffer.
+The new current window restores its saved cursor location.  This becomes
+the new current line, the text insertion point (dot).
 
 Each window has a status line at its bottom that shows the line
-numbers of the window's current line in the buffer (where you see the
-cursor) and the buffer's last line, the name of the buffer, and the
-name of the file where the buffer contents would be written.
+numbers of the window's current line in the buffer (dot, where you see
+the cursor) and the buffer's last line, the name of the buffer, and
+the name of the file where the buffer contents would be written.
 
 ## Commands ##
 
@@ -80,11 +82,11 @@ few additional commands for managing windows:
 - **o** moves the focus to the next window, which becomes the current window.
 
 By default, the *edsel* command region displays just two lines.  This
-is usually not enough to show all of the output from some *ed*
-commands, for example *n* (list buffers).  To change the number of
-lines at any time during an editing session, type a Python statement that
-assigns the *cmd_h* variable.  For example, to set the region to 8 lines,
-type this: *!cmd_h = 8*
+is usually not enough to show all of the output from some commands,
+for example *n* (list buffers).  To change the number of lines at any
+time during an editing session, type a Python statement that assigns
+the *cmd_h* variable.  For example, to set the region to 8 lines, type
+this: *!cmd_h = 8*
 
 When you use the *x* command to execute *ed* commands from a buffer,
 you can see window contents update as the commands run.  Each command
