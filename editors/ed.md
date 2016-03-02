@@ -31,13 +31,16 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 **ed.py** also adds some new commands:
 
- *x X y*
+ *x X y #*
 
 The *x* and *X* commands execute *ed* commands or Python statements 
 from an editor buffer, to support scripting and testing.
 
 The *y* (yank) command inserts the lines most recently deleted by the
 *d* command (possibly from a different buffer).  
+
+The *#* character in the first column of a command indicates a comment.  It is
+useful for annotating command scripts.
 
 Here is a [command summary](ed.txt).
 
@@ -49,7 +52,9 @@ same, and is described in a completely rewritten man page at
 [http://plan9.bell-labs.com/magic/man2html/1/ed](http://plan9.bell-labs.com/magic/man2html/1/ed)
 and
 [http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
-There is a brief tutorial at a recent [blog](http://blog.sanctum.geek.nz/actually-using-ed/), with more comments and links
+There is a manual at [GNU](http://www.gnu.org/software/ed/manual/ed_manual.html), 
+and a brief tutorial at a [blog](http://blog.sanctum.geek.nz/actually-using-ed/), 
+with more comments and links
 at [HN](https://news.ycombinator.com/item?id=4120513).
 
 The *sam* editor is described at
@@ -242,5 +247,7 @@ followed by one or two *y* commands can achieve the effect of the
 classic *ed* *m* (move) or *t* (transfer, or copy) commands, and can
 also move lines to another buffer.
 
+The *#* character in the first column of a command indicates a comment.  It is
+useful for annotating command scripts.
 
-Revised February 2016
+Revised March 2016

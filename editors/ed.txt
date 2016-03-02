@@ -39,6 +39,7 @@ Other commands, that support scripting and testing:
 
  x execute ed commands from all of the named buffer
  X execute Python statements from specified lines in the current buffer
+ # in the first column of a command indicates a comment, useful in command scripts
 
 Line addresses:
 

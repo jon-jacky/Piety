@@ -36,7 +36,7 @@ windows = list() # list of windows, windows[win_i] is the current window
 # Values saved before ed command so we can test for changes after, or use them
 (cmd_h0, current0, filename0, win0) = (None, None, None, None)
 
-# flags for update_display
+# flags set by o(), used by update_display
 set_other_window = False
 set_single_window = False
 split_window = False
@@ -47,8 +47,8 @@ def clear_flags():
 
 def save_parameters():
     'Save frame + window info before ed cmd so we can test for changes after'
-    global cmd_h0, current0, filename0
-    cmd_h0, current0, filename0 = cmd_h, ed.current, ed.buf.filename
+    global cmd_h0, current0, filename0, win0
+    cmd_h0, current0, filename0, win0 = cmd_h, ed.current, ed.buf.filename, win
 
 def print_saved():
     'for debug prints'
@@ -145,10 +145,12 @@ def update_display():
         if ed.command_mode:
             win.display_cursor() # dot cursor in window
         if split_window: 
-            # win0 is former current window, delete cursor then update
-            win0.locate_cursor()
-            win0.erase_cursor()
-            win0.update_window(not ed.command_mode)
+            # win0 is former current window
+            # if win0 cursor did not lie within new window erase it now.
+            # win.resize in o2 command code did not relocate win0 cursor
+            if win0.cursor_i < win.win_1 or win0.cursor_i > win.win_1+win.win_h:
+                win0.erase_cursor()
+            win0.update_window(not ed.command_mode) # including cursor
         else: 
             # other non-current windows might show the same buffer
             for w in windows:
@@ -178,15 +180,14 @@ def restore_display():
 
 def o(line):
     'Window commands.  These are handled here, they are not not passed to ed.'
+    # Not passed to ed, this o() does not conflict with ed.o() that returns dot.
     # For now there is just one vertical stack of windows in the frame.
-    global win, win_i, win0, \
-        set_other_window, set_single_window, split_window
+    global win, win_i, set_other_window, set_single_window, split_window
     param_string = line.lstrip()[1:].lstrip()
     # o: switch to next window
     if not param_string:
         win.dot = win.buf.dot # save
         win_i = win_i+1 if win_i+1 < len(windows) else 0
-        win0 = win
         win = windows[win_i] 
         ed.b(win.buf.name) # change current buffer
         win.buf.dot = win.dot # restore
@@ -207,14 +208,12 @@ def o(line):
                 return
             # o2: split window, horizontal
             elif param == 2:
-                # put the new window at the top
+                # put the new window at the top, it becomes current window
                 new_win_h = win.win_h // 2 # integer division
                 win.resize(frame_top + new_win_h, win.win_h - new_win_h, ncols) # old window
                 win.dot = win.buf.dot # save
-                win0 = win
                 win = window.Window(ed.buf, frame_top, new_win_h, ncols) # new window
                 windows.insert(win_i, win)
-                win = windows[win_i] # no need to adjust win_i after insert
                 split_window = True
                 return
             # maybe more options later
@@ -229,8 +228,9 @@ def cmd(line):
     # try/except ensures we restore display, especially scrolling
     try:
         save_parameters() # before ed.cmd
-        # intercept special commands used by edsel only, not ed
-        if line.lstrip().startswith('o'):
+        # Intercept special commands used by edsel only, not ed
+        # Only in command mode!  Otherwise line is text to add to buffer.
+        if ed.command_mode and line.lstrip().startswith('o'):
             o(line) # window commands
         else:
             ed.cmd(line) # non-blocking

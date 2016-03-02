@@ -65,7 +65,7 @@ class Window(object):
         """
         buf_S = len(self.buf.lines)-1 # last line in buffer
         # // is python 3 "floor division"
-        return (self.dot < self.win_hl//2 or buf_S <= self.win_hl)
+        return (self.dot <= self.win_hl//2 or buf_S <= self.win_hl)
 
     def at_bottom_segment(self):
         """
