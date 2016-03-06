@@ -5,7 +5,7 @@ unikernel
 A *unikernel* comprises an application together with a minimal
 operating system configured to support just that application.  
 
-These files were part of an experiment in November 2015 to build a
+These files were part of an unfinished experiment in November 2015 to build a
 unikernel for running Piety, based on the NetBSD [Rumprun
 unikernel](https://github.com/rumpkernel/rumprun).
 

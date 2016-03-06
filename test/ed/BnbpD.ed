@@ -1,0 +1,20 @@
+# BnbpD.ed - Test buffer commands
+e line20.txt
+n
+B ed.md.txt
+n
+B ed.py.txt
+n
+b main
+1,5p
+b ed.md.txt
+1,5p
+b ed.py.txt
+1,5p
+D ed.md.txt
+n
+D ed.py.txt
+n
+D main
+# previous command should get error message - mustn't delete main
+# test finished

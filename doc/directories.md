@@ -34,7 +34,7 @@ The Piety repository is organized into these directories:
 - **test**: shell scripts and modules that test code in other
      directories.
 
-- **unikernel**: an experiment to build a NetBSD Rumprun unikernel for
+- **unikernel**: an unfinished experiment to build a NetBSD Rumprun unikernel for
     running Piety.  Set aside for now, pending resolution of a Rumprun
     issue.
 
