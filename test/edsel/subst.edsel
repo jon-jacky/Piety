@@ -1,0 +1,8 @@
+# subst.edsel - subst in every line in buffer, two windows
+#
+# start test
+e lines.txt
+o2
+1
+,s/line/LINE/
+# test finished
