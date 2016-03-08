@@ -23,6 +23,9 @@ editors are kept in *test/ed/*.  The *.edsel* scripts here in
 features that are not present in *ed*: display functions and window
 management commands.
 
+The names of some scripts are made from the sequence of commands
+they contain, for example *lio2o1xn.edsel*.
+
 When you execute an *.ed* or *.edsel* script, you can see the window contents
 update as the test runs.  Each command echoes in the scrolling command
 region, followed by a short delay so you can observe its effect.  The

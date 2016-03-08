@@ -1,0 +1,36 @@
+# eo2Bo2BoDoDoD.edsel - Buffer and window cmds including D w/o bufname
+# First, by hand:
+# ...$ python -i .../edsel.py
+# !cmd_h=12  # large enough to see output from n commands
+# B eo2Bo2BoDoDoD.edsel
+# b main
+# B eo2Bo2BoDoDoD.edsel 1 2  # or 0.2 or 5 or any convenient delay
+#
+# test begins
+e line20.txt
+n
+o2
+# screen splits, line20.txt in both windows, cursor in top
+B ed.md.txt
+n
+o2
+# screen splits again, ed.md.txt in top two windows, cursor in top
+B ed.py.txt
+# windows, top to bottom: ed.py.txt  ed.md.txt  main w/line20.txt
+n
+o
+# Now in ed.md.txt, D w/o bufname parameter
+1,5p
+D
+n
+o
+# Now in main, D w/o bufname should get error msg
+1,5p
+D
+n
+o
+# Now in ed.py.txt, D w/o bufname
+1,5p
+D
+n
+# test finished
