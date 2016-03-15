@@ -1,0 +1,17 @@
+# eo2li.edsel - insert with two windows into same place in buffer
+#  both windows should update - then move current window elsewhere
+e lines.txt
+o2
+-3
+# same segment visible in both windows - both should update
+i
+INSERTED TEXT 1
+INSERTED TEXT 2
+.
+3
+# Now current window shows different segment - other window should not update
+i
+INSERTED TEXT 3
+INSERTED TEXT 4
+.
+# test finished

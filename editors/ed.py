@@ -578,19 +578,21 @@ def parse_cmd(cmd_string):
         return (cmd_name, start, end) + (tuple(params.split() if params else ()))
 
 # state variables that must persist between ed_cmd invocations during input mode
+# also must be global so display editor can use them
 command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
+start = 0  # line address, first line of affected region, often dot, initialize empty
+end = 0    # line address, last line of affected region, initialize empty
 
 pysh = pysh.mk_shell() # embedded Python shell for ! command
 
 def cmd(line):
     """
     Process one input line without blocking in ed command or input mode
-    Update buffers and control state variables: command_mode, cmd_name, args
+    Update buffers and control variables: command_mode, cmd_name, args, start, end
     """
-    # state variables that must persist between cmd invocations during input mode
-    global command_mode, cmd_name, args
+    global command_mode, cmd_name, args, start, end
     if command_mode:
         # special prefix characters, don't parse these lines
         if line and line[0] == '#': # comment
@@ -604,6 +606,8 @@ def cmd(line):
         else:
             tokens = tuple([ t for t in items if t != None ])
         cmd_name, args = tokens[0], tokens[1:]
+        start, end, x, xxx = parse_args(args) # might be int or None
+        start, end = mk_range(start, end) # int only
         if cmd_name in complete_cmds:
             globals()[cmd_name](*args) # dict from name (string) to object (fcn)
         elif cmd_name in input_cmds:
@@ -611,8 +615,6 @@ def cmd(line):
             # Instead of using buf.a, i, c, we handle input mode cmds inline here
             # We will add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once.
-            start, end, x, xxx = parse_args(args) # might be int or None
-            start, end = mk_range(start, end) # int only
             if not (iline_ok0(start) if cmd_name in 'ai'
                     else range_ok(start, end)):
                 print('? invalid address')

@@ -14,6 +14,7 @@ assumptions.
 """
 
 import display
+from datetime import datetime # for timestamp, used for testing
 
 class Window(object):
     """
@@ -135,6 +136,13 @@ class Window(object):
             display.kill_whole_line()
             print()
 
+    def display_timestamp(self):
+        'print timestamp near right margin of status line'
+        # For testing, to reveal window updates where contents don't change
+        timestamp = datetime.strftime(datetime.now(),'%H:%M:%S  ') # 10 ch w/margin
+        display.put_cursor(self.status_1, self.ncols-10)
+        display.render(timestamp, display.white_bg) # white_bg is gray on mac term
+
     def display_status(self):
         "Print information about window's buffer in window's status line."
         # later, maybe optimize by printing these fields separately
@@ -148,10 +156,11 @@ class Window(object):
                                          #  else ' ',
                                          '*' if self.buf.unsaved else ' ', 
                                          self.buf.name, filename_str)
-        status += (self.ncols - (25 + len(filename_str)))*' ' # all bg_color
+        # -11 more here, leave space for timestamp  was .... - (25 + len ...)
+        status += (self.ncols - (36 + len(filename_str)))*' ' # all bg_color
         display.put_cursor(self.status_1, 1)
         display.render(status, display.white_bg) # white_bg is gray on mac term
-        
+
     def cursor_elsewhere(self):
         'dot lies outside segment of buffer visible in window'
         return ((not self.seg_1 <= self.dot <= self.seg_n) 
@@ -213,6 +222,8 @@ class Window(object):
         self.locate_cursor() # *re*assign new self.cursor_i, cursor_ch
         self.display_window(insert_mode)
         self.display_status()
+        # For testing, to reveal window updates where contents don't change
+        self.display_timestamp()
         if insert_mode: # must set insert cursor *after* display_status
             self.set_insert_cursor() # window cursor for text entry
         # but no self.display_cursor() - leave it to caller 

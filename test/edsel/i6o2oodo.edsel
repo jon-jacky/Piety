@@ -1,0 +1,15 @@
+# i6o2oodo.edsel - split, set dot in other window, delete text above in active window
+i
+line 1
+line 2
+line 3
+line 4
+line 5
+line 6
+.
+3
+o2
+o
+o
+1,2d
+o

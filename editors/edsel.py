@@ -152,11 +152,12 @@ def update_display():
                 win0.erase_cursor()
             win0.update_window(not ed.command_mode) # including cursor
         else: 
-            # other non-current windows might show the same buffer
+            # other non-current windows might show part of same buffer
             for w in windows:
-                if w != win and w.buf == win.buf:
-                    # many of these updates will change nothing
-                    # could add stronger conditions here someday
+                if (w != win and w.buf == win.buf
+                    # w overlaps ed.start .. end.edn
+                    and ((w.seg_1 <= ed.start <= w.seg_n)
+                         or (w.seg_1 <= ed.end <= w.seg_n))):
                     w.update_window(not ed.command_mode)
                     if not ed.command_mode:
                         win.set_insert_cursor()

@@ -1,0 +1,12 @@
+# eo21lllll.edsel - Investigate scrolling in one window, updates in both.
+# Observe timestamps in both status lines to see when each window updates.
+# Start with !cmd_h=20  B eo21lllll.edsel b main  x eo21lllll.edsel 1 2 
+e lines.txt
+o2
+1
+l
+l
+l
+l
+l
+# script done, keep typing RET to continue scrolling in upper window
