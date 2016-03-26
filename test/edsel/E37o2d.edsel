@@ -1,0 +1,7 @@
+# E37o2d.edsel - delete from one window lines including dot that appear in both
+# frame must have enough lines so both windows contain line 37 of 40
+E lines.txt
+37
+o2
+32,38d
+# test finished

@@ -154,10 +154,23 @@ def update_display():
         else: 
             # other non-current windows might show part of same buffer
             for w in windows:
-                if (w != win and w.buf == win.buf
-                    # w overlaps ed.start .. end.edn
-                    and ((w.seg_1 <= ed.start <= w.seg_n)
-                         or (w.seg_1 <= ed.end <= w.seg_n))):
+                if (w != win and w.buf == win.buf):
+                    # adjust w.dot,seg_1,_n for insert/delete in w.buf
+                    # FIXME? maybe move this up to top with win.dot = win.buf.dot
+                    if ed.cmd_name in ('raiyt'): # insert commands
+                        if w.dot > ed.end: # insert above w.dot
+                            w.dot += w.buf.nlines
+                    elif ed.cmd_name == 'd':
+                        if w.dot > ed.end: # delete above w.dot
+                            w.dot -= w.buf.nlines
+                        elif ed.start <= w.dot <= ed.end: # delete w.dot
+                            w.dot = win.dot # first line after deletes
+                    # FIXME? what about c m - both delete and insert !
+                    seg_1, seg_n = w.seg_1, w.seg_n # used below
+                    w.locate_segment() # adjust w.seg_1,_n
+                    # w overlaps ed.start .. end, so update it
+                    if ((seg_1 <= ed.start <= seg_n)  # use saved seg_1,n
+                         or (seg_1 <= ed.end <= seg_n)):
                     w.update_window(not ed.command_mode)
                     if not ed.command_mode:
                         win.set_insert_cursor()

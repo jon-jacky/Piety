@@ -52,6 +52,7 @@ class Buffer(object):
         # for example the buffer of deleted lines used by the yank method
         self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
+        self.nlines = 0 # n of inserted or deleted lines, used by display editor
 
     # For other programs (besides editors) to write into buffers
 
@@ -125,13 +126,13 @@ class Buffer(object):
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
-        nlines = len(lines)
-        self.dot = iline + nlines - 1
+        self.nlines = len(lines)
+        self.dot = iline + self.nlines - 1
         self.unsaved = True # usually the right thing but ed.B and E override it.
         # adjust line numbers for marks below the insertion point
         for c in self.mark:
             if self.mark[c] >= iline:
-                self.mark[c] += nlines
+                self.mark[c] += self.nlines
 
     # files
 

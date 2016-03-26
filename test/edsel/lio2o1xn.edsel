@@ -7,12 +7,12 @@
 # To run, start edsel in a 33-line window and type the following commands by hand:
 #
 # !cmd_h=20
-# e lines.txt
 # B lio2o1xn.edsel
 # b main
 # x lio2o1xn.edsel 1 2
 #
 # test begins
+E lines.txt
 1
 o2
 o1

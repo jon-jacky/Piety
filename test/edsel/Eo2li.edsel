@@ -1,6 +1,6 @@
-# eo2li.edsel - insert with two windows into same place in buffer
+# Eo2li.edsel - insert with two windows into same place in buffer
 #  both windows should update - then move current window elsewhere
-e lines.txt
+E lines.txt
 o2
 -3
 # same segment visible in both windows - both should update

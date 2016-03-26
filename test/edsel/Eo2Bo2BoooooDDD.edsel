@@ -1,13 +1,13 @@
-# eo2Bo2BoDoDoD.edsel - Buffer and window cmds including D w/o bufname
+# Eo2Bo2Bo2oooooDDD.edsel - Test buffer and window commands
 # First, by hand:
 # ...$ python -i .../edsel.py
 # !cmd_h=12  # large enough to see output from n commands
-# B eo2Bo2BoDoDoD.edsel
+# B eo2Bo2Bo2oooooDDD.edsel
 # b main
-# B eo2Bo2BoDoDoD.edsel 1 2  # or 0.2 or 5 or any convenient delay
+# B eo2Bo2Bo2oooooDDD.edsel 1 2  # or 0.2 or 5 or any convenient delay
 #
 # test begins
-e line20.txt
+E line20.txt
 n
 o2
 # screen splits, line20.txt in both windows, cursor in top
@@ -19,18 +19,22 @@ B ed.py.txt
 # windows, top to bottom: ed.py.txt  ed.md.txt  main w/line20.txt
 n
 o
-# Now in ed.md.txt, D w/o bufname parameter
+# Now in ed.md.txt
 1,5p
-D
-n
 o
-# Now in main, D w/o bufname should get error msg
+# Now in main
 1,5p
-D
-n
 o
-# Now in ed.py.txt, D w/o bufname
+# Now in ed.py.txt
 1,5p
-D
+o
+o
+# Now back in main, delete buffers in other two windows, top to bottom
+D ed.py.txt
+n
+D ed.md.txt
+n
+# next command should get error message - mustn't delete main
+D main
 n
 # test finished

@@ -1,7 +1,7 @@
 # insert.edsel - i(nsert) command, two windows into same buffer.
 #
 # test begin
-e lines.txt
+E lines.txt
 3
 o2
 i
