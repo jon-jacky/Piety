@@ -123,6 +123,25 @@ def init_session(*filename, **options):
     win_i = 0 # Now win == windows[win_i]
     display_frame()
 
+def maintain_display():
+    'Maintain consistency in window data after buffer contents change.'
+    for w in windows:
+        # adjust dot in other windows into current buffer
+        if (w != win and w.buf == win.buf):
+            if ed.cmd_name in 'aicyr': # insert commands
+                if ed.start < w.dot:
+                    w.dot += w.buf.nlines
+            elif ed.cmd_name == 'd':  # delete
+                if ed.start < w.dot:
+                    w.dot -= w.buf.nlines
+            elif ed.cmd_name == 't': # transfer (copy)
+                if ed.dest < w.dot
+                    w.dot += w.buf.nlines
+            elif ed.cmd_name == 'm': # move
+                if ed.dest < w.dot and ed.start > w.dot:
+                    w.dot += w.buf.nlines
+                elif ed.start < w.dot and ed.dest > w.dot:
+                    w.dot -= w.buf.nlines
 
 def update_display():
     'Check for any needed display updates.  If there are any, do them.'
@@ -144,6 +163,8 @@ def update_display():
         win.update_window(not ed.command_mode) # insert mode
         if ed.command_mode:
             win.display_cursor() # dot cursor in window
+        else: 
+            win.set_insert_cursor()
         if split_window: 
             # win0 is former current window
             # if win0 cursor did not lie within new window erase it now.
@@ -155,25 +176,9 @@ def update_display():
             # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
-                    # adjust w.dot,seg_1,_n for insert/delete in w.buf
-                    # FIXME? maybe move this up to top with win.dot = win.buf.dot
-                    if ed.cmd_name in ('raiyt'): # insert commands
-                        if w.dot > ed.end: # insert above w.dot
-                            w.dot += w.buf.nlines
-                    elif ed.cmd_name == 'd':
-                        if w.dot > ed.end: # delete above w.dot
-                            w.dot -= w.buf.nlines
-                        elif ed.start <= w.dot <= ed.end: # delete w.dot
-                            w.dot = win.dot # first line after deletes
-                    # FIXME? what about c m - both delete and insert !
-                    seg_1, seg_n = w.seg_1, w.seg_n # used below
-                    w.locate_segment() # adjust w.seg_1,_n
-                    # w overlaps ed.start .. end, so update it
-                    if ((seg_1 <= ed.start <= seg_n)  # use saved seg_1,n
-                         or (seg_1 <= ed.end <= seg_n)):
+                    # FIXME add stronger conditions, 
+                    # prevent updates when lines in w unchanged
                     w.update_window(not ed.command_mode)
-                    if not ed.command_mode:
-                        win.set_insert_cursor()
         cursor_at_command = False
     elif win.cursor_moved():
         # update cursor only in current window, don't update window content
@@ -203,7 +208,9 @@ def o(line):
         win.dot = win.buf.dot # save
         win_i = win_i+1 if win_i+1 < len(windows) else 0
         win = windows[win_i] 
-        ed.b(win.buf.name) # change current buffer
+        # ed.b(win.buf.name) # change current buffer
+        ed.current = win.buf.name
+        ed.buf = ed.buffers[ed.current]
         win.buf.dot = win.dot # restore
         set_other_window = True
         return
@@ -250,6 +257,7 @@ def cmd(line):
             ed.cmd(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
+        maintain_display() # maintain consistency in window data 
         update_display() # contains all update logic, may do nothing
         clear_flags() # flags used by update_display, maybe set above
     except BaseException as e:

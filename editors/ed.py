@@ -595,10 +595,10 @@ command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
 
-# Assigned by cmd, used by display editor
+# Assigned by cmd before command executes, before any insertions or deletions
 start = 0  # line address, first line of affected region, often dot
 end = 0    # line address, last line of affected region
-nlines = 0 # number of lines added by aicmrty commands, or deleted by d command
+dest = 0   # line address, destination for m(ove), t(ransfer, copy) commands
 
 pysh = pysh.mk_shell() # embedded Python shell for ! command
 
@@ -607,7 +607,7 @@ def cmd(line):
     Process one input line without blocking in ed command or input mode
     Update buffers and control variables: command_mode, cmd_name, args, start, end
     """
-    global command_mode, cmd_name, args, start, end, nlines
+    global command_mode, cmd_name, args, start, end, dest
     if command_mode:
         # special prefix characters, don't parse these lines
         if line and line[0] == '#': # comment
@@ -621,7 +621,7 @@ def cmd(line):
         else:
             tokens = tuple([ t for t in items if t != None ])
         cmd_name, args = tokens[0], tokens[1:]
-        start, end, x, xxx = parse_args(args) # might be int or None
+        start, end, dest, xxx = parse_args(args) # might be int or None
         start, end = mk_range(start, end) # int only
         if cmd_name in complete_cmds:
             globals()[cmd_name](*args) # dict from name (string) to object (fcn)

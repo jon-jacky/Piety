@@ -52,7 +52,7 @@ class Buffer(object):
         # for example the buffer of deleted lines used by the yank method
         self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
-        self.nlines = 0 # n of inserted or deleted lines, used by display editor
+        self.nlines = 0 # n of most recently inserted or deleted lines
 
     # For other programs (besides editors) to write into buffers
 
@@ -181,6 +181,7 @@ class Buffer(object):
         """Delete text from start up through end, 
         set dot to first line after deletes or last line in buffer"""
         self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
+        self.nlines = len(self.caller.deleted) # or self.nlines = end - start + 1
         self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -188,7 +189,6 @@ class Buffer(object):
             self.dot = min(start,self.S()) # S() if we deleted end of buffer
         else:
             self.dot = 0
-        nlines = end - start + 1
         # new_mark needed because we can't remove items from dict as we iterate
         new_mark = dict() # new_mark is self.mark without marks at deleted lines
         self.caller.deleted_mark = dict() 
@@ -198,7 +198,7 @@ class Buffer(object):
             else:
                 # adjust marks below deleted lines
                 markc = self.mark[c]
-                new_mark[c] = markc if markc < end else markc - nlines
+                new_mark[c] = markc if markc < end else markc - self.nlines
         self.mark = new_mark
 
     def c(self, start, end, string):

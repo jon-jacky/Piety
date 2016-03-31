@@ -3,7 +3,8 @@ edsel tests
 ===========
 
 Tests for *edsel.py*.  The directions and explanations in
-*test/ed/README.md* also apply here.
+*test/ed/README.md* also apply here.  Comments in each file explain
+its test.
 
 The *edsel.py* display editor imports the *ed.py* line editor and
 supports all of its commands and API calls.  However, the *.py* and
