@@ -124,6 +124,15 @@ def parse_check_range_dest(args):
             print('? invalid destination')
     return (valid and dest_valid), start, end, dest
 
+def match_prefix(prefix, names):
+    'If prefix ends with -, return name (if any) that matches, otherwise return same prefix'
+    if isinstance(prefix, str) and prefix.endswith('-'): # might be None
+        for n in names:
+            if n.startswith(prefix[:-1]):
+                return n
+    return prefix
+
+
 # central data structure and variables
 
 # Each ed command is implemented by a function with the same
@@ -133,14 +142,16 @@ def parse_check_range_dest(args):
 # So the current buffer, buf, must be global.
 
 buffers = dict() # dict from buffer names (strings) to Buffer instances
-deleted = list() # most recently deleted lines from any buffer, for yank command
-deleted_mark = list() # markers for deleted lines, for yank command
                  
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
 current = 'main'
 buf = buffer.Buffer(current, caller=sys.modules[__name__]) # caller = this module  
 buffers[current] = buf 
+
+# assigned by d(elete) in current buffer, may be used by y(ank) in another buffer
+deleted = list() # most recently deleted lines from any buffer, for yank command
+deleted_mark = list() # markers for deleted lines, for yank command
 
 # line addresses
 
@@ -199,17 +210,18 @@ def b_new(name):
 def b(*args):
     """
     Set current buffer to name.  If no buffer with that name, create one.
-    If no name given, print the name of the current buffer.
+    Then print current buffer name.  If no name given, print current name
     """
     global current, buf
     x, xx, bufname, xxx = parse_args(args)
-    if not bufname:
-        print_status(current, o())
-    elif bufname in buffers:
+    bufname = match_prefix(bufname, buffers)
+    if bufname in buffers:
         current = bufname
-        buf = buffers[current]
-    else:
+        buf = buffers[current]                 
+    elif bufname:
         b_new(bufname)
+        buf.filename = bufname
+    print(current) # even if no bufname given
 
 def r_new(buffername, filename):
     'Create new buffer, Read in file contents'
@@ -577,13 +589,16 @@ def parse_cmd(cmd_string):
         # return each space-separated parameter as separate argument in sequence
         return (cmd_name, start, end) + (tuple(params.split() if params else ()))
 
-# state variables that must persist between ed_cmd invocations during input mode
-# also must be global so display editor can use them
+# State variables that must persist between cmd invocations during input mode,
+#  also must be global so display editor can use them.
 command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
-start = 0  # line address, first line of affected region, often dot, initialize empty
-end = 0    # line address, last line of affected region, initialize empty
+
+# Assigned by cmd, used by display editor
+start = 0  # line address, first line of affected region, often dot
+end = 0    # line address, last line of affected region
+nlines = 0 # number of lines added by aicmrty commands, or deleted by d command
 
 pysh = pysh.mk_shell() # embedded Python shell for ! command
 
@@ -592,7 +607,7 @@ def cmd(line):
     Process one input line without blocking in ed command or input mode
     Update buffers and control variables: command_mode, cmd_name, args, start, end
     """
-    global command_mode, cmd_name, args, start, end
+    global command_mode, cmd_name, args, start, end, nlines
     if command_mode:
         # special prefix characters, don't parse these lines
         if line and line[0] == '#': # comment
@@ -691,16 +706,16 @@ def x(*args):
      echo - optional, default True; delay - optional, default 0.2 sec
     """
     x, xx, bufname, params = parse_args(args)
-    if not bufname or (bufname and bufname not in buffers):
-        print('? buffer name')
-        return
-    else:
+    bufname = match_prefix(bufname, buffers)
+    if bufname in buffers:
         valid, echo, delay = parse_echo_delay(params)
         if valid:
             echo = echo if echo != None else True
             delay = delay if delay != None else 0.2
             do_cmds(x_cmd_fcn, buffers[bufname].lines[1:], echo, delay)
             # cmds in buffer advance dot
+    else:
+        print('? buffer name')
 
 def X(*args):
     """
