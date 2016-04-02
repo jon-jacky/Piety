@@ -159,7 +159,7 @@ def update_display():
         cursor_at_command = False
     elif (file_changed() or text_cmd() or win.cursor_elsewhere() 
         or set_single_window or split_window):
-        # update current window contents and cursor
+        # update current window contents
         win.update_window(not ed.command_mode) # insert mode
         if split_window: 
             # win0 is former current window
@@ -167,7 +167,7 @@ def update_display():
             # win.resize in o2 command code did not relocate win0 cursor
             if win0.cursor_i < win.win_1 or win0.cursor_i > win.win_1+win.win_h:
                 win0.erase_cursor()
-            win0.update_window(False) # including cursor
+            win0.update_window(False)
         else: 
             # other non-current windows might show part of same buffer
             for w in windows:
@@ -175,10 +175,11 @@ def update_display():
                     # FIXME add stronger conditions, 
                     # prevent updates when lines in w unchanged
                     w.update_window(False)
+        # must draw cursor last
         if ed.command_mode:
-            win.display_cursor() # dot cursor in window
+            win.display_cursor() # edsel dot cursor in window
         else: 
-            win.set_insert_cursor()
+            win.set_insert_cursor() # edsel insert cursor at open line
         cursor_at_command = False
     elif win.cursor_moved():
         # update cursor only in current window, don't update window content
@@ -190,7 +191,7 @@ def update_display():
         # some commands do not affect windows: A b (with no args) f k n w 
         pass
     if ed.command_mode and not cursor_at_command:
-        set_command_cursor()
+        set_command_cursor() # ed command cursor in scrolling region
 
 def restore_display():
     'Restore full-screen scrolling, cursor to bottom.'
