@@ -650,6 +650,7 @@ def cmd(line):
         return
     else: # input mode for a,i,c commands that collect text
         if line == '.':
+            buf.nlines = 0 # reset, don't count this line
             command_mode = True # exit input mode
         else:
             # Recall raw_input returns each line with final \n stripped off,

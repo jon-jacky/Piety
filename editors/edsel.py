@@ -135,7 +135,7 @@ def maintain_display():
                 if ed.start < w.dot:
                     w.dot -= w.buf.nlines
             elif ed.cmd_name == 't': # transfer (copy)
-                if ed.dest < w.dot
+                if ed.dest < w.dot:
                     w.dot += w.buf.nlines
             elif ed.cmd_name == 'm': # move
                 if ed.dest < w.dot and ed.start > w.dot:
