@@ -224,6 +224,4 @@ class Window(object):
         self.display_status()
         # For testing, to reveal window updates where contents don't change
         self.display_timestamp()
-        if insert_mode: # must set insert cursor *after* display_status
-            self.set_insert_cursor() # window cursor for text entry
-        # but no self.display_cursor() - leave it to caller 
+        # No self.set_insert_cursor or display_cursor, caller must do it.

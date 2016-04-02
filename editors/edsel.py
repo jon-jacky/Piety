@@ -161,24 +161,24 @@ def update_display():
         or set_single_window or split_window):
         # update current window contents and cursor
         win.update_window(not ed.command_mode) # insert mode
-        if ed.command_mode:
-            win.display_cursor() # dot cursor in window
-        else: 
-            win.set_insert_cursor()
         if split_window: 
             # win0 is former current window
             # if win0 cursor did not lie within new window erase it now.
             # win.resize in o2 command code did not relocate win0 cursor
             if win0.cursor_i < win.win_1 or win0.cursor_i > win.win_1+win.win_h:
                 win0.erase_cursor()
-            win0.update_window(not ed.command_mode) # including cursor
+            win0.update_window(False) # including cursor
         else: 
             # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
                     # FIXME add stronger conditions, 
                     # prevent updates when lines in w unchanged
-                    w.update_window(not ed.command_mode)
+                    w.update_window(False)
+        if ed.command_mode:
+            win.display_cursor() # dot cursor in window
+        else: 
+            win.set_insert_cursor()
         cursor_at_command = False
     elif win.cursor_moved():
         # update cursor only in current window, don't update window content
