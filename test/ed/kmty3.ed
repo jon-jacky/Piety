@@ -1,0 +1,30 @@
+# kmty3.ed - test  k m t y commands - based on test_ed_kmty3.sh
+E line20.txt
+3ka
+5kb
+7kc
+9kd
+15ke
+18kf
+!ed.buf.mark
+'a,'bm12
+!ed.buf.mark
+'a
+'b
+,p
+'a,'bt0
+'a,'bt$
+!ed.buf.mark
+,p
+'a
+'b
+'c
+'d
+'e
+'f
+!ed.deleted
+!ed.deleted_mark
+16y
+!ed.buf.mark
+,p
+# test finished

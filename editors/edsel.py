@@ -128,7 +128,7 @@ def maintain_display():
     for w in windows:
         # adjust dot in other windows into current buffer
         if (w != win and w.buf == win.buf):
-            if ed.cmd_name in 'aicyr': # insert commands
+            if ed.cmd_name in 'aiyr': # insert commands (not including c)
                 if ed.start < w.dot:
                     w.dot += w.buf.nlines
             elif ed.cmd_name == 'd':  # delete
@@ -142,6 +142,8 @@ def maintain_display():
                     w.dot += w.buf.nlines
                 elif ed.start < w.dot and ed.dest > w.dot:
                     w.dot -= w.buf.nlines
+            w.dot = w.dot if w.dot > 0 else 1
+            w.dot = w.dot if w.dot <= w.buf.S() else w.buf.S()
 
 def update_display():
     'Check for any needed display updates.  If there are any, do them.'

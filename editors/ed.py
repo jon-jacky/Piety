@@ -623,6 +623,7 @@ def cmd(line):
         cmd_name, args = tokens[0], tokens[1:]
         start, end, dest, xxx = parse_args(args) # might be int or None
         start, end = mk_range(start, end) # int only
+        dest, _ = (None, None) if dest is None else match_address(dest) # str -> int
         if cmd_name in complete_cmds:
             globals()[cmd_name](*args) # dict from name (string) to object (fcn)
         elif cmd_name in input_cmds:
