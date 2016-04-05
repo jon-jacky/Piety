@@ -144,6 +144,7 @@ def maintain_display():
                     w.dot -= w.buf.nlines
             w.dot = w.dot if w.dot > 0 else 1
             w.dot = w.dot if w.dot <= w.buf.S() else w.buf.S()
+    win.buf.nlines = 0 # FIXME? Put this in cmd with clear_flags ?
 
 def update_display():
     'Check for any needed display updates.  If there are any, do them.'
