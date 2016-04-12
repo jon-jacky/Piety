@@ -128,6 +128,7 @@ def maintain_display():
     for w in windows:
         # adjust dot in other windows into current buffer
         if (w != win and w.buf == win.buf):
+            dot0 = w.dot # DEBUG - save initial value for print, below
             if ed.cmd_name in 'aiyr': # insert commands (not including c)
                 if ed.start < w.dot:
                     w.dot += w.buf.nlines
@@ -138,12 +139,23 @@ def maintain_display():
                 if ed.dest < w.dot:
                     w.dot += w.buf.nlines
             elif ed.cmd_name == 'm': # move
-                if ed.dest < w.dot and ed.start > w.dot:
+                # segment follows dot, after move precedes dot
+                if ed.start > w.dot > ed.dest:
                     w.dot += w.buf.nlines
-                elif ed.start < w.dot and ed.dest > w.dot:
+		# segment precedes dot, after move follows dot
+                elif ed.start < w.dot < ed.dest and ed.end < w.dot:
                     w.dot -= w.buf.nlines
+	        # dot lies within segment, moves along with segment
+                elif ed.start <= w.dot <= ed.end:
+                    if ed.dest >= w.dot:  # destination follows w.dot
+                        w.dot = (ed.dest - w.buf.nlines) + (w.dot - ed.start) + 1
+                    else: # destination precedes w.dot
+                        w.dot = ed.dest + (w.dot - ed.start) + 1
+            # else... is implicit, all other cases: don't adjust w.dot
             w.dot = w.dot if w.dot > 0 else 1
             w.dot = w.dot if w.dot <= w.buf.S() else w.buf.S()
+            #print('w %s  start %s  end %s  dest %s  nlines %s  dot0 %s  dot %s' %
+            #      (w, ed.start, ed.end, ed.dest, w.buf.nlines, dot0, w.dot)) # DEBUG
     win.buf.nlines = 0 # FIXME? Put this in cmd with clear_flags ?
 
 def update_display():
@@ -257,6 +269,7 @@ def cmd(line):
         # Only in command mode!  Otherwise line is text to add to buffer.
         if ed.command_mode and line.lstrip().startswith('o'):
             o(line) # window commands
+            ed.cmd_name = ' ' # must indicate 'no ed command'
         else:
             ed.cmd(line) # non-blocking
             if ed.cmd_name in 'bBeED':

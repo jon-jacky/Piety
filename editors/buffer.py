@@ -181,7 +181,7 @@ class Buffer(object):
         """Delete text from start up through end, 
         set dot to first line after deletes or last line in buffer"""
         self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
-        self.nlines = len(self.caller.deleted) # or self.nlines = end - start + 1
+        self.nlines = len(self.caller.deleted) # nlines is positive
         self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -204,7 +204,9 @@ class Buffer(object):
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string'
         self.d(start,end)
+        ndeleted = self.nlines
         self.i(start,string) # original start is now insertion point
+        self.nlines = self.nlines + ndeleted # nlines might be negative
 
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
