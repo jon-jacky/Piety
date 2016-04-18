@@ -1,0 +1,52 @@
+# maintain.edsel - check all the cases in edsel.py maintain_display
+E lines.txt
+o2 
+o
+30
+o
+5
+a
+LINE A
+LINE B
+LINE C
+.
+o
+!win.dot
+o
++3
+i
+LINE D
+LINE E
+LINE F
+.
+o
+!win.dot
+o
++3
+.,+4d
+o
+!win.dot
+o
++3 
+y
++3
+r line05.txt
+o
+!win.dot
+o
++3 
+.,+4t25
+o
+!win.dot
+o
+35
+.,+4m25
+o
+!win.dot
+o
+20
+.,+4m$
+o
+!win.dot
+o
+# test finished

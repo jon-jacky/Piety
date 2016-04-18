@@ -1,0 +1,16 @@
+# transfer_5_15.edsel - moves, then transfers, from/to above/below other window dot
+#                    like move_5_15 but replace second move with transfer (that is, copy)
+E lines.txt
+o2
+o
+10
+!win.dot
+o
+1,4m15
+o
+!win.dot
+o
+25,39t0
+o
+!win.dot
+# test finished

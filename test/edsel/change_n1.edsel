@@ -1,0 +1,24 @@
+# change_n1.edsel - each change deletes 2 lines, adds 1 
+E lines.txt
+o2
+o
+5
+o
+1
+.,+1c
+LINE  1
+.
+o
+o
+/line 10/
+.,+1c
+LINE 10
+.
+o
+o
+?line  5?
+.,+1c
+LINE  5
+.
+o
+# test finished

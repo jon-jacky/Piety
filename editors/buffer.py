@@ -52,7 +52,8 @@ class Buffer(object):
         # for example the buffer of deleted lines used by the yank method
         self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
-        self.nlines = 0 # n of most recently inserted or deleted lines
+        self.nlines = 0 # signed number of most recently inserted or deleted lines,
+                        # positive for insertion, negative for deletion
 
     # For other programs (besides editors) to write into buffers
 
@@ -181,7 +182,7 @@ class Buffer(object):
         """Delete text from start up through end, 
         set dot to first line after deletes or last line in buffer"""
         self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
-        self.nlines = len(self.caller.deleted) # nlines is positive
+        self.nlines = -len(self.caller.deleted) # nlines is negative here!
         self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -197,16 +198,16 @@ class Buffer(object):
                 self.caller.deleted_mark[c] = self.mark[c]-start+1
             else:
                 # adjust marks below deleted lines
-                markc = self.mark[c]
-                new_mark[c] = markc if markc < end else markc - self.nlines
+                markc = self.mark[c]              # here nlines is negative
+                new_mark[c] = markc if markc < end else markc + self.nlines
         self.mark = new_mark
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string'
         self.d(start,end)
-        ndeleted = self.nlines
+        ndeleted = self.nlines # negative number 
         self.i(start,string) # original start is now insertion point
-        self.nlines = self.nlines + ndeleted # nlines might be negative
+        self.nlines = self.nlines + ndeleted # positive or negative
 
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
@@ -233,5 +234,6 @@ class Buffer(object):
         
     def m(self, start, end, dest):
         'move lines to after destination line'
-        self.d(start, end) # d changes line numbers, must adjust below
+        self.d(start, end)
         self.y(dest+1 if dest < start else dest+1-(end-start+1))
+        # y assigns positive nlines, same magnitude as d neg. nlines

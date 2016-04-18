@@ -1,0 +1,15 @@
+# move.edsel - moves from/to above/below other window dot
+E lines.txt
+o2
+o
+20
+!win.dot
+o
+10,15m25
+o
+!win.dot
+o
+30,40m1
+o
+!win.dot
+# test finished

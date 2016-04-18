@@ -1,0 +1,19 @@
+# delete.edsel - delete segment including dot in current and other window.
+E lines.txt
+o2
+o
+30
+o
+30
+d
+o
+o
+y
+o
+o
+-2,+2d
+o
+o
+y
+o
+# test finished 

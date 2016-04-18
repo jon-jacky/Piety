@@ -125,26 +125,33 @@ def init_session(*filename, **options):
 
 def maintain_display():
     'Maintain consistency in window data after buffer contents change.'
+    # Why this code is so much more complicated than maintaining marks in ed.py:
+    # Within ed.py, all of these commands are combinations of just insert i and delete d.
+    # ed.py has access to i and d steps within each command and to all buffer instance attrs.
+    # But edsel.py only learns of command after ed.py has finished executing it,
+    #  must infer i and d for each command from ed.cmd_name .start .end and buf.nlines.
     for w in windows:
         # adjust dot in other windows into current buffer
         if (w != win and w.buf == win.buf):
             dot0 = w.dot # DEBUG - save initial value for print, below
             if ed.cmd_name in 'aiyr': # insert commands (not including c)
-                if ed.start < w.dot:
+                if ed.start <= w.dot:
                     w.dot += w.buf.nlines
-            elif ed.cmd_name == 'd':  # delete
-                if ed.start < w.dot:
-                    w.dot -= w.buf.nlines
             elif ed.cmd_name == 't': # transfer (copy)
                 if ed.dest < w.dot:
                     w.dot += w.buf.nlines
-            elif ed.cmd_name == 'm': # move
+            elif ed.cmd_name in 'dc': # delete or change (replace), del then insert
+                if ed.start < w.dot and ed.end < w.dot: # del or change before w.dot
+                    w.dot += w.buf.nlines # nlines here might be negative
+                elif ed.start <= w.dot <= ed.end: # change segment includes w.dot
+                    w.dot = w.buf.dot
+            elif ed.cmd_name == 'm': # move, delete then yank
                 # segment follows dot, after move precedes dot
                 if ed.start > w.dot > ed.dest:
                     w.dot += w.buf.nlines
 		# segment precedes dot, after move follows dot
                 elif ed.start < w.dot < ed.dest and ed.end < w.dot:
-                    w.dot -= w.buf.nlines
+                    w.dot -= w.buf.nlines # move nlines is positive
 	        # dot lies within segment, moves along with segment
                 elif ed.start <= w.dot <= ed.end:
                     if ed.dest >= w.dot:  # destination follows w.dot
@@ -154,8 +161,9 @@ def maintain_display():
             # else... is implicit, all other cases: don't adjust w.dot
             w.dot = w.dot if w.dot > 0 else 1
             w.dot = w.dot if w.dot <= w.buf.S() else w.buf.S()
+            # In insert mode, this DEBUG print appears in window, is rapidly overwritten
             #print('w %s  start %s  end %s  dest %s  nlines %s  dot0 %s  dot %s' %
-            #      (w, ed.start, ed.end, ed.dest, w.buf.nlines, dot0, w.dot)) # DEBUG
+            #     (w, ed.start, ed.end, ed.dest, w.buf.nlines, dot0, w.dot)) # DEBUG
     win.buf.nlines = 0 # FIXME? Put this in cmd with clear_flags ?
 
 def update_display():
@@ -187,7 +195,7 @@ def update_display():
             # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
-                    # FIXME add stronger conditions, 
+                    # FIXME? add stronger conditions, 
                     # prevent updates when lines in w unchanged
                     w.update_window(False)
         # must draw cursor last
