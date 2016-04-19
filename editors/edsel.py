@@ -125,11 +125,11 @@ def init_session(*filename, **options):
 
 def maintain_display():
     'Maintain consistency in window data after buffer contents change.'
-    # Why this code is so much more complicated than maintaining marks in ed.py:
+    # Why is this code is so much more complicated than maintaining marks in ed.py?
     # Within ed.py, all of these commands are combinations of just insert i and delete d.
-    # ed.py has access to i and d steps within each command and to all buffer instance attrs.
+    # ed.py updates buffer immediately for each i and/or d step in each command.
     # But edsel.py only learns of command after ed.py has finished executing it,
-    #  must infer i and d for each command from ed.cmd_name .start .end and buf.nlines.
+    # must infer i and/or d for each command from ed.cmd_name .start .end and buf.nlines.
     for w in windows:
         # adjust dot in other windows into current buffer
         if (w != win and w.buf == win.buf):
@@ -141,6 +141,9 @@ def maintain_display():
                 if ed.dest < w.dot:
                     w.dot += w.buf.nlines
             elif ed.cmd_name in 'dc': # delete or change (replace), del then insert
+                # c command: first ed.cmd() calls buf.d, the rest call buf.a
+                #  but ed.cmd_name is 'c' until final . exits insert mode
+                # This code will not work for c() in API.
                 if ed.start < w.dot and ed.end < w.dot: # del or change before w.dot
                     w.dot += w.buf.nlines # nlines here might be negative
                 elif ed.start <= w.dot <= ed.end: # change segment includes w.dot
@@ -254,10 +257,11 @@ def o(line):
             # o2: split window, horizontal
             elif param == 2:
                 # put the new window at the top, it becomes current window
+                win_top = win.win_1
                 new_win_h = win.win_h // 2 # integer division
-                win.resize(frame_top + new_win_h, win.win_h - new_win_h, ncols) # old window
+                win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old window
                 win.dot = win.buf.dot # save
-                win = window.Window(ed.buf, frame_top, new_win_h, ncols) # new window
+                win = window.Window(ed.buf, win_top, new_win_h, ncols) # new window
                 windows.insert(win_i, win)
                 split_window = True
                 return
