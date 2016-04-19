@@ -228,7 +228,7 @@ def o(line):
     'Window commands.  These are handled here, they are not not passed to ed.'
     # Not passed to ed, this o() does not conflict with ed.o() that returns dot.
     # For now there is just one vertical stack of windows in the frame.
-    global win, win_i, set_other_window, set_single_window, split_window
+    global windows, win, win_i, set_other_window, set_single_window, split_window
     param_string = line.lstrip()[1:].lstrip()
     # o: switch to next window
     if not param_string:
@@ -247,8 +247,7 @@ def o(line):
             # o1: return to single window
             if param == 1:
                 # delete all but current window
-                del windows[:win_i]   
-                del windows[win_i+1:]
+                windows = [windows[win_i]]
                 win_i = 0
                 win = windows[win_i]
                 win.resize(frame_top, windows_h, ncols) # one big window
