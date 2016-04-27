@@ -1,0 +1,18 @@
+# empty-windows.edsel - start with empty main buffer, make four windows,
+#                        cycle through windows, then E lines.txt into top window
+o2
+o2
+o
+o
+o2
+o
+o
+o
+o
+o
+o
+E lines.txt
+o
+o
+o
+# test finished
