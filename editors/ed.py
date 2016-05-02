@@ -249,7 +249,8 @@ def E(*args):
     if not filename:
         print('? no current filename')
         return
-    r_new(current, filename) # replace previous current buffer with new
+    buf.d(1,S())
+    r(0, filename)
 
 def e(*args):
     'read in file, replace buffer contents unless unsaved changes'

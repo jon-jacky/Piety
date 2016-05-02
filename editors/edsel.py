@@ -59,13 +59,21 @@ def frame_changed():
     # We do not handle the frame size itself changing
     return cmd_h != cmd_h0
 
-def file_changed():
-    'Current buffer changed or different file loaded in current buffer'
+def buffer_changed():
+    'Current buffer changed'
+    # Can't just check for b or B cmd, might fail if bad bufname or filename
     return ed.current != current0 or ed.buf.filename != filename0
+
+def file_changed():
+    'Different file loaded in current buffer'
+    # filename check not sufficient, might reload same file into empty buffer
+    # return ed.buf.filename != filename0 
+    return ed.cmd_name in 'eEf' # BUT might fail if bad filename 
 
 def text_cmd():
     'Buffer text contents changed in buffer segment visible in window'
-    return ed.cmd_name in 'aicdsymtr' # append, insert, change, delete, substitute, yank etc.
+    # But these commands could fail too, if bad range given
+    return ed.cmd_name in 'aicdsymtr' # append, insert, change, delete, yank etc.
 
 def calc_frame():
     'Calculate dimensions and location of window and scrolling command region'
@@ -128,7 +136,8 @@ def maintain_display():
     # Why is this code is so much more complicated than maintaining marks in ed.py?
     # Within ed.py, all of these commands are combinations of just insert i and delete d.
     # ed.py updates buffer immediately for each i and/or d step in each command.
-    # But edsel.py only learns of command after ed.py has finished executing it,
+    # But in our design ed.py has no access to display data structures.
+    # edsel.py can only observe effects of ed.py command after ed.py has executed it,
     # must infer i and/or d for each command from ed.cmd_name .start .end and buf.nlines.
     for w in windows:
         # adjust dot in other windows into current buffer
@@ -183,7 +192,7 @@ def update_display():
         win0.erase_cursor()
         win.display_cursor()
         cursor_at_command = False
-    elif (file_changed() or text_cmd() or win.cursor_elsewhere() 
+    elif (file_changed() or buffer_changed() or text_cmd() or win.cursor_elsewhere() 
         or set_single_window or split_window):
         # update current window contents
         win.update_window(not ed.command_mode) # insert mode

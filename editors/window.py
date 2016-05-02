@@ -202,6 +202,10 @@ class Window(object):
         if self.cursor_i:
             display.put_cursor(self.cursor_i, 1) 
             display.render(self.cursor_chx, display.white_bg) # no blink
+        elif self.dot == 0:
+            # special case, empty buffer,  _ cursor at window ulc
+            display.put_cursor(self.win_1, 1)
+            display.render(' ', display.white_bg) # no blink
 
     def erase_cursor(self):
         'At start of previous display line, replace cursor with saved char.'
@@ -210,16 +214,22 @@ class Window(object):
             ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
             display.put_cursor(self.cursor_i0, 1)
             display.render(ch, display.clear)
-
+        elif self.dot == 0: # empty buffer, special case, cursor at window ulc
+            display.put_cursor(self.win_1, 1)
+            display.render(' ', display.clear)
+            
     def set_insert_cursor(self):
         'Position cursor at start of open line after dot for insert append change cmds.'
-        display.put_cursor(self.cursor_i + (0 if self.at_bottom_line() else 1),
-                           1) # open line after dot
+        if self.cursor_i == 0: # empty buffer, special case, cursor at window top
+            line = self.win_1  
+        else:
+            line = self.cursor_i + (0 if self.at_bottom_line() else 1)
+        display.put_cursor(line, 1) # open line after dot
 
     def update_window(self, insert_mode):
         'Locate and display the window including its status line and cursor.'
         self.locate_segment() # assign new self.seg_1, self.seg_n
-        self.locate_cursor() # *re*assign new self.cursor_i, cursor_ch
+        self.locate_cursor()  # *re*assign new self.cursor_i, cursor_ch
         self.display_window(insert_mode)
         self.display_status()
         # For testing, to reveal window updates where contents don't change
