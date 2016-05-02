@@ -1,0 +1,9 @@
+# empty_insert.edsel - two windows looking into *different* empty buffers,
+#                       insert into lower window
+o2
+o
+b new.txt
+i
+Here is a line of text
+.
+# test finished
