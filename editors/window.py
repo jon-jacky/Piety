@@ -59,14 +59,18 @@ class Window(object):
         # seg_1, seg_n assigned in locate_segment, called from update_window.
         # seg_1, seg_n are also reassigned when dot moves.
 
+    def all_visible(self):
+        'Window contains entire segment'
+        buf_S = len(self.buf.lines)-1 # last line in buffer
+        return buf_S <= self.win_hl
+
     def at_top_segment(self):
         """
         dot is in segment at beginning of buffer that fits in window,
         so visible segment is at top of buffer, begins at first line.
         """
-        buf_S = len(self.buf.lines)-1 # last line in buffer
-        # // is python 3 "floor division"
-        return (self.dot <= self.win_hl//2 or buf_S <= self.win_hl)
+        # // is python 3 floor division
+        return (self.dot <= self.win_hl//2 or self.all_visible())
 
     def at_bottom_segment(self):
         """
@@ -136,30 +140,49 @@ class Window(object):
             display.kill_whole_line()
             print()
 
-    def display_timestamp(self):
+    # status line 
+    def display_bar(self):
+        display.put_cursor(self.status_1, 1)
+        bar = '-'*8 + ' '*32 + (self.ncols-40)*'-'
+        display.render(bar, display.white_bg) #gray on mac term
+
+    def display_unsaved(self, col):
+        display.put_cursor(self.status_1, col)
+        display.render('**' if self.buf.unsaved else '--', display.white_bg)
+
+    def display_bufname(self, col):
+        display.put_cursor(self.status_1, col)
+        attrs = display.attrs(display.bold, display.white_bg) # white_bg is gray on mac term
+        display.render(' ' + self.buf.name + ' ', attrs) 
+
+    def display_position(self, col):
+        display.put_cursor(self.status_1, col)
+        position = (' All ' if self.all_visible() else
+                    ' Top ' if self.at_top_segment() else
+                    ' Bot ' if self.at_bottom_segment() else
+                    ' %2.0f%% ' % (100*self.dot/(len(self.buf.lines)-1))) # %% prints %
+        display.render(position, display.white_bg) # white_bg is gray on mac term
+
+    def display_linenums(self, col):
+        display.put_cursor(self.status_1, col)
+        linenums = ' L%s/%d ' % (self.dot, len(self.buf.lines)-1)
+        display.render(linenums, display.white_bg) # white_bg is gray on mac term
+
+    def display_timestamp(self, col):
         'print timestamp near right margin of status line'
         # For testing, to reveal window updates where contents don't change
-        timestamp = datetime.strftime(datetime.now(),'%H:%M:%S  ') # 10 ch w/margin
-        display.put_cursor(self.status_1, self.ncols-10)
+        display.put_cursor(self.status_1, col)
+        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S ') # 10 ch w/margin
         display.render(timestamp, display.white_bg) # white_bg is gray on mac term
 
     def display_status(self):
         "Print information about window's buffer in window's status line."
-        # later, maybe optimize by printing these fields separately
-        loc = '%s/%d' % (self.dot, len(self.buf.lines)-1)
-        # don't count empty first line
-        filename_str = (self.buf.filename if self.buf.filename
-                        else 'no file')
-        status = '%7s  %s%s%-12s  %s' % (loc, 
-                                         ' ', # can't get ed.current now
-                                         #'.' if self.buf.name == ed.current 
-                                         #  else ' ',
-                                         '*' if self.buf.unsaved else ' ', 
-                                         self.buf.name, filename_str)
-        # -11 more here, leave space for timestamp  was .... - (25 + len ...)
-        status += (self.ncols - (36 + len(filename_str)))*' ' # all bg_color
-        display.put_cursor(self.status_1, 1)
-        display.render(status, display.white_bg) # white_bg is gray on mac term
+        self.display_bar()
+        self.display_unsaved(6)
+        self.display_bufname(13)
+        self.display_position(28)
+        self.display_linenums(33)
+        self.display_timestamp(self.ncols-10)
 
     def cursor_elsewhere(self):
         'dot lies outside segment of buffer visible in window'
@@ -232,6 +255,4 @@ class Window(object):
         self.locate_cursor()  # *re*assign new self.cursor_i, cursor_ch
         self.display_window(insert_mode)
         self.display_status()
-        # For testing, to reveal window updates where contents don't change
-        self.display_timestamp()
         # No self.set_insert_cursor or display_cursor, caller must do it.

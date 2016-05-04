@@ -28,6 +28,8 @@ sgr = csi + '%s' + 'm' # set graphic rendition. %s is ;-separated integers like
 # sgr, attribute values
 clear = 0        # clears attributes (not transparent!)
 white_bg = 47    # gray on mac terminal
+bold = 1
+blink = 5
 
 def attrs(*attributes):
     """

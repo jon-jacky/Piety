@@ -251,6 +251,7 @@ def E(*args):
         return
     buf.d(1,S())
     r(0, filename)
+    buf.unsaved = False
 
 def e(*args):
     'read in file, replace buffer contents unless unsaved changes'
