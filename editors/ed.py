@@ -210,7 +210,7 @@ def b_new(name):
 def b(*args):
     """
     Set current buffer to name.  If no buffer with that name, create one.
-    Then print current buffer name.  If no name given, print current name
+    Then print current buffer name.  If none given, print current name + info
     """
     global current, buf
     x, xx, bufname, xxx = parse_args(args)
@@ -221,7 +221,7 @@ def b(*args):
     elif bufname:
         b_new(bufname)
         buf.filename = bufname
-    print(current) # even if no bufname given
+    print('.' + buf.info()) # even if no bufname given
 
 def r_new(buffername, filename):
     'Create new buffer, Read in file contents'
@@ -323,16 +323,6 @@ def DD(*args):
 
 # Displaying information
 
-def print_status(bufname, iline):
-    'used by e and n, given bufname and iline prints dot, $, filename, unsaved'
-    ibuf = buffers[bufname] # avoid name confusion with global buf
-    loc = '%s/%d' % (iline, len(ibuf.lines)-1) # don't count empty first line
-    print('%7s  %s%s%-12s  %s' % (loc, 
-                               '.' if bufname == current else ' ',
-                               '*' if ibuf.unsaved else ' ', 
-                               bufname, (ibuf.filename if ibuf.filename else 
-                                         'no current filename')))
-
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
     iline, x, xx, xxx = parse_args(args)
@@ -343,11 +333,10 @@ def A(*args):
         print('? invalid address')
 
 def n(*args):
-    'Print status of all buffers'
-    print("""    ./$    Buffer        File
-    ---    ------        ----""")
+    'Print information about all buffers'
+    print('C M Buffer            Size  File')
     for name in buffers:
-        print_status(name, buffers[name].dot)
+        print (('.' if name == current else ' ') + buffers[name].info())
     
 # Displaying and navigating text
     

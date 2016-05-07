@@ -83,6 +83,12 @@ class Buffer(object):
         'like ed $, Return index of the last line, 0 if the buffer is empty'
         return len(self.lines)-1 # don't count empty first line at index 0
 
+    # information
+    def info(self):
+        'return string with unsaved flag, buffer name, size in lines, filename'
+        return ((' * ' if self.unsaved else '   ') +  # reserve col 1 for readonly flag
+                '%-15s' % self.name + '%7d' % self.S() + '  %s' % self.filename)
+
     # search
 
     def search_buf(self, forward):
