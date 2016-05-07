@@ -55,8 +55,7 @@ class Window(object):
 
     def near_buffer_top(self):
         """
-        dot is in top half of segment at beginning of buffer that fits in window,
-        so put visible segment at top of buffer, begins at first line.
+        dot is in top half of segment at beginning of buffer that fits in window
         """
         # // is python 3 floor division
         return (self.dot <= self.win_hl//2 or self.buf.S() <= self.win_hl)
@@ -64,7 +63,6 @@ class Window(object):
     def near_buffer_bottom(self):
         """
         dot is in bottom half of segment at end of buffer that fits in window,
-        so put visible segment at bottom of buffer, ends at last line.
         """
         return (self.buf.S() - self.dot < self.win_hl//2 and
                 self.buf.S() >= self.win_hl)
@@ -82,13 +80,13 @@ class Window(object):
           also self.seg_n - index in buffer of last line shown in window.
         Center window on dot if possible,otherwise show top or bottom of buffer
         """
-        if self.near_buffer_top():
+        if self.near_buffer_top(): # first line at top of window
             self.seg_1 = 1  
             self.seg_n = min(self.win_hl, self.buf.S())
-        elif self.near_buffer_bottom():
+        elif self.near_buffer_bottom(): # last line at bottom of window
             self.seg_1 = self.buf.S() - (self.win_hl - 1)
             self.seg_n = self.buf.S()
-        else: # visible segment is centered on dot
+        else: # dot is centered in window
             self.seg_1 = self.dot - self.win_hl//2 # floor division
             self.seg_n = self.seg_1 + (self.win_hl - 1)
 
@@ -170,7 +168,7 @@ class Window(object):
             self.cursor_ch = cursor_line[0] if cursor_line else ''
             # To ensure cursor on space or empty line is visible, 
             #  use self.cursor_chx
-            self.cursor_chx = ('_' if self.cursor_ch in ('',' ','\n') 
+            self.cursor_chx = (' ' if self.cursor_ch in ('',' ','\n') 
                                else self.cursor_ch)
             self.cursor_i = self.win_1 + (self.dot - self.seg_1)
             self.cursor_i = (self.cursor_i 
@@ -192,7 +190,6 @@ class Window(object):
     def erase_cursor(self):
         'At start of previous display line, replace cursor with saved char.'
         if self.cursor_i0:
-            # if line is empty must use ' ' to overwrite '_'
             ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
             display.put_render(self.cursor_i0, 1, ch, display.clear)
         elif self.dot == 0: # empty buffer, special case, cursor at window ulc
