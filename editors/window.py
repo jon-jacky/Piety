@@ -59,23 +59,19 @@ class Window(object):
         # seg_1, seg_n assigned in locate_segment, called from update_window.
         # seg_1, seg_n are also reassigned when dot moves.
 
-    def all_visible(self):
-        'Window contains entire segment'
+    def near_buffer_top(self):
+        """
+        dot is in top half of segment at beginning of buffer that fits in window,
+        so put visible segment at top of buffer, begins at first line.
+        """
         buf_S = len(self.buf.lines)-1 # last line in buffer
-        return buf_S <= self.win_hl
-
-    def at_top_segment(self):
-        """
-        dot is in segment at beginning of buffer that fits in window,
-        so visible segment is at top of buffer, begins at first line.
-        """
         # // is python 3 floor division
-        return (self.dot <= self.win_hl//2 or self.all_visible())
+        return (self.dot <= self.win_hl//2 or buf_S <= self.win_hl)
 
-    def at_bottom_segment(self):
+    def near_buffer_bottom(self):
         """
-        dot is in segment at end of buffer that fits in window,
-        so visible segment is at bottom of buffer, ends at last line.
+        dot is in bottom half of segment at end of buffer that fits in window,
+        so put visible segment at bottom of buffer, ends at last line.
         """
         buf_S = len(self.buf.lines)-1 # last line in buffer
         return (buf_S - self.dot < self.win_hl//2 and buf_S >= self.win_hl)
@@ -95,10 +91,10 @@ class Window(object):
         Center window on dot if possible,otherwise show top or bottom of buffer
         """
         buf_S = len(self.buf.lines)-1
-        if self.at_top_segment():
+        if self.near_buffer_top():
             self.seg_1 = 1  
             self.seg_n = min(self.win_hl, buf_S)
-        elif self.at_bottom_segment():
+        elif self.near_buffer_bottom():
             self.seg_1 = buf_S - (self.win_hl - 1)
             self.seg_n = buf_S
         else: # visible segment is centered on dot
@@ -133,56 +129,30 @@ class Window(object):
             display.kill_whole_line() # open line to insert new text
             print() # next line
             self.display_lines(self.dot+1, 
-                               self.seg_n - (0 if self.at_top_segment() else 1))
+                               self.seg_n - (0 if self.near_buffer_top() else 1))
         else: # not insert_mode - no open line at dot
             self.display_lines(self.seg_1, self.seg_n)
         for line in range(blank_h if not insert_mode else blank_h - 1):
             display.kill_whole_line()
             print()
 
-    # status line 
-    def display_bar(self):
-        display.put_cursor(self.status_1, 1)
-        bar = '-'*8 + ' '*32 + (self.ncols-40)*'-'
-        display.render(bar, display.white_bg) #gray on mac term
-
-    def display_unsaved(self, col):
-        display.put_cursor(self.status_1, col)
-        display.render('**' if self.buf.unsaved else '--', display.white_bg)
-
-    def display_bufname(self, col):
-        display.put_cursor(self.status_1, col)
-        attrs = display.attrs(display.bold, display.white_bg) # white_bg is gray on mac term
-        display.render(' ' + self.buf.name + ' ', attrs) 
-
-    def display_position(self, col):
-        display.put_cursor(self.status_1, col)
-        position = (' All ' if self.all_visible() else
-                    ' Top ' if self.at_top_segment() else
-                    ' Bot ' if self.at_bottom_segment() else
-                    ' %2.0f%% ' % (100*self.dot/(len(self.buf.lines)-1))) # %% prints %
-        display.render(position, display.white_bg) # white_bg is gray on mac term
-
-    def display_linenums(self, col):
-        display.put_cursor(self.status_1, col)
-        linenums = ' L%s/%d ' % (self.dot, len(self.buf.lines)-1)
-        display.render(linenums, display.white_bg) # white_bg is gray on mac term
-
-    def display_timestamp(self, col):
-        'print timestamp near right margin of status line'
-        # For testing, to reveal window updates where contents don't change
-        display.put_cursor(self.status_1, col)
-        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S ') # 10 ch w/margin
-        display.render(timestamp, display.white_bg) # white_bg is gray on mac term
-
     def display_status(self):
-        "Print information about window's buffer in window's status line."
-        self.display_bar()
-        self.display_unsaved(6)
-        self.display_bufname(13)
-        self.display_position(28)
-        self.display_linenums(33)
-        self.display_timestamp(self.ncols-10)
+        "Print information about window's buffer in its status line."
+        s1 = self.status_1  # line number of status bar on display
+        unsaved = '-----**-     ' if self.buf.unsaved else '--------     '
+        bufname = '%-13s' % self.buf.name
+        position = (' All ' if self.buf.S() <= self.win_hl else # S() is last line
+                    ' Top ' if self.seg_1 == 1 else
+                    ' Bot ' if self.seg_n == self.buf.S() else
+                    ' %2.0f%% ' % (100*self.dot/(len(self.buf.lines)-1))) # %% prints %
+        linenums = '%-14s' % ('L%d/%d ' % (self.dot, self.buf.S()))
+        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 ch w/margin
+        display.put_render(s1, 0, unsaved, display.white_bg)
+        display.put_render(s1, 13, bufname, display.bold, display.white_bg)
+        display.put_render(s1, 26, position, display.white_bg)
+        display.put_render(s1, 31, linenums, display.white_bg)
+        display.put_render(s1, 45, '-'*26, display.white_bg)
+        display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
 
     def cursor_elsewhere(self):
         'dot lies outside segment of buffer visible in window'

@@ -70,7 +70,7 @@ def move_to_column(column):
 
 # line also uses kill_line, defined below
 
-# used by edd
+# used by edsel and window, they also use render (above)
 
 def erase_display(): # name in gnu readline
     putstr(ed)
@@ -93,3 +93,11 @@ def set_scroll(ltop, lbottom):
 def set_scroll_all():
     'Set scrolling region to entire display'
     putstr(decstbmn)
+
+def put_render(line, column, text, *attributes):
+    """
+    At line, column, print text with attributes
+    but without newline, then clear attributes.
+    """
+    put_cursor(line, column)
+    putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
