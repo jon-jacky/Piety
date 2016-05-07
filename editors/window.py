@@ -1,16 +1,7 @@
 """
 window.py - Window class for line-oriented display editors.
 
-This module assumes each window displays the contents of a text
-buffer similar to the one defined by our Buffer class, where the
-buffer contents is named lines, which is a list of strings (each
-string is a line of text in the buffer), and there is a current 
-line (the text insertion point) named dot.
-
-However this assumption about the text buffer is implicit.  This
-module does not import our Buffer module, and there is no checking
-that the arguments of the methods here are consistent with our
-assumptions.
+Each window instance displays a range of lines from a text buffer.
 """
 
 import display
@@ -20,13 +11,16 @@ class Window(object):
     """
     Window class for line-oriented display editors.
     A window displays a range of lines (segment) from a text buffer.
-    A window may display a cursor to indicate a specific line in the buffer.
-    A window may include a status region with information about the buffer.
+    A window includes a status line with information about the buffer.
+    A window may display a cursor to indicate the current line, called dot.
     """
     def __init__(self, buf, win_1, win_h, ncols):
         """
         Initialize window, given its text buffer, location, and dimensions
-        buf - text buffer displayed in this window
+        buf - text buffer displayed in this window, must have:
+          buf.lines: list of strings, buf.S(): returns index of last line,
+          buf.dot: current line, buf.npage: n of lines for paging commands
+          buf.unsaved: boolean, buf.name: string
         win_1 -line number on display of first buffer line shown in this window
         win_h - number of lines in this window, including status region
         ncols - maximum number of characters in a line
@@ -39,7 +33,7 @@ class Window(object):
         self.resize(win_1, win_h, ncols) # assigns self.win_1 .win_h .ncols
         # self.seg_1,seg_n are indices in buffer of 1st,last lines in window
         self.seg_1 = 1 # index in buffer of first line displayed in window
-        self.seg_n = min(self.win_hl, len(self.buf.lines)-1) # index last line
+        self.seg_n = min(self.win_hl, self.buf.S()) # index last line
         self.cursor_i = None # line number of current buffer's dot on display
         self.cursor_ch = None # character that cursor overwrites
         self.cursor_chx = None # same as cursor_ch except when that is blank
@@ -64,23 +58,21 @@ class Window(object):
         dot is in top half of segment at beginning of buffer that fits in window,
         so put visible segment at top of buffer, begins at first line.
         """
-        buf_S = len(self.buf.lines)-1 # last line in buffer
         # // is python 3 floor division
-        return (self.dot <= self.win_hl//2 or buf_S <= self.win_hl)
+        return (self.dot <= self.win_hl//2 or self.buf.S() <= self.win_hl)
 
     def near_buffer_bottom(self):
         """
         dot is in bottom half of segment at end of buffer that fits in window,
         so put visible segment at bottom of buffer, ends at last line.
         """
-        buf_S = len(self.buf.lines)-1 # last line in buffer
-        return (buf_S - self.dot < self.win_hl//2 and buf_S >= self.win_hl)
+        return (self.buf.S() - self.dot < self.win_hl//2 and
+                self.buf.S() >= self.win_hl)
 
     def at_bottom_line(self):
         'dot is at last line in buffer and is last line in full window.'
-        buf_S = len(self.buf.lines)-1 # last line in buffer
         seg_h = self.seg_n - self.seg_1 + 1 # lines in segment, maybe < win_hl
-        return (self.dot == buf_S and self.seg_n == buf_S 
+        return (self.dot == self.buf.S() and self.seg_n == self.buf.S() 
                 and seg_h == self.win_hl)
 
     def locate_segment(self):
@@ -90,13 +82,12 @@ class Window(object):
           also self.seg_n - index in buffer of last line shown in window.
         Center window on dot if possible,otherwise show top or bottom of buffer
         """
-        buf_S = len(self.buf.lines)-1
         if self.near_buffer_top():
             self.seg_1 = 1  
-            self.seg_n = min(self.win_hl, buf_S)
+            self.seg_n = min(self.win_hl, self.buf.S())
         elif self.near_buffer_bottom():
-            self.seg_1 = buf_S - (self.win_hl - 1)
-            self.seg_n = buf_S
+            self.seg_1 = self.buf.S() - (self.win_hl - 1)
+            self.seg_n = self.buf.S()
         else: # visible segment is centered on dot
             self.seg_1 = self.dot - self.win_hl//2 # floor division
             self.seg_n = self.seg_1 + (self.win_hl - 1)
@@ -193,23 +184,19 @@ class Window(object):
     def display_cursor(self):
         'Display cursor at start of display line'
         if self.cursor_i:
-            display.put_cursor(self.cursor_i, 1) 
-            display.render(self.cursor_chx, display.white_bg) # no blink
+            display.put_render(self.cursor_i, 1, self.cursor_chx, display.white_bg)
         elif self.dot == 0:
             # special case, empty buffer,  _ cursor at window ulc
-            display.put_cursor(self.win_1, 1)
-            display.render(' ', display.white_bg) # no blink
+            display.put_render(self.win_1, 1, ' ', display.white_bg) # no blink
 
     def erase_cursor(self):
         'At start of previous display line, replace cursor with saved char.'
         if self.cursor_i0:
             # if line is empty must use ' ' to overwrite '_'
             ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
-            display.put_cursor(self.cursor_i0, 1)
-            display.render(ch, display.clear)
+            display.put_render(self.cursor_i0, 1, ch, display.clear)
         elif self.dot == 0: # empty buffer, special case, cursor at window ulc
-            display.put_cursor(self.win_1, 1)
-            display.render(' ', display.clear)
+            display.put_render(self.win_1, 1, ' ', display.clear)
             
     def set_insert_cursor(self):
         'Position cursor at start of open line after dot for insert append change cmds.'
