@@ -751,7 +751,7 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='line editor in pure Python based on classic Unix ed')
     parser.add_argument('file', 
-                        help="""name of file to load into main buffer at startup (omit to start with empty main buffer)""",
+                        help='name of file to load into main buffer at startup (omit to start with empty main buffer)',
                         nargs='?',
                         default=None),
     parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',

@@ -26,8 +26,8 @@ The recommended way to run **ed.py** as a standalone program is:
 
 Here the *-i* option runs Python in interactive mode so you can use
 *readline*-style editing within command lines.  The *-m* option finds
-and runs **ed.py** from any directory on your Python path (note that
-you provide the module name, not the file name with *.py*).
+and runs **ed.py** from any directory on your Python path (you provide
+the module name *ed*, not the file name *ed.py*).
 
 **ed.py** provides a few command line arguments and options, explained in this
 output from *ed -h*:
@@ -43,9 +43,9 @@ output from *ed -h*:
       -p PROMPT, --prompt PROMPT
                             command prompt string (default no prompt)
 
-For example
+For example, to load the file *lines.txt* on startup and use colon *:* as the prompt string:
 
-    python3 -i -m ed -p : lines.txt
+    python3 -i -m ed lines.txt -p : 
 
 To run *ed.py* in an interactive Python session, import *ed* then run its *main* function:
 
@@ -53,14 +53,13 @@ To run *ed.py* in an interactive Python session, import *ed* then run its *main*
     ...
     >>> import ed
     >>> ed.main()
-    ... 
 
-The *main* function can accept an optional positional argument for a file name and 
+The *main* function accepts an optional positional argument for a file name and 
 and optional keyword argument for a prompt string:
 
-    ...
     >>> ed.main('lines.txt', p=':')
-    : ...
+    lines.txt, 40 lines
+    : 
 
 
 ## Commands ##
@@ -132,14 +131,6 @@ interactive Python session and run some commands:
 After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by typing
 *ed.main()* again.
-
-The *ed.main()* function takes one optional positional argument, the
-file name, and one optional keyword argument, *p* the command prompt
-string.  Type *ed.main('test.txt')* to begin editing *test.txt*, as if
-you had typed *ed.main()* and then *e test.txt*.  Type
-*ed.main(p=':')* to use a single colon as the command prompt (the
-default prompt is the empty string).  The file name and prompt can
-appear together, so you can type *ed.main('test.txt', p=':')*.
 
 In *!command*, the *command* is passed to the Python interpreter, not
 to the system command shell as in classic *ed*.  Use this to execute
@@ -296,5 +287,10 @@ also move lines to another buffer.
 
 The *#* character in the first column of a command indicates a comment.  It is
 useful for annotating command scripts.
+
+In the *b* and *x* commands, the buffer name parameter can be abbreviated 
+by providing a prefix followed by a hyphen.  For example, the command *b key-*
+will switch to the buffer *keyboard.py*.  If more than one buffer name begins
+with the same prefix, *ed.py* just chooses one.
 
 Revised March 2016
