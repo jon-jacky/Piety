@@ -15,6 +15,54 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 **ed.py** provides the command line and internals for the display editor
   [edsel](edsel.md).
 
+
+## Running ed.py ##
+
+**ed.py** can run as a standalone program or in an interactive Python session.  
+
+The recommended way to run **ed.py** as a standalone program is:
+
+    python3 -i -m ed
+
+Here the *-i* option runs Python in interactive mode so you can use
+*readline*-style editing within command lines.  The *-m* option finds
+and runs **ed.py** from any directory on your Python path (note that
+you provide the module name, not the file name with *.py*).
+
+**ed.py** provides a few command line arguments and options, explained in this
+output from *ed -h*:
+
+    usage: ed.py [-h] [-p PROMPT] [file]
+
+    positional arguments:
+      file                  name of file to load into main buffer at startup (omit
+                            to start with empty main buffer)
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -p PROMPT, --prompt PROMPT
+                            command prompt string (default no prompt)
+
+For example
+
+    python3 -i -m ed -p : lines.txt
+
+To run *ed.py* in an interactive Python session, import *ed* then run its *main* function:
+
+    python3 -i
+    ...
+    >>> import ed
+    >>> ed.main()
+    ... 
+
+The *main* function can accept an optional positional argument for a file name and 
+and optional keyword argument for a prompt string:
+
+    ...
+    >>> ed.main('lines.txt', p=':')
+    : ...
+
+
 ## Commands ##
 
 **ed.py** supports these commands from classic *ed*:
@@ -61,9 +109,8 @@ The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
 and [http://sam.cat-v.org/](http://sam.cat-v.org/).
 
-**ed.py** can run as a standalone program: *python ed.py* (it takes no
-command line options or arguments).  But *ed* is intended to run in an
-interactive Python session.  Here is a brief example:
+This brief example that shows how to invoke **ed.py** in an
+interactive Python session and run some commands:
 
     >>> import ed
     >>> ed.main()

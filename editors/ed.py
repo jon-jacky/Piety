@@ -334,7 +334,7 @@ def A(*args):
 
 def n(*args):
     'Print information about all buffers'
-    print('C M Buffer            Size  File')
+    print('C M Buffer            Size  File') # C current  M modified (unsaved)
     for name in buffers:
         print (('.' if name == current else ' ') + buffers[name].info())
     
@@ -747,4 +747,16 @@ def main(*filename, **options):
 # Run the editor from the system command line:  python ed.py
 
 if __name__ == '__main__':
-    main()
+    # import argparse inside if ... so it isn't always a dependency of this module
+    import argparse
+    parser = argparse.ArgumentParser(description='line editor in pure Python based on classic Unix ed')
+    parser.add_argument('file', 
+                        help="""name of file to load into main buffer at startup (omit to start with empty main buffer)""",
+                        nargs='?',
+                        default=None),
+    parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',
+                        default='')
+    args = parser.parse_args()
+    filename = [args.file] if args.file else []
+    options = {'p': args.prompt } if args.prompt else {}
+    main(*filename, **options)

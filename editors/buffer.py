@@ -55,6 +55,11 @@ class Buffer(object):
         self.nlines = 0 # signed number of most recently inserted or deleted lines,
                         # positive for insertion, negative for deletion
 
+    def info(self):
+        'return string with unsaved flag, buffer name, size in lines, filename'
+        return ((' * ' if self.unsaved else '   ') +  # reserve col 1 for readonly flag
+                '%-15s' % self.name + '%7d' % self.S() + '  %s' % self.filename)
+
     # For other programs (besides editors) to write into buffers
 
     # The call print(s, file=buffer), invokes this code to write s to buffer
@@ -82,12 +87,6 @@ class Buffer(object):
     def S(self):
         'like ed $, Return index of the last line, 0 if the buffer is empty'
         return len(self.lines)-1 # don't count empty first line at index 0
-
-    # information
-    def info(self):
-        'return string with unsaved flag, buffer name, size in lines, filename'
-        return ((' * ' if self.unsaved else '   ') +  # reserve col 1 for readonly flag
-                '%-15s' % self.name + '%7d' % self.S() + '  %s' % self.filename)
 
     # search
 
