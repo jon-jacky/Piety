@@ -44,11 +44,12 @@ command to adjust the size of the command region (along with the
 frame) to retain more (or fewer) lines.
 
 As you type in text, or type commands in the scrolling region, windows
-update to show the current text in the buffers.  Each window has a
-status line at its bottom that shows the line numbers of the window's
-current line in the buffer (dot, where you see the cursor) and the
-buffer's last line, the name of the buffer, and the name of the file
-where the buffer contents would be written.
+update to show the current text in the buffers.  
+
+Each window has a status line at its bottom that shows whether the
+buffer has unsaved changes, the buffer name, the location and line
+number of the current line in the buffer, the total number of
+lines in the buffer, and perhaps some other information.
 
 ## Commands ##
 
