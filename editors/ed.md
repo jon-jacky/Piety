@@ -290,7 +290,7 @@ useful for annotating command scripts.
 
 In the *b* and *x* commands, the buffer name parameter can be abbreviated 
 by providing a prefix followed by a hyphen.  For example, the command *b key-*
-will switch to the buffer *keyboard.py*.  If more than one buffer name begins
+might switch to the buffer *keyboard.py*.  If more than one buffer name begins
 with the same prefix, *ed.py* just chooses one.
 
-Revised March 2016
+Revised May 2016

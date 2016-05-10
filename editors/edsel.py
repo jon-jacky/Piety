@@ -122,8 +122,8 @@ def init_session(*filename, **options):
         ed.e(filename[0])
     if 'p' in options:
         prompt = options['p'] 
-    if 'h' in options:
-        cmd_h = options['h'] 
+    if 'c' in options:
+        cmd_h = options['c'] 
     # must calc_frame to get window dimensions before we create win
     calc_frame() # assign windows_h etc.
     win = window.Window(ed.buf, frame_top, windows_h, ncols) # one big window
@@ -322,4 +322,20 @@ def main(*filename, **options):
 
 # Run the editor from the system command line: python edsel.py
 if __name__ == '__main__':
-    main()
+    # import argparse inside if ... so it isn't always a dependency of this module
+    # duplicates code from ed.py but that is the cost of avoiding dependency on argparse.
+    import argparse
+    parser = argparse.ArgumentParser(description='display editor in pure Python based on the line editor ed.py')
+    parser.add_argument('file', 
+                        help='name of file to load into main buffer at startup (omit to start with empty main buffer)',
+                        nargs='?',
+                        default=None),
+    parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',
+                        default='')
+    parser.add_argument('-c', '--cmd_h', help='number of lines in scrolling command region (default 2)',
+                        type=int, default=2)
+    args = parser.parse_args()
+    filename = [args.file] if args.file else []
+    options = {'p': args.prompt } if args.prompt else {}
+    options.update({'c': args.cmd_h } if args.cmd_h else {})
+    main(*filename, **options)
