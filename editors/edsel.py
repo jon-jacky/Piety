@@ -90,7 +90,7 @@ def set_command_cursor():
 def update_windows():
     'Redraw all windows, called by display_frame, for example after frame resize.'
     for w in windows:
-        w.update_window(False) # no windows could be in insert mode at this time
+        w.update_window(True) # no windows could be in insert mode at this time
 
 def display_frame():
     'Clear and update the entire frame'
@@ -195,21 +195,21 @@ def update_display():
     elif (file_changed() or buffer_changed() or text_cmd() or win.cursor_elsewhere() 
         or set_single_window or split_window):
         # update current window contents
-        win.update_window(not ed.command_mode) # insert mode
+        win.update_window(ed.command_mode) # insert mode
         if split_window: 
             # win0 is former current window
             # if win0 cursor did not lie within new window erase it now.
             # win.resize in o2 command code did not relocate win0 cursor
             if win0.cursor_i < win.win_1 or win0.cursor_i > win.win_1+win.win_h:
                 win0.erase_cursor()
-            win0.update_window(False)
+            win0.update_window(True)
         else: 
             # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
                     # FIXME? add stronger conditions, 
                     # prevent updates when lines in w unchanged
-                    w.update_window(False)
+                    w.update_window(True)
         # must draw cursor last
         if ed.command_mode:
             win.display_cursor() # edsel dot cursor in window

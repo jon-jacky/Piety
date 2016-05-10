@@ -101,27 +101,27 @@ class Window(object):
             display.kill_line() # erase from cursor to end
             print() # advance to next line
 
-    def display_window(self, insert_mode):
+    def display_window(self, command_mode):
         """
         Start on win_1 line, display buffer lines self.seg_1 .. self.seg_n 
         If space remains in window, pad with empty lines to self.win_h
-        If in insert mode (not command mode), open line where text will be typed
+        If in insert mode (not command_mode), open line where text will be typed
         """
         # lines in segment, usually same as self.win_hl, less if small buffer
         seg_h = self.seg_n - self.seg_1 + 1 
         # n of padding empty lines at window bottom, > 0 when small buffer
         blank_h = self.win_hl - seg_h   
         display.put_cursor(self.win_1,1)  # cursor to window top
-        if insert_mode: # open line at dot to insert new text
+        if command_mode:
+            self.display_lines(self.seg_1, self.seg_n)
+        else: # insert mode, open line at dot to insert new text
             self.display_lines(self.seg_1 +(1 if self.at_bottom_line() else 0),
                                self.dot) # leave space at dot
             display.kill_whole_line() # open line to insert new text
             print() # next line
             self.display_lines(self.dot+1, 
                                self.seg_n - (0 if self.near_buffer_top() else 1))
-        else: # not insert_mode - no open line at dot
-            self.display_lines(self.seg_1, self.seg_n)
-        for line in range(blank_h if not insert_mode else blank_h - 1):
+        for line in range(blank_h if command_mode else blank_h - 1):
             display.kill_whole_line()
             print()
 
@@ -203,10 +203,10 @@ class Window(object):
             line = self.cursor_i + (0 if self.at_bottom_line() else 1)
         display.put_cursor(line, 1) # open line after dot
 
-    def update_window(self, insert_mode):
+    def update_window(self, command_mode):
         'Locate and display the window including its status line and cursor.'
         self.locate_segment() # assign new self.seg_1, self.seg_n
         self.locate_cursor()  # *re*assign new self.cursor_i, cursor_ch
-        self.display_window(insert_mode)
+        self.display_window(command_mode)
         self.display_status()
         # No self.set_insert_cursor or display_cursor, caller must do it.
