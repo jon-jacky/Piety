@@ -32,7 +32,7 @@ Use the command *python3 -m edsel -h* to print help.
 
 ## Display ##
 
-**edsel** is similar to other multiwindow display editors such as
+**edsel** looks similar to other multiwindow display editors such as
 *emacs*.  It divides its display into two main regions: a scrolling
 command region at the bottom, and above it a *frame* that holds one
 or more windows that show the contents of editor buffers.  
