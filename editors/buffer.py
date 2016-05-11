@@ -149,17 +149,17 @@ class Buffer(object):
     def r(self, iline, filename):
         'Read file contents into buffer after iline'
         if os.path.isfile(filename): 
-            fd = open(filename, mode='r')        
-            # fd.readlines reads file into a list of strings, one per line
-            strings = fd.readlines() # each string in lines ends with \n
-            fd.close()
+            strings = [] # in case readlines fails
+            with open(filename, mode='r') as fd:
+                # fd.readlines reads file into a list of strings, one per line
+                strings = fd.readlines() # each string in lines ends with \n
             self.insert(iline+1, strings) # like append, below
 
     def w(self, name):
         'Write current buffer contents to file name'
-        fd = open(name, 'w')
-        for line in self.lines[1:]: # don't print empty line 0
-            fd.write(line)
+        with open(name, 'w') as fd:
+            for line in self.lines[1:]: # don't print empty line 0
+                fd.write(line)
         self.unsaved = False
 
     # displaying and navigating text
