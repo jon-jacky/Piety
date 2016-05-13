@@ -15,11 +15,9 @@ o
 !ed.buf.mark
 'a
 'b
-,p
 'a,'bt0
 'a,'bt$
 !ed.buf.mark
-,p
 'a
 'b
 'c
@@ -30,5 +28,4 @@ o
 !ed.deleted_mark
 16y
 !ed.buf.mark
-,p
 # test finished
