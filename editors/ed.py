@@ -22,9 +22,9 @@ print_lz_destination = sys.stdout  # In ed, l and z commands print
 
 # arg lists, defaults, range checking
 
-# We parse twice, to provide both command strings and new Python API
-# Here parse_args parses variable-length argument lists for Python API
-# Below parse_cmd parses traditional ed command strings
+# We parse twice, to provide both command strings and new Python API.
+# Here parse_args parses variable-length argument lists for Python API.
+# Below parse_cmd parses traditional ed command strings.
 
 def parse_args(args):
     """
@@ -89,7 +89,7 @@ def range_ok(start, end):
 
 def parse_check_line(ok0, args):
     'Building block for parse_check_... functions'
-    iline, x, param, xx = parse_args(args)
+    iline, _, param, _ = parse_args(args)
     iline = mk_iline(iline)
     valid = iline_ok0(iline) if ok0 else iline_ok(iline)
     if not valid:
@@ -213,7 +213,7 @@ def b(*args):
     Then print current buffer name.  If none given, print current name + info
     """
     global current, buf
-    x, xx, bufname, xxx = parse_args(args)
+    _, _, bufname, _ = parse_args(args)
     bufname = match_prefix(bufname, buffers)
     if bufname in buffers:
         current = bufname
@@ -232,18 +232,17 @@ def r_new(buffername, filename):
 
 def f(*args):
     'set default filename, if filename not specified print current filename'
-    x, xx, filename, xxx = parse_args(args)
+    _, _, filename, _ = parse_args(args)
     if filename:
         buf.f(filename)
-        return
-    if buf.filename:
+    elif buf.filename:
         print(buf.filename)
-        return
-    print('? no current filename')
+    else:
+        print('? no current filename')
 
 def E(*args):
     'read in file, replace buffer contents despite unsaved changes'
-    x, xx, filename, xxx = parse_args(args)
+    _, _, filename, _ = parse_args(args)
     if not filename:
         filename = buf.filename
     if not filename:
@@ -272,7 +271,7 @@ def r(*args):
 
 def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
-    x, xx, filename, xxx = parse_args(args)
+    _, _, filename, _ = parse_args(args)
     if not filename:
         print('? file name')
         return
@@ -285,7 +284,7 @@ def B(*args):
 
 def w(*args):
     'write current buffer contents to file name'
-    x, xx, fname, xxx = parse_args(args)
+    _, _, fname, _ = parse_args(args)
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
@@ -296,7 +295,7 @@ D_count = 0 # number of consecutive times D command has been invoked
 def D(*args):
     'Delete the named buffer, if unsaved changes print message and exit'
     global D_count
-    x, xx, bufname, xxx = parse_args(args)
+    _, _, bufname, _ = parse_args(args)
     name = bufname if bufname else current
     if name in buffers and buffers[name].unsaved and not D_count:
         print('? unsaved changes, repeat D to delete')
@@ -307,7 +306,7 @@ def D(*args):
 def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
     global current, buf
-    x, xx, bufname, xxx = parse_args(args)
+    _, _, bufname, _ = parse_args(args)
     name = bufname if bufname else current
     if not name in buffers:
         print('? buffer name')
@@ -325,7 +324,7 @@ def DD(*args):
 
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
-    iline, x, xx, xxx = parse_args(args)
+    iline, _, _, _ = parse_args(args)
     iline = iline if iline != None else S() # default $ not .
     if iline_ok0(iline): # don't print error message when file is empty
         print(iline)
@@ -342,7 +341,7 @@ def n(*args):
     
 def l(*args):
     'Advance dot to iline and print it'
-    iline, x, xx, xxx = parse_args(args)
+    iline, _, _, _ = parse_args(args)
     if not buf.lines:
         print('? empty buffer')
         return
@@ -361,7 +360,7 @@ def p_lines(start, end, destination): # arg here shadows global destination
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
-    valid, start, end, x, xx = parse_check_range(args)
+    valid, start, end, _, _ = parse_check_range(args)
     if valid:
         p_lines(start, end, sys.stdout) # print unconditionally
     
@@ -408,13 +407,13 @@ def i(*args):
 
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes or...'
-    valid, start, end, x, xx = parse_check_range(args)
+    valid, start, end, _, _ = parse_check_range(args)
     if valid:
         buf.d(start, end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
-    valid, start, end, lines, xx = parse_check_range(args)
+    valid, start, end, lines, _ = parse_check_range(args)
     if valid:
         buf.c(start,end,lines)
         
@@ -455,7 +454,7 @@ def t(*args):
 
 def y(*args):
     'Insert most recently deleted lines *before* destination line address'
-    iline, x, xx, xxx = parse_args(args)
+    iline, _, _, _ = parse_args(args)
     iline = mk_iline(iline)
     if not (0 <= iline <= buf.S()+1): # allow +y at $ to append to buffer
         print('? invalid address')
@@ -612,7 +611,7 @@ def cmd(line):
         else:
             tokens = tuple([ t for t in items if t != None ])
         cmd_name, args = tokens[0], tokens[1:]
-        start, end, dest, xxx = parse_args(args) # might be int or None
+        start, end, dest, _ = parse_args(args) # might be int or None
         start, end = mk_range(start, end) # int only
         dest, _ = (None, None) if dest is None else match_address(dest) # str -> int
         if cmd_name in complete_cmds:
@@ -697,7 +696,7 @@ def x(*args):
      bufname is not optional - it cannot be the current buffer.
      echo - optional, default True; delay - optional, default 0.2 sec
     """
-    x, xx, bufname, params = parse_args(args)
+    _, _, bufname, params = parse_args(args)
     bufname = match_prefix(bufname, buffers)
     if bufname in buffers:
         valid, echo, delay = parse_echo_delay(params)
