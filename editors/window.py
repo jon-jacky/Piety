@@ -54,16 +54,12 @@ class Window(object):
         # seg_1, seg_n are also reassigned when dot moves.
 
     def near_buffer_top(self):
-        """
-        dot is in top half of segment at beginning of buffer that fits in window
-        """
+        'dot is in top half of segment at beginning of buffer that fits in window.'
         # // is python 3 floor division
         return (self.dot <= self.win_hl//2 or self.buf.S() <= self.win_hl)
 
     def near_buffer_bottom(self):
-        """
-        dot is in bottom half of segment at end of buffer that fits in window,
-        """
+        'dot is in bottom half of segment at end of buffer that fits in window.'
         return (self.buf.S() - self.dot < self.win_hl//2 and
                 self.buf.S() >= self.win_hl)
 
