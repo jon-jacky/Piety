@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 """
-eventloop script - demo piety and eventloop modules
+events.py - demo piety and eventloop modules
 """
 import piety # piety imports eventloop
              

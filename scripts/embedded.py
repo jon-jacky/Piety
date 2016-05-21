@@ -1,9 +1,8 @@
-#!/usr/bin/env python
 """
-Start a Piety session running two concurrent file writer tasks, but
-without an interactive interpreter.  Shows that Piety can run in a
-'headless' mode with no console, as is needed in some embedded
-systems.
+embedded.py - Start a Piety session running two concurrent file writer
+tasks, but without an interactive interpreter.  Shows that Piety can
+run in a 'headless' mode with no console, as is needed in some
+embedded systems.
 
 When you run this script, Piety schedules the tasks to write 10
 messages to w0.txt and 5 messages to w1.txt, then Piety exits.  To
@@ -18,7 +17,6 @@ appears, type main():
  ... w0 writes 10 messages, w1 writes five, then they stop ...
  >>> main()
  ... writers write, stop again ...
-
 """
 
 import piety, writer_tasks 

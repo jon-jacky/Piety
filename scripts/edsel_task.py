@@ -1,5 +1,5 @@
 """
-edsel_tasks.py - Creates a console Session instance with just one Job - edsel.
+edsel_task.py - Creates a console Session instance with just one Job - edsel.
                   based on console_tasks.py, see its header for explanation
 
 BUT unlike console_tasks, we start up edsel immediately and exit piety at edsel q.

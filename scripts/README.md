@@ -22,36 +22,43 @@ comments in each module for directions and explanations:
     not use the *piety* scheduler, so they still block waiting for the
     next character.
 
-- **edsel_task.py**: runs the display editor *edsel.py* under the *piety* scheduler,
-    doing non-blocking input with the *console* and *key* modules.
+- **edsel_task.py**: runs the display editor *edsel.py* under the
+    *piety* scheduler, doing non-blocking input with the *command* and
+    *key* modules.  Similar to *console_tasks.py*, also uses the
+    *Session* and *Job* classes.
 
-- **edsel_timestamps**: Uses a blocking event loop to run the *edsel*
+- **edsel_timestamps.py**: Uses a blocking event loop to run the *edsel*
     display editor, demonstrating how two *timestamp* generators can 
     write to two editor buffers.
 
-- **embedded**: Uses a non-blocking event loop to run the two concurrent file
+- **embedded.py**: Uses a non-blocking event loop to run the two concurrent file
    writer tasks created by *writer_tasks*, but without an interactive
    interpreter.  Shows that Piety can run in a "headless" mode with no
    console, as is needed in some embedded systems.
 
-- **eventloop**: Uses a non-blocking event loop to run two trivial tasks.  
+- **events.py**: Uses a non-blocking event loop to run two trivial tasks.  
   Demonstrates that Piety can use different event loops, 
   *select/eventloop.py* or *asyncio/eventloop.py*.  Redefine *PYTHONPATH*
   with *bin/paths* or *bin/asyncio_paths* to select an event loop.
   The *embedded* script (above) can also use different event loops.
 
-- **piety**: Uses a non-blocking event loop to run the console session with
-  three jobs created by *console_tasks*, concurrently with the two
-  writer tasks created by *writer_tasks*.
+- **piety_edsel.py**: runs the display editor *edsel.py* under the
+    *piety* scheduler, doing non-blocking input with the *command* and
+    *key* modules.  Similar to *edsel_task.py* but simpler code, 
+    uses *Job* without *Session*.
 
-- **piety_timestamps**: Uses a non-blocking event loop to run the
+- **piety_timestamps.py**: Uses a non-blocking event loop to run the
   console session with three jobs created by *console_tasks*,
   concurrently with the two timestamp tasks created in this script.
   The timestamp tasks write to editor buffers named *ts1* and *ts2*.
   Display these buffers using the *edsel* display editor commands *b ts1*
   and *b ts2* to see the buffers update as each timestamp is written.
 
-- **writer_tasks.py**: Creates writer tasks used by the *embedded* and
-    *piety* scripts.
+- **piety_writers.py**: Uses a non-blocking event loop to run the console session with
+  three jobs created by *console_tasks*, concurrently with the two
+  writer tasks created by *writer_tasks*.
+
+- **writer_tasks.py**: Creates writer tasks used by the *embedded.py* and
+    *piety_writers.py* scripts.
 
 Revised May 2016

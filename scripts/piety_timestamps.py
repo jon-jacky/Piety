@@ -1,8 +1,7 @@
-#!/usr/bin/env python
 """
-piety_timestamps - Uses the Piety scheduler to run the console session
-  with three jobs created by console_tasks, concurrently with the two
-  timestamp tasks created here. 
+piety_timestamps.py - Uses the Piety scheduler to run the console
+  session with three jobs created by console_tasks, concurrently with
+  the two timestamp tasks created here.
 
 The timestamp tasks write to editor buffers named ts1 and ts2.
 Display these buffers using the edsel display editor commands 'b ts1'

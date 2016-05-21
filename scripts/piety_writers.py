@@ -1,6 +1,5 @@
-#!/usr/bin/env python
 """
-piety - Uses the Piety scheduler to run the console session with
+piety_writers.py - Uses the Piety scheduler to run the console session with
   three jobs created by console_tasks, concurrently with the two
   writer tasks created by writer_tasks.
 
