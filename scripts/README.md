@@ -2,15 +2,19 @@
 scripts
 =======
 
-Python scripts that run applications as tasks or jobs with a
-non-blocking event loop. See docstrings (comment headers) and inline
-comments in each module for directions and explanations:
+Python modules that test and demonstrate the *piety* facilities.  Most
+run applications as tasks with the non-blocking *piety* event loop.
+Despite the directory name *scripts*, these are all proper Python
+modules (with *.py* suffixes and without *#!* lines) that can be
+imported, or started with *python -m ...*.  See docstrings (comment
+headers) and inline comments in each module for directions and
+explanations.
 
 - **console_tasks.py**: Creates a console *Session* instance with three
   *Job* instances: the *pysh* shell, the *ed* line editor, and the *edsel*
   display editor.  The application in each job is a *Command* instance,
   each with its own *reader* method that reads and possibly preprocesses its input. 
-  This module is used by the *piety* and *piety_timestamps* scripts.
+  This module is used by the *piety_writers* and *piety_timestamps* scripts.
   It also has a *main* method that
   runs the session in a simple blocking event loop (instead of using
   one of the non-blocking event loops).
