@@ -47,6 +47,7 @@ def display_frame():
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
     update_windows()
+    win.display_cursor()
     display.set_scroll(cmd_1, cmd_n) 
     set_command_cursor()
 

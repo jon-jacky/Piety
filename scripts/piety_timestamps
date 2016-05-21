@@ -12,23 +12,14 @@ The code that writes to the editor buffers demonstrates how to use
 the Buffer class write method and update attribute.
 
 See console_tasks header for directions on how to run the console jobs
-including the edsel editor.
+including the edsel editor, except start ed with con.job.ed not just
+job.ed etc.
 """
 
 import terminal, display
 import piety
 import timestamp
 import console_tasks as con
-
-# command aliases
-pysh = con.job.pysh # no name clash with con.pysh module
-ed = con.job.ed 
-edsel = con.job.edsel
-
-# more command aliases
-# if you prefer ed.main() and ed.main('README.md') to ed() and ed('README.md') etc.
-ed.main = ed.__call__
-edsel.main = edsel.__call__
 
 # add content to main buffer
 # we haven't started edsel yet, window not initialized, use con.ed commands
@@ -49,9 +40,8 @@ ts1buf = con.ed.buffers['ts1']
 ts2buf = con.ed.buffers['ts2']
 
 # window update function
-
 def update(buf):
-    if con.console.foreground == edsel and con.ed.buf == buf:
+    if con.console.foreground == con.job.edsel and con.ed.buf == buf:
         terminal.set_line_mode()
         con.edsel.win.update_window(True) # command mode not insert mode
         # restore cursor to edsel cmd line (bottom of scroll region), edit point

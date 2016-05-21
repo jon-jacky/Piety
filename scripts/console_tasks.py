@@ -15,23 +15,22 @@ This script starts the non-blocking pysh Python shell, with the prompt
 >> (two not three >).  When editing the pysh command line, control
 keys and arrow keys work.  Exit the pysh shell with exit() or ^D.
 
-To start the ed line editor: ed(), ed('README.md'), ed('README.md',
+To start the ed line editor: job.ed(), job.ed('README.md'), job.ed('README.md',
 p=':') etc.  Both command arguments, the file name and the ed command
-prompt character, are optional.  You can also use ed.main() etc.
+prompt character, are optional.
 
-To start the edsel display editor: edsel(), edsel('README.md',h=12,p=':')
+To start the edsel display editor: job.edsel(), job.edsel('README.md',h=12,p=':')
 etc.  All three command arguments, the file name, the edsel command
 prompt character, and the scrolling command region height in lines,
-are optional.  You can also use edsel.main() etc.
+are optional.
 
 Exit ed or edsel with the q command or ^D.
 
 When editing the ed or edsel command line, control keys and arrow keys work,
 see console/command.txt
-
 """
 
-import sys
+import os, sys
 import piety, command, keyboard, key
 import pysh, ed, edsel
 
@@ -66,7 +65,9 @@ def ed_startup(*filename, **options):
         ed.e(filename[0])
     if 'p' in options:
         cmd.ed.prompt = options['p']  # ed.prompt is not used by Piety
-    ed.show_printing() # restore output from ed p l z commands to scrolling cmd region
+    # The following two commands are initialized in ed but might be reassigned by edsel
+    ed.print_lz_destination = sys.stdout # restore ed output from p l z commands
+    ed.x_cmd_fcn = ed.cmd # not edsel.cmd which calls update_display
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
 job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup, 
@@ -80,8 +81,10 @@ cmd.edsel = command.Command(prompt='', reader=key.Key(), handler=edsel.cmd)
 def edsel_startup(*filename, **options):
     if 'p' in options:
         cmd.edsel.prompt = options['p'] # edsel.prompt is not used by Piety
-    edsel.init_session(*filename, **options)
     ed.quit = False # enable event loop, compare to Job( stopped=..) arg below
+    ed.print_lz_destination = open(os.devnull, 'w') # discard output
+    ed.x_cmd_fcn = edsel.cmd  # calls update_display
+    edsel.init_session(*filename, **options)
 
 job.edsel = piety.Job(session=console, application=cmd.edsel, startup=edsel_startup, 
                     stopped=(lambda: ed.quit or cmd.edsel.command == keyboard.C_d),

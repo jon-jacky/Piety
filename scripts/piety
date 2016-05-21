@@ -5,6 +5,7 @@ piety - Uses the Piety scheduler to run the console session with
   writer tasks created by writer_tasks.
 
 See console_tasks header for directions on how to run the console jobs.
+Except start ed with con.job.ed not just job.ed etc.
 See writer_tasks header for drections on how to observe the writer tasks.
 """
 
@@ -14,16 +15,6 @@ import piety
 # they are referenced by the piety.schedule data structure used by piety.run
 import writer_tasks
 import console_tasks as con
-
-# command aliases
-pysh = con.job.pysh # no name clash with con.pysh module
-ed = con.job.ed     # invoke ed with ed() or ed('README.md', p=':') etc.
-edsel = con.job.edsel # invoke edsel with edsel() or edsel('README.md', h=12, p=':') etc.
-
-# more command aliases
-# if you prefer ed.main() and ed.main('README.md') to ed() and ed('README.md') etc.
-ed.main = ed.__call__
-edsel.main = edsel.__call__
 
 def main():
     'Run the console session and writer tasks concurrently under the event loop'

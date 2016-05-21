@@ -124,7 +124,7 @@ class Window(object):
     def display_status(self):
         "Print information about window's buffer in its status line."
         s1 = self.status_1  # line number of status bar on display
-        unsaved = '-----**-     ' if self.buf.unsaved else '--------     '
+        unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
         position = (' All ' if self.buf.S() <= self.win_hl else # S() is last line
                     ' Top ' if self.seg_1 == 1 else
@@ -136,7 +136,7 @@ class Window(object):
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
         display.put_render(s1, 26, position, display.white_bg)
         display.put_render(s1, 31, linenums, display.white_bg)
-        display.put_render(s1, 45, '-'*26, display.white_bg)
+        display.put_render(s1, 45, '-'*(self.ncols-(45+10)), display.white_bg)
         display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
 
     def cursor_elsewhere(self):

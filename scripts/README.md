@@ -15,6 +15,16 @@ comments in each module for directions and explanations:
   runs the session in a simple blocking event loop (instead of using
   one of the non-blocking event loops).
 
+- **edc.py**, **edselc.py**: runs the editors *ed.py* and *edsel.py* respectively, using
+    the *command* and *key* modules from the *console* directory
+    instead of Python *input*, so they read commmand
+    lines and input lines one character at a time.  However, they do 
+    not use the *piety* scheduler, so they still block waiting for the
+    next character.
+
+- **edsel_task.py**: runs the display editor *edsel.py* under the *piety* scheduler,
+    doing non-blocking input with the *console* and *key* modules.
+
 - **edsel_timestamps**: Uses a blocking event loop to run the *edsel*
     display editor, demonstrating how two *timestamp* generators can 
     write to two editor buffers.
@@ -44,4 +54,4 @@ comments in each module for directions and explanations:
 - **writer_tasks.py**: Creates writer tasks used by the *embedded* and
     *piety* scripts.
 
-Revised November 2015
+Revised May 2016

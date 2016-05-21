@@ -12,7 +12,8 @@ import collections # for deque
 # Import the eventloop module for the platform where piety runs
 # The eventloop implementation is platform-dependent but its interface is not,
 #  so this piety module is platform-independent.
-# On Unix-like hosts, we usually arrange to import select/eventloop.py
+# On Unix-like hosts, we used to import select/eventloop.py
+#  Since Python3 we now import asyncio/eventloop.py
 import eventloop # for activate, deactivate, to distinguish from same local here
 
 # Other scripts use these identifiers via piety.run() etc.
@@ -74,12 +75,14 @@ class Task(object):
         self.activate()
 
     def activate(self):
+        'Add this task to the schedule'
         schedule[self.input].append(self)
         if input not in ievent:
             ievent[input] = 0
         eventloop.activate(self)
 
     def deactivate(self):
+        'Remove this task from the schedule'
         del schedule[self.input].self
         if t.input not in schedule and t.input in ievent:
             del ievent[t.input]
