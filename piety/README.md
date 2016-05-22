@@ -81,6 +81,11 @@ application for the *Session*'s job control. *Job* also uncouples
 event (such as the terminal). Therefore its initializer has to
 have a lot of arguments to access application methods.
 
+A *Job* can also run as a *Task* on its own, without a *Session*,
+when no other jobs are contending for the same event.  In this 
+case the job control functions can still be useful when the task
+starts or restarts and when it stops or suspends itself.
+
 ### Event Loop: run function, eventloop and cycle modules ###
 
 The *run* function in the *piety* module is the non-blocking event

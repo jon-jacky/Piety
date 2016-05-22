@@ -185,8 +185,10 @@ class Job(object):
         and the arguments must be provided explicitly.
 
         session - object or module with functions or methods named
-        start and stop, used for job control.  Default: no default,
-        required argument.
+        start and stop, used for job control when this Job instance 
+        is multiplexed with other Jobs that use the same event.
+        Default: None, use when this Job instance is a task on its own,
+        with no other jobs contending for the same event.
 
         application - application module or object. Default: no
         default, required argument.
