@@ -151,13 +151,11 @@ class Session(Task):
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
         self.handler = self.foreground.reader # make its reader this task's handler
-        self.foreground.continues = True  # new job continues
 
     def stop(self):
         'Foreground job says goodbye, stops, new foreground job runs'
         self.jobs.pop()
         if self.jobs:
-            self.foreground.continues = False
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.reader
             self.foreground.continues = True
@@ -230,7 +228,7 @@ class Job(object):
         setattr(self.application,self.handler_name,self.handler) # monkey patch!
         self.stopped = stopped if stopped else (lambda: True)
         self.cleanup = cleanup
-        self.continues = True  # after this, managed by methods in self.session
+        self.continues = True
 
     def handler(self):
         'Handle the command, then prepare to collect the next command'
@@ -244,7 +242,9 @@ class Job(object):
 
     def __call__(self, *args, **kwargs):
         'Switch jobs, execute startup function if it exists, then restart reader'
-        self.session.start(self)
+        if self.session:
+            self.session.start(self)
+        self.continues = True
         self.run(*args, **kwargs)
 
     def run(self, *args, **kwargs):
@@ -258,7 +258,9 @@ class Job(object):
         'Call optional cleanup fcn, then call session job control - if they exist'
         if self.cleanup:
             self.cleanup()
-        self.session.stop()
+        self.continues = False
+        if self.session:
+            self.session.stop()
 
 # Test
 

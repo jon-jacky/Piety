@@ -3,7 +3,7 @@ scripts
 =======
 
 Python modules that test and demonstrate the *piety* facilities.  Most
-run applications as tasks with the non-blocking *piety* event loop.
+run applications as tasks with a non-blocking *piety* event loop.
 Despite the directory name *scripts*, these are all proper Python
 modules (with *.py* suffixes and without *#!* lines) that can be
 imported, or started with *python -m ...*.  See docstrings (comment
@@ -23,11 +23,11 @@ explanations.
     the *command* and *key* modules from the *console* directory
     instead of Python *input*, so they read commmand
     lines and input lines one character at a time.  However, they do 
-    not use the *piety* scheduler, so they still block waiting for the
+    not use a *piety* event loop, so they still block waiting for the
     next character.
 
-- **edsel_task.py**: runs the display editor *edsel.py* under the
-    *piety* scheduler, doing non-blocking input with the *command* and
+- **edsel_task.py**: runs the display editor *edsel.py* under a
+    *piety* event loop, doing non-blocking input with the *command* and
     *key* modules.  Similar to *console_tasks.py*, also uses the
     *Session* and *Job* classes.
 
@@ -46,8 +46,8 @@ explanations.
   with *bin/paths* or *bin/asyncio_paths* to select an event loop.
   The *embedded* script (above) can also use different event loops.
 
-- **piety_edsel.py**: runs the display editor *edsel.py* under the
-    *piety* scheduler, doing non-blocking input with the *command* and
+- **piety_edsel.py**: runs the display editor *edsel.py* under a
+    *piety* event loop, doing non-blocking input with the *command* and
     *key* modules.  Similar to *edsel_task.py* but simpler code, 
     uses *Job* without *Session*.
 
