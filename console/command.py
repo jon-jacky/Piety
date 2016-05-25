@@ -1,13 +1,13 @@
 """
 command.py - Skeleton command line application.
-  Collects a command (string), passes it to a handler (callable) to execute.
+  Collects a command (string), passes it to do_command (callable) to execute.
   Can collect command without blocking, for cooperative multitasking.
   Provides command history, simple in-line editing similar to Unix readline.
   Provides optional hooks for job control commands that bypass the application.
  Has a main method, python command.py demonstrates most functions.
 
 A Command instances can work in reader mode where it uses the
-function passed to the reader initializer argument to read input,
+function passed to the handler initializer argument to read input,
 or, alternatively, can work in receiver mode where it uses
 the built-in handle_key method to accept input passed from a caller.
 This module's main function demonstrates both alternatives.
@@ -31,32 +31,32 @@ def putlines(s):
             util.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='> ', reader=terminal.getchar, handler=None):
+    def __init__(self, prompt='> ', handler=terminal.getchar, do_command=None):
         """
         All arguments are optional, with defaults
 
         prompt - Prompt string that appears at the start of each line.
         Default is '> '.
 
-        reader - function to call to read char(s) to build command
+        handler - function to call to read char(s) to build command
         string. Default is terminal.getchar, could also read/process
         multichar sequence.
 
-        handler - function to execute command.  Can be any callable
+        do_command - function to execute command.  Can be any callable
         that takes one argument, a string.  Default None (which crashes).
         command.
         """
         self.prompt = prompt # string to prompt for command 
-        self.reader_body = reader # callable reads char(s) to build command string
-        self.handler_body = handler # callable that executes command string
+        self.handler_body = handler # callable reads char(s) to build command string
+        self.do_command_body = do_command # callable that executes command string
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
-        self.new_command = True # cleared by reader, set again by handler
-        # job control commands are *not* passed to handler, only to job control
+        self.new_command = True # cleared by handler, set again by do_command
+        # job control commands are *not* passed to do_command, only to job control
         # job control commands baked in for now - could add argument later
         # job control commands are only effective if job control handles them
         self.job_control = [ keyboard.C_d ] # just ^D for now, could add more
@@ -107,15 +107,15 @@ class Command(object):
             keyboard.down: self.next_history,
             }
 
-    def reader(self):
+    def handler(self):
         'Read char, add to key sequence.  If sequence is complete, handle key'
-        key = self.reader_body() 
+        key = self.handler_body() 
         if key:
             self.handle_key(key)
 
     def handle_key(self, key):
         'Collect command string and dispatch on command'
-        self.new_command = False # handler method below sets new_command = True
+        self.new_command = False # do_command method below sets new_command = True
         # key arg might be single character or a sequence of characters
         if key in string.printable[:-5]: # exclude \t\n\r\v\f at the end
             self.keymap[string.printable](key)
@@ -125,14 +125,14 @@ class Command(object):
             print(keyboard.bel, end=' ') # sound indicates key not handled
         return key # caller might check for 'q' quit cmd or ...
 
-    def handler(self):
+    def do_command(self):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print() # print command output on new line
-        # job control commands are *not* passed to handler, only to job control
+        # job control commands are *not* passed to do_command, only to job control
         # job control command are only effective if job control handles them
         if not self.command in self.job_control:
-            self.handler_body(self.command)
+            self.do_command_body(self.command)
         # else self.command will be handled by job control code elsewhere
         self.new_command = True
 
@@ -150,7 +150,7 @@ class Command(object):
     def accept_line(self):
         self.history.append(self.command) # save command in history list
         self.hindex = len(self.history)-1
-        self.handler()
+        self.do_command()
 
     def interrupt(self):
         # raw mode terminal doesn't respond to ^C, must handle here
@@ -240,9 +240,9 @@ class Command(object):
         ^D stop is effective only if job control is also configured to handle ^D
         """
         if not self.command:
-            util.putstr('^D') # handler below sets line mode, advances line
+            util.putstr('^D') # do_command below sets line mode, advances line
             self.command = keyboard.C_d # so job control can find it
-            self.handler() # so job control can handle it
+            self.do_command() # so job control can handle it
         else:
             self.delete_char() # requires display terminal
 
@@ -280,20 +280,20 @@ def echo(command):
     else:
         print(command)
 
-c = Command(handler=echo)
+c = Command(do_command=echo)
 
 def main():
-    # Note - default reader terminal.getchar can't handle multi-char control seqs
+    # Note - default handler terminal.getchar can't handle multi-char control seqs
     #  like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
     global quit
     quit = False # earlier invocation might have set it True
-    # default handler echo sets quit=True when command='q', also enable ^D exit
+    # default do_command echo sets quit=True when command='q', also enable ^D exit
     while not (quit or c.command == keyboard.C_d): 
-        if c.new_command: # c.handler sets new_command = True
+        if c.new_command: # c.do_command sets new_command = True
             c.restart()
         # Here Command instance works in reader mode:
-        # uses the function passed to its reader argument to read its input.
-        c.reader()
+        # uses the function passed to its handler argument to read its input.
+        c.handler()
         # Alternatively, here Command instance works in receiver mode:
         # uses its built-in handle_key method to accept input passed by caller.
         # To demonstrate, comment out previous line and uncomment following lines 

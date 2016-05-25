@@ -112,5 +112,4 @@ The *piety* module imports *eventloop*.  Both modules import the
 and separates the platform-independent code in this directory from 
 platform-dependent code in the *eventloop* modules.
  
-Revised July 2015
-
+Revised May 2016

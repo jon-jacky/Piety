@@ -150,27 +150,32 @@ class Session(Task):
             self.foreground.continues = False # previous job does not continue
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
-        self.handler = self.foreground.reader # make its reader this task's handler
+        self.handler = self.foreground.handler # make its handler this task's handler
 
     def stop(self):
         'Foreground job says goodbye, stops, new foreground job runs'
         self.jobs.pop()
         if self.jobs:
             self.foreground = self.jobs[-1]
-            self.handler = self.foreground.reader
+            self.handler = self.foreground.handler
             self.foreground.continues = True
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
 
 class Job(object):
     """
-    Job provides a uniform interface (with known method names) to the application 
-    for the Session's job control. Job also uncouples Session's scheduling and job
-    control from any particular device or event (such as the terminal). Therefore
-    its initializer has to have a lot of arguments to access application methods.
+    Job provides a uniform interface for job control (with known method names) 
+    to an application - it provides standard hooks to start (or restart), then to
+    stop (or pause) the application, in addition to just handling events.
+    Therefore its initializer has to have a lot of arguments to access
+    application methods.  This interface (these methods) make it
+    possible for a job controller facility (such as the Session class, above) to
+    manage several (or many) applications, including multiplexing events
+    among several applications.  A job controller can be assigned to the (optional)
+    session argument.
     """
     def __init__(self, session=None, application=None, 
-                 startup=None, restart=None, reader=None, handler_name='',
+                 startup=None, restart=None, handler=None, do_command_name='',
                  stopped=None, cleanup=None):
         """ 
         The values assigned to most arguments are application
@@ -185,7 +190,7 @@ class Job(object):
         and the arguments must be provided explicitly.
 
         session - object or module with functions or methods named
-        start and stop, used for job control when this Job instance 
+        start and stop, used for job control, when this Job instance 
         is multiplexed with other Jobs that use the same event.
         Default: None, use when this Job instance is a task on its own,
         with no other jobs contending for the same event.
@@ -198,23 +203,24 @@ class Job(object):
         this argument is not used by some applications.
 
         restart - callable to put the application in the mode where it
-        handles calls to its reader and collects input. Default:
+        handles calls to its handler and collects input. Default:
         self.application.restart, the method used in the Command
         class.
 
-        reader - callable that collects input for the application.
-        Session assigns Job's reader to Task's handler when Job gets
-        focus.  Default: self.application.reader, the method used in
+        handler - callable that collects an input element for the application
+        (for example, a single character or single keycode).
+        Session assigns Job's handler to Task's handler when Job gets
+        focus.  Default: self.application.handler, the method used in
         the Command class.
 
-        handler_name - name (a string) of the application method that
-        calls application's handler on a chunk of input collected by
-        reader.  Default: 'handler', the method name used in the
-        Command class.
+        do_command_name - name (a string) of the application method that
+        calls application's do_command on a collection of input elements 
+        collected by handler (for example, a completed command line).  
+        Default: 'do_command', the method name used in the Command class.
         
         stopped - callable that returns True when application is about
         to exit.  Default: (lambda: True), which causes application to
-        exit after one cmd.
+        exit after one command.
 
         cleanup - callable to call if needed when application exits or
         suspends, to clean up display or ...  Default: None, this
@@ -224,17 +230,22 @@ class Job(object):
         self.application = application
         self.startup = startup
         self.restart = restart if restart else self.application.restart
-        self.reader = reader if reader else self.application.reader
-        self.handler_name = handler_name if handler_name else 'handler'
-        self.handler_body = getattr(self.application, self.handler_name)
-        setattr(self.application,self.handler_name,self.handler) # monkey patch!
+        self.handler = handler if handler else self.application.handler
+        # Patch application's do_command attribute to run this object's do_command method
+        # which follows application's do_command with job control: did application stop? etc.
+        self.do_command_name = do_command_name if do_command_name else 'do_command'
+        self.do_command_body = getattr(self.application, self.do_command_name)
+        setattr(self.application,self.do_command_name,self.do_command) 
         self.stopped = stopped if stopped else (lambda: True)
         self.cleanup = cleanup
+        # self.continues is not equivalent to (not self.stopped())
+        # because it can be assigned False by job controller when new job takes over,
+        # for example see Session start() method above.
         self.continues = True
 
-    def handler(self):
+    def do_command(self):
         'Handle the command, then prepare to collect the next command'
-        self.handler_body() # This is *application* handler, see above
+        self.do_command_body() # This is *application* do_command, see above
         if self.stopped():
             self.stop()
         elif self.continues and self.restart:
@@ -243,14 +254,17 @@ class Job(object):
             return  # do not restart this job
 
     def __call__(self, *args, **kwargs):
-        'Switch jobs, execute startup function if it exists, then restart reader'
+        """
+        Makes each job instance into a callable so it can be invoked by name from Python.
+        Switch jobs, execute startup function if it exists, then restart handler
+        """
         if self.session:
             self.session.start(self)
         self.continues = True
         self.run(*args, **kwargs)
 
     def run(self, *args, **kwargs):
-        'Execute startup function if it exists, then restart reader'
+        'Execute startup function if it exists, then restart handler'
         if self.startup:
             self.startup(*args, **kwargs) 
         if self.restart:

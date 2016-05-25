@@ -44,9 +44,9 @@ console = piety.Session(name='console', input=sys.stdin)
 # Python shell
 
 # Put pysh command in cmd namespace to avoid name clash with pysh module
-# here assign reader=key.Key that handles some multicharacter control sequences
-cmd.pysh = command.Command(prompt='>> ', reader=key.Key(),  
-                           handler=pysh.mk_shell())
+# here assign handler=key.Key that handles some multicharacter control sequences
+cmd.pysh = command.Command(prompt='>> ', handler=key.Key(),  
+                           do_command=pysh.mk_shell())
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
@@ -57,7 +57,7 @@ job.pysh = piety.Job(session=console, application=cmd.pysh, startup=pysh.start,
 
 # line editor
 
-cmd.ed = command.Command(prompt='', reader=key.Key(),  handler=ed.cmd)
+cmd.ed = command.Command(prompt='', handler=key.Key(),  do_command=ed.cmd)
 
 # startup function handles optional filename argument and optional keyword arg.
 def ed_startup(*filename, **options):
@@ -75,7 +75,7 @@ job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup,
               
 # display editor
 
-cmd.edsel = command.Command(prompt='', reader=key.Key(), handler=edsel.cmd)
+cmd.edsel = command.Command(prompt='', handler=key.Key(), do_command=edsel.cmd)
 
 # startup function handles optional filename argument and optional keyword arg.
 def edsel_startup(*filename, **options):
