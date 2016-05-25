@@ -231,21 +231,17 @@ class Job(object):
         self.startup = startup
         self.restart = restart if restart else self.application.restart
         self.handler = handler if handler else self.application.handler
-        # Patch application's do_command attribute to run this object's do_command method
-        # which follows application's do_command with job control: did application stop? etc.
-        self.do_command_name = do_command_name if do_command_name else 'do_command'
-        self.do_command_body = getattr(self.application, self.do_command_name)
-        setattr(self.application,self.do_command_name,self.do_command) 
         self.stopped = stopped if stopped else (lambda: True)
         self.cleanup = cleanup
         # self.continues is not equivalent to (not self.stopped())
         # because it can be assigned False by job controller when new job takes over,
         # for example see Session start() method above.
         self.continues = True
+        # Assign callback in application so this Job can respond to application exit
+        self.application.job_control_callback = self.stop_or_restart
 
-    def do_command(self):
-        'Handle the command, then prepare to collect the next command'
-        self.do_command_body() # This is *application* do_command, see above
+    def stop_or_restart(self):
+        'Respond to application, assign this method to callback in application'
         if self.stopped():
             self.stop()
         elif self.continues and self.restart:

@@ -59,8 +59,8 @@ class Command(object):
         # job control commands are *not* passed to do_command, only to job control
         # job control commands baked in for now - could add argument later
         # job control commands are only effective if job control handles them
-        self.job_control = [ keyboard.C_d ] # just ^D for now, could add more
-        
+        self.job_control_commands = (keyboard.C_d,) # just ^D for now, could add more
+        self.job_control_callback = None # might be assigned by Job to call code in Job
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
         # Update or reassign keymap to use different keys, methods.
@@ -131,11 +131,13 @@ class Command(object):
         print() # print command output on new line
         # job control commands are *not* passed to do_command, only to job control
         # job control command are only effective if job control handles them
-        if not self.command in self.job_control:
+        if not self.command in self.job_control_commands:
             self.do_command_body(self.command)
         # else self.command will be handled by job control code elsewhere
         self.new_command = True
-
+        if self.job_control_callback:
+            self.job_control_callback()
+            
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
         self.command = str()
