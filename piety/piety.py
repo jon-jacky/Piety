@@ -174,8 +174,8 @@ class Job(object):
     among several applications.  A job controller can be assigned to the (optional)
     session argument.
     """
-    def __init__(self, session=None, application=None, 
-                 startup=None, restart=None, handler=None, do_command_name='',
+    def __init__(self, application=None, controller=None, 
+                 startup=None, restart=None, handler=None, 
                  stopped=None, cleanup=None):
         """ 
         The values assigned to most arguments are application
@@ -189,15 +189,15 @@ class Job(object):
         does not use these method names, these defaults will not work,
         and the arguments must be provided explicitly.
 
-        session - object or module with functions or methods named
+        application - application module or object. No default,
+        this is a required argument.
+
+        controller - object or module with functions or methods named
         start and stop, used for job control, when this Job instance 
         is multiplexed with other Jobs that use the same event.
         Default: None, use when this Job instance is a task on its own,
         with no other jobs contending for the same event.
 
-        application - application module or object. Default: no
-        default, required argument.
-        
         startup - callable to call if needed when application starts
         up or resumes, to initialize display or ...  Default: None,
         this argument is not used by some applications.
@@ -209,15 +209,10 @@ class Job(object):
 
         handler - callable that collects an input element for the application
         (for example, a single character or single keycode).
-        Session assigns Job's handler to Task's handler when Job gets
+        Controller cam assign Job's handler to Task's handler when Job gets
         focus.  Default: self.application.handler, the method used in
-        the Command class.
+        the Command class.        
 
-        do_command_name - name (a string) of the application method that
-        calls application's do_command on a collection of input elements 
-        collected by handler (for example, a completed command line).  
-        Default: 'do_command', the method name used in the Command class.
-        
         stopped - callable that returns True when application is about
         to exit.  Default: (lambda: True), which causes application to
         exit after one command.
@@ -226,8 +221,8 @@ class Job(object):
         suspends, to clean up display or ...  Default: None, this
         argument is not used by some applications.
         """
-        self.session = session
         self.application = application
+        self.controller = controller
         self.startup = startup
         self.restart = restart if restart else self.application.restart
         self.handler = handler if handler else self.application.handler
@@ -254,8 +249,8 @@ class Job(object):
         Makes each job instance into a callable so it can be invoked by name from Python.
         Switch jobs, execute startup function if it exists, then restart handler
         """
-        if self.session:
-            self.session.start(self)
+        if self.controller:
+            self.controller.start(self)
         self.continues = True
         self.run(*args, **kwargs)
 
@@ -267,12 +262,12 @@ class Job(object):
             self.restart()
 
     def stop(self):
-        'Call optional cleanup fcn, then call session job control - if they exist'
+        'Call optional cleanup fcn, then call job control - if they exist'
         if self.cleanup:
             self.cleanup()
         self.continues = False
-        if self.session:
-            self.session.stop()
+        if self.controller:
+            self.controller.stop()
 
 # Test
 

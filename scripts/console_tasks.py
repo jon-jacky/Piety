@@ -50,7 +50,7 @@ cmd.pysh = command.Command(prompt='>> ', handler=key.Key(),
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-job.pysh = piety.Job(session=console, application=cmd.pysh, startup=pysh.start,
+job.pysh = piety.Job(application=cmd.pysh, controller=console, startup=pysh.start,
                       stopped=(lambda: not pysh.running 
                                or cmd.pysh.command == keyboard.C_d), 
                       cleanup=piety.stop)
@@ -70,7 +70,7 @@ def ed_startup(*filename, **options):
     ed.x_cmd_fcn = ed.cmd # not edsel.cmd which calls update_display
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
-job.ed = piety.Job(session=console, application=cmd.ed, startup=ed_startup, 
+job.ed = piety.Job(application=cmd.ed, controller=console, startup=ed_startup, 
                    stopped=(lambda: ed.quit or cmd.ed.command == keyboard.C_d))
               
 # display editor
@@ -86,7 +86,7 @@ def edsel_startup(*filename, **options):
     ed.x_cmd_fcn = edsel.cmd  # calls update_display
     edsel.init_session(*filename, **options)
 
-job.edsel = piety.Job(session=console, application=cmd.edsel, startup=edsel_startup, 
+job.edsel = piety.Job(application=cmd.edsel, controller=console, startup=edsel_startup, 
                     stopped=(lambda: ed.quit or cmd.edsel.command == keyboard.C_d),
                     cleanup=edsel.restore_display)
 
