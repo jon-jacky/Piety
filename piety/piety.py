@@ -175,8 +175,7 @@ class Job(object):
     session argument.
     """
     def __init__(self, application=None, controller=None, 
-                 startup=None, restart=None, handler=None, 
-                 stopped=None, cleanup=None):
+                 startup=None, restart=None, handler=None, cleanup=None):
         """ 
         The values assigned to most arguments are application
         callables (functions or methods).
@@ -213,10 +212,6 @@ class Job(object):
         focus.  Default: self.application.handler, the method used in
         the Command class.        
 
-        stopped - callable that returns True when application is about
-        to exit.  Default: (lambda: True), which causes application to
-        exit after one command.
-
         cleanup - callable to call if needed when application exits or
         suspends, to clean up display or ...  Default: None, this
         argument is not used by some applications.
@@ -226,7 +221,7 @@ class Job(object):
         self.startup = startup
         self.restart = restart if restart else self.application.restart
         self.handler = handler if handler else self.application.handler
-        self.stopped = stopped if stopped else (lambda: True)
+        self.stopped = self.application.stopped
         self.cleanup = cleanup
         # self.continues is not equivalent to (not self.stopped())
         # because it can be assigned False by job controller when new job takes over,

@@ -46,18 +46,21 @@ console = piety.Session(name='console', input=sys.stdin)
 # Put pysh command in cmd namespace to avoid name clash with pysh module
 # here assign handler=key.Key that handles some multicharacter control sequences
 cmd.pysh = command.Command(prompt='>> ', handler=key.Key(),  
-                           do_command=pysh.mk_shell())
+                           do_command=pysh.mk_shell(),
+                           stopped=(lambda command: 
+                                    not pysh.running or command == keyboard.C_d))
 
 # Put pysh job in the jobs namespace to avoid name clash with pysh module
 # stopped=... enables exit on exit() command or ^D
-job.pysh = piety.Job(application=cmd.pysh, controller=console, startup=pysh.start,
-                      stopped=(lambda: not pysh.running 
-                               or cmd.pysh.command == keyboard.C_d), 
-                      cleanup=piety.stop)
+job.pysh = piety.Job(application=cmd.pysh, controller=console, 
+                     startup=pysh.start, cleanup=piety.stop)
 
 # line editor
 
-cmd.ed = command.Command(prompt='', handler=key.Key(),  do_command=ed.cmd)
+cmd.ed = command.Command(handler=key.Key(),  do_command=ed.cmd,
+                         stopped=(lambda command: 
+                                  ed.quit or command == keyboard.C_d))
+
 
 # startup function handles optional filename argument and optional keyword arg.
 def ed_startup(*filename, **options):
@@ -70,12 +73,14 @@ def ed_startup(*filename, **options):
     ed.x_cmd_fcn = ed.cmd # not edsel.cmd which calls update_display
     ed.quit = False # enable event loop, compare to Job( stopped=...) arg below
 
-job.ed = piety.Job(application=cmd.ed, controller=console, startup=ed_startup, 
-                   stopped=(lambda: ed.quit or cmd.ed.command == keyboard.C_d))
+job.ed = piety.Job(application=cmd.ed, controller=console, startup=ed_startup)
               
 # display editor
 
-cmd.edsel = command.Command(prompt='', handler=key.Key(), do_command=edsel.cmd)
+cmd.edsel = command.Command(handler=key.Key(), do_command=edsel.cmd,
+                            stopped=(lambda command: 
+                                     ed.quit or command == keyboard.C_d))
+                            
 
 # startup function handles optional filename argument and optional keyword arg.
 def edsel_startup(*filename, **options):
@@ -86,9 +91,8 @@ def edsel_startup(*filename, **options):
     ed.x_cmd_fcn = edsel.cmd  # calls update_display
     edsel.init_session(*filename, **options)
 
-job.edsel = piety.Job(application=cmd.edsel, controller=console, startup=edsel_startup, 
-                    stopped=(lambda: ed.quit or cmd.edsel.command == keyboard.C_d),
-                    cleanup=edsel.restore_display)
+job.edsel = piety.Job(application=cmd.edsel, controller=console, 
+                      startup=edsel_startup, cleanup=edsel.restore_display)
 
 # main method for test and demonstration
 

@@ -4,9 +4,9 @@ command.py - Skeleton command line application.
   Can collect command without blocking, for cooperative multitasking.
   Provides command history, simple in-line editing similar to Unix readline.
   Provides optional hooks for job control commands that bypass the application.
- Has a main method, python command.py demonstrates most functions.
+ Has a main method, so python command.py demonstrates most functions.
 
-A Command instances can work in reader mode where it uses the
+A Command instance can work in reader mode where it uses the
 function passed to the handler initializer argument to read input,
 or, alternatively, can work in receiver mode where it uses
 the built-in handle_key method to accept input passed from a caller.
@@ -31,12 +31,13 @@ def putlines(s):
             util.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='> ', handler=terminal.getchar, do_command=None):
+    def __init__(self, prompt='', handler=terminal.getchar, do_command=None,
+                 stopped=None):
         """
         All arguments are optional, with defaults
 
         prompt - Prompt string that appears at the start of each line.
-        Default is '> '.
+        Default is empty string '', no prompt.
 
         handler - function to call to read char(s) to build command
         string. Default is terminal.getchar, could also read/process
@@ -45,10 +46,18 @@ class Command(object):
         do_command - function to execute command.  Can be any callable
         that takes one argument, a string.  Default None (which crashes).
         command.
+
+        stopped - callable that returns True when application is about
+        to exit.  Default: (lambda: True), which causes application to
+        exit after one command.   If the stopped argument is provided, it must
+        be a callable with one argument, the command string, for example:
+        (lambda command: command == keyboard.C_d).  The command argument is 
+        provided automatically by code in the body of this class.
         """
         self.prompt = prompt # string to prompt for command 
         self.handler_body = handler # callable reads char(s) to build command string
         self.do_command_body = do_command # callable that executes command string
+        self.stopped = (lambda: (stopped(self.command))) if stopped else (lambda: True)
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
