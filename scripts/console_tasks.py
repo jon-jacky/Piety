@@ -80,7 +80,6 @@ job.ed = piety.Job(application=cmd.ed, controller=console, startup=ed_startup)
 cmd.edsel = command.Command(handler=key.Key(), do_command=edsel.cmd,
                             stopped=(lambda command: 
                                      ed.quit or command == keyboard.C_d))
-                            
 
 # startup function handles optional filename argument and optional keyword arg.
 def edsel_startup(*filename, **options):

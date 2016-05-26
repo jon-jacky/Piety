@@ -4,18 +4,18 @@ edselc.py - Run an edsel display editor session.
  one character at a time.  BUT do not use Piety scheduler.
 """
 
-import edsel, command, key
+import edsel, command, key, keyboard
 
 # Here we use Command args rather than calling edsel functions in main()
-edselc = command.Command(prompt='', reader=key.Key(), handler=edsel.cmd)
+edselc = command.Command(handler=key.Key(), do_command=edsel.cmd,
+                         stopped=(lambda command: 
+                                  edsel.ed.quit or command == keyboard.C_d))
 
 def main():
     edsel.ed.quit = False # previous quit might have set it True
     edsel.init_session()
-    while not edsel.ed.quit:
-        if edselc.new_command:
-            edselc.restart()
-        edselc.reader()   # q command sets edsel.ed.quit True, forces exit
+    while not edselc.stopped():
+        edselc.handler()   # q command sets edsel.ed.quit True, forces exit
     edsel.restore_display()
 
 if __name__ == '__main__':

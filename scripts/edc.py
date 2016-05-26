@@ -4,16 +4,16 @@ edc.py - Run an ed line editor session.
  one character at a time.  BUT do not use Piety scheduler.
 """
 
-import ed, command, key
+import ed, command, key, keyboard
 
-edc = command.Command(prompt='', handler=ed.cmd, reader=key.Key())
+edc = command.Command(handler=key.Key(),  do_command=ed.cmd,
+                      stopped=(lambda command: 
+                               ed.quit or command == keyboard.C_d))
 
 def main():
     ed.quit = False # previous quit might have set it True
-    while not ed.quit:
-        if edc.new_command:
-            edc.restart()
-        edc.reader() # q command sets ed.quit True, forces exit
+    while not edc.stopped():
+        edc.handler() # q command sets ed.quit True, forces exit
 
 if __name__ == '__main__':
     main()

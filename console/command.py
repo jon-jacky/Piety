@@ -118,6 +118,8 @@ class Command(object):
 
     def handler(self):
         'Read char, add to key sequence.  If sequence is complete, handle key'
+        if self.new_command and not self.job_control_callback:
+      	    self.restart()
         key = self.handler_body() 
         if key:
             self.handle_key(key)
@@ -291,7 +293,8 @@ def echo(command):
     else:
         print(command)
 
-c = Command(do_command=echo)
+c = Command(prompt='> ', do_command=echo, 
+            stopped=(lambda command: quit or command == keyboard.C_d))
 
 def main():
     # Note - default handler terminal.getchar can't handle multi-char control seqs
@@ -299,9 +302,7 @@ def main():
     global quit
     quit = False # earlier invocation might have set it True
     # default do_command echo sets quit=True when command='q', also enable ^D exit
-    while not (quit or c.command == keyboard.C_d): 
-        if c.new_command: # c.do_command sets new_command = True
-            c.restart()
+    while not c.stopped():
         # Here Command instance works in reader mode:
         # uses the function passed to its handler argument to read its input.
         c.handler()
