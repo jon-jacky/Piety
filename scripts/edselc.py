@@ -9,14 +9,16 @@ import edsel, command, key, keyboard
 # Here we use Command args rather than calling edsel functions in main()
 edselc = command.Command(handler=key.Key(), do_command=edsel.cmd,
                          stopped=(lambda command: 
-                                  edsel.ed.quit or command == keyboard.C_d))
+                                  edsel.ed.quit or command == keyboard.C_d),
+                         cleanup=edsel.restore_display())
 
 def main():
     edsel.ed.quit = False # previous quit might have set it True
     edsel.init_session()
+    edselc.restart()
     while not edselc.stopped():
         edselc.handler()   # q command sets edsel.ed.quit True, forces exit
-    edsel.restore_display()
+
 
 if __name__ == '__main__':
     main()

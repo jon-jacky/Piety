@@ -1,5 +1,5 @@
 Commands to edit the command line and access its history in any
-application that uses console.py.  Similar to Unix readline.
+application that uses command.py.  Similar to Unix readline.
 Functions are assigned to keys in each Command object's keymap.  These
 are in the default keymap.
 

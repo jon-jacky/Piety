@@ -12,6 +12,7 @@ edc = command.Command(handler=key.Key(),  do_command=ed.cmd,
 
 def main():
     ed.quit = False # previous quit might have set it True
+    edc.restart()
     while not edc.stopped():
         edc.handler() # q command sets ed.quit True, forces exit
 

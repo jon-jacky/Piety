@@ -32,7 +32,7 @@ def putlines(s):
 
 class Command(object):
     def __init__(self, prompt='', handler=terminal.getchar, do_command=None,
-                 stopped=None):
+                 stopped=None, cleanup=None):
         """
         All arguments are optional, with defaults
 
@@ -53,23 +53,33 @@ class Command(object):
         be a callable with one argument, the command string, for example:
         (lambda command: command == keyboard.C_d).  The command argument is 
         provided automatically by code in the body of this class.
+
+        cleanup - callable to call if needed when application exits or
+        suspends, to clean up display or ...  Default: None, this
+        argument is not used by some applications.
         """
         self.prompt = prompt # string to prompt for command 
         self.handler_body = handler # callable reads char(s) to build command string
         self.do_command_body = do_command # callable that executes command string
         self.stopped = (lambda: (stopped(self.command))) if stopped else (lambda: True)
+        self.cleanup = cleanup
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
-        self.new_command = True # cleared by handler, set again by do_command
         # job control commands are *not* passed to do_command, only to job control
         # job control commands baked in for now - could add argument later
         # job control commands are only effective if job control handles them
         self.job_control_commands = (keyboard.C_d,) # just ^D for now, could add more
-        self.job_control_callback = None # might be assigned to call code in job control
+        # Callable stop_job and Boolean new_job are both assigned by job control (elswhere).
+        # This instance must call self.stop_job() when it stops, to inform job control.
+        # This instance must test self.new_job before it calls self.restart(),
+        #  to check whether job control has pre-empted it.
+        # Both are done here in self.do_command(), below
+        self.stop_job = None 
+        self.new_job = False
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
         # Update or reassign keymap to use different keys, methods.
@@ -118,15 +128,14 @@ class Command(object):
 
     def handler(self):
         'Read char, add to key sequence.  If sequence is complete, handle key'
-        if self.new_command and not self.job_control_callback:
-      	    self.restart()
+        # might block here in self.handler_body()
+        # to avoid blocking, must only call when input is ready for handler_body
         key = self.handler_body() 
         if key:
             self.handle_key(key)
 
     def handle_key(self, key):
         'Collect command string and dispatch on command'
-        self.new_command = False # do_command method below sets new_command = True
         # key arg might be single character or a sequence of characters
         if key in string.printable[:-5]: # exclude \t\n\r\v\f at the end
             self.keymap[string.printable](key)
@@ -140,15 +149,20 @@ class Command(object):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print() # print command output on new line
-        # job control commands are *not* passed to do_command, only to job control
-        # job control command are only effective if job control handles them
+        # Job control commands are not passed to application via do_command, 
+        #  they can be handled by this instance, for example in self.stopped().
         if not self.command in self.job_control_commands:
+            self.new_job = False # following do_command_body() might set it True
             self.do_command_body(self.command)
         # else self.command will be handled by job control code elsewhere
-        self.new_command = True
-        if self.job_control_callback:
-            self.job_control_callback() # monitor and respond to do_command
-            
+        if self.stopped():
+            if self.cleanup:
+                self.cleanup()
+            if self.stop_job:
+                self.stop_job() # and maybe start another
+        elif not self.new_job: # new job runs its restart in do_command_body, above
+      	    self.restart()
+
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
         self.command = str()
@@ -302,6 +316,7 @@ def main():
     global quit
     quit = False # earlier invocation might have set it True
     # default do_command echo sets quit=True when command='q', also enable ^D exit
+    c.restart()
     while not c.stopped():
         # Here Command instance works in reader mode:
         # uses the function passed to its handler argument to read its input.

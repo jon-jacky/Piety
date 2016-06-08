@@ -146,19 +146,16 @@ class Session(Task):
     def start(self, job):
         'Put job in the foreground, prepare to run it'
         # called from new job's __call__ method which calls its own run method
-        if self.foreground:
-            self.foreground.continues = False # previous job does not continue
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
         self.handler = self.foreground.handler # make its handler this task's handler
-
+ 
     def stop(self):
         'Foreground job says goodbye, stops, new foreground job runs'
         self.jobs.pop()
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
-            self.foreground.continues = True
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
 
@@ -175,7 +172,7 @@ class Job(object):
     session argument.
     """
     def __init__(self, application=None, controller=None, 
-                 startup=None, restart=None, handler=None, cleanup=None):
+                 startup=None, restart=None, handler=None):
         """ 
         The values assigned to most arguments are application
         callables (functions or methods).
@@ -211,42 +208,24 @@ class Job(object):
         Controller cam assign Job's handler to Task's handler when Job gets
         focus.  Default: self.application.handler, the method used in
         the Command class.        
-
-        cleanup - callable to call if needed when application exits or
-        suspends, to clean up display or ...  Default: None, this
-        argument is not used by some applications.
         """
         self.application = application
         self.controller = controller
         self.startup = startup
         self.restart = restart if restart else self.application.restart
         self.handler = handler if handler else self.application.handler
-        self.stopped = self.application.stopped
-        self.cleanup = cleanup
-        # self.continues is not equivalent to (not self.stopped())
-        # because it can be assigned False by job controller when new job takes over,
-        # for example see Session start() method above.
-        self.continues = True
         # Assign callback in application so this Job can respond to application exit
-        self.application.job_control_callback = self.stop_or_restart
-
-    def stop_or_restart(self):
-        'Respond to application, assign this method to callback in application'
-        if self.stopped():
-            self.stop()
-        elif self.continues and self.restart:
-            self.restart()
-        else:  # this job does not continue, instead new job takes over
-            return  # do not restart this job
+        self.application.stop_job = self.stop
 
     def __call__(self, *args, **kwargs):
         """
         Makes each job instance into a callable so it can be invoked by name from Python.
         Switch jobs, execute startup function if it exists, then restart handler
         """
-        if self.controller:
+        if self.controller: # this might be a standalone job with no controller
+            if self.controller.foreground:
+                self.controller.foreground.application.new_job = True # app. must reset this
             self.controller.start(self)
-        self.continues = True
         self.run(*args, **kwargs)
 
     def run(self, *args, **kwargs):
@@ -257,10 +236,7 @@ class Job(object):
             self.restart()
 
     def stop(self):
-        'Call optional cleanup fcn, then call job control - if they exist'
-        if self.cleanup:
-            self.cleanup()
-        self.continues = False
+        "Call controller's stop method  - if it exists"
         if self.controller:
             self.controller.stop()
 

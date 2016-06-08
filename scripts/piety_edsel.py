@@ -5,16 +5,16 @@ piety_edsel - Run an edsel display editor session under Piety.
 
 import sys, piety, command, keyboard, key, edsel
 
-edselc = command.Command(prompt='', handler=key.Key(), do_command=edsel.cmd,
-                         stopped=(lambda command: 
-                                  edsel.ed.quit or command == keyboard.C_d))
-                         
 def edsel_cleanup():
     edsel.restore_display()
     piety.stop()
 
-edselj = piety.Job(application=edselc, startup=edsel.init_session,
-                   cleanup=edsel_cleanup)
+edselc = command.Command(prompt='', handler=key.Key(), do_command=edsel.cmd,
+                         stopped=(lambda command: 
+                                  edsel.ed.quit or command == keyboard.C_d),
+                         cleanup=edsel_cleanup)
+
+edselj = piety.Job(application=edselc, startup=edsel.init_session)
 
 edselt = piety.Task(name='edsel', handler=edselj.handler, input=sys.stdin, 
                     enabled=piety.true)
