@@ -1,5 +1,5 @@
 """
-piety.py - defines Task, Job, Session, schedule, and run (the event loop).
+piety.py - defines Task, Session, schedule, and run (the event loop).
            Imports eventloop used by run.
 
 To run tasks in Piety, import the piety module, create some piety.Task
@@ -126,18 +126,18 @@ def tasks():
              # '  ???', # placeholder if we can't use ievent
              ename(t.input), oname(t.handler)))
 
-
 class Session(Task):
     """
     Manage multiple jobs (applications) that use the same input event,in one task.
-    The collection of jobs is a stack implemented by a deque.
-    Job on top of stack runs in foreground (has focus), gets input.
-    Top of the stack is the right end of the deque at self.jobs[-1]
     """
     def __init__(self, name=None, input=None, enabled=true):
         """
         Same args as Task __init__ , except no handler.
         Add jobs later, the foreground job's handler becomes the Task handler
+
+        The collection of jobs is a stack implemented by a deque.
+        Job on top of stack runs in foreground (has focus), gets input.
+        Top of the stack is the right end of the deque at self.jobs[-1]
         """
         self.jobs = collections.deque()
         self.foreground = None
@@ -149,96 +149,18 @@ class Session(Task):
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
         self.handler = self.foreground.handler # make its handler this task's handler
- 
+        self.foreground.new_job = False
+        # FIXME?  self.foreground.run() # why is this not needed here?
+
     def stop(self):
         'Foreground job says goodbye, stops, new foreground job runs'
         self.jobs.pop()
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
+            self.foreground.new_job = False
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
-
-class Job(object):
-    """
-    Job provides a uniform interface for job control (with known method names) 
-    to an application - it provides standard hooks to start (or restart), then to
-    stop (or pause) the application, in addition to just handling events.
-    Therefore its initializer has to have a lot of arguments to access
-    application methods.  This interface (these methods) make it
-    possible for a job controller facility (such as the Session class, above) to
-    manage several (or many) applications, including multiplexing events
-    among several applications.  A job controller can be assigned to the (optional)
-    session argument.
-    """
-    def __init__(self, application=None, controller=None, 
-                 startup=None, restart=None, handler=None):
-        """ 
-        The values assigned to most arguments are application
-        callables (functions or methods).
-
-        In general it is not necessary that the application callables have
-        particular names, BUT some of the defaults here do assume they
-        have particular names: the same names used in the Command class, so
-        the defaults will work when the application is a Command
-        instance, or uses the same method names.  If the application
-        does not use these method names, these defaults will not work,
-        and the arguments must be provided explicitly.
-
-        application - application module or object. No default,
-        this is a required argument.
-
-        controller - object or module with functions or methods named
-        start and stop, used for job control, when this Job instance 
-        is multiplexed with other Jobs that use the same event.
-        Default: None, use when this Job instance is a task on its own,
-        with no other jobs contending for the same event.
-
-        startup - callable to call if needed when application starts
-        up or resumes, to initialize display or ...  Default: None,
-        this argument is not used by some applications.
-
-        restart - callable to put the application in the mode where it
-        handles calls to its handler and collects input. Default:
-        self.application.restart, the method used in the Command
-        class.
-
-        handler - callable that collects an input element for the application
-        (for example, a single character or single keycode).
-        Controller cam assign Job's handler to Task's handler when Job gets
-        focus.  Default: self.application.handler, the method used in
-        the Command class.        
-        """
-        self.application = application
-        self.controller = controller
-        self.startup = startup
-        self.restart = restart if restart else self.application.restart
-        self.handler = handler if handler else self.application.handler
-        # Assign callback in application so this Job can respond to application exit
-        self.application.stop_job = self.stop
-
-    def __call__(self, *args, **kwargs):
-        """
-        Makes each job instance into a callable so it can be invoked by name from Python.
-        Switch jobs, execute startup function if it exists, then restart handler
-        """
-        if self.controller: # this might be a standalone job with no controller
-            if self.controller.foreground:
-                self.controller.foreground.application.new_job = True # app. must reset this
-            self.controller.start(self)
-        self.run(*args, **kwargs)
-
-    def run(self, *args, **kwargs):
-        'Execute startup function if it exists, then restart handler'
-        if self.startup:
-            self.startup(*args, **kwargs) 
-        if self.restart:
-            self.restart()
-
-    def stop(self):
-        "Call controller's stop method  - if it exists"
-        if self.controller:
-            self.controller.stop()
 
 # Test
 

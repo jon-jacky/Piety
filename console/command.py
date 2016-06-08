@@ -31,10 +31,17 @@ def putlines(s):
             util.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='', handler=terminal.getchar, do_command=None,
-                 stopped=None, cleanup=None):
+    def __init__(self, controller=None, 
+                 prompt='', handler=terminal.getchar, do_command=None,
+                 startup=None, stopped=None, cleanup=None):
         """
         All arguments are optional, with defaults
+
+        controller - object or module with functions or methods named
+        start and stop, used for job control, when this Command instance 
+        is multiplexed with other Commands that use the same event.
+        Default: None, use when this Command instance is a task on its own,
+        with no other jobs contending for the same event.
 
         prompt - Prompt string that appears at the start of each line.
         Default is empty string '', no prompt.
@@ -47,6 +54,10 @@ class Command(object):
         that takes one argument, a string.  Default None (which crashes).
         command.
 
+        startup - callable to call if needed when application starts
+        up or resumes, to initialize display or ...  Default: None,
+        this argument is not used by some applications.
+
         stopped - callable that returns True when application is about
         to exit.  Default: (lambda: True), which causes application to
         exit after one command.   If the stopped argument is provided, it must
@@ -58,9 +69,11 @@ class Command(object):
         suspends, to clean up display or ...  Default: None, this
         argument is not used by some applications.
         """
+        self.controller = controller
         self.prompt = prompt # string to prompt for command 
         self.handler_body = handler # callable reads char(s) to build command string
         self.do_command_body = do_command # callable that executes command string
+        self.startup = startup
         self.stopped = (lambda: (stopped(self.command))) if stopped else (lambda: True)
         self.cleanup = cleanup
         self.command = '' # command string 
@@ -73,12 +86,9 @@ class Command(object):
         # job control commands baked in for now - could add argument later
         # job control commands are only effective if job control handles them
         self.job_control_commands = (keyboard.C_d,) # just ^D for now, could add more
-        # Callable stop_job and Boolean new_job are both assigned by job control (elswhere).
-        # This instance must call self.stop_job() when it stops, to inform job control.
         # This instance must test self.new_job before it calls self.restart(),
         #  to check whether job control has pre-empted it.
-        # Both are done here in self.do_command(), below
-        self.stop_job = None 
+        # Test is done in self.do_command(), below
         self.new_job = False
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
@@ -126,6 +136,25 @@ class Command(object):
             keyboard.down: self.next_history,
             }
 
+    def __call__(self, *args, **kwargs):
+        """
+        Make this Command instance into a callable so it can be invoked by name from Python.
+        Switch jobs, execute startup function if it exists, then restart handler
+        """
+        if self.controller: # this might be a standalone job with no controller
+            if self.controller.foreground:
+                self.controller.foreground.new_job = True # FIXME reset to False where?
+            self.controller.start(self)
+        self.run(*args, **kwargs)
+
+    # We can't merge this into __call__ above because Session stop() also calls it.
+    def run(self, *args, **kwargs):
+        'Execute startup function if it exists, then restart handler'
+        if self.startup:
+            self.startup(*args, **kwargs) 
+        if self.restart:
+            self.restart()
+
     def handler(self):
         'Read char, add to key sequence.  If sequence is complete, handle key'
         # might block here in self.handler_body()
@@ -158,9 +187,9 @@ class Command(object):
         if self.stopped():
             if self.cleanup:
                 self.cleanup()
-            if self.stop_job:
-                self.stop_job() # and maybe start another
-        elif not self.new_job: # new job runs its restart in do_command_body, above
+            if self.controller:
+                self.controller.stop()
+        elif not self.new_job: # new job runs its restart from do_command_body, above
       	    self.restart()
 
     def restart(self):
