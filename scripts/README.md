@@ -11,8 +11,8 @@ headers) and inline comments in each module for directions and
 explanations.
 
 - **console_tasks.py**: Creates a console *Session* instance with three
-  *Job* instances: the *pysh* shell, the *ed* line editor, and the *edsel*
-  display editor.  The application in each job is a *Command* instance,
+  jobs: the *pysh* shell, the *ed* line editor, and the *edsel*
+  display editor.  Each job is a *Command* instance,
   each with its own *reader* method that reads and possibly preprocesses its input. 
   This module is used by the *piety_writers* and *piety_timestamps* scripts.
   It also has a *main* method that
@@ -25,11 +25,6 @@ explanations.
     lines and input lines one character at a time.  However, they do 
     not use a *piety* event loop, so they still block waiting for the
     next character.
-
-- **edsel_task.py**: runs the display editor *edsel.py* under a
-    *piety* event loop, doing non-blocking input with the *command* and
-    *key* modules.  Similar to *console_tasks.py*, also uses the
-    *Session* and *Job* classes.
 
 - **edsel_timestamps.py**: Uses a blocking event loop to run the *edsel*
     display editor, demonstrating how two *timestamp* generators can 
@@ -48,8 +43,7 @@ explanations.
 
 - **piety_edsel.py**: runs the display editor *edsel.py* under a
     *piety* event loop, doing non-blocking input with the *command* and
-    *key* modules.  Similar to *edsel_task.py* but simpler code, 
-    uses *Job* without *Session*.
+    *key* modules.  Uses *Command* and *Task* without *Session*.
 
 - **piety_timestamps.py**: Uses a non-blocking event loop to run the
   console session with three jobs created by *console_tasks*,
@@ -65,4 +59,4 @@ explanations.
 - **writer_tasks.py**: Creates writer tasks used by the *embedded.py* and
     *piety_writers.py* scripts.
 
-Revised May 2016
+Revised June 2016

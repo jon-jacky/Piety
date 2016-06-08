@@ -73,19 +73,6 @@ etc.) alternate, using the same terminal.  There is a single *Session*
 instance for each terminal.  Each job in a session can be be suspended
 and then resumed later without losing work in progress.
 
-### Job class ###
-
-The *Job* class provides a uniform interface (with known method names) to the
-application for the *Session*'s job control. *Job* also uncouples
-*Session*'s scheduling and job control from any particular device or
-event (such as the terminal). Therefore its initializer has to
-have a lot of arguments to access application methods.
-
-A *Job* can also run as a *Task* on its own, without a *Session*,
-when no other jobs are contending for the same event.  In this 
-case the job control functions can still be useful when the task
-starts or restarts and when it stops or suspends itself.
-
 ### Event Loop: run function, eventloop and cycle modules ###
 
 The *run* function in the *piety* module is the non-blocking event
@@ -112,4 +99,4 @@ The *piety* module imports *eventloop*.  Both modules import the
 and separates the platform-independent code in this directory from 
 platform-dependent code in the *eventloop* modules.
  
-Revised May 2016
+Revised June 2016
