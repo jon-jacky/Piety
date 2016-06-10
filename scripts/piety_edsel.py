@@ -1,6 +1,6 @@
 """
-piety_edsel - Run an edsel display editor session under Piety.
-         Run Command instance as task without Session.
+piety_edsel - Run edsel display editor under Piety.
+         Run Command instance as a task without Session.
 """
 
 import sys, piety, command, keyboard, key, edsel

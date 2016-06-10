@@ -82,14 +82,10 @@ class Command(object):
         self.hindex = 0 # index into history
         # prompt used for continuation lines: '...' as long as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
-        # job control commands are *not* passed to do_command, only to job control
-        # job control commands baked in for now - could add argument later
-        # job control commands are only effective if job control handles them
-        self.job_control_commands = (keyboard.C_d,) # just ^D for now, could add more
-        # This instance must test self.new_job before it calls self.restart(),
-        #  to check whether job control has pre-empted it.
-        # Test is done in self.do_command(), below
-        self.new_job = False
+        # Job commands are not passed to do_command, they are handled here
+        self.job_commands = (keyboard.C_d,) # just ^D for now, could add more
+        # This instance must test self.pre_empted before it calls self.restart()
+        self.pre_empted = False
         # keymap must be an attribute because its values are bound methods.
         # Keys in keymap can be multicharacter sequences, not just single chars
         # Update or reassign keymap to use different keys, methods.
@@ -139,15 +135,13 @@ class Command(object):
     def __call__(self, *args, **kwargs):
         """
         Make this Command instance into a callable so it can be invoked by name from Python.
-        Switch jobs, execute startup function if it exists, then restart handler
+        Give this job focus and Put this job in the foreground and start it.
         """
         if self.controller: # this might be a standalone job with no controller
-            if self.controller.foreground:
-                self.controller.foreground.new_job = True # FIXME reset to False where?
-            self.controller.start(self)
+            self.controller.start(self) # make this the new foreground job
         self.run(*args, **kwargs)
 
-    # We can't merge this into __call__ above because Session stop() also calls it.
+    # Can't merge this into __call__ above because Session switch() also calls it.
     def run(self, *args, **kwargs):
         'Execute startup function if it exists, then restart handler'
         if self.startup:
@@ -178,18 +172,16 @@ class Command(object):
         'Handle the command, then prepare to collect the next command'
         terminal.set_line_mode() # resume line mode for command output
         print() # print command output on new line
-        # Job control commands are not passed to application via do_command, 
-        #  they can be handled by this instance, for example in self.stopped().
-        if not self.command in self.job_control_commands:
-            self.new_job = False # following do_command_body() might set it True
+        # Job commands are not passed to application via do_command
+        if not self.command in self.job_commands:
             self.do_command_body(self.command)
-        # else self.command will be handled by job control code elsewhere
+        # Job commands might be handled by this self.stopped()
         if self.stopped():
             if self.cleanup:
                 self.cleanup()
             if self.controller:
-                self.controller.stop()
-        elif not self.new_job: # new job runs its restart from do_command_body, above
+                self.controller.switch() 
+        elif not self.pre_empted:
       	    self.restart()
 
     def restart(self):

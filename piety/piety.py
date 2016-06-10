@@ -130,6 +130,10 @@ class Session(Task):
     """
     Manage multiple jobs (applications) that use the same input event,in one task.
     """
+    # This class was created to support a console terminal session 
+    #  that initially runs a Python interpreter, which then starts other jobs.
+    # But there is no dependence here on a console terminal or Python interpreter,
+    #  so this class might also manage other kinds of sessions and jobs.
     def __init__(self, name=None, input=None, enabled=true):
         """
         Same args as Task __init__ , except no handler.
@@ -139,26 +143,35 @@ class Session(Task):
         Job on top of stack runs in foreground (has focus), gets input.
         Top of the stack is the right end of the deque at self.jobs[-1]
         """
+        # Typically the bottom of the stack is the Python interpreter,
+        # and the top of the stack is a job that it started.
         self.jobs = collections.deque()
         self.foreground = None
         super(Session, self).__init__(name=name, input=input, enabled=enabled)
 
     def start(self, job):
-        'Put job in the foreground, prepare to run it'
-        # called from new job's __call__ method which calls its own run method
+        'Put a new job in the foreground, pre-empt any current job'
+        # This is currently the only way to add a job to a Session instance.
+        # Typically the old job (if any) is the Python interpreter, which starts the new job.
+        # To start a console session, call this with the Python interpreter as the new job.
+        if self.foreground:
+            self.foreground.pre_empted = True # old job
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
         self.handler = self.foreground.handler # make its handler this task's handler
-        self.foreground.new_job = False
-        # FIXME?  self.foreground.run() # why is this not needed here?
+        self.foreground.pre_empted = False
+        # new foreground job calls its own run() method
 
-    def stop(self):
-        'Foreground job says goodbye, stops, new foreground job runs'
+    def switch(self):
+        'Remove foreground job, put preceding job (if any) in foreground, run it'
+        # Typically, the preceding job here (if any) is the Python interpreter,
+        #  this returns to the interpreter after stopping the job it started.
+        # If the current job here is the Python interpreter, this exits session.
         self.jobs.pop()
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
-            self.foreground.new_job = False
+            self.foreground.pre_empted = False
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
 
