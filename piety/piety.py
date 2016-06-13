@@ -175,6 +175,92 @@ class Session(Task):
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
 
+class Job(object):
+    'Provide a standard interface to an application so it can be used by Schedule'
+    def __init__(self, controller=None, handler=(lambda: None), 
+                 command=None, do_command=(lambda command: None), 
+                 startup=(lambda: None), restart=(lambda: None), 
+                 stopped=(lambda command: True), cleanup=(lambda: None)):
+        """
+        All arguments are optional, with defaults
+
+        controller - object or module used for job control, when this Job instance 
+        is multiplexed with other Jobs that use the same event.
+        Default: None, use when this Job instance is a task on its own,
+        with no other jobs contending for the same event.
+        If present, the controller object must have start() and switch() mathods.
+
+        command - Indicates string that holds command built up by
+        handler.  For now, a reference to an object that has an
+        attribute named command, whose value is a string.  Defaults to
+        self.  This maneuver is necessary for now because the command
+        attribute of the Command class is string, an immutable type.
+        Consider making Command class command attribute some mutable
+        type so Job instance can get a reference to Command instance c
+        command in the obvious way: self.command = c.command
+  
+        handler - Call to read char(s) to build command string.  Takes
+        no arguments, returns a string (a single character is
+        typical).  Typically from a Command instance.
+
+        do_command - call to execute command string.  Takes one
+        argument, a string.  Default ...
+
+        startup - call if needed when application starts up or
+        resumes, for example to initialize display. Takes a variable
+        number of arguments (no arguments is okay).  Default does
+        nothing, no startup needed for some applications.
+
+        restart - ... Typically from a Command instance.
+
+        stopped - Call to test command string, returns True when the
+        string commands the application to stop or exit.  Take one
+        string argument.  Default always returns True - exit immediately.
+
+        cleanup - Call if needed when application exits or suspends,
+        for example to clean up display.  Default does nothing, no startup
+        needed for some applications.
+        """
+        self.controller = controller
+        self.c = command if command else self # command string is self.c.command
+        self.command = str() # placeholder, only used when self.c is self
+        self.handler = handler 
+        # Job __init__ arg do_command has one arg, Job method do_command has none
+        self.do_command_body = do_command
+        self.startup = startup
+        self.restart = restart
+        # Job __init__ arg stopped has one arg, Job attribute self.stopped has none
+        self.stopped = (lambda: stopped(self.c.command))
+        self.cleanup = cleanup
+        self.pre_empted = False
+
+    def __call__(self, *args, **kwargs):
+        """
+        Make this Command instance into a callable so it can be invoked by name from Python.
+        Give this job focus and Put this job in the foreground and start it.
+        """
+        if self.controller: # this might be a standalone job with no controller
+            self.controller.start(self) # make this the new foreground job
+        self.run(*args, **kwargs)
+
+    # Can't merge this into __call__ above because Session switch() also calls it.
+    def run(self, *args, **kwargs):
+        'Execute startup function if it exists, then restart handler'
+        self.startup(*args, **kwargs) 
+        self.restart()
+
+    def do_command(self):
+        'Handle the command, then prepare to collect the next command'
+        # Job __init__ arg do_command has one arg, Job method do_command has none
+        self.do_command_body(self.c.command)
+        # Job __init__ arg stopped has one arg, Job attribute self.stopped has none
+        if self.stopped():
+            self.cleanup()
+            if self.controller:
+                self.controller.switch() 
+        elif not self.pre_empted:  # Not just stopped
+            self.restart()
+
 # Test
 
 def task0(): print('task 0')
