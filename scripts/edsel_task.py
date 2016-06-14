@@ -3,19 +3,18 @@ edsel_task - Edsel display editor with Command, Job, and Task classes.
                BUT without Session.  Use the Piety non-blocking event loop.
 """
 
-import sys, piety, command, keyboard, key, edsel
+import edsel, command, key, keyboard, piety, sys
+
+console = command.Command(handler=key.Key())
 
 def edsel_cleanup():
     edsel.restore_display()
     piety.stop()
 
-console = command.Command(handler=key.Key())
-
-edselj = piety.Job(handler=console.handler, 
-                   command=console.command,
-                   restart=console.restart,
+edselj = piety.Job(handler=console.handler, command=console,
                    do_command=edsel.cmd,
-                   startup=edsel.init_session,
+                   startup=(lambda: edsel.init_session(c=12)), # 12 cmd lines
+                   restart=console.restart,
                    stopped=(lambda command: 
                             edsel.ed.quit or command == keyboard.C_d),
                    cleanup=edsel_cleanup)

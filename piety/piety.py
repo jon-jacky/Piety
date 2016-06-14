@@ -176,7 +176,7 @@ class Session(Task):
         # else ... last job exits, its cleanup method has to handle it.
 
 class Job(object):
-    'Provide a standard interface to an application so it can be used by Schedule'
+    'Provide a standard interface to an application that can be used by Session'
     def __init__(self, controller=None, handler=(lambda: None), 
                  command=None, do_command=(lambda command: None), 
                  startup=(lambda: None), restart=(lambda: None), 
