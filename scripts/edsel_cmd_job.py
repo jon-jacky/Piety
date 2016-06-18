@@ -23,7 +23,7 @@ console.stopped = edselj.stopped
 def main():
     edselj() # run startup
     while not edselj.stopped():
-        console.handler()
+        edselj.handler()
 
 if __name__ == '__main__':
     main()

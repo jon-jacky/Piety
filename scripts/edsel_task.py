@@ -1,6 +1,7 @@
 """
-edsel_task - Edsel display editor with Command, Job, and Task classes.
-               BUT without Session.  Use the Piety non-blocking event loop.
+edsel_task - Edsel display editor with Command, Job, and Task classes,
+              BUT without Session.  Use the Piety non-blocking event loop.
+              Contrast to edsel_cmd_job.
 """
 
 import edsel, command, key, keyboard, piety, sys

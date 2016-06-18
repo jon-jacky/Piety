@@ -258,8 +258,7 @@ class Job(object):
             self.cleanup()
             if self.controller:
                 self.controller.switch() 
-        elif not self.pre_empted:  # Not just stopped
-            self.restart()
+
 
 # Test
 

@@ -16,7 +16,7 @@ edselj = piety.Job(do_command=edsel.cmd,
 def main():
     edselj() # run startup
     while not edselj.stopped():
-        edselj.command = input()
+        edselj.command = input(': ') # with prompt 
         edselj.do_command() 
 
 if __name__ == '__main__':

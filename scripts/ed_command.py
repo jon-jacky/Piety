@@ -6,7 +6,7 @@ edc.py - Run an ed line editor session.
 
 import ed, command, key, keyboard
 
-edc = command.Command(handler=key.Key(),  do_command=ed.cmd,
+edc = command.Command(prompt=': ', handler=key.Key(),  do_command=ed.cmd,
                       stopped=(lambda command: 
                                ed.quit or command == keyboard.C_d))
 

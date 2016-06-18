@@ -112,19 +112,6 @@ class Command(object):
             keyboard.down: self.next_history,
             }
 
-    def restore(self):
-        'Restore terminal line mode, prepare to print on new line'
-        terminal.set_line_mode()
-        print()
-
-    def handler(self):
-        'Read char, add to key sequence.  If sequence is complete, handle key'
-        # might block here in self.handler_body()
-        # to avoid blocking, must only call when input is ready for handler_body
-        key = self.handler_body() 
-        if key:
-            self.handle_key(key)
-
     def handle_key(self, key):
         'Collect command string and dispatch on command'
         # key arg might be single character or a sequence of characters
@@ -134,8 +121,14 @@ class Command(object):
             self.keymap[key]()
         else:
             print(keyboard.bel, end=' ') # sound indicates key not handled
-        if self.stopped(): # must handle here, we won't get to accept_line()
-            self.restore()
+
+    def handler(self):
+        'Read char, add to key sequence.  If sequence is complete, handle key'
+        # might block here in self.handler_body()
+        # to avoid blocking, must only call when input is ready for handler_body
+        key = self.handler_body() 
+        if key:
+            self.handle_key(key)
 
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
@@ -143,6 +136,11 @@ class Command(object):
         self.point = 0
         util.putstr(self.prompt) # prompt does not end with \n
         terminal.set_char_mode()
+
+    def restore(self):
+        'Restore terminal line mode, prepare to print on new line'
+        terminal.set_line_mode()
+        print()
 
     # All the other methods are invoked via keymap
 
@@ -297,6 +295,7 @@ def main():
         # To demonstrate, comment out previous line and uncomment following lines 
         #char = terminal.getchar()
         #c.handle_key(char)
+    c.restore()
 
 if __name__ == '__main__':
     # default()

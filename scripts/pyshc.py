@@ -6,16 +6,16 @@ pyshc.py - Run a pysh Python shell session.
 
 import pysh, command, key
 
-pyshc = command.Command(prompt='>> ',  reader=key.Key(), handler=pysh.mk_shell())
+pyshc = command.Command(prompt='>> ',  handler=key.Key(), do_command=pysh.mk_shell(),
+                        stopped=(lambda command: not pysh.running))
 
 def main():
     'Python REPL using home-made pysh shell'
-    pysh.start()
     print("pysh shell, type any Python statement, exit() to exit")
-    while pysh.running:
-        if pyshc.new_command:
-            pyshc.restart()
-        pyshc.reader() # exit() command sets pysh.running = False, forces exit
+    pysh.start()
+    pyshc.restart()
+    while not pyshc.stopped():
+        pyshc.handler()
             
 if __name__ == '__main__':
     main()

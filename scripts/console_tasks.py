@@ -4,16 +4,16 @@ console_tasks.py - Creates a console Session instance with three jobs.
 The three jobs are the pysh shell, the ed line editor, and the edsel display
 editor.  
 
-The application in each job is a Command instance, each with its own
-reader method, that reads and possibly preprocesses its input.  The
-Command instance also provides in-line editing, and command history.
+The application in each job is a Job instance that gets and edits its
+command line through a Command instance, each with its own reader
+method, that reads and possibly preprocesses its input.
 
 This module has a main function that runs the session in a simple
 blocking event loop, without the Piety scheduler.
 
-This script starts the non-blocking pysh Python shell, with the prompt
->> (two not three >).  When editing the pysh command line, control
-keys and arrow keys work.  Exit the pysh shell with exit() or ^D.
+This script starts the pysh Python shell, with the prompt >> (two not
+three >).  When editing the pysh command line, control keys and arrow
+keys work.  Exit the pysh shell with exit() or ^D.
 
 To start the ed line editor: job.ed(), job.ed('README.md'), job.ed('README.md',
 p=':') etc.  Both command arguments, the file name and the ed command
@@ -26,14 +26,15 @@ are optional.
 
 Exit ed or edsel with the q command or ^D.
 
-When editing the ed or edsel command line, control keys and arrow keys work,
+When editing the command line in any job, control keys and arrow keys work,
 see console/command.txt
 """
 
 import os, sys
-import piety, command, keyboard, key
-import pysh, ed, edsel
+import pysh, ed, edsel, piety, keyboard, key
+from console_job import console_job
 
+# Make namespace so we can say job.ed, does not conflict with ed module.
 class Namespace(object): pass 
 job = Namespace() 
 
@@ -42,13 +43,12 @@ console = piety.Session(name='console', input=sys.stdin)
 
 # Python shell
 
-# Put pysh command in cmd namespace to avoid name clash with pysh module
-# here assign handler=key.Key that handles some multicharacter control sequences
-job.pysh = command.Command(controller=console, prompt='>> ', handler=key.Key(),  
-                           do_command=pysh.mk_shell(), startup=pysh.start, 
-                           stopped=(lambda command: 
-                                    not pysh.running or command == keyboard.C_d),
-                           cleanup=piety.stop)
+# assign handler=key.Key that handles some multicharacter control sequences
+job.pysh, _ = console_job(controller=console, prompt='>> ', handler=key.Key(),  
+                          do_command=pysh.mk_shell(), startup=pysh.start, 
+                          stopped=(lambda command: 
+                                   not pysh.running or command == keyboard.C_d),
+                          cleanup=piety.stop)
 
 # line editor, : prompt to show ed is running
 
@@ -63,11 +63,11 @@ def ed_startup(*filename, **options):
     ed.print_lz_destination = sys.stdout # restore ed output from p l z commands
     ed.x_cmd_fcn = ed.cmd # not edsel.cmd which calls update_display
 
-job.ed = command.Command(controller=console,
-                         prompt=': ', handler=key.Key(),  do_command=ed.cmd,
-                         startup=ed_startup, 
-                         stopped=(lambda command: 
-                                  ed.quit or command == keyboard.C_d))
+job.ed, _ = console_job(controller=console,
+                        prompt=': ', handler=key.Key(),  do_command=ed.cmd,
+                        startup=ed_startup, 
+                        stopped=(lambda command: 
+                                 ed.quit or command == keyboard.C_d))
 
 # display editor, % prompt to show edsel is running
 
@@ -82,12 +82,12 @@ def edsel_startup(*filename, **options):
     ed.x_cmd_fcn = edsel.cmd  # calls update_display
     edsel.init_session(*filename, **options)
 
-job.edsel = command.Command(controller=console, 
-                            prompt='% ', handler=key.Key(), do_command=edsel.cmd,
-                            startup=edsel_startup,
-                            stopped=(lambda command: 
-                                     ed.quit or command == keyboard.C_d),
-                            cleanup=edsel.restore_display)
+job.edsel, _ = console_job(controller=console, 
+                           prompt='% ', handler=key.Key(), do_command=edsel.cmd,
+                           startup=edsel_startup,
+                           stopped=(lambda command: 
+                                    ed.quit or command == keyboard.C_d),
+                           cleanup=edsel.restore_display)
 
 # main method for test and demonstration
 
