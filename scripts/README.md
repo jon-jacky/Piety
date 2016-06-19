@@ -3,9 +3,11 @@ scripts
 =======
 
 Python modules that test and demonstrate *Piety*, especially the
-*Task*, *Session*, *Job*, and *Command* classes.  Some of these
-modules run one or more applications as *Piety* tasks, using the
-non-blocking event loop in *piety.run*.  Other modules run
+*Task*, *Session*, *Job*, and *Command* classes.  Most modules 
+provde a *main* method that runs when the module is invoked from 
+the command line.  Some of these
+*main* methods run one or more applications as *Piety* tasks, using the
+non-blocking event loop in *piety.run*.  Others run
 applications in an ordinary *while* loop, and block while waiting for
 the next event.
 
