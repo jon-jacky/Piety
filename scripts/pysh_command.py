@@ -1,5 +1,5 @@
 """
-pyshc.py - Run a pysh Python shell session.
+pysh_command.py - Run a pysh Python shell session.
  Use command and key modules instead of Python raw_input to get command line.
  BUT do not use Piety scheduler.
 """
