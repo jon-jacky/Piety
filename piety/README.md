@@ -2,10 +2,12 @@
 piety
 =====
 
-The *piety* module defines *Task*, *Session*, and *run*.  It imports
+The *piety* module defines *Task*, *Session*, *Job*, and *run*.  It imports
 the *cycle* and *eventloop* modules.  These are the core of the
 Piety operating system.  To run tasks in Piety, import the *piety*
 module, create some *piety.Task* instances, then call *piety.run*.
+If one of the tasks is a Python shell, you can use it to create or
+delete tasks while the system is running.
 
 The following sections provide an overview of tasks in Piety,
 describe the classes in the *piety* module, describe the
@@ -45,8 +47,8 @@ Python session, postponing all other tasks.  However, it may be
 possible to adapt some of them.
 
 The following sections describe classes in the *piety* module.  For
-much more information use *help(piety)* etc. and see the scripts in
-the *scripts* directory, especially *console_tasks* and *piety*.
+much more information read the docstrings and comments the *piety*
+module, and study the examples in the *scripts* directory.
 
 ### Task class ###
 
@@ -56,7 +58,7 @@ handler attribute to invoke the application from the event loop.
 
 ### Session class ###
 
-*Session* is a subclass of *Task*.  A Session instance manages
+*Session* is a subclass of *Task*.  A *Session* instance manages
 multiple *jobs* in a single task.
 
 More than one application can have a handler for the same event.
@@ -70,8 +72,21 @@ that must be shared among a group of jobs.
 Sessions and jobs were motivated by terminal applications.  For
 example, the Python shell and other terminal applications (editors
 etc.) alternate, using the same terminal.  There is a single *Session*
-instance for each terminal.  Each job in a session can be be suspended
-and then resumed later without losing work in progress.
+instance for each terminal.  Each job (terminal application) in a
+session can be stopped and then resumed later without losing work
+in progress.  *Session* could also work with other kinds of jobs (besides
+terminal applications).
+
+### Job class ###
+
+The *Job* class provides a standard interface to an application to
+enable *Session* (or another job control facility) to start, run, and
+stop it, by itself or along with other applications.  A *Job* instance
+provides a protocol (method names and arguments) for several
+of the application's routines, including the handler it uses to
+collect input and the callables it uses to start (or resume) and stop
+(or pause).  The *Job* class was motivated by terminal applications,
+but it could work with other kinds.
 
 ### Event Loop: run function, eventloop and cycle modules ###
 
