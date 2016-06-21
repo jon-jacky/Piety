@@ -3,7 +3,6 @@ command.py - Skeleton command line application.
   Collects a command (string), passes it to do_command (callable) to execute.
   Can collect command without blocking, for cooperative multitasking.
   Provides command history, simple in-line editing similar to Unix readline.
-  Provides optional hooks for job control commands that bypass the application.
  Has a main method, so python command.py demonstrates most functions.
 
 A Command instance can work in reader mode where it uses the
@@ -40,16 +39,13 @@ class Command(object):
         prompt - Prompt string that appears at the start of each line.
         Default is empty string '', no prompt.
 
-        handler - callable to read char(s) to build command
-        string.  Takes no arguments and returns a
+        handler - callable to read one or more characters
+        to build command string.  Takes no arguments and returns a
         string (might be just a single character).  Default is
-        terminal.getchar, could also be a function to read/process
-        multicharacter sequence.  (Add something here about reader mode
-        vs. receiver mode).
+        terminal.getchar.
 
         do_command - callable to execute command string.  Takes one
-        argument, a string.  Return value (if any) is ignored. Default
-        does nothing.
+        argument, a string.  Default does nothing.
 
         stopped - callable to test command string, that returns True
         when the string commands the application to stop or exit.

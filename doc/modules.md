@@ -82,13 +82,14 @@ design attempts to minimize dependencies among modules.
   anywhere else depend on any application modules.
   
 - The modules in the *scripts* directory run applications as tasks or
-  jobs under Piety.  These scripts typically use modules
+  jobs with *piety.run*, or with simple blocking *while* loops.
+  These scripts typically use modules
   from the *piety*, *console*, and application directories.  They
   can use any modules.  Avoiding platform- or
   device-specific code in scripts makes it possible for them to be re-used
   on different systems.
 
 - None of the Piety operating system modules or applications depend on any
-  contents of the *scripts* directory
+  contents of the *scripts* directory.
 
 Revised June 2015

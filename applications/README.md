@@ -2,7 +2,7 @@
 applications
 ============
 
-Miscellaneous applications:
+Small applications for demonstrating *piety.run*:
 
 - **printer.py**: print to stdout or text buffers to demonstrate interleaving concurrency.
 
@@ -12,4 +12,4 @@ Miscellaneous applications:
 
 - **writer.py**: write to files to demonstrate interleaving concurrency.
 
-Revised July 2015
+Revised June 2016

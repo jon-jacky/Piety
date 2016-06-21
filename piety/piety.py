@@ -39,10 +39,10 @@ class Task(object):
         condition is True.  Then the handler runs until it returns (or
         yields) control to the event loop.  There is no preemption.
 
-        This constructor creates a Task object and adds it to
+        This initializer creates a Task object and adds it to
         the collection of scheduled tasks.
 
-        This constructor should always be called with keyword
+        This initializer should always be called with keyword
         arguments. Arguments are:
 
         name - task name. By default, a unique name is constructed
@@ -177,7 +177,7 @@ class Session(Task):
 
 class Job(object):
     'Provide a standard interface to an application that can be used by Session'
-    def __init__(self, controller=None, handler=(lambda: None), 
+    def __init__(self, controller=None, handler=(lambda: ''), 
                  command=None, do_command=(lambda command: None), 
                  startup=(lambda: None), restart=(lambda: None), 
                  stopped=(lambda command: True), cleanup=(lambda: None)):
@@ -186,44 +186,52 @@ class Job(object):
 
         controller - object or module used for job control, when this Job instance 
         is multiplexed with other Jobs that use the same event.
-        Default: None, use when this Job instance is a task on its own,
-        with no other jobs contending for the same event.
+        Default: None, use when no other jobs contend for the same event.
         If present, the controller object must have start() and switch() mathods.
 
         command - Indicates string that holds command built up by
-        handler.  For now, a reference to an object that has an
-        attribute named command, whose value is a string.  Defaults to
-        self.  This maneuver is necessary for now because the command
-        attribute of the Command class is string, an immutable type.
-        Consider making Command class command attribute some mutable
-        type so Job instance can get a reference to Command instance c
-        command in the obvious way: self.command = c.command
-  
-        handler - Call to read char(s) to build command string.  Takes
-        no arguments, returns a string (a single character is
-        typical).  Typically from a Command instance.
+        handler.  A reference to an object that has an
+        attribute named command, whose value is a string.  
+        Defaults to self.  
 
-        do_command - call to execute command string.  Takes one
-        argument, a string.  Default ...
+        handler - callable to read one or more characters
+        to build command string.  Takes no arguments and returns a
+        string (might be just a single character).  Default returns 
+        empty string.
 
-        startup - call if needed when application starts up or
+        do_command - callable to execute command string.  Takes one
+        argument, a string.  Default does nothing.
+
+        startup - callable to execute when application starts up or
         resumes, for example to initialize display. Takes a variable
         number of arguments (no arguments is okay).  Default does
-        nothing, no startup needed for some applications.
+        nothing.
 
-        restart - ... Typically from a Command instance.
+        restart - callable to begin another activity cycle in the application.
+        For example, in a command line application, print the prompt.
+        Default does nothing.
 
-        stopped - Call to test command string, returns True when the
-        string commands the application to stop or exit.  Take one
-        string argument.  Default always returns True - exit immediately.
+        stopped - callable to test command string, that returns True
+        when the string commands the application to stop or exit.
+        Take one argument, a string.  Default always returns True -
+        always commands exit.
 
-        cleanup - Call if needed when application exits or suspends,
-        for example to clean up display.  Default does nothing, no startup
-        needed for some applications.
+        cleanup - callable to run when application exits or suspends,
+        for example to clean up display.  Default does nothing.
         """
         self.controller = controller
+
+        # command indicates string that holds command built up by
+        # handler.  A reference to an object that has an
+        # attribute named command, whose value is a string. 
+        # This maneuver is necessary for now because the command
+        # attribute of the Command class is string, an immutable type.
+        # Consider making Command class command attribute some mutable
+        # type so Job instance can get a reference to Command instance c
+        # command in the obvious way: self.command = c.command
         self.c = command if command else self # command string is self.c.command
         self.command = str() # placeholder, only used when self.c is self
+  
         self.handler = handler 
         # Job __init__ arg do_command has one arg, Job method do_command has none
         self.do_command_body = do_command

@@ -14,7 +14,8 @@ We draw inspiration from the single-user, single-language,
 special-hardware systems of the 1970s and 80s: Smalltalk, Lisp
 machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
 is an experiment to see if we can achieve something similar today with
-Python, but running on ordinary hardware.
+Python, but running on ordinary hardware.  (For other projects in a 
+similar spirit, again see [doc/precursors.md](doc/precursors.md).)
 
 We aim to produce, in Python, a simple but self-contained personal
 computer operating system capable of -- what else? -- writing and
@@ -25,6 +26,13 @@ experiment with TCP/IP networking (including the web) and graphics.
 We aim to see how far we can get with just Python.  There is already a
 lot of work by others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
+
+For now, Piety runs in an ordinary Python interpreter session on a
+host operating system.  We plan to run Piety on a bare machine (or
+bare VM) with no other operating system, but only a Python interpreter
+(with the minimum of hardware support in C or assembler).  There are
+only a few platform-dependent modules.  Most modules developed for
+Piety on a host operating system should also work on a bare machine.
 
 Piety might be used for ---
 
@@ -43,19 +51,6 @@ Piety might be used for ---
 
 - **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), [Erlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
 
-For now, Piety runs in an ordinary Python interpreter session on a
-host operating system.  We plan to run Piety on a bare machine (or
-bare VM) with no other operating system, but only a Python interpreter
-(with the minimum of hardware support in C or assembler).  There are
-only a few platform-dependent modules.  Most modules developed for
-Piety on a host operating system should also work on a bare machine.
-
-Recent projects by others in a similar spirit include
-[PyCorn](http://www.pycorn.org/home) and
-[Cleese](https://github.com/jtauber/cleese/) in Python, and
-[STEPS](http://www.vpri.org/pdf/tr2011004_steps11.pdf) in other
-languages.
-
 Another page describes the Piety [directories](doc/directories.md) and
 their contents.
 
@@ -63,5 +58,4 @@ Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).
 
-
-Revised June 2015
+Revised June 2016

@@ -2,8 +2,9 @@
 piety
 =====
 
-The *piety* module defines *Task*, *Session*, *Job*, and *run*.  It imports
-the *cycle* and *eventloop* modules.  These are the core of the
+The *piety* module defines *Task*, *Session*, and *Job*. It imports
+the *cycle* module and the *eventloop* module, which defines *run*,
+the non-blocking event loop.  These are the core of the
 Piety operating system.  To run tasks in Piety, import the *piety*
 module, create some *piety.Task* instances, then call *piety.run*.
 If one of the tasks is a Python shell, you can use it to create or
