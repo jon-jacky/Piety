@@ -180,7 +180,7 @@ class Job(object):
     def __init__(self, controller=None, handler=(lambda: ''), 
                  command=None, do_command=(lambda command: None), 
                  startup=(lambda: None), restart=(lambda: None), 
-                 stopped=(lambda command: True), cleanup=(lambda: None)):
+                 stopped=(lambda command: False), cleanup=(lambda: None)):
         """
         All arguments are optional, with defaults
 
@@ -190,14 +190,13 @@ class Job(object):
         If present, the controller object must have start() and switch() mathods.
 
         command - Indicates string that holds command built up by
-        handler.  A reference to an object that has an
-        attribute named command, whose value is a string.  
-        Defaults to self.  
+        handler.  A reference to an object that has an attribute named
+        command, whose value is a string.  Defaults to self.
 
-        handler - callable to read one or more characters
-        to build command string.  Takes no arguments and returns a
-        string (might be just a single character).  Default returns 
-        empty string.
+        handler - callable to read one or more characters to build
+        command string.  Takes no arguments and returns a string
+        (might be just a single character).  Default returns empty
+        string.
 
         do_command - callable to execute command string.  Takes one
         argument, a string.  Default does nothing.
@@ -207,14 +206,14 @@ class Job(object):
         number of arguments (no arguments is okay).  Default does
         nothing.
 
-        restart - callable to begin another activity cycle in the application.
-        For example, in a command line application, print the prompt.
-        Default does nothing.
+        restart - callable to begin another activity cycle in the
+        application.  For example, in a command line application,
+        print the prompt.  Default does nothing.
 
         stopped - callable to test command string, that returns True
         when the string commands the application to stop or exit.
-        Take one argument, a string.  Default always returns True -
-        always commands exit.
+        Take one argument, a string.  Default always returns False -
+        never exit (caller could still force exit).
 
         cleanup - callable to run when application exits or suspends,
         for example to clean up display.  Default does nothing.

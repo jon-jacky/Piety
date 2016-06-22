@@ -32,7 +32,7 @@ def putlines(s):
 class Command(object):
     def __init__(self, prompt='', handler=terminal.getchar, 
                  do_command=(lambda command: None),  # do nothing
-                 stopped=(lambda command: True)):    # exit immediately
+                 stopped=(lambda command: False)):   # never exit
         """
         All arguments are optional, with defaults
 
@@ -49,8 +49,8 @@ class Command(object):
 
         stopped - callable to test command string, that returns True
         when the string commands the application to stop or exit.
-        Take one argument, a string.  Default always returns True -
-        always commands exit.
+        Take one argument, a string.  Default always returns False - 
+        never exit (caller could still force exit).
         """
         self.prompt = prompt # string to prompt for command 
         self.handler_body = handler # callable reads char(s) to build command string
@@ -272,10 +272,10 @@ c = Command(prompt='> ', do_command=(lambda command: print(command)),
             stopped=(lambda command: command == 'q' or command == keyboard.C_d))
 
 def default():
-    'Just print a prompt, restore terminal to line mode, exit'
+    "Collect command lines but do nothing until command 'q' exits."
     c0.restart()
-    while not c0.stopped(): # stopped() always True
-        c0.handler() # can't reach here
+    while not c0.command == 'q': # c0.stopped() is always False
+        c0.handler() # does nothing 
     c0.restore() # undo restart, restore terminal line mode
     
 def main():
