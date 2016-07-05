@@ -38,17 +38,21 @@ from console_job import console_job
 class Namespace(object): pass 
 job = Namespace() 
 
+# cmd.pysh.stopped is used in main event loop, below.  
+# cmd.ed and cmd.edsel can be used for inspection and debugging.
+cmd = Namespace()
+
 # Session, a terminal task
 console = piety.Session(name='console', input=sys.stdin)
 
 # Python shell
 
 # assign handler=key.Key that handles some multicharacter control sequences
-job.pysh, _ = console_job(controller=console, prompt='>> ', handler=key.Key(),  
-                          do_command=pysh.mk_shell(), startup=pysh.start, 
-                          stopped=(lambda command: 
-                                   not pysh.running or command == keyboard.C_d),
-                          cleanup=piety.stop)
+job.pysh, cmd.pysh = console_job(controller=console, prompt='>> ', handler=key.Key(),  
+                                 do_command=pysh.mk_shell(), startup=pysh.start, 
+                                 stopped=(lambda command: 
+                                          not pysh.running or command == keyboard.C_d),
+                                 cleanup=piety.stop)
 
 # line editor, : prompt to show ed is running
 
@@ -63,11 +67,11 @@ def ed_startup(*filename, **options):
     ed.print_lz_destination = sys.stdout # restore ed output from p l z commands
     ed.x_cmd_fcn = ed.cmd # not edsel.cmd which calls update_display
 
-job.ed, _ = console_job(controller=console,
-                        prompt=': ', handler=key.Key(),  do_command=ed.cmd,
-                        startup=ed_startup, 
-                        stopped=(lambda command: 
-                                 ed.quit or command == keyboard.C_d))
+job.ed, cmd.ed = console_job(controller=console,
+                            prompt=': ', handler=key.Key(),  do_command=ed.cmd,
+                            startup=ed_startup, 
+                            stopped=(lambda command: 
+                                     ed.quit or command == keyboard.C_d))
 
 # display editor, % prompt to show edsel is running
 
@@ -82,12 +86,12 @@ def edsel_startup(*filename, **options):
     ed.x_cmd_fcn = edsel.cmd  # calls update_display
     edsel.init_session(*filename, **options)
 
-job.edsel, _ = console_job(controller=console, 
-                           prompt='% ', handler=key.Key(), do_command=edsel.cmd,
-                           startup=edsel_startup,
-                           stopped=(lambda command: 
-                                    ed.quit or command == keyboard.C_d),
-                           cleanup=edsel.restore_display)
+job.edsel, cmd.edsel = console_job(controller=console, 
+                                   prompt='% ', handler=key.Key(), do_command=edsel.cmd,
+                                   startup=edsel_startup,
+                                   stopped=(lambda command: 
+                                            ed.quit or command == keyboard.C_d),
+                                   cleanup=edsel.restore_display)
 
 # main method for test and demonstration
 
@@ -96,8 +100,8 @@ def main():
     Run the console session without the Piety scheduler.
     Instead just use an ordinary while loop as a simple blocking event loop.
     """
-    job.pysh() # start the first job
-    while pysh.running: # pysh module here, different from job.pysh 
+    job.pysh() # start the first job, which can start others
+    while not cmd.pysh.stopped():
         console.handler()  # block waiting for each single character 
 
 if __name__ == '__main__':

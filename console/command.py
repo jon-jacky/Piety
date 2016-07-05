@@ -48,14 +48,24 @@ class Command(object):
         argument, a string.  Default does nothing.
 
         stopped - callable to test command string, that returns True
-        when the string commands the application to stop or exit.
-        Take one argument, a string.  Default always returns False - 
-        never exit (caller could still force exit).
+        when the application should stop or exit.  Takes one argument,
+        a string.  Typically this is the command string, stopped() can
+        check if command is something like 'exit()' or 'quit' - but
+        stopped() might ignore this string and check some state
+        variable.  Default always returns False - never exit (caller
+        could still force exit).
         """
         self.prompt = prompt # string to prompt for command 
         self.handler_body = handler # callable reads char(s) to build command string
         self.do_command = (lambda: do_command(self.command))
         self.stopped = (lambda: stopped(self.command))
+        # We hoped we could assign console.pre_empted = job.pre_empted 
+        # and then console.pre_empted would track job.pre_empted but that doesn't work
+        # assigning callable piety.true or .false acts like assigning immutable 
+        #self.pre_empted = (lambda: False) # can assign reference to job control here
+        # so instead we have to do this:
+        self.job = None  # can assign console.job = job then use console.job.pre_empted
+        self.do_stop = (lambda: None) # can assign callback to job control here
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
@@ -145,10 +155,16 @@ class Command(object):
     def accept_line(self):
         self.history.append(self.command) # save command in history list
         self.hindex = len(self.history)-1
-        self.restore()
-        self.do_command() 
-        if not self.stopped():
-      	    self.restart() # print prompt and return to character mode
+        self.restore()        # advance line and put term in line mode 
+        # FIXME if self.command not in self.job_control: ...
+        if self.command != keyboard.C_d:  # job control cmds bypass application
+            self.do_command() # application executes command
+        if self.job.pre_empted(): # command may pre-empt or stop application
+            return
+        elif self.stopped():
+            self.do_stop()    # callback to job control
+        else:
+      	    self.restart()    # print prompt and put term in character mode
 
     def interrupt(self):
         # raw mode terminal doesn't respond to ^C, must handle here
@@ -233,14 +249,12 @@ class Command(object):
             display.backward_char()
 
     def handle_C_d(self):
-        """
-        ^D: stop if command string is empty, otherwise delete character.
-        ^D stop is effective only if job control is also configured to handle ^D
-        """
+        '^D: stop if command string is empty, otherwise delete character.'
         if not self.command:
-            util.putstr('^D') # do_command below sets line mode, advances line
-            self.command = keyboard.C_d # so job control can find it
-            self.do_command() # so job control can handle it
+            self.command = keyboard.C_d # so self.stopped() can find it
+            util.putstr('^D')  # no newline because ...
+            self.restore()     # ... calls print() for newline
+            self.do_stop()     # callback to job control
         else:
             self.delete_char() # requires display terminal
 

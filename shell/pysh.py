@@ -41,7 +41,7 @@ main_globals = sys.modules['__main__'].__dict__
 
 # pysh (unlike standard Python) ignores exit() so we must handle special case here
 
-running = False
+running = True
                   
 def start():
     'Start or resume pysh REPL'

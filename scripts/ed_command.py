@@ -15,6 +15,7 @@ def main():
     edc.restart()
     while not edc.stopped():
         edc.handler() # q command sets ed.quit True, forces exit
+    edc.restore()
 
 if __name__ == '__main__':
     main()

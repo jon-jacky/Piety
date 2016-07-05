@@ -18,6 +18,7 @@ def main():
     edselc.restart()
     while not edselc.stopped():
         edselc.handler()   # q command sets edsel.ed.quit True, forces exit
+    edselc.restore() # restores terminal, different from restore_display
     edsel.restore_display()
 
 if __name__ == '__main__':

@@ -4,20 +4,36 @@ edsel_job.py - Edsel display editor with Job class, but no Command.
   blocking event loop.  Contrast to edsel_command.py
 """
 
-import edsel, keyboard, piety
+import edsel, keyboard, piety, util
 
+command = str()  # global so we can pass it to edsel_stopped
+
+def edsel_stopped(command):
+    return edsel.ed.quit or command == keyboard.C_d
+
+def edsel_restart():
+    util.putstr(': ') # print prompt w/o newline
+
+def edsel_handler():
+     global command
+     command = input()
+     # the following lines are based on Command accept_line 
+     if command != keyboard.C_d: # useless here - ^D already crashes input()
+         edsel.cmd(command)
+     if edsel_stopped(command) or edselj.pre_empted():
+         edselj.do_stop()
+     else:
+         edsel_restart()
+     
 # Here we use Command args rather than calling edsel functions in main()
-edselj = piety.Job(do_command=edsel.cmd,
+edselj = piety.Job(handler=edsel_handler,
                    startup=(lambda: edsel.init_session(c=12)), # 12 cmd lines
-                   stopped=(lambda command: 
-                            edsel.ed.quit or command == keyboard.C_d),
-                   cleanup=edsel.restore_display)
+                   restart=edsel_restart, cleanup=edsel.restore_display)
 
 def main():
-    edselj() # run startup
-    while not edselj.stopped():
-        edselj.command = input(': ') # with prompt 
-        edselj.do_command() 
+    edselj() # run startup, restart
+    while not edsel_stopped(command):
+        edselj.handler()
 
 if __name__ == '__main__':
     main()

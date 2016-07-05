@@ -155,11 +155,11 @@ class Session(Task):
         # Typically the old job (if any) is the Python interpreter, which starts the new job.
         # To start a console session, call this with the Python interpreter as the new job.
         if self.foreground:
-            self.foreground.pre_empted = True # old job
+            self.foreground.pre_empted = true # pre-empt old job
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
         self.handler = self.foreground.handler # make its handler this task's handler
-        self.foreground.pre_empted = False
+        self.foreground.pre_empted = false # enable new job
         # new foreground job calls its own run() method
 
     def switch(self):
@@ -171,35 +171,30 @@ class Session(Task):
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
-            self.foreground.pre_empted = False
+            self.foreground.pre_empted = false # enable new foreground job
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
 
 class Job(object):
     'Provide a standard interface to an application that can be used by Session'
-    def __init__(self, controller=None, handler=(lambda: ''), 
-                 command=None, do_command=(lambda command: None), 
+    def __init__(self, controller=None, handler=(lambda: ''), # command=None, 
+                 # do_command=(lambda command: None), # redundant with handler
                  startup=(lambda: None), restart=(lambda: None), 
-                 stopped=(lambda command: False), cleanup=(lambda: None)):
+                 cleanup=(lambda: None)): # stopped=(lambda command: False), # in Command
         """
         All arguments are optional, with defaults
 
-        controller - object or module used for job control, when this Job instance 
-        is multiplexed with other Jobs that use the same event.
-        Default: None, use when no other jobs contend for the same event.
-        If present, the controller object must have start() and switch() mathods.
-
-        command - Indicates string that holds command built up by
-        handler.  A reference to an object that has an attribute named
-        command, whose value is a string.  Defaults to self.
+        controller - object or module used for job control, when this
+        Job instance is multiplexed with other Jobs that use the same
+        event.  Default: None, use when no other jobs contend for the
+        same event.  If present, the controller object must have
+        start() and switch() mathods.
 
         handler - callable to read one or more characters to build
         command string.  Takes no arguments and returns a string
         (might be just a single character).  Default returns empty
-        string.
-
-        do_command - callable to execute command string.  Takes one
-        argument, a string.  Default does nothing.
+        string.   Typically, the handler invokes the application 
+        on the command, when the command string is complete.
 
         startup - callable to execute when application starts up or
         resumes, for example to initialize display. Takes a variable
@@ -210,36 +205,17 @@ class Job(object):
         application.  For example, in a command line application,
         print the prompt.  Default does nothing.
 
-        stopped - callable to test command string, that returns True
-        when the string commands the application to stop or exit.
-        Take one argument, a string.  Default always returns False -
-        never exit (caller could still force exit).
-
         cleanup - callable to run when application exits or suspends,
         for example to clean up display.  Default does nothing.
         """
         self.controller = controller
-
-        # command indicates string that holds command built up by
-        # handler.  A reference to an object that has an
-        # attribute named command, whose value is a string. 
-        # This maneuver is necessary for now because the command
-        # attribute of the Command class is string, an immutable type.
-        # Consider making Command class command attribute some mutable
-        # type so Job instance can get a reference to Command instance c
-        # command in the obvious way: self.command = c.command
-        self.c = command if command else self # command string is self.c.command
-        self.command = str() # placeholder, only used when self.c is self
-  
         self.handler = handler 
-        # Job __init__ arg do_command has one arg, Job method do_command has none
-        self.do_command_body = do_command
         self.startup = startup
         self.restart = restart
-        # Job __init__ arg stopped has one arg, Job attribute self.stopped has none
-        self.stopped = (lambda: stopped(self.c.command))
         self.cleanup = cleanup
-        self.pre_empted = False
+        # For pre_empted, must use function false not immutable boolean False
+        #  so we can pass around reference to this attribute.
+        self.pre_empted = false 
 
     def __call__(self, *args, **kwargs):
         """
@@ -256,16 +232,12 @@ class Job(object):
         self.startup(*args, **kwargs) 
         self.restart()
 
-    def do_command(self):
-        'Handle the command, then prepare to collect the next command'
-        # Job __init__ arg do_command has one arg, Job method do_command has none
-        self.do_command_body(self.c.command)
-        # Job __init__ arg stopped has one arg, Job attribute self.stopped has none
-        if self.stopped():
-            self.cleanup()
-            if self.controller:
-                self.controller.switch() 
-
+    # assign to callback in application 
+    def do_stop(self):
+        'This job is done for now.  Clean up, switch to another'
+        self.cleanup()
+        if self.controller:
+            self.controller.switch() 
 
 # Test
 

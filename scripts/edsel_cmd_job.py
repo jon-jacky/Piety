@@ -6,23 +6,23 @@ edsel_cmd_job.py - Edsel display editor with Command and Job classes,
 
 import edsel, command, key, keyboard, piety
 
-console = command.Command(handler=key.Key())
+console = command.Command(prompt=': ', handler=key.Key(),
+                          do_command=edsel.cmd,
+                          stopped=(lambda command: 
+                                   edsel.ed.quit or command == keyboard.C_d))
 
-edselj = piety.Job(handler=console.handler, command=console,
-                   do_command=edsel.cmd,
+edselj = piety.Job(handler=console.handler,
                    startup=(lambda: edsel.init_session(c=12)), # 12 cmd lines
                    restart=console.restart,
-                   stopped=(lambda command: 
-                            edsel.ed.quit or command == keyboard.C_d),
                    cleanup=edsel.restore_display)
 
 # assign callbacks
-console.do_command = edselj.do_command
-console.stopped = edselj.stopped
+console.pre_empted = edselj.pre_empted
+console.do_stop = edselj.do_stop
 
 def main():
     edselj() # run startup
-    while not edselj.stopped():
+    while not console.stopped():
         edselj.handler()
 
 if __name__ == '__main__':
