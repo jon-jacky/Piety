@@ -17,8 +17,7 @@ edselj = piety.Job(handler=console.handler,
                    cleanup=edsel.restore_display)
 
 # assign callbacks
-console.pre_empted = edselj.pre_empted
-console.do_stop = edselj.do_stop
+console.job = edselj
 
 def main():
     edselj() # run startup

@@ -59,13 +59,8 @@ class Command(object):
         self.handler_body = handler # callable reads char(s) to build command string
         self.do_command = (lambda: do_command(self.command))
         self.stopped = (lambda: stopped(self.command))
-        # We hoped we could assign console.pre_empted = job.pre_empted 
-        # and then console.pre_empted would track job.pre_empted but that doesn't work
-        # assigning callable piety.true or .false acts like assigning immutable 
-        #self.pre_empted = (lambda: False) # can assign reference to job control here
-        # so instead we have to do this:
-        self.job = None  # can assign console.job = job then use console.job.pre_empted
-        self.do_stop = (lambda: None) # can assign callback to job control here
+        self.job = None  # can assign console.job = job then use console.job.replaced
+        self.job_commands = [ keyboard.C_d ] # ^D exit, job cmds bypass application
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
@@ -156,13 +151,12 @@ class Command(object):
         self.history.append(self.command) # save command in history list
         self.hindex = len(self.history)-1
         self.restore()        # advance line and put term in line mode 
-        # FIXME if self.command not in self.job_control: ...
-        if self.command != keyboard.C_d:  # job control cmds bypass application
+        if self.command not in self.job_commands: # job cmds bypass application
             self.do_command() # application executes command
-        if self.job.pre_empted(): # command may pre-empt or stop application
+        if self.job and self.job.replaced: # command may replace or stop application
             return
-        elif self.stopped():
-            self.do_stop()    # callback to job control
+        elif self.stopped() and self.job:
+            self.job.do_stop()    # callback to job control
         else:
       	    self.restart()    # print prompt and put term in character mode
 
@@ -254,7 +248,8 @@ class Command(object):
             self.command = keyboard.C_d # so self.stopped() can find it
             util.putstr('^D')  # no newline because ...
             self.restore()     # ... calls print() for newline
-            self.do_stop()     # callback to job control
+            if self.job:
+                self.job.do_stop()     # callback to job control
         else:
             self.delete_char() # requires display terminal
 

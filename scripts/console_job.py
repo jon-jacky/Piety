@@ -16,7 +16,5 @@ def console_job(controller=None, prompt='', handler=(lambda: None),
     job = piety.Job(controller=controller, handler=console.handler, 
                     startup=startup, restart=console.restart,
                     cleanup=cleanup)
-    # assign callbacks
-    console.job = job # so console can say self.job.pre_empted
-    console.do_stop = job.do_stop
+    console.job = job # so console can use self.job.replaced, self.job.do_stop
     return job, console  # return job first, caller might ignore console

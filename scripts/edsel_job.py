@@ -9,7 +9,7 @@ import edsel, keyboard, piety, util
 command = str()  # global so we can pass it to edsel_stopped
 
 def edsel_stopped(command):
-    return edsel.ed.quit or command == keyboard.C_d
+    return edsel.ed.quit or command == keyboard.C_d # But ^D crashes input() 
 
 def edsel_restart():
     util.putstr(': ') # print prompt w/o newline
@@ -20,7 +20,9 @@ def edsel_handler():
      # the following lines are based on Command accept_line 
      if command != keyboard.C_d: # useless here - ^D already crashes input()
          edsel.cmd(command)
-     if edsel_stopped(command) or edselj.pre_empted():
+     if edselj.replaced:
+         return
+     if edsel_stopped(command):
          edselj.do_stop()
      else:
          edsel_restart()

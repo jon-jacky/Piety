@@ -31,7 +31,7 @@ class Task(object):
     'Task instances are scheduled and invoked by a Piety event loop.'
     taskno = 0
 
-    def __init__(self, name=None, input=None, handler=None, enabled=true):
+    def __init__(self, name=None, input=None, handler=None, enabled=True):
         """
         A Task instance identifies a handler, an input source, an enabling
         condition, and a name.  A Piety event loop may
@@ -134,7 +134,7 @@ class Session(Task):
     #  that initially runs a Python interpreter, which then starts other jobs.
     # But there is no dependence here on a console terminal or Python interpreter,
     #  so this class might also manage other kinds of sessions and jobs.
-    def __init__(self, name=None, input=None, enabled=true):
+    def __init__(self, name=None, input=None, enabled=True):
         """
         Same args as Task __init__ , except no handler.
         Add jobs later, the foreground job's handler becomes the Task handler
@@ -150,20 +150,20 @@ class Session(Task):
         super(Session, self).__init__(name=name, input=input, enabled=enabled)
 
     def start(self, job):
-        'Put a new job in the foreground, pre-empt any current job'
+        'Put a new job in the foreground, replace any current job'
         # This is currently the only way to add a job to a Session instance.
         # Typically the old job (if any) is the Python interpreter, which starts the new job.
         # To start a console session, call this with the Python interpreter as the new job.
         if self.foreground:
-            self.foreground.pre_empted = true # pre-empt old job
+            self.foreground.replaced = True # replace old job
         self.jobs.append(job)             # add new job
         self.foreground = job             # give it the focus
         self.handler = self.foreground.handler # make its handler this task's handler
-        self.foreground.pre_empted = false # enable new job
+        self.foreground.replaced = False # enable new job
         # new foreground job calls its own run() method
 
-    def switch(self):
-        'Remove foreground job, put preceding job (if any) in foreground, run it'
+    def resume(self):
+        'Remove foreground job, resume running preceding job (if any) in foreground'
         # Typically, the preceding job here (if any) is the Python interpreter,
         #  this returns to the interpreter after stopping the job it started.
         # If the current job here is the Python interpreter, this exits session.
@@ -171,7 +171,7 @@ class Session(Task):
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
-            self.foreground.pre_empted = false # enable new foreground job
+            self.foreground.replaced = False # enable new foreground job
             self.foreground.run()
         # else ... last job exits, its cleanup method has to handle it.
 
@@ -188,7 +188,7 @@ class Job(object):
         Job instance is multiplexed with other Jobs that use the same
         event.  Default: None, use when no other jobs contend for the
         same event.  If present, the controller object must have
-        start() and switch() mathods.
+        start() and resume() mathods.
 
         handler - callable to read one or more characters to build
         command string.  Takes no arguments and returns a string
@@ -213,9 +213,7 @@ class Job(object):
         self.startup = startup
         self.restart = restart
         self.cleanup = cleanup
-        # For pre_empted, must use function false not immutable boolean False
-        #  so we can pass around reference to this attribute.
-        self.pre_empted = false 
+        self.replaced = False 
 
     def __call__(self, *args, **kwargs):
         """
@@ -226,7 +224,7 @@ class Job(object):
             self.controller.start(self) # make this the new foreground job
         self.run(*args, **kwargs)
 
-    # Can't merge this into __call__ above because Session switch() also calls it.
+    # Can't merge this into __call__ above because Session resume() also calls it.
     def run(self, *args, **kwargs):
         'Execute startup function if it exists, then restart handler'
         self.startup(*args, **kwargs) 
@@ -234,10 +232,10 @@ class Job(object):
 
     # assign to callback in application 
     def do_stop(self):
-        'This job is done for now.  Clean up, switch to another'
+        'This job is done for now.  Clean up, resume previous job if any'
         self.cleanup()
         if self.controller:
-            self.controller.switch() 
+            self.controller.resume() 
 
 # Test
 
