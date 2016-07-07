@@ -1,15 +1,23 @@
 """
-command.py - Skeleton command line application.
-  Collects a command (string), passes it to do_command (callable) to execute.
-  Can collect command without blocking, for cooperative multitasking.
-  Provides command history, simple in-line editing similar to Unix readline.
- Has a main method, so python command.py demonstrates most functions.
+command.py - Skeleton command line application.  Collects a
+  command (string), passes it to a handler (callable) to execute.  Can
+  collect a command one character at a time without blocking to permit
+  cooperative multitasking (unlike Python *input*, which blocks until
+  the command is complete).  Provides command history and editing
+  similar to Unix *readline* (but no tab completion).  Provides hooks
+  for optional job control commands that bypass the application.
+
+This module has a main method, so python command.py demonstrates some
+functions.
 
 A Command instance can work in reader mode where it uses the
 function passed to the handler initializer argument to read input,
 or, alternatively, can work in receiver mode where it uses
 the built-in handle_key method to accept input passed from a caller.
 This module's main function demonstrates both alternatives.
+
+This module has some similarities to the Python standard library cmd
+module, but does not provide the same API.
 """
 
 import sys

@@ -1,7 +1,7 @@
 """
 edsel_cmd_job.py - Edsel display editor with Command and Job classes,
  in blocking event loop.  Show how to use callbacks to connect Command
- to Job.  Contrast to edsel_command.py and edsel_job.py.
+ to Job.  Contrast to edsel_command.py, edsel_job.py, and edsel_task.py
 """
 
 import edsel, command, key, keyboard, piety

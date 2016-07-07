@@ -31,7 +31,7 @@ class Task(object):
     'Task instances are scheduled and invoked by a Piety event loop.'
     taskno = 0
 
-    def __init__(self, name=None, input=None, handler=None, enabled=True):
+    def __init__(self, name=None, input=None, handler=None, enabled=true):
         """
         A Task instance identifies a handler, an input source, an enabling
         condition, and a name.  A Piety event loop may
@@ -134,7 +134,7 @@ class Session(Task):
     #  that initially runs a Python interpreter, which then starts other jobs.
     # But there is no dependence here on a console terminal or Python interpreter,
     #  so this class might also manage other kinds of sessions and jobs.
-    def __init__(self, name=None, input=None, enabled=True):
+    def __init__(self, name=None, input=None, enabled=true):
         """
         Same args as Task __init__ , except no handler.
         Add jobs later, the foreground job's handler becomes the Task handler

@@ -6,23 +6,22 @@ edsel_task - Edsel display editor with Command, Job, and Task classes,
 
 import edsel, command, key, keyboard, piety, sys
 
-console = command.Command(handler=key.Key())
+console = command.Command(handler=key.Key(),
+                          do_command=edsel.cmd,
+                          stopped=(lambda command: 
+                                   edsel.ed.quit or command == keyboard.C_d))
 
 def edsel_cleanup():
     edsel.restore_display()
     piety.stop()
 
-edselj = piety.Job(handler=console.handler, command=console,
-                   do_command=edsel.cmd,
+edselj = piety.Job(handler=console.handler,
                    startup=(lambda: edsel.init_session(c=12)), # 12 cmd lines
                    restart=console.restart,
-                   stopped=(lambda command: 
-                            edsel.ed.quit or command == keyboard.C_d),
                    cleanup=edsel_cleanup)
 
 # assign callbacks
-console.do_command = edselj.do_command
-console.stopped = edselj.stopped
+console.job = edselj
 
 task = piety.Task(name='edsel', handler=edselj.handler, input=sys.stdin, 
                   enabled=piety.true)
