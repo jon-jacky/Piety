@@ -24,6 +24,56 @@ import sys
 import string # for string.printable
 import util, terminal, keyboard, display
 
+# A keymap is a dictionary from keycode string to Command method name string.
+# Values are name strings not function objects, so they can refer to bound methods.
+# Keycodes in keymap can be multicharacter sequences, not just single characters.
+# Most method names in the keymap are the same as in GNU readline or Emacs.
+
+# FIXME first define printing_keymap, then update it to create editing_keymap.
+
+# This editing_keymap requires a display terminal with cursor addressing.
+editing_keymap = {
+    # self_insert_command requires special-case handling
+    #  because it takes an additional argument: the key.
+    # Use this function with printing terminals, comment out now:
+    #  string.printable: 'self_append_command',
+    # This function requires display terminal with cursor addressing:
+    string.printable: 'self_insert_command',
+
+    # these entries work on a printing terminal
+    keyboard.cr: 'accept_line',
+    keyboard.C_c: 'interrupt',
+    keyboard.C_j: 'newline',
+    keyboard.C_l: 'redraw_current_line',
+    keyboard.C_u: 'line_discard',
+    keyboard.C_p: 'previous_history',
+    keyboard.C_n: 'next_history',
+
+    # Rudimentary in-line editing, just delete last char in line
+    # Use these with printing terminals, commented out now
+    # keyboard.bs: backward_delete_last_char',
+    # keyboard.delete: backward_delete_last_char',
+
+    # editing that requires a display terminal with cursor addressing
+    # must remove all these when using printing terminals
+    keyboard.bs: 'backward_delete_char',
+    keyboard.delete: 'backward_delete_char',
+    keyboard.C_a: 'move_beginning_of_line',
+    keyboard.C_b: 'backward_char',
+    keyboard.C_d: 'handle_C_d', # exit or 'delete_char
+    # keyboard.C_d: 'delete_char
+    keyboard.C_e: 'move_end_of_line',
+    keyboard.C_f: 'forward_char',
+    keyboard.C_k: 'kill_line',
+
+    # These keys are multicharacter control sequences
+    # require keyboard that sends ANSI control sequences
+    keyboard.right: 'forward_char',
+    keyboard.left: 'backward_char',
+    keyboard.up: 'previous_history',
+    keyboard.down: 'next_history',
+    }
+
 # used by Command to print history to print current 'line' including newlines
 def putlines(s):
     """
@@ -40,10 +90,11 @@ def putlines(s):
 class Command(object):
     def __init__(self, prompt='', handler=terminal.getchar, 
                  do_command=(lambda command: None),  # do nothing
-                 stopped=(lambda command: False)):   # never exit
+                 stopped=(lambda command: False),    # never exit
+                 keymap=editing_keymap):             # defined above
         """
         All arguments are optional, with defaults
-
+s
         prompt - Prompt string that appears at the start of each line.
         Default is empty string '', no prompt.
 
@@ -62,6 +113,8 @@ class Command(object):
         stopped() might ignore this string and check some state
         variable.  Default always returns False - never exit (caller
         could still force exit).
+
+        keymap: dictionary from keycode to Command method name string
         """
         self.prompt = prompt # string to prompt for command 
         self.handler_body = handler # callable reads char(s) to build command string
@@ -73,71 +126,31 @@ class Command(object):
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
-        # prompt used for continuation lines: '...' as long as self.prompt
+        # prompt used for continuation lines: '...' same len as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
-        # keymap must be an attribute because its values are bound methods.
-        # Keys in keymap can be multicharacter sequences, not just single chars
-        # Update or reassign keymap to use different keys, methods.
-        # Most function names in keymap are same as in GNU readline or Emacs
-        self.keymap = {
-            # This entry requires special-case handling
-            #  because it takes an additional argument: the key
-            # Use this function with printing terminals, comment out now:
-            #  string.printable: self.self_append_command,
-            # This function requires display terminal with cursor addressing:
-            string.printable: self.self_insert_command,
-            
-            # these entries work on a printing terminal
-            keyboard.cr: self.accept_line,
-            keyboard.C_c: self.interrupt,
-            keyboard.C_j: self.newline,
-            keyboard.C_l: self.redraw_current_line,
-            keyboard.C_u: self.line_discard,
-            keyboard.C_p: self.previous_history,
-            keyboard.C_n: self.next_history,
+        self.keymap = keymap
 
-            # Rudimentary in-line editing, just delete last char in line
-            # Use these with printing terminals, commented out now
-            # keyboard.bs: backward_delete_last_char,
-            # keyboard.delete: backward_delete_last_char,
-
-            # editing that requires a display terminal with cursor addressing
-            # must remove all these when using printing terminals
-            keyboard.bs: self.backward_delete_char,
-            keyboard.delete: self.backward_delete_char,
-            keyboard.C_a: self.move_beginning_of_line,
-            keyboard.C_b: self.backward_char,
-            keyboard.C_d: self.handle_C_d, # exit or self.delete_char
-            # keyboard.C_d: self.delete_char
-            keyboard.C_e: self.move_end_of_line,
-            keyboard.C_f: self.forward_char,
-            keyboard.C_k: self.kill_line,
-
-            # These keys are multicharacter control sequences
-            # require keyboard that sends ANSI control sequences
-            keyboard.right: self.forward_char,
-            keyboard.left: self.backward_char,
-            keyboard.up: self.previous_history,
-            keyboard.down: self.next_history,
-            }
-
-    def handle_key(self, key):
+    def handle_key(self, keycode):
         'Collect command string and dispatch on command'
-        # key arg might be single character or a sequence of characters
-        if key in string.printable[:-5]: # exclude \t\n\r\v\f at the end
-            self.keymap[string.printable](key)
-        elif key in self.keymap:
-            self.keymap[key]()
+        # keycode arg might be single character or a sequence of characters.
+        # Printable keys require special-case handling,
+        # because their method takes an additional argument: the key.
+        if keycode in string.printable[:-5]: # exclude \t\n\r\v\f at the end
+            method = getattr(self, self.keymap[string.printable])
+            method(keycode)
+        elif keycode in self.keymap:
+            method = getattr(self, self.keymap[keycode])
+            method()
         else:
             print(keyboard.bel, end=' ') # sound indicates key not handled
 
     def handler(self):
-        'Read char, add to key sequence.  If sequence is complete, handle key'
+        'Read char, add to keycode sequence.  If sequence is complete, handle keycode'
         # might block here in self.handler_body()
         # to avoid blocking, must only call when input is ready for handler_body
-        key = self.handler_body() 
-        if key:
-            self.handle_key(key)
+        keycode = self.handler_body() 
+        if keycode:
+            self.handle_key(keycode)
 
     def restart(self):
         'Clear command string, print command prompt, set single-char mode'
