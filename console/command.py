@@ -29,18 +29,12 @@ import util, terminal, keyboard, display
 # Keycodes in keymap can be multicharacter sequences, not just single characters.
 # Most method names in the keymap are the same as in GNU readline or Emacs.
 
-# FIXME first define printing_keymap, then update it to create editing_keymap.
-
-# This editing_keymap requires a display terminal with cursor addressing.
-editing_keymap = {
+# This printing_keymap would work on a printing terminal
+printing_keymap = {
     # self_insert_command requires special-case handling
     #  because it takes an additional argument: the key.
-    # Use this function with printing terminals, comment out now:
-    #  string.printable: 'self_append_command',
-    # This function requires display terminal with cursor addressing:
-    string.printable: 'self_insert_command',
+    string.printable: 'self_append_command',
 
-    # these entries work on a printing terminal
     keyboard.cr: 'accept_line',
     keyboard.C_c: 'interrupt',
     keyboard.C_j: 'newline',
@@ -50,12 +44,14 @@ editing_keymap = {
     keyboard.C_n: 'next_history',
 
     # Rudimentary in-line editing, just delete last char in line
-    # Use these with printing terminals, commented out now
-    # keyboard.bs: backward_delete_last_char',
-    # keyboard.delete: backward_delete_last_char',
+    keyboard.bs: 'backward_delete_last_char',
+    keyboard.delete: 'backward_delete_last_char'
+    }
 
-    # editing that requires a display terminal with cursor addressing
-    # must remove all these when using printing terminals
+# These require a display terminal with cursor addressing.
+editing_keys = {
+    string.printable: 'self_insert_command',
+
     keyboard.bs: 'backward_delete_char',
     keyboard.delete: 'backward_delete_char',
     keyboard.C_a: 'move_beginning_of_line',
@@ -73,6 +69,9 @@ editing_keymap = {
     keyboard.up: 'previous_history',
     keyboard.down: 'next_history',
     }
+
+editing_keymap = printing_keymap.copy()
+editing_keymap.update(editing_keys)
 
 # used by Command to print history to print current 'line' including newlines
 def putlines(s):

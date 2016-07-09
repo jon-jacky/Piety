@@ -178,7 +178,6 @@ class Session(Task):
 class Job(object):
     'Provide a standard interface to an application that can be used by Session'
     def __init__(self, controller=None, handler=(lambda: ''), # command=None, 
-                 # do_command=(lambda command: None), # redundant with handler
                  startup=(lambda: None), restart=(lambda: None), 
                  cleanup=(lambda: None)): # stopped=(lambda command: False), # in Command
         """
