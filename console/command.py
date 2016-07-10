@@ -37,6 +37,7 @@ printing_keymap = {
     #  because it takes an additional argument: the key.
     printable: 'self_append_command',
 
+    # any keycode that maps to accept_line is a command terminator
     keyboard.cr: 'accept_line',
     keyboard.C_c: 'interrupt',
     keyboard.C_j: 'newline',
@@ -84,10 +85,7 @@ job_control_keymap = {
 
 # used by Command to print history to print current 'line' including newlines
 def putlines(s):
-    """
-    Format and print possibly multi-line string
-    at each linebreak print \r\n
-    """
+    'Format and print possibly multi-line string, at each linebreak print \r\n'
     lines = s.splitlines()
     lastline = len(lines) - 1 # index of last line
     for iline, line in enumerate(lines):
@@ -196,7 +194,9 @@ s
 
     # Application commands invoked via keymap
 
+    # any keycode that maps to accept_line is a command terminator
     def accept_line(self):
+        'Terminate command line, do command, possibly exit job'
         self.history.append(self.command) # save command in history list
         self.hindex = len(self.history)-1
         self.restore()        # advance line and put term in line mode 
@@ -209,6 +209,7 @@ s
       	    self.restart()    # print prompt and put term in character mode
 
     def interrupt(self):
+        'Handle ^C, exit from Piety'
         # raw mode terminal doesn't respond to ^C, must handle here
         util.putstr('^C') 
         terminal.set_line_mode() # on new line...
@@ -218,13 +219,11 @@ s
     # Simple command editing that works on printing terminals
 
     def self_append_command(self, key):
-        'Append last character on line, works on printing terminals'
         self.command += key
         self.point += 1
         util.putstr(key)
 
     def backward_delete_last_char(self):
-        'Delete last character on line, works on printing terminals'
         if self.point > 0:
             ch = self.command[-1]
             self.command = self.command[:-1]
