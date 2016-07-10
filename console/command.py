@@ -10,11 +10,11 @@ command.py - Skeleton command line application.  Collects a
 This module has a main method, so python command.py demonstrates some
 functions.
 
-A Command instance can work in reader mode where it uses the
-function passed to the handler initializer argument to read input,
-or, alternatively, can work in receiver mode where it uses
-the built-in handle_key method to accept input passed from a caller.
-This module's main function demonstrates both alternatives.
+A Command instance can work in reader mode where it uses the function
+passed to Command __init__ argument named reader to read input, or,
+alternatively, can work in receiver mode where it uses the built-in
+handle_key method to accept input passed from a caller.  This module's
+main function demonstrates both alternatives.
 
 This module has some similarities to the Python standard library cmd
 module, but does not provide the same API.
@@ -29,11 +29,13 @@ import util, terminal, keyboard, display
 # Keycodes in keymap can be multicharacter sequences, not just single characters.
 # Most method names in the keymap are the same as in GNU readline or Emacs.
 
-# This printing_keymap would work on a printing terminal
+printable = 'a' # proxy in keymaps for all printable characters
+
+# This keymap works on a printing terminal.
 printing_keymap = {
     # self_insert_command requires special-case handling
     #  because it takes an additional argument: the key.
-    string.printable: 'self_append_command',
+    printable: 'self_append_command',
 
     keyboard.cr: 'accept_line',
     keyboard.C_c: 'interrupt',
@@ -48,16 +50,16 @@ printing_keymap = {
     keyboard.delete: 'backward_delete_last_char'
     }
 
-# These require a display terminal with cursor addressing.
+# This keymap requires a display terminal with cursor addressing.
+#  Some of the keys redefine entries in printing_keymap, above.
 editing_keys = {
-    string.printable: 'self_insert_command',
+    printable: 'self_insert_command',
 
     keyboard.bs: 'backward_delete_char',
     keyboard.delete: 'backward_delete_char',
     keyboard.C_a: 'move_beginning_of_line',
     keyboard.C_b: 'backward_char',
-    keyboard.C_d: 'handle_C_d', # exit or 'delete_char
-    # keyboard.C_d: 'delete_char
+    keyboard.C_d: 'delete_char',
     keyboard.C_e: 'move_end_of_line',
     keyboard.C_f: 'forward_char',
     keyboard.C_k: 'kill_line',
@@ -73,6 +75,13 @@ editing_keys = {
 editing_keymap = printing_keymap.copy()
 editing_keymap.update(editing_keys)
 
+# For now, job control commands must be single keycodes at start of line.
+# Job keymap is checked before ordinary keymap so same keys can appear in both.
+job_control_keymap = {
+    keyboard.C_d: 'ctrl_d',
+    keyboard.C_z: 'ctrl_z'
+}
+
 # used by Command to print history to print current 'line' including newlines
 def putlines(s):
     """
@@ -87,17 +96,17 @@ def putlines(s):
             util.putstr('\r\n')
 
 class Command(object):
-    def __init__(self, prompt='', handler=terminal.getchar, 
+    def __init__(self, prompt='', reader=terminal.getchar, 
                  do_command=(lambda command: None),  # do nothing
                  stopped=(lambda command: False),    # never exit
-                 keymap=editing_keymap):             # defined above
+                 keymap=editing_keymap, job_control=job_control_keymap): # defined above
         """
         All arguments are optional, with defaults
 s
         prompt - Prompt string that appears at the start of each line.
         Default is empty string '', no prompt.
 
-        handler - callable to read one or more characters
+        reader - callable to read one or more characters
         to build command string.  Takes no arguments and returns a
         string (might be just a single character).  Default is
         terminal.getchar.
@@ -114,13 +123,14 @@ s
         could still force exit).
 
         keymap: dictionary from keycode to Command method name string
+
+        job_control: dictionary from keycode to job control method name string
         """
         self.prompt = prompt # string to prompt for command 
-        self.handler_body = handler # callable reads char(s) to build command string
+        self.reader = reader # callable, reads char(s) to build command string
         self.do_command = (lambda: do_command(self.command))
         self.stopped = (lambda: stopped(self.command))
         self.job = None  # can assign console.job = job then use console.job.replaced
-        self.job_commands = [ keyboard.C_d ] # ^D exit, job cmds bypass application
         self.command = '' # command string 
         self.point = 0  # index of insertion point in self.command
         self.history = list() # list of previous commands, earliest first
@@ -128,14 +138,26 @@ s
         # prompt used for continuation lines: '...' same len as self.prompt
         self.continuation = '.'*(len(self.prompt)-1) + ' ' 
         self.keymap = keymap
+        self.job_control = job_control
 
     def handle_key(self, keycode):
         'Collect command string and dispatch on command'
         # keycode arg might be single character or a sequence of characters.
+        # For now, job control commands must be a single keycode at start of line.
+        # Job keymap is checked before ordinary keymap so same keys can appear in both.
+        if keycode in self.job_control and not self.command:
+            self.command = keycode # so job control code can use it
+            method = getattr(self, self.job_control[keycode])
+            method()
+            # For now, all job control commands exit
+            self.restore()     # calls print() for newline
+            if self.job:
+                self.job.do_stop()     # callback to job control
+            return
         # Printable keys require special-case handling,
         # because their method takes an additional argument: the key.
         if keycode in string.printable[:-5]: # exclude \t\n\r\v\f at the end
-            method = getattr(self, self.keymap[string.printable])
+            method = getattr(self, self.keymap[printable])
             method(keycode)
         elif keycode in self.keymap:
             method = getattr(self, self.keymap[keycode])
@@ -145,9 +167,8 @@ s
 
     def handler(self):
         'Read char, add to keycode sequence.  If sequence is complete, handle keycode'
-        # might block here in self.handler_body()
-        # to avoid blocking, must only call when input is ready for handler_body
-        keycode = self.handler_body() 
+        # to avoid blocking in self.reader(), must only call when input is ready
+        keycode = self.reader() # returns '' when keycode is not yet complete
         if keycode:
             self.handle_key(keycode)
 
@@ -163,16 +184,23 @@ s
         terminal.set_line_mode()
         print()
 
-    # All the other methods are invoked via keymap
+    # Job control commands invoked via job_control
+    # Two for now just to show we can distinguish commands
 
-    # Methods that work on printing terminals
+    def ctrl_d(self):
+        util.putstr('^D')  # no newline, caller handles it.
+
+    def ctrl_z(self):
+        print('^Z')
+        util.putstr('\rStopped') # still in raw mode, print didn't RET
+
+    # Application commands invoked via keymap
 
     def accept_line(self):
         self.history.append(self.command) # save command in history list
         self.hindex = len(self.history)-1
         self.restore()        # advance line and put term in line mode 
-        if self.command not in self.job_commands: # job cmds bypass application
-            self.do_command() # application executes command
+        self.do_command() # application executes command
         if self.job and self.job.replaced: # command may replace or stop application
             return
         elif self.stopped() and self.job:
@@ -262,17 +290,6 @@ s
             self.point -= 1
             display.backward_char()
 
-    def handle_C_d(self):
-        '^D: stop if command string is empty, otherwise delete character.'
-        if not self.command:
-            self.command = keyboard.C_d # so self.stopped() can find it
-            util.putstr('^D')  # no newline because ...
-            self.restore()     # ... calls print() for newline
-            if self.job:
-                self.job.do_stop()     # callback to job control
-        else:
-            self.delete_char() # requires display terminal
-
     def delete_char(self):
         self.command = (self.command[:self.point] + self.command[self.point+1:])
         display.delete_char()
@@ -291,19 +308,18 @@ s
          self.command = self.command[:self.point] # point doesn't change
          display.kill_line()
 
-# Test
+# Tests - no stopped arg, but exit at any job control command: ^D ^Z
 
-# Default do_command, stopped: do nothing, exit immediately
+# Default do_command - echo input chars, but do nothing else
 c0 = Command(prompt='> ') # prompt to show restart() ran.
 
-# echo input lines, exit at q or ^D
-c = Command(prompt='> ', do_command=(lambda command: print(command)),
-            stopped=(lambda command: command == 'q' or command == keyboard.C_d))
+# echo completed input lines
+c = Command(prompt='> ', do_command=(lambda command: print(command)))
 
 def default():
-    "Collect command lines but do nothing until command 'q' exits."
+    "Collect command lines but do nothing until ^D or ^Z exits"
     c0.restart()
-    while not c0.command == 'q': # c0.stopped() is always False
+    while c0.command not in c0.job_control: # use job control for exit
         c0.handler() # does nothing 
     c0.restore() # undo restart, restore terminal line mode
     
@@ -311,7 +327,7 @@ def main():
     # Note - default handler terminal.getchar can't handle multi-char control seqs
     #  like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
     c.restart()
-    while not c.stopped():
+    while c.command not in c.job_control: # use job control for exit
         # Here Command instance works in reader mode:
         # uses the function passed to its handler argument to read its input.
         c.handler()

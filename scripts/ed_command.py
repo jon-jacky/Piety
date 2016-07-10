@@ -6,14 +6,13 @@ edc.py - Run an ed line editor session.
 
 import ed, command, key, keyboard
 
-edc = command.Command(prompt=': ', handler=key.Key(),  do_command=ed.cmd,
-                      stopped=(lambda command: 
-                               ed.quit or command == keyboard.C_d))
+edc = command.Command(prompt=': ', reader=key.Key(),  do_command=ed.cmd,
+                      stopped=(lambda command: ed.quit))
 
 def main():
     ed.quit = False # previous quit might have set it True
     edc.restart()
-    while not edc.stopped():
+    while not edc.stopped() and edc.command not in edc.job_control:
         edc.handler() # q command sets ed.quit True, forces exit
     edc.restore()
 

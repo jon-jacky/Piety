@@ -8,15 +8,14 @@ edsel_command.py - Edsel display editor with Command class, but no
 import edsel, command, key, keyboard
 
 # Here we use Command args rather than calling edsel functions in main()
-edselc = command.Command(handler=key.Key(), do_command=edsel.cmd,
-                         stopped=(lambda command: 
-                                  edsel.ed.quit or command == keyboard.C_d))
+edselc = command.Command(reader=key.Key(), do_command=edsel.cmd,
+                         stopped=(lambda command: edsel.ed.quit))
 
 def main():
     edsel.ed.quit = False # previous quit might have set it True
     edsel.init_session(c=12) # 12 lines in scrolling command region
     edselc.restart()
-    while not edselc.stopped():
+    while not edselc.stopped() and edselc.command not in edselc.job_control:
         edselc.handler()   # q command sets edsel.ed.quit True, forces exit
     edselc.restore() # restores terminal, different from restore_display
     edsel.restore_display()

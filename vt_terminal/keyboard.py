@@ -35,6 +35,8 @@ C_l = '\f'   # ^L, ff
 C_n = '\x0E' # ^N, so
 C_p = '\x10' # ^P, dle
 C_u = '\x15' # ^U, nak
+C_w = '\x17' # ^W, etb
+C_z = '\x1a'  # ^Z, sub
 
 # ANSI codes for arrow keys
 

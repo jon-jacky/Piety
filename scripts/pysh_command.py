@@ -6,15 +6,14 @@ pysh_command.py - Run a pysh Python shell session.
 
 import pysh, command, key, keyboard
 
-pyshc = command.Command(prompt='>> ',  handler=key.Key(), do_command=pysh.mk_shell(),
-                        stopped=(lambda command: 
-                                 not pysh.running or command == keyboard.C_d))
+pyshc = command.Command(prompt='>> ', reader=key.Key(), do_command=pysh.mk_shell(),
+                        stopped=(lambda command: not pysh.running))
 
 def main():
     'Python REPL using home-made pysh shell'
     print("pysh shell, type any Python statement, exit() or ^D to exit")
     pyshc.restart()
-    while not pyshc.stopped():
+    while not pyshc.stopped() and pyshc.command not in pyshc.job_control:
         pyshc.handler()
     pyshc.restore()
 
