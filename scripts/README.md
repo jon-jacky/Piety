@@ -4,7 +4,7 @@ scripts
 
 Python modules that test and demonstrate *Piety*, especially the
 *Task*, *Session*, *Job*, and *Command* classes.  Most modules 
-provde a *main* method that runs when the module is invoked from 
+provide a *main* method that runs when the module is invoked from 
 the command line.  Some of these
 *main* methods run one or more applications as *Piety* tasks, using the
 non-blocking event loop in *piety.run*.  Others run
@@ -27,12 +27,9 @@ for directions and explanations.
   display editor.  Makes all three jobs with *console_job*.  Runs
   the session in a *while* loop.
 
-- **ed_cmd_job.py**, **edsel_cmd_job.py**: Makes a console job that runs the editor *ed*
-  (or *edsel*) by connecting a *Job* instance and a *Command* instance, but without
+- **edsel_cmd_job.py**: Makes a console job that runs the editor *edsel*
+  by connecting a *Job* instance and a *Command* instance, but without
   using *console_job*.  Runs the job in a *while* loop.
-
-- **ed_command.py**, **edsel_command.py**: Makes a *Command* instance
-  that runs the editor *ed* (or *(edsel*) in a *while* loop.
 
 - **edsel_console_job.py**: Makes a console job that runs the editor *ed*
   (or *edsel*) by  using *console_job* to connect a *Job* instance and a 
@@ -78,4 +75,4 @@ for directions and explanations.
 - **writer_tasks.py**: Creates writer tasks used by the *embedded.py* and
     *piety_writers.py* scripts.
 
-Revised June 2016
+Revised October 2016

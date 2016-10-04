@@ -13,7 +13,8 @@ def main():
     'Python REPL using home-made pysh shell'
     print("pysh shell, type any Python statement, exit() or ^D to exit")
     pyshc.restart()
-    while not pyshc.stopped() and pyshc.command not in pyshc.job_control:
+    while (not pyshc.stopped() 
+           and pyshc.command_line.chars not in pyshc.job_control):
         pyshc.handler()
     pyshc.restore()
 

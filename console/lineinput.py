@@ -21,10 +21,6 @@ printing_keymap = {
     #  because it takes an additional argument: the key.
     printable: 'self_append_command',
 
-    keyboard.C_j: 'newline',
-    keyboard.C_l: 'redraw_current_line',
-    keyboard.C_u: 'line_discard',
-
     # Rudimentary in-line editing, just delete last char in line
     keyboard.bs: 'backward_delete_last_char',
     keyboard.delete: 'backward_delete_last_char'
@@ -46,6 +42,7 @@ editing_keys = {
 
     # These keys are multicharacter control sequences
     # require keyboard that sends ANSI control sequences
+    # and keyboard reader that handles multicharacter keycodes
     keyboard.right: 'forward_char',
     keyboard.left: 'backward_char',
     }
@@ -55,12 +52,11 @@ editing_keymap.update(editing_keys)
 
 class LineInput(object):
     def __init__(self, keymap=editing_keymap):
-        self.chars = ''  # string to edit
-        self.start_col = 1   # column number of left margin, 1-based
+        self.chars = '' # string to edit
         self.point = 0  # index of insertion point in self.chars, 0-based
+        self.start = 1  # index of first column on display, 1-based
         self.keymap = keymap
-        self.prompt = ''
-
+        
     # Simple command editing that works on printing terminals
     def handler(self, keycode):
         'Look up command for keycode and run it'
@@ -89,26 +85,11 @@ class LineInput(object):
             # util.putstr('^H') # omit, it is more helpful to echo
             util.putstr('\\%s' % ch) # echo \c where c is deleted char
 
-    def redraw_current_line(self):
-        util.putstr('^L\r\n' + self.prompt)  # on new line
-        #putlines(self.chars) # might be multiple lines
-        util.putstr(self.chars)
-
-    def line_discard(self): # name like gnu readline unix-line-discard
-        self.chars = str() 
-        self.point = 0
-        util.putstr('^U\r\n' + self.prompt)
-
-    def newline(self):
-        self.chars += '\n'
-        self.point += 1
-        util.putstr('^J\r\n' + self.continuation)
-
     # Command editing that requires a display terminal with cursor addressing
  
     def self_insert_command(self, key):
-        self.chars = (self.chars[:self.point] + key + \
-                        self.chars[self.point:])
+        self.chars = (self.chars[:self.point] + key +
+                      self.chars[self.point:])
         self.point += 1
         display.self_insert_char(key)
 
@@ -120,8 +101,7 @@ class LineInput(object):
 
     def move_beginning_of_line(self):
         self.point = 0
-        start = len(self.prompt)+1 # allow for space after prompt
-        display.move_to_column(start) # move to character after prompt
+        display.move_to_column(self.start)
 
     def backward_char(self):
         if self.point > 0:
@@ -134,7 +114,7 @@ class LineInput(object):
 
     def move_end_of_line(self):
         self.point = len(self.chars)
-        eol = len(self.prompt) + 1 + len(self.chars)
+        eol = self.start + len(self.chars)
         display.move_to_column(eol)
 
     def forward_char(self):
@@ -146,5 +126,48 @@ class LineInput(object):
          self.chars = self.chars[:self.point] # point doesn't change
          display.kill_line()
 
-# no test code in this module - useful test must import command, key
+# Test - shows how much setup, teardown, event handling lineinput needs
 
+line = LineInput() # outside main() so we can inspect from >>>
+
+def main():
+    import terminal # only needed for this test
+
+    def edit():
+        'event loop for testing lineinput'
+        while True:
+            # reads single chars, arrow keys won't work
+            key = terminal.getchar()
+            if key in printing_chars or key in line.keymap:
+                line.handler(key)
+            else:
+                break
+
+    print('Enter and edit a fresh line:')
+    # Typically, caller assigns prompt and start column
+    # based on Command restart method
+    prompt = '> '
+    line.chars = ''
+    line.start = len(prompt) + 1
+    util.putstr(prompt)
+    terminal.set_char_mode()
+    # lineinput event loop
+    edit()
+    # based on Command restore method
+    terminal.set_line_mode()
+    print()
+
+    # Caller can reassign prompt etc. and line to edit
+    print('Now edit a previously entered line:')
+    prompt = '>> '
+    line.chars = 'Here is some text to edit.'
+    line.start = len(prompt) + 1
+    util.putstr(prompt)
+    util.putstr(line.chars) # show line to edit
+    terminal.set_char_mode()
+    edit()
+    terminal.set_line_mode()
+    print()
+
+if __name__ == '__main__':
+    main()

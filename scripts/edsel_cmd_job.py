@@ -20,7 +20,8 @@ console.job = edselj
 
 def main():
     edselj() # run startup
-    while not console.stopped() and console.command not in console.job_control:
+    while (not console.stopped() and 
+           console.command_line.chars not in console.job_control):
         edselj.handler()
 
 if __name__ == '__main__':

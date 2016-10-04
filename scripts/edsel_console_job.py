@@ -6,7 +6,7 @@ edsel_cmd_job.py - Edsel display editor with Command and Job classes,
 import edsel, key, keyboard
 from console_job import console_job
 
-edselj, c = console_job(prompt=': ', handler=key.Key(),
+edselj, c = console_job(prompt=': ', reader=key.Key(),
                         do_command=edsel.cmd,
                         startup=(lambda: edsel.init_session(c=12)), # 12 cmd lines
                         stopped=(lambda command: 

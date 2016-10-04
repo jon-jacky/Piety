@@ -740,7 +740,8 @@ def main(*filename, **options):
     if 'p' in options:
         prompt = options['p'] 
     while not quit:
-        line = input(prompt) # blocking
+        prompt_string = prompt if command_mode else ''
+        line = input(prompt_string) # blocking
         cmd(line) # non-blocking
 
 # Run the editor from the system command line:  python ed.py

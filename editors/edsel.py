@@ -275,7 +275,8 @@ def main(*filename, **options):
     ed.quit = False # allow restart
     init_session(*filename, **options)
     while not ed.quit:
-        line = input(prompt) # blocking
+        prompt_string = prompt if ed.command_mode else ''
+        line = input(prompt_string) # blocking
         cmd(line) # no blocking
     restore_display()
 
