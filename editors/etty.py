@@ -8,7 +8,7 @@ import ed, command, key, keyboard
 
 edc = command.Command(prompt=':', do_command=ed.cmd,
                       stopped=(lambda command: ed.quit),
-                      keymap=command.printing_command_keymap,
+                      # accept default keymap for printing terminal
                       mode=(lambda: ed.command_mode), # True or False
                       behavior={ False: ('', command.printing_insert_keymap) })
 

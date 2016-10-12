@@ -34,34 +34,53 @@ printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 
 # This keymap works for ed insert mode on a printing terminal.
+# (These keys are also enabled in ed command mode.)
 printing_insert_keymap = {
     # any keycode that maps to accept_line is a command terminator
     keyboard.cr: 'accept_line', # don't add to history, don't exit
     keyboard.C_c: 'interrupt',
-    keyboard.C_l: 'redraw_current_line',
-    keyboard.C_u: 'line_discard',
+    keyboard.C_l: 'redraw_current_line_tty',
+    keyboard.C_u: 'line_discard_tty',
     }
 
 # Add keys used in ed command mode on a printing terminal.
 printing_command_keys = {
     # any keycode that maps to accept_line is a command terminator
     keyboard.cr: 'accept_command', # add to history, possibly exit
-    keyboard.C_n: 'next_history',
-    keyboard.C_p: 'previous_history',
+    keyboard.C_n: 'next_history_tty',
+    keyboard.C_p: 'previous_history_tty',
     }
 
-# This keymap works for ed command mode on a printing terminal.
-printing_command_keymap = printing_insert_keymap.copy()
-printing_command_keymap.update(printing_command_keys)
+# This combined keymap works for ed command mode on a printing terminal.
+printing_keymap = printing_insert_keymap.copy()
+printing_keymap.update(printing_command_keys)
 
-# This keymap requires a terminal with arrow keys
-vt_keys = {
+# This keymap works for ed insert mode on a terminal with cursor addressing
+# (These keys are also enabled in ed command mode.)
+vt_insert_keymap = {
+    # any keycode that maps to accept_line is a command terminator
+    keyboard.cr: 'accept_line', # don't add to history, don't exit
+    keyboard.C_c: 'interrupt',
+    # Put these next two entries in LineInput keymap, not here
+    # keyboard.C_l: 'redraw_current_line',
+    # keyboard.C_u: 'line_discard',
+    }
+
+# Add keys used in ed command mode on a terminal with cursor addressing
+#  and arrow keys
+vt_command_keys = {
+    # any keycode that maps to accept_line is a command terminator
+    keyboard.cr: 'accept_command', # add to history, possibly exit
+    keyboard.C_n: 'next_history',
+    keyboard.C_p: 'previous_history',
     keyboard.up: 'previous_history',
     keyboard.down: 'next_history',
     }
 
-vt_command_keymap = printing_command_keymap.copy()
-vt_command_keymap.update(vt_keys)
+# This combined keymap works for ed command mode
+#  on a terminal with cursor addressing and arrow keys
+vt_keymap = vt_insert_keymap.copy()
+vt_keymap.update(vt_command_keys)
 
 # For now, job control commands must be single keycodes at start of empty line.
 # Job keymap is checked before ordinary keymap so same keys can appear in both.
@@ -71,12 +90,16 @@ job_control_keymap = {
 }
 
 class LineInput(object):
-    'Minimal placeholder for command_line object, backspace for editing'
+    """
+    Minimal but quite usable default command_line object
+    Works on printing terminal, only editing is backspace key
+    """
     def __init__(self, keymap={c: None for c in 
                                printing_chars + keyboard.delete}):
         self.chars = ''  # string to edit
-        self.start = 1   # index of first column on display, 1-based
+        self.start_col = 1   # index of first column on display, 1-based
         self.keymap = keymap
+        self.point = 0 # not used, but assigned by Command restart method
 
     def handler(self, keycode):
         'No table lookup, Just two simple cases: append char or delete last'
@@ -87,13 +110,15 @@ class LineInput(object):
         else: # keymap ensures this is printing char
             util.putstr(keycode)  # just echo ... 
             self.chars += keycode # ... and append char
-            
+    # no redraw_current_line, requires video terminal with cursor addressing
+
 class Command(object):
     def __init__(self, prompt='', reader=terminal.getchar, 
                  command_line=LineInput(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
-                 keymap=vt_command_keymap, 
+                 # this default keymap works with default command_line
+                 keymap=printing_keymap, 
                  job_control=job_control_keymap,
                  mode=(lambda: True), behavior={}):
         """
@@ -111,11 +136,13 @@ class Command(object):
           Default is terminal.getchar, always gets a single character.
 
         command_line - object to collect and store command line, and
-          optionally provide in-line editing.  Command line text must be
-          stored in an attribute named chars, its keymap must be in
-          an attribute named keymap, and it must have a method named
-          dispatch that takes a keycode argument.
+          optionally provide in-line editing.  
           Default is minimal LineInput class defined in this module.
+          command_line attributes used by Command, in minimal LineInput:
+           chars: string, start_col: int, keymap: dict, handler: method
+          Additional command_line attributes used by Command, via history 
+            methods in vt_keymap, not used with printing_keymap:
+           point: int, redraw_current_line: method
 
         do_command - callable to execute command string.  Takes one
           argument, a string.  
@@ -131,7 +158,7 @@ class Command(object):
         keymap - dictionary from keycode to Command method name
           string, used except in modes where it is overridden by mode
           and behavior args (below).
-          Default: vt_command_keymap (above)
+          Default: vt_keymap (above)
 
         job_control: dictionary from keycode to job control method
           name string.  The method typically bypasses or suspends the
@@ -162,7 +189,7 @@ class Command(object):
         self.behavior = behavior
         self.command_line = command_line
         self.command_line.chars = ''
-        self.command_line.start = len(self.prompt) + 1 # 1-based not 0-based
+        self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
         self.do_command = (lambda: do_command(self.command_line.chars))
         self.stopped = (lambda: stopped(self.command_line.chars))
         self.job = None  # assign elsewhere, then here use self.job.stop() etc.
@@ -211,8 +238,10 @@ class Command(object):
             self.prompt, self.keymap = self.behavior[mode]
         else:
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
-        util.putstr(self.prompt) # prompt does not end with \n
+        self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
         self.command_line.chars = ''
+        self.command_line.point = len(self.command_line.chars)
+        util.putstr(self.prompt) # prompt does not end with \n
         terminal.set_char_mode()
 
     def restore(self):
@@ -264,35 +293,53 @@ class Command(object):
         print()              # ... otherwise traceback is a mess
         raise KeyboardInterrupt
 
-    # Command history, works on printing terminals
+    # Command history, works on with default LineInput on printing terminals
 
-    def previous_history(self):
+    def retrieve_previous_history(self):
         if self.history:
             length = len(self.history)
             self.hindex = self.hindex if self.hindex < length else length-1
             self.command_line.chars = self.history[self.hindex]
-        self.point = len(self.command_line.chars)
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
-        util.putstr('^P\r\n' + self.prompt) # on new line
-        util.putstr(self.command_line.chars) # might be multiple lines
 
-    def next_history(self):
+    def previous_history_tty(self):
+        self.retrieve_previous_history()
+        util.putstr('^P\r\n' + self.prompt + self.command_line.chars)
+
+    def retrieve_next_history(self):
         length = len(self.history)
         self.hindex = self.hindex + 1 if self.hindex < length else length
         self.command_line.chars = (self.history[self.hindex] 
                                    if self.hindex < length else '')
-        self.point = len(self.command_line.chars)
-        util.putstr('^N\r\n' + self.prompt)  # on new line
-        util.putstr(self.command_line.chars) # might be multiple lines
 
-    def redraw_current_line(self):
+    def next_history_tty(self):
+        self.retrieve_next_history()
+        util.putstr('^N\r\n' + self.prompt + self.command_line.chars)
+
+    # Command history, requires video terminal with cursor addressing
+
+    def previous_history(self):
+        self.retrieve_previous_history()
+        self.command_line.point = len(self.command_line.chars)
+        self.command_line.redraw_current_line()
+
+    def next_history(self):
+        self.retrieve_next_history()
+        self.command_line.point = len(self.command_line.chars)
+        self.command_line.redraw_current_line()
+
+    # Command editing, works with default LineInput on printing terminal
+
+    def redraw_current_line_tty(self):
         util.putstr('^L\r\n' + self.prompt)  # on new line
         util.putstr(self.command_line.chars)
 
-    def line_discard(self): # name like gnu readline unix-line-discard
+    def line_discard_tty(self): # name like gnu readline unix-line-discard
         self.command_line.chars = ''
-        self.point = 0
         util.putstr('^U\r\n' + self.prompt)
+
+    # Command editing, requires video terminal with cursor addressing,
+    # not provided in this module, see (for example) lineinput module.
 
 # Tests - no stopped arg, but exit at any job control command: ^D ^Z
 
