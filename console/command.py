@@ -5,7 +5,7 @@ Collects a command (string) one keycode at a time, passes it to a
   handler (callable) to execute.
 
 Delegates in-line editing of the command string to another class.  A
-  simple stub class is included in this module.
+  simple stub class with rudimentary editing is included in this module.
 
 Provides command history similar to readline.
 
@@ -32,6 +32,8 @@ import util, terminal, keyboard, display
 
 printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
+
+# Any keycode that maps to accept_line or _command is a command terminator
 
 # This keymap works for ed insert mode on a printing terminal.
 # (These keys are also enabled in ed command mode.)
@@ -99,7 +101,7 @@ class LineInput(object):
         self.chars = ''  # string to edit
         self.start_col = 1   # index of first column on display, 1-based
         self.keymap = keymap
-        self.point = 0 # not used, but assigned by Command restart method
+        self.point = 0 # not used here, but assigned by Command restart etc.
 
     def handler(self, keycode):
         'No table lookup, Just two simple cases: append char or delete last'
@@ -190,6 +192,7 @@ class Command(object):
         self.command_line = command_line
         self.command_line.chars = ''
         self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
+        self.clear_chars = True # do_command might assign False
         self.do_command = (lambda: do_command(self.command_line.chars))
         self.stopped = (lambda: stopped(self.command_line.chars))
         self.job = None  # assign elsewhere, then here use self.job.stop() etc.
@@ -231,7 +234,8 @@ class Command(object):
         """
         Prepare to collect a command string using the command_line object.
         Assign prompt and keymap for current mode.
-        Clear command string, print command prompt, set single-char mode.
+        Print command prompt, set single-char mode.
+        Do NOT initialize chars and point, caller has assigned them already
         """
         mode = self.mode() 
         if mode in self.behavior:
@@ -239,9 +243,8 @@ class Command(object):
         else:
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
         self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
-        self.command_line.chars = ''
-        self.command_line.point = len(self.command_line.chars)
-        util.putstr(self.prompt) # prompt does not end with \n
+        util.putstr(self.prompt + self.command_line.chars)
+        # FIXME set cursor to point, might not be eol, but only on VT terminals
         terminal.set_char_mode()
 
     def restore(self):
@@ -259,21 +262,27 @@ class Command(object):
         print('^Z')
         util.putstr('\rStopped') # still in raw mode, print didn't RET
 
+    def accept_chars(self):
+        'Used by both accept_line and accept_command, below'
+        self.restore()    # advance line and put terminal in line mode 
+        self.clear_chars = True # do_command might assign this False
+        self.do_command() # do_command might assign chars, point
+        if self.clear_chars: # if do_command did not already assign chars, point
+            self.command_line.chars = ''
+            self.command_line.point = 0
+
     # Application commands invoked via keymap
 
-    # any keycode that maps to accept_line or _command is a command terminator
     def accept_line(self):
-        'Finish command line, do command, but no history or exit'
-        self.restore()    # advance line and put terminal in line mode 
-        self.do_command() # application executes command
+        'For ed insert mode: handle line, but no history, exit, or job control'
+        self.accept_chars()
         self.restart() # print prompt and put term in character mode
 
     def accept_command(self):
-        'Finish command line, do command, add to history, possibly exit'
+        'For ed command mode: handle line, with  history, exit, and job control'
         self.history.append(self.command_line.chars) # save command in history
         self.hindex = len(self.history)-1
-        self.restore()    # advance line and put terminal in line mode 
-        self.do_command() # application executes command
+        self.accept_chars()
         if self.stopped():
             if self.job:
                 self.job.do_stop() # callback to job control

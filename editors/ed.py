@@ -632,8 +632,8 @@ def cmd(line):
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
             elif cmd_name == 'c': # c(hange) command deletes changed lines first
-                buf.d(start, end) # updates buf.dot
-                buf.dot = start - 1
+                buf.d(start, end) # d updates buf.dot to the line after deletes
+                buf.dot = start - 1 # supercede dot assigned in preceding
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:
@@ -733,7 +733,7 @@ def main(*filename, **options):
     Top level ed command to use at Python prompt.
     This version won't work in Piety, it calls blocking command raw_input
     """
-    global cmd_name, quit, prompt
+    global quit, prompt
     quit = False # allow restart
     if filename:
         e(filename[0])
