@@ -7,9 +7,16 @@ eden.py - run *edsel.py* display editor, with additional screen
 
 import edsel, command, key, lineinput, display
 
+c_command, buf, dot = False, None, 0
+
+# Ths cmd called from accept_command or accept_line, via do_command
 def cmd(chars):
     'Handle new eden commands here, pass other commands to edsel'
-    if chars == 'c': # c(hange) just one line at dot, no line address range
+    global c_command, buf, dot
+
+    # command mode, 'c' with no address range, c(hange) just one line
+    if edsel.ed.command_mode and chars == 'c':
+        c_command = True
         buf = edsel.ed.buf
         dot = buf.dot
         edenc.command_line.chars = buf.lines[dot].rstrip() # strip \n
@@ -18,11 +25,23 @@ def cmd(chars):
         edsel.ed.cmd_name = 'c' # needed by edsel functions, following
         edsel.ed.command_mode = False 
         buf.d(dot, dot) # ed c(hange) command deletes changed lines first
-        buf.dot = dot - 1 # buf.d updates buf.dot to the line after delete
+        dot -= 1        # buf.d updates buf.dot to the line after delete
+        buf.dot = dot
         edsel.maintain_display()
         edsel.update_display()
+
+    # insert mode, line finished 
+    elif not edsel.ed.command_mode and c_command:
+        buf.a(dot, edenc.command_line.chars + '\n')
+        edsel.ed.command_mode = True
+        c_command = False    
+        edsel.maintain_display()
+        edsel.update_display()
+
+    # pass all other commands to edsel
     else:
         edsel.cmd(chars)
+
 
 edenc = command.Command(prompt=':', reader = key.Key(),
                         command_line=lineinput.LineInput(),

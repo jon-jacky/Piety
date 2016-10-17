@@ -244,7 +244,8 @@ class Command(object):
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
         self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
         util.putstr(self.prompt + self.command_line.chars)
-        # FIXME set cursor to point, might not be eol, but only on VT terminals
+        display.move_to_column(self.command_line.start_col +
+                               self.command_line.point)
         terminal.set_char_mode()
 
     def restore(self):
@@ -279,7 +280,7 @@ class Command(object):
         self.restart() # print prompt and put term in character mode
 
     def accept_command(self):
-        'For ed command mode: handle line, with  history, exit, and job control'
+        'For ed command mode: handle line, with history, exit, and job control'
         self.history.append(self.command_line.chars) # save command in history
         self.hindex = len(self.history)-1
         self.accept_chars()
