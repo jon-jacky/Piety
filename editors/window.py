@@ -69,21 +69,33 @@ class Window(object):
         return (self.dot == self.buf.S() and self.seg_n == self.buf.S() 
                 and seg_h == self.win_hl)
 
-    def locate_segment(self):
+    def locate_segment_top(self):
         """
-        Compute segment of buffer that is visible in window.
+        Compute top of segment of buffer that is visible in window.
         Assign self.seg_1 - index in buffer of first line shown in window.
-          also self.seg_n - index in buffer of last line shown in window.
         Center window on dot if possible,otherwise show top or bottom of buffer
+        Call this only when segment moves, to avoid distracting jumps in display
         """
         if self.near_buffer_top(): # first line at top of window
             self.seg_1 = 1  
-            self.seg_n = min(self.win_hl, self.buf.S())
         elif self.near_buffer_bottom(): # last line at bottom of window
             self.seg_1 = self.buf.S() - (self.win_hl - 1)
-            self.seg_n = self.buf.S()
         else: # dot is centered in window
             self.seg_1 = self.dot - self.win_hl//2 # floor division
+
+    def locate_segment_bottom(self):
+        """
+        Compute bottom of segment of buffer that is visible in window.
+        Assign self.seg_n - index in buffer of last line shown in window.
+        Depends on self.seg_1 computed in locate_segment_top, call that first
+        Center window on dot if possible,otherwise show top or bottom of buffer
+        Call this whenever segment contents might have changed.
+        """
+        if self.near_buffer_top(): # first line at top of window
+            self.seg_n = min(self.win_hl, self.buf.S())
+        elif self.near_buffer_bottom(): # last line at bottom of window
+            self.seg_n = self.buf.S()
+        else: # dot is centered in window
             self.seg_n = self.seg_1 + (self.win_hl - 1)
 
     def display_lines(self, first, last):
@@ -116,7 +128,7 @@ class Window(object):
             display.kill_whole_line() # open line to insert new text
             print() # next line
             self.display_lines(self.dot+1, 
-                               self.seg_n - (0 if self.near_buffer_top() else 1))
+                               self.seg_n-(0 if self.near_buffer_top() else 1))
         for line in range(blank_h if command_mode else blank_h - 1):
             display.kill_whole_line()
             print()
@@ -201,7 +213,8 @@ class Window(object):
 
     def update_window(self, command_mode):
         'Locate and display the window including its status line and cursor.'
-        self.locate_segment() # assign new self.seg_1, self.seg_n
+        # do not call locate_segment_top() here, can cause distracting jumps
+        self.locate_segment_bottom() # assign new self.seg_n
         self.locate_cursor()  # *re*assign new self.cursor_i, cursor_ch
         self.display_window(command_mode)
         self.display_status()

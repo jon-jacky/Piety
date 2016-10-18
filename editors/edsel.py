@@ -35,7 +35,8 @@ def calc_frame():
 def update_windows():
     'Redraw all windows, called by display_frame, for example after frame resize.'
     for w in windows:
-        w.update_window(True) # no windows could be in insert mode at this time
+        w.locate_segment_top() # necessary if window(s) resized
+        w.update_window(True)  # no windows could be in insert mode at this time
 
 def set_command_cursor():
     'Put cursor at input line in scrolling command region'
@@ -146,7 +147,9 @@ def update_display():
     'Check for any needed display updates.  If there are any, do them.'
     win.dot = win.buf.dot # dot may or may not have changed, update anyway
     win.locate_cursor() # assign new cursor_i, only in current winow
-
+    segment_moved = (ed.cmd_name in file_cmds + buffer_cmds
+                     or win.cursor_elsewhere() 
+                     or o_cmd in ('o1','o2')) # set single window or split
     # frame changed, update all windows and cursor
     if cmd_h != cmd_h0:
         update_frame()  # calls display_frame, which calls update_windows
@@ -159,8 +162,9 @@ def update_display():
         win.display_cursor()
 
     # update current window contents, maybe other windows too
-    elif (ed.cmd_name in file_cmds + buffer_cmds + text_cmds or win.cursor_elsewhere() 
-          or o_cmd in ('o1','o2')): # set single window or split window
+    elif segment_moved or ed.cmd_name in text_cmds:
+        if segment_moved:
+            win.locate_segment_top()
         win.update_window(ed.command_mode)
         if o_cmd == 'o2': # split window
             # win0 is former current window
@@ -168,11 +172,13 @@ def update_display():
             # win.resize in o2 command code does not relocate win0 cursor
             if win0.cursor_i < win.win_1 or win0.cursor_i > win.win_1+win.win_h:
                 win0.erase_cursor()
+                win0.locate_segment_top() # necessary?
             win0.update_window(True)
         else:  # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
                     # might update even when lines in w unchanged
+                    # win0.locate_segment_top() # necessary?
                     w.update_window(True)
         # must draw cursor last
         if ed.command_mode:
