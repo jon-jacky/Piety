@@ -88,7 +88,18 @@ class LineInput(object):
             util.putstr('\\%s' % ch) # echo \c where c is deleted char
 
     # Command editing that requires a display terminal with cursor addressing
+
+    def move_to_point(self):
+        display.move_to_column(self.start_col + self.point)
  
+    def move_beginning_of_line(self):
+        self.point = 0
+        self.move_to_point()
+
+    def move_end_of_line(self):
+        self.point = len(self.chars)
+        self.move_to_point()
+
     def self_insert_command(self, key):
         self.chars = (self.chars[:self.point] + key +
                       self.chars[self.point:])
@@ -101,10 +112,6 @@ class LineInput(object):
             self.point -= 1
             display.backward_delete_char()
 
-    def move_beginning_of_line(self):
-        self.point = 0
-        display.move_to_column(self.start_col)
-
     def backward_char(self):
         if self.point > 0:
             self.point -= 1
@@ -113,10 +120,6 @@ class LineInput(object):
     def delete_char(self):
         self.chars = (self.chars[:self.point] + self.chars[self.point+1:])
         display.delete_char() # point does not change
-
-    def move_end_of_line(self):
-        self.point = len(self.chars)
-        display.move_to_column(self.start_col + self.point)
 
     def forward_char(self):
         if self.point < len(self.chars):

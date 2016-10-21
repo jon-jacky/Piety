@@ -1,8 +1,11 @@
 """
 command.py - Command class, skeleton command line application.  
 
-Collects a command (string) one keycode at a time, passes it to a
-  handler (callable) to execute.
+Collects a command (string), with editing and history, and passes it
+  to a handler (callable) to execute.
+
+Collects the string one character at a time, so it can be used 
+  for cooperative multitasking without blocking.
 
 Delegates in-line editing of the command string to another class.  A
   simple stub class with rudimentary editing is included in this module.
@@ -23,7 +26,7 @@ This module has some similar motivations to the Python standard
 
 import sys
 import string # for string.printable
-import util, terminal, keyboard, display
+import util, terminal, keyboard
 
 # A keymap is a dictionary from keycode string to Command method name string.
 # Keycodes in keymap can have multiple characters (for example escape sequences)
@@ -113,6 +116,10 @@ class LineInput(object):
             util.putstr(keycode)  # just echo ... 
             self.chars += keycode # ... and append char
     # no redraw_current_line, requires video terminal with cursor addressing
+
+    def move_to_point(self):
+        'Called by Command class restart method'
+        pass # caller already putstr(chars) - nothing more needed
 
 class Command(object):
     def __init__(self, prompt='', reader=terminal.getchar, 
@@ -244,8 +251,7 @@ class Command(object):
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
         self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
         util.putstr(self.prompt + self.command_line.chars)
-        display.move_to_column(self.command_line.start_col +
-                               self.command_line.point)
+        self.command_line.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
     def restore(self):
@@ -264,7 +270,10 @@ class Command(object):
         util.putstr('\rStopped') # still in raw mode, print didn't RET
 
     def accept_chars(self):
-        'Used by both accept_line and accept_command, below'
+        """
+        Used by both accept_line and accept_command, below.
+        Makes it possible for do_command to optionally initialize command_line.
+        """
         self.restore()    # advance line and put terminal in line mode 
         self.clear_chars = True # do_command might assign this False
         self.do_command() # do_command might assign chars, point
