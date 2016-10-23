@@ -4,18 +4,19 @@ command.py - Command class, skeleton command line application.
 Collects a command (string), with editing and history, and passes it
   to a handler (callable) to execute.
 
-Collects the string one character at a time, so it can be used 
+Collects the string one character at a time, so this class can be used 
   for cooperative multitasking without blocking.
 
 Delegates in-line editing of the command string to another class.  A
-  simple stub class with rudimentary editing is included in this module.
+  minimal  stub class with rudimentary editing is included in this module.
 
 Provides command history similar to readline.
 
-Provides for different keymaps that map keycodes to behaviors.
+Provides for customization by assigning keymaps that map keycodes to
+  behaviors.
 
-Provides for modes with different behaviors, for example an editor's
-  command and insert modes.
+Provides for modes that assign different keymaps to select different
+  behaviors, for example an editor's command and insert modes.
 
 Provides for job control commands that can bypass or suspend the
   application.
@@ -96,8 +97,8 @@ job_control_keymap = {
 
 class LineInput(object):
     """
-    Minimal but quite usable default command_line object
-    Works on printing terminal, only editing is backspace key
+    Minimal but usable class for default command_line object.
+    Works on printing terminal, only editing is backspace key.
     """
     def __init__(self, keymap={c: None for c in 
                                printing_chars + keyboard.delete}):
@@ -107,7 +108,7 @@ class LineInput(object):
         self.point = 0 # not used here, but assigned by Command restart etc.
 
     def handler(self, keycode):
-        'No table lookup, Just two simple cases: append char or delete last'
+        'No keymap lookup, just two simple cases: append char or delete last'
         if keycode == keyboard.delete and self.chars: # edit with delete
             ch = self.chars[-1]
             self.chars = self.chars[:-1] # delete last char
@@ -115,11 +116,11 @@ class LineInput(object):
         else: # keymap ensures this is printing char
             util.putstr(keycode)  # just echo ... 
             self.chars += keycode # ... and append char
-    # no redraw_current_line, requires video terminal with cursor addressing
 
+    # This is required, it is called by Command class restart method.
+    # It does nothing, just leaves the cursor where preceding putstr left it.
     def move_to_point(self):
-        'Called by Command class restart method'
-        pass # caller already putstr(chars) - nothing more needed
+        pass
 
 class Command(object):
     def __init__(self, prompt='', reader=terminal.getchar, 
@@ -135,26 +136,28 @@ class Command(object):
 
         prompt - Prompt string, appears unless overidden by mode and 
           behavior args (below).  
-          Default is empty string '', no prompt.
+         Default is empty string '', no prompt.
 
        reader - callable to read a keycode, which might be a single
-          character or several (an escape sequence, for example).
-          Takes no arguments and returns a keycode, or returns empty
-          string '' to indicate char was received but keycode is
-          incomplete.
-          Default is terminal.getchar, always gets a single character.
+         character or several (an escape sequence, for example).
+         Takes no arguments and returns a keycode, or returns empty
+         string '' to indicate char was received but keycode is
+         incomplete.
+        Default is terminal.getchar, always gets a single character.
 
         command_line - object to collect and store command line, and
-          optionally provide in-line editing.  
-          Default is minimal LineInput class defined in this module.
-          command_line attributes used by Command, in minimal LineInput:
-           chars: string, start_col: int, keymap: dict, handler: method
-          Additional command_line attributes used by Command, via history 
-            methods in vt_keymap, not used with printing_keymap:
-           point: int, redraw_current_line: method
+           in-line editing.  Default is instance of minimal LineInput
+           class defined in this module, which works on a printing
+           terminal.
+          Some Command methods require self.command_line to belong to
+           a richer class that provides video cursor addressing.  The
+           lineinput module provides a suitable LineInput class.
+          You must ensure that the keymap and behavior arguments
+           (described below) only contain methods that can be 
+           executed by the command_line class you have have assigned.
 
         do_command - callable to execute command string.  Takes one
-          argument, a string.  
+           argument, a string.  
           Default is (lambda command: None), do nothing.
 
         stopped - callable to test when the application should stop or
@@ -162,12 +165,12 @@ class Command(object):
           command string, so stopped() can check if command is
           something like 'exit()' or 'quit' - but stopped() might
           ignore this string and check some state variable instead.
-          Default is (lambda command: False), never exit.
+         Default is (lambda command: False), never exit.
 
         keymap - dictionary from keycode to Command method name
           string, used except in modes where it is overridden by mode
           and behavior args (below).
-          Default: vt_keymap (above)
+         Default: vt_keymap (defined above in this module)
 
         job_control: dictionary from keycode to job control method
           name string.  The method typically bypasses or suspends the
@@ -175,21 +178,21 @@ class Command(object):
           they appear alone at the beginning of an empty command line,
           so they can be the same as keycodes in keymap.  For example
           the job control exit command ^D is the same as the LineInput
-          delete character command ^D.  Default: entries for ^D and ^Z
-          that suspend the application.
+          delete character command ^D.  
+         Default: entries for ^D and ^Z that suspend the application.
 
         mode - callable to get current application mode, returns a
           value (of some type) that depends on the application.  Used
           with behavior argument (below) to select prompt and keymap.
-          Default: (lambda: True), always use prompt and keymap args
+         Default: (lambda: True), always use prompt and keymap args
           (above).
 
         behavior - Customizes prompt and keymap for mode.  A dictionary
-           indexed by values returned by calling mode() (above).  Each
-           key in the dict (a mode) is associated with a tuple:
-           (prompt, keymap) to use in that mode.  
-           Default is {}, the empty dictionary, always use prompt
-           and keymap args (above).
+          indexed by values returned by calling mode() (above).  Each
+          key in the dict (a mode) is associated with a tuple:
+          (prompt, keymap) to use in that mode.  
+         Default is {}, the empty dictionary, always use prompt
+          and keymap args (above).
         """
         self.default_prompt = prompt # prompt string used in command mode
         self.prompt = prompt # can be other prompt or '' in other modes
@@ -276,8 +279,8 @@ class Command(object):
         """
         self.restore()    # advance line and put terminal in line mode 
         self.clear_chars = True # do_command might assign this False
-        self.do_command() # do_command might assign chars, point
-        if self.clear_chars: # if do_command did not already assign chars, point
+        self.do_command() # do_command might assign chars, point, clear_chars
+        if self.clear_chars: # if do_command did not assign chars = False
             self.command_line.chars = ''
             self.command_line.point = 0
 
@@ -312,7 +315,7 @@ class Command(object):
         print()              # ... otherwise traceback is a mess
         raise KeyboardInterrupt
 
-    # Command history, works on with default LineInput on printing terminals
+    # Command history, works with default command_line on printing terminals
 
     def retrieve_previous_history(self):
         if self.history:
@@ -335,7 +338,7 @@ class Command(object):
         self.retrieve_next_history()
         util.putstr('^N\r\n' + self.prompt + self.command_line.chars)
 
-    # Command history, requires video terminal with cursor addressing
+    # Command history, requires command_line that uses video terminal.
 
     def previous_history(self):
         self.retrieve_previous_history()
@@ -347,7 +350,7 @@ class Command(object):
         self.command_line.point = len(self.command_line.chars)
         self.command_line.redraw_current_line()
 
-    # Command editing, works with default LineInput on printing terminal
+    # Command editing, works with default command_line on printing terminal.
 
     def redraw_current_line_tty(self):
         util.putstr('^L\r\n' + self.prompt)  # on new line

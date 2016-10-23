@@ -1,7 +1,7 @@
 """
 lineinput.py - LineInput class, in-line editing of strings.
            Provides subset of readline editing functions.
-           BUT unlike readline, can pass in a string to edit.
+           BUT unlike readline, can assign an initial string to edit.
 """
 
 import string
