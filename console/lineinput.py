@@ -53,10 +53,13 @@ vt_keymap = {
 
 class LineInput(object):
     def __init__(self, keymap=vt_keymap):
-        self.chars = '' # string to edit
-        self.point = 0  # index of insertion point in self.chars, 0-based
-        self.start_col = 1  # index of first column on display, 1-based
+        self.reinit()
         self.keymap = keymap
+
+    def reinit(self, chars='', prompt='', point=None):
+        self.chars = chars
+        self.point = point if point != None else len(self.chars) # end of line
+        self.start_col = len(prompt)+1 # 1-based indexing, not 0-based
         
     def handler(self, keycode):
         'Look up command for keycode and run it'

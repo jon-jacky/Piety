@@ -102,10 +102,13 @@ class LineInput(object):
     """
     def __init__(self, keymap={c: None for c in 
                                printing_chars + keyboard.delete}):
-        self.chars = ''  # string to edit
-        self.start_col = 1   # index of first column on display, 1-based
+        self.reinit()
         self.keymap = keymap
-        self.point = 0 # not used here, but assigned by Command restart etc.
+
+    def reinit(self, chars='', prompt='', point=None):
+        self.chars = chars
+        self.point = point if point != None else len(self.chars) # end of line
+        self.start_col = len(prompt)+1 # 1-based indexing, not 0-based
 
     def handler(self, keycode):
         'No keymap lookup, just two simple cases: append char or delete last'
@@ -118,7 +121,7 @@ class LineInput(object):
             self.chars += keycode # ... and append char
 
     # This is required, it is called by Command class restart method.
-    # It does nothing, just leaves the cursor where preceding putstr left it.
+    # Here it does nothing, just leaves cursor where preceding putstr left it.
     def move_to_point(self):
         pass
 
@@ -200,9 +203,11 @@ class Command(object):
         self.mode = mode
         self.behavior = behavior
         self.command_line = command_line
-        self.command_line.chars = ''
-        self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
-        self.clear_chars = True # do_command might assign False
+        # Assign default restart values for self.command_line.chars, point.
+        # Some do_command might assign non-default values.
+        self.initchars = ''
+        self.initpoint = None
+        self.reinit_command_line() # assign initchars, initpoint, prompt
         self.do_command = (lambda: do_command(self.command_line.chars))
         self.stopped = (lambda: stopped(self.command_line.chars))
         self.job = None  # assign elsewhere, then here use self.job.stop() etc.
@@ -211,6 +216,11 @@ class Command(object):
         self.default_keymap = keymap # keymap used in command mode
         self.keymap = keymap # can be other keymap in other modes
         self.job_control = job_control
+
+    def reinit_command_line(self):
+        'Pass previously assigned attributes to self.command_line.reinit'
+        self.command_line.reinit(chars=self.initchars, point=self.initpoint,
+                                 prompt=self.prompt)
 
     def handler(self):
         'Read char, add to keycode sequence.  If seq complete, handle keycode'
@@ -247,12 +257,13 @@ class Command(object):
         Print command prompt, set single-char mode.
         Do NOT initialize chars and point, caller has assigned them already
         """
-        mode = self.mode() 
+        mode = self.mode() # do_command may have changed mode
         if mode in self.behavior:
             self.prompt, self.keymap = self.behavior[mode]
         else:
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
-        self.command_line.start_col = len(self.prompt) + 1 # 1-based not 0-based
+        # Re-initialize command_line object with previously assigned attributes
+        self.reinit_command_line()
         util.putstr(self.prompt + self.command_line.chars)
         self.command_line.move_to_point() # might not be end of line
         terminal.set_char_mode()
@@ -272,30 +283,25 @@ class Command(object):
         print('^Z')
         util.putstr('\rStopped') # still in raw mode, print didn't RET
 
-    def accept_chars(self):
-        """
-        Used by both accept_line and accept_command, below.
-        Makes it possible for do_command to optionally initialize command_line.
-        """
-        self.restore()    # advance line and put terminal in line mode 
-        self.clear_chars = True # do_command might assign this False
-        self.do_command() # do_command might assign chars, point, clear_chars
-        if self.clear_chars: # if do_command did not assign chars = False
-            self.command_line.chars = ''
-            self.command_line.point = 0
-
     # Application commands invoked via keymap
+
+    def accept_chars(self):
+        'Common behavior for accept_line (insert mode) and accept_command'
+        self.restore()    # advance line and put terminal in line mode 
+        # Restore default restart values for self.command_line.chars, point.
+        self.initchars = ''
+        self.initpoint = None
+        self.do_command() # Might assign non-default initchars, initpoint.
 
     def accept_line(self):
         'For ed insert mode: handle line, but no history, exit, or job control'
-        self.accept_chars()
+        self.accept_chars() # calls do_command, might reassign .mode .chars etc
         self.restart() # print prompt and put term in character mode
 
     def accept_command(self):
         'For ed command mode: handle line, with history, exit, and job control'
-        self.history.append(self.command_line.chars) # save command in history
-        self.hindex = len(self.history)-1
-        self.accept_chars()
+        self.history.append(self.command_line.chars) # Save command in history.
+        self.accept_chars() # calls do_command, might reassign .mode .chars etc
         if self.stopped():
             if self.job:
                 self.job.do_stop() # callback to job control
@@ -321,7 +327,8 @@ class Command(object):
         if self.history:
             length = len(self.history)
             self.hindex = self.hindex if self.hindex < length else length-1
-            self.command_line.chars = self.history[self.hindex]
+            self.initchars = self.history[self.hindex]
+            self.reinit_command_line()
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
 
     def previous_history_tty(self):
@@ -331,8 +338,9 @@ class Command(object):
     def retrieve_next_history(self):
         length = len(self.history)
         self.hindex = self.hindex + 1 if self.hindex < length else length
-        self.command_line.chars = (self.history[self.hindex] 
-                                   if self.hindex < length else '')
+        self.initchars = (self.history[self.hindex] 
+                          if self.hindex < length else '')
+        self.reinit_command_line()
 
     def next_history_tty(self):
         self.retrieve_next_history()
@@ -342,12 +350,10 @@ class Command(object):
 
     def previous_history(self):
         self.retrieve_previous_history()
-        self.command_line.point = len(self.command_line.chars)
         self.command_line.redraw_current_line()
 
     def next_history(self):
         self.retrieve_next_history()
-        self.command_line.point = len(self.command_line.chars)
         self.command_line.redraw_current_line()
 
     # Command editing, works with default command_line on printing terminal.
@@ -382,7 +388,7 @@ def main():
     # Default handler terminal.getchar can't handle multi-char control
     # sequences like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
     c.restart()
-    while c.command_line.chars not in c.job_control: # use job control for exit
+    while c.command_line.ochars not in c.job_control: # use job control for exit
         # Here Command instance works in reader mode:
         # uses the function passed to its handler argument to read its input.
         c.handler()

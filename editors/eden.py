@@ -19,9 +19,8 @@ def cmd(chars):
         c_command = True
         buf = edsel.ed.buf
         dot = buf.dot
-        edenc.command_line.chars = buf.lines[dot].rstrip() # strip \n
-        edenc.command_line.point = 0
-        edenc.clear_chars = False # don't clear the line we just assigned
+        edenc.initchars = buf.lines[dot].rstrip() # strip \n
+        edenc.initpoint = 0
         edsel.ed.cmd_name = 'c' # needed by edsel functions, following
         edsel.ed.command_mode = False 
         buf.d(dot, dot) # ed c(hange) command deletes changed lines first
