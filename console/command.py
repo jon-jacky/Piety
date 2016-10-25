@@ -331,8 +331,8 @@ class Command(object):
             self.prompt, self.keymap = self.behavior[mode]
         else:
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
-        # Re-initialize command_line object with previously assigned attributes
-        # Only now do we finally have self.initchars self.initpoint self.prompt
+        # Re-initialize command_line object with previously assigned attributes.
+        # Only now do we have self.prompt to accompany initchars and initpoint.
         self.reinit_command_line() # maybe not the usual default empty line
         util.putstr(self.prompt + self.command_line.chars) # both might be empty
         self.command_line.move_to_point() # might not be end of line
