@@ -166,7 +166,8 @@ class Command(object):
           command string, so stopped() can check if command is
           something like 'exit()' or 'quit' - but stopped() might
           ignore this string and check some state variable instead.
-         Default is (lambda command: False), never exit.
+         Default is (lambda command: False), never exit -- but
+          can still suspend application using job_control (below).
 
         keymap - dictionary from keycode to Command method name
           string, used except in modes where it is overridden by mode
