@@ -8,7 +8,7 @@ Collects the string one character at a time, so this class can be used
   for cooperative multitasking without blocking.
 
 Delegates in-line editing of the command string to another class.  A
-  minimal  stub class with rudimentary editing is included in this module.
+  minimal stub class with rudimentary editing is included in this module.
 
 Provides command history similar to readline.
 
@@ -36,8 +36,6 @@ import util, terminal, keyboard
 
 printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
-
-# Any keycode that maps to accept_line or _command is a command terminator
 
 # This keymap works for ed insert mode on a printing terminal.
 # (These keys are also enabled in ed command mode.)
@@ -75,7 +73,7 @@ vt_insert_keymap = {
 # Add keys used in ed command mode on a terminal with cursor addressing
 #  and arrow keys
 vt_command_keys = {
-    # any keycode that maps to accept_line is a command terminator
+    # any keycode that maps to accept_command is a command terminator
     keyboard.cr: 'accept_command', # add to history, possibly exit
     keyboard.C_n: 'next_history',
     keyboard.C_p: 'previous_history',
@@ -217,11 +215,6 @@ class Command(object):
         self.keymap = keymap # can be other keymap in other modes
         self.job_control = job_control
 
-    def reinit_command_line(self):
-        'Pass previously assigned attributes to self.command_line.reinit'
-        self.command_line.reinit(chars=self.initchars, point=self.initpoint,
-                                 prompt=self.prompt)
-
     def handler(self):
         'Read char, add to keycode sequence.  If seq complete, handle keycode'
         # to avoid blocking in self.reader(), must only call when input is ready
@@ -250,6 +243,81 @@ class Command(object):
         else:
             pass # incomplete keycode, do nothing
 
+    # Job control commands, suspend application via self.job_control, 
+    # Two for now just to show we can distinguish commands.
+
+    def ctrl_d(self):
+        util.putstr('^D')  # no newline, caller handles it.
+
+    def ctrl_z(self):
+        print('^Z')
+        util.putstr('\rStopped') # still in raw mode, print didn't RET
+
+    # ^C exit is more drastic than job control, exits to top-level Python
+
+    def interrupt(self):
+        'Handle ^C, exit from Python sesson'
+        # raw mode terminal doesn't respond to ^C, must handle here
+        util.putstr('^C') 
+        terminal.set_line_mode() # on new line...
+        print()              # ... otherwise traceback is a mess
+        raise KeyboardInterrupt
+
+    # The following methods, restore through restart, are invoked by
+    # accept_line (when the user finishes entering/editing text in insert mode)
+    # or accept_command (when the user finishes entering/editing a command).
+    # The user typically indicates this by typing RET, but the actual keycodes
+    # (for each mode) are set by keymaps in self.keymap and self.behavior.
+    # Complications arise due to commands that might exit or suspend application
+    # (so control must be transferred elsewhere) and commands that might 
+    # initialize the command (or text) line, overriding defaults 
+    # (which must then be restored).
+
+    def restore(self):
+        'Restore terminal line mode, prepare to print on new line'
+        terminal.set_line_mode()
+        print()
+
+    def do_command_1(self):
+        'Call do_command, but first prepare to restore default command line'
+        # initchars initpoint assigned here, might be reassigned by do_command
+        # but are not used until self.restart calls self.reinit_command_line.
+        self.initchars = '' # default restart value for self.command_line.chars
+        self.initpoint = None  #  "    "   self.point
+        self.do_command() # Might assign non-default to initchars, initpoint.
+
+    # accept_line and accept_command invoke the other methods in this section.
+    # These are the commands that are invoked from the keymaps.
+    # accept_line is used in text insert modes, accept_command in command modes.
+
+    def accept_line(self):
+        'For ed insert mode: handle line, but no history, exit, or job control'
+        self.restore()      # advance line and put terminal in line mode 
+        self.do_command_1() # might reassign self.mode, self.command_line.chars
+        self.restart()      # print prompt and put term in character mode
+
+    def accept_command(self):
+        'For ed command mode: handle line, with history, exit, and job control'
+        self.history.append(self.command_line.chars) # Save command in history.
+        self.restore()      # advance line and put terminal in line mode 
+        self.do_command_1() # might reassign self.mode, self.command_line.chars
+        # do_command might exit or invoke job control to suspend application
+        if self.stopped():
+            if self.job:
+                self.job.do_stop() # callback to job control
+            else:
+                return  # no job - just exit application
+        elif self.job and self.job.replaced: # command may replace or stop app
+            return
+        else:
+            self.restart() # print prompt and put term in character mode
+            return # application continues
+
+    def reinit_command_line(self):
+        'Pass previously assigned attributes to self.command_line.reinit'
+        self.command_line.reinit(chars=self.initchars, point=self.initpoint,
+                                 prompt=self.prompt)
+
     def restart(self):
         """
         Prepare to collect a command string using the command_line object.
@@ -263,63 +331,11 @@ class Command(object):
         else:
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
         # Re-initialize command_line object with previously assigned attributes
+        # Only now do we finally have self.initchars self.initpoint self.prompt
         self.reinit_command_line()
         util.putstr(self.prompt + self.command_line.chars)
         self.command_line.move_to_point() # might not be end of line
         terminal.set_char_mode()
-
-    def restore(self):
-        'Restore terminal line mode, prepare to print on new line'
-        terminal.set_line_mode()
-        print()
-
-    # Job control commands invoked via job_control
-    # Two for now just to show we can distinguish commands
-
-    def ctrl_d(self):
-        util.putstr('^D')  # no newline, caller handles it.
-
-    def ctrl_z(self):
-        print('^Z')
-        util.putstr('\rStopped') # still in raw mode, print didn't RET
-
-    # Application commands invoked via keymap
-
-    def accept_chars(self):
-        'Common behavior for accept_line (insert mode) and accept_command'
-        self.restore()    # advance line and put terminal in line mode 
-        # Restore default restart values for self.command_line.chars, point.
-        self.initchars = ''
-        self.initpoint = None
-        self.do_command() # Might assign non-default initchars, initpoint.
-
-    def accept_line(self):
-        'For ed insert mode: handle line, but no history, exit, or job control'
-        self.accept_chars() # calls do_command, might reassign .mode .chars etc
-        self.restart() # print prompt and put term in character mode
-
-    def accept_command(self):
-        'For ed command mode: handle line, with history, exit, and job control'
-        self.history.append(self.command_line.chars) # Save command in history.
-        self.accept_chars() # calls do_command, might reassign .mode .chars etc
-        if self.stopped():
-            if self.job:
-                self.job.do_stop() # callback to job control
-            else:
-                return  # no job - just exit application
-        elif self.job and self.job.replaced: # command may replace or stop app
-            return
-        else:
-            self.restart() # print prompt and put term in character mode
-            return # application continues
-
-    def interrupt(self):
-        'Handle ^C, exit from Piety'
-        # raw mode terminal doesn't respond to ^C, must handle here
-        util.putstr('^C') 
-        terminal.set_line_mode() # on new line...
-        print()              # ... otherwise traceback is a mess
-        raise KeyboardInterrupt
 
     # Command history, works with default command_line on printing terminals
 
@@ -366,10 +382,10 @@ class Command(object):
         self.command_line.chars = ''
         util.putstr('^U\r\n' + self.prompt)
 
-    # Command editing, requires video terminal with cursor addressing,
-    # not provided in this module, see (for example) lineinput module.
+    # Command editing that requires video terminal with cursor addressing
+    # is not provided in this module, see (for example) lineinput module.
 
-# Tests - no stopped arg, but exit at any job control command: ^D ^Z
+# Tests - use job control commands ^D ^Z to exit.
 
 # Default do_command - echo input chars, but do nothing else
 c0 = Command(prompt='> ') # prompt to show restart() ran.
