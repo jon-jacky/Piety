@@ -322,8 +322,8 @@ class Command(object):
         """
         Prepare to collect a command string using the command_line object.
         Assign prompt and keymap for current mode.
-        Print command prompt, set single-char mode.
-        Do NOT initialize chars and point, caller has assigned them already
+        Assign initial command string (default empty) for in-line editing.
+        Print command prompt and command line (if any), set single-char mode.
         """
         mode = self.mode() # do_command may have changed mode
         if mode in self.behavior:
@@ -332,8 +332,8 @@ class Command(object):
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
         # Re-initialize command_line object with previously assigned attributes
         # Only now do we finally have self.initchars self.initpoint self.prompt
-        self.reinit_command_line()
-        util.putstr(self.prompt + self.command_line.chars)
+        self.reinit_command_line() # maybe not the usual default empty line
+        util.putstr(self.prompt + self.command_line.chars) # both might be empty
         self.command_line.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
