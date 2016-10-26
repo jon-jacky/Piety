@@ -5,7 +5,7 @@ Collects a command (string), with editing and history, and passes it
   to a handler (callable) to execute.
 
 Collects the string one character at a time, so this class can be used 
-  for cooperative multitasking without blocking.
+  in a cooperative multitasking system without blocking.
 
 Delegates in-line editing of the command string to another class.  A
   minimal stub class with rudimentary editing is included in this module.
@@ -18,8 +18,8 @@ Provides for customization by assigning keymaps that map keycodes to
 Provides for modes that assign different keymaps to select different
   behaviors, for example an editor's command and insert modes.
 
-Provides for job control commands that can bypass or suspend the
-  application.
+Provides for transferring control when the application exits, or when
+  job control commands bypass or suspend the application.
 
 This module has some similar motivations to the Python standard
   library cmd module, but does not provide the same API.
