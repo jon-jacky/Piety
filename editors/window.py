@@ -204,12 +204,20 @@ class Window(object):
             display.put_render(self.win_1, 1, ' ', display.clear)
             
     def set_insert_cursor(self):
-        'Position cursor at start of open line after dot for insert append change cmds.'
-        if self.cursor_i == 0: # empty buffer, special case, cursor at window top
+        'Position cursor at start of open line after dot for i(nsert) a c  cmds'
+        if self.cursor_i == 0: # empty buffer,special case, cursor at window top
             line = self.win_1  
         else:
             line = self.cursor_i + (0 if self.at_bottom_line() else 1)
         display.put_cursor(line, 1) # open line after dot
+
+    def set_update_cursor(self):
+        'Position cursor at start of dot itself for in-line edits.'
+        if self.cursor_i == 0: # empty buffer, cursor at window top
+            line = self.win_1  
+        else:
+            line = self.cursor_i
+        display.put_cursor(line, 1)
 
     def update_window(self, command_mode):
         'Locate and display the window including its status line and cursor.'

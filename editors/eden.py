@@ -19,23 +19,18 @@ def cmd(chars):
         c_command = True
         buf = edsel.ed.buf
         dot = buf.dot
-        edenc.initchars = buf.lines[dot].rstrip() # strip \n
+        edenc.initchars = buf.lines[dot].rstrip() # strip \n at eol
         edenc.initpoint = 0
         edsel.ed.cmd_name = 'c' # needed by edsel functions, following
         edsel.ed.command_mode = False 
-        buf.d(dot, dot) # ed c(hange) command deletes changed lines first
-        dot -= 1        # buf.d updates buf.dot to the line after delete
-        buf.dot = dot
-        edsel.maintain_display()
-        edsel.update_display()
+        edsel.win.set_update_cursor()
 
-    # insert mode, line finished 
+    # inline c command finished, assign updated line and update
     elif not edsel.ed.command_mode and c_command:
-        buf.a(dot, edenc.command_line.chars + '\n')
+        buf.lines[dot] = edenc.command_line.chars + '\n'
         edsel.ed.command_mode = True
         c_command = False    
-        edsel.maintain_display()
-        edsel.update_display()
+        edsel.update_display() # maintain not needed, no insert/delete/move
 
     # pass all other commands to edsel
     else:
