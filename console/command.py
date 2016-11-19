@@ -199,6 +199,7 @@ class Command(object):
         self.default_prompt = prompt # prompt string used in command mode
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string
+        self.appending = True # False to update lines already on display
         self.mode = mode
         self.behavior = behavior
         self.command_line = command_line
@@ -272,7 +273,7 @@ class Command(object):
     # Complications arise due to commands that might exit or suspend application
     # (so control must be transferred elsewhere) and commands that might 
     # initialize the command (or text) line, overriding defaults 
-    # (which must then be restored).
+    # (which must be restored later).
 
     def restore(self):
         'Restore terminal line mode, prepare to print on new line'
@@ -334,7 +335,8 @@ class Command(object):
         # Re-initialize command_line object with previously assigned attributes.
         # Only now do we have self.prompt to accompany initchars and initpoint.
         self.reinit_command_line() # maybe not the usual default empty line
-        util.putstr(self.prompt + self.command_line.chars) # both might be empty
+        if self.appending: # True to add line to display, False update in place
+            util.putstr(self.prompt + self.command_line.chars) # might be empty
         self.command_line.move_to_point() # might not be end of line
         terminal.set_char_mode()
 

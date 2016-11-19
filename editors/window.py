@@ -129,7 +129,7 @@ class Window(object):
             print() # next line
             self.display_lines(self.dot+1, 
                                self.seg_n-(0 if self.near_buffer_top() else 1))
-        for line in range(blank_h if command_mode else blank_h - 1):
+        for iline in range(blank_h if command_mode else blank_h - 1):
             display.kill_whole_line()
             print()
 
@@ -206,18 +206,18 @@ class Window(object):
     def set_insert_cursor(self):
         'Position cursor at start of open line after dot for i(nsert) a c  cmds'
         if self.cursor_i == 0: # empty buffer,special case, cursor at window top
-            line = self.win_1  
+            iline = self.win_1  
         else:
-            line = self.cursor_i + (0 if self.at_bottom_line() else 1)
-        display.put_cursor(line, 1) # open line after dot
+            iline = self.cursor_i + (0 if self.at_bottom_line() else 1)
+        display.put_cursor(iline, 1) # open line after dot
 
     def set_update_cursor(self):
         'Position cursor at start of dot itself for in-line edits.'
         if self.cursor_i == 0: # empty buffer, cursor at window top
-            line = self.win_1  
+            iline = self.win_1  
         else:
-            line = self.cursor_i
-        display.put_cursor(line, 1)
+            iline = self.cursor_i
+        display.put_cursor(iline, 1)
 
     def update_window(self, command_mode):
         'Locate and display the window including its status line and cursor.'
