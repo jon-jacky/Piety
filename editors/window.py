@@ -12,7 +12,8 @@ class Window(object):
     Window class for line-oriented display editors.
     A window displays a range of lines (segment) from a text buffer.
     A window includes a status line with information about the buffer.
-    A window may display a cursor to indicate the current line, called dot.
+    A window has a line called dot where text insertions etc. occur.
+    A window may display a cursor-like marker to indicate dot.
     """
     def __init__(self, buf, win_1, win_h, ncols):
         """
@@ -34,11 +35,11 @@ class Window(object):
         # self.seg_1,seg_n are indices in buffer of 1st,last lines in window
         self.seg_1 = 1 # index in buffer of first line displayed in window
         self.seg_n = min(self.win_hl, self.buf.S()) # index last line
-        self.cursor_i = None # line number of current buffer's dot on display
-        self.cursor_ch = None # character that cursor overwrites
-        self.cursor_chx = None # same as cursor_ch except when that is blank
-        self.cursor_i0 = None # previous value of cursor_i
-        self.cursor_ch0 = None # previous value of cursor_ch
+        self.dot_i = None # line number of current buffer's dot on display
+        self.marker_ch = None # character that marker overwrites
+        self.marker_chx = None # same as marker_ch except when that is blank
+        self.dot_i0 = None # previous value of dot_i
+        self.marker_ch0 = None # previous value of marker_ch
 
     def resize(self, win_1, win_h, ncols):
         'Assign, recalculate window dimensions'
@@ -100,8 +101,8 @@ class Window(object):
 
     def display_lines(self, first, last):
         """
-        Print lines in buffer numbered first through last
-        starting at current cursor position - assumes cursor already positioned
+        Print lines in buffer numbered first through last.
+        Assumes cursor already positioned at first line.
         """
         for line in self.buf.lines[first:last+1]: # slice, upper limit excluded
             # remove \n, truncate don't wrap
@@ -151,79 +152,82 @@ class Window(object):
         display.put_render(s1, 45, '-'*(self.ncols-(45+10)), display.white_bg)
         display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
 
-    def cursor_elsewhere(self):
+    def dot_elsewhere(self):
         'dot lies outside segment of buffer visible in window'
         return ((not self.seg_1 <= self.dot <= self.seg_n) 
                 if self.dot else False)
     
-    def cursor_moved(self):
-        'Cursor moved to a different line in the buffer (than cursor_i0)'
-        return self.cursor_i != self.cursor_i0
+    def dot_moved(self):
+        'dot moved to a different line in the buffer (than dot_i0)'
+        return self.dot_i != self.dot_i0
 
-    def locate_cursor(self):
+    def locate_dot(self):
         """
-        Update self.cursor_i to line number of dot on display
+        Update self.dot_i to line number of dot on display
          if it is visible, else assign to 0.
-        Also update self.cursor_ch, the cursor character,
+        Also update self.marker_ch, the marker character,
          because we will need to erase it later.
         """
-        self.cursor_i0 = self.cursor_i # save previous values
-        self.cursor_ch0 = self.cursor_ch
+        self.dot_i0 = self.dot_i # save previous values
+        self.marker_ch0 = self.marker_ch
         # buffer not empty, don't count empty first line at index 0
         if len(self.buf.lines)-1: 
-            # self.cursor_ch is char at start of line that cursor overwrites
-            cursor_line = self.buf.lines[self.dot]
-            self.cursor_ch = cursor_line[0] if cursor_line else ''
-            # To ensure cursor on space or empty line is visible, 
-            #  use self.cursor_chx
-            self.cursor_chx = (' ' if self.cursor_ch in ('',' ','\n') 
-                               else self.cursor_ch)
-            self.cursor_i = self.win_1 + (self.dot - self.seg_1)
-            self.cursor_i = (self.cursor_i 
-                             if (self.win_1 <= self.cursor_i 
+            # self.marker_ch is char at start of line that marker overwrites
+            dot_line = self.buf.lines[self.dot]
+            self.marker_ch = dot_line[0] if dot_line else ''
+            # To ensure marker on space or empty line is visible, 
+            #  use self.marker_chx
+            self.marker_chx = (' ' if self.marker_ch in ('',' ','\n') 
+                               else self.marker_ch)
+            self.dot_i = self.win_1 + (self.dot - self.seg_1)
+            self.dot_i = (self.dot_i 
+                             if (self.win_1 <= self.dot_i 
                                  <= self.win_1 + self.win_hl -1)
                              else 0)
         else:
-            self.cursor_i = 0
-            self.cursor_ch = ''
+            self.dot_i = 0
+            self.marker_ch = ''
 
-    def display_cursor(self):
-        'Display cursor at start of display line'
-        if self.cursor_i:
-            display.put_render(self.cursor_i, 1, self.cursor_chx, display.white_bg)
+    def display_marker(self):
+        """
+        Display cursor-like marker at start of line to indicate dot
+        when terminal cursor is elsewhere (at command line etc.)
+        """
+        if self.dot_i:
+            display.put_render(self.dot_i, 1, self.marker_chx, display.white_bg)
         elif self.dot == 0:
-            # special case, empty buffer,  _ cursor at window ulc
-            display.put_render(self.win_1, 1, ' ', display.white_bg) # no blink
+            # empty buffer, cursor at window ulc
+            display.put_render(self.win_1, 1, ' ', display.white_bg)
 
-    def erase_cursor(self):
-        'At start of previous display line, replace cursor with saved char.'
-        if self.cursor_i0:
-            ch = self.cursor_ch0 if not self.cursor_ch0 == '\n' else ' '
-            display.put_render(self.cursor_i0, 1, ch, display.clear)
-        elif self.dot == 0: # empty buffer, special case, cursor at window ulc
+    def erase_marker(self):
+        'At start of line, replace marker with saved character'
+        if self.dot_i0:
+            ch = self.marker_ch0 if not self.marker_ch0 == '\n' else ' '
+            display.put_render(self.dot_i0, 1, ch, display.clear)
+        elif self.dot == 0: # empty buffer, marker at window ulc
             display.put_render(self.win_1, 1, ' ', display.clear)
             
-    def set_insert_cursor(self):
+    def put_insert_cursor(self):
         'Position cursor at start of open line after dot for i(nsert) a c  cmds'
-        if self.cursor_i == 0: # empty buffer,special case, cursor at window top
+        if self.dot_i == 0: # empty buffer,special case, cursor at window top
             iline = self.win_1  
         else:
-            iline = self.cursor_i + (0 if self.at_bottom_line() else 1)
+            iline = self.dot_i + (0 if self.at_bottom_line() else 1)
         display.put_cursor(iline, 1) # open line after dot
 
-    def set_update_cursor(self):
+    def put_update_cursor(self):
         'Position cursor at start of dot itself for in-line edits.'
-        if self.cursor_i == 0: # empty buffer, cursor at window top
+        if self.dot_i == 0: # empty buffer, cursor at window top
             iline = self.win_1  
         else:
-            iline = self.cursor_i
+            iline = self.dot_i
         display.put_cursor(iline, 1)
 
     def update_window(self, command_mode):
-        'Locate and display the window including its status line and cursor.'
+        'Locate and display the window including its status line and mark.'
         # do not call locate_segment_top() here, can cause distracting jumps
         self.locate_segment_bottom() # assign new self.seg_n
-        self.locate_cursor()  # *re*assign new self.cursor_i, cursor_ch
+        self.locate_dot()  # *re*assign new self.dot_i, marker_ch
         self.display_window(command_mode)
         self.display_status()
-        # No self.set_insert_cursor or display_cursor, caller must do it.
+        # No self.put_insert_cursor or display_marker, caller must do it.

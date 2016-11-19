@@ -38,7 +38,7 @@ def update_windows():
         w.locate_segment_top() # necessary if window(s) resized
         w.update_window(True)  # no windows could be in insert mode at this time
 
-def set_command_cursor():
+def put_command_cursor():
     'Put cursor at input line in scrolling command region'
     display.put_cursor(cmd_n, 1) # last line on display
 
@@ -48,9 +48,9 @@ def display_frame():
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
     update_windows()
-    win.display_cursor()
+    win.display_marker()
     display.set_scroll(cmd_1, cmd_n) 
-    set_command_cursor()
+    put_command_cursor()
 
 def update_frame():
     'Recalculate frame and all window dimensions, then display all.'
@@ -65,7 +65,7 @@ def update_frame():
 
 def init_session(*filename, **options):
     """
-    Clear and render entire display, set scrolling region, place cursor.
+    Clear and render entire display, set scrolling region, place marker.
     Process optional arguments: filename, options if present.
     """
     global prompt, cmd_h, win, win_i
@@ -146,20 +146,20 @@ cmd_h0 = win0 = None
 def update_display():
     'Check for any needed display updates.  If there are any, do them.'
     win.dot = win.buf.dot # dot may or may not have changed, update anyway
-    win.locate_cursor() # assign new cursor_i, only in current winow
+    win.locate_dot() # assign new dot_i, only in current winow
     segment_moved = (ed.cmd_name in file_cmds + buffer_cmds
-                     or win.cursor_elsewhere() 
+                     or win.dot_elsewhere() 
                      or o_cmd in ('o1','o2')) # set single window or split
-    # frame changed, update all windows and cursor
+    # frame changed, update all windows and marker
     if cmd_h != cmd_h0:
         update_frame()  # calls display_frame, which calls update_windows
 
     # set other window
     elif o_cmd == 'o': 
-        # move cursor to new current window, don't update window content
-        win0.locate_cursor()
-        win0.erase_cursor()
-        win.display_cursor()
+        # move marker to new current window, don't update window content
+        win0.locate_dot()
+        win0.erase_marker()
+        win.display_marker()
 
     # update current window contents, maybe other windows too
     elif segment_moved or ed.cmd_name in text_cmds:
@@ -168,10 +168,10 @@ def update_display():
         win.update_window(ed.command_mode)
         if o_cmd == 'o2': # split window
             # win0 is former current window
-            # if win0 cursor does not lie within new window erase it now.
-            # win.resize in o2 command code does not relocate win0 cursor
-            if win0.cursor_i < win.win_1 or win0.cursor_i > win.win_1+win.win_h:
-                win0.erase_cursor()
+            # if win0 marker does not lie within new window erase it now.
+            # win.resize in o2 command code does not relocate win0 marker
+            if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
+                win0.erase_marker()
                 win0.locate_segment_top() # necessary?
             win0.update_window(True)
         else:  # other non-current windows might show part of same buffer
@@ -180,23 +180,23 @@ def update_display():
                     # might update even when lines in w unchanged
                     # win0.locate_segment_top() # necessary?
                     w.update_window(True)
-        # must draw cursor last
+        # must draw marker or cursor last
         if ed.command_mode:
-            win.display_cursor() # edsel dot cursor in window
+            win.display_marker() # indicates dot in window
         else: 
-            win.set_insert_cursor() # edsel insert cursor at open line
+            win.set_insert_cursor() # term. insert cursor at open line
 
-    # update cursor only in current window, don't update window content
-    elif win.cursor_moved():
-        win.erase_cursor()
-        win.display_cursor()
+    # update marker only in current window, don't update window content
+    elif win.dot_moved():
+        win.erase_marker()
+        win.display_marker()
         win.display_status()
 
     # some commands do not affect windows or status line: A k n w ... 
 
     # put ed command cursor back in scrolling command region
     if ed.command_mode:
-        set_command_cursor() 
+        put_command_cursor() 
 
 def restore_display():
     'Restore full-screen scrolling, cursor to bottom.'
