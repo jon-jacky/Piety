@@ -19,6 +19,8 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
   *key* modules instead of Python builtin *input()* to collect and edit
   input lines.  Contrast to *ed.py* *main* function and *etty.py*.
 
+- **eden.md**: description of *eden.py*.
+
 - **eden.py**: run *edsel.py* display editor, with additional screen editing 
   commands.  Use *command*, *lineinput*, and
   *key* modules instead of Python builtin *input()* to collect and edit
@@ -44,4 +46,4 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
 
 - **window.py**: defines Window class used by *edsel.py*
 
-Revised October 2016
+Revised November 2016

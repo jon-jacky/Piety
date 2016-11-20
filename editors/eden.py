@@ -2,7 +2,7 @@
 eden.py - run *edsel.py* display editor, with additional screen
  editing commands. Use *command*, *lineinput*, and *key* modules
  instead of Python builtin *input()* to collect and edit input lines.
- Contrast to *edsel.py* *main* function and *edc.py*.
+ Contrast to *edsel.py* *main* function and *edselc.py*.
 """
 
 import edsel, command, key, lineinput, display
