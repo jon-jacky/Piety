@@ -1,5 +1,5 @@
 Commands to edit the command line and access its history in any
-application that uses command.py.  Similar to Unix readline.
+application that uses console.py.  Similar to Unix readline.
 Functions are assigned to keys in each Command object's keymap.  These
 are in the default keymap.
 
@@ -41,4 +41,4 @@ These keys must be removed from the keymap for printing terminals.
 There is an alternate method to put in the keymap to support bs del ^H
  on printing terminals, by printing \x to indicate x has been deleted.
 
-Revised February 2015
+Revised November 2016

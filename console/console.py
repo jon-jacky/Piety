@@ -1,5 +1,5 @@
 """
-command.py - Command class, skeleton command line application.  
+console.py - Console class, skeleton command line application.  
 
 Collects a command (string), with editing and history, and passes it
   to a handler (callable) to execute.
@@ -29,7 +29,7 @@ import sys
 import string # for string.printable
 import util, terminal, keyboard
 
-# A keymap is a dictionary from keycode string to Command method name string.
+# A keymap is a dictionary from keycode string to Console method name string.
 # Keycodes in keymap can have multiple characters (for example escape sequences)
 # Values are name strings not function objects. They can refer to bound methods.
 # Most method names in the keymap are the same as in GNU readline or Emacs.
@@ -39,7 +39,7 @@ printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 
 # This keymap works for ed insert mode on a printing terminal.
 # (These keys are also enabled in ed command mode.)
-printing_insert_keymap = {
+printing_insertmode_keymap = {
     # any keycode that maps to accept_line is a command terminator
     keyboard.cr: 'accept_line', # don't add to history, don't exit
     keyboard.C_c: 'interrupt',
@@ -56,12 +56,12 @@ printing_command_keys = {
     }
 
 # This combined keymap works for ed command mode on a printing terminal.
-printing_keymap = printing_insert_keymap.copy()
+printing_keymap = printing_insertmode_keymap.copy()
 printing_keymap.update(printing_command_keys)
 
 # This keymap works for ed insert mode on a terminal with cursor addressing
 # (These keys are also enabled in ed command mode.)
-vt_insert_keymap = {
+vt_insertmode_keymap = {
     # any keycode that maps to accept_line is a command terminator
     keyboard.cr: 'accept_line', # don't add to history, don't exit
     keyboard.C_c: 'interrupt',
@@ -83,19 +83,19 @@ vt_command_keys = {
 
 # This combined keymap works for ed command mode
 #  on a terminal with cursor addressing and arrow keys
-vt_keymap = vt_insert_keymap.copy()
+vt_keymap = vt_insertmode_keymap.copy()
 vt_keymap.update(vt_command_keys)
 
 # For now, job control commands must be single keycodes at start of empty line.
 # Job keymap is checked before ordinary keymap so same keys can appear in both.
-job_control_keymap = {
+job_commands_keymap = {
     keyboard.C_d: 'ctrl_d',
     keyboard.C_z: 'ctrl_z'
 }
 
 class LineInput(object):
     """
-    Minimal but usable class for default command_line object.
+    Minimal but usable class for default command object.
     Works on printing terminal, only editing is backspace key.
     """
     def __init__(self, keymap={c: None for c in 
@@ -103,34 +103,34 @@ class LineInput(object):
         self.reinit()
         self.keymap = keymap
 
-    def reinit(self, chars='', prompt='', point=None):
-        self.chars = chars
-        self.point = point if point != None else len(self.chars) # end of line
+    def reinit(self, line='', prompt='', point=None):
+        self.line = line
+        self.point = point if point != None else len(self.line) # end of line
         self.start_col = len(prompt)+1 # 1-based indexing, not 0-based
 
     def handler(self, keycode):
         'No keymap lookup, just two simple cases: append char or delete last'
-        if keycode == keyboard.delete and self.chars: # edit with delete
-            ch = self.chars[-1]
-            self.chars = self.chars[:-1] # delete last char
+        if keycode == keyboard.delete and self.line: # edit with delete
+            ch = self.line[-1]
+            self.line = self.line[:-1] # delete last char
             util.putstr('\\%s' % ch) # echo \c where c is deleted char
         else: # keymap ensures this is printing char
             util.putstr(keycode)  # just echo ... 
-            self.chars += keycode # ... and append char
+            self.line += keycode # ... and append char
 
-    # This is required, it is called by Command class restart method.
+    # This is required, it is called by Console class restart method.
     # Here it does nothing, just leaves cursor where preceding putstr left it.
     def move_to_point(self):
         pass
 
-class Command(object):
+class Console(object):
     def __init__(self, prompt='', reader=terminal.getchar, 
-                 command_line=LineInput(),
+                 command=LineInput(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
                  # this default keymap works with default command_line
                  keymap=printing_keymap, 
-                 job_control=job_control_keymap,
+                 job_commands=job_commands_keymap,
                  mode=(lambda: True), behavior={}):
         """
         All arguments are optional, with defaults.
@@ -146,16 +146,16 @@ class Command(object):
          incomplete.
         Default is terminal.getchar, always gets a single character.
 
-        command_line - object to collect and store command line, and
+        command - object to collect and store command line, and
            in-line editing.  Default is instance of minimal LineInput
            class defined in this module, which works on a printing
            terminal.
-          Some Command methods require self.command_line to belong to
+          Some Console methods require self.command to belong to
            a richer class that provides video cursor addressing.  The
            lineinput module provides a suitable LineInput class.
           You must ensure that the keymap and behavior arguments
            (described below) only contain methods that can be 
-           executed by the command_line class you have have assigned.
+           executed by the command class you have have assigned.
 
         do_command - callable to execute command string.  Takes one
            argument, a string.  
@@ -167,14 +167,14 @@ class Command(object):
           something like 'exit()' or 'quit' - but stopped() might
           ignore this string and check some state variable instead.
          Default is (lambda command: False), never exit -- but
-          can still suspend application using job_control (below).
+          can still suspend application using job_commands (below).
 
-        keymap - dictionary from keycode to Command method name
+        keymap - dictionary from keycode to Console method name
           string, used except in modes where it is overridden by mode
           and behavior args (below).
          Default: vt_keymap (defined above in this module)
 
-        job_control: dictionary from keycode to job control method
+        job_commands: dictionary from keycode to job control method
           name string.  The method typically bypasses or suspends the
           application.  Job control keycodes are only effective when
           they appear alone at the beginning of an empty command line,
@@ -202,20 +202,20 @@ class Command(object):
         self.appending = True # False to update lines already on display
         self.mode = mode
         self.behavior = behavior
-        self.command_line = command_line
-        # Assign default restart values for self.command_line.chars, point.
+        self.command = command
+        # Assign default restart values for self.command.line, point.
         # Some do_command might assign non-default values.
-        self.initchars = ''
+        self.initline = ''
         self.initpoint = None
-        self.reinit_command_line() # assign initchars, initpoint, prompt
-        self.do_command = (lambda: do_command(self.command_line.chars))
-        self.stopped = (lambda: stopped(self.command_line.chars))
+        self.reinit_command() # assign initline, initpoint, prompt
+        self.do_command = (lambda: do_command(self.command.line))
+        self.stopped = (lambda: stopped(self.command.line))
         self.job = None  # assign elsewhere, then here use self.job.stop() etc.
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         self.default_keymap = keymap # keymap used in command mode
         self.keymap = keymap # can be other keymap in other modes
-        self.job_control = job_control
+        self.job_commands = job_commands
 
     def handler(self):
         'Read char, add to keycode sequence.  If seq complete, handle keycode'
@@ -224,10 +224,10 @@ class Command(object):
         # keycode might be single character or a sequence of characters.
         # Check job keymap before ordinary keymap, same keys can appear in both.
         # Job control commands must be a single keycode at start of line.
-        if keycode and (keycode in self.job_control 
-                        and self.command_line.chars == ''):
-            self.command_line.chars = keycode # so job control code can find it
-            method = getattr(self, self.job_control[keycode])
+        if keycode and (keycode in self.job_commands 
+                        and self.command.line == ''):
+            self.command.line = keycode # so job control code can find it
+            method = getattr(self, self.job_commands[keycode])
             method()
             # For now, all job control commands exit
             self.restore()     # calls print() for newline
@@ -238,14 +238,14 @@ class Command(object):
             method = getattr(self, self.keymap[keycode])
             method()
         elif keycode and (keycode in printing_chars or 
-                          keycode in self.command_line.keymap):
-            self.command_line.handler(keycode)
+                          keycode in self.command.keymap):
+            self.command.handler(keycode)
         elif keycode:
             print(keyboard.bel, end=' ') # sound indicates key not handled
         else:
             pass # incomplete keycode, do nothing
 
-    # Job control commands, suspend application via self.job_control, 
+    # Job control commands, suspend application via self.job_commands, 
     # Two for now just to show we can distinguish commands.
 
     def ctrl_d(self):
@@ -282,11 +282,11 @@ class Command(object):
 
     def do_command_1(self):
         'Call do_command, but first prepare to restore default command line'
-        # initchars initpoint assigned here, might be reassigned by do_command
-        # but are not used until self.restart calls self.reinit_command_line.
-        self.initchars = '' # default restart value for self.command_line.chars
+        # initline initpoint assigned here, might be reassigned by do_command
+        # but are not used until self.restart calls self.reinit_command.
+        self.initline = '' # default restart value for self.command.line
         self.initpoint = None  #  "    "   self.point
-        self.do_command() # Might assign non-default to initchars, initpoint.
+        self.do_command() # Might assign non-default to initline, initpoint.
 
     # accept_line and accept_command invoke the other methods in this section.
     # These are the commands that are invoked from the keymaps.
@@ -295,14 +295,15 @@ class Command(object):
     def accept_line(self):
         'For ed insert mode: handle line, but no history, exit, or job control'
         self.restore()      # advance line and put terminal in line mode 
-        self.do_command_1() # might reassign self.mode, self.command_line.chars
+        self.do_command_1() # might reassign self.mode, self.command.line
         self.restart()      # print prompt and put term in character mode
 
     def accept_command(self):
         'For ed command mode: handle line, with history, exit, and job control'
-        self.history.append(self.command_line.chars) # Save command in history.
+        self.history.append(self.command.line) # Save command in history.
+        self.hindex += 1
         self.restore()      # advance line and put terminal in line mode 
-        self.do_command_1() # might reassign self.mode, self.command_line.chars
+        self.do_command_1() # might reassign self.mode, self.command.line
         # do_command might exit or invoke job control to suspend application
         if self.stopped():
             if self.job:
@@ -315,14 +316,14 @@ class Command(object):
             self.restart() # print prompt and put term in character mode
             return # application continues
 
-    def reinit_command_line(self):
-        'Pass previously assigned attributes to self.command_line.reinit'
-        self.command_line.reinit(chars=self.initchars, point=self.initpoint,
+    def reinit_command(self):
+        'Pass previously assigned attributes to self.command.reinit'
+        self.command.reinit(line=self.initline, point=self.initpoint,
                                  prompt=self.prompt)
 
     def restart(self):
         """
-        Prepare to collect a command string using the command_line object.
+        Prepare to collect a command string using the command object.
         Assign prompt and keymap for current mode.
         Assign initial command string (default empty) for in-line editing.
         Print command prompt and command line (if any), set single-char mode.
@@ -332,57 +333,57 @@ class Command(object):
             self.prompt, self.keymap = self.behavior[mode]
         else:
             self.prompt, self.keymap = self.default_prompt, self.default_keymap
-        # Re-initialize command_line object with previously assigned attributes.
-        # Only now do we have self.prompt to accompany initchars and initpoint.
-        self.reinit_command_line() # maybe not the usual default empty line
+        # Re-initialize command object with previously assigned attributes.
+        # Only now do we have self.prompt to accompany initline and initpoint.
+        self.reinit_command() # maybe not the usual default empty line
         if self.appending: # True to add line to display, False update in place
-            util.putstr(self.prompt + self.command_line.chars) # might be empty
-        self.command_line.move_to_point() # might not be end of line
+            util.putstr(self.prompt + self.command.line) # might be empty
+        self.command.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
-    # Command history, works with default command_line on printing terminals
+    # Command history, works with default command on printing terminals
 
     def retrieve_previous_history(self):
         if self.history:
             length = len(self.history)
             self.hindex = self.hindex if self.hindex < length else length-1
-            self.initchars = self.history[self.hindex]
-            self.reinit_command_line()
+            self.initline = self.history[self.hindex]
+            self.reinit_command()
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
 
     def previous_history_tty(self):
         self.retrieve_previous_history()
-        util.putstr('^P\r\n' + self.prompt + self.command_line.chars)
+        util.putstr('^P\r\n' + self.prompt + self.command.line)
 
     def retrieve_next_history(self):
         length = len(self.history)
         self.hindex = self.hindex + 1 if self.hindex < length else length
-        self.initchars = (self.history[self.hindex] 
+        self.initline = (self.history[self.hindex] 
                           if self.hindex < length else '')
-        self.reinit_command_line()
+        self.reinit_command()
 
     def next_history_tty(self):
         self.retrieve_next_history()
-        util.putstr('^N\r\n' + self.prompt + self.command_line.chars)
+        util.putstr('^N\r\n' + self.prompt + self.command.line)
 
-    # Command history, requires command_line that uses video terminal.
+    # Command history, requires command that uses video terminal.
 
     def previous_history(self):
         self.retrieve_previous_history()
-        self.command_line.redraw_current_line()
+        self.command.redraw_current_line()
 
     def next_history(self):
         self.retrieve_next_history()
-        self.command_line.redraw_current_line()
+        self.command.redraw_current_line()
 
-    # Command editing, works with default command_line on printing terminal.
+    # Command editing, works with default command on printing terminal.
 
     def redraw_current_line_tty(self):
         util.putstr('^L\r\n' + self.prompt)  # on new line
-        util.putstr(self.command_line.chars)
+        util.putstr(self.command.line)
 
     def line_discard_tty(self): # name like gnu readline unix-line-discard
-        self.command_line.chars = ''
+        self.command.line = ''
         util.putstr('^U\r\n' + self.prompt)
 
     # Command editing that requires video terminal with cursor addressing
@@ -391,15 +392,15 @@ class Command(object):
 # Tests - use job control commands ^D ^Z to exit.
 
 # Default do_command - echo input chars, but do nothing else
-c0 = Command(prompt='> ') # prompt to show restart() ran.
+c0 = Console(prompt='> ') # prompt to show restart() ran.
 
 # echo completed input lines
-c = Command(prompt='> ', do_command=(lambda command: print(command)))
+c = Console(prompt='> ', do_command=(lambda command: print(command)))
 
 def default():
     "Collect command lines but do nothing until ^D or ^Z exits"
     c0.restart()
-    while c0.command not in c0.job_control: # use job control for exit
+    while c0.command.line not in c0.job_commands: # use job control for exit
         c0.handler() # does nothing 
     c0.restore() # undo restart, restore terminal line mode
     
@@ -407,11 +408,11 @@ def main():
     # Default handler terminal.getchar can't handle multi-char control
     # sequences like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
     c.restart()
-    while c.command_line.ochars not in c.job_control: # use job control for exit
-        # Here Command instance works in reader mode:
+    while c.command.line not in c.job_commands: # use job control for exit
+        # Here Console instance works in reader mode:
         # uses the function passed to its handler argument to read its input.
         c.handler()
-        # Alternatively, here Command instance works in receiver mode:
+        # Alternatively, here Console instance works in receiver mode:
         # uses its built-in dispatch method to accept input passed by caller.
         # To demonstrate, comment out previous line and uncomment these lines:
         #char = terminal.getchar()

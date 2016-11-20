@@ -4,21 +4,21 @@ etty.py - Run ed line editor session, but use console/command.py
 Use keymaps to provide retro printing-terminal-style editing and history.
 """
 
-import ed, command, key, keyboard
+import ed, console as con, key, keyboard
 
-edc = command.Command(prompt=':', do_command=ed.cmd,
+console = con.Console(prompt=':', do_command=ed.do_command,
                       stopped=(lambda command: ed.quit),
                       # accept default keymap for printing terminal
                       mode=(lambda: ed.command_mode), # True or False
-                      behavior={ False: ('', command.printing_insert_keymap) })
+                      behavior={ False: ('', con.printing_insertmode_keymap) })
 
 def main():
     ed.quit = False # previous quit might have set it True
-    edc.restart()
-    while (not edc.stopped() and 
-           edc.command_line.chars not in edc.job_control):
-        edc.handler() # q command sets ed.quit True, forces exit
-    edc.restore()
+    console.restart()
+    while (not console.stopped() and 
+           console.command.line not in console.job_commands):
+        console.handler() # q command sets ed.quit True, forces exit
+    console.restore()
 
 if __name__ == '__main__':
     main()

@@ -592,7 +592,7 @@ dest = 0   # line address, destination for m(ove), t(ransfer, copy) commands
 
 pysh = pysh.mk_shell() # embedded Python shell for ! command
 
-def cmd(line):
+def do_command(line):
     """
     Process one input line without blocking in ed command or input mode
     Update buffers and control variables: command_mode, cmd_name, args, start, end
@@ -661,7 +661,7 @@ def do_cmds(cmd, lines, echo, delay):
         line1 = line.rstrip() # remove terminal \n
         if echo: 
             print(line1)
-        cmd(line1) 
+        do_command(line1) 
         if delay and delay > 0:
             time.sleep(delay)
 
@@ -686,8 +686,8 @@ def parse_echo_delay(params):
     return valid, echo, delay
 
 # Hook for edsel display editor to configure ed x behavior:
-# Edsel assigns x_cmd_fcn to edsel.cmd, which calls update_display.  
-x_cmd_fcn = cmd  # In ed, x command only prints in command region
+# Edsel assigns x_cmd_fcn to edsel.do_command, which calls update_display.  
+x_cmd_fcn = do_command  # In ed, x command only prints in command region
 
 def x(*args):
     """
@@ -742,7 +742,7 @@ def main(*filename, **options):
     while not quit:
         prompt_string = prompt if command_mode else ''
         line = input(prompt_string) # blocking
-        cmd(line) # non-blocking
+        do_command(ine) # non-blocking
 
 # Run the editor from the system command line:  python ed.py
 

@@ -104,7 +104,7 @@ def maintain_display():
                 if ed.dest < w.dot:
                     w.dot += w.buf.nlines
             elif ed.cmd_name in 'dc': # delete or change (replace), del then insert
-                # c command: first ed.cmd() calls buf.d, the rest call buf.a
+                # c command: first ed.do_command() calls buf.d, the rest call buf.a
                 #  but ed.cmd_name is 'c' until final . exits insert mode
                 # This code will not work for c() in API.
                 if ed.start < w.dot and ed.end < w.dot: # del or change before w.dot
@@ -184,7 +184,7 @@ def update_display():
         if ed.command_mode:
             win.display_marker() # indicates dot in window
         else: 
-            win.set_insert_cursor() # term. insert cursor at open line
+            win.put_insert_cursor() # term. insert cursor at open line
 
     # update marker only in current window, don't update window content
     elif win.dot_moved():
@@ -245,7 +245,7 @@ def o(line):
         print('? integer 1 or 2 expected at %s' % param_string)
 
 
-def cmd(line):
+def do_command(line):
     'Process one command line without blocking.'
     global cmd_h0, win0, o_cmd
     # try/except ensures we restore display, especially scrolling
@@ -257,7 +257,7 @@ def cmd(line):
         if ed.command_mode and line.lstrip().startswith('o'):
             o(line) # window commands, assigns o_cmd
         else:
-            ed.cmd(line) # non-blocking
+            ed.do_command(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
         maintain_display() # maintain consistency in window data 
@@ -271,7 +271,7 @@ def cmd(line):
 # Suppress printing ed l z command output to scrolling command region
 ed.print_lz_destination = open(os.devnull, 'w') # discard output
 # In ed x command use edsel.cmd in this module that calls update_display
-ed.x_cmd_fcn = cmd 
+ed.x_cmd_fcn = do_command
 
 def main(*filename, **options):
     """
@@ -283,7 +283,7 @@ def main(*filename, **options):
     while not ed.quit:
         prompt_string = prompt if ed.command_mode else ''
         line = input(prompt_string) # blocking
-        cmd(line) # no blocking
+        do_command(line) # no blocking
     restore_display()
 
 # Run the editor from the system command line: python edsel.py
