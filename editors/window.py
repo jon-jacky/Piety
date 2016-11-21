@@ -110,7 +110,7 @@ class Window(object):
             display.kill_line() # erase from cursor to end
             print() # advance to next line
 
-    def display_window(self, command_mode):
+    def display_text(self, open_line=False):
         """
         Start on win_1 line, display buffer lines self.seg_1 .. self.seg_n 
         If space remains in window, pad with empty lines to self.win_h
@@ -121,16 +121,16 @@ class Window(object):
         # n of padding empty lines at window bottom, > 0 when small buffer
         blank_h = self.win_hl - seg_h   
         display.put_cursor(self.win_1,1)  # cursor to window top
-        if command_mode:
-            self.display_lines(self.seg_1, self.seg_n)
-        else: # insert mode, open line at dot to insert new text
+        if open_line: # open line at dot to insert new text
             self.display_lines(self.seg_1 +(1 if self.at_bottom_line() else 0),
                                self.dot) # leave space at dot
             display.kill_whole_line() # open line to insert new text
             print() # next line
             self.display_lines(self.dot+1, 
                                self.seg_n-(0 if self.near_buffer_top() else 1))
-        for iline in range(blank_h if command_mode else blank_h - 1):
+        else:
+            self.display_lines(self.seg_1, self.seg_n)
+        for iline in range(blank_h if not open_line else blank_h - 1):
             display.kill_whole_line()
             print()
 
@@ -223,11 +223,14 @@ class Window(object):
             iline = self.dot_i
         display.put_cursor(iline, 1)
 
-    def update_window(self, command_mode):
-        'Locate and display the window including its status line and mark.'
+    def update(self, open_line=False):
+        """
+        Locate and display the window including its text and status line,
+        but NOT its marker or cursor.
+        """
         # do not call locate_segment_top() here, can cause distracting jumps
         self.locate_segment_bottom() # assign new self.seg_n
         self.locate_dot()  # *re*assign new self.dot_i, marker_ch
-        self.display_window(command_mode)
+        self.display_text(open_line)
         self.display_status()
         # No self.put_insert_cursor or display_marker, caller must do it.

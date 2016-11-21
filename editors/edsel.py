@@ -36,7 +36,7 @@ def update_windows():
     'Redraw all windows, called by display_frame, for example after frame resize.'
     for w in windows:
         w.locate_segment_top() # necessary if window(s) resized
-        w.update_window(True)  # no windows could be in insert mode at this time
+        w.update()  # no windows could be in insert mode at this time
 
 def put_command_cursor():
     'Put cursor at input line in scrolling command region'
@@ -165,7 +165,7 @@ def update_display():
     elif segment_moved or ed.cmd_name in text_cmds:
         if segment_moved:
             win.locate_segment_top()
-        win.update_window(ed.command_mode)
+        win.update(open_line=(not ed.command_mode)) # open line in insert mode
         if o_cmd == 'o2': # split window
             # win0 is former current window
             # if win0 marker does not lie within new window erase it now.
@@ -173,13 +173,13 @@ def update_display():
             if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
                 win0.erase_marker()
                 win0.locate_segment_top() # necessary?
-            win0.update_window(True)
+            win0.update()
         else:  # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
                     # might update even when lines in w unchanged
                     # win0.locate_segment_top() # necessary?
-                    w.update_window(True)
+                    w.update()
         # must draw marker or cursor last
         if ed.command_mode:
             win.display_marker() # indicates dot in window
