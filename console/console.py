@@ -301,7 +301,7 @@ class Console(object):
     def accept_command(self):
         'For ed command mode: handle line, with history, exit, and job control'
         self.history.append(self.command.line) # Save command in history.
-        self.hindex += 1
+        self.hindex = len(self.history) - 1
         self.restore()      # advance line and put terminal in line mode 
         self.do_command_1() # might reassign self.mode, self.command.line
         # do_command might exit or invoke job control to suspend application
