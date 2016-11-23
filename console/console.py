@@ -134,7 +134,9 @@ class Console(object):
                  mode=(lambda: True),
                  behavior={ False: ('', vt_insertmode_keymap) }):
         """
-        All arguments are optional, with defaults.
+        All arguments are optional, with defaults.  Defaults are chosen
+         to simplify the editors ed, edsel, and eden.  We expect
+         they will be useful to other terminal applications also.
 
         prompt - Prompt string, appears unless overidden by mode and 
           behavior args (below).  
@@ -147,16 +149,11 @@ class Console(object):
          incomplete.
         Default is terminal.getchar, always gets a single character.
 
-        command - object to collect and store command line, and
-           in-line editing.  Default is instance of minimal LineInput
-           class defined in this module, which works on a printing
-           terminal.
-          Some Console methods require self.command to belong to
-           a richer class that provides video cursor addressing.  The
-           lineinput module provides a suitable LineInput class.
-          You must ensure that the keymap and behavior arguments
-           (described below) only contain methods that can be 
-           executed by the command class you have have assigned.
+        command - object to collect and store command line, with
+          in-line editing.  
+         Default is instance of lineinput.LineInput class, which
+          requires a video terminal.  For printing terminals, use the
+          mininal LineInput class defined in this module.
 
         do_command - callable to execute command string.  Takes one
            argument, a string.  
@@ -173,7 +170,8 @@ class Console(object):
         keymap - dictionary from keycode to Console method name
           string, used except in modes where it is overridden by mode
           and behavior args (below).
-         Default: vt_keymap (defined above in this module)
+         Default: vt_keymap (defined above in this module), requires
+          video terminal.
 
         job_commands: dictionary from keycode to job control method
           name string.  The method typically bypasses or suspends the
@@ -195,8 +193,9 @@ class Console(object):
           indexed by values returned by calling mode() (above).  Each
           key in the dict (a mode) is associated with a tuple:
           (prompt, keymap) to use in that mode.  
-         Default is {}, the empty dictionary, always use prompt
-          and keymap args (above).
+         Default is { False: ('', vt_insertmode_keymap) }, works with
+          ed (etc.) insert mode (when self.mode() returns True for command
+          mode, False for insert mode)
         """
         self.default_prompt = prompt # prompt string used in command mode
         self.prompt = prompt # can be other prompt or '' in other modes
