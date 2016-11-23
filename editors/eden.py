@@ -1,15 +1,16 @@
 """
 eden.py - run *edsel.py* display editor, with additional screen
- editing commands. Use *command*, *lineinput*, and *key* modules
- instead of Python builtin *input()* to collect and edit input lines.
- Contrast to *edsel.py* *main* function and *edselc.py*.
+ editing commands, see eden.md.  Use *command* module instead of
+ Python builtin *input()* to collect and edit input lines.  Contrast
+ to *edsel.py* *main* function and *edselc.py*.
 """
 
-import edsel, console as con, key, lineinput
+import edsel, console as con
 
 c_command, buf, dot = False, None, 0
 
-# Ths cmd called from accept_command or accept_line, via do_command
+# This do_command implements the additional screen editing commands
+# described in eden.md
 def do_command(chars):
     'Handle new eden commands here, pass other commands to edsel'
     global c_command, buf, dot
@@ -36,22 +37,15 @@ def do_command(chars):
     else:
         edsel.do_command(chars)
 
-console = con.Console(prompt=':', reader = key.Key(),
-                      command=lineinput.LineInput(),
+console = con.Console(prompt=':', 
                       do_command=do_command,
                       stopped=(lambda command: edsel.ed.quit),
-                      keymap=con.vt_keymap,
-                      mode=(lambda: edsel.ed.command_mode), # True or False
-                      behavior={ False: ('', con.vt_insertmode_keymap) })
+                      mode=(lambda: edsel.ed.command_mode))
 
 def main():
     edsel.ed.quit = False # previous quit might have set it True
     edsel.init_session(c=12) # 12 lines in scrolling command region
-    console.restart()
-    while (not console.stopped() and 
-           console.command.line not in console.job_commands):
-        console.handler()   # q command sets edsel.ed.quit True, forces exit
-    console.restore() # restores terminal, different from restore_display
+    console.run()
     edsel.restore_display()
 
 if __name__ == '__main__':

@@ -28,6 +28,7 @@ This module has some similar motivations to the Python standard
 import sys
 import string # for string.printable
 import util, terminal, keyboard
+import lineinput, key # used in Console __init__ defaults
 
 # A keymap is a dictionary from keycode string to Console method name string.
 # Keycodes in keymap can have multiple characters (for example escape sequences)
@@ -124,14 +125,14 @@ class LineInput(object):
         pass
 
 class Console(object):
-    def __init__(self, prompt='', reader=terminal.getchar, 
-                 command=LineInput(),
+    def __init__(self, prompt='', reader=key.Key(),
+                 command=lineinput.LineInput(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
-                 # this default keymap works with default command_line
-                 keymap=printing_keymap, 
+                 keymap=vt_keymap, 
                  job_commands=job_commands_keymap,
-                 mode=(lambda: True), behavior={}):
+                 mode=(lambda: True),
+                 behavior={ False: ('', vt_insertmode_keymap) }):
         """
         All arguments are optional, with defaults.
 
@@ -181,7 +182,8 @@ class Console(object):
           so they can be the same as keycodes in keymap.  For example
           the job control exit command ^D is the same as the LineInput
           delete character command ^D.  
-         Default: entries for ^D and ^Z that suspend the application.
+         Default: job_commands_keymap (defined in this module),
+          entries for ^D and ^Z that suspend the application.
 
         mode - callable to get current application mode, returns a
           value (of some type) that depends on the application.  Used
@@ -216,6 +218,16 @@ class Console(object):
         self.default_keymap = keymap # keymap used in command mode
         self.keymap = keymap # can be other keymap in other modes
         self.job_commands = job_commands
+
+    def run(self):
+        'Console event loop - run Console instance as an application'
+        self.restart()
+        while (not self.stopped() and 
+               self.command.line not in self.job_commands):
+            self.handler() # blocks in self.reader at each character
+        self.restore()
+
+    # alternative run_noreader passes keycode to handler, use getchar as default
 
     def handler(self):
         'Read char, add to keycode sequence.  If seq complete, handle keycode'
@@ -300,7 +312,7 @@ class Console(object):
 
     def accept_command(self):
         'For ed command mode: handle line, with history, exit, and job control'
-        self.history.append(self.command.line) # Save command in history.
+        self.history.append(self.command.line)
         self.hindex = len(self.history) - 1
         self.restore()      # advance line and put terminal in line mode 
         self.do_command_1() # might reassign self.mode, self.command.line
@@ -341,7 +353,7 @@ class Console(object):
         self.command.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
-    # Command history, works with default command on printing terminals
+    # Command history, works on printing terminals
 
     def retrieve_previous_history(self):
         if self.history:
@@ -366,7 +378,7 @@ class Console(object):
         self.retrieve_next_history()
         util.putstr('^N\r\n' + self.prompt + self.command.line)
 
-    # Command history, requires command that uses video terminal.
+    # Command history, requires video terminal.
 
     def previous_history(self):
         self.retrieve_previous_history()
@@ -376,7 +388,7 @@ class Console(object):
         self.retrieve_next_history()
         self.command.redraw_current_line()
 
-    # Command editing, works with default command on printing terminal.
+    # Command editing, works with printing terminal.
 
     def redraw_current_line_tty(self):
         util.putstr('^L\r\n' + self.prompt)  # on new line
@@ -387,38 +399,10 @@ class Console(object):
         util.putstr('^U\r\n' + self.prompt)
 
     # Command editing that requires video terminal with cursor addressing
-    # is not provided in this module, see (for example) lineinput module.
+    # is not provided in this class.  
 
-# Tests - use job control commands ^D ^Z to exit.
-
-# Default do_command - echo input chars, but do nothing else
-c0 = Console(prompt='> ') # prompt to show restart() ran.
-
-# echo completed input lines
-c = Console(prompt='> ', do_command=(lambda command: print(command)))
-
-def default():
-    "Collect command lines but do nothing until ^D or ^Z exits"
-    c0.restart()
-    while c0.command.line not in c0.job_commands: # use job control for exit
-        c0.handler() # does nothing 
-    c0.restore() # undo restart, restore terminal line mode
-    
-def main():
-    # Default handler terminal.getchar can't handle multi-char control
-    # sequences like keyboard.up, down, right, left - use ^P ^N ^F ^B instead
-    c.restart()
-    while c.command.line not in c.job_commands: # use job control for exit
-        # Here Console instance works in reader mode:
-        # uses the function passed to its handler argument to read its input.
-        c.handler()
-        # Alternatively, here Console instance works in receiver mode:
-        # uses its built-in dispatch method to accept input passed by caller.
-        # To demonstrate, comment out previous line and uncomment these lines:
-        #char = terminal.getchar()
-        #c.handler(char)
-    c.restore()
+# echo completed input lines, use job control commands ^D ^Z to exit.
+echo = Console(prompt='> ', do_command=(lambda command: print(command)))
 
 if __name__ == '__main__':
-    # default()
-    main()
+    echo.run()
