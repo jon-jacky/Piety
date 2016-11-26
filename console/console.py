@@ -132,11 +132,13 @@ class Console(object):
                  keymap=vt_keymap, 
                  job_commands=job_commands_keymap,
                  mode=(lambda: True),
+                 # False means not command mode: empty prompt, insert mode 
                  behavior={ False: ('', vt_insertmode_keymap) }):
         """
-        All arguments are optional, with defaults.  Defaults are chosen
-         to simplify the editors ed, edsel, and eden.  We expect
-         they will be useful to other terminal applications also.
+        All arguments are optional, with defaults.  Defaults were chosen
+         to simplify the editors ed, edsel, and eden.  For many applications,
+         it should only be necessary to specify these arguments: prompt,
+         do_command, stopped, and mode.
 
         prompt - Prompt string, appears unless overidden by mode and 
           behavior args (below).  
@@ -397,10 +399,10 @@ class Console(object):
         self.command.line = ''
         util.putstr('^U\r\n' + self.prompt)
 
-    # Command editing that requires video terminal with cursor addressing
-    # is not provided in this class.  
+    # Command editing that requires a video terminal
+    # is not provided by the this class - use LineInput for that.
 
-# echo completed input lines, use job control commands ^D ^Z to exit.
+# Test: echo input lines, use job control commands ^D ^Z to exit.
 echo = Console(prompt='> ', do_command=(lambda command: print(command)))
 
 if __name__ == '__main__':

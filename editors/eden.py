@@ -37,8 +37,7 @@ def do_command(chars):
     else:
         edsel.do_command(chars)
 
-console = con.Console(prompt=':', 
-                      do_command=do_command,
+console = con.Console(prompt=':', do_command=do_command,
                       stopped=(lambda command: edsel.ed.quit),
                       mode=(lambda: edsel.ed.command_mode))
 

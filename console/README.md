@@ -15,28 +15,24 @@ similar to Unix *readline*.
   *readline* (but no tab completion).  Provides hooks for optional job
   control commands that bypass the application.
 
-  *Console* can work with *LineInput* (see below) to provide command
-  line editing.  Minimal line editing is provided in the *command*
-  module.
-
-  A *Console* instance can work in *reader* mode where it uses the
-  function passed to the *handler* initializer argument to read input,
-  or, alternatively, can work in *receiver* mode where it uses the
-  built-in *handle_key* method to accept input passed from a caller.
-  This module's *main* function demonstrates both alternatives.
+  *Console* can work with *Key* and *LineInput* (see below) to read
+  keycodes and edit the input line.  Minimal reading and
+  editing are provided in the *command* module itself.
 
   This *console* module has some similarities to the Python standard
   library *cmd* module, but does not provide the same API.
 
 - **console.txt**: command summary for *Console* with *LineInput*,
    similar to Unix *readline*.  How to edit the command line and
-   access its history in any application the uses *console.py*.
+   access its history in any application the uses *console*
+   with *lineinput* and *key* modules.
 
-- **key.py**: defines *Key* class that can collect, store, return
-    single character or multi-character key sequences.  Can be used as
-    a *reader* by *Console*.
+- **key.py**: defines *Key* class that can collect, store, and return
+    single character or multi-character keycodes.  It can be 
+    passed to the *reader* argument of *Console.__init__* 
 
-- **lineinput.py**: Defines *LineInput* class that provides editing
-  for *Console* (or any other module that might need it).
+- **lineinput.py**: Defines *LineInput* class that provides input and
+    editing within a single line.  It can be passed to the
+    *command* argument of *Console.__init__*
 
 Revised November 2016
