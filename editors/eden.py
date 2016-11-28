@@ -1,7 +1,7 @@
 """
 eden.py - run *edsel.py* display editor, with additional screen
- editing commands, see eden.md.  Use *command* module instead of
- Python builtin *input()* to collect and edit input lines.  Contrast
+ editing commands, see eden.md.  Use *console* module instead of
+ Python builtin *input* to collect and edit input lines.  Contrast
  to *edsel.py* *main* function and *edselc.py*.
 """
 

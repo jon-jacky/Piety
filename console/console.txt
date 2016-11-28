@@ -1,7 +1,8 @@
-Commands to edit the command line and access its history in any
-application that uses console.py.  Similar to Unix readline.
-Functions are assigned to keys in each Command object's keymap.  These
-are in the default keymap.
+Commands (keystrokes) to edit the command line and access its history in any
+application that uses the console module.  Commands are similar to Unix readline.
+
+Functions are assigned to keys in each Command object's keymap.  This
+document describes the default keymap.
 
 Dedicated function keys:
 
@@ -29,11 +30,10 @@ Control keys: hold down control key while typing the named key, upper or lowerca
  ^N  retrieve (n)ext line from history
  ^P  retrieve (p)revious line from history
  ^U  discard line, start over with an empty line
+ ^Z  if line is empty, exit application.
 
 Printing characters are inserted before the cursor.
 Unhandled control characters ring the bell.
-
-^D only exits application if job control has also been programmed to recognize it.
 
 These functions require a display terminal with cursor addressing:
  left right ^A ^B ^D ^E ^F ^K

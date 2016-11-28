@@ -47,7 +47,7 @@ def render(text, *attributes):
 
 # used by line
 
-def self_insert_char(key):
+def insert_char(key):
     'Insert character in front of cursor'
     putstr((ich % 1) + key) # open space to insert char
 

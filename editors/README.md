@@ -10,34 +10,34 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
 - **ed.md**: description of *ed.py*
 
 - **ed.py**: line editor inspired by the classic Unix editor *ed*
-  Uses Python *input()* to collect and edit command lines and inserted
+  Uses Python *input* to collect and edit command lines and inserted
   text lines.
 
 - **ed.txt**: command summary for *ed.py*
 
-- **edc.py**: run *ed.py* line editor, use *command*, *lineinput*, and
-  *key* modules instead of Python builtin *input()* to collect and edit
+- **edc.py**: run *ed.py* line editor, use *console*
+  module instead of Python builtin *input* to collect and edit
   input lines.  Contrast to *ed.py* *main* function and *etty.py*.
 
 - **eden.md**: description of *eden.py*.
 
 - **eden.py**: run *edsel.py* display editor, with additional screen editing 
-  commands.  Use *command*, *lineinput*, and
-  *key* modules instead of Python builtin *input()* to collect and edit
+  commands.  Use *console* module instead of Python builtin *input* 
+  to collect and edit
   input lines.  Contrast to *edsel.py* *main* function and *edselc.py*.
 
 - **edsel.py**: display editor based on *ed.py*.  Uses Python builtin
-  *input()* to collect and edit input lines.
+  *input* to collect and edit input lines.
 
 - **edsel.md**: description of *edsel.py*.
 
-- **edselc.py**: run *edsel.py* display editor, use *command*, *lineinput*, and
-  *key* modules instead of Python builtin *input()* to collect and edit
+- **edselc.py**: run *edsel.py* display editor, use *console*
+  module instead of Python builtin *input* to collect and edit
   input lines.  Contrast to *edsel.py* *main* function and *eden.py*.
 
-- **etty.py**: Run *ed.py* line editor, use *command*,
-  *lineinput*, and *key* modules to collect and edit input lines.  Use
-  non-default keymap with *Command* class to provide retro
+- **etty.py**: Run *ed.py* line editor, use *console*,
+  module to collect and edit input lines.  Use
+  non-default keymaps with *Command* class to provide retro
   printing-terminal-style editing and history.  Contrast to *ed.py*
   *main* function and *edc.py*.
 
@@ -47,3 +47,4 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and a
 - **window.py**: defines Window class used by *edsel.py*
 
 Revised November 2016
+
