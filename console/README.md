@@ -27,8 +27,7 @@ similar to Unix *readline*.
    with the *inputline* and *key* modules.
 
 - **key.py**: defines *Key* class that can collect, store, and return
-    single character or multi-character keycodes.  It is the default
-    *reader* argument of *Console.__init__* 
+    single character or multi-character keycodes, used by *Console*.
 
 - **inputline.py**: Defines *InputLine* class that provides input and
     editing within a single line, used by *Console*.

@@ -6,8 +6,8 @@ Callable Python shell:
 
 - **pysh.py**: Python shell. 
 
-- **pyshc.py**: *pysh.py*, using the *command* and *key* modules from
-    the *console* directory to get the commmand line, instead of Python
-    *input*.
+- **pyshc.py**: run *pysh.py* Python shell, use *console*
+  module instead of Python builtin *input* to collect and edit
+  input lines.  Contrast to *pysh.py* *main* function.
 
-Revised June 2015
+Revised November 2016

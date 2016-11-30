@@ -12,7 +12,11 @@ eden
   dot.  You can then move the cursor and edit within that line as
   described [here](../console/command.txt), and add
   text anywhere within that line just by typing.  When you are 
-  finished editing that line, type RETURN to return to 
+  finished editing that line, simply type RETURN to return to 
   command mode.
+  
+  When the *c* command is used with address arguments, it behaves
+  as in classic *ed*.  In particular, *.c* (*dot* *c*) deletes and
+  then replaces the single line at dot.
 
 Revised November 2016

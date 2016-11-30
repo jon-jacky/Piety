@@ -207,7 +207,7 @@ class Console(object):
                           keycode in self.command.keymap):
             self.command.handler(keycode)
         elif keycode:
-            print(keyboard.bel, end=' ') # sound indicates key not handled
+            util.putstr(keyboard.bel) # sound indicates key not handled
         else:
             pass # incomplete keycode, do nothing
 

@@ -2,8 +2,8 @@
 editors
 =======
 
-Text editors, including a line editor inspired by the classic *Unix ed*, and a
-    new display editor *edsel*:
+Text editors, including a line editor inspired by the classic *Unix ed*, and
+    new display editors *edsel* and *eden*:
 
 - **buffer.py**: defines Buffer class used by *ed.py* and *edsel.py*
 

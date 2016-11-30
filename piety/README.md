@@ -4,15 +4,15 @@ piety
 
 The *piety* module is the core of the Piety operating system.  It
 defines the *Task*, *Session*, and *Job* classes. It imports the
-*cycle* module and the *eventloop* module, which defines the *run*,
+*cycle* module and the *eventloop* module, which defines *run*,
 the non-blocking event loop.  To run tasks in Piety, import the
 *piety* module, create some *piety.Task* instances, then call
 *piety.run*.  If one of the tasks is a Python shell, you can use it to
 create or delete tasks while Piety is running.
 
-The following sections provide an overview of tasks in Piety,
-describe the classes in the *piety* module, describe the
-Piety *run* function, and explain how it uses the *cycle* and *eventloop*
+This page provides an overview of tasks in Piety,
+describes the classes in the *piety* module, describes the
+Piety *run* function, and explains how it uses the *cycle* and *eventloop*
 modules.
 
 ### Tasks in Piety ###
@@ -55,7 +55,7 @@ module, and study the examples in the *scripts* directory.
 
 *Task* connects an application to the event loop.  Assign the
 application's handler function (or method etc.) to the task object's
-handler attribute to invoke the application from the event loop.
+*handler* attribute to invoke the application from the event loop.
 
 ### Session class ###
 

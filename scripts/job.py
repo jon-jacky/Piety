@@ -2,9 +2,9 @@
 console_job.py - create, connect Command, Job instances for console application
 """
 
-import command, piety
+import piety, console as con
 
-def console_job(controller=None, prompt='', reader=(lambda: None), 
+def console_job(controller=None, prompt='', # FIXME? reader=(lambda: None), 
                 do_command=(lambda command: None), startup=(lambda: None), 
                 stopped=(lambda command: True), cleanup=(lambda: None)):
     """
@@ -12,8 +12,8 @@ def console_job(controller=None, prompt='', reader=(lambda: None),
     See docstrings in piety and command modules for meanings of arguments.
     """
     # reader arg to console_job __init__ is called by handler in returned Job
-    console = command.Command(prompt=prompt, reader=reader, 
-                              do_command=do_command, stopped=stopped)
+    console = con.Console(prompt=prompt, reader=reader, 
+                          do_command=do_command, stopped=stopped)
     job = piety.Job(controller=controller, handler=console.handler, 
                     startup=startup, restart=console.restart,
                     cleanup=cleanup)
