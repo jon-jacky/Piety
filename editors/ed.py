@@ -728,17 +728,20 @@ def X(*args):
 
 prompt = '' # default no prompt
 
-def main(*filename, **options):
-    """
-    Top level ed command to use at Python prompt.
-    This version won't work in Piety, it calls blocking command raw_input
-    """
+def startup(*filename, **options):
     global quit, prompt
     quit = False # allow restart
     if filename:
         e(filename[0])
     if 'p' in options:
         prompt = options['p'] 
+
+def main(*filename, **options):
+    """
+    Top level ed command to use at Python prompt.
+    This version won't work in Piety, it calls blocking command raw_input
+    """
+    startup(*filename, **options)
     while not quit:
         prompt_string = prompt if command_mode else ''
         line = input(prompt_string) # blocking

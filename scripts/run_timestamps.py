@@ -9,42 +9,39 @@ and 'b ts2' to see the buffers update as each timestamp is written.
 
 The code that writes to the editor buffers demonstrates how to use 
 the Buffer class write method and update attribute.
-
-See console_tasks header for directions on how to run the console jobs
-including the edsel editor, except start ed with con.job.ed not just
-job.ed etc.
 """
 
-import terminal, display
-import piety
-import timestamp
-import console_tasks as con
+import terminal, display, piety, timestamp, session
 
-# add content to main buffer
-# we haven't started edsel yet, window not initialized, use con.ed commands
-con.ed.cmd('i')
-con.ed.cmd('This is the main buffer')
-con.ed.cmd('.')
+# We haven't started display editor yet, window not initialized, 
+#  so use ed commands
+edsel = session.eden.edsel
+ed = edsel.ed
+
+# Add content to main buffer.
+ed.do_command('i')
+ed.do_command('This is the main buffer')
+ed.do_command('.')
 
 # create timestamp generators
 ts1 = timestamp.timestamp('ts1')
 ts2 = timestamp.timestamp('ts2')
 
 # create buffers for timestamp messages
-con.ed.cmd('b ts1')
-con.ed.cmd('b ts2')
+ed.do_command('b ts1')
+ed.do_command('b ts2')
 
 # aliases for timestamp buffers
-ts1buf = con.ed.buffers['ts1']
-ts2buf = con.ed.buffers['ts2']
+ts1buf = ed.buffers['ts1']
+ts2buf = ed.buffers['ts2']
 
-# window update function
+# window update function - FIXME 
 def update(buf):
-    if con.console.foreground == con.job.edsel and con.ed.buf == buf:
+    if session.session.foreground == session.eden and ed.buf == buf:
         terminal.set_line_mode()
-        con.edsel.win.update_window(True) # command mode not insert mode
-        # restore cursor to edsel cmd line (bottom of scroll region), edit point
-        display.put_cursor(con.edsel.cmd_n, con.cmd.edsel.point+1) 
+        edsel.win.update(open_line=(not ed.command_mode)) # open line in insert mode
+        # restore cursor to eden cmd line (bottom of scroll region), edit point
+        display.put_cursor(edsel.cmd_n, 1) # FIXME just get it running for now
         terminal.set_char_mode() # FIXME should restore whatever was before
         
 # add window update callbacks to timestamp buffers
@@ -69,11 +66,8 @@ ts1task = piety.Task(handler=ts1handler, input=piety.timer, enabled=piety.true)
 ts2task = piety.Task(handler=ts2handler, input=piety.timer, enabled=alternate)
 
 def main():
-    'Run the console session and writer tasks concurrently under the event loop'
-    # con.job.pysh() runs its startup(), calls pysh.start() sets pysh.running=True
-    con.job.pysh() # start the first job, recall pysh is in jobs namespace
-    # piety.run() calls its piety.start() which sets eventloop.running=True
-    piety.run() # start event loop, until pysh >> exit() triggers piety.stop()
+    session.pysh()
+    piety.run()
 
 if __name__ == '__main__':
     main()

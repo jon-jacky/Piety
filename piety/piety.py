@@ -179,7 +179,7 @@ class Job(object):
     'Provide a standard interface to an application that can be used by Session'
     def __init__(self, controller=None, handler=(lambda: ''), # command=None, 
                  startup=(lambda: None), restart=(lambda: None), 
-                 cleanup=(lambda: None)): # stopped=(lambda command: False), # in Command
+                 cleanup=(lambda: None)):
         """
         All arguments are optional, with defaults
 

@@ -18,27 +18,18 @@ imported, or started with *python -m* .
 See docstrings (comment headers) and inline comments in each module
 for directions and explanations.
 
-- **job.py**: Provides a function to make a console job by
-  creating and connecting a *Job* instance and a *Console* instance.
-  No *main* method.
-
-- **tasks.py**: Makes a console *Session* instance with
-  three jobs: a Python shell, a line editor, and a
-  display editor.  Makes all three jobs with *job*.  Runs
-  the session in a *while* loop.
-
-- **editor_console0.py**: Makes a console job that runs the display editor
-  by connecting a *Job* instance and a *Console* instance, but without
-  using *job*.  Runs the job in a *while* loop.
-
-- **editor_console.py**: Makes a console job that runs the display editor
+- **editor_console.py**: Makes a console job that runs a display editor
   by  using *job* to connect a *Job* instance and a 
   *Console* instance.  Runs the job in a *while* loop.
 
-- **editor_job.py**: Makes a *Job* instance that runs the display editor 
-   in a *while* loop.
+- **editor_console0.py**: Makes a console job that runs a display editor
+  by connecting a *Job* instance and a *Console* instance, but without
+  using *job*.  Runs the job in a *while* loop.
 
-- **editor_task.py**: Makes a console job that runs the display editor
+- **editor_job.py**: Makes a *Job* instance that runs a display editor 
+   in a *while* loop.  Does not use *Console*, uses Python *input*.
+
+- **editor_task.py**: Makes a console job that runs a display editor
   by connecting a *Job* instance and a *Console* instance, but without
   using *job*.  Uses *Task* (not *Session*) to run the job with
   *piety.run*.
@@ -59,6 +50,10 @@ for directions and explanations.
   event loop.  The *embedded* script (above) can also use different
   event loops.
 
+- **job.py**: Provides a function to make a console job by
+  creating and connecting a *Job* instance and a *Console* instance.
+  No *main* method.
+
 - **run_timestamps.py**: Uses *piety.run* with a
   console *Session* instance to run the three jobs created by *tasks*,
   concurrently with the two timestamp tasks created in this script.
@@ -69,6 +64,11 @@ for directions and explanations.
 - **run_writers.py**: Uses *piety.run* with a console *Session*
   instance to run the three jobs created by *tasks*, concurrently with
   the two writer tasks created by *writers*.
+
+- **tasks.py**: Makes a console *Session* instance with
+  three jobs: a Python shell, a line editor, and a
+  display editor.  Makes all three jobs with *job*.  Runs
+  the session in a *while* loop.
 
 - **writers.py**: Creates writer tasks used by the *embedded.py* and
     *run_writers.py* scripts.

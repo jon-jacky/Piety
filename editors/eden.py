@@ -43,9 +43,9 @@ console = con.Console(prompt=':', do_command=do_command,
 
 def main():
     edsel.ed.quit = False # previous quit might have set it True
-    edsel.init_session(c=12) # 12 lines in scrolling command region
+    edsel.startup(c=12) # 12 lines in scrolling command region
     console.run()
-    edsel.restore_display()
+    edsel.cleanup()
 
 if __name__ == '__main__':
     main()

@@ -63,12 +63,13 @@ def update_frame():
         win.resize(frame_top + iwin*win_h0, win_h, ncols)
     display_frame()
 
-def init_session(*filename, **options):
+def startup(*filename, **options):
     """
     Clear and render entire display, set scrolling region, place marker.
     Process optional arguments: filename, options if present.
     """
     global prompt, cmd_h, win, win_i
+    ed.quit = False # allow restart
     if filename:
         ed.e(filename[0])
     if 'p' in options:
@@ -198,7 +199,7 @@ def update_display():
     if ed.command_mode:
         put_command_cursor() 
 
-def restore_display():
+def cleanup():
     'Restore full-screen scrolling, cursor to bottom.'
     display.set_scroll_all()
     display.put_cursor(nlines,1)
@@ -263,7 +264,7 @@ def do_command(line):
         maintain_display() # maintain consistency in window data 
         update_display() # contains all update logic, may do nothing
     except BaseException as e:
-        restore_display() # so we can see entire traceback 
+        cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         exit()
 
@@ -276,15 +277,14 @@ ed.x_cmd_fcn = do_command
 def main(*filename, **options):
     """
     Top level edsel command to invoke from python prompt or command line.
-    Won't cooperate with Piety scheduler, calls blocking command raw_input.
+    Won't cooperate with Piety scheduler, calls blocking input.
     """
-    ed.quit = False # allow restart
-    init_session(*filename, **options)
+    startup(*filename, **options) # sets ed.quit = False etc. etc.
     while not ed.quit:
         prompt_string = prompt if ed.command_mode else ''
         line = input(prompt_string) # blocking
         do_command(line) # no blocking
-    restore_display()
+    cleanup()
 
 # Run the editor from the system command line: python edsel.py
 if __name__ == '__main__':

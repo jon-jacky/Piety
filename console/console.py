@@ -157,7 +157,7 @@ class Console(object):
         self.do_command = (lambda: do_command(self.command.line))
         self.stopped = (lambda: stopped(self.command.line))
         self.job_commands = job_commands
-        self.command_keymap = command_keymap
+        self.keymap = command_keymap
         self.mode = mode
         # call this arg specialmodes because othermodes=None is misleading
         self.othermodes = ({ False: ('', insert_keymap) }
@@ -171,8 +171,11 @@ class Console(object):
                                          keymap=edit_keymap) # __init__ arg
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
-        self.job = None  # assign elsewhere, then here use self.job.stop() etc.
-
+        # We might assign some job controller object to supervisor later.
+        # if not None, supervisor must be an object with a method do_stop(self)
+        # and a Boolean attribute named 'replaced'.
+        self.supervisor = None  
+                                 
     def run(self):
         'Console event loop - run Console instance as an application'
         self.restart()
@@ -197,8 +200,8 @@ class Console(object):
             method()
             # For now, all job control commands exit
             self.restore()     # calls print() for newline
-            if self.job:
-                self.job.do_stop() # callback to job control
+            if self.supervisor:
+                self.supervisor.do_stop() # callback to job control
             return
         elif keycode and keycode in self.keymap:
             method = getattr(self, self.keymap[keycode])
@@ -272,12 +275,12 @@ class Console(object):
         self.do_command_1() # might reassign self.mode, self.command.line
         # do_command might exit or invoke job control to suspend application
         if self.stopped():
-            if self.job:
-                self.job.do_stop() # callback to job control
+            if self.supervisor:
+                self.supervisor.do_stop() # callback to job control
             else:
                 return  # no job - just exit application
-        elif self.job and self.job.replaced: # command may replace or stop app
-            return
+        elif self.supervisor and self.supervisor.replaced: 
+            return # command may replace or stop app
         else:
             self.restart() # print prompt and put term in character mode
             return # application continues
@@ -293,7 +296,7 @@ class Console(object):
         if mode in self.othermodes:
             self.prompt, self.keymap = self.othermodes[mode]
         else:
-            self.prompt, self.keymap = self.default_prompt, self.command_keymap
+            self.prompt, self.keymap = self.default_prompt, command_keymap
         # Re-initialize command object with previously assigned attributes.
         # Only now do we have self.prompt to accompany initline and initpoint.
         self.command.reinit(prompt=self.prompt, line=self.initline, 
