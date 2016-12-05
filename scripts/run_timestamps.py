@@ -15,7 +15,7 @@ import terminal, display, piety, timestamp, session
 
 # We haven't started display editor yet, window not initialized, 
 #  so use ed commands
-edsel = session.eden.edsel
+edsel = session.editor.edsel
 ed = edsel.ed
 
 # Add content to main buffer.

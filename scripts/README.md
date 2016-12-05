@@ -20,7 +20,7 @@ for directions and explanations.
 
 - **editor_job.py**: Makes a *Job* instance that runs a display editor
    in a *while* loop.  Does not use *Console*, uses Python *input*.
-   Contrast to *eden.py* and *run_editor.py.*
+   Contrast to *eden* and *run_editor*.
 
 - **editor_timestamps.py**: Demonstrate printing to editor buffers.  Use
      a while loop, not the Piety event loop.
@@ -35,8 +35,9 @@ for directions and explanations.
   *asyncio/eventloop.py*. The *embedded* script (above) can also use
   different event loops.
 
-- **run_editor.py** - Run one *Task* made from a display editor *Console*
-    with the Piety event loop.  Contrast to eden.py and editor_job.py
+- **run_editor.py** - Uses *piety_run* to run a display editor
+    *Console* instance, without using *Job* or *Session*.  Contrast to
+    *eden* and *editor_job*.
 
 - **run_timestamps.py**: Uses *piety.run* to run the three jobs
   created by *session*, concurrently with two timestamp tasks created
