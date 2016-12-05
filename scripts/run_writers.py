@@ -1,10 +1,13 @@
 """
-piety_writers.py - Run the three jobs created by session.py,
+run_writers.py - Run the three jobs created by session.py,
   concurrently with the two writer tasks created by writers.py,
   using the Piety scheduler.   
 
 Start the script and run the three jobs, much as described in the header
-to session.py.  At startup, the Python interpreter runs.  Other jobs must
+to session.py.  You can use these three jobs at the same time the writers
+are writing.
+
+At startup, the Python interpreter runs.  Other jobs must
 be prefixed by the session module name:
 
 ...$ python3 -m run_writers
