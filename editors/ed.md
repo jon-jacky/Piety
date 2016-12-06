@@ -2,7 +2,7 @@
 ed.py
 ==
 
-**ed.py** is a text editor in pure Python inspired by the classic Unix
+**[ed.py](ed.py)** is a text editor in pure Python inspired by the classic Unix
 editor *ed*.  It provides many of the commands from *ed*, augmented
 with a few commands for handling multiple buffers and files from the
 later Unix (and Plan 9) editor *sam*.  You can use **ed.py** in a
@@ -178,36 +178,36 @@ The line address forms *. $ /text/ ?text?* correspond to the function
 calls *o() S() F(text) R(text)*.  For example, the print commands *.,$p* and
 */text/p* correspond to function calls *p(o(),S())* and *p(F('text'))*.
 
-The API also provides a function *cmd* with a single string
+The API also provides a function *do_command* with a single string
 argument, which is exactly the command string you would type to *ed*
 in command mode or the text string you would type in input mode.  Here
-is the preceding example expressed once more using *ed.cmd*:
+is the preceding example expressed once more using *ed.do_command*:
 
     >>> import ed
-    >>> ed.cmd('e test.txt')
+    >>> ed.do_command('e test.txt')
     test.txt, 0 lines
-    >>> ed.cmd('a')
-    >>> ed.cmd('ed() enters ed command mode.  By default, there is no command prompt.')
-    >>> ed.cmd("'e <name>' loads the named file into the current buffer.")
-    >>> ed.cmd("'a' enters ed input mode and appends the text after the current line.")
-    >>> ed.cmd("'w' writes the buffer contents back to the file")
-    >>> ed.cmd("'q' quits ed command mode.")
-    >>> ed.cmd('To quit input mode, type a period by itself at the start of a line.')
-    >>> ed.cmd('.')
-    >>> ed.cmd('w')
+    >>> ed.do_command('a')
+    >>> ed.do_command('ed() enters ed command mode.  By default, there is no command prompt.')
+    >>> ed.do_command("'e <name>' loads the named file into the current buffer.")
+    >>> ed.do_command("'a' enters ed input mode and appends the text after the current line.")
+    >>> ed.do_command("'w' writes the buffer contents back to the file")
+    >>> ed.do_command("'q' quits ed command mode.")
+    >>> ed.do_command('To quit input mode, type a period by itself at the start of a line.')
+    >>> ed.do_command('.')
+    >>> ed.do_command('w')
     test.txt, 6 lines
 
 When **ed.py** is running with the *Piety* cooperative multitasking
 scheduler, *Piety* collects a command line or input line without
-blocking, and then passes that line to *ed.cmd*.
+blocking, and then passes that line to *ed.do_command*.
 
 ## Modules ##
 
-**ed.py** provides the user interface: the command line and the public
+**[ed.py](ed.py)** provides the user interface: the command line and the public
 Python API described above, including command line parsing, argument
 checking, and error messages.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
-**ed.py** imports *buffer.py*, which provides the *Buffer* class,
+**ed.py** imports *[buffer.py](buffer.py)*, which provides the *Buffer* class,
 which defines the core data structure and the internal API for
 updating it.  Many *Buffer* methods correspond to functions in the
 API, but here each method has a fixed argument list, provides no error

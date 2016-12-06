@@ -22,11 +22,11 @@ editor.console.supervisor = Stopper()
 
 def main():
     editor.edsel.ed.quit = False # previous quit might have set it True
-    editor.edsel.init_session(c=12)
+    editor.edsel.startup(c=12)
     editor.console.restart()
     piety.run()
     editor.console.restore()
-    editor.edsel.restore_display()
+    editor.edsel.cleanup()
 
 if __name__ == '__main__':
     main()

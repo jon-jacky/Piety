@@ -15,12 +15,12 @@ nlines, ncols = terminal_util.dimensions()
 frame_top = 1 # line number on display of first line of frame
 cmd_h = 2  # height (lines) of scrolling command region at the bottom
 
-# Assigned by calc_frame called from init_session and update_frame
+# Assigned by calc_frame called from startup and update_frame
 windows_h = None # total number of lines in windows region of frame (all windows)
 cmd_1 = None # line number on display of first line of scrolling command region
 cmd_n = None #  " bottom "
 
-# First window is assigned from init_session after cmd_h etc. are assigned
+# First window is assigned from startup after cmd_h etc. are assigned
 win_i = None # current window index
 win = None # current window
 windows = list() # list of windows, windows[win_i] is the current window
@@ -44,7 +44,7 @@ def put_command_cursor():
 
 def display_frame():
     'Clear and update the entire frame'
-    # called from init_session and update_frame
+    # called from startup and update_frame
     display.put_cursor(1,1) # origin, upper left corner
     display.erase_display() 
     update_windows()
