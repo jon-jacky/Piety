@@ -14,10 +14,10 @@ task = piety.Task(name='editor',handler=editor.console.handler,input=sys.stdin)
 class Stopper():
     def __init__(self):
         self.replaced = False # must be here, but never used
-    def do_stop(self):
+    def stop(self):
         piety.stop()
 
-# At exit, editor.console calls supervisor.do_stop, which calls piety.stop
+# At exit, editor.console calls supervisor.stop, which calls piety.stop
 editor.console.supervisor = Stopper()  
 
 def main():

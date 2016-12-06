@@ -230,7 +230,7 @@ class Job(object):
         self.restart()
 
     # assign to callback in application 
-    def do_stop(self):
+    def stop(self):
         'This job is done for now.  Clean up, resume previous job if any'
         self.cleanup()
         if self.controller:

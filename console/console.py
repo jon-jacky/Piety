@@ -172,7 +172,7 @@ class Console(object):
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # We might assign some job controller object to supervisor later.
-        # if not None, supervisor must be an object with a method do_stop(self)
+        # if not None, supervisor must be an object with a method stop(self)
         # and a Boolean attribute named 'replaced'.
         self.supervisor = None  
                                  
@@ -201,7 +201,7 @@ class Console(object):
             # For now, all job control commands exit
             self.restore()     # calls print() for newline
             if self.supervisor:
-                self.supervisor.do_stop() # callback to job control
+                self.supervisor.stop() # callback to job control
             return
         elif keycode and keycode in self.keymap:
             method = getattr(self, self.keymap[keycode])
@@ -276,7 +276,7 @@ class Console(object):
         # do_command might exit or invoke job control to suspend application
         if self.stopped():
             if self.supervisor:
-                self.supervisor.do_stop() # callback to job control
+                self.supervisor.stop() # callback to job control
             else:
                 return  # no job - just exit application
         elif self.supervisor and self.supervisor.replaced: 
