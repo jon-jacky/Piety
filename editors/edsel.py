@@ -83,55 +83,64 @@ def startup(*filename, **options):
     win_i = 0 # Now win == windows[win_i]
     display_frame()
 
-# command names used in maintain_display and update_display
+# command names used in maintain_window_data and update_display
 ed.cmd_name = '' 
 
-def maintain_display():
-    'Maintain consistency in window data after buffer contents change.'
+def maintain_window_data():
+    """
+    Maintain consistency in window data after buffer contents change.
+    In each window w into the same buffer as the current window win,
+    update w.dot so it indicates the same line as before,
+    even when its line number changes due to deletes/inserts above.
+    Also adjust w.seg_1 w.seg_n by the same amount, to indicate same segment.
+    """
     # Why is this code is so much more complicated than maintaining marks in ed.py?
     # Within ed.py, all of these commands are combinations of just insert i and delete d.
     # ed.py updates buffer immediately for each i and/or d step in each command.
     # But in our design ed.py has no access to display data structures.
     # edsel.py can only observe effects of ed.py command after ed.py has executed it,
-    # must infer i and/or d for each command from ed.cmd_name .start .end and buf.nlines.
+    # must infer i and/or d for each command from ed.cmd_name .start .end and buf.nmoved.
     for w in windows:
-        # adjust dot in other windows into current buffer
+        # adjust dot etc. in other windows into current buffer
         if (w != win and w.buf == win.buf):
             dot0 = w.dot # DEBUG - save initial value for print, below
+            nshift = 0 # default: don't move w.dot etc.
             if ed.cmd_name in 'aiyr': # insert commands (not including c)
                 if ed.start <= w.dot:
-                    w.dot += w.buf.nlines
+                    nshift = w.buf.nmoved
             elif ed.cmd_name == 't': # transfer (copy)
                 if ed.dest < w.dot:
-                    w.dot += w.buf.nlines
+                    nshift = w.buf.nmoved
             elif ed.cmd_name in 'dc': # delete or change (replace), del then insert
                 # c command: first ed.do_command() calls buf.d, the rest call buf.a
                 #  but ed.cmd_name is 'c' until final . exits insert mode
                 # This code will not work for c() in API.
                 if ed.start < w.dot and ed.end < w.dot: # del or change before w.dot
-                    w.dot += w.buf.nlines # nlines here might be negative
+                    nshift = w.buf.nmoved # nmoved here might be negative
                 elif ed.start <= w.dot <= ed.end: # change segment includes w.dot
-                    w.dot = w.buf.dot
+                    # w.dot = w.buf.dot
+                    nshift = w.buf.dot - w.dot # so w.dot + nshift == w.buf.dot
             elif ed.cmd_name == 'm': # move, delete then yank
                 # segment follows dot, after move precedes dot
                 if ed.start > w.dot > ed.dest:
-                    w.dot += w.buf.nlines
+                    nshift = w.buf.nmoved
 		# segment precedes dot, after move follows dot
                 elif ed.start < w.dot < ed.dest and ed.end < w.dot:
-                    w.dot -= w.buf.nlines # move nlines is positive
+                    nshift = -w.buf.nmoved # nmoved is positive, but move dot up
 	        # dot lies within segment, moves along with segment
                 elif ed.start <= w.dot <= ed.end:
                     if ed.dest >= w.dot:  # destination follows w.dot
-                        w.dot = (ed.dest - w.buf.nlines) + (w.dot - ed.start) + 1
+                        # w.dot = (ed.dest - w.buf.nmoved) + (w.dot - ed.start) + 1
+                        nshift = (ed.dest - w.buf.nmoved) - ed.start + 1
                     else: # destination precedes w.dot
-                        w.dot = ed.dest + (w.dot - ed.start) + 1
-            # else... is implicit, all other cases: don't adjust w.dot
-            w.dot = w.dot if w.dot > 0 else 1
-            w.dot = w.dot if w.dot <= w.buf.S() else w.buf.S()
+                        # w.dot = ed.dest + (w.dot - ed.start) + 1
+                        nshift = ed.dest - ed.start + 1
+            # else: don't adjust w.dot etc., recall we set nshift = 0 at the top
+            w.shift(nshift)
             # In insert mode, this DEBUG print appears in window, is rapidly overwritten
-            #print('w %s  start %s  end %s  dest %s  nlines %s  dot0 %s  dot %s' %
-            #     (w, ed.start, ed.end, ed.dest, w.buf.nlines, dot0, w.dot)) # DEBUG
-    win.buf.nlines = 0 # FIXME? Put this in cmd with clear_flags ?
+            #print('w %s  start %s  end %s  dest %s  nmoved %s  dot0 %s  dot %s' %
+            #     (w, ed.start, ed.end, ed.dest, w.buf.nmoved, dot0, w.dot)) # DEBUG
+    win.buf.nmoved = 0 # FIXME? Put this in cmd with clear_flags ?
 
 # command names used in update_display
 o_cmd = '' # also ed.cmd_name, initialized above
@@ -261,7 +270,7 @@ def do_command(line):
             ed.do_command(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
-        maintain_display() # maintain consistency in window data 
+        maintain_window_data() 
         update_display() # contains all update logic, may do nothing
     except BaseException as e:
         cleanup() # so we can see entire traceback 

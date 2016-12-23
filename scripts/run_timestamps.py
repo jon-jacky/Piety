@@ -18,18 +18,16 @@ import terminal, display, piety, timestamp, session
 edsel = session.editor.edsel
 ed = edsel.ed
 
-# Add content to main buffer.
-ed.do_command('i')
-ed.do_command('This is the main buffer')
-ed.do_command('.')
+# Put some content in main buffer
+ed.i('This is the main buffer') 
 
 # create timestamp generators
 ts1 = timestamp.timestamp('ts1')
 ts2 = timestamp.timestamp('ts2')
 
 # create buffers for timestamp messages
-ed.do_command('b ts1')
-ed.do_command('b ts2')
+ed.b('ts1')
+ed.b('ts2')
 
 # aliases for timestamp buffers
 ts1buf = ed.buffers['ts1']

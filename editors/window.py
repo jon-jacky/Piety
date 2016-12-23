@@ -7,6 +7,12 @@ Each window instance displays a range of lines from a text buffer.
 import display
 from datetime import datetime # for timestamp, used for testing
 
+def clip(iline, first, last):
+    'limit iline to range first .. last inclusive'
+    iline = iline if iline >= first else first
+    iline = iline if iline <= last else last
+    return iline
+
 class Window(object):
     """
     Window class for line-oriented display editors.
@@ -234,3 +240,16 @@ class Window(object):
         self.display_text(open_line)
         self.display_status()
         # No self.put_insert_cursor or display_marker, caller must do it.
+
+    def shift(self, nlines):
+        """
+        Move segment of buffer displayed in window by nlines.
+        Positive nlines moves segment toward end of buffer.
+        """
+        self.dot += nlines
+        self.seg_1 += nlines
+        self.seg_n += nlines 
+        last = self.buf.S()
+        self.dot = clip(self.dot, 1, last)
+        self.seg_1 = clip(self.seg_1, 1, last)
+        self.seg_n = clip(self.seg_n, 1, last)

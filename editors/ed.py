@@ -745,7 +745,7 @@ def main(*filename, **options):
     while not quit:
         prompt_string = prompt if command_mode else ''
         line = input(prompt_string) # blocking
-        do_command(ine) # non-blocking
+        do_command(line) # non-blocking
 
 # Run the editor from the system command line:  python ed.py
 
