@@ -108,7 +108,7 @@ Here are some examples.
 | [Cleese](https://github.com/jtauber/cleese/), also [here](http://code.google.com/p/cleese/) | P | 2003, 2009 | Python | Bare machine | x86 | "microkernel mostly based on the Python VM and all other OS functionality written in Python" |
 | [Unununium](http://mail.python.org/pipermail/python-announce-list/2004-July/003220.html), also [here](http://web.archive.org/web/20061013010205/http://www.unununium.org/) | P | 2004 -- 2006 | Python | OS components, then Native OS |  [Flux OSKit](http://www.cs.utah.edu/flux/oskit/), then Linux | "create a better computing environment by maximizing interconnection between components" |
 | [Pardus Linux](http://en.pardus-wiki.org/Main_Page), also [here](https://github.com/Pardus-Linux) and [here](http://blogs.kde.org/2009/07/12/interesting-things-i-saw-gcds-pardus-linux) and [here](http://web.archive.org/web/20070329062212/http://www.pardus.org.tr/eng/projects/comar/PythonInPardus.html) and [here](http://web.archive.org/web/20061114003057/http://www.pardus.org.tr/eng/projeler/comar/SpeedingUpLinuxWithPardus.html) | R | 2005 -- | Python | Native OS | Linux | Linux distribution that ["uses Python across many of its core tools ... even a new init framework"](http://onlamp.com/onlamp/2007/05/10/rethinking-the-linux-distribution.html)
-| [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) and [here](http://www.sugarlabs.org/index.php) | R | 2007 -- | Python | Native OS | OLPC laptop, Linux + Gtk | "an inexpensive laptop project intended to help educate children around the world" |
+| [Sugar](http://www.ibm.com/developerworks/linux/tutorials/l-sugarpy/), also [here](http://wiki.laptop.org/go/Sugar_Architecture) and [here](http://wiki.laptop.org/go/Understanding_Sugar_code) and [here](http://www.sugarlabs.org/index.php), [HN](https://news.ycombinator.com/item?id=13258261) on goals | R | 2007 -- | Python | Native OS | OLPC laptop, Linux + Gtk | "an inexpensive laptop project intended to help educate children around the world" |
 | [Pycorn](http://www.pycorn.org/home), also [here](https://github.com/tornewuff/pycorn) | P | 2008 -- | Python | Bare machine | Gumstix Verdex board (ARM processor) | "interpreter-centric OS ... access to the full capabilities of the computer ... educational ... fun!" |
 | [Python OS Project (POP)](http://python-os.info/en/) | P | 2009  | Python | Native OS | Linux | "Fun ... easy to modify OS" "Dominate desktop OS market!" |
 | [raspi+python+ipython](http://www.pythononwheels.org/post/blog) | P | 2013 | Python | Native OS | Linux (Raspian) on Raspberry Pi | "using [IPython as a shell](http://transneptune.net/2009/06/16/ipython-as-your-default-shell/) ... works on any Linux" |
@@ -181,7 +181,8 @@ systems:
 [Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 (Cambridge), 
 [OS from Scratch](http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) (Birmingham, more in [HN](https://news.ycombinator.com/item?id=8380822)),
-[these](http://news.ycombinator.com/item?id=4834008)
+[OS Development](http://littleosbook.github.io/), (RIT Stockholm, more on HN(https://news.ycombinator.com/item?id=13258063)),
+ [these](http://news.ycombinator.com/item?id=4834008)
 (CMU, UMD, MIT, Stanford, Harvard),
 [BrokenThorn](http://www.brokenthorn.com/Resources/OSDevIndex.html),
 [bkerndev](http://www.osdever.net/bkerndev/index.php),
