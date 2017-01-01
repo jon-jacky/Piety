@@ -181,7 +181,7 @@ systems:
 [Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
 (Cambridge), 
 [OS from Scratch](http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) (Birmingham, more in [HN](https://news.ycombinator.com/item?id=8380822)),
-[OS Development](http://littleosbook.github.io/), (RIT Stockholm, more on HN(https://news.ycombinator.com/item?id=13258063)),
+[OS Development](http://littleosbook.github.io/), (RIT Stockholm, more on [HN](https://news.ycombinator.com/item?id=13258063)),
  [these](http://news.ycombinator.com/item?id=4834008)
 (CMU, UMD, MIT, Stanford, Harvard),
 [BrokenThorn](http://www.brokenthorn.com/Resources/OSDevIndex.html),
