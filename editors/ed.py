@@ -12,7 +12,7 @@ in test/ed/
 import re, os, sys
 import pysh  # provides embedded Python shell for ! command
 import buffer
-import time # only used for sleep() in do_cmds, FIXME write piety.sleep
+import time # only used for sleep() in do_commands, FIXME write piety.sleep
 
 # Hook for edsel display editor to configure ed printing behavior:
 # Edsel assigns assigns print_lz_destination to null 
@@ -648,10 +648,10 @@ def do_command(line):
             buf.a(o(), line + '\n') # append new line after dot, advance dot
         return
 
-def do_cmds(cmd, lines, echo, delay):
+def do_commands(do_command, lines, echo, delay):
     """
     Execute a sequence of command lines.
-     cmd - function to call on each line to execute one command
+     do_command - function to call on each line to execute one command
      lines - list of lines, one command per line
      echo - if True, print each line before executing it
      delay - if not None, wait delay seconds after printing each line
@@ -703,7 +703,7 @@ def x(*args):
         if valid:
             echo = echo if echo != None else True
             delay = delay if delay != None else 0.2
-            do_cmds(x_cmd_fcn, buffers[bufname].lines[1:], echo, delay)
+            do_commands(x_cmd_fcn, buffers[bufname].lines[1:], echo, delay)
             # cmds in buffer advance dot
     else:
         print('? buffer name')
@@ -723,7 +723,7 @@ def X(*args):
         if params_valid:
             echo = echo if echo != None else False
             delay = delay if delay != None else None
-            do_cmds(pysh, buffers[current].lines[start:end+1], echo, delay)
+            do_commands(pysh, buffers[current].lines[start:end+1], echo, delay)
             buffers[current].dot = end 
 
 prompt = '' # default no prompt

@@ -33,22 +33,22 @@ def calc_frame():
     windows_h = nlines - cmd_h # text window fills remaining space
 
 def update_windows():
-    'Redraw all windows, called by display_frame, for example after frame resize.'
+    'Redraw all windows, called by render_frame, for example after frame resize.'
     for w in windows:
-        w.locate_segment_top() # necessary if window(s) resized
+        w.position_seg_top() # necessary if window(s) resized
         w.update()  # no windows could be in insert mode at this time
 
 def put_command_cursor():
     'Put cursor at input line in scrolling command region'
     display.put_cursor(cmd_n, 1) # last line on display
 
-def display_frame():
+def render_frame():
     'Clear and update the entire frame'
     # called from startup and update_frame
     display.put_cursor(1,1) # origin, upper left corner
-    display.erase_display() 
+    display.erase() 
     update_windows()
-    win.display_marker()
+    win.render_marker()
     display.set_scroll(cmd_1, cmd_n) 
     put_command_cursor()
 
@@ -61,7 +61,7 @@ def update_frame():
     for iwin, win in enumerate(windows):
         win_h = win_h0 if iwin < nwindows-1 else windows_h - (nwindows-1)*win_h0
         win.resize(frame_top + iwin*win_h0, win_h, ncols)
-    display_frame()
+    render_frame()
 
 def startup(*filename, **options):
     """
@@ -81,25 +81,25 @@ def startup(*filename, **options):
     win = window.Window(ed.buf, frame_top, windows_h, ncols) # one big window
     windows.append(win) 
     win_i = 0 # Now win == windows[win_i]
-    display_frame()
+    render_frame()
 
-# command names used in maintain_window_data and update_display
+# command names used in adjust_segments and update_display
 ed.cmd_name = '' 
 
-def maintain_window_data():
+def adjust_segments():
     """
-    Maintain consistency in window data after buffer contents change.
-    In each window w into the same buffer as the current window win,
-    update w.dot so it indicates the same line as before,
-    even when its line number changes due to deletes/inserts above.
-    Also adjust w.seg_1 w.seg_n by the same amount, to indicate same segment.
+    Adust each w.dot .seg_1 .seg_n so that same lines remain at same
+     positions in window even when line numbers change due to deletes
+     or inserts above.
+    Shift each window's segment (lines defined by .dot .seg_1 .seg_n)
+     by computing and adding a constant nshift to all three.
     """
     # Why is this code is so much more complicated than maintaining marks in ed.py?
     # Within ed.py, all of these commands are combinations of just insert i and delete d.
     # ed.py updates buffer immediately for each i and/or d step in each command.
     # But in our design ed.py has no access to display data structures.
     # edsel.py can only observe effects of ed.py command after ed.py has executed it,
-    # must infer i and/or d for each command from ed.cmd_name .start .end and buf.nmoved.
+    # must infer i and/or d for each command from ed.cmd_name .start .end and buf.ninserted.
     for w in windows:
         # adjust dot etc. in other windows into current buffer
         if (w != win and w.buf == win.buf):
@@ -107,40 +107,40 @@ def maintain_window_data():
             nshift = 0 # default: don't move w.dot etc.
             if ed.cmd_name in 'aiyr': # insert commands (not including c)
                 if ed.start <= w.dot:
-                    nshift = w.buf.nmoved
+                    nshift = w.buf.ninserted
             elif ed.cmd_name == 't': # transfer (copy)
                 if ed.dest < w.dot:
-                    nshift = w.buf.nmoved
+                    nshift = w.buf.ninserted
             elif ed.cmd_name in 'dc': # delete or change (replace), del then insert
                 # c command: first ed.do_command() calls buf.d, the rest call buf.a
                 #  but ed.cmd_name is 'c' until final . exits insert mode
                 # This code will not work for c() in API.
                 if ed.start < w.dot and ed.end < w.dot: # del or change before w.dot
-                    nshift = w.buf.nmoved # nmoved here might be negative
+                    nshift = w.buf.ninserted # ninserted here might be negative
                 elif ed.start <= w.dot <= ed.end: # change segment includes w.dot
                     # w.dot = w.buf.dot
                     nshift = w.buf.dot - w.dot # so w.dot + nshift == w.buf.dot
             elif ed.cmd_name == 'm': # move, delete then yank
                 # segment follows dot, after move precedes dot
                 if ed.start > w.dot > ed.dest:
-                    nshift = w.buf.nmoved
+                    nshift = w.buf.ninserted
 		# segment precedes dot, after move follows dot
                 elif ed.start < w.dot < ed.dest and ed.end < w.dot:
-                    nshift = -w.buf.nmoved # nmoved is positive, but move dot up
+                    nshift = -w.buf.ninserted # ninserted is positive, but move dot up
 	        # dot lies within segment, moves along with segment
                 elif ed.start <= w.dot <= ed.end:
                     if ed.dest >= w.dot:  # destination follows w.dot
-                        # w.dot = (ed.dest - w.buf.nmoved) + (w.dot - ed.start) + 1
-                        nshift = (ed.dest - w.buf.nmoved) - ed.start + 1
+                        # w.dot = (ed.dest - w.buf.ninserted) + (w.dot - ed.start) + 1
+                        nshift = (ed.dest - w.buf.ninserted) - ed.start + 1
                     else: # destination precedes w.dot
                         # w.dot = ed.dest + (w.dot - ed.start) + 1
                         nshift = ed.dest - ed.start + 1
             # else: don't adjust w.dot etc., recall we set nshift = 0 at the top
             w.shift(nshift)
             # In insert mode, this DEBUG print appears in window, is rapidly overwritten
-            #print('w %s  start %s  end %s  dest %s  nmoved %s  dot0 %s  dot %s' %
-            #     (w, ed.start, ed.end, ed.dest, w.buf.nmoved, dot0, w.dot)) # DEBUG
-    win.buf.nmoved = 0 # FIXME? Put this in cmd with clear_flags ?
+            #print('w %s  start %s  end %s  dest %s  ninserted %s  dot0 %s  dot %s' %
+            #     (w, ed.start, ed.end, ed.dest, w.buf.ninserted, dot0, w.dot)) # DEBUG
+    win.buf.ninserted = 0 # FIXME? Put this in cmd with clear_flags ?
 
 # command names used in update_display
 o_cmd = '' # also ed.cmd_name, initialized above
@@ -156,25 +156,25 @@ cmd_h0 = win0 = None
 def update_display():
     'Check for any needed display updates.  If there are any, do them.'
     win.dot = win.buf.dot # dot may or may not have changed, update anyway
-    win.locate_dot() # assign new dot_i, only in current winow
+    win.find_dot() # FIXME?  Is this redundant here?  Called again later on all paths?
     segment_moved = (ed.cmd_name in file_cmds + buffer_cmds
                      or win.dot_elsewhere() 
                      or o_cmd in ('o1','o2')) # set single window or split
     # frame changed, update all windows and marker
     if cmd_h != cmd_h0:
-        update_frame()  # calls display_frame, which calls update_windows
+        update_frame()  # calls render_frame, which calls update_windows
 
     # set other window
     elif o_cmd == 'o': 
         # move marker to new current window, don't update window content
-        win0.locate_dot()
+        win0.find_dot()
         win0.erase_marker()
-        win.display_marker()
+        win.render_marker()
 
     # update current window contents, maybe other windows too
     elif segment_moved or ed.cmd_name in text_cmds:
         if segment_moved:
-            win.locate_segment_top()
+            win.position_seg_top()
         win.update(open_line=(not ed.command_mode)) # open line in insert mode
         if o_cmd == 'o2': # split window
             # win0 is former current window
@@ -182,25 +182,25 @@ def update_display():
             # win.resize in o2 command code does not relocate win0 marker
             if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
                 win0.erase_marker()
-                win0.locate_segment_top() # necessary?
+                win0.position_seg_top() # necessary?
             win0.update()
         else:  # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
                     # might update even when lines in w unchanged
-                    # win0.locate_segment_top() # necessary?
+                    # win0.position_seg_top() # necessary?
                     w.update()
         # must draw marker or cursor last
         if ed.command_mode:
-            win.display_marker() # indicates dot in window
+            win.render_marker() # indicates dot in window
         else: 
             win.put_insert_cursor() # term. insert cursor at open line
 
     # update marker only in current window, don't update window content
     elif win.dot_moved():
         win.erase_marker()
-        win.display_marker()
-        win.display_status()
+        win.render_marker()
+        win.render_status()
 
     # some commands do not affect windows or status line: A k n w ... 
 
@@ -270,7 +270,7 @@ def do_command(line):
             ed.do_command(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
-        maintain_window_data() 
+        adjust_segments() # shift to adjust for insert/delete
         update_display() # contains all update logic, may do nothing
     except BaseException as e:
         cleanup() # so we can see entire traceback 
@@ -280,7 +280,7 @@ def do_command(line):
 # Configure ed (imported above) to work with edsel
 # Suppress printing ed l z command output to scrolling command region
 ed.print_lz_destination = open(os.devnull, 'w') # discard output
-# In ed x command use edsel.cmd in this module that calls update_display
+# In ed x command use edsel do_command in this module that calls update_display
 ed.x_cmd_fcn = do_command
 
 def main(*filename, **options):

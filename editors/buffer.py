@@ -52,8 +52,12 @@ class Buffer(object):
         # for example the buffer of deleted lines used by the yank method
         self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
-        self.nmoved = 0 # signed number of most recently inserted or deleted lines,
+        self.ninserted = 0 # signed number of most recently inserted or deleted lines,
                         # positive for insertion, negative for deletion
+
+    def empty(self):
+        'True when buffer is empty (not couting empty line at index 0)'
+        return self.dot == 0
 
     def info(self):
         'return string with unsaved flag, buffer name, size in lines, filename'
@@ -132,13 +136,13 @@ class Buffer(object):
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
-        self.nmoved = len(lines)
-        self.dot = iline + self.nmoved - 1
+        self.ninserted = len(lines)
+        self.dot = iline + self.ninserted - 1
         self.unsaved = True # usually the right thing but ed.B and E override it.
         # adjust line numbers for marks below the insertion point
         for c in self.mark:
             if self.mark[c] >= iline:
-                self.mark[c] += self.nmoved
+                self.mark[c] += self.ninserted
 
     # files
 
@@ -187,7 +191,7 @@ class Buffer(object):
         """Delete text from start up through end, 
         set dot to first line after deletes or last line in buffer"""
         self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
-        self.nmoved = -len(self.caller.deleted) # nlines is negative here!
+        self.ninserted = -len(self.caller.deleted) # ninserted is negative here!
         self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -203,16 +207,16 @@ class Buffer(object):
                 self.caller.deleted_mark[c] = self.mark[c]-start+1
             else:
                 # adjust marks below deleted lines
-                markc = self.mark[c]              # here nlines is negative
-                new_mark[c] = markc if markc < end else markc + self.nmoved
+                markc = self.mark[c]              # here ninserted is negative
+                new_mark[c] = markc if markc < end else markc + self.ninserted
         self.mark = new_mark
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string'
         self.d(start,end)
-        ndeleted = self.nmoved # negative number 
+        ndeleted = self.ninserted # negative number 
         self.i(start,string) # original start is now insertion point
-        self.nmoved = self.nmoved + ndeleted # positive or negative
+        self.ninserted = self.ninserted + ndeleted # positive or negative
 
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
@@ -241,4 +245,4 @@ class Buffer(object):
         'move lines to after destination line'
         self.d(start, end)
         self.y(dest+1 if dest < start else dest+1-(end-start+1))
-        # y assigns positive nlines, same magnitude as d neg. nlines
+        # y assigns positive ninserted, same magnitude as d neg. ninserted

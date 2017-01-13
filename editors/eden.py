@@ -41,6 +41,10 @@ console = con.Console(prompt=':', do_command=do_command,
                       stopped=(lambda command: edsel.ed.quit),
                       mode=(lambda: edsel.ed.command_mode))
 
+# In ed x command use eden do_command here that calls edsel.do_command 
+#  which calls edsel.update_display
+edsel.ed.x_cmd_fcn = do_command
+
 def main():
     edsel.ed.quit = False # previous quit might have set it True
     edsel.startup(c=12) # 12 lines in scrolling command region

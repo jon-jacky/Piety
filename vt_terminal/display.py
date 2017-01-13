@@ -72,7 +72,7 @@ def move_to_column(column):
 
 # used by edsel and window, they also use render (above)
 
-def erase_display(): # name in gnu readline
+def erase(): # erase_display in gnu readline
     putstr(ed)
 
 def put_cursor(line, column):      # not in emacs or gnu readline
