@@ -35,7 +35,7 @@ def calc_frame():
 def update_windows():
     'Redraw all windows, called by render_frame, for example after frame resize.'
     for w in windows:
-        w.position_seg_top() # necessary if window(s) resized
+        w.position_segment() # necessary if window(s) resized
         w.update()  # no windows could be in insert mode at this time
 
 def put_command_cursor():
@@ -57,10 +57,10 @@ def update_frame():
     # Makes all windows (almost) the same height, unlike after o2 command
     calc_frame() # recalculate global cmd_1 cmd_n windows_h
     nwindows = len(windows)
-    win_h0 = windows_h // nwindows # integer division
+    win_hdiv = windows_h // nwindows # integer division
     for iwin, win in enumerate(windows):
-        win_h = win_h0 if iwin < nwindows-1 else windows_h - (nwindows-1)*win_h0
-        win.resize(frame_top + iwin*win_h0, win_h, ncols)
+        win_h = win_hdiv if iwin < nwindows-1 else windows_h - (nwindows-1)*win_hdiv
+        win.resize(frame_top + iwin*win_hdiv, win_h, ncols)
     render_frame()
 
 def startup(*filename, **options):
@@ -174,7 +174,7 @@ def update_display():
     # update current window contents, maybe other windows too
     elif segment_moved or ed.cmd_name in text_cmds:
         if segment_moved:
-            win.position_seg_top()
+            win.position_segment()
         win.update(open_line=(not ed.command_mode)) # open line in insert mode
         if o_cmd == 'o2': # split window
             # win0 is former current window
@@ -182,13 +182,13 @@ def update_display():
             # win.resize in o2 command code does not relocate win0 marker
             if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
                 win0.erase_marker()
-                win0.position_seg_top() # necessary?
+                win0.position_segment() # necessary?
             win0.update()
         else:  # other non-current windows might show part of same buffer
             for w in windows:
                 if (w != win and w.buf == win.buf):
                     # might update even when lines in w unchanged
-                    # win0.position_seg_top() # necessary?
+                    # win0.position_segment() # necessary?
                     w.update()
         # must draw marker or cursor last
         if ed.command_mode:

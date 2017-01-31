@@ -101,7 +101,7 @@ class Window(object):
         self.seg_1 = clip(self.seg_1 + nlines, 1, last)
         self.seg_n = clip(self.seg_n + nlines,  1, last)
 
-    def position_seg_top(self):
+    def position_segment(self):
         """
         Compute top of segment of buffer that is visible in window.
         Assign self.seg_1: index in buffer of first line shown in window.
@@ -116,11 +116,11 @@ class Window(object):
         else: # dot is centered in window
             self.seg_1 = self.dot - self.win_hl//2 # floor division
 
-    def find_seg_end(self):
+    def find_end(self):
         """
         Compute bottom of segment of buffer that is visible in window.
         Assign self.seg_n: index in buffer of last line shown in window.
-        Depends on self.seg_1 computed in position_seg_top (above), call that first
+        Depends on self.seg_1 computed in position_segment (above), call that first
          also depends on height self.win_hl, and possibly line address self.buf.S()
         Center window on dot if possible,otherwise show top or bottom of buffer
         """
@@ -136,7 +136,7 @@ class Window(object):
         Compute location of dot (the current line) in window.
         Assign self.dot_i: line number on display where self.dot appears
          if it is visible, otherwise assign to self.dot_i to 0.
-        Depends on self.seg_1 computed in position_seg_top (above), call that first.
+        Depends on self.seg_1 computed in position_segment (above), call that first.
         Also uses line address in buffer self.dot, 
          window location on display self.win_1, window height self.win_hl
         Also update self.marker_ch, the marker character,
@@ -250,8 +250,8 @@ class Window(object):
         Position and render window contents including text and status line,
         but NOT its marker or cursor.
         """
-        # do not call position_seg_top() here, can cause distracting jumps
-        self.find_seg_end()
+        # do not call position_segment() here, can cause distracting jumps
+        self.find_end()
         self.find_dot() 
         self.render_segment(open_line)
         self.render_status()

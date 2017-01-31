@@ -1,4 +1,4 @@
-# change1.edsel - c above, below, at w.dot, add one line at each change
+# change1.edsel - c above, below, at w.dot, add two lines at each change
 E lines.txt
 o2
 o

@@ -10,10 +10,13 @@ ANSI control sequences, Best explanation at:
  http://www.inwap.com/pdp10/ansicode.txt.  
  especially section "Minimum requirements for VT100 emulation"
 See also:
+ http://vt100.net/
  http://en.wikipedia.org/wiki/ANSI_escape_code
- http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+ https://en.wikipedia.org/wiki/C0_and_C1_control_codes
+ http://invisible-island.net/xterm/ctlseqs/ctlseqs.html (also dirs above)
 This page says 'Line and column numbers start at 1':
  http://www.umich.edu/~archive/apple2/misc/programmers/vt100.codes.txt
+
 """
 
 # ASCII codes for control characters
