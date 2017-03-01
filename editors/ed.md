@@ -15,6 +15,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 **ed.py** provides the command line and internals for the display editor
   [edsel](edsel.md).
 
+**ed.py** has no dependencies.
 
 ## Running ed.py ##
 
@@ -138,6 +139,76 @@ Python statements without leaving *ed* command mode.  For example, you
 can use this to change the command prompt at any time during an editing session:
 *!ed.prompt = ':'*
 
+## Limitations and differences from classic ed ##
+
+**ed.py** does not support these classic *ed* commands: 
+*H h j n P Q u wq W x*.  Some of these might be supported in the
+future.
+
+**ed.py** supports the *sam* command *n* (print list of buffers),
+not the classic *ed* command *n* (print line numbers).
+
+**ed.py** supports a new command *x* (execute *ed* commands in buffer)
+instead of the classic *ed* command *x* (prompt for encryption key).
+
+**ed.py** does not support the classic *ed* *p* command suffix (for
+printing the current line after any command).
+
+**ed.py** does not support the classic *ed* iteration commands *g G v V*.
+
+**ed.py** does not warn about the quit command *q* when there are
+unsaved buffers, because the session with all its buffers can be
+resumed by calling *ed.main()* at the Python interpreter prompt again.
+
+**ed.py** always prints the error message following the *?* character.
+There is no way to suppress printing the error messages as in classic
+*ed*.
+
+In the *s* (substitute) command and in the */text/* and *?text?*
+address forms, the text pattern is ordinary text, not a regular
+expression.  Regular expressions might be supported in the future.
+
+In the */text/* and *?text?* address forms, **ed.py** only searches
+forward to the end of the buffer (or backward to the beginning). It
+does not wrap around and continue searching from the beginning (or
+end).
+
+The *B* (and *D*) commands accept only one file (or buffer) name argument, 
+not multiple names as in *sam*.
+
+In *!command*, the *command* is passed to the Python interpreter, not
+to the system command shell as in classic *ed*.  
+
+## Commands not present in classic ed ##
+
+The *x* and *X* commands execute *ed* commands or Python statements 
+from an editor buffer, to support scripting and testing.
+
+The *x* command requires the buffer name parameter, it cannot execute
+*ed* commands in the current buffer.  It ignores any line address
+arguments; it always executes the entire buffer.  The *X* command has
+no buffer name parameter; it always executes Python statements in the current
+buffer.  It only executes the statements specified by the line address
+arguments, which, if absent, default to the current line (called
+*dot*).  Both *x* and *X* take optional parameters echo (boolean) and
+delay (float), which are helpful for visualizing execution.  With *x*
+the defaults are echo *True* and delay 0.2 sec, with *X* defaults are
+*False* and no delay.
+
+The *y* (yank) command inserts the lines most recently deleted by the
+*d* command (possibly from a different buffer).  A *d* command
+followed by one or two *y* commands can achieve the effect of the
+classic *ed* *m* (move) or *t* (transfer, or copy) commands, and can
+also move lines to another buffer.
+
+The *#* character in the first column of a command indicates a comment.  It is
+useful for annotating command scripts.
+
+In the *b* and *x* commands, the buffer name parameter can be abbreviated 
+by providing a prefix followed by a hyphen.  For example, the command *b key-*
+might switch to the buffer *keyboard.py*.  If more than one buffer name begins
+with the same prefix, *ed.py* just chooses one.
+
 ## API ##
 
 **ed.py** has a Python API so you can edit from the Python prompt or
@@ -207,6 +278,7 @@ blocking, and then passes that line to *ed.do_command*.
 Python API described above, including command line parsing, argument
 checking, and error messages.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
+
 **ed.py** imports *[buffer.py](buffer.py)*, which provides the *Buffer* class,
 which defines the core data structure and the internal API for
 updating it.  Many *Buffer* methods correspond to functions in the
@@ -222,75 +294,11 @@ an *update* attribute which can optionally be assigned to a callable
 that may be used by the *write* method to update a display (for
 example).
 
-## Limitations and differences from classic ed ##
+**ed.py** also imports *[pysh.py](../shells/pysh.py)*, which provides a
+callable Python interpreter used by the *!* command.  
 
-**ed.py** does not support these classic *ed* commands: 
-*H h j n P Q u wq W x*.  Some of these might be supported in the
-future.
+The *buffer* and *pysh* modules are included here.  Other than Python
+itself, *ed.py* has no dependencies.
 
-**ed.py** supports the *sam* command *n* (print list of buffers),
-not the classic *ed* command *n* (print line numbers).
+Revised February 2017
 
-**ed.py** supports a new command *x* (execute *ed* commands in buffer)
-instead of the classic *ed* command *x* (prompt for encryption key).
-
-**ed.py** does not support the classic *ed* *p* command suffix (for
-printing the current line after any command).
-
-**ed.py** does not support the classic *ed* iteration commands *g G v V*.
-
-**ed.py** does not warn about the quit command *q* when there are
-unsaved buffers, because the session with all its buffers can be
-resumed by calling *ed.main()* at the Python interpreter prompt again.
-
-**ed.py** always prints the error message following the *?* character.
-There is no way to suppress printing the error messages as in classic
-*ed*.
-
-In the *s* (substitute) command and in the */text/* and *?text?*
-address forms, the text pattern is ordinary text, not a regular
-expression.  Regular expressions might be supported in the future.
-
-In the */text/* and *?text?* address forms, **ed.py** only searches
-forward to the end of the buffer (or backward to the beginning). It
-does not wrap around and continue searching from the beginning (or
-end).
-
-The *B* (and *D*) commands accept only one file (or buffer) name argument, 
-not multiple names as in *sam*.
-
-In *!command*, the *command* is passed to the Python interpreter, not
-to the system command shell as in classic *ed*.  
-
-
-## Commands not present in classic ed ##
-
-The *x* and *X* commands execute *ed* commands or Python statements 
-from an editor buffer, to support scripting and testing.
-
-The *x* command requires the buffer name parameter, it cannot execute
-*ed* commands in the current buffer.  It ignores any line address
-arguments; it always executes the entire buffer.  The *X* command has
-no buffer name parameter; it always executes Python statements in the current
-buffer.  It only executes the statements specified by the line address
-arguments, which, if absent, default to the current line (called
-*dot*).  Both *x* and *X* take optional parameters echo (boolean) and
-delay (float), which are helpful for visualizing execution.  With *x*
-the defaults are echo *True* and delay 0.2 sec, with *X* defaults are
-*False* and no delay.
-
-The *y* (yank) command inserts the lines most recently deleted by the
-*d* command (possibly from a different buffer).  A *d* command
-followed by one or two *y* commands can achieve the effect of the
-classic *ed* *m* (move) or *t* (transfer, or copy) commands, and can
-also move lines to another buffer.
-
-The *#* character in the first column of a command indicates a comment.  It is
-useful for annotating command scripts.
-
-In the *b* and *x* commands, the buffer name parameter can be abbreviated 
-by providing a prefix followed by a hyphen.  For example, the command *b key-*
-might switch to the buffer *keyboard.py*.  If more than one buffer name begins
-with the same prefix, *ed.py* just chooses one.
-
-Revised May 2016

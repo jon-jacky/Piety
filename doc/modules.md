@@ -92,4 +92,11 @@ design attempts to minimize dependencies among modules.
 - None of the Piety operating system modules or applications depend on any
   contents of the *scripts* directory.
 
-Revised June 2015
+The Piety system itself has no dependencies, other than Python itself.
+This makes Piety a minimal self-contained system, written in a uniform
+style throughout.  Alternatively, it might be possible to assemble
+similar functionality from [other projects](utilities.md), but we
+expect the resulting system would be larger and harder to understand
+than Piety.
+
+Revised February 2017
