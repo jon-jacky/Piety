@@ -10,7 +10,7 @@ eden
   When you type the classic *ed* *c* (change) command without address
   arguments, *eden* puts the cursor at the beginning of the line at
   dot.  You can then move the cursor and edit within that line as
-  described [here](../console/command.txt), and add
+  described [here](../console/console.txt), and add
   text anywhere within that line just by typing.  When you are 
   finished editing that line, simply type RETURN to return to 
   command mode.
@@ -19,4 +19,5 @@ eden
   as in classic *ed*.  In particular, *.c* (*dot* *c*) deletes and
   then replaces the single line at dot.
 
-Revised November 2016
+Revised February 2017
+

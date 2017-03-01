@@ -294,7 +294,7 @@ an *update* attribute which can optionally be assigned to a callable
 that may be used by the *write* method to update a display (for
 example).
 
-**ed.py** also imports *[pysh.py](../shells/pysh.py)*, which provides a
+**ed.py** also imports *[pysh.py](../shell/pysh.py)*, which provides a
 callable Python interpreter used by the *!* command.  
 
 The *buffer* and *pysh* modules are included here.  Other than Python

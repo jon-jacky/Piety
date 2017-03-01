@@ -9,7 +9,7 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and
 
 - **ed.md**: description of *ed.py*
 
-- **ed.py**: line editor inspired by the classic Unix editor *ed*
+- **ed.py**: line editor inspired by the classic Unix editor *ed*.
   Uses Python *input* to collect and edit command lines and inserted
   text lines.
 
@@ -46,5 +46,4 @@ Text editors, including a line editor inspired by the classic *Unix ed*, and
 
 - **window.py**: defines Window class used by *edsel.py*
 
-Revised November 2016
-
+Revised February 2017
