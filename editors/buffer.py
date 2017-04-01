@@ -32,10 +32,44 @@ a display (for example).
 """
 
 import os.path
+from enum import Enum
+from collections import namedtuple, deque
+
+class Op(Enum):
+    'Generic editing operations named independently of editor commands'
+    # insert, delete etc. apply to ranges of lines in the buffer
+    insert = 1  # Buffer methods: insert, also via ed a i r t y but not c
+    delete = 2  # ed d, also via ed c command
+    move = 3    # ed m
+    replace = 4 # ed c s
+    locate = 5    # ed l
+    # create, destroy etc. apply to entire buffer 
+    create = 6
+    destroy = 7
+    switch = 8
+    # window operations, placeholder, add more later
+    window = 9
+
+Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])
+
+def update(op, buffer=None, start=0, end=0, dest=0, nlines=0):
+    'Create an Update record and append it to the Buffer.updates queue'
+    # op is the only required (positional) argument,
+    # default buffer=None indicates current buffer 
+    Buffer.updates.append(Update(op, buffer=buffer, start=start,end=end,dest=dest,
+                                 nlines=nlines))
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and metadata'
-    def __init__(self, name, update=None, caller=None):
+
+    # assigned by d(elete) in current buffer, may be used by y(ank) in another
+    deleted = list() # most recently deleted lines from any buffer, for yank
+    deleted_mark = list() # markers for deleted lines, for yank command
+
+    # assigned by buffer operations that might call for display updates etc.
+    updates = deque()
+
+    def __init__(self, name): # , update=None): # now use head of Buffer.updates
         'New text buffer'
         self.name = name
         # Buffer always contains empty line at index 0, never used or printed
@@ -45,15 +79,12 @@ class Buffer(object):
         self.unsaved = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
         self.npage = 22 # page length used, optionally set by z scroll command
-        self.end_phase = False # used by write method, see explanation below
-        self.update = update # call from write method to update display
-        # caller is the module which created this Buffer instance
-        # used for referencing data that must be global to all buffers
-        # for example the buffer of deleted lines used by the yank method
-        self.caller = caller 
         self.mark = dict() # dict from mark char to line number, for 'c addresses
-        self.ninserted = 0 # signed number of most recently inserted or deleted lines,
-                        # positive for insertion, negative for deletion
+
+        # Used by write method
+        self.end_phase = False # state variable needed for control
+        #self.update = update # call from write method to update display
+        #               # FIXME unnecessary, use head of Buffer.updates queue
 
     def empty(self):
         'True when buffer is empty (not couting empty line at index 0)'
@@ -64,10 +95,9 @@ class Buffer(object):
         return ((' * ' if self.unsaved else '   ') +  # reserve col 1 for readonly flag
                 '%-15s' % self.name + '%7d' % self.S() + '  %s' % self.filename)
 
-    # For other programs (besides editors) to write into buffers
-
-    # The call print(s, file=buffer), invokes this code to write s to buffer
-    # Experiments show that this Python print calls Buffer write *twice*,
+    # write method for other programs (besides editors) to write into buffers
+    # The call print(s, file=buffer), invokes this method to write s to buffer
+    # Experiments show that this Python print calls this write method twice,
     # first write for the contents s, second write for end string
     # even when end string is default \n or empty ''     
     # So here we alternate reading contents and discarding end string
@@ -79,8 +109,8 @@ class Buffer(object):
             # ignore the end string, ed0 buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
             self.a(self.dot, self.contents) # append command, advances dot
-            if self.update:
-                self.update()
+            #if self.update: # FIXME unnecessary, use Buffer.updates instead
+            #   self.update()
         else:
             # store contents string until we get end string
             self.contents = s
@@ -130,19 +160,20 @@ class Buffer(object):
         return line number where found, self.dot if not found"""
         return self.search(pattern, False)
 
-    # helpers for r(ead), a(ppend), i(nsert), c(hange)
+    # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert(self, iline, lines):
+    def insert(self, iline, lines): 
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
-        self.ninserted = len(lines)
-        self.dot = iline + self.ninserted - 1
+        nlines = len(lines)
+        self.dot = iline + nlines - 1
         self.unsaved = True # usually the right thing but ed.B and E override it.
         # adjust line numbers for marks below the insertion point
         for c in self.mark:
             if self.mark[c] >= iline:
-                self.mark[c] += self.ninserted
+                self.mark[c] += nlines
+        update(Op.insert, start=iline, nlines=nlines)
 
     # files
 
@@ -171,6 +202,7 @@ class Buffer(object):
     def l(self, iline):
         'Advance dot to iline and return it (so caller can print it)'
         self.dot = iline
+        update(Op.locate, start=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -179,7 +211,7 @@ class Buffer(object):
         'Append lines from string after iline, update dot to last appended line'
         # string is one big str with linebreaks indicated by embedded \n
         # splitlines(True) breaks at \n to make list of strings
-        # keepends True arg keeps each trailing \n, same conventn as fd.readlines()
+        # keepends True arg keeps each trailing \n, same convntn as fd.readlines()
         self.insert(iline+1, string.splitlines(True))
 
     def i(self, iline, string):
@@ -188,61 +220,70 @@ class Buffer(object):
         self.insert(iline if iline else iline+1, string.splitlines(True))
 
     def d(self, start, end):
-        """Delete text from start up through end, 
-        set dot to first line after deletes or last line in buffer"""
-        self.caller.deleted = self.lines[start:end+1] # save deleted lines for yank later
-        self.ninserted = -len(self.caller.deleted) # ninserted is negative here!
-        self.lines[start:end+1] = [] # classic ed range is inclusive, unlike Python
+        'Delete text from start up through end.'
+        self.lines[start:end+1] = [] # ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
             # first line after deletes, or last line in buffer
             self.dot = min(start,self.S()) # S() if we deleted end of buffer
         else:
             self.dot = 0
+        Buffer.deleted = self.lines[start:end+1] # save deleted lines for yank
         # new_mark needed because we can't remove items from dict as we iterate
         new_mark = dict() # new_mark is self.mark without marks at deleted lines
-        self.caller.deleted_mark = dict() 
+        Buffer.deleted_mark = dict() 
         for c in self.mark: 
             if (start <= self.mark[c] <= end): # save marks from deleted lines
-                self.caller.deleted_mark[c] = self.mark[c]-start+1
+                Buffer.deleted_mark[c] = self.mark[c]-start+1
             else:
                 # adjust marks below deleted lines
-                markc = self.mark[c]              # here ninserted is negative
-                new_mark[c] = markc if markc < end else markc + self.ninserted
+                markc = self.mark[c]
+                new_mark[c] = markc - self.nlines if markc >= end else markc
         self.mark = new_mark
+        update(Op.delete, start=start, end=end, nlines=len(Buffer.deleted))
 
     def c(self, start, end, string):
-        'Change (replace) lines from start up to end with lines from string'
+        'Change (replace) lines from start up to end with lines from string.'
+        # ed (and also edsel) call d(elete) when command is 'c'
+        # then handle new lines as later a(ppend) commands ...
         self.d(start,end)
-        ndeleted = self.ninserted # negative number 
-        self.i(start,string) # original start is now insertion point
-        self.ninserted = self.ninserted + ndeleted # positive or negative
+        # ...but API does handle string argument.  
+        self.i(start,string) # This i calls string.splitlines(True)
+        # overide op start end nlines that were assigned by d() and i()
+        update(Op.replace, start=start, end=end,
+               nlines = len(string.splitlines(True)))
 
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,
         otherwise substitute only the first occurrence in each line."""
-        for i in range(start,end+1): # classic ed range is inclusive, unlike Python
+        for i in range(start,end+1): # ed range is inclusive, unlike Python
             if old in self.lines[i]: # test to see if we should advance dot
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
+        update(Op.replace, start=start, end=end, nlines=(end-start)+1)
 
     def y(self, iline):
-        'Insert most recently deleted lines *before* iline, update dot to last inserted line'
+        'Insert most recently deleted lines before iline.'
         # based on def i ... above
-        self.insert(iline if iline > 0 else iline+1, self.caller.deleted)
+        self.insert(iline if iline > 0 else iline+1, Buffer.deleted)
         # restore marks, if any
-        for c in self.caller.deleted_mark:
+        for c in Buffer.deleted_mark:
             if c not in self.mark: # do not replace existing marks
-                self.mark[c] = self.caller.deleted_mark[c]+iline-1
+                self.mark[c] = Buffer.deleted_mark[c]+iline-1
 
     def t(self, start, end, dest):
-        'transfer (copy) lines to after destination line'
-        self.insert(dest+1, self.lines[start:end+1])
-        
+        'Transfer (copy) lines to after destination line.'
+        self.insert(dest+1, self.lines[start:end+1]) 
+
     def m(self, start, end, dest):
-        'move lines to after destination line'
+        'Move lines to after destination line.'
         self.d(start, end)
-        self.y(dest+1 if dest < start else dest+1-(end-start+1))
-        # y assigns positive ninserted, same magnitude as d neg. ninserted
+        nlines = (end-start) + 1
+        dest = (dest+1) - nlines if start < dest else dest+1 
+        self.y(self.dest) # d then y maintain self.mark
+        # must override op start end assigned by y()
+        # start, end refer to origin *before* move
+        # dest refers to destination *after* move
+        update(Op.move, start=start, end=end, dest=dest, nlines=nlines)

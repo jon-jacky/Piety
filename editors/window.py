@@ -4,8 +4,8 @@ window.py - Window class for line-oriented display editors.
 Each window instance displays a range of lines from a text buffer.
 """
 
-import display
 from datetime import datetime # for timestamp, used for testing
+import display, buffer
 
 def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
@@ -90,17 +90,6 @@ class Window(object):
 
     # assign segment position: self.seg_1 seg_n dot_i 
 
-    def shift(self, nlines):
-        """
-        Move segment of buffer displayed in window by nlines (pos or neg).
-        Assign self.seg_1 self.seg_n self.dot
-        Typically used to keep same text in window when lines added/deleted above.
-        """
-        last = self.buf.S()
-        self.dot = clip(self.dot + nlines, 1, last)
-        self.seg_1 = clip(self.seg_1 + nlines, 1, last)
-        self.seg_n = clip(self.seg_n + nlines,  1, last)
-
     def position_segment(self):
         """
         Compute top of segment of buffer that is visible in window.
@@ -155,6 +144,45 @@ class Window(object):
             # self.marker_chx ensures marker on space or empty line is visible.
             self.marker_chx = (' ' if self.marker_ch in ('',' ','\n') 
                                else self.marker_ch)
+
+    def shift(self, nlines):
+        """
+        Move segment of buffer displayed in window by nlines (pos or neg).
+        Assign self.seg_1 self.seg_n self.dot
+        Typically used to keep same text in window when lines added/deleted above.
+        """
+        last = self.buf.S()
+        self.dot = clip(self.dot + nlines, 1, last)
+        self.seg_1 = clip(self.seg_1 + nlines, 1, last)
+        self.seg_n = clip(self.seg_n + nlines,  1, last)
+
+    def adjust_insert(self, update):
+        'Used by adjust_segment, below'
+        if self.dot >= update.start:
+            self.shift(update.nlines)
+
+    def adjust_delete(self, update):
+        'Used by adjust_segment, below'
+        if update.start <= self.dot <= update.end:
+            self.shift(self.buf.dot - self.dot) # so dot + shift == bufdot
+        elif self.dot >= update.start and self.dot >= update.end:
+            self.shift(-update.nlines)
+ 
+    def adjust_segment(self, update):
+        """
+        Adust self.dot .seg_1 .seg_n so that same lines remain at same
+        positions in window even when line numbers change due to deletes
+        or inserts above.  Compare to management of mark in Buffer.
+        """
+        if update.op == buffer.Op.insert:
+            self.adjust_insert(update)
+        elif update.op == buffer.Op.delete:
+            self.adjust_delete(update)
+        elif update.op == buffer.Op.move:
+            self.adjust_delete(update)
+            update_dest = Update(op=buffer.Op.insert, start=update.dest)
+            self.adjust_insert(update_dest)
+        # FIXME? more cases, buffer.Op.replace for s(ubst) etc. ...
 
     # display (parts of) window
 

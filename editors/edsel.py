@@ -83,69 +83,24 @@ def startup(*filename, **options):
     win_i = 0 # Now win == windows[win_i]
     render_frame()
 
-# command names used in adjust_segments and update_display
-ed.cmd_name = '' 
-
-def adjust_segments():
+def adjust_segments(update):
     """
     Adust each w.dot .seg_1 .seg_n so that same lines remain at same
      positions in window even when line numbers change due to deletes
      or inserts above.
-    Shift each window's segment (lines defined by .dot .seg_1 .seg_n)
-     by computing and adding a constant nshift to all three.
     """
-    # Why is this code is so much more complicated than maintaining marks in ed.py?
-    # Within ed.py, all of these commands are combinations of just insert i and delete d.
-    # ed.py updates buffer immediately for each i and/or d step in each command.
-    # But in our design ed.py has no access to display data structures.
-    # edsel.py can only observe effects of ed.py command after ed.py has executed it,
-    # must infer i and/or d for each command from ed.cmd_name .start .end and buf.ninserted.
     for w in windows:
         # adjust dot etc. in other windows into current buffer
         if (w != win and w.buf == win.buf):
-            dot0 = w.dot # DEBUG - save initial value for print, below
-            nshift = 0 # default: don't move w.dot etc.
-            if ed.cmd_name in 'aiyr': # insert commands (not including c)
-                if ed.start <= w.dot:
-                    nshift = w.buf.ninserted
-            elif ed.cmd_name == 't': # transfer (copy)
-                if ed.dest < w.dot:
-                    nshift = w.buf.ninserted
-            elif ed.cmd_name in 'dc': # delete or change (replace), del then insert
-                # c command: first ed.do_command() calls buf.d, the rest call buf.a
-                #  but ed.cmd_name is 'c' until final . exits insert mode
-                # This code will not work for c() in API.
-                if ed.start < w.dot and ed.end < w.dot: # del or change before w.dot
-                    nshift = w.buf.ninserted # ninserted here might be negative
-                elif ed.start <= w.dot <= ed.end: # change segment includes w.dot
-                    # w.dot = w.buf.dot
-                    nshift = w.buf.dot - w.dot # so w.dot + nshift == w.buf.dot
-            elif ed.cmd_name == 'm': # move, delete then yank
-                # segment follows dot, after move precedes dot
-                if ed.start > w.dot > ed.dest:
-                    nshift = w.buf.ninserted
-		# segment precedes dot, after move follows dot
-                elif ed.start < w.dot < ed.dest and ed.end < w.dot:
-                    nshift = -w.buf.ninserted # ninserted is positive, but move dot up
-	        # dot lies within segment, moves along with segment
-                elif ed.start <= w.dot <= ed.end:
-                    if ed.dest >= w.dot:  # destination follows w.dot
-                        # w.dot = (ed.dest - w.buf.ninserted) + (w.dot - ed.start) + 1
-                        nshift = (ed.dest - w.buf.ninserted) - ed.start + 1
-                    else: # destination precedes w.dot
-                        # w.dot = ed.dest + (w.dot - ed.start) + 1
-                        nshift = ed.dest - ed.start + 1
-            # else: don't adjust w.dot etc., recall we set nshift = 0 at the top
-            w.shift(nshift)
-            # In insert mode, this DEBUG print appears in window, is rapidly overwritten
-            #print('w %s  start %s  end %s  dest %s  ninserted %s  dot0 %s  dot %s' %
-            #     (w, ed.start, ed.end, ed.dest, w.buf.ninserted, dot0, w.dot)) # DEBUG
-    win.buf.ninserted = 0 # FIXME? Put this in cmd with clear_flags ?
+            w.adjust_segment(update)
 
-# command names used in update_display
+# ed command names used in update_display - FIXME use Op
+ed.cmd_name = '' 
+
+# edsel command names used in update_display
 o_cmd = '' # also ed.cmd_name, initialized above
 
-# command name categories used in update_display
+# ed command name categories used in update_display - FIXME should use Op
 file_cmds = 'eEfB' # change file displayed in current window
 buffer_cmds = 'bB' # change buffer displayed in current window
 text_cmds = 'aicdsymtr' # change text displayed in current window
@@ -153,7 +108,7 @@ text_cmds = 'aicdsymtr' # change text displayed in current window
 # previous values used in update_display
 cmd_h0 = win0 = None
 
-def update_display():
+def update_display(update):  # FIXME - use contents of update, an Update record.
     'Check for any needed display updates.  If there are any, do them.'
     win.dot = win.buf.dot # dot may or may not have changed, update anyway
     win.find_dot() # FIXME?  Is this redundant here?  Called again later on all paths?
@@ -249,11 +204,11 @@ def o(line):
         win.dot = win.buf.dot # save
         win = window.Window(ed.buf, win_top, new_win_h, ncols) # new window
         windows.insert(win_i, win)
-
     # maybe more options later
     else:
         print('? integer 1 or 2 expected at %s' % param_string)
-
+    # FIXME force update, later this will replace o_cmd 
+    ed.buffer.update(ed.buffer.Op.window)
 
 def do_command(line):
     'Process one command line without blocking.'
@@ -270,8 +225,10 @@ def do_command(line):
             ed.do_command(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
-        adjust_segments() # shift to adjust for insert/delete
-        update_display() # contains all update logic, may do nothing
+        while ed.buffer.Buffer.updates: # process pending updates from all tasks
+            update = ed.buffer.Buffer.updates.popleft()
+            adjust_segments(update) # shift to adjust for insert/delete
+            update_display(update) # contains all update logic, may do nothing
     except BaseException as e:
         cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception

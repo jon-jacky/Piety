@@ -146,12 +146,8 @@ buffers = dict() # dict from buffer names (strings) to Buffer instances
 # There is always a current buffer so we can avoid check for special case
 # Start with one empty buffer named 'main', can't ever delete it
 current = 'main'
-buf = buffer.Buffer(current, caller=sys.modules[__name__]) # caller = this module  
+buf = buffer.Buffer(current)
 buffers[current] = buf 
-
-# assigned by d(elete) in current buffer, may be used by y(ank) in another buffer
-deleted = list() # most recently deleted lines from any buffer, for yank command
-deleted_mark = list() # markers for deleted lines, for yank command
 
 # line addresses
 
@@ -203,7 +199,7 @@ def current_filename(filename):
 def b_new(name):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer(name, caller=sys.modules[__name__]) # caller = this module
+    buf = buffer.Buffer(name)
     buffers[name] = buf # replace buffers[name] if it already exists
     current = name
 
@@ -218,9 +214,11 @@ def b(*args):
     if bufname in buffers:
         current = bufname
         buf = buffers[current]                 
+        buffer.update(buffer.Op.switch, buffer=buf)
     elif bufname:
         b_new(bufname)
         buf.filename = bufname
+        buffer.update(buffer.Op.create, buffer=buf)
     print('.' + buf.info()) # even if no bufname given
 
 def r_new(buffername, filename):
