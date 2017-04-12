@@ -311,7 +311,9 @@ def DD(*args):
     elif name == 'main':
         print("? Can't delete main buffer")
     else:
+        dbuf = buffers[name]
         del buffers[name]
+        buffer.update(buffer.Op.delete, buffer=dbuf)
         if name == current: # pick a new current buffer
             keys = list(buffers.keys())
             current = keys[0] if keys else None
@@ -640,6 +642,7 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
+            buffer.update(buffer.Op.command)
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line

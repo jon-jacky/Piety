@@ -38,17 +38,18 @@ from collections import namedtuple, deque
 class Op(Enum):
     'Generic editing operations named independently of editor commands'
     # insert, delete etc. apply to ranges of lines in the buffer
-    insert = 1  # Buffer methods: insert, also via ed a i r t y but not c
-    delete = 2  # ed d, also via ed c command
-    move = 3    # ed m
-    replace = 4 # ed c s
-    locate = 5    # ed l
+    # m(ove), c(hange)/replace are just d(elete) then i(nsert)
+    locate = 1  # ed l
+    insert = 2  # Buffer methods: insert, also via ed a i r t y but not c
+    delete = 3  # ed d, also via ed m c
+    mutate = 4  # ed s
     # create, destroy etc. apply to entire buffer 
-    create = 6
-    destroy = 7
-    switch = 8
-    # window operations, placeholder, add more later
-    window = 9
+    create = 5
+    destroy = 6
+    switch = 7
+    # window operations 
+    window = 8   # placeholder, add more specific values later
+    command = 9  # return to command mode after insert mode
 
 Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])
 
@@ -221,6 +222,7 @@ class Buffer(object):
 
     def d(self, start, end):
         'Delete text from start up through end.'
+        Buffer.deleted = self.lines[start:end+1] # save deleted lines for yank
         self.lines[start:end+1] = [] # ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -228,7 +230,6 @@ class Buffer(object):
             self.dot = min(start,self.S()) # S() if we deleted end of buffer
         else:
             self.dot = 0
-        Buffer.deleted = self.lines[start:end+1] # save deleted lines for yank
         # new_mark needed because we can't remove items from dict as we iterate
         new_mark = dict() # new_mark is self.mark without marks at deleted lines
         Buffer.deleted_mark = dict() 
@@ -247,11 +248,8 @@ class Buffer(object):
         # ed (and also edsel) call d(elete) when command is 'c'
         # then handle new lines as later a(ppend) commands ...
         self.d(start,end)
-        # ...but API does handle string argument.  
+        # ...but API c method does handle string argument.  
         self.i(start,string) # This i calls string.splitlines(True)
-        # overide op start end nlines that were assigned by d() and i()
-        update(Op.replace, start=start, end=end,
-               nlines = len(string.splitlines(True)))
 
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
@@ -262,7 +260,7 @@ class Buffer(object):
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
-        update(Op.replace, start=start, end=end, nlines=(end-start)+1)
+        update(Op.mutate, start=start, end=end, nlines=(end-start)+1)
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'
@@ -281,9 +279,7 @@ class Buffer(object):
         'Move lines to after destination line.'
         self.d(start, end)
         nlines = (end-start) + 1
-        dest = (dest+1) - nlines if start < dest else dest+1 
-        self.y(self.dest) # d then y maintain self.mark
-        # must override op start end assigned by y()
         # start, end refer to origin *before* move
-        # dest refers to destination *after* move
-        update(Op.move, start=start, end=end, dest=dest, nlines=nlines)
+        # now dest must be adjusted to refer to destination *after* move
+        dest = (dest+1) - nlines if start < dest else dest+1 
+        self.y(dest) # d then y maintain self.mark

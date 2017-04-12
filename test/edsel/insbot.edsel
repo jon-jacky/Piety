@@ -1,0 +1,19 @@
+# insbot.edsel - i below dot, test for window adjust_segment
+E lines120.txt
+o2
+90
+o
+60
+o
+# insert five lines 
+i
+line   a
+line   b
+line   c
+line   d
+line   e
+.
+!windows[1].dot
+!windows[1].seg_1
+!windows[1].seg_n
+# test finished

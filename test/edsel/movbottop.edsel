@@ -1,0 +1,12 @@
+# movbottop.edsel - m from below dot to above, test for window adjust_segment
+E lines120.txt
+o2
+60
+o
+60
+o
+91,120m1
+!windows[1].dot
+!windows[1].seg_1
+!windows[1].seg_n
+# test finished

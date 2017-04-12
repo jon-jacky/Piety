@@ -207,8 +207,6 @@ def o(line):
     # maybe more options later
     else:
         print('? integer 1 or 2 expected at %s' % param_string)
-    # FIXME force update, later this will replace o_cmd 
-    ed.buffer.update(ed.buffer.Op.window)
 
 def do_command(line):
     'Process one command line without blocking.'
@@ -221,6 +219,8 @@ def do_command(line):
         # Only in command mode!  Otherwise line is text to add to buffer.
         if ed.command_mode and line.lstrip().startswith('o'):
             o(line) # window commands, assigns o_cmd
+            # FIXME: force update, later this will replace o_cmd 
+            ed.buffer.update(ed.buffer.Op.window)
         else:
             ed.do_command(line) # non-blocking
             if ed.cmd_name in 'bBeED':

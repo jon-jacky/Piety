@@ -1,3 +1,4 @@
+
 """
 window.py - Window class for line-oriented display editors.
 
@@ -148,26 +149,13 @@ class Window(object):
     def shift(self, nlines):
         """
         Move segment of buffer displayed in window by nlines (pos or neg).
-        Assign self.seg_1 self.seg_n self.dot
-        Typically used to keep same text in window when lines added/deleted above.
+        Typically used to keep same text in window when lines added/deleted.
         """
         last = self.buf.S()
         self.dot = clip(self.dot + nlines, 1, last)
         self.seg_1 = clip(self.seg_1 + nlines, 1, last)
         self.seg_n = clip(self.seg_n + nlines,  1, last)
 
-    def adjust_insert(self, update):
-        'Used by adjust_segment, below'
-        if self.dot >= update.start:
-            self.shift(update.nlines)
-
-    def adjust_delete(self, update):
-        'Used by adjust_segment, below'
-        if update.start <= self.dot <= update.end:
-            self.shift(self.buf.dot - self.dot) # so dot + shift == bufdot
-        elif self.dot >= update.start and self.dot >= update.end:
-            self.shift(-update.nlines)
- 
     def adjust_segment(self, update):
         """
         Adust self.dot .seg_1 .seg_n so that same lines remain at same
@@ -175,14 +163,13 @@ class Window(object):
         or inserts above.  Compare to management of mark in Buffer.
         """
         if update.op == buffer.Op.insert:
-            self.adjust_insert(update)
+            if self.dot >= update.start:
+                self.shift(update.nlines)
         elif update.op == buffer.Op.delete:
-            self.adjust_delete(update)
-        elif update.op == buffer.Op.move:
-            self.adjust_delete(update)
-            update_dest = Update(op=buffer.Op.insert, start=update.dest)
-            self.adjust_insert(update_dest)
-        # FIXME? more cases, buffer.Op.replace for s(ubst) etc. ...
+            if update.start <= self.dot <= update.end:
+                self.shift(self.buf.dot - self.dot) # so dot + shift == bufdot
+            elif self.dot >= update.start and self.dot >= update.end:
+                self.shift(-update.nlines)
 
     # display (parts of) window
 

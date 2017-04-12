@@ -1,0 +1,12 @@
+# delbot.edsel - d below dot, test for window adjust_segment
+E lines120.txt
+o2
+60
+o
+60
+o
+91,120d
+!windows[1].dot
+!windows[1].seg_1
+!windows[1].seg_n
+# test finished
