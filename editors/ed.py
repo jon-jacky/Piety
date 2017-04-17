@@ -9,16 +9,10 @@ For more explanation see ed.md, ed.txt, the docstrings here, and the tests
 in test/ed/
 """
 
-import re, os, sys
+import re, os, sys, enum
 import pysh  # provides embedded Python shell for ! command
 import buffer
 import time # only used for sleep() in do_commands, FIXME write piety.sleep
-
-# Hook for edsel display editor to configure ed printing behavior:
-# Edsel assigns assigns print_lz_destination to null 
-# to suppress printing from ed l z commands to scrolling command region,
-# because edsel already shows those lines in the display window.
-print_lz_destination = sys.stdout  # In ed, l and z commands print
 
 # arg lists, defaults, range checking
 
@@ -133,7 +127,7 @@ def match_prefix(prefix, names):
     return prefix
 
 
-# central data structure and variables
+# data structures and variables
 
 # Each ed command is implemented by a function with the same
 # one-letter name, whose arguments are the same as the ed command
@@ -141,13 +135,18 @@ def match_prefix(prefix, names):
 # make the API similar to ed commands, it cannot appear as an arg. 
 # So the current buffer, buf, must be global.
 
+# initialize these with mk_buf after update fcn is defined and configured
+buf = None
+current = str()
 buffers = dict() # dict from buffer names (strings) to Buffer instances
-                 
-# There is always a current buffer so we can avoid check for special case
-# Start with one empty buffer named 'main', can't ever delete it
-current = 'main'
-buf = buffer.Buffer(current)
-buffers[current] = buf 
+
+# most Op are defined in buffer module
+class Op(enum.Enum):
+    'Generic buffer operations named independently of editor commands'
+    create = 1   # ed b 
+    delete = 2   # ed D
+    switch = 3   # ed b
+    command = 4  # ed .  exit insert mode, return to command mode
 
 # line addresses
 
@@ -196,10 +195,10 @@ def current_filename(filename):
     print('? no current filename')
     return None
 
-def b_new(name):
+def mk_buf(name):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer(name)
+    buf = buffer.Buffer(name, update=update)
     buffers[name] = buf # replace buffers[name] if it already exists
     current = name
 
@@ -214,16 +213,16 @@ def b(*args):
     if bufname in buffers:
         current = bufname
         buf = buffers[current]                 
-        buffer.update(buffer.Op.switch, buffer=buf)
+        update(Op.switch, buffer=buf)
     elif bufname:
-        b_new(bufname)
+        mk_buf(bufname)
         buf.filename = bufname
-        buffer.update(buffer.Op.create, buffer=buf)
+        update(Op.create, buffer=buf)
     print('.' + buf.info()) # even if no bufname given
 
-def r_new(buffername, filename):
+def r_new(bufname, filename):
     'Create new buffer, Read in file contents'
-    b_new(buffername)
+    mk_buf(bufname)
     buf.filename = filename
     r(0, filename)
     buf.unsaved = False # insert in r sets unsaved = True, this is exception
@@ -273,12 +272,12 @@ def B(*args):
     if not filename:
         print('? file name')
         return
-    buffername = os.path.basename(filename) # may differ from filename
-    if buffername in buffers:
-        # FIXME? create new buffername a la emacs name<1>, name<2> etc.
-        print('? buffer name %s already in use' % buffername)
+    bufname = os.path.basename(filename) # may differ from filename
+    if bufname in buffers:
+        # FIXME? create new buffer name a la emacs name<1>, name<2> etc.
+        print('? buffer name %s already in use' % bufname)
         return
-    r_new(buffername, filename)
+    r_new(bufname, filename)
 
 def w(*args):
     'write current buffer contents to file name'
@@ -313,7 +312,7 @@ def DD(*args):
     else:
         dbuf = buffers[name]
         del buffers[name]
-        buffer.update(buffer.Op.delete, buffer=dbuf)
+        update(Op.delete, buffer=dbuf)
         if name == current: # pick a new current buffer
             keys = list(buffers.keys())
             current = keys[0] if keys else None
@@ -351,7 +350,7 @@ def l(*args):
     if not iline_ok(iline):
         print('? invalid address')
         return
-    print(buf.l(iline), file=print_lz_destination) # destination might be null
+    print(buf.l(iline), file=lz_print_dest) # null destination suppresses print
 
 def p_lines(start, end, destination): # arg here shadows global destination
     'Print lines start through end, inclusive, at destination'
@@ -387,7 +386,7 @@ def z(*args):
             iline += buf.npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= S() else S()
-        p_lines(iline, end, print_lz_destination) # destination might be null
+        p_lines(iline, end, lz_print_dest) # null destination suppresses print
         if buf.npage < 0:
             buf.dot = iline
 
@@ -460,8 +459,6 @@ def y(*args):
         print('? invalid address')
         return
     buf.y(iline)
-
-# command mode
 
 quit = False
 
@@ -642,7 +639,7 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
-            buffer.update(buffer.Op.command)
+            update(Op.command)
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
@@ -686,10 +683,6 @@ def parse_echo_delay(params):
                 valid = False
     return valid, echo, delay
 
-# Hook for edsel display editor to configure ed x behavior:
-# Edsel assigns x_cmd_fcn to edsel.do_command, which calls update_display.  
-x_cmd_fcn = do_command  # In ed, x command only prints in command region
-
 def x(*args):
     """
     Execute ed commands in another buffer: x(bufname, echo, delay)
@@ -727,10 +720,24 @@ def X(*args):
             do_commands(pysh, buffers[current].lines[start:end+1], echo, delay)
             buffers[current].dot = end 
 
+# Hooks to configure ed behavior for display editor
+x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
+lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
+update = (lambda op, **args: None) # default: display updates are not posted
+
+def configure(cmd_fcn=None, print_dest=None, update_fcn=None):
+    'Call from display editor to configure ed behavior'
+    global x_cmd_fcn, lz_print_dest, update
+    if cmd_fcn: x_cmd_fcn = cmd_fcn
+    if print_dest: lz_print_dest = print_dest
+    if update_fcn: update = update_fcn
+    # FIXME must also pass update_fcn to Buffer __init__
+
 prompt = '' # default no prompt
 
 def startup(*filename, **options):
     global quit, prompt
+    mk_buf('main')
     quit = False # allow restart
     if filename:
         e(filename[0])
@@ -739,8 +746,8 @@ def startup(*filename, **options):
 
 def main(*filename, **options):
     """
-    Top level ed command to use at Python prompt.
-    This version won't work in Piety, it calls blocking command raw_input
+    Top level ed command to use at Python prompt or command line.
+    Won't work with Piety cooperative multitasking, calls blocking input().
     """
     startup(*filename, **options)
     while not quit:
@@ -748,19 +755,24 @@ def main(*filename, **options):
         line = input(prompt_string) # blocking
         do_command(line) # non-blocking
 
-# Run the editor from the system command line:  python ed.py
-
-if __name__ == '__main__':
-    # import argparse inside if ... so it isn't always a dependency of this module
+def cmd_options():
+    # import argparse inside this fcn so it isn't always a dependency.
     import argparse
-    parser = argparse.ArgumentParser(description='line editor in pure Python based on classic Unix ed')
+    parser = argparse.ArgumentParser(description='editor in pure Python based on classic Unix ed')
     parser.add_argument('file', 
                         help='name of file to load into main buffer at startup (omit to start with empty main buffer)',
                         nargs='?',
                         default=None),
     parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',
                         default='')
+    parser.add_argument('-c', '--cmd_h', help='number of lines in scrolling command region (display editor only, default 2)',
+                        type=int, default=2)
     args = parser.parse_args()
     filename = [args.file] if args.file else []
     options = {'p': args.prompt } if args.prompt else {}
+    options.update({'c': args.cmd_h } if args.cmd_h else {})
+    return filename, options
+
+if __name__ == '__main__':
+    filename, options = cmd_options()
     main(*filename, **options)

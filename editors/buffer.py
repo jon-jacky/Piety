@@ -18,8 +18,9 @@ not empty).
 
 In this class each method has a fixed (positional) argument list,
 provides no error checking, and no error messages or progress
-messages.  This class has no print statements, and does not read or write at
-the console.  This class only updates buffers and reads and writes files.
+messages.  This class has no print statements, and does not read or
+write at the console.  This class only updates buffers and reads and
+writes files.
 
 This Buffer class provides a write method so other code can update
 text buffers without using the ed.py user interface or API, simply
@@ -27,65 +28,41 @@ calling the standard Python print function, with the file=... optional
 argument pointing to the buffer.
 
 The Buffer class has an attribute named update which can optionally be
-assigned to a callable that may be used by the write method to update
-a display (for example).
+assigned to a callable that may be used to update a display (for example).
 """
 
 import os.path
 from enum import Enum
-from collections import namedtuple, deque
 
 class Op(Enum):
     'Generic editing operations named independently of editor commands'
-    # insert, delete etc. apply to ranges of lines in the buffer
     # m(ove), c(hange)/replace are just d(elete) then i(nsert)
-    locate = 1  # ed l
-    insert = 2  # Buffer methods: insert, also via ed a i r t y but not c
-    delete = 3  # ed d, also via ed m c
-    mutate = 4  # ed s
-    # create, destroy etc. apply to entire buffer 
-    create = 5
-    destroy = 6
-    switch = 7
-    # window operations 
-    window = 8   # placeholder, add more specific values later
-    command = 9  # return to command mode after insert mode
-
-Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])
-
-def update(op, buffer=None, start=0, end=0, dest=0, nlines=0):
-    'Create an Update record and append it to the Buffer.updates queue'
-    # op is the only required (positional) argument,
-    # default buffer=None indicates current buffer 
-    Buffer.updates.append(Update(op, buffer=buffer, start=start,end=end,dest=dest,
-                                 nlines=nlines))
+    insert = 1  # Buffer methods: insert, also via ed a i r t y but not c
+    delete = 2  # ed d, also via ed m c
+    mutate = 3  # ed s
+    locate = 4  # ed l
 
 class Buffer(object):
-    'Text buffer for editors, a list of lines (strings) and metadata'
+    'Text buffer for editors, a list of lines (strings) and state variables.'
 
     # assigned by d(elete) in current buffer, may be used by y(ank) in another
     deleted = list() # most recently deleted lines from any buffer, for yank
     deleted_mark = list() # markers for deleted lines, for yank command
 
-    # assigned by buffer operations that might call for display updates etc.
-    updates = deque()
-
-    def __init__(self, name): # , update=None): # now use head of Buffer.updates
+    def __init__(self, name, update=None):
         'New text buffer'
         self.name = name
         # Buffer always contains empty line at index 0, never used or printed
         self.lines = [''] # text in current buffer, a list of strings
         self.dot = 0 # index of current line, 0 when buffer is empty
-        self.filename = None # name of file (string) to read/write buffer contents
+        self.filename = None # file name (string) to read/write buffer contents
         self.unsaved = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
         self.npage = 22 # page length used, optionally set by z scroll command
-        self.mark = dict() # dict from mark char to line number, for 'c addresses
-
-        # Used by write method
-        self.end_phase = False # state variable needed for control
-        #self.update = update # call from write method to update display
-        #               # FIXME unnecessary, use head of Buffer.updates queue
+        self.mark = dict() # dict from mark char to line num, for 'c addresses
+        self.end_phase = False # control variable used by write method
+        # optional function to update display, default does nothing
+        self.update = update if update else (lambda op, *args: None)
 
     def empty(self):
         'True when buffer is empty (not couting empty line at index 0)'
@@ -107,11 +84,9 @@ class Buffer(object):
         #print([c for c in s]) # DEBUG reveals second write for end string
         #print('end_phase %s' % self.end_phase) # DEBUG
         if self.end_phase:
-            # ignore the end string, ed0 buffer lines must end with \n
+            # ignore the end string, buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
             self.a(self.dot, self.contents) # append command, advances dot
-            #if self.update: # FIXME unnecessary, use Buffer.updates instead
-            #   self.update()
         else:
             # store contents string until we get end string
             self.contents = s
@@ -174,7 +149,7 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-        update(Op.insert, start=iline, nlines=nlines)
+        self.update(Op.insert, start=iline, nlines=nlines)
 
     # files
 
@@ -203,7 +178,7 @@ class Buffer(object):
     def l(self, iline):
         'Advance dot to iline and return it (so caller can print it)'
         self.dot = iline
-        update(Op.locate, start=iline)
+        self.update(Op.locate, start=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -241,7 +216,7 @@ class Buffer(object):
                 markc = self.mark[c]
                 new_mark[c] = markc - self.nlines if markc >= end else markc
         self.mark = new_mark
-        update(Op.delete, start=start, end=end, nlines=len(Buffer.deleted))
+        self.update(Op.delete, start=start,end=end, nlines=len(Buffer.deleted))
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
@@ -260,7 +235,7 @@ class Buffer(object):
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
-        update(Op.mutate, start=start, end=end, nlines=(end-start)+1)
+        self.update(Op.mutate, start=start, end=end, nlines=(end-start)+1)
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'

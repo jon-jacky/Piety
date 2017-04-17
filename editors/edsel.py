@@ -5,9 +5,7 @@ Described in ed.md and edsel.md.  To run: python3 edsel.py or import edsel then 
 """
 
 import traceback, os
-import terminal_util, display, window, ed
-
-prompt = '' # command prompt
+import terminal_util, display, window, ed, frame
 
 nlines, ncols = terminal_util.dimensions()
 
@@ -63,35 +61,14 @@ def update_frame():
         win.resize(frame_top + iwin*win_hdiv, win_h, ncols)
     render_frame()
 
-def startup(*filename, **options):
-    """
-    Clear and render entire display, set scrolling region, place marker.
-    Process optional arguments: filename, options if present.
-    """
-    global prompt, cmd_h, win, win_i
-    ed.quit = False # allow restart
-    if filename:
-        ed.e(filename[0])
-    if 'p' in options:
-        prompt = options['p'] 
-    if 'c' in options:
-        cmd_h = options['c'] 
-    # must calc_frame to get window dimensions before we create win
-    calc_frame() # assign windows_h etc.
-    win = window.Window(ed.buf, frame_top, windows_h, ncols) # one big window
-    windows.append(win) 
-    win_i = 0 # Now win == windows[win_i]
-    render_frame()
-
 def adjust_segments(update):
     """
     Adust each w.dot .seg_1 .seg_n so that same lines remain at same
-     positions in window even when line numbers change due to deletes
-     or inserts above.
+    positions in windows even when line numbers change due to deletes
+    or inserts above.
     """
     for w in windows:
-        # adjust dot etc. in other windows into current buffer
-        if (w != win and w.buf == win.buf):
+        if (w != win and w.buf == win.buf): # other windows, current buffer
             w.adjust_segment(update)
 
 # ed command names used in update_display - FIXME use Op
@@ -220,13 +197,13 @@ def do_command(line):
         if ed.command_mode and line.lstrip().startswith('o'):
             o(line) # window commands, assigns o_cmd
             # FIXME: force update, later this will replace o_cmd 
-            ed.buffer.update(ed.buffer.Op.window)
+            frame.update(frame.Op.window)
         else:
             ed.do_command(line) # non-blocking
             if ed.cmd_name in 'bBeED':
                 win.buf = ed.buf # ed.buf might have changed
-        while ed.buffer.Buffer.updates: # process pending updates from all tasks
-            update = ed.buffer.Buffer.updates.popleft()
+        while frame.updates: # process pending updates from all tasks
+            update = frame.updates.popleft()
             adjust_segments(update) # shift to adjust for insert/delete
             update_display(update) # contains all update logic, may do nothing
     except BaseException as e:
@@ -234,40 +211,33 @@ def do_command(line):
         traceback.print_exc() # looks just like unhandled exception
         exit()
 
-# Configure ed (imported above) to work with edsel
-# Suppress printing ed l z command output to scrolling command region
-ed.print_lz_destination = open(os.devnull, 'w') # discard output
-# In ed x command use edsel do_command in this module that calls update_display
-ed.x_cmd_fcn = do_command
+def startup(*filename, **options):
+    global cmd_h, win, win_i
+    # must call configure() first, startup() uses update_fcn 
+    ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
+                 print_dest=open(os.devnull, 'w'), # discard l z printed output
+                 update_fcn=frame.update) # post display updates
+    ed.startup(*filename, **options)
+    if 'c' in options:
+        cmd_h = options['c'] 
+    calc_frame() # must assign windows_h etc. before we create first window
+    win = window.Window(ed.buf, frame_top, windows_h, ncols) # one big window
+    windows.append(win) 
+    win_i = 0 # Now win == windows[win_i]
+    render_frame()
 
 def main(*filename, **options):
     """
     Top level edsel command to invoke from python prompt or command line.
-    Won't cooperate with Piety scheduler, calls blocking input.
+    Won't work with Piety cooperative multitasking, calls blocking input().
     """
-    startup(*filename, **options) # sets ed.quit = False etc. etc.
+    startup(*filename, **options)
     while not ed.quit:
-        prompt_string = prompt if ed.command_mode else ''
+        prompt_string = ed.prompt if ed.command_mode else ''
         line = input(prompt_string) # blocking
         do_command(line) # no blocking
     cleanup()
 
-# Run the editor from the system command line: python edsel.py
 if __name__ == '__main__':
-    # import argparse inside if ... so it isn't always a dependency of this module
-    # duplicates code from ed.py but that is the cost of avoiding dependency on argparse.
-    import argparse
-    parser = argparse.ArgumentParser(description='display editor in pure Python based on the line editor ed.py')
-    parser.add_argument('file', 
-                        help='name of file to load into main buffer at startup (omit to start with empty main buffer)',
-                        nargs='?',
-                        default=None),
-    parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',
-                        default='')
-    parser.add_argument('-c', '--cmd_h', help='number of lines in scrolling command region (default 2)',
-                        type=int, default=2)
-    args = parser.parse_args()
-    filename = [args.file] if args.file else []
-    options = {'p': args.prompt } if args.prompt else {}
-    options.update({'c': args.cmd_h } if args.cmd_h else {})
+    filename, options = ed.cmd_options()
     main(*filename, **options)
