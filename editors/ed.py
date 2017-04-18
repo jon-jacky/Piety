@@ -746,8 +746,8 @@ def startup(*filename, **options):
 
 def main(*filename, **options):
     """
-    Top level ed command to use at Python prompt or command line.
-    Won't work with Piety cooperative multitasking, calls blocking input().
+    Top level ed command to invoke from Python prompt or command line.
+    Won't work with cooperative multitasking, calls blocking input().
     """
     startup(*filename, **options)
     while not quit:
