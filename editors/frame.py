@@ -41,10 +41,10 @@ windows = list() # list of windows, windows[win_i] is the current window
 # previous values used in update_display
 cmd_h0 = win0 = None
 
-# edsel command names used in update_display
+# edsel command names used in update_display - FIXME use op instead
 o_cmd = '' # also ed.cmd_name, initialized above
 
-# ed command name categories used in update_display - FIXME should use Op
+# ed command name categories used in update_display - FIXME use Op instead
 file_cmds = 'eEfB' # change file displayed in current window
 buffer_cmds = 'bB' # change buffer displayed in current window
 text_cmds = 'aicdsymtr' # change text displayed in current window
@@ -166,8 +166,7 @@ def o(line):
         win.dot = win.buf.dot # save
         win_i = win_i+1 if win_i+1 < len(windows) else 0
         win = windows[win_i] 
-        ed.current = win.buf.name
-        ed.buf = ed.buffers[ed.current]
+        select_buf(win.buf.name)
         win.buf.dot = win.dot # restore
         update(Op.window) # FIXME - specialize Op.
 
@@ -189,7 +188,7 @@ def o(line):
         new_win_h = win.win_h // 2 # integer division
         win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old window
         win.dot = win.buf.dot # save
-        win = window.Window(ed.buf, win_top, new_win_h, ncols) # new window
+        win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
         windows.insert(win_i, win)
         update(Op.window) # FIXME - specialize Op.
 
@@ -197,9 +196,12 @@ def o(line):
     else:
         print('? integer 1 or 2 expected at %s' % param_string)
 
-def init(buffer, cmd_h_option):
+select_buf = (lambda bufname: None)
+
+def init(select_buf_fcn, buffer, cmd_h_option):
     'Initialize frame with one window into buffer'
-    global cmd_h, win, win_i
+    global select_buf, cmd_h, win, win_i
+    select_buf = select_buf_fcn
     if cmd_h_option: 
         cmd_h = cmd_h_option # otherwise keep default assigned above
     calc_frame() # must assign windows_h etc. before we create first window
@@ -210,7 +212,8 @@ def init(buffer, cmd_h_option):
 
 def handle_updates():
     'Process display update records from update queue'
-    # FIXME moved from edsel do_command, can't while loop below get this?
+    # FIXME moved from edsel do_command, should fold into updates handling
+    # FIXME should not need to refer to ed.buf, find buf in update record
     if ed.cmd_name in 'bBeED':
         win.buf = ed.buf # ed.buf might have changed
     while updates: # process pending updates from all tasks

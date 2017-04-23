@@ -195,12 +195,18 @@ def current_filename(filename):
     print('? no current filename')
     return None
 
-def mk_buf(name):
+def mk_buf(bufname):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer(name, update=update)
-    buffers[name] = buf # replace buffers[name] if it already exists
-    current = name
+    buf = buffer.Buffer(bufname, update=update)
+    buffers[bufname] = buf # replace buffers[bufname] if it already exists
+    current = bufname
+
+def select_buf(bufname):
+    'Make buffer with given name the current buffer'
+    global current, buf
+    current = bufname
+    buf = buffers[current]
 
 def b(*args):
     """
@@ -211,8 +217,7 @@ def b(*args):
     _, _, bufname, _ = parse_args(args)
     bufname = match_prefix(bufname, buffers)
     if bufname in buffers:
-        current = bufname
-        buf = buffers[current]                 
+        select_buf(bufname)
         update(Op.switch, buffer=buf)
     elif bufname:
         mk_buf(bufname)
@@ -314,8 +319,8 @@ def DD(*args):
         del buffers[name]
         update(Op.delete, buffer=dbuf)
         if name == current: # pick a new current buffer
-            keys = list(buffers.keys())
-            current = keys[0] if keys else None
+            keys = list(buffers.keys()) # always nonempty due to main
+            select_buf(keys[0])
             buf = buffers[current]
         print('%s, buffer deleted' % name)
 
