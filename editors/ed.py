@@ -135,7 +135,7 @@ def match_prefix(prefix, names):
 # make the API similar to ed commands, it cannot appear as an arg. 
 # So the current buffer, buf, must be global.
 
-# initialize these with mk_buf after update fcn is defined and configured
+# initialize these with create_buf after update fcn is defined and configured
 buf = None
 current = str()
 buffers = dict() # dict from buffer names (strings) to Buffer instances
@@ -143,9 +143,9 @@ buffers = dict() # dict from buffer names (strings) to Buffer instances
 # most Op are defined in buffer module
 class Op(enum.Enum):
     'Generic buffer operations named independently of editor commands'
-    create = 1   # ed b 
-    delete = 2   # ed D
-    switch = 3   # ed b
+    create = 1   # ed b, B via create_buf
+    delete = 2   # ed D, DD but then Op.select
+    select = 3   # ed b, D via select_buf
     command = 4  # ed .  exit insert mode, return to command mode
 
 # line addresses
@@ -195,18 +195,20 @@ def current_filename(filename):
     print('? no current filename')
     return None
 
-def mk_buf(bufname):
+def create_buf(bufname):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
     buf = buffer.Buffer(bufname, update=update)
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
     current = bufname
+    update(Op.create, buffer=buf)
 
 def select_buf(bufname):
     'Make buffer with given name the current buffer'
     global current, buf
     current = bufname
     buf = buffers[current]
+    update(Op.select, buffer=buf)
 
 def b(*args):
     """
@@ -218,16 +220,14 @@ def b(*args):
     bufname = match_prefix(bufname, buffers)
     if bufname in buffers:
         select_buf(bufname)
-        update(Op.switch, buffer=buf)
     elif bufname:
-        mk_buf(bufname)
+        create_buf(bufname)
         buf.filename = bufname
-        update(Op.create, buffer=buf)
     print('.' + buf.info()) # even if no bufname given
 
 def r_new(bufname, filename):
     'Create new buffer, Read in file contents'
-    mk_buf(bufname)
+    create_buf(bufname)
     buf.filename = filename
     r(0, filename)
     buf.unsaved = False # insert in r sets unsaved = True, this is exception
@@ -644,7 +644,7 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
-            update(Op.command)
+            update(Op.command, buffer=buf)
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
@@ -736,13 +736,12 @@ def configure(cmd_fcn=None, print_dest=None, update_fcn=None):
     if cmd_fcn: x_cmd_fcn = cmd_fcn
     if print_dest: lz_print_dest = print_dest
     if update_fcn: update = update_fcn
-    # FIXME must also pass update_fcn to Buffer __init__
 
 prompt = '' # default no prompt
 
 def startup(*filename, **options):
     global quit, prompt
-    mk_buf('main')
+    create_buf('main')
     quit = False # allow restart
     if filename:
         e(filename[0])

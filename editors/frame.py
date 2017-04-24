@@ -88,6 +88,10 @@ def update_frame():
         win.resize(frame_top + iwin*win_hdiv, win_h, ncols)
     render_frame()
 
+def reassign_window(update):
+    if update.op in ():
+        win.buf = update.buffer
+
 def adjust_segments(update):
     """
     Adust each w.dot .seg_1 .seg_n so that same lines remain at same
@@ -198,7 +202,7 @@ def o(line):
 
 select_buf = (lambda bufname: None)
 
-def init(select_buf_fcn, buffer, cmd_h_option):
+def init(buffer, select_buf_fcn, cmd_h_option=None):
     'Initialize frame with one window into buffer'
     global select_buf, cmd_h, win, win_i
     select_buf = select_buf_fcn
@@ -218,5 +222,6 @@ def handle_updates():
         win.buf = ed.buf # ed.buf might have changed
     while updates: # process pending updates from all tasks
         update = updates.popleft()
+        reassign_window(update) # possibly reassign win.buf
         adjust_segments(update) # shift to adjust for insert/delete
         update_display(update) # contains all update logic, may do nothing

@@ -36,7 +36,7 @@ def startup(*filename, **options):
                  update_fcn=frame.update) # post display updates
     ed.startup(*filename, **options)
     cmd_h = options['c'] if 'c' in options else None
-    frame.init(ed.select_buf, ed.buf, cmd_h) # ed.startup() just above initializes ed.buf
+    frame.init(ed.buf, ed.select_buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf
 
 def cleanup():
     'Restore full-screen scrolling, cursor to bottom.'

@@ -149,7 +149,7 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-        self.update(Op.insert, start=iline, nlines=nlines)
+        self.update(Op.insert, buffer=self, start=iline, nlines=nlines)
 
     # files
 
@@ -178,7 +178,7 @@ class Buffer(object):
     def l(self, iline):
         'Advance dot to iline and return it (so caller can print it)'
         self.dot = iline
-        self.update(Op.locate, start=iline)
+        self.update(Op.locate, buffer=self, start=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -216,7 +216,8 @@ class Buffer(object):
                 markc = self.mark[c]
                 new_mark[c] = markc - self.nlines if markc >= end else markc
         self.mark = new_mark
-        self.update(Op.delete, start=start,end=end, nlines=len(Buffer.deleted))
+        self.update(Op.delete, buffer=self, start=start,end=end, 
+                    nlines=len(Buffer.deleted))
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
@@ -235,7 +236,8 @@ class Buffer(object):
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
-        self.update(Op.mutate, start=start, end=end, nlines=(end-start)+1)
+        self.update(Op.mutate, buffer=self, start=start, end=end, 
+                    nlines=(end-start)+1)
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'
