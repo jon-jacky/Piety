@@ -33,14 +33,7 @@ assigned to a callable that may be used to update a display (for example).
 
 import os.path
 from enum import Enum
-
-class Op(Enum):
-    'Generic editing operations named independently of editor commands'
-    # m(ove), c(hange)/replace are just d(elete) then i(nsert)
-    insert = 1  # Buffer methods: insert, also via ed a i r t y but not c
-    delete = 2  # ed d, also via ed m c
-    mutate = 3  # ed s
-    locate = 4  # ed l
+from update import update, Op
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
@@ -49,7 +42,7 @@ class Buffer(object):
     deleted = list() # most recently deleted lines from any buffer, for yank
     deleted_mark = list() # markers for deleted lines, for yank command
 
-    def __init__(self, name, update=None):
+    def __init__(self, name):
         'New text buffer'
         self.name = name
         # Buffer always contains empty line at index 0, never used or printed
@@ -61,8 +54,6 @@ class Buffer(object):
         self.npage = 22 # page length used, optionally set by z scroll command
         self.mark = dict() # dict from mark char to line num, for 'c addresses
         self.end_phase = False # control variable used by write method
-        # optional function to update display, default does nothing
-        self.update = update if update else (lambda op, *args: None)
 
     def empty(self):
         'True when buffer is empty (not couting empty line at index 0)'
@@ -149,7 +140,7 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-        self.update(Op.insert, buffer=self, start=iline, nlines=nlines)
+        update(Op.insert, buffer=self, start=iline, nlines=nlines)
 
     # files
 
@@ -178,7 +169,7 @@ class Buffer(object):
     def l(self, iline):
         'Advance dot to iline and return it (so caller can print it)'
         self.dot = iline
-        self.update(Op.locate, buffer=self, start=iline)
+        update(Op.locate, buffer=self, start=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -216,8 +207,8 @@ class Buffer(object):
                 markc = self.mark[c]
                 new_mark[c] = markc - self.nlines if markc >= end else markc
         self.mark = new_mark
-        self.update(Op.delete, buffer=self, start=start,end=end, 
-                    nlines=len(Buffer.deleted))
+        update(Op.delete, buffer=self, start=start,end=end, 
+               nlines=len(Buffer.deleted))
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
@@ -236,8 +227,8 @@ class Buffer(object):
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
-        self.update(Op.mutate, buffer=self, start=start, end=end, 
-                    nlines=(end-start)+1)
+        update(Op.mutate, buffer=self, start=start, end=end, 
+               nlines=(end-start)+1)
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'

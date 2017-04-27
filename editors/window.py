@@ -1,4 +1,3 @@
-
 """
 window.py - Window class for line-oriented display editors.
 
@@ -6,7 +5,8 @@ Each window instance displays a range of lines from a text buffer.
 """
 
 from datetime import datetime # for timestamp, used for testing
-import display, buffer
+import display
+from update import Op
 
 def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
@@ -162,10 +162,10 @@ class Window(object):
         positions in window even when line numbers change due to deletes
         or inserts above.  Compare to management of mark in Buffer.
         """
-        if update.op == buffer.Op.insert:
+        if update.op == Op.insert:
             if self.dot >= update.start:
                 self.shift(update.nlines)
-        elif update.op == buffer.Op.delete:
+        elif update.op == Op.delete:
             if update.start <= self.dot <= update.end:
                 self.shift(self.buf.dot - self.dot) # so dot + shift == bufdot
             elif self.dot >= update.start and self.dot >= update.end:

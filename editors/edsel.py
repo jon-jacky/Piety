@@ -32,8 +32,7 @@ def do_command(line):
 def startup(*filename, **options):
     # must call configure() first, startup() uses update_fcn 
     ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
-                 print_dest=open(os.devnull, 'w'), # discard l z printed output
-                 update_fcn=frame.update) # post display updates
+                 print_dest=open(os.devnull, 'w')) # discard l z printed output
     ed.startup(*filename, **options)
     cmd_h = options['c'] if 'c' in options else None
     frame.init(ed.buf, ed.select_buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf

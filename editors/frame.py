@@ -4,23 +4,9 @@ frame.py - collection of windows
 Just a module, not a class.  We expect only a single frame in a session.
 """
 
-from enum import Enum
-from collections import namedtuple, deque
 import terminal_util, display, window
+from update import update, updates, Op
 import ed # FIXME should be able to remove when Op and update queue working
-
-class Op(Enum):
-    'Generic window operations named independently of particular editor cmds'
-    window = 1 # FIXME placeholder for edsel o o1 o2, add more Op values later
-
-Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])
-
-updates = deque()
-
-def update(op, buffer=None, start=0, end=0, dest=0, nlines=0):
-    'Create an Update record and append it to the updates queue'
-    updates.append(Update(op, buffer=buffer, start=start, end=end, dest=dest, 
-                          nlines=nlines))
 
 nlines, ncols = terminal_util.dimensions()
 
@@ -89,7 +75,8 @@ def update_frame():
     render_frame()
 
 def reassign_window(update):
-    if update.op in ():
+    'Assign a different buffer to the current window'
+    if update.op in (Op.create, Op.select):
         win.buf = update.buffer
 
 def adjust_segments(update):
@@ -172,7 +159,7 @@ def o(line):
         win = windows[win_i] 
         select_buf(win.buf.name)
         win.buf.dot = win.dot # restore
-        update(Op.window) # FIXME - specialize Op.
+        update(Op.window, buffer=win.buf) # FIXME - specialize Op.
 
     # o1: return to single window
     elif param_string.startswith('1'):
@@ -182,7 +169,7 @@ def o(line):
         win_i = 0
         win = windows[win_i]
         win.resize(frame_top, windows_h, ncols) # one big window
-        update(Op.window) # FIXME - specialize Op.
+        update(Op.window, buffer=win.buf) # FIXME - specialize Op.
 
     # o2: split window, horizontal
     elif param_string.startswith('2'):
@@ -194,7 +181,7 @@ def o(line):
         win.dot = win.buf.dot # save
         win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
         windows.insert(win_i, win)
-        update(Op.window) # FIXME - specialize Op.
+        update(Op.window, buffer=win.buf) # FIXME - specialize Op.
 
     # maybe more options later
     else:
@@ -216,10 +203,6 @@ def init(buffer, select_buf_fcn, cmd_h_option=None):
 
 def handle_updates():
     'Process display update records from update queue'
-    # FIXME moved from edsel do_command, should fold into updates handling
-    # FIXME should not need to refer to ed.buf, find buf in update record
-    if ed.cmd_name in 'bBeED':
-        win.buf = ed.buf # ed.buf might have changed
     while updates: # process pending updates from all tasks
         update = updates.popleft()
         reassign_window(update) # possibly reassign win.buf

@@ -10,9 +10,10 @@ in test/ed/
 """
 
 import re, os, sys, enum
+import time # only used for sleep() in do_commands, FIXME write piety.sleep
 import pysh  # provides embedded Python shell for ! command
 import buffer
-import time # only used for sleep() in do_commands, FIXME write piety.sleep
+from update import update, Op
 
 # arg lists, defaults, range checking
 
@@ -135,18 +136,10 @@ def match_prefix(prefix, names):
 # make the API similar to ed commands, it cannot appear as an arg. 
 # So the current buffer, buf, must be global.
 
-# initialize these with create_buf after update fcn is defined and configured
+# initialize these with create_buf
 buf = None
 current = str()
 buffers = dict() # dict from buffer names (strings) to Buffer instances
-
-# most Op are defined in buffer module
-class Op(enum.Enum):
-    'Generic buffer operations named independently of editor commands'
-    create = 1   # ed b, B via create_buf
-    delete = 2   # ed D, DD but then Op.select
-    select = 3   # ed b, D via select_buf
-    command = 4  # ed .  exit insert mode, return to command mode
 
 # line addresses
 
@@ -198,7 +191,7 @@ def current_filename(filename):
 def create_buf(bufname):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer(bufname, update=update)
+    buf = buffer.Buffer(bufname)
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
     current = bufname
     update(Op.create, buffer=buf)
@@ -317,7 +310,7 @@ def DD(*args):
     else:
         dbuf = buffers[name]
         del buffers[name]
-        update(Op.delete, buffer=dbuf)
+        update(Op.remove, buffer=dbuf)
         if name == current: # pick a new current buffer
             keys = list(buffers.keys()) # always nonempty due to main
             select_buf(keys[0])
@@ -728,14 +721,12 @@ def X(*args):
 # Hooks to configure ed behavior for display editor
 x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
 lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
-update = (lambda op, **args: None) # default: display updates are not posted
 
-def configure(cmd_fcn=None, print_dest=None, update_fcn=None):
+def configure(cmd_fcn=None, print_dest=None):
     'Call from display editor to configure ed behavior'
-    global x_cmd_fcn, lz_print_dest, update
+    global x_cmd_fcn, lz_print_dest
     if cmd_fcn: x_cmd_fcn = cmd_fcn
     if print_dest: lz_print_dest = print_dest
-    if update_fcn: update = update_fcn
 
 prompt = '' # default no prompt
 
