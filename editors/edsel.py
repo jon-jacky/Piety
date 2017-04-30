@@ -5,9 +5,21 @@ edsel - Display editor based on the line editor ed.py.
 
 import traceback, os
 import ed, frame, display # display only used in cleanup()
+from update import update, Op
 
 # ed command names used in update_display - FIXME use Op
 # ed.cmd_name = ''   # FIXME unnecessary?  Occurs in ed.py already
+
+def do_window_command(line):
+    param_string = line.lstrip()[1:].lstrip()
+    if not param_string: # o: switch to next window
+        update(Op.next)
+    elif param_string.startswith('1'): # o1: return to single window
+        update(Op.single)
+    elif param_string.startswith('2'): # o2: split window, horizontal
+        update(Op.hsplit)
+    else: # more options later?
+        print('? integer 1 or 2 expected at %s' % param_string) 
 
 def do_command(line):
     'Process one command line without blocking.'
@@ -16,11 +28,11 @@ def do_command(line):
         # FIXME the next two lines should disappear when we handle update Op
         # For now we have two top-level calls in frame, o() and handle_updates
         frame.cmd_h0, frame.win0 = frame.cmd_h, frame.win # save parameters before call ed.cmd
-        frame.o_cmd = ed.cmd_name = ''  # must clear before call ed.cmd
+        ed.cmd_name = ''  # must clear before call ed.cmd
         # Intercept special commands used by frame only, not ed
         # Only in command mode!  Otherwise line is text to add to buffer.
         if ed.command_mode and line.lstrip().startswith('o'):
-            frame.o(line) # window commands, assigns o_cmd
+            do_window_command(line)
         else:
             ed.do_command(line) # non-blocking
         frame.handle_updates()

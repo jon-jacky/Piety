@@ -25,11 +25,12 @@ class Op(Enum):
     next = 9     # edsle o, switch to next window
     single = 10  # edsel o1, return to single window
     hsplit = 11   # edsel o2, split window, horizontal
+    window = 12  # edsel o o1 o2 FIXME included now for backward compatibility only
 
 # Record that describes a single display update
 Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])
 
-# Queue of pending display updates
+# Queue of pending display updates from all tasks
 updates = deque()
 
 def update(op, buffer=None, start=0, end=0, dest=0, nlines=0):

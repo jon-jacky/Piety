@@ -24,17 +24,15 @@ win_i = None # current window index
 win = None # current window
 windows = list() # list of windows, windows[win_i] is the current window
 
+# Control state variables - these should all be replaced by Op
+
 # previous values used in update_display
 cmd_h0 = win0 = None
-
-# edsel command names used in update_display - FIXME use op instead
-o_cmd = '' # also ed.cmd_name, initialized above
 
 # ed command name categories used in update_display - FIXME use Op instead
 file_cmds = 'eEfB' # change file displayed in current window
 buffer_cmds = 'bB' # change buffer displayed in current window
 text_cmds = 'aicdsymtr' # change text displayed in current window
-
 
 def calc_frame():
     'Calculate dimensions and location of windows and scrolling command region'
@@ -43,7 +41,7 @@ def calc_frame():
     cmd_n = nlines # last line on display
     windows_h = nlines - cmd_h # text window fills remaining space
 
-def update_windows():
+def update_windows():  # update_all_windows
     'Redraw all windows, called by render_frame, for example after resize.'
     for w in windows:
         w.position_segment() # necessary if window(s) resized
@@ -89,103 +87,126 @@ def adjust_segments(update):
         if (w != win and w.buf == win.buf): # other windows, current buffer
             w.adjust_segment(update)
 
+def update_other_windows():
+    for w in windows:
+        if (w != win and w.buf == win.buf):
+            # might update even when lines in w unchanged
+            # win0.position_segment() # necessary?
+            w.update()
+                
+def update_cursor():
+    # extracted from update_affected_windows above
+    if ed.command_mode:
+        win.render_marker() # indicates dot in window
+    else: 
+        win.put_insert_cursor() # term. insert cursor at open line
+
+def update_affected_windows(update, segment_moved):
+   # extracted from update display under elif segment_moved or ... txt_cmds:
+    if segment_moved:
+        win.position_segment()
+    win.update(open_line=(not ed.command_mode)) # open line in insert mode
+    update_other_windows() # other non-current windows might show part of same buffer
+    update_cursor() # must draw marker or cursor last
+
 def update_display(update):  # FIXME - use contents of update, an Update record.
     'Check for any needed display updates.  If there are any, do them.'
-    win.dot = win.buf.dot # dot may or may not have changed, update anyway
-    win.find_dot() # FIXME?  Is this redundant here?  Called again later on all paths?
-    segment_moved = (ed.cmd_name in file_cmds + buffer_cmds
-                     or win.dot_elsewhere() 
-                     or o_cmd in ('o1','o2')) # set single window or split
-    # frame changed, update all windows and marker
-    if cmd_h != cmd_h0:
+
+
+    # new update_display code that branches on update.op
+    # first do window commands o o1 o2, based on old o() fcn
+    # merge in more code from below when we untangle logic
+    global windows, win, win_i
+
+    #print('update_display: ed.cmd_name %s, update.op %s' % 
+    #     (ed.cmd_name, update.op)) # DEBUG
+
+    reassign_window(update) # possibly reassign win.buf
+    adjust_segments(update) # shift to adjust for insert/delete
+
+    # frame changed, update all windows and marke
+    if cmd_h != cmd_h0: # FIXME can this be an Op also? Then we wouldn't need cmd_h0
         update_frame()  # calls render_frame, which calls update_windows
 
-    # set other window
-    elif o_cmd == 'o': 
-        # move marker to new current window, don't update window content
-        win0.find_dot()
+    # Op cases 
+
+    # o: switch to next window
+    elif update.op == Op.next:
+        win.dot = win.buf.dot # save buffer dot in old window dot
+        win_i = win_i = win_i+1 if win_i+1 < len(windows) else 0
+        win = windows[win_i]
+        select_buf(win.buf.name)
+        win.buf.dot = win.dot  # restore buffer dot to new window dot 
+        # above: copied from old o(), below copied from update_display top
+        win.dot = win.buf.dot #  FIXME? redundant?  Yes, see immediately above.
+        win.find_dot() # FIXME?  redundant?
+        # below copied from update_display case elif 'o'
+        win0.find_dot() # move marker to new current window
         win0.erase_marker()
         win.render_marker()
 
-    # update current window contents, maybe other windows too
-    elif segment_moved or ed.cmd_name in text_cmds:
-        if segment_moved:
-            win.position_segment()
+    # o1, delete all but current window
+    elif update.op == Op.single:
+        windows = [win]
+        win_i = 0
+        win.resize(frame_top, windows_h, ncols) # one big window
+        # above: copied from old o(), below; copied from update_display
+        win.dot = win.buf.dot # FIXME? redundant?  I think so.  It's already current
+        win.find_dot() # FIXME? redundant?  It's already current
+        # below:copied from update_affected_windows which is not called here
+        win.position_segment()
         win.update(open_line=(not ed.command_mode)) # open line in insert mode
-        if o_cmd == 'o2': # split window
-            # win0 is former current window
-            # if win0 marker does not lie within new window erase it now.
-            # win.resize in o2 command code does not relocate win0 marker
-            if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
-                win0.erase_marker()
-                win0.position_segment() # necessary?
-            win0.update()
-        else:  # other non-current windows might show part of same buffer
-            for w in windows:
-                if (w != win and w.buf == win.buf):
-                    # might update even when lines in w unchanged
-                    # win0.position_segment() # necessary?
-                    w.update()
-        # must draw marker or cursor last
-        if ed.command_mode:
-            win.render_marker() # indicates dot in window
-        else: 
-            win.put_insert_cursor() # term. insert cursor at open line
+        update_other_windows() # FIXME there are no others
+        update_cursor()
 
-    # update marker only in current window, don't update window content
-    elif win.dot_moved():
-        win.erase_marker()
-        win.render_marker()
-        win.render_status()
+    # o2, put the new window at the top, it becomes current window
+    elif update.op == Op.hsplit:
+        win_top = win.win_1
+        new_win_h = win.win_h // 2 # integer division
+        win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old window
+        win.dot = win.buf.dot
+        win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
+        windows.insert(win_i, win)
+        # above: copied from old o(), below; copied from update_display
+        win.dot = win.buf.dot # FIXME - redundant - see above
+        win.find_dot() # FIXME? redundant?
+        # below:copied from update_affected_windows which is not called here
+        win.position_segment()
+        win.update(open_line=(not ed.command_mode)) # open line in insert mode
+        # win0 is former current window
+        # if win0 marker does not lie within new window erase it now.
+        # win.resize in o2 command code does not relocate win0 marker
+        if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
+            win0.erase_marker()
+            win0.position_segment() # FIXME necessary?
+        win0.update()
+
+    # previous update_display code.  FIXME untangle logic, use Op case analysis
+    else:
+        win.dot = win.buf.dot # FIXME? dot may or may not have changed, update anyway
+        win.find_dot() # FIXME? redundant?  Called again later on all paths?       
+        # FIXME break apart this logic into Op case analysis
+        segment_moved = (ed.cmd_name in file_cmds + buffer_cmds
+                     or win.dot_elsewhere())
+                     ### No more ... or o_cmd in (o1,o2)), handled in Op cases above
+        # print(' segment_moved %s' % segment_moved) # DEBUG
+
+        # update current window contents, maybe other windows too
+        # FIXME break apart this logic into Op case analysis
+        if segment_moved or ed.cmd_name in text_cmds:
+            update_affected_windows(update, segment_moved)
+
+        # update marker only in current window, don't update window content
+        elif win.dot_moved():
+            win.erase_marker()
+            win.render_marker()
+            win.render_status()
 
     # some commands do not affect windows or status line: A k n w ... 
 
     # put ed command cursor back in scrolling command region
     if ed.command_mode:
         put_command_cursor() 
-
-def o(line):
-    'Window commands.'
-    # Not passed to ed, this o() does not conflict with ed.o() that returns dot.
-    # For now there is just one vertical stack of windows in the frame.
-    global windows, win, win_i, o_cmd
-    param_string = line.lstrip()[1:].lstrip()
-
-    # o: switch to next window
-    if not param_string:
-        o_cmd = 'o' # used by update_display
-        win.dot = win.buf.dot # save
-        win_i = win_i+1 if win_i+1 < len(windows) else 0
-        win = windows[win_i] 
-        select_buf(win.buf.name)
-        win.buf.dot = win.dot # restore
-        update(Op.window, buffer=win.buf) # FIXME - specialize Op.
-
-    # o1: return to single window
-    elif param_string.startswith('1'):
-        o_cmd = 'o1'
-        # delete all but current window
-        windows = [windows[win_i]]
-        win_i = 0
-        win = windows[win_i]
-        win.resize(frame_top, windows_h, ncols) # one big window
-        update(Op.window, buffer=win.buf) # FIXME - specialize Op.
-
-    # o2: split window, horizontal
-    elif param_string.startswith('2'):
-        o_cmd = 'o2'
-        # put the new window at the top, it becomes current window
-        win_top = win.win_1
-        new_win_h = win.win_h // 2 # integer division
-        win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old window
-        win.dot = win.buf.dot # save
-        win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
-        windows.insert(win_i, win)
-        update(Op.window, buffer=win.buf) # FIXME - specialize Op.
-
-    # maybe more options later
-    else:
-        print('? integer 1 or 2 expected at %s' % param_string)
 
 select_buf = (lambda bufname: None)
 
@@ -202,9 +223,7 @@ def init(buffer, select_buf_fcn, cmd_h_option=None):
     render_frame()
 
 def handle_updates():
-    'Process display update records from update queue'
-    while updates: # process pending updates from all tasks
+    'Process display update records from queue'
+    while updates:
         update = updates.popleft()
-        reassign_window(update) # possibly reassign win.buf
-        adjust_segments(update) # shift to adjust for insert/delete
-        update_display(update) # contains all update logic, may do nothing
+        update_display(update)
