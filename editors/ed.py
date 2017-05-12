@@ -623,12 +623,15 @@ def do_command(line):
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = start
+                update(Op.input)
             elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
+                update(Op.input)
             elif cmd_name == 'c': # c(hange) command deletes changed lines first
-                buf.d(start, end) # d updates buf.dot to the line after deletes
+                buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
                 buf.dot = start - 1 # supercede dot assigned in preceding
+                update(Op.input)  # queues Op.input after Op.delete from buf.d above
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:
@@ -637,7 +640,7 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
-            update(Op.command, buffer=buf)
+            update(Op.command) # return from input (insert) mode to command mode
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line

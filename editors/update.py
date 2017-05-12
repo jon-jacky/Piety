@@ -20,12 +20,13 @@ class Op(Enum):
     create = 5   # ed b, B via create_buf
     remove = 6   # ed D, DD but then Op.select
     select = 7   # ed b, D via select_buf
-    command = 8  # ed .  exit insert mode, return to command mode
+    # user interface in ed, toggle command mode/input mode (insert mode)
+    input = 8    # ed a i c  enter input (insert) mode, from command mode.
+    command = 9  # ed .  exit input (insert) mode, return to command mode
     # update operations in frame, refer to windows
-    next = 9     # edsle o, switch to next window
-    single = 10  # edsel o1, return to single window
-    hsplit = 11   # edsel o2, split window, horizontal
-    window = 12  # edsel o o1 o2 FIXME included now for backward compatibility only
+    next = 10     # edsle o, switch to next window
+    single = 11  # edsel o1, return to single window
+    hsplit = 12  # edsel o2, split window, horizontal
 
 # Record that describes a single display update
 Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])

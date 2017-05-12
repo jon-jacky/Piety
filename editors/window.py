@@ -89,8 +89,6 @@ class Window(object):
         'dot moved to a different line in the buffer (than dot_i0)'
         return self.dot_i != self.dot_i0
 
-    # assign segment position: self.seg_1 seg_n dot_i 
-
     def position_segment(self):
         """
         Compute top of segment of buffer that is visible in window.
@@ -146,19 +144,9 @@ class Window(object):
             self.marker_chx = (' ' if self.marker_ch in ('',' ','\n') 
                                else self.marker_ch)
 
-    def shift(self, nlines):
-        """
-        Move segment of buffer displayed in window by nlines (pos or neg).
-        Typically used to keep same text in window when lines added/deleted.
-        """
-        last = self.buf.S()
-        self.dot = clip(self.dot + nlines, 1, last)
-        self.seg_1 = clip(self.seg_1 + nlines, 1, last)
-        self.seg_n = clip(self.seg_n + nlines,  1, last)
-
     def adjust_segment(self, update):
         """
-        Adust self.dot .seg_1 .seg_n so that same lines remain at same
+        Adust self.dot .seg_1 .seg_n so that same contents remain at same
         positions in window even when line numbers change due to deletes
         or inserts above.  Compare to management of mark in Buffer.
         """
@@ -178,18 +166,20 @@ class Window(object):
         Print lines in buffer numbered first through last.
         Assumes cursor already positioned at first line.
         """
-        for line in self.buf.lines[first:last+1]: # slice, upper limit excluded
-            # remove \n, truncate don't wrap
-            print(line.rstrip()[:self.ncols-1], end=' ') 
-            display.kill_line() # erase from cursor to end
-            print() # advance to next line
+        i = -1
+        for i, line in enumerate(self.buf.lines[first:last+1]):
+            print(line.rstrip()[:self.ncols-1], end=' ') # remove \n, truncate
+            display.kill_line()
+            print()
+        return i+1 # n printed, less than first:last+1 if end of buf
 
     def render_segment(self, open_line=False):
         """
         Start on win_1 line, display buffer lines self.seg_1 .. self.seg_n 
         If space remains in window, pad with empty lines to self.win_h
-        If in insert mode (not command_mode), open line where text will be typed
+        If in insert mode (not command_mode),open line where text will be typed
         """
+        # FIXME similar to update_lines below - just keep one
         # lines in segment, usually same as self.win_hl, less if small buffer
         seg_h = self.seg_n - self.seg_1 + 1 
         # n of padding empty lines at window bottom, > 0 when small buffer
@@ -271,3 +261,55 @@ class Window(object):
         self.render_segment(open_line)
         self.render_status()
         # No self.put_insert_cursor or render_marker, caller must do it.
+
+    # New and revised methods used by new frame module in Op cases 
+
+    def scroll(self, nlines):
+        """
+        Move segment of buffer displayed in window by nlines (pos or neg),
+        but leave dot unchanged so window contents appear to scroll.
+        """
+        last = self.buf.S()
+        self.seg_1 = clip(self.seg_1 + nlines, 1, last)
+        self.seg_n = clip(self.seg_n + nlines,  1, last)
+
+    def shift(self, nlines):
+        """
+        Move segment of buffer displayed in window by nlines (pos or neg),
+        and shift dot also so window contents appear the same.
+        """
+        self.scroll(nlines)
+        self.dot = clip(self.dot + nlines, 1, self.buf.S())
+
+    def open_line(self, win_i):
+        'Make line empty at line number win_i on display'
+        # FIXME - omit guard - don't call this when out-of-range - let it crash
+        #if self.win_1 <= win_i <= self.win_1 + self.win_h - 2:
+        display.put_cursor(win_i, 1)
+        display.kill_whole_line()
+
+    
+    def clear_lines(self, first, last):
+        """
+        Clear consecutive consecutive lines from first through last in window.
+        Cursor must be positioned at first line already.
+        """
+        for i in range(first,last+1): # unempty if reached end of buffer
+            display.kill_whole_line()
+            print()
+
+    def update_lines(self, first, seg_i, last=0):
+        """
+        Write lines in window starting at line numbered first on the display,
+        to the bottom of the window, or to line numbered last if arg present.
+        Lines come from self.buf starting at its line seg_i.
+        """
+        # FIXME similar to render_segment above - just keep one
+        last = last if last else self.win_1 + self.win_hl - 1 #FIXMEself.bottom
+        # FIXME - omit guard - don't call this when out-of-range - let it crash
+        #if (self.win_1 <= first <= last and 1 <= seg_i <= self.buf.S()):
+        self.seg_n = seg_i + (last - first)
+        display.put_cursor(first, 1)
+        nprinted = self.render_lines(seg_i, self.seg_n)
+        icursor = first + nprinted
+        self.clear_lines(icursor, last)

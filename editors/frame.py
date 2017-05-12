@@ -1,5 +1,6 @@
 """
-frame.py - collection of windows 
+frame.py - Multiwindow display implemented by a list of window instances,
+            with a scrolling command region at the bottom of the display.
 
 Just a module, not a class.  We expect only a single frame in a session.
 """
@@ -24,7 +25,8 @@ win_i = None # current window index
 win = None # current window
 windows = list() # list of windows, windows[win_i] is the current window
 
-# Control state variables - these should all be replaced by Op
+# Control state variables
+command_mode = True # alternates with input (insert) mode used by ed a,i,c commands
 
 # previous values used in update_display
 cmd_h0 = win0 = None
@@ -96,7 +98,7 @@ def update_other_windows():
                 
 def update_cursor():
     # extracted from update_affected_windows above
-    if ed.command_mode:
+    if command_mode:
         win.render_marker() # indicates dot in window
     else: 
         win.put_insert_cursor() # term. insert cursor at open line
@@ -105,32 +107,52 @@ def update_affected_windows(update, segment_moved):
    # extracted from update display under elif segment_moved or ... txt_cmds:
     if segment_moved:
         win.position_segment()
-    win.update(open_line=(not ed.command_mode)) # open line in insert mode
+    win.update(open_line=(not command_mode)) # open line in insert mode
     update_other_windows() # other non-current windows might show part of same buffer
     update_cursor() # must draw marker or cursor last
 
 def update_display(update):  # FIXME - use contents of update, an Update record.
     'Check for any needed display updates.  If there are any, do them.'
 
-
     # new update_display code that branches on update.op
     # first do window commands o o1 o2, based on old o() fcn
     # merge in more code from below when we untangle logic
-    global windows, win, win_i
+    global command_mode, windows, win, win_i
 
     #print('update_display: ed.cmd_name %s, update.op %s' % 
     #     (ed.cmd_name, update.op)) # DEBUG
-
     reassign_window(update) # possibly reassign win.buf
     adjust_segments(update) # shift to adjust for insert/delete
 
     # frame changed, update all windows and marke
-    if cmd_h != cmd_h0: # FIXME can this be an Op also? Then we wouldn't need cmd_h0
+    if cmd_h != cmd_h0: # FIXME can this be an Op also? Try to eliminate cmd_h0
         update_frame()  # calls render_frame, which calls update_windows
 
     # Op cases 
 
-    # o: switch to next window
+    # Toggle between command mode and input (insert) mode.
+    if update.op == Op.input:
+        command_mode = False
+        win.dot = win.buf.dot 
+        win.dot_i = win.win_1 + (win.dot - win.seg_1) # FIXME make win method
+        if win.dot_i > 0:
+            display.put_render(win.dot_i, 1, win.buf.lines[win.dot][0],
+                               display.clear) # erase cursor at dot
+        if win.dot_i >= win.win_1 + win.win_hl - 1: # at bottom of window
+            win.scroll(win.win_hl//2)
+            win.dot_i = win.win_1 + (win.dot - win.seg_1) # FIXME make win mthd
+            win.update_lines(win.win_1, win.dot-win.win_hl//2+1, 
+                             last=win.dot_i)
+        win.open_line(win.dot_i+1)
+        win.update_lines(win.dot_i+2, win.dot+1)
+        display.put_cursor(win.dot_i+1,1)
+
+    elif update.op == Op.command:
+        command_mode = True
+        win.update(open_line=False)        
+        update_cursor()
+
+    # Switch to next window, edsel o command.
     elif update.op == Op.next:
         win.dot = win.buf.dot # save buffer dot in old window dot
         win_i = win_i = win_i+1 if win_i+1 < len(windows) else 0
@@ -145,7 +167,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win0.erase_marker()
         win.render_marker()
 
-    # o1, delete all but current window
+    # Delete all but current window, edsel o1 command.
     elif update.op == Op.single:
         windows = [win]
         win_i = 0
@@ -155,15 +177,15 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.find_dot() # FIXME? redundant?  It's already current
         # below:copied from update_affected_windows which is not called here
         win.position_segment()
-        win.update(open_line=(not ed.command_mode)) # open line in insert mode
+        win.update(open_line=(not command_mode)) # open line in insert mode
         update_other_windows() # FIXME there are no others
         update_cursor()
 
-    # o2, put the new window at the top, it becomes current window
+    # Put a new window at the top, it becomes current window, edsel o2 command.
     elif update.op == Op.hsplit:
         win_top = win.win_1
         new_win_h = win.win_h // 2 # integer division
-        win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old window
+        win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old win
         win.dot = win.buf.dot
         win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
         windows.insert(win_i, win)
@@ -172,7 +194,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.find_dot() # FIXME? redundant?
         # below:copied from update_affected_windows which is not called here
         win.position_segment()
-        win.update(open_line=(not ed.command_mode)) # open line in insert mode
+        win.update(open_line=(not command_mode)) # open line in insert mode
         # win0 is former current window
         # if win0 marker does not lie within new window erase it now.
         # win.resize in o2 command code does not relocate win0 marker
@@ -205,7 +227,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     # some commands do not affect windows or status line: A k n w ... 
 
     # put ed command cursor back in scrolling command region
-    if ed.command_mode:
+    if command_mode:
         put_command_cursor() 
 
 select_buf = (lambda bufname: None)
