@@ -133,23 +133,22 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     # Toggle between command mode and input (insert) mode.
     if update.op == Op.input:
         command_mode = False
-        win.dot = win.buf.dot 
-        win.dot_i = win.win_1 + (win.dot - win.seg_1) # FIXME make win method
+        win.dot_i = win.win_1 + (win.buf.dot - win.seg_1) # FIXME make win method
         if win.dot_i > 0:
-            display.put_render(win.dot_i, 1, win.buf.lines[win.dot][0],
+            display.put_render(win.dot_i, 1, win.buf.lines[win.buf.dot][0],
                                display.clear) # erase cursor at dot
         if win.dot_i >= win.win_1 + win.win_hl - 1: # at bottom of window
             win.scroll(win.win_hl//2)
-            win.dot_i = win.win_1 + (win.dot - win.seg_1) # FIXME make win mthd
-            win.update_lines(win.win_1, win.dot-win.win_hl//2+1, 
+            win.dot_i = win.win_1 + (win.buf.dot - win.seg_1)
+            win.update_lines(win.win_1, win.buf.dot-win.win_hl//2+1, 
                              last=win.dot_i)
         win.open_line(win.dot_i+1)
-        win.update_lines(win.dot_i+2, win.dot+1)
+        win.update_lines(win.dot_i+2, win.buf.dot+1)
         display.put_cursor(win.dot_i+1,1)
 
     elif update.op == Op.command:
         command_mode = True
-        win.update(open_line=False)        
+        win.update_lines(win.dot_i+1, win.buf.dot+1)
         update_cursor()
 
     # Switch to next window, edsel o command.
@@ -173,7 +172,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win_i = 0
         win.resize(frame_top, windows_h, ncols) # one big window
         # above: copied from old o(), below; copied from update_display
-        win.dot = win.buf.dot # FIXME? redundant?  I think so.  It's already current
+        win.dot = win.buf.dot # FIXME? redundant?  Isn't it already current?
         win.find_dot() # FIXME? redundant?  It's already current
         # below:copied from update_affected_windows which is not called here
         win.position_segment()
