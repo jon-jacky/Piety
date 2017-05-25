@@ -29,12 +29,13 @@ class Op(Enum):
     hsplit = 12  # edsel o2, split window, horizontal
 
 # Record that describes a single display update
-Update = namedtuple('Update', ['op','buffer','start','end','dest','nlines'])
+Update = namedtuple('Update', 
+                    ['op','buffer','start','end','destination','nlines'])
 
 # Queue of pending display updates from all tasks
 updates = deque()
 
-def update(op, buffer=None, start=0, end=0, dest=0, nlines=0):
+def update(op, buffer=None, start=0, end=0, destination=0, nlines=0):
     'Create an Update record and append it to the updates queue'
-    updates.append(Update(op, buffer=buffer, start=start, end=end, dest=dest, 
-                          nlines=nlines))
+    updates.append(Update(op, buffer=buffer, start=start, end=end, 
+                          destination=destination, nlines=nlines))

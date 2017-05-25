@@ -133,28 +133,34 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     # Toggle between command mode and input (insert) mode.
     if update.op == Op.input:
         command_mode = False
-        win.dot_i = win.win_1 + (win.buf.dot - win.seg_1) # FIXME make win method
-        if win.dot_i > 0:
-            display.put_render(win.dot_i, 1, win.buf.lines[win.buf.dot][0],
-                               display.clear) # erase cursor at dot
-        if win.dot_i >= win.win_1 + win.win_hl - 1: # at bottom of window
-            win.scroll(win.win_hl//2)
-            win.dot_i = win.win_1 + (win.buf.dot - win.seg_1)
-            win.update_lines(win.win_1, win.buf.dot-win.win_hl//2+1, 
-                             last=win.dot_i)
-        win.open_line(win.dot_i+1)
-        win.update_lines(win.dot_i+2, win.buf.dot+1)
-        display.put_cursor(win.dot_i+1,1)
+        win.update_for_input()
 
     elif update.op == Op.command:
         command_mode = True
+        # Overwrite '.' line on display, and lines below.
         win.update_lines(win.dot_i+1, win.buf.dot+1)
-        update_cursor()
+        win.set_marker(win.dot_i, win.buf.dot)
+
+    elif update.op == Op.insert and not command_mode:
+        # Dot itself is already up-to-date on display.
+        # Open next line and overwite lines below, scroll up if needed.
+        win.update_for_input()
+
+    elif update.op == Op.locate:
+        win.dot = win.buf.dot # dot_elsewhere and position_segment assume this
+        # update.start is the destination line, same was win.buf.dot
+        if win.dot_elsewhere(): # new destination dot outside previous segment
+            win.position_segment() # given new win.dot assigns new win.seg_1
+            win.update_lines(win.win_1, win.seg_1)
+        else:
+            win.clear_marker(win.buf2win(update.start), update.start)
+        # FIXME update.destination is supposed to be new win.buf.dot, right?  
+        win.set_marker(win.buf2win(update.destination), update.destination)
 
     # Switch to next window, edsel o command.
     elif update.op == Op.next:
         win.dot = win.buf.dot # save buffer dot in old window dot
-        win_i = win_i = win_i+1 if win_i+1 < len(windows) else 0
+        win_i = win_i+1 if win_i+1 < len(windows) else 0
         win = windows[win_i]
         select_buf(win.buf.name)
         win.buf.dot = win.dot  # restore buffer dot to new window dot 

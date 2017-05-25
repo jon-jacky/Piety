@@ -62,7 +62,8 @@ class Window(object):
         # seg_1, seg_n assigned in set_segment, called from update_window.
         # seg_1, seg_n are also reassigned when dot moves.
 
-    # report segment position: top, near bottom, at bottom, dot elsewhere, moved
+    # report segment position: top, near bottom, at bottom, dot elsewhere,moved
+    # FIXME?  Make dot an argument to all these, rather than using self.dot?
 
     def near_buf_top(self):
         'dot is in top half of segment at beginning of buffer that fits in window.'
@@ -91,12 +92,12 @@ class Window(object):
 
     def position_segment(self):
         """
-        Compute top of segment of buffer that is visible in window.
-        Assign self.seg_1: index in buffer of first line shown in window.
+        Given dot, assign self.seg_1: index in buffer of top line in window.
+        Center window on dot if possible,otherwise show top or bottom of buffer
         Uses line addresses in buffer self.dot self.buf.S()
          also window height self.win_hl
-        Center window on dot if possible,otherwise show top or bottom of buffer
         """
+        # FIXME?  Make dot an argument rather than using self.dot?
         if self.near_buf_top(): # first line at top of window
             self.seg_1 = 1  
         elif self.near_buf_bottom(): # last line at bottom of window
@@ -150,12 +151,12 @@ class Window(object):
         positions in window even when line numbers change due to deletes
         or inserts above.  Compare to management of mark in Buffer.
         """
-        if update.op == Op.insert:
-            if self.dot >= update.start:
+        if update.op == Op.insert:  
+            if self.dot >= update.start: # FIXME? update.destination
                 self.shift(update.nlines)
         elif update.op == Op.delete:
             if update.start <= self.dot <= update.end:
-                self.shift(self.buf.dot - self.dot) # so dot + shift == bufdot
+                self.shift(self.buf.dot - self.dot) # so dot + shift == buf.dot
             elif self.dot >= update.start and self.dot >= update.end:
                 self.shift(-update.nlines)
 
@@ -235,7 +236,7 @@ class Window(object):
             display.put_render(self.dot_i0, 1, ch, display.clear)
             
     def put_insert_cursor(self):
-        'Position cursor at start of open line after dot for i(nsert) a c  cmds'
+        'Position cursor at start of open line after dot for i(nsert) a c cmds'
         if self.buf.empty():
             iline = self.win_1  
         else:
@@ -262,7 +263,35 @@ class Window(object):
         self.render_status()
         # No self.put_insert_cursor or render_marker, caller must do it.
 
-    # New and revised methods used by new frame module in Op cases 
+    ### New and revised methods used by update.op cases in new frame module ###
+
+    # Naming - Here we use win_i arg for line number on display,
+    #   BUT in frame.py win_i is index of current window in windows list - !!??
+
+    def bottom(self):
+        'Line number on display of last content line in window (not status line).'
+        return self.win_1 + self.win_hl - 1
+
+    def buf2win(self, seg_i):
+        'Line number on display of seg_i in buffer.'
+        return self.win_1 + (seg_i - self.seg_1)
+ 
+    def empty_line(self, seg_i):
+        'True when line number seg_i in buffer is empty, or is just \n'
+        return self.buf.lines[seg_i] in ('','\n')
+
+    def ch0(self, seg_i):
+        'First character in line seg_i in buffer, or space if line is empty'
+        return ' ' if self.empty_line(seg_i) else self.buf.lines[seg_i][0]
+
+    def set_marker(self, win_i, seg_i):
+        'Set marker on display line number win_i which shows buffer line seg_i'
+        # FIXME?  Handle empty buffer here or in caller?
+        display.put_render(win_i, 1, self.ch0(seg_i), display.white_bg)
+
+    def clear_marker(self, win_i, seg_i):
+        'Clear marker from display line win_i which shows buffer line seg_i'
+        display.put_render(win_i, 1, self.ch0(seg_i), display.clear)
 
     def scroll(self, nlines):
         """
@@ -288,7 +317,6 @@ class Window(object):
         display.put_cursor(win_i, 1)
         display.kill_whole_line()
 
-    
     def clear_lines(self, first, last):
         """
         Clear consecutive consecutive lines from first through last in window.
@@ -305,7 +333,7 @@ class Window(object):
         Lines come from self.buf starting at its line seg_i.
         """
         # FIXME similar to render_segment above - just keep one
-        last = last if last else self.win_1 + self.win_hl - 1 #FIXMEself.bottom
+        last = last if last else self.bottom()
         # FIXME - omit guard - don't call this when out-of-range - let it crash
         #if (self.win_1 <= first <= last and 1 <= seg_i <= self.buf.S()):
         self.seg_n = seg_i + (last - first)
@@ -313,3 +341,22 @@ class Window(object):
         nprinted = self.render_lines(seg_i, self.seg_n)
         icursor = first + nprinted
         self.clear_lines(icursor, last)
+
+    def update_for_input(self):
+        """
+        Open next line and overwrite lines below.
+        If at bottom of window, scroll insertion point up to the middle.
+        Then place input cursor.
+        """
+        self.dot_i = self.buf2win(self.buf.dot)
+        if self.dot_i > 0:
+            display.put_render(self.dot_i, 1, self.buf.lines[self.buf.dot][0],
+                               display.clear) # erase cursor at dot
+        if self.dot_i >= self.win_1 + self.win_hl - 1: # at bottom of window
+            self.scroll(self.win_hl//2)
+            self.dot_i = self.win_1 + (self.buf.dot - self.seg_1)
+            self.update_lines(self.win_1, self.buf.dot-self.win_hl//2+1, 
+                             last=self.dot_i)
+        self.open_line(self.dot_i+1)
+        self.update_lines(self.dot_i+2, self.buf.dot+1)
+        display.put_cursor(self.dot_i+1,1)
