@@ -134,17 +134,22 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     if update.op == Op.input:
         command_mode = False
         win.update_for_input()
+        win.render_status_info(update)
+        display.put_cursor(win.dot_i+1,1)
 
     elif update.op == Op.command:
         command_mode = True
         # Overwrite '.' line on display, and lines below.
         win.update_lines(win.dot_i+1, win.buf.dot+1)
         win.set_marker(win.dot_i, win.buf.dot)
+        win.render_status_info(update)
 
     elif update.op == Op.insert and not command_mode:
         # Dot itself is already up-to-date on display.
         # Open next line and overwite lines below, scroll up if needed.
         win.update_for_input()
+        win.render_status_info(update)
+        display.put_cursor(win.dot_i+1,1)
 
     elif update.op == Op.locate:
         win.dot = win.buf.dot # dot_elsewhere and position_segment assume this
@@ -156,6 +161,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
             win.clear_marker(win.buf2win(update.start), update.start)
         # FIXME update.destination is supposed to be new win.buf.dot, right?  
         win.set_marker(win.buf2win(update.destination), update.destination)
+        win.render_status_info(update)
 
     # Switch to next window, edsel o command.
     elif update.op == Op.next:

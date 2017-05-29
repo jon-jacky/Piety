@@ -20,6 +20,9 @@ class Window(object):
     Has a line called dot where text insertions etc. occur.
     May display a cursor-like marker to indicate dot.
     """
+
+    nupdates = 0 # diagnostic, used by update_status_info
+
     def __init__(self, buf, win_1, win_h, ncols):
         """
         Initialize window, given its text buffer, location, and dimensions
@@ -45,6 +48,9 @@ class Window(object):
         self.marker_chx = '' # same as marker_ch except when that is blank
         self.dot_i0 = 0 # previous value of dot_i
         self.marker_ch0 = '' # previous value of marker_ch
+
+        self.first = 0    # first line printed on window during this update
+        self.nprinted = 0 # n of lines printed on window during this update
 
     # assign window dimenions: self.win_1 win_h win_hl status_1 ncols buf.npage
     
@@ -199,7 +205,7 @@ class Window(object):
             display.kill_whole_line()
             print()
 
-    def render_status(self):
+    def render_status_prefix(self):
         "Print information about window's buffer in its status line."
         s1 = self.status_1  # line number of status bar on display
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
@@ -209,13 +215,32 @@ class Window(object):
                     ' Bot ' if self.seg_n == self.buf.S() else
                     ' %2.0f%% ' % (100*self.dot/(len(self.buf.lines)-1))) # %% prints %
         linenums = '%-14s' % ('L%d/%d ' % (self.dot, self.buf.S()))
-        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 ch w/margin
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
         display.put_render(s1, 26, position, display.white_bg)
         display.put_render(s1, 31, linenums, display.white_bg)
+
+    def render_status(self):
+        "Print information about window's buffer in its status line."
+        self.render_status_prefix()
+        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 char
+        s1 = self.status_1  # line number of status bar on display
         display.put_render(s1, 45, '-'*(self.ncols-(45+10)), display.white_bg)
         display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
+
+    def render_status_info(self, update):
+        "Print diagnostic and debug information in the status line."
+        self.render_status_prefix()
+        s1 = self.status_1   # line number of status bar on display
+        Window.nupdates += 1 # ensure at least this changes in status line
+        update_info = '%3d %3s s:%3d e:%3d d:%3d n:%3d,%3d %3d' % \
+            (Window.nupdates, str(update.op)[3:6],
+             update.start, update.end, update.destination, update.nlines,
+             self.first, self.nprinted)
+        display.put_render(s1, 40, update_info, display.white_bg)
+        display.kill_line()
+        self.first = 0    # reset after each update
+        self.nprinted = 0 
 
     def render_marker(self):
         """
@@ -332,14 +357,15 @@ class Window(object):
         to the bottom of the window, or to line numbered last if arg present.
         Lines come from self.buf starting at its line seg_i.
         """
+        self.first = first if not self.first else self.first
         # FIXME similar to render_segment above - just keep one
         last = last if last else self.bottom()
         # FIXME - omit guard - don't call this when out-of-range - let it crash
         #if (self.win_1 <= first <= last and 1 <= seg_i <= self.buf.S()):
         self.seg_n = seg_i + (last - first)
         display.put_cursor(first, 1)
-        nprinted = self.render_lines(seg_i, self.seg_n)
-        icursor = first + nprinted
+        self.nprinted += self.render_lines(seg_i, self.seg_n)
+        icursor = first + self.nprinted
         self.clear_lines(icursor, last)
 
     def update_for_input(self):
@@ -359,4 +385,3 @@ class Window(object):
                              last=self.dot_i)
         self.open_line(self.dot_i+1)
         self.update_lines(self.dot_i+2, self.buf.dot+1)
-        display.put_cursor(self.dot_i+1,1)
