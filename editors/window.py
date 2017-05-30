@@ -49,6 +49,7 @@ class Window(object):
         self.dot_i0 = 0 # previous value of dot_i
         self.marker_ch0 = '' # previous value of marker_ch
 
+        # DIAGNOSTICS
         self.first = 0    # first line printed on window during this update
         self.nprinted = 0 # n of lines printed on window during this update
 
@@ -178,7 +179,7 @@ class Window(object):
             print(line.rstrip()[:self.ncols-1], end=' ') # remove \n, truncate
             display.kill_line()
             print()
-        return i+1 # n printed, less than first:last+1 if end of buf
+        return i+1 # fewer than first:last+1 when at end of buffer
 
     def render_segment(self, open_line=False):
         """
@@ -325,7 +326,7 @@ class Window(object):
         """
         last = self.buf.S()
         self.seg_1 = clip(self.seg_1 + nlines, 1, last)
-        self.seg_n = clip(self.seg_n + nlines,  1, last)
+        self.seg_n = clip(self.seg_n + nlines, 1, last)
 
     def shift(self, nlines):
         """
@@ -357,17 +358,18 @@ class Window(object):
         to the bottom of the window, or to line numbered last if arg present.
         Lines come from self.buf starting at its line seg_i.
         """
-        self.first = first if not self.first else self.first
+        self.first = first if self.first == 0 else self.first # DIAGNOSTIC
         # FIXME similar to render_segment above - just keep one
         last = last if last else self.bottom()
         # FIXME - omit guard - don't call this when out-of-range - let it crash
         #if (self.win_1 <= first <= last and 1 <= seg_i <= self.buf.S()):
-        self.seg_n = seg_i + (last - first)
+        self.seg_n = seg_i + (last - first) # seg_n might exceed $ if near eob
         display.put_cursor(first, 1)
-        self.nprinted += self.render_lines(seg_i, self.seg_n)
-        icursor = first + self.nprinted
+        nprinted = self.render_lines(seg_i, self.seg_n)
+        icursor = first + nprinted
+        self.nprinted += nprinted # DIAGNOSTIC
         self.clear_lines(icursor, last)
-
+        
     def update_for_input(self):
         """
         Open next line and overwrite lines below.
@@ -382,6 +384,6 @@ class Window(object):
             self.scroll(self.win_hl//2)
             self.dot_i = self.win_1 + (self.buf.dot - self.seg_1)
             self.update_lines(self.win_1, self.buf.dot-self.win_hl//2+1, 
-                             last=self.dot_i)
+                              last=self.dot_i)
         self.open_line(self.dot_i+1)
         self.update_lines(self.dot_i+2, self.buf.dot+1)

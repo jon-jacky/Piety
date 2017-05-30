@@ -134,7 +134,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     if update.op == Op.input:
         command_mode = False
         win.update_for_input()
-        win.render_status_info(update)
+        win.render_status_info(update) # DIAGNOSTIC
         display.put_cursor(win.dot_i+1,1)
 
     elif update.op == Op.command:
@@ -142,13 +142,13 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         # Overwrite '.' line on display, and lines below.
         win.update_lines(win.dot_i+1, win.buf.dot+1)
         win.set_marker(win.dot_i, win.buf.dot)
-        win.render_status_info(update)
+        win.render_status_info(update) # DIAGNOSTIC
 
     elif update.op == Op.insert and not command_mode:
         # Dot itself is already up-to-date on display.
         # Open next line and overwite lines below, scroll up if needed.
         win.update_for_input()
-        win.render_status_info(update)
+        win.render_status_info(update) # DIAGNOSTIC
         display.put_cursor(win.dot_i+1,1)
 
     elif update.op == Op.locate:
@@ -161,7 +161,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
             win.clear_marker(win.buf2win(update.start), update.start)
         # FIXME update.destination is supposed to be new win.buf.dot, right?  
         win.set_marker(win.buf2win(update.destination), update.destination)
-        win.render_status_info(update)
+        win.render_status_info(update) # DIAGNOSTIC
 
     # Switch to next window, edsel o command.
     elif update.op == Op.next:
@@ -177,6 +177,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win0.find_dot() # move marker to new current window
         win0.erase_marker()
         win.render_marker()
+        win.render_status_info(update) # DIAGNOSTIC
 
     # Delete all but current window, edsel o1 command.
     elif update.op == Op.single:
@@ -188,6 +189,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.find_dot() # FIXME? redundant?  It's already current
         # below:copied from update_affected_windows which is not called here
         win.position_segment()
+        # win.update calls render_status, so can't call new render_status_info
         win.update(open_line=(not command_mode)) # open line in insert mode
         update_other_windows() # FIXME there are no others
         update_cursor()
@@ -205,6 +207,7 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.find_dot() # FIXME? redundant?
         # below:copied from update_affected_windows which is not called here
         win.position_segment()
+        # win.update calls render_status, so can't call new render_status_info
         win.update(open_line=(not command_mode)) # open line in insert mode
         # win0 is former current window
         # if win0 marker does not lie within new window erase it now.

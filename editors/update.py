@@ -24,7 +24,7 @@ class Op(Enum):
     input = 8    # ed a i c  enter input (insert) mode, from command mode.
     command = 9  # ed .  exit input (insert) mode, return to command mode
     # update operations in frame, refer to windows
-    next = 10     # edsle o, switch to next window
+    next = 10    # edsel o, switch to next window
     single = 11  # edsel o1, return to single window
     hsplit = 12  # edsel o2, split window, horizontal
 

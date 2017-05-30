@@ -201,7 +201,7 @@ def select_buf(bufname):
     global current, buf
     current = bufname
     buf = buffers[current]
-    update(Op.select, buffer=buf)
+    # update(Op.select, buffer=buf) # FIXME - can we use this?
 
 def b(*args):
     """
