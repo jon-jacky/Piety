@@ -295,8 +295,23 @@ class Window(object):
     #   BUT in frame.py win_i is index of current window in windows list - !!??
 
     def bottom(self):
-        'Line number on display of last content line in window (not status line).'
+        'Line number on display of last line in window (but not status line).'
         return self.win_1 + self.win_hl - 1
+
+    def near_top(self, seg_i):
+        """
+        Line number in buffer seg_i 
+        is in top half of segment at beginning of buffer that fits in window.
+        """
+        return (seg_i <= self.win_hl//2 or self.buf.S() <= self.win_hl)
+
+    def near_bottom(self, seg_i):
+        """
+        Line number in buffer seg_i 
+        is in bottom half of segment at end of buffer that fits in window.
+        """
+        return (self.buf.S() - seg_i < self.win_hl//2 and
+                self.buf.S() >= self.win_hl)
 
     def buf2win(self, seg_i):
         'Line number on display of seg_i in buffer.'
@@ -306,6 +321,10 @@ class Window(object):
         'True when line number seg_i in buffer is empty, or is just \n'
         return self.buf.lines[seg_i] in ('','\n')
 
+    def contains(self, seg_i):
+        'True when line number seg_i in buffer is contained in the window'
+        return (self.seg_1 <= seg_i <= self.seg_n)
+        
     def ch0(self, seg_i):
         'First character in line seg_i in buffer, or space if line is empty'
         return ' ' if self.empty_line(seg_i) else self.buf.lines[seg_i][0]
@@ -335,6 +354,18 @@ class Window(object):
         """
         self.scroll(nlines)
         self.dot = clip(self.dot + nlines, 1, self.buf.S())
+
+    def locate_segment(self, seg_i):
+        """
+        Given line number in buffer seg_i, position window by
+        assigning self.seg_1, index in buffer of top line in window.
+        """
+        if self.near_top(seg_i): # put first buffer line at top of window
+            self.seg_1 = 1  
+        elif self.near_bottom(seg_i): # put last buffer line at bottom
+            self.seg_1 = self.buf.S() - (self.win_hl - 1)
+        else: # center seg_i in window
+            self.seg_1 = seg_i - self.win_hl//2
 
     def open_line(self, win_i):
         'Make line empty at line number win_i on display'

@@ -125,18 +125,19 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     adjust_segments(update) # shift to adjust for insert/delete
 
     # frame changed, update all windows and marke
-    if cmd_h != cmd_h0: # FIXME can this be an Op also? Try to eliminate cmd_h0
+    if cmd_h != cmd_h0: # FIXME should be an Op case, eliminate cmd_h0
         update_frame()  # calls render_frame, which calls update_windows
 
     # Op cases 
 
-    # Toggle between command mode and input (insert) mode.
+    # Switch to input (insert) mode, edsel a i c commands
     if update.op == Op.input:
-        command_mode = False
+        command_mode = False 
         win.update_for_input()
         win.render_status_info(update) # DIAGNOSTIC
         display.put_cursor(win.dot_i+1,1)
 
+    # Switch to command mode, edsel . while in input mode
     elif update.op == Op.command:
         command_mode = True
         # Overwrite '.' line on display, and lines below.
@@ -144,78 +145,71 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.set_marker(win.dot_i, win.buf.dot)
         win.render_status_info(update) # DIAGNOSTIC
 
+    # Insert text in input mode, after edsel a i c commands
     elif update.op == Op.insert and not command_mode:
-        # Dot itself is already up-to-date on display.
+        # Text at dot is already up-to-date on display.
         # Open next line and overwite lines below, scroll up if needed.
         win.update_for_input()
         win.render_status_info(update) # DIAGNOSTIC
         display.put_cursor(win.dot_i+1,1)
 
+    # Dot moved, edsel l command
     elif update.op == Op.locate:
-        win.dot = win.buf.dot # dot_elsewhere and position_segment assume this
-        # update.start is the destination line, same was win.buf.dot
-        if win.dot_elsewhere(): # new destination dot outside previous segment
-            win.position_segment() # given new win.dot assigns new win.seg_1
-            win.update_lines(win.win_1, win.seg_1)
-        else:
+        # Later move all this to Window method, 
+        # here just call win.locate(... source ..., ...destination...)
+        if win.contains(update.destination):
             win.clear_marker(win.buf2win(update.start), update.start)
-        # FIXME update.destination is supposed to be new win.buf.dot, right?  
+        else:
+            # The following four lines appear in Op.single,.hsplit, make method
+            win.locate_segment(update.destination)
+            win.update_lines(win.win_1, win.seg_1)
         win.set_marker(win.buf2win(update.destination), update.destination)
-        win.render_status_info(update) # DIAGNOSTIC
+        win.render_status_info(update) # DIAGNOSTIC, not included in win.locate
 
-    # Switch to next window, edsel o command.
+    # Switch to next window, edsel o command
     elif update.op == Op.next:
-        win.dot = win.buf.dot # save buffer dot in old window dot
+        # Save current buffer dot in window saved dot
+        lwin0 = win # lwin0 is local win0 - will replace module level win0 
+        lwin0.dot = lwin0.buf.dot #FIXME rename lhs win.saved_dot
         win_i = win_i+1 if win_i+1 < len(windows) else 0
-        win = windows[win_i]
-        select_buf(win.buf.name)
-        win.buf.dot = win.dot  # restore buffer dot to new window dot 
-        # above: copied from old o(), below copied from update_display top
-        win.dot = win.buf.dot #  FIXME? redundant?  Yes, see immediately above.
-        win.find_dot() # FIXME?  redundant?
-        # below copied from update_display case elif 'o'
-        win0.find_dot() # move marker to new current window
-        win0.erase_marker()
-        win.render_marker()
+        win = windows[win_i] # assign new window
+        # Restore new window saved dot to buffer dot 
+        win.buf.dot = win.dot # FIXME rename rhs win.saved_dot
+        lwin0.clear_marker(lwin0.buf2win(lwin0.dot),lwin0.dot) #lwin0.saved_dot
+        win.set_marker(win.buf2win(win.buf.dot), win.buf.dot)
         win.render_status_info(update) # DIAGNOSTIC
 
-    # Delete all but current window, edsel o1 command.
-    elif update.op == Op.single:
+    # Delete all but current window, edsel o1 cmd
+    elif update.op == Op.single: 
         windows = [win]
         win_i = 0
         win.resize(frame_top, windows_h, ncols) # one big window
-        # above: copied from old o(), below; copied from update_display
-        win.dot = win.buf.dot # FIXME? redundant?  Isn't it already current?
-        win.find_dot() # FIXME? redundant?  It's already current
-        # below:copied from update_affected_windows which is not called here
-        win.position_segment()
-        # win.update calls render_status, so can't call new render_status_info
-        win.update(open_line=(not command_mode)) # open line in insert mode
-        update_other_windows() # FIXME there are no others
-        update_cursor()
+        # The following four lines appear in Op.hsplit also - window method
+        win.locate_segment(win.buf.dot)
+        win.update_lines(win.win_1, win.seg_1)
+        win.set_marker(win.buf2win(win.buf.dot), win.buf.dot)
+        win.render_status_info(update) # DIAGNOSTIC
 
-    # Put a new window at the top, it becomes current window, edsel o2 command.
-    elif update.op == Op.hsplit:
-        win_top = win.win_1
-        new_win_h = win.win_h // 2 # integer division
-        win.resize(win_top + new_win_h, win.win_h - new_win_h, ncols) # old win
-        win.dot = win.buf.dot
+    # Split window, new window above becomes current window, edsel o2 command
+    elif update.op == Op.hsplit: 
+        lwin0 = win # lwin0 is local win0 - will replace module level win0 
+        lwin0.dot = lwin0.buf.dot  # FIXME lhs: lwin0.saved_dot
+        win_top = lwin0.win_1
+        new_win_h = lwin0.win_h // 2 # integer division
+        lwin0.resize(win_top + new_win_h, lwin0.win_h - new_win_h, ncols) # old
         win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
         windows.insert(win_i, win)
-        # above: copied from old o(), below; copied from update_display
-        win.dot = win.buf.dot # FIXME - redundant - see above
-        win.find_dot() # FIXME? redundant?
-        # below:copied from update_affected_windows which is not called here
-        win.position_segment()
-        # win.update calls render_status, so can't call new render_status_info
-        win.update(open_line=(not command_mode)) # open line in insert mode
-        # win0 is former current window
-        # if win0 marker does not lie within new window erase it now.
-        # win.resize in o2 command code does not relocate win0 marker
-        if win0.dot_i < win.win_1 or win0.dot_i > win.win_1+win.win_h:
-            win0.erase_marker()
-            win0.position_segment() # FIXME necessary?
-        win0.update()
+        # The following four lines appear in Op.single also - window method
+        win.locate_segment(win.buf.dot)
+        win.update_lines(win.win_1, win.seg_1)
+        win.set_marker(win.buf2win(win.buf.dot), win.buf.dot)
+        win.render_status_info(update) # DIAGNOSTIC
+        # Here are those same four lines again - should be a window method
+        # EXCEPT here we clear marker instead of set it.
+        lwin0.locate_segment(lwin0.buf.dot)
+        lwin0.update_lines(lwin0.win_1, lwin0.seg_1)
+        lwin0.clear_marker(lwin0.buf2win(lwin0.buf.dot), lwin0.buf.dot)
+        lwin0.render_status_info(update) # DIAGNOSTIC
 
     # previous update_display code.  FIXME untangle logic, use Op case analysis
     else:
@@ -244,12 +238,9 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     if command_mode:
         put_command_cursor() 
 
-select_buf = (lambda bufname: None)
-
-def init(buffer, select_buf_fcn, cmd_h_option=None):
+def init(buffer, cmd_h_option=None):
     'Initialize frame with one window into buffer'
-    global select_buf, cmd_h, win, win_i
-    select_buf = select_buf_fcn
+    global cmd_h, win, win_i
     if cmd_h_option: 
         cmd_h = cmd_h_option # otherwise keep default assigned above
     calc_frame() # must assign windows_h etc. before we create first window

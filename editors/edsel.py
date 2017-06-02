@@ -12,13 +12,20 @@ from update import update, Op
 
 def do_window_command(line):
     param_string = line.lstrip()[1:].lstrip()
+
     if not param_string: # o: switch to next window
+        next_i = (frame.win_i+1 if frame.win_i+1 < len(frame.windows)
+                  else 0)
+        ed.select_buf(frame.windows[next_i].buf.name) # calls update(Op.select)
         update(Op.next)
+
     elif param_string.startswith('1'): # o1: return to single window
         update(Op.single)
+
     elif param_string.startswith('2'): # o2: split window, horizontal
         update(Op.hsplit)
-    else: # more options later?
+
+    else:
         print('? integer 1 or 2 expected at %s' % param_string) 
 
 def do_command(line):
@@ -47,7 +54,7 @@ def startup(*filename, **options):
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
     ed.startup(*filename, **options)
     cmd_h = options['c'] if 'c' in options else None
-    frame.init(ed.buf, ed.select_buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf
+    frame.init(ed.buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf
 
 def cleanup():
     'Restore full-screen scrolling, cursor to bottom.'

@@ -1,5 +1,5 @@
 """
-update.py - Define display updates: generic editing, buffer, window, operations 
+update.py - Define display updates: generic editing, buffer, window operations 
              named independently of particular editors or other programs.
 """
 
