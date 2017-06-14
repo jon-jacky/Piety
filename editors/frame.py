@@ -6,7 +6,7 @@ Just a module, not a class.  We expect only a single frame in a session.
 """
 
 import terminal_util, display, window
-from update import update, updates, Op
+from update import updates, Op, placeholder
 import ed # FIXME should be able to remove when Op and update queue working
 
 nlines, ncols = terminal_util.dimensions()
@@ -46,8 +46,10 @@ def calc_frame():
 def update_windows():  # update_all_windows
     'Redraw all windows, called by render_frame, for example after resize.'
     for w in windows:
-        w.position_segment() # necessary if window(s) resized
-        w.update()  # no windows could be in insert mode at this time
+        w.update_lines(w.win_1, w.seg_1)
+        if w.current:
+            w.set_marker(w.buf2win(w.buf.dot), w.buf.dot)
+        w.render_status_info(placeholder) # DIAGNOSTIC
 
 def put_command_cursor():
     'Put cursor at input line in scrolling command region'
@@ -59,7 +61,6 @@ def render_frame():
     display.put_cursor(1,1) # origin, upper left corner
     display.erase() 
     update_windows()
-    win.render_marker()
     display.set_scroll(cmd_1, cmd_n) 
     put_command_cursor()
 
@@ -77,6 +78,7 @@ def update_frame():
 def reassign_window(update):
     'Assign a different buffer to the current window'
     if update.op in (Op.create, Op.select):
+        win.current = True
         win.buf = update.buffer
 
 def adjust_segments(update):
@@ -121,8 +123,8 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
 
     #print('update_display: ed.cmd_name %s, update.op %s' % 
     #     (ed.cmd_name, update.op)) # DEBUG
-    reassign_window(update) # possibly reassign win.buf
-    adjust_segments(update) # shift to adjust for insert/delete
+    # reassign_window(update) # possibly reassign win.buf # FIXME Op cases
+    # adjust_segments(update) # shift to adjust for insert/delete
 
     # frame changed, update all windows and marke
     if cmd_h != cmd_h0: # FIXME should be an Op case, eliminate cmd_h0
@@ -130,14 +132,33 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
 
     # Op cases 
 
-    # Switch to input (insert) mode, edsel a i c commands
-    if update.op == Op.input:
+    # Placeholder
+    if update.op == Op.nop:
+        pass 
+
+    # Create new buffer, ed B, Op.insert case will display its contents
+    if update.op == Op.create:
+        win.current = True
+        win.buf = update.buffer
+
+    # Change buffer in current window, ed b E D
+    elif update.op == Op.select:
+        win.current = True
+        win.buf = update.buffer
+        # These four lines occur again and again
+        win.locate_segment(win.buf.dot)
+        win.update_lines(win.win_1, win.seg_1)
+        win.set_marker(win.buf2win(win.buf.dot), win.buf.dot)
+        win.render_status_info(update) # DIAGNOSTIC
+
+    # Switch to input (insert) mode, for ed a i c commands
+    elif update.op == Op.input:
         command_mode = False 
         win.update_for_input()
         win.render_status_info(update) # DIAGNOSTIC
         display.put_cursor(win.dot_i+1,1)
 
-    # Switch to command mode, edsel . while in input mode
+    # Switch to command mode, ed . while in input mode
     elif update.op == Op.command:
         command_mode = True
         # Overwrite '.' line on display, and lines below.
@@ -145,20 +166,11 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.set_marker(win.dot_i, win.buf.dot)
         win.render_status_info(update) # DIAGNOSTIC
 
-    # Insert text in input mode, after edsel a i c commands
-    elif update.op == Op.insert and not command_mode:
-        # Text at dot is already up-to-date on display.
-        # Open next line and overwite lines below, scroll up if needed.
-        win.update_for_input()
-        win.render_status_info(update) # DIAGNOSTIC
-        display.put_cursor(win.dot_i+1,1)
-
-    # Dot moved, edsel l command
+    # Dot moved, ed l command
     elif update.op == Op.locate:
-        # Later move all this to Window method, 
-        # here just call win.locate(... source ..., ...destination...)
+        # Later move all this to window method, 
         if win.contains(update.destination):
-            win.clear_marker(win.buf2win(update.start), update.start)
+            win.clear_marker(win.buf2win(update.origin), update.origin)
         else:
             # The following four lines appear in Op.single,.hsplit, make method
             win.locate_segment(update.destination)
@@ -166,13 +178,71 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
         win.set_marker(win.buf2win(update.destination), update.destination)
         win.render_status_info(update) # DIAGNOSTIC, not included in win.locate
 
+    # Insert text: ed a i c m r t y commands
+    elif update.op == Op.insert:
+        # update.start, end are the first, last inserted line
+        # win.buf.dot is the last inserted line
+        if command_mode: # ed commands m r t y
+            if win.contains(update.end):
+                if update.origin != 0:
+                    win.clear_marker(win.buf2win(update.origin), update.origin)
+                win.update_lines(win.buf2win(update.start), update.start)
+            else:
+                win.locate_segment(update.end)
+                win.update_lines(win.win_1, win.seg_1)
+            win.set_marker(win.buf2win(update.end), update.end)
+        else: # input mode after ed commands a i c    
+            # Text at dot is already up-to-date on display.
+            # Open next line and overwite lines below, scroll up if needed.
+            win.update_for_input()
+        win.render_status_info(update) # DIAGNOSTIC
+        for w in windows:
+            if (w != win and w.buf == win.buf): # other windows, current buffer
+                #FIXME?Does this assumes only one line inserted?
+                if w.contains(update.end): # does this assume nlines == 1 ?
+                    w.update_lines(w.buf2win(update.end), update.end)
+                    w.render_status_info(update) # DIAGNOSTIC
+                elif w.seg_1 > update.end: # inserted text above window
+                    nlines = (update.end - update.start) + 1
+                    w.shift(nlines)  # does this assume update.nlines==1
+                    w.render_status_info(update) # DIAGNOSTIC
+                else: # inserted text below window
+                    pass
+        if not command_mode:
+            display.put_cursor(win.dot_i+1,1)
+
+    # Delete text: ed d m commands
+    elif update.op == Op.delete:
+        if win.contains(update.destination):
+            win.update_lines(win.buf2win(update.destination), 
+                             update.destination)
+        else:
+            win.locate_segment(update.destination)
+            win.update_lines(win.win_1, win.seg_1)
+        win.set_marker(win.buf2win(update.destination), update.destination)
+        win.render_status_info(update) # DIAGNOSTIC
+        for w in windows:
+            if (w != win and w.buf == win.buf): # other windows, current buffer
+                if w.contains(update.destination):
+                    w.update_lines(w.buf2win(update.destination), 
+                                   update.destination)
+                    w.render_status_info(update) # DIAGNOSTIC
+                elif w.seg_1 > update.destination: # deleted text above window
+                    nlines = (update.end - update.start) + 1
+                    w.shift(-nlines)
+                    w.render_status_info(update) # DIAGNOSTIC
+                else: # deleted text below window
+                    pass
+
     # Switch to next window, edsel o command
     elif update.op == Op.next:
         # Save current buffer dot in window saved dot
         lwin0 = win # lwin0 is local win0 - will replace module level win0 
+        lwin0.current = False
         lwin0.dot = lwin0.buf.dot #FIXME rename lhs win.saved_dot
         win_i = win_i+1 if win_i+1 < len(windows) else 0
         win = windows[win_i] # assign new window
+        win.current = True
         # Restore new window saved dot to buffer dot 
         win.buf.dot = win.dot # FIXME rename rhs win.saved_dot
         lwin0.clear_marker(lwin0.buf2win(lwin0.dot),lwin0.dot) #lwin0.saved_dot
@@ -193,11 +263,13 @@ def update_display(update):  # FIXME - use contents of update, an Update record.
     # Split window, new window above becomes current window, edsel o2 command
     elif update.op == Op.hsplit: 
         lwin0 = win # lwin0 is local win0 - will replace module level win0 
+        lwin0.current = False
         lwin0.dot = lwin0.buf.dot  # FIXME lhs: lwin0.saved_dot
         win_top = lwin0.win_1
         new_win_h = lwin0.win_h // 2 # integer division
         lwin0.resize(win_top + new_win_h, lwin0.win_h - new_win_h, ncols) # old
         win = window.Window(win.buf, win_top, new_win_h, ncols) # new window
+        win.current = True
         windows.insert(win_i, win)
         # The following four lines appear in Op.single also - window method
         win.locate_segment(win.buf.dot)
@@ -245,6 +317,7 @@ def init(buffer, cmd_h_option=None):
         cmd_h = cmd_h_option # otherwise keep default assigned above
     calc_frame() # must assign windows_h etc. before we create first window
     win = window.Window(buffer, frame_top, windows_h, ncols)
+    win.current = True
     windows.append(win) 
     win_i = 0 # Now win == windows[win_i]
     render_frame()

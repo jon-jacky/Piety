@@ -5,6 +5,7 @@ Each window instance displays a range of lines from a text buffer.
 """
 
 from datetime import datetime # for timestamp, used for testing
+import math # for math.ceil
 import display
 from update import Op
 
@@ -21,7 +22,7 @@ class Window(object):
     May display a cursor-like marker to indicate dot.
     """
 
-    nupdates = 0 # diagnostic, used by update_status_info
+    nupdates = 0 # diagnostic, used by render_status_info
 
     def __init__(self, buf, win_1, win_h, ncols):
         """
@@ -34,6 +35,7 @@ class Window(object):
         win_h - number of lines in this window, including status region
         ncols - maximum number of characters in a line
         """
+        self.current = False # True when this window is the current window
         self.buf = buf
         # Initialize but never update self.dot here, this window might not be current
         self.dot = self.buf.dot 
@@ -158,14 +160,15 @@ class Window(object):
         positions in window even when line numbers change due to deletes
         or inserts above.  Compare to management of mark in Buffer.
         """
+        nlines = update.end - update.start + 1  # might be negative
         if update.op == Op.insert:  
             if self.dot >= update.start: # FIXME? update.destination
-                self.shift(update.nlines)
+                self.shift(nlines)
         elif update.op == Op.delete:
             if update.start <= self.dot <= update.end:
                 self.shift(self.buf.dot - self.dot) # so dot + shift == buf.dot
             elif self.dot >= update.start and self.dot >= update.end:
-                self.shift(-update.nlines)
+                self.shift(nlines)
 
     # display (parts of) window
 
@@ -214,12 +217,13 @@ class Window(object):
         position = (' All ' if self.buf.S() <= self.win_hl else # S() is last line
                     ' Top ' if self.seg_1 == 1 else
                     ' Bot ' if self.seg_n == self.buf.S() else
-                    ' %2.0f%% ' % (100*self.dot/(len(self.buf.lines)-1))) # %% prints %
-        linenums = '%-14s' % ('L%d/%d ' % (self.dot, self.buf.S()))
+                    ' %2.0f%% ' % (100*self.buf.dot/(len(self.buf.lines)-1)))
+        linenums = '%-14s' % ('L%d/%d ' % (self.buf.dot if self.current 
+                                           else self.dot, self.buf.S()))
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
-        display.put_render(s1, 26, position, display.white_bg)
-        display.put_render(s1, 31, linenums, display.white_bg)
+        display.put_render(s1, 22, position, display.white_bg) # was 26
+        display.put_render(s1, 27, linenums, display.white_bg) # was 31
 
     def render_status(self):
         "Print information about window's buffer in its status line."
@@ -234,11 +238,11 @@ class Window(object):
         self.render_status_prefix()
         s1 = self.status_1   # line number of status bar on display
         Window.nupdates += 1 # ensure at least this changes in status line
-        update_info = '%3d %3s s:%3d e:%3d d:%3d n:%3d,%3d %3d' % \
+        update_info = '%3d %3s o:%3d d:%3d s:%3d e:%3d, f:%3d n:%3d' % \
             (Window.nupdates, str(update.op)[3:6],
-             update.start, update.end, update.destination, update.nlines,
+             update.origin, update.destination, update.start, update.end, 
              self.first, self.nprinted)
-        display.put_render(s1, 40, update_info, display.white_bg)
+        display.put_render(s1, 36, update_info, display.white_bg) # was 40
         display.kill_line()
         self.first = 0    # reset after each update
         self.nprinted = 0 
@@ -407,6 +411,9 @@ class Window(object):
         If at bottom of window, scroll insertion point up to the middle.
         Then place input cursor.
         """
+        # FIXME: remove self.dot_i
+        # Instead use local dot_i, here calc only when needed
+        # Or new  self.dot_i() method that uses win.top win.seg_1 win.buf.dot
         self.dot_i = self.buf2win(self.buf.dot)
         if self.dot_i > 0:
             display.put_render(self.dot_i, 1, self.buf.lines[self.buf.dot][0],

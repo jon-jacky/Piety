@@ -126,18 +126,20 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert(self, iline, lines): 
+    def insert(self, iline, lines, origin=0): 
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
         nlines = len(lines)
         self.dot = iline + nlines - 1
-        self.unsaved = True # usually the right thing but ed.B and E override it.
+        self.unsaved = True # usually the right thing but ed.B .E override it.
         # adjust line numbers for marks below the insertion point
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-        update(Op.insert, buffer=self, destination=iline, nlines=nlines)
+        # start and end of inserted text, end is dot, destination same as start
+        update(Op.insert, buffer=self, origin=origin, destination=iline, 
+               start=iline, end=self.dot)
 
     # files
 
@@ -167,7 +169,7 @@ class Buffer(object):
         'Advance dot to iline and return it (so caller can print it)'
         prev_dot = self.dot
         self.dot = iline
-        update(Op.locate, buffer=self, start=prev_dot, destination=iline)
+        update(Op.locate, buffer=self, origin=prev_dot, destination=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -205,8 +207,9 @@ class Buffer(object):
                 markc = self.mark[c]
                 new_mark[c] = markc - self.nlines if markc >= end else markc
         self.mark = new_mark
-        update(Op.delete, buffer=self, start=start,end=end, 
-               nlines=len(Buffer.deleted))
+        # origin, start, end are before deletion, destination is dot after
+        update(Op.delete, buffer=self, origin=start, destination=self.dot,
+               start=start, end=end) # destination?
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
@@ -225,8 +228,7 @@ class Buffer(object):
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
-        update(Op.mutate, buffer=self, start=start, end=end, 
-               nlines=(end-start)+1)
+        update(Op.mutate, buffer=self, start=start, end=end) # destination?
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'
@@ -239,7 +241,7 @@ class Buffer(object):
 
     def t(self, start, end, dest):
         'Transfer (copy) lines to after destination line.'
-        self.insert(dest+1, self.lines[start:end+1]) 
+        self.insert(dest+1, self.lines[start:end+1], origin=start) 
 
     def m(self, start, end, dest):
         'Move lines to after destination line.'

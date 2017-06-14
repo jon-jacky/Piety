@@ -8,10 +8,12 @@ from collections import namedtuple, deque
 
 class Op(Enum):
     'Display update operations, named independently of particular programs'
+    # FIXME can't we replace all these numbers with 'auto' ?
+    nop = 0  # no operation, placeholder
     # update operations in buffer, refer to lines
     # m(ove), c(hange)/replace are just d(elete) then i(nsert)
     # ed e E are delete, then insert via r
-    insert = 1  # Buffer methods: insert, also via ed a i r t y but not c
+    insert = 1  # Buffer methods: insert, also via ed a i m r t y but not c
     delete = 2  # ed d, also via ed m c, ed e E but then insert via r
     mutate = 3  # ed s
     locate = 4  # ed l
@@ -28,14 +30,19 @@ class Op(Enum):
     single = 11  # edsel o1, return to single window
     hsplit = 12  # edsel o2, split window, horizontal
 
-# Record that describes a single display update
-Update = namedtuple('Update', 
-                    ['op','buffer','start','end','destination','nlines'])
+# Record that describes a single display update.
+# Most Op do not use all fields, and their meanings depend on Op, for example:
+# Op.delete start, end are in origin, Op.insert start, end are in destination.
+Update = namedtuple('Update', ['op','buffer',
+                               'origin','destination','start','end'])
+
+placeholder = Update(Op.nop,None,0,0,0,0)
 
 # Queue of pending display updates from all tasks
 updates = deque()
 
-def update(op, buffer=None, start=0, end=0, destination=0, nlines=0):
+def update(op, buffer=None, origin=0, destination=0, start=0, end=0):
     'Create an Update record and append it to the updates queue'
-    updates.append(Update(op, buffer=buffer, start=start, end=end, 
-                          destination=destination, nlines=nlines))
+    updates.append(Update(op, buffer=buffer, 
+                          origin=origin, destination=destination, 
+                          start=start, end=end))

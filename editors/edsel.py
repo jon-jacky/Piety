@@ -15,8 +15,9 @@ def do_window_command(line):
 
     if not param_string: # o: switch to next window
         next_i = (frame.win_i+1 if frame.win_i+1 < len(frame.windows)
-                  else 0)
-        ed.select_buf(frame.windows[next_i].buf.name) # calls update(Op.select)
+                  else 0)  # FIXME?  Define frame.next_window() - ?
+        ed.current = frame.windows[next_i].buf.name
+        ed.buf = ed.buffers[ed.current]
         update(Op.next)
 
     elif param_string.startswith('1'): # o1: return to single window
@@ -55,6 +56,7 @@ def startup(*filename, **options):
     ed.startup(*filename, **options)
     cmd_h = options['c'] if 'c' in options else None
     frame.init(ed.buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf
+    frame.handle_updates() # ed.startup above can queue updates
 
 def cleanup():
     'Restore full-screen scrolling, cursor to bottom.'
