@@ -8,8 +8,6 @@ from collections import namedtuple, deque
 
 class Op(Enum):
     'Display update operations, named independently of particular programs'
-    # FIXME can't we replace all these numbers with 'auto' ?
-    nop = 0  # no operation, placeholder
     # update operations in buffer, refer to lines
     # m(ove), c(hange)/replace are just d(elete) then i(nsert)
     # ed e E are delete, then insert via r
@@ -29,6 +27,9 @@ class Op(Enum):
     next = 10    # edsel o, switch to next window
     single = 11  # edsel o1, return to single window
     hsplit = 12  # edsel o2, split window, horizontal
+    refresh = 13 # clear screen and redraw all windows
+    rescale = 14 # rescale frame and window sizes, then refresh
+    init = 15 
 
 # Record that describes a single display update.
 # Most Op do not use all fields, and their meanings depend on Op, for example:
@@ -36,7 +37,7 @@ class Op(Enum):
 Update = namedtuple('Update', ['op','buffer',
                                'origin','destination','start','end'])
 
-placeholder = Update(Op.nop,None,0,0,0,0)
+initialize = Update(Op.init, None, 0, 0, 0, 0)
 
 # Queue of pending display updates from all tasks
 updates = deque()

@@ -7,9 +7,6 @@ import traceback, os
 import ed, frame, display # display only used in cleanup()
 from update import update, Op
 
-# ed command names used in update_display - FIXME use Op
-# ed.cmd_name = ''   # FIXME unnecessary?  Occurs in ed.py already
-
 def do_window_command(line):
     param_string = line.lstrip()[1:].lstrip()
 
@@ -33,10 +30,6 @@ def do_command(line):
     'Process one command line without blocking.'
     # try/except ensures we restore display, especially scrolling
     try:
-        # FIXME the next two lines should disappear when we handle update Op
-        # For now we have two top-level calls in frame, o() and handle_updates
-        frame.cmd_h0, frame.win0 = frame.cmd_h, frame.win # save parameters before call ed.cmd
-        ed.cmd_name = ''  # must clear before call ed.cmd
         # Intercept special commands used by frame only, not ed
         # Only in command mode!  Otherwise line is text to add to buffer.
         if ed.command_mode and line.lstrip().startswith('o'):
@@ -50,13 +43,11 @@ def do_command(line):
         exit()
 
 def startup(*filename, **options):
-    # must call configure() first, startup() uses update_fcn 
     ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
     ed.startup(*filename, **options)
     cmd_h = options['c'] if 'c' in options else None
     frame.init(ed.buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf
-    frame.handle_updates() # ed.startup above can queue updates
 
 def cleanup():
     'Restore full-screen scrolling, cursor to bottom.'

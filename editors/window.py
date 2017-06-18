@@ -22,7 +22,7 @@ class Window(object):
     May display a cursor-like marker to indicate dot.
     """
 
-    nupdates = 0 # diagnostic, used by render_status_info
+    nupdates = 0 # diagnostic, used by update_diagnostics
 
     def __init__(self, buf, top, nlines, ncols):
         """
@@ -190,7 +190,7 @@ class Window(object):
         self.open_line(wdot+1)
         self.update_lines(wdot+2, self.buf.dot+1)
 
-    def render_status_prefix(self):
+    def update_status_prefix(self):
         "Print information about window's buffer in its status line."
         s1 = self.statusline()
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
@@ -206,17 +206,17 @@ class Window(object):
         display.put_render(s1, 22, position, display.white_bg) # was 26
         display.put_render(s1, 27, linenums, display.white_bg) # was 31
 
-    def render_status(self):
+    def update_status(self):
         "Print information about window's buffer in its status line."
-        self.render_status_prefix()
+        self.update_status_prefix()
         timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 char
         s1 = self.statusline()
         display.put_render(s1, 45, '-'*(self.ncols-(45+10)), display.white_bg)
         display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
 
-    def render_status_info(self, update):
+    def update_diagnostics(self, update):
         "Print diagnostic and debug information in the status line."
-        self.render_status_prefix()
+        self.update_status_prefix()
         s1 = self.statusline()
         Window.nupdates += 1 # ensure at least this changes in status line
         update_info = '%3d %3s o:%3d d:%3d s:%3d e:%3d, f:%3d n:%3d' % \
