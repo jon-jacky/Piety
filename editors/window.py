@@ -28,10 +28,7 @@ class Window(object):
         """
         Initialize window, given its text buffer, location, and dimensions
         buf - text buffer displayed in this window, must have:
-          buf.lines: list of strings, buf.S(): returns index of last line,
-          buf.dot: index of current line, buf.npage: n of lines for paging cmds
-          buf.unsaved: boolean, buf.name: string
-        top -line number on display of first buffer line shown in this window
+        top - line number on display of first buffer line shown in this window
         nlines - number of lines in this window, excluding status line
         ncols - maximum number of characters in a line
         """
@@ -41,7 +38,7 @@ class Window(object):
         self.btop = 1 # index in buffer of first line displayed in window
         self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
 
-        # DIAGNOSTICS
+        # Diagnostics
         self.first = 0    # first line printed on window during this update
         self.nprinted = 0 # n of lines printed on window during this update
 
@@ -95,13 +92,14 @@ class Window(object):
         'First character in line iline in buffer, or space if line is empty'
         return ' ' if self.empty_line(iline) else self.buf.lines[iline][0]
 
-    def set_marker(self, wiline, iline):
-        'Set marker on display line number wiline which shows buf line iline'
-        display.put_render(wiline, 1, self.ch0(iline), display.white_bg)
+    def set_marker(self, iline):
+        'Set marker on buffer line iline'
+        display.put_render(self.wline(iline), 1, self.ch0(iline), 
+                           display.white_bg)
 
-    def clear_marker(self, wiline, iline):
-        'Clear marker from display line wiline which shows buffer line iline'
-        display.put_render(wiline, 1, self.ch0(iline), display.clear)
+    def clear_marker(self, iline):
+        'Clear marker from buffer line iline'
+        display.put_render(self.wline(iline), 1, self.ch0(iline),display.clear)
 
     def scroll(self, nlines):
         """
@@ -172,6 +170,14 @@ class Window(object):
         self.nprinted += nprinted # DIAGNOSTIC
         self.clear_lines(icursor, last)
         
+    def update_from(self, iline):
+        'Write lines in window starting at line number iline in buffer'
+        self.update_lines(self.wline(iline), iline)
+
+    def update(self):
+        'Write all lines in window'
+        self.update_from(self.btop)
+
     def update_for_input(self):
         """
         Open next line and overwrite lines below.

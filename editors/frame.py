@@ -14,7 +14,7 @@ nlines, ncols = terminal_util.dimensions()
 frame_top = 1 # line number on display of first line of frame
 cmd_h = 2  # default height (lines) of scrolling command region at the bottom
 
-# Assigned by scale called from startup and update_frame
+# Assigned by scale()
 windows_h = None # total number of lines of all windows, including status lines
 cmd_1 = None # line number on display of first line of scrolling command region
 cmd_n = None #  " bottom "
@@ -37,9 +37,9 @@ def scale(nlines, cmd_h):
 def update_windows(update):  # update_all_windows
     'Redraw all windows, called by refresh, for example after resize.'
     for w in windows:
-        w.update_lines(w.top, w.btop)
+        w.update()
         if w.current:
-            w.set_marker(w.wline(w.buf.dot), w.buf.dot)
+            w.set_marker(w.buf.dot)
         w.update_diagnostics(update)
 
 def put_command_cursor():
@@ -48,7 +48,6 @@ def put_command_cursor():
 
 def refresh(update):
     'Clear and update the entire frame'
-    # called from startup and update_frame
     display.put_cursor(1,1) # origin, upper left corner
     display.erase() 
     update_windows(update)
@@ -91,8 +90,8 @@ def update_display(update):
         win.buf = update.buffer
         # These four lines occur again and again.
         win.locate_segment(win.buf.dot)
-        win.update_lines(win.top, win.btop)
-        win.set_marker(win.wline(win.buf.dot), win.buf.dot)
+        win.update()
+        win.set_marker(win.buf.dot)
         win.update_diagnostics(update)
 
     # Switch to input (insert) mode, for ed a i c commands
@@ -107,36 +106,32 @@ def update_display(update):
     elif update.op == Op.command:
         command_mode = True
         # Overwrite '.' line on display, and lines below.
-        wdot = win.wline(win.buf.dot)
-        win.update_lines(wdot+1, win.buf.dot+1)
-        win.set_marker(wdot, win.buf.dot)
+        win.update_from(win.buf.dot + 1)
+        win.set_marker(win.buf.dot)
         win.update_diagnostics(update)
 
     # Dot moved, ed l command
     elif update.op == Op.locate:
-        # Later move all this to window method, 
         if win.contains(update.destination):
-            win.clear_marker(win.wline(update.origin), update.origin)
+            win.clear_marker(update.origin)
         else:
-            # The following four lines appear in Op.single,.hsplit, make method
             win.locate_segment(update.destination)
-            win.update_lines(win.top, win.btop)
-        win.set_marker(win.wline(update.destination), update.destination)
+            win.update()
+        win.set_marker(update.destination)
         win.update_diagnostics(update)
 
     # Insert text: ed a i c m r t y commands
     elif update.op == Op.insert:
-        # update.start, end are the first, last inserted line
-        # win.buf.dot is the last inserted line
+        # win.buf.dot is the last inserted line, update.end
         if command_mode: # ed commands m r t y
             if win.contains(update.end):
                 if update.origin != 0:
-                    win.clear_marker(win.wline(update.origin), update.origin)
-                win.update_lines(win.wline(update.start), update.start)
+                    win.clear_marker(update.origin)
+                win.update_from(update.start)
             else:
                 win.locate_segment(update.end)
-                win.update_lines(win.top, win.btop)
-            win.set_marker(win.wline(update.end), update.end)
+                win.update()
+            win.set_marker(update.end)
         else: # input mode after ed commands a i c    
             # Text at dot is already up-to-date on display.
             # Open next line and overwite lines below, scroll up if needed.
@@ -146,7 +141,7 @@ def update_display(update):
             if (w != win and w.buf == win.buf): # other windows, current buffer
                 #FIXME?Does this assumes only one line inserted?
                 if w.contains(update.end): # does this assume nlines == 1 ?
-                    w.update_lines(w.wline(update.end), update.end)
+                    w.update_from(update.end)
                     w.update_diagnostics(update)
                 elif w.btop > update.end: # inserted text above window
                     nlines = (update.end - update.start)+1 #FIXME global nlines
@@ -161,18 +156,16 @@ def update_display(update):
     # Delete text: ed d m commands
     elif update.op == Op.delete:
         if win.contains(update.destination):
-            win.update_lines(win.wline(update.destination), 
-                             update.destination)
+            win.update_from(update.destination)
         else:
             win.locate_segment(update.destination)
-            win.update_lines(win.top, win.btop)
-        win.set_marker(win.wline(update.destination), update.destination)
+            win.update()
+        win.set_marker(update.destination)
         win.update_diagnostics(update)
         for w in windows:
             if (w != win and w.buf == win.buf): # other windows, current buffer
                 if w.contains(update.destination):
-                    w.update_lines(w.wline(update.destination), 
-                                   update.destination)
+                    w.update_from(update.destination)
                     w.update_diagnostics(update)
                 elif w.btop > update.destination: # deleted text above window
                     nlines = (update.end - update.start)+1 #FIXME global nlines
@@ -183,16 +176,15 @@ def update_display(update):
 
     # Switch to next window, edsel o command
     elif update.op == Op.next:
-        # Save current buffer dot in window saved dot
-        win0 = win
-        win0.current = False
-        win0.saved_dot = win0.buf.dot
+        w0 = win
+        w0.current = False
+        w0.saved_dot = w0.buf.dot
         win_i = win_i+1 if win_i+1 < len(windows) else 0
-        win = windows[win_i] # assign new window
+        win = windows[win_i]
         win.current = True
         win.buf.dot = win.saved_dot
-        win0.clear_marker(win0.wline(win0.saved_dot),win0.saved_dot)
-        win.set_marker(win.wline(win.buf.dot), win.buf.dot)
+        w0.clear_marker(w0.saved_dot)
+        win.set_marker(win.buf.dot)
         win.update_diagnostics(update)
 
     # Delete all but current window, edsel o1 cmd
@@ -202,32 +194,32 @@ def update_display(update):
         win.resize(frame_top, windows_h-1, ncols) # one window, -1 excl status
         # The following four lines appear in Op.hsplit also - window method
         win.locate_segment(win.buf.dot)
-        win.update_lines(win.top, win.btop)
-        win.set_marker(win.wline(win.buf.dot), win.buf.dot)
+        win.update()
+        win.set_marker(win.buf.dot)
         win.update_diagnostics(update)
 
     # Split window, new window above becomes current window, edsel o2 command
     elif update.op == Op.hsplit: 
-        win0 = win
-        win0.current = False
-        win0.saved_dot = win0.buf.dot
-        win_top = win0.top
-        win_nlines = win0.nlines // 2
-        win0.resize(win_top + win_nlines, win0.nlines - win_nlines, ncols)
+        w0 = win
+        w0.current = False
+        w0.saved_dot = w0.buf.dot
+        win_top = w0.top
+        win_nlines = w0.nlines // 2
+        w0.resize(win_top + win_nlines, w0.nlines - win_nlines, ncols)
         win = window.Window(win.buf,win_top,win_nlines-1,ncols) #-1 excl status
         win.current = True
         windows.insert(win_i, win)
         # The following four lines appear in Op.single also - window method
         win.locate_segment(win.buf.dot)
-        win.update_lines(win.top, win.btop)
-        win.set_marker(win.wline(win.buf.dot), win.buf.dot)
+        win.update()
+        win.set_marker(win.buf.dot)
         win.update_diagnostics(update)
         # Here are those same four lines again - should be a window method
         # EXCEPT here we clear marker instead of set it.
-        win0.locate_segment(win0.buf.dot)
-        win0.update_lines(win0.top, win0.btop)
-        win0.clear_marker(win0.wline(win0.buf.dot), win0.buf.dot)
-        win0.update_diagnostics(update)
+        w0.locate_segment(w0.buf.dot)
+        w0.update()
+        w0.clear_marker(w0.buf.dot)
+        w0.update_diagnostics(update)
 
     # Put ed command cursor back in scrolling command region
     if command_mode:
@@ -238,7 +230,7 @@ def init(buffer, cmd_h_option=None):
     global cmd_h, win, win_i
     if cmd_h_option: 
         cmd_h = cmd_h_option # otherwise keep default assigned above
-    scale(nlines, cmd_h) # must determine frame size before create first window
+    scale(nlines, cmd_h) # must assign frame size before create first window
     win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
     win.current = True
     windows.append(win) 
