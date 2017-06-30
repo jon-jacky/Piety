@@ -30,7 +30,7 @@ argument pointing to the buffer.
 
 import os.path
 from enum import Enum
-from update import update, Op
+from updates import update, Op
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
@@ -137,8 +137,8 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-        # start and end of inserted text, end is dot, destination same as start
-        update(Op.insert, buffer=self, origin=origin, destination=iline, 
+        # start and end of inserted text, end == destination == dot
+        update(Op.insert, buffer=self, origin=origin, destination=self.dot,
                start=iline, end=self.dot)
 
     # files
@@ -197,7 +197,7 @@ class Buffer(object):
         else:
             self.dot = 0
         # new_mark needed because we can't remove items from dict as we iterate
-        new_mark = dict() # new_mark is self.mark without marks at deleted lines
+        new_mark = dict() #new_mark is self.mark without marks at deleted lines
         Buffer.deleted_mark = dict() 
         for c in self.mark: 
             if (start <= self.mark[c] <= end): # save marks from deleted lines
@@ -207,7 +207,8 @@ class Buffer(object):
                 markc = self.mark[c]
                 new_mark[c] = markc - self.nlines if markc >= end else markc
         self.mark = new_mark
-        # origin, start, end are before deletion, destination is dot after
+        # origin, start, end are before deletion
+        # destination == dot after deletion, first line following deleted lines
         update(Op.delete, buffer=self, origin=start, destination=self.dot,
                start=start, end=end) # destination?
 

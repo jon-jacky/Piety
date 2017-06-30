@@ -4,10 +4,10 @@ window.py - Window class for line-oriented display editors.
 Each window instance displays a range of lines from a text buffer.
 """
 
-from datetime import datetime # for timestamp, used for testing
-import math # for math.ceil
+from datetime import datetime # for timestamp in status line - FIXME omit
 import display
-from update import Op
+
+diagnostics = None # assign to update record to show diagnostics on status line
 
 def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
@@ -111,7 +111,8 @@ class Window(object):
     def shift(self, nlines):
         """
         Move segment of buffer displayed in window by nlines (pos or neg),
-        and shift dot also so window contents appear the same.
+        and shift saved_dot also so window contents appear the same.
+        This is only meaningful for non-current windows w != win
         """
         self.scroll(nlines)
         self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.S())
@@ -173,10 +174,42 @@ class Window(object):
     def update_from(self, iline):
         'Write lines in window starting at line number iline in buffer'
         self.update_lines(self.wline(iline), iline)
+        self.update_status()
 
     def update(self):
         'Write all lines in window'
         self.update_from(self.btop)
+
+    def move_update(self, iline):
+        'Move window to show buffer line iline then update window'
+        self.locate_segment(iline)
+        self.update()
+        self.set_marker(iline)
+
+    def reupdate(self):
+        'Move window to show its buf.dot then update window'
+        self.move_update(self.buf.dot)
+
+    def adjust_segment(self, start, end, destination, delete=False):
+        """
+        Adjust the segment visible in a window other the than current window,
+        so start, end, destination might not appear in self.
+        """
+        # start, end are line numbers before the delete, but after the insert. 
+        # destination is always the line number after the insert or delete.
+        # With insert, end == destination.  It is one of the changed lines.
+        # With delete,destination is the first unchanged line after the delete.
+        nlines = (-1 if delete else 1)*((end - start)+1)
+        if self.contains(start) or self.contains(end):
+            self.shift(nlines) # shifts save_dot, used below
+            self.move_update(self.saved_dot) 
+            # but what if saved_dot was one of the deleted lines!?
+            # reassign saved_dot to new dot in buffer d()
+        elif self.btop > end: # inserted (or deleted) text above window
+            self.shift(nlines)
+            self.update_status()
+        else: # inserted (or deleted) text below window
+            pass
 
     def update_for_input(self):
         """
@@ -186,8 +219,7 @@ class Window(object):
         """
         wdot = self.wline(self.buf.dot) # line on display where dot appears
         if wdot > 0:
-            display.put_render(wdot, 1, self.buf.lines[self.buf.dot][0],
-                               display.clear) # erase cursor at dot
+            self.clear_marker(self.buf.dot)
         if wdot >= self.top + self.nlines - 1: # at bottom of window
             self.scroll(self.nlines//2)
             wdot = self.top + (self.buf.dot - self.btop)
@@ -195,10 +227,10 @@ class Window(object):
                               last=wdot)
         self.open_line(wdot+1)
         self.update_lines(wdot+2, self.buf.dot+1)
+        self.update_status()
 
     def update_status_prefix(self):
         "Print information about window's buffer in its status line."
-        s1 = self.statusline()
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
         position = (' All ' if self.buf.S() <= self.nlines else # S() is last line
@@ -207,6 +239,7 @@ class Window(object):
                     ' %2.0f%% ' % (100*self.buf.dot/(len(self.buf.lines)-1)))
         linenums = '%-14s' % ('L%d/%d ' % (self.buf.dot if self.current 
                                            else self.saved_dot, self.buf.S()))
+        s1 = self.statusline()
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
         display.put_render(s1, 22, position, display.white_bg) # was 26
@@ -215,20 +248,23 @@ class Window(object):
     def update_status(self):
         "Print information about window's buffer in its status line."
         self.update_status_prefix()
-        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 char
+        if diagnostics:
+            self.update_diagnostics()
+            return
         s1 = self.statusline()
-        display.put_render(s1, 45, '-'*(self.ncols-(45+10)), display.white_bg)
-        display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
+        display.put_render(s1, 45, '-'*(self.ncols-45), display.white_bg)
+        # was ncols-(45+10) before commenting out timestamp
+        #timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 char
+        #display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
 
-    def update_diagnostics(self, update):
+    def update_diagnostics(self):
         "Print diagnostic and debug information in the status line."
-        self.update_status_prefix()
-        s1 = self.statusline()
         Window.nupdates += 1 # ensure at least this changes in status line
         update_info = '%3d %3s o:%3d d:%3d s:%3d e:%3d, f:%3d n:%3d' % \
-            (Window.nupdates, str(update.op)[3:6],
-             update.origin, update.destination, update.start, update.end, 
+            (Window.nupdates, str(diagnostics.op)[3:6], diagnostics.origin, 
+             diagnostics.destination, diagnostics.start, diagnostics.end, 
              self.first, self.nprinted)
+        s1 = self.statusline()
         display.put_render(s1, 36, update_info, display.white_bg) # was 40
         display.kill_line()
         self.first = 0    # reset after each update

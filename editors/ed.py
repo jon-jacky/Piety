@@ -13,7 +13,7 @@ import re, os, sys, enum
 import time # only used for sleep() in do_commands, FIXME write piety.sleep
 import pysh  # provides embedded Python shell for ! command
 import buffer
-from update import update, Op
+from updates import update, Op
 
 # arg lists, defaults, range checking
 

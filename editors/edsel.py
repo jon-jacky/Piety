@@ -5,7 +5,7 @@ edsel - Display editor based on the line editor ed.py.
 
 import traceback, os
 import ed, frame, display # display only used in cleanup()
-from update import update, Op
+from updates import update, Op
 
 def do_window_command(line):
     param_string = line.lstrip()[1:].lstrip()

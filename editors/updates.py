@@ -1,5 +1,5 @@
 """
-update.py - Define display updates: generic editing, buffer, window operations 
+updates.py - Define display updates: generic editing, buffer,window operations 
              named independently of particular editors or other programs.
 """
 
@@ -34,16 +34,16 @@ class Op(Enum):
 # Record that describes a single display update.
 # Most Op do not use all fields, and their meanings depend on Op, for example:
 # Op.delete start, end are in origin, Op.insert start, end are in destination.
-Update = namedtuple('Update', ['op','buffer',
-                               'origin','destination','start','end'])
+UpdateRecord = namedtuple('UpdateRecord', 
+                          ['op','buffer','origin','destination','start','end'])
 
-initialize = Update(Op.init, None, 0, 0, 0, 0)
+initialize = UpdateRecord(Op.init, None, 0, 0, 0, 0)
 
 # Queue of pending display updates from all tasks
 updates = deque()
 
 def update(op, buffer=None, origin=0, destination=0, start=0, end=0):
-    'Create an Update record and append it to the updates queue'
-    updates.append(Update(op, buffer=buffer, 
-                          origin=origin, destination=destination, 
-                          start=start, end=end))
+    'Create an UpdateRecord record and append it to the updates queue'
+    updates.append(UpdateRecord(op, buffer=buffer, 
+                                origin=origin, destination=destination, 
+                                start=start, end=end))
