@@ -1,10 +1,9 @@
 """
-updates.py - Define display updates: generic editing, buffer,window operations 
-             named independently of particular editors or other programs.
+updates.py - Define display operations Op, display update record UpdateRec
 """
 
 from enum import Enum
-from collections import namedtuple, deque
+from collections import namedtuple
 
 class Op(Enum):
     'Display update operations, named independently of particular programs'
@@ -29,21 +28,9 @@ class Op(Enum):
     hsplit = 12  # edsel o2, split window, horizontal
     refresh = 13 # clear screen and redraw all windows
     rescale = 14 # rescale frame and window sizes, then refresh
-    init = 15 
 
 # Record that describes a single display update.
 # Most Op do not use all fields, and their meanings depend on Op, for example:
 # Op.delete start, end are in origin, Op.insert start, end are in destination.
 UpdateRecord = namedtuple('UpdateRecord', 
                           ['op','buffer','origin','destination','start','end'])
-
-initialize = UpdateRecord(Op.init, None, 0, 0, 0, 0)
-
-# Queue of pending display updates from all tasks
-updates = deque()
-
-def update(op, buffer=None, origin=0, destination=0, start=0, end=0):
-    'Create an UpdateRecord record and append it to the updates queue'
-    updates.append(UpdateRecord(op, buffer=buffer, 
-                                origin=origin, destination=destination, 
-                                start=start, end=end))

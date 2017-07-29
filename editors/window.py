@@ -17,65 +17,76 @@ class Window(object):
     """
     Window class for line-oriented display editors.
     Displays a range of lines (the segment) from a text buffer.
-    Includes a status line with information about the buffer.
-    Has a line called dot where text insertions etc. occur.
-    May display a cursor-like marker to indicate dot.
+    May display a marker to indicate text insertion point (called dot).
+    May be followed by a status line with information about the buffer.
     """
 
     nupdates = 0 # diagnostic, used by update_diagnostics
 
     def __init__(self, buf, top, nlines, ncols):
         """
-        Initialize window, given its text buffer, location, and dimensions
-        buf - text buffer displayed in this window, must have:
-        top - line number on display of first buffer line shown in this window
-        nlines - number of lines in this window, excluding status line
-        ncols - maximum number of characters in a line
+        Initialize window, given its text buffer, location,and dimensions
+         buf - text buffer displayed in this window
+         top - line number on display of first buffer line in window
+         nlines - number of lines in this window, excluding status line
+         ncols - maximum number of characters in a line
         """
-        self.current = False # True when this window is the current window
+        self.current = False # True when this window is current window
         self.buf = buf
         self.saved_dot = self.buf.dot 
         self.btop = 1 # index in buffer of first line displayed in window
         self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
 
         # Diagnostics
-        self.first = 0    # first line printed on window during this update
-        self.nprinted = 0 # n of lines printed on window during this update
+        self.first = 0    # first line printed on window in this update
+        self.nprinted = 0 # n of lines printed on window in this update
 
     def resize(self, top, nlines, ncols):
-        'Assign, recalculate window dimensions'
-        self.top = top # line number on display of first line of this window
-        self.nlines = nlines # n of lines in window, excluding status line
-        self.ncols = ncols # max number of chars in a line
-        self.buf.npage = self.nlines #initial page size for ed z paging command
+        """
+        Assign, recalculate window dimensions
+         top - line number on display of first line of window
+         nlines - n of lines in window, excludling status line
+         ncols - maximum number of characters in a line
+        """
+        self.top = top
+        self.nlines = nlines 
+        self.ncols = ncols
+        self.buf.npage = self.nlines #initial page size for ed z page cmd
 
     def wline(self, iline):
         'Line number on display of iline in buffer.'
         return self.top + (iline - self.btop)
 
-    def blast(self):
-        'Index in buffer of last text line in the window, maybe not at bottom'
-        return min(self.btop + self.nlines - 1, self.buf.S())
- 
     def bottom(self):
-        'Line number on display of bottom line in window (but not status line)'
+        'Line num. on display of bottom line in window (not status line)'
         return self.top + self.nlines - 1
 
+    def bbottom(self):
+        'Index in buffer of bottom line in window. May exceed buffer size'
+        return self.btop + self.nlines - 1
+
+    def blast(self):
+        """
+        Index in buffer of last line in window, maybe not bottom of window.
+        Assumes that last line in window is up-to-date with buffer size.
+        """
+        return min(self.bbottom(), self.buf.S())
+ 
     def statusline(self):
          "Line number on display of window's status line"
          return self.bottom() + 1
 
     def near_top(self, iline):
         """
-        Line number in buffer iline 
-        is in top half of segment at beginning of buffer that fits in window.
+        Line number in buffer iline is in
+        top half of segment at beginning of buffer that fits in window.
         """
         return (iline <= self.nlines//2 or self.buf.S() <= self.nlines)
 
     def near_bottom(self, iline):
         """
-        Line number in buffer iline 
-        is in bottom half of segment at end of buffer that fits in window.
+        Line number in buffer iline is in
+        bottom half of segment at end of buffer that fits in window.
         """
         return (self.buf.S() - iline < self.nlines//2 and
                 self.buf.S() >= self.nlines)
@@ -85,11 +96,28 @@ class Window(object):
         return self.buf.lines[iline] in ('','\n')
 
     def contains(self, iline):
-        'True when line number iline in buffer is contained in the window'
+        """
+        True when line number iline in buffer is contained in window.
+        Assumes that last line in window is up-to-date with buffer size.
+        """
         return (self.btop <= iline <= self.blast())
+
+    def might_contain(self, iline):
+        'True when line number iline in buffer might be contained in window'
+        return (self.btop <= iline <= self.bbottom())
         
+    def intersects(self, start, end):
+        'True when window intersects range defined by start..end'
+        return (self.contains(start) or self.contains(end)
+                or (start < self.btop and end > self.bbottom()))
+
+    def might_intersect(self, start, end):
+        'True when window might intersect range defined by start..end'
+        return (self.might_contain(start) or self.might_contain(end)
+                or (start < self.btop and end > self.bbottom()))
+
     def ch0(self, iline):
-        'First character in line iline in buffer, or space if line is empty'
+        'First character in line iline in buffer, or space if line empty'
         return ' ' if self.empty_line(iline) else self.buf.lines[iline][0]
 
     def set_marker(self, iline):
@@ -99,27 +127,28 @@ class Window(object):
 
     def clear_marker(self, iline):
         'Clear marker from buffer line iline'
-        display.put_render(self.wline(iline), 1, self.ch0(iline),display.clear)
+        display.put_render(self.wline(iline), 1, self.ch0(iline),
+                           display.clear)
 
     def scroll(self, nlines):
         """
-        Move segment of buffer displayed in window by nlines (pos or neg),
+        Move segment of buffer displayed in window by nlines (pos or neg)
         but leave dot unchanged so window contents appear to scroll.
         """
         self.btop = clip(self.btop + nlines, 1, self.buf.S())
 
     def shift(self, nlines):
         """
-        Move segment of buffer displayed in window by nlines (pos or neg),
+        Move segment of buffer displayed in window by nlines (pos or neg)
         and shift saved_dot also so window contents appear the same.
-        This is only meaningful for non-current windows w != win
+        This is only meaningful for non-current windows.
         """
         self.scroll(nlines)
         self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.S())
 
     def locate_segment(self, iline):
         """
-        Given line number in buffer iline, position window by
+        Given line number in buffer iline, prepare to position window by
         assigning self.btop, index in buffer of top line in window.
         """
         if self.near_top(iline):
@@ -137,7 +166,7 @@ class Window(object):
 
     def clear_lines(self, first, last):
         """
-        Clear consecutive consecutive lines from first through last in window.
+        Clear consecutive lines from first through last in window.
         Cursor must be positioned at first line already.
         """
         for i in range(first,last+1): # unempty if reached end of buffer
@@ -158,17 +187,17 @@ class Window(object):
 
     def update_lines(self, first, iline, last=0):
         """
-        Write lines in window starting at line numbered first on the display,
-        to the bottom of the window, or to line numbered last if arg present.
+        Write lines in window starting at line numbere first on display,
+        to bottom of the window, or to line numbered last if arg present.
         Lines come from self.buf starting at its line iline.
         """
-        self.first = first if self.first == 0 else self.first # DIAGNOSTIC
+        self.first = first if self.first == 0 else self.first
         last = last if last else self.bottom()
-        blastline = iline + (last - first) # blastline might exceed $ near eob
+        blastline = iline + (last - first) # might exceed $ near eob
         display.put_cursor(first, 1)
         nprinted = self.render_lines(iline, blastline)
         icursor = first + nprinted
-        self.nprinted += nprinted # DIAGNOSTIC
+        self.nprinted += nprinted
         self.clear_lines(icursor, last)
         
     def update_from(self, iline):
@@ -184,32 +213,36 @@ class Window(object):
         'Move window to show buffer line iline then update window'
         self.locate_segment(iline)
         self.update()
-        self.set_marker(iline)
+        if self.current:
+            self.set_marker(iline)
 
     def reupdate(self):
         'Move window to show its buf.dot then update window'
         self.move_update(self.buf.dot)
 
     def adjust_segment(self, start, end, destination, delete=False):
-        """
-        Adjust the segment visible in a window other the than current window,
-        so start, end, destination might not appear in self.
-        """
-        # start, end are line numbers before the delete, but after the insert. 
-        # destination is always the line number after the insert or delete.
-        # With insert, end == destination.  It is one of the changed lines.
-        # With delete,destination is the first unchanged line after the delete.
+        'Adjust the segment visible in a window other than current window'
+        # start, end are line numbers before delete, but after insert. 
+        # destination is always the line number after insert or delete.
+        # With insert, end == destination, one of the changed lines.
+        # With delete, destination is first unchanged line after delete.
         nlines = (-1 if delete else 1)*((end - start)+1)
-        if self.contains(start) or self.contains(end):
-            self.shift(nlines) # shifts save_dot, used below
-            self.move_update(self.saved_dot) 
-            # but what if saved_dot was one of the deleted lines!?
-            # reassign saved_dot to new dot in buffer d()
-        elif self.btop > end: # inserted (or deleted) text above window
+        if self.might_intersect(start, end):
+            if self.saved_dot < start:
+                pass
+            elif self.saved_dot > end:
+                self.saved_dot = self.saved_dot + nlines
+            else:
+                self.saved_dot = destination 
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.btop > end:
             self.shift(nlines)
             self.update_status()
-        else: # inserted (or deleted) text below window
-            pass
+        elif self.bbottom() < start:
+            self.update_status() # xx% nn/mm in status line changes
+        else:
+            pass # should be unreachable! status line doesn't update
 
     def update_for_input(self):
         """
@@ -233,12 +266,12 @@ class Window(object):
         "Print information about window's buffer in its status line."
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
+        dot = self.buf.dot if self.current else self.saved_dot
         position = (' All ' if self.buf.S() <= self.nlines else # S() is last line
                     ' Top ' if self.btop == 1 else
                     ' Bot ' if self.blast() == self.buf.S() else
-                    ' %2.0f%% ' % (100*self.buf.dot/(len(self.buf.lines)-1)))
-        linenums = '%-14s' % ('L%d/%d ' % (self.buf.dot if self.current 
-                                           else self.saved_dot, self.buf.S()))
+                    ' %2.0f%% ' % (100*dot/(len(self.buf.lines)-1)))
+        linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.S()))
         s1 = self.statusline()
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
@@ -268,4 +301,5 @@ class Window(object):
         display.put_render(s1, 36, update_info, display.white_bg) # was 40
         display.kill_line()
         self.first = 0    # reset after each update
-        self.nprinted = 0 
+        self.nprinted = 0
+ 

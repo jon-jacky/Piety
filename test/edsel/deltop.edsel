@@ -6,7 +6,7 @@ o
 60
 o
 1,30d
-!frame.windows[1].dot
-!frame.windows[1].seg_1
-!frame.windows[1].seg_n
+!frame.windows[1].saved_dot
+!frame.windows[1].btop
+!frame.windows[1].nlines
 # test finished

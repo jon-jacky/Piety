@@ -30,7 +30,10 @@ argument pointing to the buffer.
 
 import os.path
 from enum import Enum
-from updates import update, Op
+from updates import Op
+
+# Hook to configure behavior for display editor
+def update(op, **kwargs): pass # default: ed has no display,update does nothing
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
@@ -205,7 +208,8 @@ class Buffer(object):
             else:
                 # adjust marks below deleted lines
                 markc = self.mark[c]
-                new_mark[c] = markc - self.nlines if markc >= end else markc
+                nlines = (end-start) + 1
+                new_mark[c] = markc - nlines if markc >= end else markc
         self.mark = new_mark
         # origin, start, end are before deletion
         # destination == dot after deletion, first line following deleted lines
@@ -224,12 +228,15 @@ class Buffer(object):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,
         otherwise substitute only the first occurrence in each line."""
+        origin = self.dot 
         for i in range(start,end+1): # ed range is inclusive, unlike Python
             if old in self.lines[i]: # test to see if we should advance dot
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
                 self.dot = i
                 self.unsaved = True
-        update(Op.mutate, buffer=self, start=start, end=end) # destination?
+        # Update.end and .destination are last line actually changed
+        update(Op.mutate, buffer=self, origin=origin,
+               start=start, end=self.dot, destination=self.dot)
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'

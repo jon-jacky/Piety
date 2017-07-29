@@ -7,7 +7,7 @@ o
 60
 o
 !ed.c(30, 50, samples.linea)
-!windows[1].dot
-!windows[1].seg_1
-!windows[1].seg_n
+!frame.windows[1].dot
+!frame.windows[1].seg_1
+!frame.windows[1].seg_n
 # test finished

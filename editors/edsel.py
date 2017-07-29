@@ -5,7 +5,8 @@ edsel - Display editor based on the line editor ed.py.
 
 import traceback, os
 import ed, frame, display # display only used in cleanup()
-from updates import update, Op
+from updates import Op
+from updatecall import update
 
 def do_window_command(line):
     param_string = line.lstrip()[1:].lstrip()
@@ -36,18 +37,20 @@ def do_command(line):
             do_window_command(line)
         else:
             ed.do_command(line) # non-blocking
-        frame.handle_updates()
     except BaseException as e:
         cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         exit()
 
 def startup(*filename, **options):
-    ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
-                 print_dest=open(os.devnull, 'w')) # discard l z printed output
-    ed.startup(*filename, **options)
+    temp = ed.buffer.Buffer('placeholder') # will be reassigned by ed.startup()
     cmd_h = options['c'] if 'c' in options else None
-    frame.init(ed.buf, cmd_h_option=cmd_h) # ed.startup() above inits ed.buf
+    frame.init(temp, cmd_h_option=cmd_h) # ed.startup requires frame.win
+    ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
+                 update_fcn=update,  # replace ed's no-op update function
+                 print_dest=open(os.devnull, 'w')) # discard l z printed output
+    ed.startup(*filename, **options) # must follow frame.init,reassigns win.buf
+    update(Op.refresh)
 
 def cleanup():
     'Restore full-screen scrolling, cursor to bottom.'

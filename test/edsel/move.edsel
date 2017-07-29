@@ -3,13 +3,13 @@ E lines.txt
 o2
 o
 20
-!win.dot
+!frame.win.buf.dot
 o
 10,15m25
 o
-!win.dot
+!frame.win.buf.dot
 o
 30,40m1
 o
-!win.dot
+!frame.win.buf.dot
 # test finished

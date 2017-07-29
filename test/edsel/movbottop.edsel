@@ -6,7 +6,6 @@ o
 60
 o
 91,120m1
-!windows[1].dot
-!windows[1].seg_1
-!windows[1].seg_n
+!frame.windows[1].saved_dot
+!frame.windows[1].btop
 # test finished

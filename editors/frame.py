@@ -1,12 +1,10 @@
 """
 frame.py - Multiwindow display implemented by a list of window instances,
             with a scrolling command region at the bottom of the display.
-
-Just a module, not a class.  We expect only a single frame in a session.
 """
 
 import terminal_util, display, window
-from updates import updates, Op, initialize
+from updates import Op
 
 nlines, ncols = terminal_util.dimensions()
 
@@ -33,6 +31,17 @@ def scale(nlines, cmd_h):
     cmd_1 = nlines - cmd_h + 1 # scrolling command region, index of first line
     cmd_n = nlines # scrolling command region, last line
     windows_h = nlines - cmd_h # windows with status lines fill remaining space
+
+def init(buffer, cmd_h_option=None):
+    'Initialize frame with one window into buffer'
+    global cmd_h, win, win_i
+    if cmd_h_option: 
+        cmd_h = cmd_h_option # otherwise keep default assigned above
+    scale(nlines, cmd_h) # must assign frame size before create first window
+    win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
+    win.current = True
+    windows.append(win) 
+    win_i = 0
 
 def update_windows():
     'Redraw all windows, called by refresh, for example after resize.'
@@ -72,8 +81,6 @@ def update(op, buffer, origin, destination, start, end):
     Other data used here are already stored in the frame, windows, and buffers.
     """
     global command_mode, win, win_i
-
-    # Op.init not handled here, implemented by init() function below.
 
     # Clear display, redraw all the windows and scrolling command region.
     if op == Op.refresh:
@@ -139,9 +146,9 @@ def update(op, buffer, origin, destination, start, end):
             display.put_cursor(wdot+1,1)
 
     # Delete text: ed d m command
-    # start, end are line numbers before delete, destination == win.buf.dot
+    # start,end are line numbers before delete, destination==win.buf.dot
     elif op == Op.delete:
-        if win.contains(destination): # window already contains new dot
+        if win.might_contain(destination): # window already contains new dot
             win.update_from(destination)
             win.set_marker(destination)
         else:
@@ -150,6 +157,29 @@ def update(op, buffer, origin, destination, start, end):
             if (w != win and w.buf == win.buf):
                 w.adjust_segment(start, end, destination,
                                  delete=True)
+ 
+    # Change text: ed s command
+    # Update all lines in start..end, we don't know which lines changed,
+    # except destination == end is the last line actually changed.
+    elif op == Op.mutate:
+        if win.contains(destination):
+            # FIXME? If origin not in window, does this do nothing, or crash?
+            win.clear_marker(origin)
+            top = max(start, win.btop)
+            win.update_lines(win.wline(top), top, 
+                             last=win.wline(destination))
+            win.update_status()
+            win.set_marker(destination)
+        else:
+            win.reupdate()
+        for w in windows:
+            if (w != win and w.buf == win.buf):
+                if w.intersects(start, destination):
+                    # FIXME: almost repeats code in win. case above
+                    top = max(start, win.btop)
+                    w.update_lines(w.wline(top), top, 
+                                   last=w.wline(destination))
+                    w.update_status()
 
     # Switch to next window, edsel o command
     elif op == Op.next:
@@ -189,23 +219,3 @@ def update(op, buffer, origin, destination, start, end):
     # Put ed command cursor back in scrolling command region
     if command_mode:
         put_command_cursor() 
-
-def init(buffer, cmd_h_option=None):
-    'Initialize frame with one window into buffer'
-    global cmd_h, win, win_i
-    if cmd_h_option: 
-        cmd_h = cmd_h_option # otherwise keep default assigned above
-    scale(nlines, cmd_h) # must assign frame size before create first window
-    win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
-    win.current = True
-    windows.append(win) 
-    win_i = 0
-    window.diagnostics = initialize # show diagnostics on status line
-    refresh()
-
-def handle_updates():
-    'Process display update records from queue'
-    while updates:
-        update_record = updates.popleft()
-        window.diagnostics = update_record # show diagnostics on status line
-        update(**update_record._asdict())
