@@ -148,7 +148,7 @@ def update(op, buffer, origin, destination, start, end):
     # Delete text: ed d m command
     # start,end are line numbers before delete, destination==win.buf.dot
     elif op == Op.delete:
-        if win.might_contain(destination): # window already contains new dot
+        if win.contains(destination): # window already contains new dot
             win.update_from(destination)
             win.set_marker(destination)
         else:

@@ -36,6 +36,7 @@ class Window(object):
         self.saved_dot = self.buf.dot 
         self.btop = 1 # index in buffer of first line displayed in window
         self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
+        self.blast = self.blastline() # buffer can get out of synch
 
         # Diagnostics
         self.first = 0    # first line printed on window in this update
@@ -65,7 +66,7 @@ class Window(object):
         'Index in buffer of bottom line in window. May exceed buffer size'
         return self.btop + self.nlines - 1
 
-    def blast(self):
+    def blastline(self):
         """
         Index in buffer of last line in window, maybe not bottom of window.
         Assumes that last line in window is up-to-date with buffer size.
@@ -100,20 +101,11 @@ class Window(object):
         True when line number iline in buffer is contained in window.
         Assumes that last line in window is up-to-date with buffer size.
         """
-        return (self.btop <= iline <= self.blast())
+        return (self.btop <= iline <= self.blast)
 
-    def might_contain(self, iline):
-        'True when line number iline in buffer might be contained in window'
-        return (self.btop <= iline <= self.bbottom())
-        
     def intersects(self, start, end):
         'True when window intersects range defined by start..end'
         return (self.contains(start) or self.contains(end)
-                or (start < self.btop and end > self.bbottom()))
-
-    def might_intersect(self, start, end):
-        'True when window might intersect range defined by start..end'
-        return (self.might_contain(start) or self.might_contain(end)
                 or (start < self.btop and end > self.bbottom()))
 
     def ch0(self, iline):
@@ -136,6 +128,7 @@ class Window(object):
         but leave dot unchanged so window contents appear to scroll.
         """
         self.btop = clip(self.btop + nlines, 1, self.buf.S())
+        self.blast = self.blastline()
 
     def shift(self, nlines):
         """
@@ -157,6 +150,7 @@ class Window(object):
             self.btop = self.buf.S() - (self.nlines - 1) # last page
         else: 
             self.btop = iline - self.nlines//2 # center iline in window
+        self.blast = self.blastline()
 
     def open_line(self, wiline):
         'Make line empty at line number wiline on display'
@@ -193,9 +187,9 @@ class Window(object):
         """
         self.first = first if self.first == 0 else self.first
         last = last if last else self.bottom()
-        blastline = iline + (last - first) # might exceed $ near eob
+        blastlinenum = iline + (last - first) # might exceed $ near eob
         display.put_cursor(first, 1)
-        nprinted = self.render_lines(iline, blastline)
+        nprinted = self.render_lines(iline, blastlinenum)
         icursor = first + nprinted
         self.nprinted += nprinted
         self.clear_lines(icursor, last)
@@ -227,7 +221,7 @@ class Window(object):
         # With insert, end == destination, one of the changed lines.
         # With delete, destination is first unchanged line after delete.
         nlines = (-1 if delete else 1)*((end - start)+1)
-        if self.might_intersect(start, end):
+        if self.intersects(start, end):
             if self.saved_dot < start:
                 pass
             elif self.saved_dot > end:
@@ -269,7 +263,7 @@ class Window(object):
         dot = self.buf.dot if self.current else self.saved_dot
         position = (' All ' if self.buf.S() <= self.nlines else # S() is last line
                     ' Top ' if self.btop == 1 else
-                    ' Bot ' if self.blast() == self.buf.S() else
+                    ' Bot ' if self.blast == self.buf.S() else
                     ' %2.0f%% ' % (100*dot/(len(self.buf.lines)-1)))
         linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.S()))
         s1 = self.statusline()
