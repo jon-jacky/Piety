@@ -13,7 +13,7 @@ line   c
 line   d
 line   e
 .
-!windows[1].dot
-!windows[1].seg_1
-!windows[1].seg_n
+!frame.windows[1].saved_dot
+!frame.windows[1].btop
+!frame.windows[1].blast
 # test finished

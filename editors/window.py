@@ -93,18 +93,19 @@ class Window(object):
                 self.buf.S() >= self.nlines)
  
     def empty_line(self, iline):
-        'True when line number iline in buffer is empty, or is just \n'
+        'Line number iline in buffer is empty, or is just \n'
         return self.buf.lines[iline] in ('','\n')
 
     def contains(self, iline):
-        """
-        True when line number iline in buffer is contained in window.
-        Assumes that last line in window is up-to-date with buffer size.
-        """
+        'Line number iline in buffer is one of the lines present in the window'
         return (self.btop <= iline <= self.blast)
 
+    def covers(self, iline):
+        'Line number iline in buffer is in range of lines covered by window.'
+        return (self.btop <= iline <= self.bbottom())
+
     def intersects(self, start, end):
-        'True when window intersects range defined by start..end'
+        'Window intersects range defined by start..end'
         return (self.contains(start) or self.contains(end)
                 or (start < self.btop and end > self.bbottom()))
 
@@ -214,13 +215,30 @@ class Window(object):
         'Move window to show its buf.dot then update window'
         self.move_update(self.buf.dot)
 
-    def adjust_segment(self, start, end, destination, delete=False):
-        'Adjust the segment visible in a window other than current window'
-        # start, end are line numbers before delete, but after insert. 
-        # destination is always the line number after insert or delete.
-        # With insert, end == destination, one of the changed lines.
-        # With delete, destination is first unchanged line after delete.
-        nlines = (-1 if delete else 1)*((end - start)+1)
+    def adjust_insert(self, start, end, destination):
+        'After insert, adjust segment visible in a window other than current'
+        # start, end are line numbers *after* insert is executed in buffer.
+        # ed i() inserts text *before* dot, so start == buf.dot before execute.
+        # destination == end, last inserted line *after* insert executed in buf
+        nlines = end - start + 1
+        if self.covers(start):
+            if self.saved_dot >= start:
+                self.saved_dot = self.saved_dot + nlines
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.btop >= start:
+            self.shift(nlines)
+            self.update_status()
+        elif self.blast < start:
+            self.update_status() # xx% nn/mm in status line changes
+        else:
+            pass # should be unreachable! status line doesn't update
+
+    def adjust_delete(self, start, end, destination):
+        'After delete, adjust segment visible in a window other than current'
+        # start, end are line numbers *before* delete is executed in buffer.
+        # destination is first unchanged line *after* delete executed in buf.
+        nlines = -(end - start + 1)
         if self.intersects(start, end):
             if self.saved_dot < start:
                 pass
@@ -233,7 +251,7 @@ class Window(object):
         elif self.btop > end:
             self.shift(nlines)
             self.update_status()
-        elif self.bbottom() < start:
+        elif self.blast < start:
             self.update_status() # xx% nn/mm in status line changes
         else:
             pass # should be unreachable! status line doesn't update

@@ -140,7 +140,7 @@ def update(op, buffer, origin, destination, start, end):
             win.update_for_input()
         for w in windows:
             if (w != win and w.buf == win.buf):
-                w.adjust_segment(start, end, destination)
+                w.adjust_insert(start, end, destination)
         if not command_mode:
             wdot = win.wline(win.buf.dot)
             display.put_cursor(wdot+1,1)
@@ -155,8 +155,7 @@ def update(op, buffer, origin, destination, start, end):
             win.reupdate() 
         for w in windows:
             if (w != win and w.buf == win.buf):
-                w.adjust_segment(start, end, destination,
-                                 delete=True)
+                w.adjust_delete(start, end, destination)
  
     # Change text: ed s command
     # Update all lines in start..end, we don't know which lines changed,
