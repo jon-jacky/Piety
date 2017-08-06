@@ -4,7 +4,6 @@ window.py - Window class for line-oriented display editors.
 Each window instance displays a range of lines from a text buffer.
 """
 
-from datetime import datetime # for timestamp in status line - FIXME omit
 import display
 
 diagnostics = None # assign to update record to show diagnostics on status line
@@ -113,15 +112,19 @@ class Window(object):
         'First character in line iline in buffer, or space if line empty'
         return ' ' if self.empty_line(iline) else self.buf.lines[iline][0]
 
+    def put_marker(self, iline, clear=False):
+        'Set or clear marker on buffer line iline, or top line if buffer empty'
+        display.put_render(self.top if self.buf.empty() else self.wline(iline),
+                           1, self.ch0(iline), 
+                           display.clear if clear else display.white_bg)
+        
     def set_marker(self, iline):
-        'Set marker on buffer line iline'
-        display.put_render(self.wline(iline), 1, self.ch0(iline), 
-                           display.white_bg)
+        'Set marker on buffer line iline, or top line if buffer empty'
+        self.put_marker(iline)
 
     def clear_marker(self, iline):
-        'Clear marker from buffer line iline'
-        display.put_render(self.wline(iline), 1, self.ch0(iline),
-                           display.clear)
+        'Clear marker from buffer line iline, or top line if buffer empty'
+        self.put_marker(iline, clear=True)
 
     def scroll(self, nlines):
         """
@@ -221,7 +224,11 @@ class Window(object):
         # ed i() inserts text *before* dot, so start == buf.dot before execute.
         # destination == end, last inserted line *after* insert executed in buf
         nlines = end - start + 1
-        if self.covers(start):
+        if self.saved_dot == 0:  # buffer was empty
+            self.saved_dot = self.buf.dot
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.covers(start):
             if self.saved_dot >= start:
                 self.saved_dot = self.saved_dot + nlines
             self.move_update(self.saved_dot)
@@ -298,9 +305,6 @@ class Window(object):
             return
         s1 = self.statusline()
         display.put_render(s1, 45, '-'*(self.ncols-45), display.white_bg)
-        # was ncols-(45+10) before commenting out timestamp
-        #timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 char
-        #display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
 
     def update_diagnostics(self):
         "Print diagnostic and debug information in the status line."
@@ -314,4 +318,3 @@ class Window(object):
         display.kill_line()
         self.first = 0    # reset after each update
         self.nprinted = 0
- 

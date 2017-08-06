@@ -308,13 +308,12 @@ def DD(*args):
     elif name == 'main':
         print("? Can't delete main buffer")
     else:
-        dbuf = buffers[name]
+        delbuf = buffers[name]
         del buffers[name]
-        update(Op.remove, buffer=dbuf)
         if name == current: # pick a new current buffer
             keys = list(buffers.keys()) # always nonempty due to main
             select_buf(keys[0])
-            buf = buffers[current]
+        update(Op.remove, sourcebuf=delbuf, buffer=buf)
         print('%s, buffer deleted' % name)
 
 # Displaying information

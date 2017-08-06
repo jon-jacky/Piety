@@ -185,13 +185,13 @@ class Buffer(object):
         self.insert(iline+1, string.splitlines(True))
 
     def i(self, iline, string):
-        'Insert lines from string before iline, update dot to last inserted line'
-        # iline at initial empty line with index 0 is a special case, must append
+        'Insert lines from string before iline, new dot is last inserted line'
+        # iline at initial empty line w/ index 0 is a special case, must append
         self.insert(iline if iline else iline+1, string.splitlines(True))
 
     def d(self, start, end):
         'Delete text from start up through end.'
-        Buffer.deleted = self.lines[start:end+1] # save deleted lines for yank
+        Buffer.deleted = self.lines[start:end+1] # save lines for yank
         self.lines[start:end+1] = [] # ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0

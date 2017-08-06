@@ -74,7 +74,7 @@ def rescale():
         win.resize(frame_top + iwin*win_hdiv, win_h-1, ncols) # -1 excl status
     refresh()
 
-def update(op, buffer, origin, destination, start, end):
+def update(op, sourcebuf, buffer, origin, destination, start, end):
     """
     Update the display: one window, several, or the entire frame.
     Arguments here are the fields of the UpdateRecord namedtuple.
@@ -94,12 +94,20 @@ def update(op, buffer, origin, destination, start, end):
     elif op == Op.create:
         win.current = True
         win.buf = buffer
+        win.update_status()
 
     # Change buffer in current window, ed b E D
     elif op == Op.select:
         win.current = True
         win.buf = buffer
         win.reupdate()
+
+    # Delete current buffer, ed D
+    elif op == Op.remove:
+        for w in windows:
+            if w.buf == sourcebuf: # deleted buffer
+                w.buf = buffer     # new current buffer
+                w.reupdate()
 
     # Switch to input (insert) mode, for ed a i c commands
     elif op == Op.input:
