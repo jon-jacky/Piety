@@ -30,7 +30,7 @@ class Window(object):
          nlines - number of lines in this window, excluding status line
          ncols - maximum number of characters in a line
         """
-        self.current = False # True when this window is current window
+        self.focus = False # True when this window has the input focus
         self.buf = buf
         self.saved_dot = self.buf.dot 
         self.btop = 1 # index in buffer of first line displayed in window
@@ -138,7 +138,7 @@ class Window(object):
         """
         Move segment of buffer displayed in window by nlines (pos or neg)
         and shift saved_dot also so window contents appear the same.
-        This is only meaningful for non-current windows.
+        This is only meaningful for the windows without input focus.
         """
         self.scroll(nlines)
         self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.S())
@@ -211,82 +211,63 @@ class Window(object):
         'Move window to show buffer line iline then update window'
         self.locate_segment(iline)
         self.update()
-        if self.current:
+        if self.focus:
             self.set_marker(iline)
 
     def reupdate(self):
         'Move window to show its buf.dot then update window'
         self.move_update(self.buf.dot)
 
-    def adjust_insert(self, start, end, destination):
-        'After insert, adjust segment visible in a window other than current'
-        # start, end are line numbers *after* insert is executed in buffer.
-        # ed i() inserts text *before* dot, so start == buf.dot before execute.
-        # destination == end, last inserted line *after* insert executed in buf
-        nlines = end - start + 1
-        if self.saved_dot == 0:  # buffer was empty
-            self.saved_dot = self.buf.dot
-            self.move_update(self.saved_dot)
+    def locate(self, origin, destination):
+        'Update window after cursor moves from origin to destination'
+        if self.contains(destination):
+            self.clear_marker(origin)
+            self.set_marker(destination)
             self.update_status()
-        elif self.covers(start):
-            if self.saved_dot >= start:
-                self.saved_dot = self.saved_dot + nlines
-            self.move_update(self.saved_dot)
-            self.update_status()
-        elif self.btop >= start:
-            self.shift(nlines)
-            self.update_status()
-        elif self.blast < start:
-            self.update_status() # xx% nn/mm in status line changes
         else:
-            pass # should be unreachable! status line doesn't update
+            self.reupdate()
 
-    def adjust_delete(self, start, end, destination):
-        'After delete, adjust segment visible in a window other than current'
-        # start, end are line numbers *before* delete is executed in buffer.
-        # destination is first unchanged line *after* delete executed in buf.
-        nlines = -(end - start + 1)
-        if self.intersects(start, end):
-            if self.saved_dot < start:
-                pass
-            elif self.saved_dot > end:
-                self.saved_dot = self.saved_dot + nlines
-            else:
-                self.saved_dot = destination 
-            self.move_update(self.saved_dot)
-            self.update_status()
-        elif self.btop > end:
-            self.shift(nlines)
-            self.update_status()
-        elif self.blast < start:
-            self.update_status() # xx% nn/mm in status line changes
+    def insert(self, origin, start, end):
+        'Update window after insert lines from origin to start..end'
+        if self.contains(end):
+            if origin != 0:
+                self.clear_marker(origin)
+            self.update_from(start)
         else:
-            pass # should be unreachable! status line doesn't update
+            self.reupdate()
 
-    def update_for_input(self):
-        """
-        Open next line and overwrite lines below.
-        If at bottom of window, scroll insertion point up to the middle.
-        Then place input cursor.
-        """
-        wdot = self.wline(self.buf.dot) # line on display where dot appears
-        if wdot > 0:
-            self.clear_marker(self.buf.dot)
-        if wdot >= self.top + self.nlines - 1: # at bottom of window
-            self.scroll(self.nlines//2)
-            wdot = self.top + (self.buf.dot - self.btop)
-            self.update_lines(self.top, self.buf.dot-self.nlines//2+1, 
-                              last=wdot)
-        self.open_line(wdot+1)
-        self.update_lines(wdot+2, self.buf.dot+1)
+    def delete(self, destination):
+        'Update window after delete lines above destination'
+        if self.contains(destination): # window already contains new dot
+            self.update_from(destination)
+            self.set_marker(destination)
+        else:
+            self.reupdate() 
+
+    def mutate_lines(self, start, destination):
+        'Update window after some lines in range start..destination changed'
+        top = max(start, self.btop)
+        self.update_lines(self.wline(top), top, 
+                       last=self.wline(destination))
         self.update_status()
+
+    def mutate(self, origin, start, destination):
+        'Update window and move marker after some lines in range changed'
+        if self.contains(destination):
+            self.clear_marker(origin)
+            self.mutate_lines(start, destination)
+            self.set_marker(destination)
+        else:
+            self.reupdate()
+
+# The following methods are only used with the status line
 
     def update_status_prefix(self):
         "Print information about window's buffer in its status line."
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
-        dot = self.buf.dot if self.current else self.saved_dot
-        position = (' All ' if self.buf.S() <= self.nlines else # S() is last line
+        dot = self.buf.dot if self.focus else self.saved_dot
+        position = (' All ' if self.buf.S() <= self.nlines else # S() last line
                     ' Top ' if self.btop == 1 else
                     ' Bot ' if self.blast == self.buf.S() else
                     ' %2.0f%% ' % (100*dot/(len(self.buf.lines)-1)))
@@ -318,3 +299,90 @@ class Window(object):
         display.kill_line()
         self.first = 0    # reset after each update
         self.nprinted = 0
+
+# The following methods are only used with input mode
+
+    def update_for_input(self):
+        """
+        Open next line and overwrite lines below.
+        If at bottom of window, scroll insertion point up to the middle.
+        """
+        wdot = self.wline(self.buf.dot) # line on display where dot appears
+        if wdot > 0:
+            self.clear_marker(self.buf.dot)
+        if wdot >= self.top + self.nlines - 1: # at bottom of window
+            self.scroll(self.nlines//2)
+            wdot = self.top + (self.buf.dot - self.btop)
+            self.update_lines(self.top, self.buf.dot-self.nlines//2+1, 
+                              last=wdot)
+        self.open_line(wdot+1)
+        self.update_lines(wdot+2, self.buf.dot+1)
+        self.update_status()
+
+    def put_cursor_for_input(self):
+        'Place input cursor for insert after update_for_input, above'
+        wdot = self.wline(self.buf.dot)
+        display.put_cursor(wdot+1,1)
+
+# The following methods are only used with multiple windows
+
+    def samebuf(self, win):
+        'True when this window differs from win but uses the same buffer'
+        return (self != win and self.buf == win.buf)
+
+    def set_focus(self):
+        'Set input focus to this window'
+        self.focus = True
+        self.buf.dot = self.saved_dot
+        self.set_marker(self.buf.dot)
+
+    def release_focus(self):
+        'Release input focus from this window'
+        self.focus = False
+        self.saved_dot = self.buf.dot
+        self.clear_marker(self.saved_dot)
+
+    def adjust_insert(self, start, end, destination):
+        'After insert, adjust segment visible in a window without input focus'
+        # start, end are line numbers *after* insert is executed in buffer.
+        # ed i() inserts text *before* dot, so start == buf.dot before execute.
+        # destination == end, last inserted line *after* insert executed in buf
+        nlines = end - start + 1
+        if self.saved_dot == 0:  # buffer was empty
+            self.saved_dot = self.buf.dot
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.covers(start):
+            if self.saved_dot >= start:
+                self.saved_dot = self.saved_dot + nlines
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.btop >= start:
+            self.shift(nlines)
+            self.update_status()
+        elif self.blast < start:
+            self.update_status() # xx% nn/mm in status line changes
+        else:
+            pass # should be unreachable! status line doesn't update
+
+    def adjust_delete(self, start, end, destination):
+        'After delete, adjust segment visible in a window without input focus'
+        # start, end are line numbers *before* delete is executed in buffer.
+        # destination is first unchanged line *after* delete executed in buf.
+        nlines = -(end - start + 1)
+        if self.intersects(start, end):
+            if self.saved_dot < start:
+                pass
+            elif self.saved_dot > end:
+                self.saved_dot = self.saved_dot + nlines
+            else:
+                self.saved_dot = destination 
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.btop > end:
+            self.shift(nlines)
+            self.update_status()
+        elif self.blast < start:
+            self.update_status() # xx% nn/mm in status line changes
+        else:
+            pass # should be unreachable! status line doesn't update

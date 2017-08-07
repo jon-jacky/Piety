@@ -12,7 +12,7 @@ def do_window_command(line):
     param_string = line.lstrip()[1:].lstrip()
 
     if not param_string: # o: switch to next window
-        next_i = (frame.win_i+1 if frame.win_i+1 < len(frame.windows)
+        next_i = (frame.ifocus+1 if frame.ifocus+1 < len(frame.windows)
                   else 0)  # FIXME?  Define frame.next_window() - ?
         ed.current = frame.windows[next_i].buf.name
         ed.buf = ed.buffers[ed.current]
