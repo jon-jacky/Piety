@@ -1,7 +1,7 @@
 """
 window.py - Window class for line-oriented display editors.
 
-Each window instance displays a range of lines from a text buffer.
+Each window displays a range of lines - a segment - from a text buffer.
 """
 
 import display

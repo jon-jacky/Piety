@@ -1,12 +1,8 @@
 """
 ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 
-This module provides both the classic command interface and the public
-Python API.  It imports buffer.py which defines the Buffer class that
-provides the core data structure and the internal API.
-
-For more explanation see ed.md, ed.txt, the docstrings here, and the tests
-in test/ed/
+For more explanation see ed.md, ed.txt, docstrings and comments here,
+and tests in test/ed/
 """
 
 import re, os, sys, enum
@@ -23,10 +19,10 @@ from updates import Op
 
 def parse_args(args):
     """
-    Parse variable-length argument list for new Python API, all args are optional.
+    Parse variable-length argument list for new Python API, all args optional.
     Return fixed length tuple: start, end, text, params 
-    start, end are line numbers, for example the first and last line of a region.
-    When present, start and end are int, both might be absent, indicated by None.
+    start, end are line numbers, for example the first and last line of region.
+    When present, start and end are int, both might be absent, indicated None.
     text is the first token in the parameter list, str or None if absent
     params is the parameter list, [] if absent.
     """
@@ -120,7 +116,10 @@ def parse_check_range_dest(args):
     return (valid and dest_valid), start, end, dest
 
 def match_prefix(prefix, names):
-    'If prefix ends with -, return name (if any) that matches, otherwise return same prefix'
+    """
+    If prefix ends with -, return name (if any) that matches, 
+    otherwise return same prefix.  'Poor person's tab completion'.
+    """
     if isinstance(prefix, str) and prefix.endswith('-'): # might be None
         for n in names:
             if n.startswith(prefix[:-1]):
@@ -153,7 +152,7 @@ def S():
 
 def k(*args):
     """
-    Mark addressed line in this buffer with character c (the command parameter),
+    Mark addressed line in this buffer with character c (command parameter),
     to use with 'c address form.  'c address identifies both buffer and line.
     """
     valid, iline, marker = parse_check_iline(args)
@@ -352,7 +351,7 @@ def l(*args):
 def p_lines(start, end, destination): # arg here shadows global destination
     'Print lines start through end, inclusive, at destination'
     for iline in range(start, end+1): # +1 because start,end is inclusive
-        print(buf.l(iline), file=destination) # file can be null or stdout or ...
+        print(buf.l(iline), file=destination) # file can be null or stdout or..
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
@@ -365,7 +364,7 @@ def z(*args):
     Scroll: print buf.npage lines, scroll backwards if npage is negative.
     If parameter is present, update buf.npage
     If npage is non-negative, start at iline, leave dot at last line printed.
-    if npage is negative, start at iline + npage, leave dot at first line printed.
+    if npage is negative, start at iline+npage, leave dot at first line printed
     """
     valid, iline, npage_string = parse_check_iline(args)
     if valid: 
@@ -402,7 +401,7 @@ def i(*args):
         buf.i(iline, lines)
 
 def d(*args):
-    'Delete text from start up to end, set dot to first line after deletes or...'
+    'Delete text from start up to end, set dot to first line after deletes'
     valid, start, end, _, _ = parse_check_range(args)
     if valid:
         buf.d(start, end)
@@ -464,7 +463,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'AbBdDeEfklmnpqrstwxXyz' # commands that do not require further input
+complete_cmds = 'AbBdDeEfklmnpqrstwxXyz' # commands that require no more input
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -565,16 +564,15 @@ def parse_cmd(cmd_string):
     # special handling for commands that must be repeated to confirm
     D_count = 0 if cmd_name != 'D' else D_count
     # command-specific parameter parsing
-    if cmd_name == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
+    if cmd_name == 's' and len(params.split('/')) == 4: #s/old/new/g,g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
         return cmd_name, start, end, old, new, glbl
     # all other commands, no special parameter parsing
     else:
-        # return each space-separated parameter as separate argument in sequence
-        return (cmd_name, start, end) + (tuple(params.split() if params else ()))
+        # return each space-separated parameter as separate arg in sequence
+        return (cmd_name,start,end) + (tuple(params.split() if params else ()))
 
-# State variables that must persist between cmd invocations during input mode,
-#  also must be global so display editor can use them.
+# State variables that must persist between cmd invocations during input mode
 command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
@@ -589,7 +587,7 @@ pysh = pysh.mk_shell() # embedded Python shell for ! command
 def do_command(line):
     """
     Process one input line without blocking in ed command or input mode
-    Update buffers and control variables: command_mode, cmd_name, args, start, end
+    Update buffers and control variables: command_mode,cmd_name,args,start,end
     """
     global command_mode, cmd_name, args, start, end, dest
     if command_mode:
@@ -607,14 +605,14 @@ def do_command(line):
         cmd_name, args = tokens[0], tokens[1:]
         start, end, dest, _ = parse_args(args) # might be int or None
         start, end = mk_range(start, end) # int only
-        dest, _ = (None, None) if dest is None else match_address(dest) # str -> int
+        dest,_ = (None,None) if dest is None else match_address(dest) #str->int
         if cmd_name in complete_cmds:
-            globals()[cmd_name](*args) # dict from name (string) to object (fcn)
+            globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in input_cmds:
             command_mode = False # enter input mode
-            # Instead of using buf.a, i, c, we handle input mode cmds inline here
-            # We will add each line to buffer when user types RET at end-of-line,
-            # *unlike* in Python API where we pass multiple input lines at once.
+            # Instead of using buf.a,i,c, we handle input mode cmds inline here
+            # We add each line to buffer when user types RET at end-of-line,
+            # *unlike* in Python API where we pass multiple input lines at once
             if not (iline_ok0(start) if cmd_name in 'ai'
                     else range_ok(start, end)):
                 print('? invalid address')
@@ -627,10 +625,10 @@ def do_command(line):
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
                 update(Op.input)
-            elif cmd_name == 'c': # c(hange) command deletes changed lines first
+            elif cmd_name == 'c': #c(hange) command deletes changed lines first
                 buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
                 buf.dot = start - 1 # supercede dot assigned in preceding
-                update(Op.input)  # queues Op.input after Op.delete from buf.d above
+                update(Op.input)  # queues Op.input after Op.delete from buf.d
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:
@@ -639,7 +637,7 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
-            update(Op.command) # return from input (insert) mode to command mode
+            update(Op.command) # return from input (insert) mode to cmd mode
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
@@ -705,13 +703,13 @@ def x(*args):
 def X(*args):
     """
     Execute Python statements in the current buffer: X(start, end, echo, delay)
-     start, end default to dot, so X command without range single-steps through buffer.
+     start, end default to dot, so X cmd without range single-steps thru buffer
      echo - optional, default False; delay - optional, default no delay
     Leaves dot at last line executed, to single-step through file, repeat +X
     """
-    valid, start, end, echo, delay_singleton = parse_check_range(args) # no bufname
+    valid,start,end,echo,delay_singleton = parse_check_range(args) # no bufname
     if valid:
-        # delay if present is in a singleton tuple. If echo is absent, so is delay
+        # delay if present is in a singleton tuple. If echo absent, so is delay
         params = (echo,)+delay_singleton if echo else ()
         params_valid, echo, delay = parse_echo_delay(params)
         if params_valid:
