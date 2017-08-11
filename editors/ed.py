@@ -63,13 +63,13 @@ def mk_range(start, end):
 def iline_ok(iline):
     """Return True if iline address is in buffer, always False for empty buffer
     Used by most commands, which don't make sense for an empty buffer"""
-    return (0 < iline <= buf.S()) 
+    return (0 < iline <= buf.nlines()) 
 
 def iline_ok0(iline):
     """Return True if iline address is in buffer, or iline is 0 for start 
     Used by commands which make sense for an empty buffer: insert, append, read
     """
-    return (0 <= iline <= buf.S())
+    return (0 <= iline <= buf.nlines())
 
 def range_ok(start, end):
     'Return True if start and end are in buffer, and start does not follow end'
@@ -142,13 +142,13 @@ buffers = dict() # dict from buffer names (strings) to Buffer instances
 
 # line addresses
 
-def o():
+def o(): # looks like ed .
     'Return index of the current line (called dot), 0 if the buffer is empty'
     return buf.dot
 
-def S():
+def S(): # looks like ed $
     'Return index of the last line, 0 if the buffer is empty'
-    return buf.S()
+    return buf.nlines()
 
 def k(*args):
     """
@@ -242,7 +242,7 @@ def E(*args):
     if not filename:
         print('? no current filename')
         return
-    buf.d(1,S())
+    buf.d(1, buf.nlines())
     r(0, filename)
     buf.unsaved = False
 
@@ -259,9 +259,9 @@ def r(*args):
     if valid:
         filename = current_filename(fname)
         if filename:
-            S0 = S()
+            nlines0 = buf.nlines()
             buf.r(iline, filename)
-            print('%s, %d lines' % (filename, S()-S0))
+            print('%s, %d lines' % (filename, buf.nlines() - nlines0))
 
 def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
@@ -282,7 +282,7 @@ def w(*args):
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
-        print('%s, %d lines' % (filename, S()))
+        print('%s, %d lines' % (filename, buf.nlines()))
 
 D_count = 0 # number of consecutive times D command has been invoked
 
@@ -320,7 +320,7 @@ def DD(*args):
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
     iline, _, _, _ = parse_args(args)
-    iline = iline if iline != None else S() # default $ not .
+    iline = iline if iline != None else buf.nlines() # default $ not .
     if iline_ok0(iline): # don't print error message when file is empty
         print(iline)
     else:
@@ -342,7 +342,7 @@ def l(*args):
         return
     # don't use usual default dot here, instead advance dot
     if iline == None:
-        iline = o() + 1
+        iline = buf.dot + 1
     if not iline_ok(iline):
         print('? invalid address')
         return
@@ -381,7 +381,7 @@ def z(*args):
             end = iline
             iline += buf.npage # npage negative, go backward
             iline = iline if iline > 0 else 1
-        end = end if end <= S() else S()
+        end = end if end <= buf.nlines() else buf.nlines()
         p_lines(iline, end, lz_print_dest) # null destination suppresses print
         if buf.npage < 0:
             buf.dot = iline
@@ -451,7 +451,7 @@ def y(*args):
     'Insert most recently deleted lines *before* destination line address'
     iline, _, _, _ = parse_args(args)
     iline = mk_iline(iline)
-    if not (0 <= iline <= buf.S()+1): # allow +y at $ to append to buffer
+    if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer
         print('? invalid address')
         return
     buf.y(iline)
@@ -490,11 +490,11 @@ def match_address(cmd_string):
     if cmd_string == '':
         return None, '' 
     if cmd_string[0] == '.': # current line
-        return o(), cmd_string[1:]
+        return buf.dot, cmd_string[1:]
     if cmd_string[0] == '$': # last line
-        return S(), cmd_string[1:]
+        return buf.nlines(), cmd_string[1:]
     if cmd_string[0] == ';': # equivalent to .,$  - current line to end
-        return o(), ',$'+ cmd_string[1:]
+        return buf.dot, ',$'+ cmd_string[1:]
     if cmd_string[0] in ',%': # equivalent to 1,$ - whole buffer
         return 1, ',$'+ cmd_string[1:]
     m = number.match(cmd_string) # digits, the line number
@@ -502,22 +502,22 @@ def match_address(cmd_string):
         return int(m.group(1)), cmd_string[m.end():]
     m = fwdnumber.match(cmd_string) # +digits, relative line number forward
     if m:
-        return o() + int(m.group(1)), cmd_string[m.end():]
+        return buf.dot + int(m.group(1)), cmd_string[m.end():]
     m = bkdnumber.match(cmd_string) # -digits, relative line number backward
     if m:
-        return o() - int(m.group(1)), cmd_string[m.end():]
+        return buf.dot - int(m.group(1)), cmd_string[m.end():]
     m = bkdcnumber.match(cmd_string) # ^digits, relative line number backward
     if m:
-        return o() - int(m.group(1)), cmd_string[m.end():]
+        return buf.dot - int(m.group(1)), cmd_string[m.end():]
     m = plusnumber.match(cmd_string) # + or ++ or +++ ...
     if m:
-        return o() + len(m.group(0)), cmd_string[m.end():]
+        return buf.dot + len(m.group(0)), cmd_string[m.end():]
     m = minusnumber.match(cmd_string) # digits, the line number
     if m:
-        return o() - len(m.group(0)), cmd_string[m.end():]
+        return buf.dot - len(m.group(0)), cmd_string[m.end():]
     m = caratnumber.match(cmd_string) # digits, the line number
     if m:
-        return o() - len(m.group(0)), cmd_string[m.end():]
+        return buf.dot - len(m.group(0)), cmd_string[m.end():]
     m = fwdsearch.match(cmd_string)  # /text/ or // - forward search
     if m: 
         return buf.F(m.group(1)), cmd_string[m.end():]
@@ -641,7 +641,7 @@ def do_command(line):
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
-            buf.a(o(), line + '\n') # append new line after dot, advance dot
+            buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
         return
 
 def do_commands(do_command, lines, echo, delay):

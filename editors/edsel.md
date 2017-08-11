@@ -10,7 +10,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 ## Running edsel ##
 
-**edsel** can run as a standalone program or in an interactive Python session.  
+**edsel** can run as a standalone program or in an interactive Python session.
 
 **edsel** is invoked using a similar command line or fuction call as
 [ed.py](ed.md).  It adds one more option, *c*, the number of lines in
@@ -71,6 +71,9 @@ type a period at the start of a line to exit input mode.  Then *edsel*
 puts the cursor back in the command region for you to type another
 command.
 
+Conventional full-screen display editing is (will be) provided by an
+enhanced version of *edsel* called *eden*.
+
 As in *ed*, you can execute any Python statement at the *edsel*
 command line by preceding it with the *!* character, for example
 *!dir(ed)*.
@@ -120,4 +123,21 @@ suppressed by two optional *x* parameters that follow the buffer name:
 echo (boolean) and delay (float), which default to *True* and *0.2*
 seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
 
-Revised May 2016
+## Modules ##
+
+**edsel.py** is a wrapper around *ed.py*.  Here *edsel* imports the
+*update* function from the *updates* module and passes it to *ed*,
+which assigns it to its own *update* function.  Then *edsel* collects
+commands and passes most of them to *ed*.  Then *ed* performs the
+commanded editing operations and calls its newly assigned *update*
+function to cause *frame* to display their effects.
+(The default *ed.update* does nothing, so *ed* without
+*edsel* runs without any display.)
+
+The only commands that *edsel* does not pass to *ed* are the windowing
+commands that create, destroy, or rearrange windows, or change
+the input focus from one window to another.   For these, *edsel* itself calls
+*update* to cause *frame* to display the effects.
+
+Revised Aug 2017
+

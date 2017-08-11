@@ -70,7 +70,7 @@ class Window(object):
         Index in buffer of last line in window, maybe not bottom of window.
         Assumes that last line in window is up-to-date with buffer size.
         """
-        return min(self.bbottom(), self.buf.S())
+        return min(self.bbottom(), self.buf.nlines())
  
     def statusline(self):
          "Line number on display of window's status line"
@@ -81,15 +81,15 @@ class Window(object):
         Line number in buffer iline is in
         top half of segment at beginning of buffer that fits in window.
         """
-        return (iline <= self.nlines//2 or self.buf.S() <= self.nlines)
+        return (iline <= self.nlines//2 or self.buf.nlines() <= self.nlines)
 
     def near_bottom(self, iline):
         """
         Line number in buffer iline is in
         bottom half of segment at end of buffer that fits in window.
         """
-        return (self.buf.S() - iline < self.nlines//2 and
-                self.buf.S() >= self.nlines)
+        return (self.buf.nlines() - iline < self.nlines//2 and
+                self.buf.nlines() >= self.nlines)
  
     def empty_line(self, iline):
         'Line number iline in buffer is empty, or is just \n'
@@ -131,7 +131,7 @@ class Window(object):
         Move segment of buffer displayed in window by nlines (pos or neg)
         but leave dot unchanged so window contents appear to scroll.
         """
-        self.btop = clip(self.btop + nlines, 1, self.buf.S())
+        self.btop = clip(self.btop + nlines, 1, self.buf.nlines())
         self.blast = self.blastline()
 
     def shift(self, nlines):
@@ -141,7 +141,7 @@ class Window(object):
         This is only meaningful for the windows without input focus.
         """
         self.scroll(nlines)
-        self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.S())
+        self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.nlines())
 
     def locate_segment(self, iline):
         """
@@ -151,7 +151,7 @@ class Window(object):
         if self.near_top(iline):
             self.btop = 1  
         elif self.near_bottom(iline):
-            self.btop = self.buf.S() - (self.nlines - 1) # last page
+            self.btop = self.buf.nlines() - (self.nlines - 1) # last page
         else: 
             self.btop = iline - self.nlines//2 # center iline in window
         self.blast = self.blastline()
@@ -267,11 +267,11 @@ class Window(object):
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
         dot = self.buf.dot if self.focus else self.saved_dot
-        position = (' All ' if self.buf.S() <= self.nlines else # S() last line
+        position = (' All ' if self.buf.nlines() <= self.nlines else
                     ' Top ' if self.btop == 1 else
-                    ' Bot ' if self.blast == self.buf.S() else
-                    ' %2.0f%% ' % (100*dot/(len(self.buf.lines)-1)))
-        linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.S()))
+                    ' Bot ' if self.blast == self.buf.nlines() else
+                    ' %2.0f%% ' % (100*dot/self.buf.nlines()))
+        linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
         s1 = self.statusline()
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)

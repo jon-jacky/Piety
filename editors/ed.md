@@ -18,7 +18,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 ## Running ed.py ##
 
-**ed.py** can run as a standalone program or in an interactive Python session.  
+**ed.py** can run as a standalone program or in an interactive Python session.
 
 The recommended way to run **ed.py** as a standalone program is:
 
@@ -207,6 +207,7 @@ blocking, and then passes that line to *ed.do_command*.
 Python API described above, including command line parsing, argument
 checking, and error messages.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
+
 **ed.py** imports *[buffer.py](buffer.py)*, which provides the *Buffer* class,
 which defines the core data structure and the internal API for
 updating it.  Many *Buffer* methods correspond to functions in the
@@ -217,10 +218,14 @@ and writes files.
 
 The *Buffer* class provides a *write* method so other code can update
 text buffers without using the *ed.py* user interface or API, by
-calling the standard Python *print* function.  The *Buffer* class has
-an *update* attribute which can optionally be assigned to a callable
-that may be used by the *write* method to update a display (for
-example).
+calling the standard Python *print* function, with the *file=...* optional
+argument pointing to the buffer.
+
+The *buffer* module defines an *update* function that can optionally
+be reassigned to a callable that may be used to update a display
+whenever buffer contents change.  The default definition of this
+function does nothing (has an empty body), so the *buffer* module can
+be used by programs like *ed.py* that do not use a display.
 
 ## Limitations and differences from classic ed ##
 
