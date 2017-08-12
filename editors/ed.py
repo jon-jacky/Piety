@@ -1,8 +1,6 @@
 """
 ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 
-For more explanation see ed.md, ed.txt, docstrings and comments here,
-and tests in test/ed/
 """
 
 import re, os, sys, enum

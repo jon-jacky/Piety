@@ -1,6 +1,6 @@
 """
 edsel - Display editor based on the line editor ed.py.  
-         Described in ed.md and edsel.md.
+
 """
 
 import traceback, os
@@ -9,21 +9,18 @@ from updates import Op
 from updatecall import update
 
 def do_window_command(line):
+    'Window manager commands'
     param_string = line.lstrip()[1:].lstrip()
-
     if not param_string: # o: switch to next window
         next_i = (frame.ifocus+1 if frame.ifocus+1 < len(frame.windows)
-                  else 0)  # FIXME?  Define frame.next_window() - ?
+                  else 0)
         ed.current = frame.windows[next_i].buf.name
         ed.buf = ed.buffers[ed.current]
         update(Op.next)
-
     elif param_string.startswith('1'): # o1: return to single window
         update(Op.single)
-
     elif param_string.startswith('2'): # o2: split window, horizontal
         update(Op.hsplit)
-
     else:
         print('? integer 1 or 2 expected at %s' % param_string) 
 
@@ -31,8 +28,8 @@ def do_command(line):
     'Process one command line without blocking.'
     # try/except ensures we restore display, especially scrolling
     try:
-        # Intercept special commands used by frame only, not ed
-        # Only in command mode!  Otherwise line is text to add to buffer.
+        # Intercept special commands used by frame only, not ed.
+        # Only in command mode!  Otherwise line might be text to add to buffer.
         if ed.command_mode and line.lstrip().startswith('o'):
             do_window_command(line)
         else:
@@ -43,6 +40,7 @@ def do_command(line):
         exit()
 
 def startup(*filename, **options):
+    'Configure ed for display editing, other startup chores'
     temp = ed.buffer.Buffer('placeholder') # will be reassigned by ed.startup()
     cmd_h = options['c'] if 'c' in options else None
     frame.init(temp, cmd_h_option=cmd_h) # ed.startup requires frame.win

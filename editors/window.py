@@ -1,16 +1,15 @@
 """
-window.py - Window class for line-oriented display editors.
-
-Each window displays a range of lines - a segment - from a text buffer.
+window.py - Window class for line-oriented display editors. 
+            Each window displays a range of lines (a segment) of a text buffer.
 """
 
 import display
 
-diagnostics = None # assign to update record to show diagnostics on status line
-
 def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
     return min(max(first, iline), last)
+
+show_diagnostics = True # on status line
 
 class Window(object):
     """
@@ -20,7 +19,7 @@ class Window(object):
     May be followed by a status line with information about the buffer.
     """
 
-    nupdates = 0 # diagnostic, used by update_diagnostics
+    nupdates = 0 # diagnostic, optionally show on status line
 
     def __init__(self, buf, top, nlines, ncols):
         """
@@ -37,7 +36,7 @@ class Window(object):
         self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
         self.blast = self.blastline() # buffer can get out of synch
 
-        # Diagnostics
+        # Diagnostics, optionally show on status line
         self.first = 0    # first line printed on window in this update
         self.nprinted = 0 # n of lines printed on window in this update
 
@@ -262,8 +261,8 @@ class Window(object):
 
 # The following methods are only used with the status line
 
-    def update_status_prefix(self):
-        "Print information about window's buffer in its status line."
+    def update_status(self):
+        'Print information about window and its buffer in its status line.'
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
         dot = self.buf.dot if self.focus else self.saved_dot
@@ -275,28 +274,17 @@ class Window(object):
         s1 = self.statusline()
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
-        display.put_render(s1, 22, position, display.white_bg) # was 26
-        display.put_render(s1, 27, linenums, display.white_bg) # was 31
-
-    def update_status(self):
-        "Print information about window's buffer in its status line."
-        self.update_status_prefix()
-        if diagnostics:
-            self.update_diagnostics()
-            return
-        s1 = self.statusline()
-        display.put_render(s1, 45, '-'*(self.ncols-45), display.white_bg)
-
-    def update_diagnostics(self):
-        "Print diagnostic and debug information in the status line."
+        display.put_render(s1, 22, position, display.white_bg)
+        display.put_render(s1, 27, linenums, display.white_bg)
+        display.put_render(s1, 41, '(Text)', display.white_bg)
+        nsuffix = 17
+        nstrut = self.ncols - (46+nsuffix) # n of chars in suffix
+        display.put_render(s1, 47, '-'*nstrut, display.white_bg)
         Window.nupdates += 1 # ensure at least this changes in status line
-        update_info = '%3d %3s o:%3d d:%3d s:%3d e:%3d, f:%3d n:%3d' % \
-            (Window.nupdates, str(diagnostics.op)[3:6], diagnostics.origin, 
-             diagnostics.destination, diagnostics.start, diagnostics.end, 
-             self.first, self.nprinted)
-        s1 = self.statusline()
-        display.put_render(s1, 36, update_info, display.white_bg) # was 40
-        display.kill_line()
+        diagnostics = '  N%4d f%3d n%3d' % \
+            (Window.nupdates, self.first, self.nprinted)
+        suffix = diagnostics if show_diagnostics else '-'*nsuffix
+        display.put_render(s1, 47 + nstrut, suffix, display.white_bg)
         self.first = 0    # reset after each update
         self.nprinted = 0
 

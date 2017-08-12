@@ -4,7 +4,7 @@ updatecall.py - function to update display by making and sending an UpdateRec
 """
 
 from updates import UpdateRecord
-import window, frame
+import frame
 
 def update(op, sourcebuf=None, buffer=None, origin=0, destination=0, 
            start=0, end=0):
@@ -12,5 +12,4 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     update_record = UpdateRecord(op, sourcebuf=sourcebuf, buffer=buffer, 
                                  origin=origin, destination=destination, 
                                  start=start, end=end)
-    window.diagnostics = update_record # show diagnostics on status line
     frame.update(**update_record._asdict())
