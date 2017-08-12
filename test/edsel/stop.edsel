@@ -1,0 +1,12 @@
+# stop.edsel - that's s(ubstitute) above dot, to test adjust_segment
+E lines120.txt
+o2
+60
+o
+60
+o
+1,30s/line/abcd/
+!frame.windows[1].saved_dot
+!frame.windows[1].btop
+!frame.windows[1].nlines
+# test finished

@@ -1,0 +1,13 @@
+# cmorebot.edsel - c(hange) command that adds lines below 2nd window segment
+!import samples
+E lines120.txt
+o2
+60
+o
+60
+o
+!ed.c(90, samples.linesabz)
+!windows[1].dot
+!windows[1].seg_1
+!windows[1].seg_n
+# test finished

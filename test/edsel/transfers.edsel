@@ -1,0 +1,14 @@
+# transfers.edsel - test t(ransfer) that is copy command in one or two windows
+E lines120.txt
+1
+1,5t10
+1,5t17
+1,5t100
+1,5t$
+o2
+1
+1,3t5
+o
+1
+3,4t5
+# test finished

@@ -1,258 +1,376 @@
 """
-window.py - Window class for line-oriented display editors.
-
-Each window instance displays a range of lines from a text buffer.
+window.py - Window class for line-oriented display editors. 
+            Each window displays a range of lines (a segment) of a text buffer.
 """
 
 import display
-from datetime import datetime # for timestamp, used for testing
 
 def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
     return min(max(first, iline), last)
 
+show_diagnostics = True # on status line
+
 class Window(object):
     """
     Window class for line-oriented display editors.
     Displays a range of lines (the segment) from a text buffer.
-    Includes a status line with information about the buffer.
-    Has a line called dot where text insertions etc. occur.
-    May display a cursor-like marker to indicate dot.
+    May display a marker to indicate text insertion point (called dot).
+    May be followed by a status line with information about the buffer.
     """
-    def __init__(self, buf, win_1, win_h, ncols):
+
+    nupdates = 0 # diagnostic, optionally show on status line
+
+    def __init__(self, buf, top, nlines, ncols):
         """
-        Initialize window, given its text buffer, location, and dimensions
-        buf - text buffer displayed in this window, must have:
-          buf.lines: list of strings, buf.S(): returns index of last line,
-          buf.dot: index of current line, buf.npage: n of lines for paging cmds
-          buf.unsaved: boolean, buf.name: string
-        win_1 -line number on display of first buffer line shown in this window
-        win_h - number of lines in this window, including status region
-        ncols - maximum number of characters in a line
+        Initialize window, given its text buffer, location,and dimensions
+         buf - text buffer displayed in this window
+         top - line number on display of first buffer line in window
+         nlines - number of lines in this window, excluding status line
+         ncols - maximum number of characters in a line
         """
+        self.focus = False # True when this window has the input focus
         self.buf = buf
-        # Initialize but never update self.dot here, this window might not be current
-        self.dot = self.buf.dot 
-        # status_h is height of status region in lines, usually 1
-        self.status_h = 1 # height (lines) of window status region(status line)
-        self.resize(win_1, win_h, ncols) # assigns self.win_1 .win_h .ncols
-        # self.seg_1,seg_n are indices in buffer of 1st,last lines in window
-        self.seg_1 = 1 # index in buffer of first line displayed in window
-        self.seg_n = min(self.win_hl, self.buf.S()) # index of last line
-        self.dot_i = 0 # line number on display of this window's dot, 0 not visible
-        self.marker_ch = '' # character that marker overwrites
-        self.marker_chx = '' # same as marker_ch except when that is blank
-        self.dot_i0 = 0 # previous value of dot_i
-        self.marker_ch0 = '' # previous value of marker_ch
+        self.saved_dot = self.buf.dot 
+        self.btop = 1 # index in buffer of first line displayed in window
+        self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
+        self.blast = self.blastline() # buffer can get out of synch
 
-    # assign window dimenions: self.win_1 win_h win_hl status_1 ncols buf.npage
-    
-    # called by __init__ and also at other time
-    def resize(self, win_1, win_h, ncols):
-        'Assign, recalculate window dimensions'
-        self.win_1 = win_1 # line number on display of 1st line of this window
-        self.win_h = win_h # number of lines in this window including status
-        self.ncols = ncols # max number of chars in a line
-        # There are also edd.py global win_h: total lines in all windows
-        self.win_hl = self.win_h - self.status_h #window lines excluding status
-        # status_1 is line num on display of 1st line of status region
-        self.status_1 = self.win_1 + self.win_hl # first line after buffer text
-        self.buf.npage = self.win_hl # page size for classic ed z paging command
-        # seg_1, seg_n assigned in set_segment, called from update_window.
-        # seg_1, seg_n are also reassigned when dot moves.
+        # Diagnostics, optionally show on status line
+        self.first = 0    # first line printed on window in this update
+        self.nprinted = 0 # n of lines printed on window in this update
 
-    # report segment position: top, near bottom, at bottom, dot elsewhere, moved
+    def resize(self, top, nlines, ncols):
+        """
+        Assign, recalculate window dimensions
+         top - line number on display of first line of window
+         nlines - n of lines in window, excludling status line
+         ncols - maximum number of characters in a line
+        """
+        self.top = top
+        self.nlines = nlines 
+        self.ncols = ncols
+        self.buf.npage = self.nlines #initial page size for ed z page cmd
 
-    def near_buf_top(self):
-        'dot is in top half of segment at beginning of buffer that fits in window.'
-        # // is python 3 floor division
-        return (self.dot <= self.win_hl//2 or self.buf.S() <= self.win_hl)
+    def wline(self, iline):
+        'Line number on display of iline in buffer.'
+        return self.top + (iline - self.btop)
 
-    def near_buf_bottom(self):
-        'dot is in bottom half of segment at end of buffer that fits in window.'
-        return (self.buf.S() - self.dot < self.win_hl//2 and
-                self.buf.S() >= self.win_hl)
+    def bottom(self):
+        'Line num. on display of bottom line in window (not status line)'
+        return self.top + self.nlines - 1
 
-    def at_bottom_line(self):
-        'dot is at last line in buffer and is last line in full window.'
-        seg_h = self.seg_n - self.seg_1 + 1 # lines in segment, maybe < win_hl
-        return (self.dot == self.buf.S() and self.seg_n == self.buf.S() 
-                and seg_h == self.win_hl)
+    def bbottom(self):
+        'Index in buffer of bottom line in window. May exceed buffer size'
+        return self.btop + self.nlines - 1
 
-    def dot_elsewhere(self):
-        'dot lies outside segment of buffer visible in window'
-        return ((not self.seg_1 <= self.dot <= self.seg_n) 
-                if self.dot else False)
-    
-    def dot_moved(self):
-        'dot moved to a different line in the buffer (than dot_i0)'
-        return self.dot_i != self.dot_i0
+    def blastline(self):
+        """
+        Index in buffer of last line in window, maybe not bottom of window.
+        Assumes that last line in window is up-to-date with buffer size.
+        """
+        return min(self.bbottom(), self.buf.nlines())
+ 
+    def statusline(self):
+         "Line number on display of window's status line"
+         return self.bottom() + 1
 
-    # assign segment position: self.seg_1 seg_n dot_i 
+    def near_top(self, iline):
+        """
+        Line number in buffer iline is in
+        top half of segment at beginning of buffer that fits in window.
+        """
+        return (iline <= self.nlines//2 or self.buf.nlines() <= self.nlines)
+
+    def near_bottom(self, iline):
+        """
+        Line number in buffer iline is in
+        bottom half of segment at end of buffer that fits in window.
+        """
+        return (self.buf.nlines() - iline < self.nlines//2 and
+                self.buf.nlines() >= self.nlines)
+ 
+    def empty_line(self, iline):
+        'Line number iline in buffer is empty, or is just \n'
+        return self.buf.lines[iline] in ('','\n')
+
+    def contains(self, iline):
+        'Line number iline in buffer is one of the lines present in the window'
+        return (self.btop <= iline <= self.blast)
+
+    def covers(self, iline):
+        'Line number iline in buffer is in range of lines covered by window.'
+        return (self.btop <= iline <= self.bbottom())
+
+    def intersects(self, start, end):
+        'Window intersects range defined by start..end'
+        return (self.contains(start) or self.contains(end)
+                or (start < self.btop and end > self.bbottom()))
+
+    def ch0(self, iline):
+        'First character in line iline in buffer, or space if line empty'
+        return ' ' if self.empty_line(iline) else self.buf.lines[iline][0]
+
+    def put_marker(self, iline, clear=False):
+        'Set or clear marker on buffer line iline, or top line if buffer empty'
+        display.put_render(self.top if self.buf.empty() else self.wline(iline),
+                           1, self.ch0(iline), 
+                           display.clear if clear else display.white_bg)
+        
+    def set_marker(self, iline):
+        'Set marker on buffer line iline, or top line if buffer empty'
+        self.put_marker(iline)
+
+    def clear_marker(self, iline):
+        'Clear marker from buffer line iline, or top line if buffer empty'
+        self.put_marker(iline, clear=True)
+
+    def scroll(self, nlines):
+        """
+        Move segment of buffer displayed in window by nlines (pos or neg)
+        but leave dot unchanged so window contents appear to scroll.
+        """
+        self.btop = clip(self.btop + nlines, 1, self.buf.nlines())
+        self.blast = self.blastline()
 
     def shift(self, nlines):
         """
-        Move segment of buffer displayed in window by nlines (pos or neg).
-        Assign self.seg_1 self.seg_n self.dot
-        Typically used to keep same text in window when lines added/deleted above.
+        Move segment of buffer displayed in window by nlines (pos or neg)
+        and shift saved_dot also so window contents appear the same.
+        This is only meaningful for the windows without input focus.
         """
-        last = self.buf.S()
-        self.dot = clip(self.dot + nlines, 1, last)
-        self.seg_1 = clip(self.seg_1 + nlines, 1, last)
-        self.seg_n = clip(self.seg_n + nlines,  1, last)
+        self.scroll(nlines)
+        self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.nlines())
 
-    def position_segment(self):
+    def locate_segment(self, iline):
         """
-        Compute top of segment of buffer that is visible in window.
-        Assign self.seg_1: index in buffer of first line shown in window.
-        Uses line addresses in buffer self.dot self.buf.S()
-         also window height self.win_hl
-        Center window on dot if possible,otherwise show top or bottom of buffer
+        Given line number in buffer iline, prepare to position window by
+        assigning self.btop, index in buffer of top line in window.
         """
-        if self.near_buf_top(): # first line at top of window
-            self.seg_1 = 1  
-        elif self.near_buf_bottom(): # last line at bottom of window
-            self.seg_1 = self.buf.S() - (self.win_hl - 1)
-        else: # dot is centered in window
-            self.seg_1 = self.dot - self.win_hl//2 # floor division
+        if self.near_top(iline):
+            self.btop = 1  
+        elif self.near_bottom(iline):
+            self.btop = self.buf.nlines() - (self.nlines - 1) # last page
+        else: 
+            self.btop = iline - self.nlines//2 # center iline in window
+        self.blast = self.blastline()
 
-    def find_end(self):
-        """
-        Compute bottom of segment of buffer that is visible in window.
-        Assign self.seg_n: index in buffer of last line shown in window.
-        Depends on self.seg_1 computed in position_segment (above), call that first
-         also depends on height self.win_hl, and possibly line address self.buf.S()
-        Center window on dot if possible,otherwise show top or bottom of buffer
-        """
-        if self.near_buf_top(): # first line is at top of window
-            self.seg_n = min(self.win_hl, self.buf.S())
-        elif self.near_buf_bottom(): # last line is at bottom of window
-            self.seg_n = self.buf.S()
-        else: # dot is centered in window
-            self.seg_n = self.seg_1 + (self.win_hl - 1)
+    def open_line(self, wiline):
+        'Make line empty at line number wiline on display'
+        #if self.top <= wiline <= self.top + self.nlines-1: # omit,let it crash
+        display.put_cursor(wiline, 1)
+        display.kill_whole_line()
 
-    def find_dot(self):
+    def clear_lines(self, first, last):
         """
-        Compute location of dot (the current line) in window.
-        Assign self.dot_i: line number on display where self.dot appears
-         if it is visible, otherwise assign to self.dot_i to 0.
-        Depends on self.seg_1 computed in position_segment (above), call that first.
-        Also uses line address in buffer self.dot, 
-         window location on display self.win_1, window height self.win_hl
-        Also update self.marker_ch, the marker character,
-         because we may need to erase it later.
+        Clear consecutive lines from first through last in window.
+        Cursor must be positioned at first line already.
         """
-        self.dot_i0 = self.dot_i
-        self.marker_ch0 = self.marker_ch
-        if self.buf.empty() or self.dot_elsewhere():
-            self.dot_i = 0
-            self.marker_ch = ''
-        else:
-            self.dot_i = self.win_1 + (self.dot - self.seg_1)
-            # self.marker_ch is char at start of line that marker overwrites.
-            line = self.buf.lines[self.dot]
-            self.marker_ch = line[0] if line else ''
-            # self.marker_chx ensures marker on space or empty line is visible.
-            self.marker_chx = (' ' if self.marker_ch in ('',' ','\n') 
-                               else self.marker_ch)
-
-    # display (parts of) window
+        for i in range(first,last+1): # unempty if reached end of buffer
+            display.kill_whole_line()
+            print()
 
     def render_lines(self, first, last):
         """
         Print lines in buffer numbered first through last.
         Assumes cursor already positioned at first line.
         """
-        for line in self.buf.lines[first:last+1]: # slice, upper limit excluded
-            # remove \n, truncate don't wrap
-            print(line.rstrip()[:self.ncols-1], end=' ') 
-            display.kill_line() # erase from cursor to end
-            print() # advance to next line
-
-    def render_segment(self, open_line=False):
-        """
-        Start on win_1 line, display buffer lines self.seg_1 .. self.seg_n 
-        If space remains in window, pad with empty lines to self.win_h
-        If in insert mode (not command_mode), open line where text will be typed
-        """
-        # lines in segment, usually same as self.win_hl, less if small buffer
-        seg_h = self.seg_n - self.seg_1 + 1 
-        # n of padding empty lines at window bottom, > 0 when small buffer
-        blank_h = self.win_hl - seg_h   
-        display.put_cursor(self.win_1,1)  # cursor to window top
-        if open_line: # open line at dot to insert new text
-            self.render_lines(self.seg_1 +(1 if self.at_bottom_line() else 0),
-                               self.dot) # leave space at dot
-            display.kill_whole_line() # open line to insert new text
-            print() # next line
-            self.render_lines(self.dot+1, 
-                               self.seg_n-(0 if self.near_buf_top() else 1))
-        else:
-            self.render_lines(self.seg_1, self.seg_n)
-        for iline in range(blank_h if not open_line else blank_h - 1):
-            display.kill_whole_line()
+        i = -1
+        for i, line in enumerate(self.buf.lines[first:last+1]):
+            print(line.rstrip()[:self.ncols-1], end=' ') # remove \n, truncate
+            display.kill_line()
             print()
+        return i+1 # fewer than first:last+1 when at end of buffer
 
-    def render_status(self):
-        "Print information about window's buffer in its status line."
-        s1 = self.status_1  # line number of status bar on display
+    def update_lines(self, first, iline, last=0):
+        """
+        Write lines in window starting at line numbere first on display,
+        to bottom of the window, or to line numbered last if arg present.
+        Lines come from self.buf starting at its line iline.
+        """
+        self.first = first if self.first == 0 else self.first
+        last = last if last else self.bottom()
+        blastlinenum = iline + (last - first) # might exceed $ near eob
+        display.put_cursor(first, 1)
+        nprinted = self.render_lines(iline, blastlinenum)
+        icursor = first + nprinted
+        self.nprinted += nprinted
+        self.clear_lines(icursor, last)
+        
+    def update_from(self, iline):
+        'Write lines in window starting at line number iline in buffer'
+        self.update_lines(self.wline(iline), iline)
+        self.update_status()
+
+    def update(self):
+        'Write all lines in window'
+        self.update_from(self.btop)
+
+    def move_update(self, iline):
+        'Move window to show buffer line iline then update window'
+        self.locate_segment(iline)
+        self.update()
+        if self.focus:
+            self.set_marker(iline)
+
+    def reupdate(self):
+        'Move window to show its buf.dot then update window'
+        self.move_update(self.buf.dot)
+
+    def locate(self, origin, destination):
+        'Update window after cursor moves from origin to destination'
+        if self.contains(destination):
+            self.clear_marker(origin)
+            self.set_marker(destination)
+            self.update_status()
+        else:
+            self.reupdate()
+
+    def insert(self, origin, start, end):
+        'Update window after insert lines from origin to start..end'
+        if self.contains(end):
+            if origin != 0:
+                self.clear_marker(origin)
+            self.update_from(start)
+        else:
+            self.reupdate()
+
+    def delete(self, destination):
+        'Update window after delete lines above destination'
+        if self.contains(destination): # window already contains new dot
+            self.update_from(destination)
+            self.set_marker(destination)
+        else:
+            self.reupdate() 
+
+    def mutate_lines(self, start, destination):
+        'Update window after some lines in range start..destination changed'
+        top = max(start, self.btop)
+        self.update_lines(self.wline(top), top, 
+                       last=self.wline(destination))
+        self.update_status()
+
+    def mutate(self, origin, start, destination):
+        'Update window and move marker after some lines in range changed'
+        if self.contains(destination):
+            self.clear_marker(origin)
+            self.mutate_lines(start, destination)
+            self.set_marker(destination)
+        else:
+            self.reupdate()
+
+# The following methods are only used with the status line
+
+    def update_status(self):
+        'Print information about window and its buffer in its status line.'
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
-        position = (' All ' if self.buf.S() <= self.win_hl else # S() is last line
-                    ' Top ' if self.seg_1 == 1 else
-                    ' Bot ' if self.seg_n == self.buf.S() else
-                    ' %2.0f%% ' % (100*self.dot/(len(self.buf.lines)-1))) # %% prints %
-        linenums = '%-14s' % ('L%d/%d ' % (self.dot, self.buf.S()))
-        timestamp = datetime.strftime(datetime.now(),' %H:%M:%S -') # 10 ch w/margin
+        dot = self.buf.dot if self.focus else self.saved_dot
+        position = (' All ' if self.buf.nlines() <= self.nlines else
+                    ' Top ' if self.btop == 1 else
+                    ' Bot ' if self.blast == self.buf.nlines() else
+                    ' %2.0f%% ' % (100*dot/self.buf.nlines()))
+        linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
+        s1 = self.statusline()
         display.put_render(s1, 0, unsaved, display.white_bg)
         display.put_render(s1, 13, bufname, display.bold, display.white_bg)
-        display.put_render(s1, 26, position, display.white_bg)
-        display.put_render(s1, 31, linenums, display.white_bg)
-        display.put_render(s1, 45, '-'*(self.ncols-(45+10)), display.white_bg)
-        display.put_render(s1, self.ncols-10, timestamp, display.white_bg)
+        display.put_render(s1, 22, position, display.white_bg)
+        display.put_render(s1, 27, linenums, display.white_bg)
+        display.put_render(s1, 41, '(Text)', display.white_bg)
+        nsuffix = 17
+        nstrut = self.ncols - (46+nsuffix) # n of chars in suffix
+        display.put_render(s1, 47, '-'*nstrut, display.white_bg)
+        Window.nupdates += 1 # ensure at least this changes in status line
+        diagnostics = '  N%4d f%3d n%3d' % \
+            (Window.nupdates, self.first, self.nprinted)
+        suffix = diagnostics if show_diagnostics else '-'*nsuffix
+        display.put_render(s1, 47 + nstrut, suffix, display.white_bg)
+        self.first = 0    # reset after each update
+        self.nprinted = 0
 
-    def render_marker(self):
-        """
-        Display cursor-like marker at start of line to indicate dot
-        when terminal cursor is elsewhere (at command line etc.)
-        """
-        if self.buf.empty():
-            display.put_render(self.win_1, 1, ' ', display.white_bg)
-        else:
-            display.put_render(self.dot_i, 1, self.marker_chx, display.white_bg)
+# The following methods are only used with input mode
 
-    def erase_marker(self):
-        'At start of line, replace marker with saved character'
-        if self.dot_i0 == 0: # was empty buffer
-            display.put_render(self.win_1, 1, ' ', display.clear)
-        else:
-            ch = self.marker_ch0 if not self.marker_ch0 == '\n' else ' '
-            display.put_render(self.dot_i0, 1, ch, display.clear)
-            
-    def put_insert_cursor(self):
-        'Position cursor at start of open line after dot for i(nsert) a c  cmds'
-        if self.buf.empty():
-            iline = self.win_1  
-        else:
-            iline = self.dot_i + (0 if self.at_bottom_line() else 1)
-        display.put_cursor(iline, 1) # open line after dot
-
-    def put_update_cursor(self):
-        'Position cursor at start of dot itself for in-line edits.'
-        if self.buf.empty():
-            iline = self.win_1  
-        else:
-            iline = self.dot_i
-        display.put_cursor(iline, 1)
-
-    def update(self, open_line=False):
+    def update_for_input(self):
         """
-        Position and render window contents including text and status line,
-        but NOT its marker or cursor.
+        Open next line and overwrite lines below.
+        If at bottom of window, scroll insertion point up to the middle.
         """
-        # do not call position_segment() here, can cause distracting jumps
-        self.find_end()
-        self.find_dot() 
-        self.render_segment(open_line)
-        self.render_status()
-        # No self.put_insert_cursor or render_marker, caller must do it.
+        wdot = self.wline(self.buf.dot) # line on display where dot appears
+        if wdot > 0:
+            self.clear_marker(self.buf.dot)
+        if wdot >= self.top + self.nlines - 1: # at bottom of window
+            self.scroll(self.nlines//2)
+            wdot = self.top + (self.buf.dot - self.btop)
+            self.update_lines(self.top, self.buf.dot-self.nlines//2+1, 
+                              last=wdot)
+        self.open_line(wdot+1)
+        self.update_lines(wdot+2, self.buf.dot+1)
+        self.update_status()
+
+    def put_cursor_for_input(self):
+        'Place input cursor for insert after update_for_input, above'
+        wdot = self.wline(self.buf.dot)
+        display.put_cursor(wdot+1,1)
+
+# The following methods are only used with multiple windows
+
+    def samebuf(self, win):
+        'True when this window differs from win but uses the same buffer'
+        return (self != win and self.buf == win.buf)
+
+    def set_focus(self):
+        'Set input focus to this window'
+        self.focus = True
+        self.buf.dot = self.saved_dot
+        self.set_marker(self.buf.dot)
+
+    def release_focus(self):
+        'Release input focus from this window'
+        self.focus = False
+        self.saved_dot = self.buf.dot
+        self.clear_marker(self.saved_dot)
+
+    def adjust_insert(self, start, end, destination):
+        'After insert, adjust segment visible in a window without input focus'
+        # start, end are line numbers *after* insert is executed in buffer.
+        # ed i() inserts text *before* dot, so start == buf.dot before execute.
+        # destination == end, last inserted line *after* insert executed in buf
+        nlines = end - start + 1
+        if self.saved_dot == 0:  # buffer was empty
+            self.saved_dot = self.buf.dot
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.covers(start):
+            if self.saved_dot >= start:
+                self.saved_dot = self.saved_dot + nlines
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.btop >= start:
+            self.shift(nlines)
+            self.update_status()
+        elif self.blast < start:
+            self.update_status() # xx% nn/mm in status line changes
+        else:
+            pass # should be unreachable! status line doesn't update
+
+    def adjust_delete(self, start, end, destination):
+        'After delete, adjust segment visible in a window without input focus'
+        # start, end are line numbers *before* delete is executed in buffer.
+        # destination is first unchanged line *after* delete executed in buf.
+        nlines = -(end - start + 1)
+        if self.intersects(start, end):
+            if self.saved_dot < start:
+                pass
+            elif self.saved_dot > end:
+                self.saved_dot = self.saved_dot + nlines
+            else:
+                self.saved_dot = destination 
+            self.move_update(self.saved_dot)
+            self.update_status()
+        elif self.btop > end:
+            self.shift(nlines)
+            self.update_status()
+        elif self.blast < start:
+            self.update_status() # xx% nn/mm in status line changes
+        else:
+            pass # should be unreachable! status line doesn't update

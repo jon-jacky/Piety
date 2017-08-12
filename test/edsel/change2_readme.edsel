@@ -1,0 +1,30 @@
+# change2_readme.edsel - c above, below, at w.dot, add two lines at each change
+E README.md
+o2
+o
+5
+o
+1
+c
+LINE  1
+LINE  1a
+LINE  1b
+.
+o
+o
+12
+c
+LINE 10
+LINE 10a
+LINE 10b
+.
+o
+o
+7
+c
+LINE  5
+LINE  5a
+LINE  5b
+.
+o
+# test finished

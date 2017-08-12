@@ -1,0 +1,16 @@
+# yanktopbot.edsel - d above dot, yank below, test for window adjust_segment
+E lines120.txt
+o2
+60
+o
+60
+o
+1,30d
+!windows[1].dot
+!windows[1].seg_1
+!windows[1].seg_n
+70y
+!windows[1].dot
+!windows[1].seg_1
+!windows[1].seg_n
+# test finished

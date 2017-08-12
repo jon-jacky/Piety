@@ -25,8 +25,8 @@ e line20.txt
 'd
 'e
 'f
-!ed.deleted
-!ed.deleted_mark
+!ed.buffer.Buffer.deleted
+!ed.buffer.Buffer.deleted_mark
 16y
 !ed.buf.mark
 ,p

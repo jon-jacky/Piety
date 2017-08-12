@@ -1,0 +1,12 @@
+# deltop.edsel - d above dot, test for window adjust_segment
+E lines120.txt
+o2
+60
+o
+60
+o
+1,30d
+!frame.windows[1].saved_dot
+!frame.windows[1].btop
+!frame.windows[1].nlines
+# test finished

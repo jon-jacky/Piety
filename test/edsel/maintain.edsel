@@ -11,7 +11,7 @@ LINE B
 LINE C
 .
 o
-!win.dot
+!frame.win.saved_dot
 o
 +3
 i
@@ -20,33 +20,33 @@ LINE E
 LINE F
 .
 o
-!win.dot
+!frame.win.saved_dot
 o
 +3
 .,+4d
 o
-!win.dot
+!frame.win.saved_dot
 o
 +3 
 y
 +3
 r line05.txt
 o
-!win.dot
+!frame.win.saved_dot
 o
 +3 
 .,+4t25
 o
-!win.dot
+!frame.win.saved_dot
 o
 35
 .,+4m25
 o
-!win.dot
+!frame.win.saved_dot
 o
 20
 .,+4m$
 o
-!win.dot
+!frame.win.saved_dot
 o
 # test finished

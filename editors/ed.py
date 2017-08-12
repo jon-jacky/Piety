@@ -1,24 +1,13 @@
 """
 ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 
-This module provides both the classic command interface and the public
-Python API.  It imports buffer.py which defines the Buffer class that
-provides the core data structure and the internal API.
-
-For more explanation see ed.md, ed.txt, the docstrings here, and the tests
-in test/ed/
 """
 
-import re, os, sys
+import re, os, sys, enum
+import time # only used for sleep() in do_commands, FIXME write piety.sleep
 import pysh  # provides embedded Python shell for ! command
 import buffer
-import time # only used for sleep() in do_commands, FIXME write piety.sleep
-
-# Hook for edsel display editor to configure ed printing behavior:
-# Edsel assigns assigns print_lz_destination to null 
-# to suppress printing from ed l z commands to scrolling command region,
-# because edsel already shows those lines in the display window.
-print_lz_destination = sys.stdout  # In ed, l and z commands print
+from updates import Op
 
 # arg lists, defaults, range checking
 
@@ -28,10 +17,10 @@ print_lz_destination = sys.stdout  # In ed, l and z commands print
 
 def parse_args(args):
     """
-    Parse variable-length argument list for new Python API, all args are optional.
+    Parse variable-length argument list for new Python API, all args optional.
     Return fixed length tuple: start, end, text, params 
-    start, end are line numbers, for example the first and last line of a region.
-    When present, start and end are int, both might be absent, indicated by None.
+    start, end are line numbers, for example the first and last line of region.
+    When present, start and end are int, both might be absent, indicated None.
     text is the first token in the parameter list, str or None if absent
     params is the parameter list, [] if absent.
     """
@@ -72,13 +61,13 @@ def mk_range(start, end):
 def iline_ok(iline):
     """Return True if iline address is in buffer, always False for empty buffer
     Used by most commands, which don't make sense for an empty buffer"""
-    return (0 < iline <= buf.S()) 
+    return (0 < iline <= buf.nlines()) 
 
 def iline_ok0(iline):
     """Return True if iline address is in buffer, or iline is 0 for start 
     Used by commands which make sense for an empty buffer: insert, append, read
     """
-    return (0 <= iline <= buf.S())
+    return (0 <= iline <= buf.nlines())
 
 def range_ok(start, end):
     'Return True if start and end are in buffer, and start does not follow end'
@@ -125,7 +114,10 @@ def parse_check_range_dest(args):
     return (valid and dest_valid), start, end, dest
 
 def match_prefix(prefix, names):
-    'If prefix ends with -, return name (if any) that matches, otherwise return same prefix'
+    """
+    If prefix ends with -, return name (if any) that matches, 
+    otherwise return same prefix.  'Poor person's tab completion'.
+    """
     if isinstance(prefix, str) and prefix.endswith('-'): # might be None
         for n in names:
             if n.startswith(prefix[:-1]):
@@ -133,7 +125,7 @@ def match_prefix(prefix, names):
     return prefix
 
 
-# central data structure and variables
+# data structures and variables
 
 # Each ed command is implemented by a function with the same
 # one-letter name, whose arguments are the same as the ed command
@@ -141,31 +133,24 @@ def match_prefix(prefix, names):
 # make the API similar to ed commands, it cannot appear as an arg. 
 # So the current buffer, buf, must be global.
 
+# initialize these with create_buf
+buf = None
+current = str()
 buffers = dict() # dict from buffer names (strings) to Buffer instances
-                 
-# There is always a current buffer so we can avoid check for special case
-# Start with one empty buffer named 'main', can't ever delete it
-current = 'main'
-buf = buffer.Buffer(current, caller=sys.modules[__name__]) # caller = this module  
-buffers[current] = buf 
-
-# assigned by d(elete) in current buffer, may be used by y(ank) in another buffer
-deleted = list() # most recently deleted lines from any buffer, for yank command
-deleted_mark = list() # markers for deleted lines, for yank command
 
 # line addresses
 
-def o():
+def o(): # looks like ed .
     'Return index of the current line (called dot), 0 if the buffer is empty'
     return buf.dot
 
-def S():
+def S(): # looks like ed $
     'Return index of the last line, 0 if the buffer is empty'
-    return buf.S()
+    return buf.nlines()
 
 def k(*args):
     """
-    Mark addressed line in this buffer with character c (the command parameter),
+    Mark addressed line in this buffer with character c (command parameter),
     to use with 'c address form.  'c address identifies both buffer and line.
     """
     valid, iline, marker = parse_check_iline(args)
@@ -200,12 +185,20 @@ def current_filename(filename):
     print('? no current filename')
     return None
 
-def b_new(name):
+def create_buf(bufname):
     'Create buffer with given name. Replace any existing buffer with same name'
     global current, buf
-    buf = buffer.Buffer(name, caller=sys.modules[__name__]) # caller = this module
-    buffers[name] = buf # replace buffers[name] if it already exists
-    current = name
+    buf = buffer.Buffer(bufname)
+    buffers[bufname] = buf # replace buffers[bufname] if it already exists
+    current = bufname
+    update(Op.create, buffer=buf)
+
+def select_buf(bufname):
+    'Make buffer with given name the current buffer'
+    global current, buf
+    current = bufname
+    buf = buffers[current]
+    update(Op.select, buffer=buf)
 
 def b(*args):
     """
@@ -216,16 +209,15 @@ def b(*args):
     _, _, bufname, _ = parse_args(args)
     bufname = match_prefix(bufname, buffers)
     if bufname in buffers:
-        current = bufname
-        buf = buffers[current]                 
+        select_buf(bufname)
     elif bufname:
-        b_new(bufname)
+        create_buf(bufname)
         buf.filename = bufname
     print('.' + buf.info()) # even if no bufname given
 
-def r_new(buffername, filename):
+def r_new(bufname, filename):
     'Create new buffer, Read in file contents'
-    b_new(buffername)
+    create_buf(bufname)
     buf.filename = filename
     r(0, filename)
     buf.unsaved = False # insert in r sets unsaved = True, this is exception
@@ -248,7 +240,7 @@ def E(*args):
     if not filename:
         print('? no current filename')
         return
-    buf.d(1,S())
+    buf.d(1, buf.nlines())
     r(0, filename)
     buf.unsaved = False
 
@@ -265,9 +257,9 @@ def r(*args):
     if valid:
         filename = current_filename(fname)
         if filename:
-            S0 = S()
+            nlines0 = buf.nlines()
             buf.r(iline, filename)
-            print('%s, %d lines' % (filename, S()-S0))
+            print('%s, %d lines' % (filename, buf.nlines() - nlines0))
 
 def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
@@ -275,12 +267,12 @@ def B(*args):
     if not filename:
         print('? file name')
         return
-    buffername = os.path.basename(filename) # may differ from filename
-    if buffername in buffers:
-        # FIXME? create new buffername a la emacs name<1>, name<2> etc.
-        print('? buffer name %s already in use' % buffername)
+    bufname = os.path.basename(filename) # may differ from filename
+    if bufname in buffers:
+        # FIXME? create new buffer name a la emacs name<1>, name<2> etc.
+        print('? buffer name %s already in use' % bufname)
         return
-    r_new(buffername, filename)
+    r_new(bufname, filename)
 
 def w(*args):
     'write current buffer contents to file name'
@@ -288,7 +280,7 @@ def w(*args):
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
-        print('%s, %d lines' % (filename, S()))
+        print('%s, %d lines' % (filename, buf.nlines()))
 
 D_count = 0 # number of consecutive times D command has been invoked
 
@@ -313,11 +305,12 @@ def DD(*args):
     elif name == 'main':
         print("? Can't delete main buffer")
     else:
+        delbuf = buffers[name]
         del buffers[name]
         if name == current: # pick a new current buffer
-            keys = list(buffers.keys())
-            current = keys[0] if keys else None
-            buf = buffers[current]
+            keys = list(buffers.keys()) # always nonempty due to main
+            select_buf(keys[0])
+        update(Op.remove, sourcebuf=delbuf, buffer=buf)
         print('%s, buffer deleted' % name)
 
 # Displaying information
@@ -325,7 +318,7 @@ def DD(*args):
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
     iline, _, _, _ = parse_args(args)
-    iline = iline if iline != None else S() # default $ not .
+    iline = iline if iline != None else buf.nlines() # default $ not .
     if iline_ok0(iline): # don't print error message when file is empty
         print(iline)
     else:
@@ -347,16 +340,16 @@ def l(*args):
         return
     # don't use usual default dot here, instead advance dot
     if iline == None:
-        iline = o() + 1
+        iline = buf.dot + 1
     if not iline_ok(iline):
         print('? invalid address')
         return
-    print(buf.l(iline), file=print_lz_destination) # destination might be null
+    print(buf.l(iline), file=lz_print_dest) # null destination suppresses print
 
 def p_lines(start, end, destination): # arg here shadows global destination
     'Print lines start through end, inclusive, at destination'
     for iline in range(start, end+1): # +1 because start,end is inclusive
-        print(buf.l(iline), file=destination) # file can be null or stdout or ...
+        print(buf.l(iline), file=destination) # file can be null or stdout or..
 
 def p(*args):
     'Print lines from start up to end, leave dot at last line printed'
@@ -369,7 +362,7 @@ def z(*args):
     Scroll: print buf.npage lines, scroll backwards if npage is negative.
     If parameter is present, update buf.npage
     If npage is non-negative, start at iline, leave dot at last line printed.
-    if npage is negative, start at iline + npage, leave dot at first line printed.
+    if npage is negative, start at iline+npage, leave dot at first line printed
     """
     valid, iline, npage_string = parse_check_iline(args)
     if valid: 
@@ -386,8 +379,8 @@ def z(*args):
             end = iline
             iline += buf.npage # npage negative, go backward
             iline = iline if iline > 0 else 1
-        end = end if end <= S() else S()
-        p_lines(iline, end, print_lz_destination) # destination might be null
+        end = end if end <= buf.nlines() else buf.nlines()
+        p_lines(iline, end, lz_print_dest) # null destination suppresses print
         if buf.npage < 0:
             buf.dot = iline
 
@@ -406,7 +399,7 @@ def i(*args):
         buf.i(iline, lines)
 
 def d(*args):
-    'Delete text from start up to end, set dot to first line after deletes or...'
+    'Delete text from start up to end, set dot to first line after deletes'
     valid, start, end, _, _ = parse_check_range(args)
     if valid:
         buf.d(start, end)
@@ -456,12 +449,10 @@ def y(*args):
     'Insert most recently deleted lines *before* destination line address'
     iline, _, _, _ = parse_args(args)
     iline = mk_iline(iline)
-    if not (0 <= iline <= buf.S()+1): # allow +y at $ to append to buffer
+    if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer
         print('? invalid address')
         return
     buf.y(iline)
-
-# command mode
 
 quit = False
 
@@ -470,7 +461,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'AbBdDeEfklmnpqrstwxXyz' # commands that do not require further input
+complete_cmds = 'AbBdDeEfklmnpqrstwxXyz' # commands that require no more input
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -497,11 +488,11 @@ def match_address(cmd_string):
     if cmd_string == '':
         return None, '' 
     if cmd_string[0] == '.': # current line
-        return o(), cmd_string[1:]
+        return buf.dot, cmd_string[1:]
     if cmd_string[0] == '$': # last line
-        return S(), cmd_string[1:]
+        return buf.nlines(), cmd_string[1:]
     if cmd_string[0] == ';': # equivalent to .,$  - current line to end
-        return o(), ',$'+ cmd_string[1:]
+        return buf.dot, ',$'+ cmd_string[1:]
     if cmd_string[0] in ',%': # equivalent to 1,$ - whole buffer
         return 1, ',$'+ cmd_string[1:]
     m = number.match(cmd_string) # digits, the line number
@@ -509,22 +500,22 @@ def match_address(cmd_string):
         return int(m.group(1)), cmd_string[m.end():]
     m = fwdnumber.match(cmd_string) # +digits, relative line number forward
     if m:
-        return o() + int(m.group(1)), cmd_string[m.end():]
+        return buf.dot + int(m.group(1)), cmd_string[m.end():]
     m = bkdnumber.match(cmd_string) # -digits, relative line number backward
     if m:
-        return o() - int(m.group(1)), cmd_string[m.end():]
+        return buf.dot - int(m.group(1)), cmd_string[m.end():]
     m = bkdcnumber.match(cmd_string) # ^digits, relative line number backward
     if m:
-        return o() - int(m.group(1)), cmd_string[m.end():]
+        return buf.dot - int(m.group(1)), cmd_string[m.end():]
     m = plusnumber.match(cmd_string) # + or ++ or +++ ...
     if m:
-        return o() + len(m.group(0)), cmd_string[m.end():]
+        return buf.dot + len(m.group(0)), cmd_string[m.end():]
     m = minusnumber.match(cmd_string) # digits, the line number
     if m:
-        return o() - len(m.group(0)), cmd_string[m.end():]
+        return buf.dot - len(m.group(0)), cmd_string[m.end():]
     m = caratnumber.match(cmd_string) # digits, the line number
     if m:
-        return o() - len(m.group(0)), cmd_string[m.end():]
+        return buf.dot - len(m.group(0)), cmd_string[m.end():]
     m = fwdsearch.match(cmd_string)  # /text/ or // - forward search
     if m: 
         return buf.F(m.group(1)), cmd_string[m.end():]
@@ -571,16 +562,15 @@ def parse_cmd(cmd_string):
     # special handling for commands that must be repeated to confirm
     D_count = 0 if cmd_name != 'D' else D_count
     # command-specific parameter parsing
-    if cmd_name == 's' and len(params.split('/')) == 4: # s/old/new/g, g optional
+    if cmd_name == 's' and len(params.split('/')) == 4: #s/old/new/g,g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
         return cmd_name, start, end, old, new, glbl
     # all other commands, no special parameter parsing
     else:
-        # return each space-separated parameter as separate argument in sequence
-        return (cmd_name, start, end) + (tuple(params.split() if params else ()))
+        # return each space-separated parameter as separate arg in sequence
+        return (cmd_name,start,end) + (tuple(params.split() if params else ()))
 
-# State variables that must persist between cmd invocations during input mode,
-#  also must be global so display editor can use them.
+# State variables that must persist between cmd invocations during input mode
 command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
@@ -595,7 +585,7 @@ pysh = pysh.mk_shell() # embedded Python shell for ! command
 def do_command(line):
     """
     Process one input line without blocking in ed command or input mode
-    Update buffers and control variables: command_mode, cmd_name, args, start, end
+    Update buffers and control variables: command_mode,cmd_name,args,start,end
     """
     global command_mode, cmd_name, args, start, end, dest
     if command_mode:
@@ -613,14 +603,14 @@ def do_command(line):
         cmd_name, args = tokens[0], tokens[1:]
         start, end, dest, _ = parse_args(args) # might be int or None
         start, end = mk_range(start, end) # int only
-        dest, _ = (None, None) if dest is None else match_address(dest) # str -> int
+        dest,_ = (None,None) if dest is None else match_address(dest) #str->int
         if cmd_name in complete_cmds:
-            globals()[cmd_name](*args) # dict from name (string) to object (fcn)
+            globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in input_cmds:
             command_mode = False # enter input mode
-            # Instead of using buf.a, i, c, we handle input mode cmds inline here
-            # We will add each line to buffer when user types RET at end-of-line,
-            # *unlike* in Python API where we pass multiple input lines at once.
+            # Instead of using buf.a,i,c, we handle input mode cmds inline here
+            # We add each line to buffer when user types RET at end-of-line,
+            # *unlike* in Python API where we pass multiple input lines at once
             if not (iline_ok0(start) if cmd_name in 'ai'
                     else range_ok(start, end)):
                 print('? invalid address')
@@ -628,12 +618,15 @@ def do_command(line):
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = start
+                update(Op.input)
             elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
-            elif cmd_name == 'c': # c(hange) command deletes changed lines first
-                buf.d(start, end) # d updates buf.dot to the line after deletes
+                update(Op.input)
+            elif cmd_name == 'c': #c(hange) command deletes changed lines first
+                buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
                 buf.dot = start - 1 # supercede dot assigned in preceding
+                update(Op.input)  # queues Op.input after Op.delete from buf.d
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:
@@ -642,10 +635,11 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
+            update(Op.command) # return from input (insert) mode to cmd mode
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
-            buf.a(o(), line + '\n') # append new line after dot, advance dot
+            buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
         return
 
 def do_commands(do_command, lines, echo, delay):
@@ -685,10 +679,6 @@ def parse_echo_delay(params):
                 valid = False
     return valid, echo, delay
 
-# Hook for edsel display editor to configure ed x behavior:
-# Edsel assigns x_cmd_fcn to edsel.do_command, which calls update_display.  
-x_cmd_fcn = do_command  # In ed, x command only prints in command region
-
 def x(*args):
     """
     Execute ed commands in another buffer: x(bufname, echo, delay)
@@ -711,13 +701,13 @@ def x(*args):
 def X(*args):
     """
     Execute Python statements in the current buffer: X(start, end, echo, delay)
-     start, end default to dot, so X command without range single-steps through buffer.
+     start, end default to dot, so X cmd without range single-steps thru buffer
      echo - optional, default False; delay - optional, default no delay
     Leaves dot at last line executed, to single-step through file, repeat +X
     """
-    valid, start, end, echo, delay_singleton = parse_check_range(args) # no bufname
+    valid,start,end,echo,delay_singleton = parse_check_range(args) # no bufname
     if valid:
-        # delay if present is in a singleton tuple. If echo is absent, so is delay
+        # delay if present is in a singleton tuple. If echo absent, so is delay
         params = (echo,)+delay_singleton if echo else ()
         params_valid, echo, delay = parse_echo_delay(params)
         if params_valid:
@@ -726,10 +716,25 @@ def X(*args):
             do_commands(pysh, buffers[current].lines[start:end+1], echo, delay)
             buffers[current].dot = end 
 
+# Hooks to configure ed behavior for display editor
+x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
+lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
+def update(op, **kwargs): pass # default: ed has no display,update does nothing
+
+def configure(cmd_fcn=None, update_fcn=None, print_dest=None):
+    'Call from display editor to configure ed behavior'
+    global x_cmd_fcn, lz_print_dest, update
+    if cmd_fcn: x_cmd_fcn = cmd_fcn
+    if print_dest: lz_print_dest = print_dest
+    if update_fcn: 
+        update = update_fcn
+        buffer.update = update_fcn
+
 prompt = '' # default no prompt
 
 def startup(*filename, **options):
     global quit, prompt
+    create_buf('main')
     quit = False # allow restart
     if filename:
         e(filename[0])
@@ -738,8 +743,8 @@ def startup(*filename, **options):
 
 def main(*filename, **options):
     """
-    Top level ed command to use at Python prompt.
-    This version won't work in Piety, it calls blocking command raw_input
+    Top level ed command to invoke from Python prompt or command line.
+    Won't work with cooperative multitasking, calls blocking input().
     """
     startup(*filename, **options)
     while not quit:
@@ -747,19 +752,24 @@ def main(*filename, **options):
         line = input(prompt_string) # blocking
         do_command(line) # non-blocking
 
-# Run the editor from the system command line:  python ed.py
-
-if __name__ == '__main__':
-    # import argparse inside if ... so it isn't always a dependency of this module
+def cmd_options():
+    # import argparse inside this fcn so it isn't always a dependency.
     import argparse
-    parser = argparse.ArgumentParser(description='line editor in pure Python based on classic Unix ed')
+    parser = argparse.ArgumentParser(description='editor in pure Python based on classic Unix ed')
     parser.add_argument('file', 
                         help='name of file to load into main buffer at startup (omit to start with empty main buffer)',
                         nargs='?',
                         default=None),
     parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',
                         default='')
+    parser.add_argument('-c', '--cmd_h', help='number of lines in scrolling command region (display editor only, default 2)',
+                        type=int, default=2)
     args = parser.parse_args()
     filename = [args.file] if args.file else []
     options = {'p': args.prompt } if args.prompt else {}
+    options.update({'c': args.cmd_h } if args.cmd_h else {})
+    return filename, options
+
+if __name__ == '__main__':
+    filename, options = cmd_options()
     main(*filename, **options)
