@@ -24,7 +24,7 @@ def do_command(chars):
         console.initpoint = 0
         edsel.ed.cmd_name = 'c' # needed by edsel functions, following
         edsel.ed.command_mode = False 
-        edsel.win.put_update_cursor()
+        edsel.frame.win.put_update_cursor()
 
     # inline c command finished, assign updated line and update
     elif not edsel.ed.command_mode and c_command:

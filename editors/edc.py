@@ -11,7 +11,7 @@ console = con.Console(prompt=':', do_command=ed.do_command,
                       mode=(lambda: ed.command_mode))
 
 def main():
-    ed.quit = False # previous quit might have set it True
+    ed.startup()
     console.run()
 
 if __name__ == '__main__':
