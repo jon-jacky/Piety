@@ -133,6 +133,8 @@ class Buffer(object):
                 # fd.readlines reads file into a list of strings, one per line
                 strings = fd.readlines() # each string in lines ends with \n
             self.insert(iline+1, strings) # like append, below
+        else:
+            update(Op.select, buffer=self) # new empty buffer for new file
 
     def w(self, name):
         'Write current buffer contents to file name'

@@ -124,7 +124,6 @@ def match_prefix(prefix, names):
                 return n
     return prefix
 
-
 # data structures and variables
 
 # Each ed command is implemented by a function with the same
@@ -171,6 +170,8 @@ def R(pattern):
     return line number where found, dot if not found"""
     return buf.R(pattern)
 
+# buffers and files
+
 def current_filename(filename):
     """
     Return filename arg if present, if not return current filename.
@@ -215,13 +216,6 @@ def b(*args):
         buf.filename = bufname
     print('.' + buf.info()) # even if no bufname given
 
-def r_new(bufname, filename):
-    'Create new buffer, Read in file contents'
-    create_buf(bufname)
-    buf.filename = filename
-    r(0, filename)
-    buf.unsaved = False # insert in r sets unsaved = True, this is exception
-
 def f(*args):
     'set default filename, if filename not specified print current filename'
     _, _, filename, _ = parse_args(args)
@@ -231,6 +225,16 @@ def f(*args):
         print(buf.filename)
     else:
         print('? no current filename')
+
+def r(*args):
+    'Read file contents into buffer after iline'
+    valid, iline, fname = parse_check_iline0(args)
+    if valid:
+        filename = current_filename(fname)
+        if filename:
+            nlines0 = buf.nlines()
+            buf.r(iline, filename)
+            print('%s, %d lines' % (filename, buf.nlines() - nlines0))
 
 def E(*args):
     'read in file, replace buffer contents despite unsaved changes'
@@ -251,16 +255,6 @@ def e(*args):
         return
     E(*args)
 
-def r(*args):
-    'Read file contents into buffer after iline'
-    valid, iline, fname = parse_check_iline0(args)
-    if valid:
-        filename = current_filename(fname)
-        if filename:
-            nlines0 = buf.nlines()
-            buf.r(iline, filename)
-            print('%s, %d lines' % (filename, buf.nlines() - nlines0))
-
 def B(*args):
     'Create new Buffer and load the named file. Buffer name is file basename'
     _, _, filename, _ = parse_args(args)
@@ -272,7 +266,10 @@ def B(*args):
         # FIXME? create new buffer name a la emacs name<1>, name<2> etc.
         print('? buffer name %s already in use' % bufname)
         return
-    r_new(bufname, filename)
+    create_buf(bufname)
+    buf.filename = filename
+    r(0, filename)
+    buf.unsaved = False # insert in r sets unsaved = True, this is exception
 
 def w(*args):
     'write current buffer contents to file name'
@@ -281,19 +278,6 @@ def w(*args):
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
         print('%s, %d lines' % (filename, buf.nlines()))
-
-D_count = 0 # number of consecutive times D command has been invoked
-
-def D(*args):
-    'Delete the named buffer, if unsaved changes print message and exit'
-    global D_count
-    _, _, bufname, _ = parse_args(args)
-    name = bufname if bufname else current
-    if name in buffers and buffers[name].unsaved and not D_count:
-        print('? unsaved changes, repeat D to delete')
-        D_count += 1 # must invoke D twice to confirm, see message below
-        return
-    DD(*args)
 
 def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
@@ -312,6 +296,19 @@ def DD(*args):
             select_buf(keys[0])
         update(Op.remove, sourcebuf=delbuf, buffer=buf)
         print('%s, buffer deleted' % name)
+
+D_count = 0 # number of consecutive times D command has been invoked
+
+def D(*args):
+    'Delete the named buffer, if unsaved changes print message and exit'
+    global D_count
+    _, _, bufname, _ = parse_args(args)
+    name = bufname if bufname else current
+    if name in buffers and buffers[name].unsaved and not D_count:
+        print('? unsaved changes, repeat D to delete')
+        D_count += 1 # must invoke D twice to confirm, see message below
+        return
+    DD(*args)
 
 # Displaying information
 
