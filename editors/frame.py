@@ -94,6 +94,8 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
     elif op == Op.create:
         win.focus = True
         win.buf = buffer
+        win.locate_segment(win.buf.dot)
+        win.saved_dot = win.buf.dot
         win.update_status()
 
     # Change buffer in current window, ed b E D

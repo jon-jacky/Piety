@@ -16,7 +16,7 @@ from updates import Op
 # Below parse_cmd parses traditional ed command strings.
 
 def parse_args(args):
-    """
+    """ 
     Parse variable-length argument list for new Python API, all args optional.
     Return fixed length tuple: start, end, text, params 
     start, end are line numbers, for example the first and last line of region.
@@ -61,13 +61,13 @@ def mk_range(start, end):
 def iline_ok(iline):
     """Return True if iline address is in buffer, always False for empty buffer
     Used by most commands, which don't make sense for an empty buffer"""
-    return (0 < iline <= buf.nlines()) 
+    return isinstance(iline, int) and (0 < iline <= buf.nlines()) 
 
 def iline_ok0(iline):
     """Return True if iline address is in buffer, or iline is 0 for start 
     Used by commands which make sense for an empty buffer: insert, append, read
     """
-    return (0 <= iline <= buf.nlines())
+    return isinstance(iline, int) and (0 <= iline <= buf.nlines())
 
 def range_ok(start, end):
     'Return True if start and end are in buffer, and start does not follow end'
@@ -100,6 +100,7 @@ def parse_check_range(args):
     valid = range_ok(start, end)
     if not valid:
         print('? invalid address')
+    param = param if param is not None else ''
     return valid, start, end, param, param_list
 
 def parse_check_range_dest(args):
@@ -458,7 +459,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'AbBdDeEfklmnpqrstwxXyz' # commands that require no more input
+complete_cmds = 'AbBdDeEfkKlmnpqrstwxXyz' # commands that require no more input
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -713,6 +714,8 @@ def X(*args):
             do_commands(pysh, buffers[current].lines[start:end+1], echo, delay)
             buffers[current].dot = end 
 
+def K(): return 1/0  # raise exception on demand
+
 # Hooks to configure ed behavior for display editor
 x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
 lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
@@ -731,8 +734,7 @@ prompt = '' # default no prompt
 
 def startup(*filename, **options):
     global quit, prompt
-    create_buf('main')
-    quit = False # allow restart
+    quit = False # needed for restart
     if filename:
         e(filename[0])
     if 'p' in options:
@@ -766,6 +768,8 @@ def cmd_options():
     options = {'p': args.prompt } if args.prompt else {}
     options.update({'c': args.cmd_h } if args.cmd_h else {})
     return filename, options
+
+create_buf('main')  # initialize main buffer only once on import
 
 if __name__ == '__main__':
     filename, options = cmd_options()

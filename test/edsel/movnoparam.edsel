@@ -1,0 +1,7 @@
+# movnoparam.edsel - move command with no parameters
+E lines.txt
+1,2m5
+1,5p
+1,2m
+1,5p
+# test finished

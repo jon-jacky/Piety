@@ -1,6 +1,5 @@
 """
 edsel - Display editor based on the line editor ed.py.  
-
 """
 
 import traceback, os
@@ -37,17 +36,15 @@ def do_command(line):
     except BaseException as e:
         cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
-        exit()
+        ed.quit = True # exit() here raises another exception
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
-    temp = ed.buffer.Buffer('placeholder') # will be reassigned by ed.startup()
     cmd_h = options['c'] if 'c' in options else None
-    frame.init(temp, cmd_h_option=cmd_h) # ed.startup requires frame.win
     ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
                  update_fcn=update,  # replace ed's no-op update function
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
-    ed.startup(*filename, **options) # must follow frame.init,reassigns win.buf
+    ed.startup(*filename, **options)
     update(Op.refresh)
 
 def cleanup():
@@ -60,6 +57,9 @@ def main(*filename, **options):
     Top level edsel command to invoke from python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
     """
+    cmd_h = options['c'] if 'c' in options else None
+    if not frame.windows: # initialize first window only once on import
+        frame.init(ed.buf, cmd_h_option=cmd_h) # ed.buf init by import ed
     startup(*filename, **options)
     while not ed.quit:
         prompt_string = ed.prompt if ed.command_mode else ''

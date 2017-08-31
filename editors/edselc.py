@@ -12,7 +12,7 @@ console = con.Console(prompt=':', do_command=edsel.do_command,
 
 def main():
     edsel.ed.quit = False # previous quit might have set it True
-    edsel.startup(c=12) # 12 lines in scrolling command region
+    edsel.startup()
     console.run()
     edsel.cleanup()
 

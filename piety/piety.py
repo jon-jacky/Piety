@@ -1,5 +1,5 @@
 """
-piety.py - defines Task, Session, schedule, and run (the event loop).
+piety.py - defines Task, Session, Job, schedule, and run (the event loop).
            Imports eventloop used by run.
 
 To run tasks in Piety, import the piety module, create some piety.Task
