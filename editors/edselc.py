@@ -10,11 +10,12 @@ console = con.Console(prompt=':', do_command=edsel.do_command,
                       stopped=(lambda command: edsel.ed.quit),
                       mode=(lambda: edsel.ed.command_mode))
 
-def main():
-    edsel.ed.quit = False # previous quit might have set it True
-    edsel.startup()
+def main(*filename, **options):
+    edsel.startup(*filename, **options)
     console.run()
     edsel.cleanup()
 
 if __name__ == '__main__':
-    main()
+    filename, options = edsel.ed.cmd_options()
+    main(*filename, **options)
+

@@ -51,9 +51,13 @@ pysh = piety.Job(controller=session,
 
 pyshc.console.supervisor = pysh
 
+def edstartup():
+    edc.ed.quit = False
+    edc.ed.configure() # restore ed to no display, no updates
+
 ed = piety.Job(controller=session,
                handler=edc.console.handler,
-               startup=edc.ed.startup,
+               startup=edstartup,
                restart=edc.console.restart)
 
 edc.console.supervisor = ed

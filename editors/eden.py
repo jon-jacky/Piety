@@ -24,14 +24,20 @@ def do_command(chars):
         console.initpoint = 0
         edsel.ed.cmd_name = 'c' # needed by edsel functions, following
         edsel.ed.command_mode = False 
-        edsel.frame.win.put_update_cursor()
+        win = edsel.frame.win
+        edsel.display.put_cursor(win.wline(dot), 1)
+        # FIXME shouldn't the preceding two lines call Op.input like this:
+        # buf.dot -= 1 # compensate for wdot+1 in frame Op.input
+        # edsel.update(edsel.Op.input)
+        # No, doesn't quite work because Op.input calls win.update_for_input
 
     # inline c command finished, assign updated line and update
     elif not edsel.ed.command_mode and c_command:
         buf.lines[dot] = console.command.line + '\n'
         edsel.ed.command_mode = True
         c_command = False    
-        edsel.update_display() # maintain not needed, no insert/delete/move
+        buf = edsel.ed.buf
+        edsel.update(edsel.Op.command)
 
     # pass all other commands to edsel
     else:
@@ -46,8 +52,9 @@ console = con.Console(prompt=':', do_command=do_command,
 edsel.ed.x_cmd_fcn = do_command
 
 def main():
-    edsel.ed.quit = False # previous quit might have set it True
-    edsel.startup(c=12) # 12 lines in scrolling command region
+    if not edsel.frame.windows: # initialize first window only once
+        edsel.frame.init(edsel.ed.buf, cmd_h_option=12) # edsel inits ed.buf
+    edsel.startup()
     console.run()
     edsel.cleanup()
 

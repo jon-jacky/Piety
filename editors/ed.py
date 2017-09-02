@@ -719,16 +719,19 @@ def K(): return 1/0  # raise exception on demand
 # Hooks to configure ed behavior for display editor
 x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
 lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
-def update(op, **kwargs): pass # default: ed has no display,update does nothing
+def noupdate(op, **kwargs): pass 
+update = noupdate # default: ed has no display, update does nothing
 
 def configure(cmd_fcn=None, update_fcn=None, print_dest=None):
-    'Call from display editor to configure ed behavior'
+    """
+    Call from display editor with kw args to configure ed to update display.
+    Call again with no kw args to restore ed to no display, no updates.
+    """
     global x_cmd_fcn, lz_print_dest, update
-    if cmd_fcn: x_cmd_fcn = cmd_fcn
-    if print_dest: lz_print_dest = print_dest
-    if update_fcn: 
-        update = update_fcn
-        buffer.update = update_fcn
+    x_cmd_fcn = cmd_fcn if cmd_fcn else do_command
+    lz_print_dest = print_dest if print_dest else sys.stdout
+    update = update_fcn if update_fcn else noupdate
+    buffer.update = update_fcn if update_fcn else noupdate
 
 prompt = '' # default no prompt
 

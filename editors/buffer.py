@@ -8,7 +8,8 @@ from enum import Enum
 from updates import Op
 
 # Hook to configure behavior for display editor
-def update(op, **kwargs): pass # default: ed has no display,update does nothing
+def noupdate(op, **kwargs): pass 
+update = noupdate # default: ed has no display, update does nothing
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'

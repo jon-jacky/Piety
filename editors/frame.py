@@ -32,12 +32,11 @@ def scale(nlines, cmd_h):
     cmd_n = nlines # scrolling command region, last line
     windows_h = nlines - cmd_h # windows with status lines fill remaining space
 
-def init(buffer, cmd_h_option=None):
+def init(buffer):
     'Initialize frame with one window into buffer'
-    global cmd_h, win, ifocus
-    if cmd_h_option: 
-        cmd_h = cmd_h_option # otherwise keep default assigned above
-    scale(nlines, cmd_h) # must assign frame size before create first window
+    global win, ifocus
+    # must assign frame size before create first window 
+    scale(nlines, cmd_h) # default cmd_h, may reassign before first update
     win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
     win.focus = True
     windows.append(win) 
@@ -80,7 +79,7 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
     Arguments here are the fields of the UpdateRecord namedtuple.
     Other data used here are already stored in the frame, windows, and buffers.
     """
-    global command_mode, win, ifocus
+    global command_mode, win, ifocus, cmd_h
 
     # Clear display, redraw all the windows and scrolling command region.
     if op == Op.refresh:
@@ -88,6 +87,7 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
 
     # Rescale frame and window sizes, then refresh.
     if op == Op.rescale:
+        cmd_h = start if start else cmd_h
         rescale()
 
     # Create new buffer, ed B, Op.insert case will display its contents.
