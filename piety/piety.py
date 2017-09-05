@@ -178,8 +178,7 @@ class Session(Task):
 class Job(object):
     'Provide a standard interface to an application that can be used by Session'
     def __init__(self, controller=None, handler=(lambda: ''), # command=None, 
-                 startup=(lambda: None), restart=(lambda: None), 
-                 cleanup=(lambda: None)):
+                 startup=(lambda: None), cleanup=(lambda: None)):
         """
         All arguments are optional, with defaults
 
@@ -197,12 +196,10 @@ class Job(object):
 
         startup - callable to execute when application starts up or
         resumes, for example to initialize display. Takes a variable
-        number of arguments (no arguments is okay).  Default does
+        number of arguments (no arguments is okay).  Also must begin
+        another activity cycle in the application.  For example, in a
+        command line application, print the prompt.  Default does
         nothing.
-
-        restart - callable to begin another activity cycle in the
-        application.  For example, in a command line application,
-        print the prompt.  Default does nothing.
 
         cleanup - callable to run when application exits or suspends,
         for example to clean up display.  Default does nothing.
@@ -210,7 +207,6 @@ class Job(object):
         self.controller = controller
         self.handler = handler 
         self.startup = startup
-        self.restart = restart
         self.cleanup = cleanup
         self.replaced = False 
 
@@ -227,7 +223,6 @@ class Job(object):
     def run(self, *args, **kwargs):
         'Execute startup function if it exists, then restart handler'
         self.startup(*args, **kwargs) 
-        self.restart()
 
     # assign to callback in application 
     def stop(self):

@@ -46,7 +46,7 @@ session = piety.Session(name='session', input=sys.stdin)
 
 pysh = piety.Job(controller=session,
                  handler=pyshc.console.handler,
-                 restart=pyshc.console.restart,
+                 startup=pyshc.console.restart, # no separate pysh.startup
                  cleanup=piety.stop) # sets piety.cycle.running = False
 
 pyshc.console.supervisor = pysh
@@ -54,19 +54,22 @@ pyshc.console.supervisor = pysh
 def edstartup():
     edc.ed.quit = False
     edc.ed.configure() # restore ed to no display, no updates
+    edc.console.restart()
 
 ed = piety.Job(controller=session,
                handler=edc.console.handler,
-               startup=edstartup,
-               restart=edc.console.restart)
+               startup=edstartup)
 
 edc.console.supervisor = ed
 
+def edenstartup():
+    editor.edsel.startup(c=12)
+    editor.console.restart()
+ 
 # copied from editor_job.py
 eden = piety.Job(controller=session,
                  handler=editor.console.handler,
-                 startup=(lambda: editor.edsel.startup(c=12)),
-                 restart=editor.console.restart, 
+                 startup=edenstartup,
                  cleanup=editor.edsel.cleanup)
 
 editor.console.supervisor = eden
