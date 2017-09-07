@@ -44,35 +44,32 @@ import sys, piety, pyshc, edc, eden as editor
 
 session = piety.Session(name='session', input=sys.stdin)
 
-pysh = piety.Job(controller=session,
+pysh = piety.Job(supervisor=session,
+                 application=pyshc.console,
                  handler=pyshc.console.handler,
                  startup=pyshc.console.restart, # no separate pysh.startup
                  cleanup=piety.stop) # sets piety.cycle.running = False
-
-pyshc.console.supervisor = pysh
 
 def edstartup():
     edc.ed.quit = False
     edc.ed.configure() # restore ed to no display, no updates
     edc.console.restart()
 
-ed = piety.Job(controller=session,
+ed = piety.Job(supervisor=session,
+               application=edc.console,
                handler=edc.console.handler,
                startup=edstartup)
-
-edc.console.supervisor = ed
 
 def edenstartup():
     editor.edsel.startup(c=12)
     editor.console.restart()
  
 # copied from editor_job.py
-eden = piety.Job(controller=session,
+eden = piety.Job(supervisor=session,
+                 application=editor.console,
                  handler=editor.console.handler,
                  startup=edenstartup,
                  cleanup=editor.edsel.cleanup)
-
-editor.console.supervisor = eden
 
 # Test
 

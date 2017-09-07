@@ -28,8 +28,8 @@ that invokes *tasks*.  Each Piety task identifies an *event*, a
 *handler*, and an *enabling condition*.  A handler can be any Python
 callable: a function or method, etc.  The enabling condition can be
 any callable that returns a Boolean.  A Piety event loop may call a
-task's handler when its event occurs and its enabling condition is
-true.  Then the handler runs until it returns control to the event
+task's handler when its event occurs and its enabling condition returns
+*True*.  Then the handler runs until it returns control to the event
 loop.  There is no preemption.  This is called *cooperative
 multitasking*.
 

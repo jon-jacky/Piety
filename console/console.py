@@ -171,10 +171,10 @@ class Console(object):
                                          keymap=edit_keymap) # __init__ arg
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
-        # We might assign some job controller object to supervisor later.
-        # if not None, supervisor must be an object with a method stop(self)
-        # and a Boolean attribute named 'replaced'.
-        self.supervisor = None  
+        # if not None, controller must be an object with a method stop(self)
+        # and a Boolean attribute named 'replaced', such as a piety.Job.
+        # We might assign some piety.Job object to self.controller later.
+        self.controller = None  
                                  
     def run(self):
         'Console event loop - run Console instance as an application'
@@ -200,8 +200,8 @@ class Console(object):
             method()
             # For now, all job control commands exit
             self.restore()     # calls print() for newline
-            if self.supervisor:
-                self.supervisor.stop() # callback to job control
+            if self.controller:
+                self.controller.stop() # callback to job control
             return
         elif keycode and keycode in self.keymap:
             method = getattr(self, self.keymap[keycode])
@@ -275,22 +275,23 @@ class Console(object):
         self.do_command_1() # might reassign self.mode, self.command.line
         # do_command might exit or invoke job control to suspend application
         if self.stopped():
-            if self.supervisor:
-                self.supervisor.stop() # callback to job control
+            if self.controller:
+                self.controller.stop() # callback to job control
             else:
                 return  # no job - just exit application
-        elif self.supervisor and self.supervisor.replaced: 
+        elif self.controller and self.controller.replaced: 
             return # command may replace or stop app
         else:
             self.restart() # print prompt and put term in character mode
             return # application continues
 
     def restart(self):
-        """
+        """ 
         Prepare to collect a command string using the command object.
-        Assign prompt and keymap for current mode.
-        Assign initial command string (default empty) for in-line editing.
-        Print command prompt and command line (if any), set single-char mode.
+        Assign prompt and keymap for current mode.  Assign initial
+        command string (default empty) for in-line editing.  Print
+        command prompt and command line (if any), set single-char
+        mode.
         """
         mode = self.mode() # do_command may have changed mode
         if mode in self.othermodes:

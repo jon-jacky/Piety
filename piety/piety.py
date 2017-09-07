@@ -1,25 +1,20 @@
 """
 piety.py - defines Task, Session, Job, schedule, and run (the event loop).
            Imports eventloop used by run.
-
-To run tasks in Piety, import the piety module, create some piety.Task
-instances, then call piety.run.  More details appear in the docstrings
-below, in the examples in the scripts directory, and in piety.md.
 """
 
 import collections # for deque
 
-# Import the eventloop module for the platform where piety runs
+# Import the eventloop module for the platform where piety runs.
 # The eventloop implementation is platform-dependent but its interface is not,
 #  so this piety module is platform-independent.
 # On Unix-like hosts, we used to import select/eventloop.py
 #  Since Python3 we now import asyncio/eventloop.py
-import eventloop # for activate, deactivate, to distinguish from same local here
-
+import eventloop # For activate,deactivate, distinguish from method names here.
 # Other scripts use these identifiers via piety.run() etc.
 from eventloop import run, start, stop
 
-# These used to be defined here, continue to say timer not cycle.timer etc.
+# These used to be defined here, we continue to say timer not cycle.timer etc.
 from cycle import schedule, ievent, timer
 import cycle # must use cycle.period, because immutable ...
 
@@ -132,7 +127,7 @@ class Session(Task):
     """
     # This class was created to support a console terminal session 
     #  that initially runs a Python interpreter, which then starts other jobs.
-    # But there is no dependence here on a console terminal or Python interpreter,
+    # But there is no dependence here on a console or Python interpreter,
     #  so this class might also manage other kinds of sessions and jobs.
     def __init__(self, name=None, input=None, enabled=true):
         """
@@ -152,21 +147,22 @@ class Session(Task):
     def start(self, job):
         'Put a new job in the foreground, replace any current job'
         # This is currently the only way to add a job to a Session instance.
-        # Typically the old job (if any) is the Python interpreter, which starts the new job.
-        # To start a console session, call this with the Python interpreter as the new job.
+        # Typically the old job (if any) is the Python interpreter, 
+        # which starts the new job.  To start a console session, 
+        # call this method with the Python interpreter as the new job.
         if self.foreground:
-            self.foreground.replaced = True # replace old job
-        self.jobs.append(job)             # add new job
-        self.foreground = job             # give it the focus
-        self.handler = self.foreground.handler # make its handler this task's handler
-        self.foreground.replaced = False # enable new job
+            self.foreground.replaced = True
+        self.jobs.append(job)
+        self.foreground = job
+        self.handler = self.foreground.handler
+        self.foreground.replaced = False # enable new foreground job
         # new foreground job calls its own run() method
 
-    def resume(self):
-        'Remove foreground job, resume running preceding job (if any) in foreground'
+    def switch(self):
+        'Remove foreground job, resume running preceding job (if any).'
         # Typically, the preceding job here (if any) is the Python interpreter,
         #  this returns to the interpreter after stopping the job it started.
-        # If the current job here is the Python interpreter, this exits session.
+        # If current job here is the Python interpreter, this exits session.
         self.jobs.pop()
         if self.jobs:
             self.foreground = self.jobs[-1]
@@ -176,17 +172,22 @@ class Session(Task):
         # else ... last job exits, its cleanup method has to handle it.
 
 class Job(object):
-    'Provide a standard interface to an application that can be used by Session'
-    def __init__(self, controller=None, handler=(lambda: ''), # command=None, 
+    'Provide standard interface to an application that can be used by Session'
+    def __init__(self, supervisor=None, application=None, handler=(lambda: ''),
                  startup=(lambda: None), cleanup=(lambda: None)):
         """
         All arguments are optional, with defaults
 
-        controller - object or module used for job control, when this
+        supervisor - object or module used for job control, when this
         Job instance is multiplexed with other Jobs that use the same
         event.  Default: None, use when no other jobs contend for the
-        same event.  If present, the controller object must have
-        start() and resume() mathods.
+        same event.  If present, the supervisor object must have
+        start() and switch() mathods.
+
+        application - object that indicates when the application wants
+        to stop or pause, by calling stop() in this Job object.  The
+        application object must have an attribute named 'controller',
+        which is assigned a reference back to this Job object.
 
         handler - callable to read one or more characters to build
         command string.  Takes no arguments and returns a string
@@ -204,7 +205,16 @@ class Job(object):
         cleanup - callable to run when application exits or suspends,
         for example to clean up display.  Default does nothing.
         """
-        self.controller = controller
+        self.supervisor = supervisor
+        # Currently Job (controller) and Console (application)
+        # make assumptions about each other.  Job assumes that Console
+        # has an attribute named 'controller' which will hold ref back to Job,
+        # Console assumes Job has method named 'stop' and attribute 'replaced'
+        # which it calls/uses when it wants to stop or pause. We could remove 
+        # these assumptions by passing these names as arguments to Job.
+        # Job is supposed to serve as an adapter so applications need not
+        # provide or use particular names, but we're not quite there yet.
+        application.controller = self # so app. can call methods here
         self.handler = handler 
         self.startup = startup
         self.cleanup = cleanup
@@ -212,24 +222,24 @@ class Job(object):
 
     def __call__(self, *args, **kwargs):
         """
-        Make this Command instance into a callable so it can be invoked by name from Python.
-        Give this job focus and Put this job in the foreground and start it.
+        Make this Job instance into a callable so it can be invoked by name.
+        Give this Job the focus, put it in the foreground, and start it.
         """
-        if self.controller: # this might be a standalone job with no controller
-            self.controller.start(self) # make this the new foreground job
+        if self.supervisor: # this might be a standalone job with no supervisor
+            self.supervisor.start(self) # make this the new foreground job
         self.run(*args, **kwargs)
 
-    # Can't merge this into __call__ above because Session resume() also calls it.
+    # Can't merge this into __call__ above, Session switch() also calls it.
     def run(self, *args, **kwargs):
         'Execute startup function if it exists, then restart handler'
         self.startup(*args, **kwargs) 
 
-    # assign to callback in application 
+    # The application calls this method when it wants to stop.
     def stop(self):
         'This job is done for now.  Clean up, resume previous job if any'
         self.cleanup()
-        if self.controller:
-            self.controller.resume() 
+        if self.supervisor:
+            self.supervisor.switch() 
 
 # Test
 
@@ -241,7 +251,7 @@ def main():
     # Creates a pair of tasks each time main() is called
     t0 = Task(name='task 0', handler=task0, input=timer)
     t1 = Task(name='task 1', handler=task1, input=timer)
-    # we don't need to assign piety.done because we use nevents instead
+    # We don't need to assign piety.done here because we use nevents instead.
     run(nevents=10) # handle 10 clock ticks and exit
     tasks() # show the tasks
 

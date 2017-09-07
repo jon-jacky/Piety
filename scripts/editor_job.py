@@ -7,12 +7,14 @@ editor_job.py - Run Job made from display editor Console in a while loop.
 import piety
 import eden as editor
 
-job = piety.Job(handler=editor.console.handler,
-                startup=(lambda: editor.edsel.startup(c=12)),
-                restart=editor.console.restart, 
-                cleanup=editor.edsel.cleanup)
+def editorstartup():
+    editor.edsel.startup(c=12)
+    editor.console.restart()
 
-editor.console.supervisor = job
+job = piety.Job(application=editor.console,
+                handler=editor.console.handler,
+                startup=editorstartup,
+                cleanup=editor.edsel.cleanup)
 
 def main():
     job() # run job startup and restart
