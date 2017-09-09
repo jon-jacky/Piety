@@ -7,6 +7,9 @@ import ed, frame, display # display only used in cleanup()
 from updates import Op
 from updatecall import update
 
+def refresh():
+    update(Op.refresh)
+
 def do_window_command(line):
     'Window manager commands'
     param_string = line.lstrip()[1:].lstrip()
@@ -29,7 +32,9 @@ def do_command(line):
     try:
         # Intercept special commands used by frame only, not ed.
         # Only in command mode!  Otherwise line might be text to add to buffer.
-        if ed.command_mode and line.lstrip().startswith('o'):
+        if ed.command_mode and line.lstrip() == 'L': # similar to ^L
+            refresh()
+        elif ed.command_mode and line.lstrip().startswith('o'):
             do_window_command(line)
         else:
             ed.do_command(line) # non-blocking
