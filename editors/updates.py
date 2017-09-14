@@ -29,6 +29,8 @@ class Op(Enum):
     refresh = 13 # clear screen and redraw all windows
     rescale = 14 # rescale frame and window sizes, then refresh
 
+background_task = -1  # used in update(Op.input, origin=background_task, ...)
+
 # Record that describes a single display update.
 # Most Op do not use all fields, and their meanings depend on Op, for example:
 # Op.delete start, end are in origin, Op.insert start, end are in destination.

@@ -5,7 +5,7 @@ buffer.py - Buffer class for line-oriented text editors.
 
 import os.path
 from enum import Enum
-from updates import Op
+from updates import Op, background_task
 
 # Hook to configure behavior for display editor
 def noupdate(op, **kwargs): pass 
@@ -53,7 +53,9 @@ class Buffer(object):
         if self.end_phase:
             # ignore the end string, buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
-            self.a(self.dot, self.contents) # append command, advances dot
+            # self.a(self.dot, self.contents) # append command, advances dot
+            self.insert(self.dot+1, self.contents.splitlines(True), 
+                        origin=background_task) # like commented-out a() above
         else:
             # store contents string until we get end string
             self.contents = s
@@ -156,10 +158,10 @@ class Buffer(object):
     # adding, changing, and deleting text
 
     def a(self, iline, string):
-        'Append lines from string after iline, update dot to last appended line'
+        'Append lines from string after iline,update dot to last appended line'
         # string is one big str with linebreaks indicated by embedded \n
         # splitlines(True) breaks at \n to make list of strings
-        # keepends True arg keeps each trailing \n, same convntn as fd.readlines()
+        # keepends True arg keeps each trailing \n, same as with fd.readlines()
         self.insert(iline+1, string.splitlines(True))
 
     def i(self, iline, string):

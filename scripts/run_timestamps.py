@@ -33,19 +33,6 @@ ed.b('ts2')
 ts1buf = ed.buffers['ts1']
 ts2buf = ed.buffers['ts2']
 
-# window update function - FIXME 
-def update(buf):
-    if session.session.foreground == session.eden and ed.buf == buf:
-        terminal.set_line_mode()
-        edsel.win.update(open_line=(not ed.command_mode)) # open line in insert mode
-        # restore cursor to eden cmd line (bottom of scroll region), edit point
-        display.put_cursor(edsel.cmd_n, 1) # FIXME just get it running for now
-        terminal.set_char_mode() # FIXME should restore whatever was before
-        
-# add window update callbacks to timestamp buffers
-ts1buf.update = (lambda: update(ts1buf))
-ts2buf.update = (lambda: update(ts2buf))
-
 # add content to timestamp buffers
 print(next(ts1), file=ts1buf)
 print(next(ts2), file=ts2buf)

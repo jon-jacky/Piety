@@ -3,8 +3,8 @@ frame.py - Multiwindow display implemented by a list of window instances,
             with a scrolling command region at the bottom of the display.
 """
 
-import terminal_util, display, window
-from updates import Op
+import terminal, terminal_util, display, window
+from updates import Op, background_task
 
 nlines, ncols = terminal_util.dimensions()
 
@@ -132,17 +132,35 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
     # Insert text: ed a i c m r t y commands
     # start, end are after insert, start == destination, end == win.buf.dot
     elif op == Op.insert:
-        if command_mode: # ed commands m r t y
-            win.insert(origin, start, end)
-        else: # input mode after ed commands a i c    
-            # Text at dot is already up-to-date on display, open next line.
-            win.update_for_input()
-        for w in windows:
-            if w.samebuf(win):
-                w.adjust_insert(start, end, destination)
+
+        saved_focus = None
+        if origin == background_task:
+            for w in windows:
+                if w.buf == buffer:
+                    saved_focus = win
+                    win = w
+                    break # Might be more than one, others handled below
+
+        if saved_focus: # origin == background_task also
+            terminal.set_line_mode()
+                    
+        if origin != background_task or saved_focus:
+            if command_mode: # ed commands m r t y
+                win.insert(origin, start, end)
+            else: # input mode after ed commands a i c    
+                # Text at dot is already up-to-date on display, open next line.
+                win.update_for_input()
+            for w in windows:
+                if w.samebuf(win):
+                    w.adjust_insert(start, end, destination)
+
+        if saved_focus:
+            win = saved_focus
+            terminal.set_char_mode()
+
         if not command_mode: # can't put input cursor til other windows done
             win.put_cursor_for_input()
-
+        
     # Delete text: ed d m command
     # start,end are line numbers before delete, destination == win.buf.dot
     elif op == Op.delete:

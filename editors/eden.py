@@ -54,7 +54,7 @@ edsel.ed.x_cmd_fcn = do_command
 def main():
     if not edsel.frame.windows: # initialize first window only once
         edsel.frame.init(edsel.ed.buf, cmd_h_option=12) # edsel inits ed.buf
-    edsel.startup()
+    edsel.startup(c=12)
     console.run()
     edsel.cleanup()
 
