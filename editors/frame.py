@@ -81,6 +81,19 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
     """
     global command_mode, win, ifocus, cmd_h
 
+    def insert(win):
+        'Local function, called below from two Op.insert cases'
+        if command_mode: # ed commands m r t y
+            win.insert(origin, start, end)
+        else: # input mode after ed commands a i c    
+            # Text at dot is already up-to-date on display, open next line.
+            win.update_for_input()
+        for w in windows:
+            if w.samebuf(win):
+                w.adjust_insert(start, end, destination)
+        if not command_mode: # can't put input cursor til other windows done
+            win.put_cursor_for_input()
+
     # Clear display, redraw all the windows and scrolling command region.
     if op == Op.refresh:
         refresh()
@@ -131,36 +144,19 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
 
     # Insert text: ed a i c m r t y commands
     # start, end are after insert, start == destination, end == win.buf.dot
-    elif op == Op.insert:
+    elif op == Op.insert and origin != background_task:
+        insert(win)
 
-        saved_focus = None
-        if origin == background_task:
-            for w in windows:
-                if w.buf == buffer:
-                    saved_focus = win
-                    win = w
-                    break # Might be more than one, others handled below
+    # Background task inserts text by calling buffer write() method.
+    # Search for window (if any) which displays that buffer.
+    elif op == Op.insert and origin == background_task:
+        for w in windows:
+            if w.buf == buffer:
+                terminal.set_line_mode()
+                insert(w)
+                terminal.set_char_mode()                    
+                break # might be more than one w, use the first
 
-        if saved_focus: # origin == background_task also
-            terminal.set_line_mode()
-                    
-        if origin != background_task or saved_focus:
-            if command_mode: # ed commands m r t y
-                win.insert(origin, start, end)
-            else: # input mode after ed commands a i c    
-                # Text at dot is already up-to-date on display, open next line.
-                win.update_for_input()
-            for w in windows:
-                if w.samebuf(win):
-                    w.adjust_insert(start, end, destination)
-
-        if saved_focus:
-            win = saved_focus
-            terminal.set_char_mode()
-
-        if not command_mode: # can't put input cursor til other windows done
-            win.put_cursor_for_input()
-        
     # Delete text: ed d m command
     # start,end are line numbers before delete, destination == win.buf.dot
     elif op == Op.delete:
@@ -208,5 +204,5 @@ def update(op, sourcebuf, buffer, origin, destination, start, end):
         win.reupdate()
 
     # Put ed command cursor back in scrolling command region
-    if command_mode:
+    if command_mode and origin != background_task:
         put_command_cursor() 
