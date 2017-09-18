@@ -71,6 +71,9 @@ eden = piety.Job(supervisor=session,
                  startup=edenstartup,
                  cleanup=editor.edsel.cleanup)
 
+# So update() can restore cursor after updates from background task
+editor.edsel.ed.buffer.inputline = editor.console.command # InputLine instance
+
 # Test
 
 def main():

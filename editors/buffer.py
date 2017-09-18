@@ -11,6 +11,9 @@ from updates import Op, background_task
 def noupdate(op, **kwargs): pass 
 update = noupdate # default: ed has no display, update does nothing
 
+# Hook for display updates from background tasks to restore cursor etc.
+inputline = None  # default: no updates from background tasks,no restore needed
+
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
 
@@ -55,7 +58,9 @@ class Buffer(object):
             # self.lines.append(self.contents) # already  includes final'\n'
             # self.a(self.dot, self.contents) # append command, advances dot
             self.insert(self.dot+1, self.contents.splitlines(True), 
-                        origin=background_task) # like commented-out a() above
+                        origin=background_task, 
+                        column=(inputline.start_col + inputline.point 
+                                if inputline else 0))
         else:
             # store contents string until we get end string
             self.contents = s
@@ -107,7 +112,7 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert(self, iline, lines, origin=0): 
+    def insert(self, iline, lines, origin=0, column=1): 
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
@@ -120,7 +125,7 @@ class Buffer(object):
                 self.mark[c] += nlines
         # start and end of inserted text, end == destination == dot
         update(Op.insert, buffer=self, origin=origin, destination=self.dot,
-               start=iline, end=self.dot)
+               start=iline, end=self.dot, column=column)
 
     # files
 

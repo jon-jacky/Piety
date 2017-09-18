@@ -307,10 +307,10 @@ class Window(object):
         self.update_lines(wdot+2, self.buf.dot+1)
         self.update_status()
 
-    def put_cursor_for_input(self):
+    def put_cursor_for_input(self, column=1):
         'Place input cursor for insert after update_for_input, above'
         wdot = self.wline(self.buf.dot)
-        display.put_cursor(wdot+1,1)
+        display.put_cursor(wdot+1, column)
 
 # The following methods are only used with multiple windows
 
