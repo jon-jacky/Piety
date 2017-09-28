@@ -29,6 +29,9 @@ ts2 = timestamp.timestamp('ts2')
 ed.b('ts1')
 ed.b('ts2')
 
+# return to main buffer
+ed.b('main')
+
 # aliases for timestamp buffers
 ts1buf = ed.buffers['ts1']
 ts2buf = ed.buffers['ts2']

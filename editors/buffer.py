@@ -57,7 +57,7 @@ class Buffer(object):
             # ignore the end string, buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
             # self.a(self.dot, self.contents) # append command, advances dot
-            self.insert(self.dot+1, self.contents.splitlines(True), 
+            self.insert(self.nlines()+1, self.contents.splitlines(True), 
                         origin=background_task, 
                         column=(inputline.start_col + inputline.point 
                                 if inputline else 0))

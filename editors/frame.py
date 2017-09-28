@@ -49,9 +49,9 @@ def update_windows():
         if w.focus:
             w.set_marker(w.buf.dot)
 
-def put_command_cursor():
-    'Put cursor at input line in scrolling command region'
-    display.put_cursor(cmd_n, 1) # last line on display
+def put_command_cursor(column=1):
+    'Put cursor at input line in scrolling command region, at given column'
+    display.put_cursor(cmd_n, column) # last line on display
 
 def refresh():
     'Clear and update the entire frame'
@@ -59,7 +59,7 @@ def refresh():
     display.erase() 
     update_windows()
     display.set_scroll(cmd_1, cmd_n) 
-    put_command_cursor()
+    put_command_cursor(column=1) 
 
 def rescale():
     'Recalculate frame and all window dimensions, then display all.'
@@ -141,7 +141,7 @@ def update(op, sourcebuf, buffer, origin, destination, start, end, column):
             if w.samebuf(win):
                 w.adjust_insert(start, end, destination)
         if not command_mode: # can't put input cursor til other windows done
-            win.put_cursor_for_input()
+            win.put_cursor_for_input(column=1)
 
     # Background task inserts text by calling buffer write() method.
     # Search for window (if any) which displays that buffer.
@@ -154,9 +154,7 @@ def update(op, sourcebuf, buffer, origin, destination, start, end, column):
                     if w1.samebuf(w):
                         w1.adjust_insert(start, end, destination)
                 terminal.set_char_mode()
-                if command_mode:
-                    display.put_cursor(cmd_n, column)
-                else:
+                if not command_mode:
                     win.put_cursor_for_input(column=column) # win not w
                 break # might be other w with same buf, just update the first
 
@@ -208,5 +206,5 @@ def update(op, sourcebuf, buffer, origin, destination, start, end, column):
 
     # Put ed command cursor back in scrolling command region.
     # Then we can call standard Python input() or Piety Console restart().
-    if command_mode and origin != background_task:
-        put_command_cursor() 
+    if command_mode:
+        put_command_cursor(column=column) # background task can set column

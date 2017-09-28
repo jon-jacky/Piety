@@ -184,7 +184,7 @@ class Window(object):
 
     def update_lines(self, first, iline, last=0):
         """
-        Write lines in window starting at line numbere first on display,
+        Write lines in window starting at line numbered first on display,
         to bottom of the window, or to line numbered last if arg present.
         Lines come from self.buf starting at its line iline.
         """
@@ -298,11 +298,10 @@ class Window(object):
         wdot = self.wline(self.buf.dot) # line on display where dot appears
         if wdot > 0:
             self.clear_marker(self.buf.dot)
-        if wdot >= self.top + self.nlines - 1: # at bottom of window
+        if wdot >= self.bottom():
             self.scroll(self.nlines//2)
-            wdot = self.top + (self.buf.dot - self.btop)
-            self.update_lines(self.top, self.buf.dot-self.nlines//2+1, 
-                              last=wdot)
+            wdot = self.wline(self.buf.dot)
+            self.update_lines(self.top, self.btop, last=wdot)
         self.open_line(wdot+1)
         self.update_lines(wdot+2, self.buf.dot+1)
         self.update_status()
@@ -331,7 +330,10 @@ class Window(object):
         self.clear_marker(self.saved_dot)
 
     def adjust_insert(self, start, end, destination):
-        'After insert, adjust segment visible in a window without input focus'
+        """
+        After insert, adjust segment visible in a window without input focus,
+        to keep lines shown in that window the same so no update is needed.
+        """
         # start, end are line numbers *after* insert is executed in buffer.
         # ed i() inserts text *before* dot, so start == buf.dot before execute.
         # destination == end, last inserted line *after* insert executed in buf
@@ -354,7 +356,10 @@ class Window(object):
             pass # should be unreachable! status line doesn't update
 
     def adjust_delete(self, start, end, destination):
-        'After delete, adjust segment visible in a window without input focus'
+        """
+        After delete, adjust segment visible in a window without input focus,
+        to keep lines shown in that window the same so no update is needed.
+        """
         # start, end are line numbers *before* delete is executed in buffer.
         # destination is first unchanged line *after* delete executed in buf.
         nlines = -(end - start + 1)
