@@ -177,7 +177,7 @@ class Window(object):
         """
         i = -1
         for i, line in enumerate(self.buf.lines[first:last+1]):
-            print(line.rstrip()[:self.ncols-1], end=' ') # remove \n, truncate
+            print(line.rstrip()[:self.ncols], end='') # remove \n, truncate
             display.kill_line()
             print()
         return i+1 # fewer than first:last+1 when at end of buffer
@@ -277,11 +277,11 @@ class Window(object):
         display.put_render(s1, 22, position, display.white_bg)
         display.put_render(s1, 27, linenums, display.white_bg)
         display.put_render(s1, 41, '(Text)', display.white_bg)
-        nsuffix = 17
-        nstrut = self.ncols - (46+nsuffix) # n of chars in suffix
+        nsuffix = 19
+        nstrut = self.ncols - (46+nsuffix)
         display.put_render(s1, 47, '-'*nstrut, display.white_bg)
         Window.nupdates += 1 # ensure at least this changes in status line
-        diagnostics = '  N%4d f%3d n%3d' % \
+        diagnostics = '  N%6d f%3d n%3d' % \
             (Window.nupdates, self.first, self.nprinted)
         suffix = diagnostics if show_diagnostics else '-'*nsuffix
         display.put_render(s1, 47 + nstrut, suffix, display.white_bg)

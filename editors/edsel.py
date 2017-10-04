@@ -53,7 +53,8 @@ def startup(*filename, **options):
     ed.startup(*filename, **options)
 
 def cleanup():
-    'Restore full-screen scrolling, cursor to bottom.'
+    'Restore ed no display modes, full-screen scrolling, cursor to bottom.'
+    ed.configure() 
     display.set_scroll_all()
     display.put_cursor(frame.nlines,1)
 
