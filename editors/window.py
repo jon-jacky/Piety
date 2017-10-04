@@ -259,8 +259,6 @@ class Window(object):
         else:
             self.reupdate()
 
-# The following methods are only used with the status line
-
     def update_status(self):
         'Print information about window and its buffer in its status line.'
         unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
@@ -271,20 +269,16 @@ class Window(object):
                     ' Bot ' if self.blast == self.buf.nlines() else
                     ' %2.0f%% ' % (100*dot/self.buf.nlines()))
         linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
-        s1 = self.statusline()
-        display.put_render(s1, 0, unsaved, display.white_bg)
-        display.put_render(s1, 13, bufname, display.bold, display.white_bg)
-        display.put_render(s1, 22, position, display.white_bg)
-        display.put_render(s1, 27, linenums, display.white_bg)
-        display.put_render(s1, 41, '(Text)', display.white_bg)
-        nsuffix = 19
-        nstrut = self.ncols - (46+nsuffix)
-        display.put_render(s1, 47, '-'*nstrut, display.white_bg)
+        statustext = unsaved + bufname + position + linenums + '(Text)' 
+        nstatus = len(statustext)
         Window.nupdates += 1 # ensure at least this changes in status line
         diagnostics = '  N%6d f%3d n%3d' % \
             (Window.nupdates, self.first, self.nprinted)
+        nsuffix = len(diagnostics)
         suffix = diagnostics if show_diagnostics else '-'*nsuffix
-        display.put_render(s1, 47 + nstrut, suffix, display.white_bg)
+        nstrut = self.ncols - (nstatus + nsuffix)
+        statustext += '-'*nstrut + suffix
+        display.put_render(self.statusline(), 1, statustext, display.white_bg)
         self.first = 0    # reset after each update
         self.nprinted = 0
 
