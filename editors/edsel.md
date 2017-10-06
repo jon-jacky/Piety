@@ -113,6 +113,12 @@ number command lines at any time during an editing session, type a
 Python statement that assigns the *cmd_h* variable.  For example, to
 set the region to 12 lines, type: *!cmd_h = 12*
 
+## Frame commands ##
+
+The $L$ command refreshes the entire frame including all windows, and
+also the command line in the scrolling region.  This command can be
+used to recover if display contents get corrupted.
+
 ## Script commands ##
 
 When you use the *x* command to execute *ed* commands from a buffer,

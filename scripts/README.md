@@ -41,7 +41,9 @@ for directions and explanations.
 
 - **run_timestamps.py**: Uses *piety.run* to run the three jobs
   created by *session*, concurrently with two timestamp tasks created
-  in this script.
+  in this script.  The two timestamp tasks can be seen updating editor
+  windows at the same time the user edits and updates text in other
+  windows or in the scrolling command region.
 
 - **run_writers.py**: Uses *piety.run* to run the three jobs created
     by *session*, concurrently with the two writer tasks created by
