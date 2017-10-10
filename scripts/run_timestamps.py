@@ -11,9 +11,13 @@ Some interesting commands to type at the editor command prompt:
  task generates a new message, even when another window gets focus
  and updates as its text is edited.
 
+ !piety.tasks() - show information about tasks
+
  !ts1task.enabled=piety.false - disable ts1task so ts1 buffer stops updating
 
  !ts1task.enabled=piety.true -  enable ts1task so ts1 buffer resumes updating
+
+ !ts1task.enabled=alternate - run ts1task handler on alternate timeout events 
 
  !piety.cycle.period=0.1 - cause ts1 buffer to update ten times a second
 
