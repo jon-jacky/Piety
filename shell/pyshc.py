@@ -6,7 +6,7 @@ pyshc.py - Run a pysh Python shell session.
 
 import pysh, console as con
 
-console = con.Console(prompt='>> ', do_command=pysh.mk_shell(),
+console = con.Console(prompt='>> ', do_command=pysh.do_command,
                       stopped=(lambda command: not pysh.running))
 
 def main():

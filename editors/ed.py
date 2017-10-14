@@ -5,7 +5,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 
 import re, os, sys, enum
 import time # only used for sleep() in do_commands, FIXME write piety.sleep
-import pysh  # provides embedded Python shell for ! command
+import pysh  # callable Python shell for ! command
 import buffer
 from updates import Op
 
@@ -578,8 +578,6 @@ start = 0  # line address, first line of affected region, often dot
 end = 0    # line address, last line of affected region
 dest = 0   # line address, destination for m(ove), t(ransfer, copy) commands
 
-pysh = pysh.mk_shell() # embedded Python shell for ! command
-
 def do_command(line):
     """
     Process one input line without blocking in ed command or input mode
@@ -591,7 +589,7 @@ def do_command(line):
         if line and line[0] == '#': # comment
             return 
         if line and line[0] == '!': 
-            pysh(line[1:]) # execute Python expression or statement
+            pysh.do_command(line[1:]) # execute Python statement
             return
         items = parse_cmd(line)
         if items[0] == 'ERROR':
@@ -711,7 +709,8 @@ def X(*args):
         if params_valid:
             echo = echo if echo != None else False
             delay = delay if delay != None else None
-            do_commands(pysh, buffers[current].lines[start:end+1], echo, delay)
+            do_commands(pysh.do_command, buffers[current].lines[start:end+1], 
+                        echo, delay)
             buffers[current].dot = end 
 
 def K(): return 1/0  # raise exception on demand
