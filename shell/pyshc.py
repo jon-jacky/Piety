@@ -7,7 +7,9 @@ pyshc.py - Run a pysh Python shell session.
 import pysh, console as con
 
 console = con.Console(prompt='>> ', do_command=pysh.do_command,
-                      stopped=(lambda command: not pysh.running))
+                      stopped=(lambda command: not pysh.running),
+                      mode=(lambda: not pysh.more), 
+                      specialmodes={False: ('.. ', con.command_keymap)})
 
 def main():
     'Python REPL using home-made pysh shell'
