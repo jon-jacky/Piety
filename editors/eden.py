@@ -5,7 +5,7 @@ eden.py - run *edsel.py* display editor, with additional screen
  to *edsel.py* *main* function and *edselc.py*.
 """
 
-import edsel, console as con
+import edc, edsel, console as con
 
 c_command, buf, dot = False, None, 0
 
@@ -45,7 +45,8 @@ def do_command(chars):
 
 console = con.Console(prompt=':', do_command=do_command,
                       stopped=(lambda command: edsel.ed.quit),
-                      mode=(lambda: edsel.ed.command_mode))
+                      mode=edc.ed_command_mode,
+                      specialmodes=edc.ed_specialmodes)
 
 # In ed x command use eden do_command here that calls edsel.do_command 
 #  which calls edsel.update_display

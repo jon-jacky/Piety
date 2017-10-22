@@ -1,0 +1,10 @@
+# append by calling ed API a(), with both single- and multi-line strings
+E lines.txt
+5
+!ed.a('Single-line string')
+7
+!ed.a("""Multi-line string
+line a
+line b
+line c""")
+# test finished

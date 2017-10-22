@@ -167,12 +167,13 @@ class Buffer(object):
         # string is one big str with linebreaks indicated by embedded \n
         # splitlines(True) breaks at \n to make list of strings
         # keepends True arg keeps each trailing \n, same as with fd.readlines()
-        self.insert(iline+1, string.splitlines(True))
+        self.insert(iline+1, string.splitlines(True), origin=iline)
 
     def i(self, iline, string):
         'Insert lines from string before iline, new dot is last inserted line'
         # iline at initial empty line w/ index 0 is a special case, must append
-        self.insert(iline if iline else iline+1, string.splitlines(True))
+        self.insert(iline if iline else iline+1, string.splitlines(True),
+                    origin=iline)
 
     def d(self, start, end):
         'Delete text from start up through end.'

@@ -65,8 +65,8 @@ def main(*filename, **options):
     """
     startup(*filename, **options)
     while not ed.quit:
-        prompt_string = ed.prompt if ed.command_mode else ''
-        line = input(prompt_string) # blocking
+        ed_prompt = ed.prompt if ed.command_mode else ''
+        line = input(ed_prompt if not ed.pysh.continuation else ed.pysh.ps2)
         do_command(line) # non-blocking
     cleanup()
 

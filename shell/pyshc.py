@@ -6,13 +6,13 @@ pyshc.py - Run a pysh Python shell session.
 
 import pysh, console as con
 
-console = con.Console(prompt='>> ', do_command=pysh.do_command,
+console = con.Console(prompt=pysh.ps1, do_command=pysh.push,
                       stopped=(lambda command: not pysh.running),
-                      mode=(lambda: not pysh.more), 
-                      specialmodes={False: ('.. ', con.command_keymap)})
+                      mode=(lambda: not pysh.continuation), 
+                      specialmodes={False: (pysh.ps2, con.command_keymap)})
 
 def main():
-    'Python REPL using home-made pysh shell'
+    'Python REPL using pysh shell'
     print("pysh shell, type any Python statement, exit() or ^D to exit")
     console.run()
 

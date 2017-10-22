@@ -1,0 +1,10 @@
+# append by calling ed API a(), for use with edselc, eden, session
+E lines.txt
+5
+!edc.ed.a('Single-line string')
+7
+!edc.ed.a("""Multi-line string
+line a
+line b
+line c""")
+# test finished

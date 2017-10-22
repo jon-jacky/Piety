@@ -589,8 +589,11 @@ def do_command(line):
         if line and line[0] == '#': # comment
             return 
         if line and line[0] == '!': 
-            pysh.do_command(line[1:]) # execute Python statement
+            pysh.push(line[1:]) # push line to Python interpreter
             return
+        if line and pysh.continuation:
+            pysh.push(line)
+            return            
         items = parse_cmd(line)
         if items[0] == 'ERROR':
             return None # parse_cmd already printed message
@@ -709,7 +712,7 @@ def X(*args):
         if params_valid:
             echo = echo if echo != None else False
             delay = delay if delay != None else None
-            do_commands(pysh.do_command, buffers[current].lines[start:end+1], 
+            do_commands(pysh.push, buffers[current].lines[start:end+1], 
                         echo, delay)
             buffers[current].dot = end 
 
@@ -749,9 +752,9 @@ def main(*filename, **options):
     """
     startup(*filename, **options)
     while not quit:
-        prompt_string = prompt if command_mode else ''
-        line = input(prompt_string) # blocking
-        do_command(line) # non-blocking
+        ed_prompt = prompt if command_mode else ''
+        line = input(ed_prompt if not pysh.continuation else pysh.ps2)
+        do_command(line)
 
 def cmd_options():
     # import argparse inside this fcn so it isn't always a dependency.

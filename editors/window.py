@@ -232,6 +232,8 @@ class Window(object):
             if origin != 0:
                 self.clear_marker(origin)
             self.update_from(start)
+            if self.focus:
+                self.set_marker(end)
         else:
             self.reupdate()
 
