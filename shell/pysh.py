@@ -4,8 +4,6 @@ pysh.py - Callable Python shell, based on Python standard library code module
 
 import sys, code
 
-# pysh exit() is managed by pysh itself, must not exit top-level Python session
-
 running = True
 continuation = False # True when continuation line expected
 

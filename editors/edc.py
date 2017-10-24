@@ -15,7 +15,7 @@ def ed_command_mode():
     else: # not ed.command_mode:
         return 'ed_input'
 
-ed_specialmodes = { 'ed_input': ('', con.command_keymap),
+ed_specialmodes = { 'ed_input': ('', con.insert_keymap),
                     'pysh_continuation': (ed.pysh.ps2, con.command_keymap)}
 
 console = con.Console(prompt=':', do_command=ed.do_command,
