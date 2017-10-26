@@ -135,6 +135,9 @@ class Console(object):
          Default: job_commands_keymap (defined in this module),
           entries for ^D and ^Z that suspend the application.
 
+        NOTE: Effects of mode and specialmodes are currently commented out.
+              See editors/edo.py and shell/wyshka.py for new modes scheme.
+
         mode - callable to get current application mode, returns a
           value (of some type) that depends on the application.  For
           example, (lambda: ed.command_mode) returns True for ed
@@ -296,8 +299,8 @@ class Console(object):
         mode = self.mode() # do_command may have changed mode
         if mode in self.othermodes:
             self.prompt, self.keymap = self.othermodes[mode]
-        else:
-            self.prompt, self.keymap = self.default_prompt, command_keymap
+        #else:
+        #   self.prompt, self.keymap = self.default_prompt, command_keymap
         # Re-initialize command object with previously assigned attributes.
         # Only now do we have self.prompt to accompany initline and initpoint.
         self.command.reinit(prompt=self.prompt, line=self.initline, 

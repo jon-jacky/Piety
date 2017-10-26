@@ -17,7 +17,7 @@ Text editors, including the line editor *ed.py* inspired by the
 
 - **ed.txt**: command summary for *ed.py*
 
-- **edc.py**: run *ed.py* line editor, use *console*
+- **edo.py**: run *ed.py* line editor, use *console*
   module instead of Python builtin *input* to collect and edit
   input lines.  Contrast to *ed.py* *main* function and *etty*.
 
@@ -41,7 +41,7 @@ Text editors, including the line editor *ed.py* inspired by the
   module to collect and edit input lines.  Use
   non-default keymaps with *Command* class to provide retro
   printing-terminal-style editing and history.  Contrast to *ed.py*
-  *main* function and *edc*.
+  *main* function and *edo*.
 
 - **frame.md**: description of *frame.py*, *updates.py*, and *updatecall.py*.
 
@@ -60,4 +60,4 @@ Text editors, including the line editor *ed.py* inspired by the
 
 - **window.py**: defines Window class used by *frame*
 
-Revised Aug 2017
+Revised Oct 2017

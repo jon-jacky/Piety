@@ -38,7 +38,7 @@ def main():
     start()
     print("pysh shell, type any Python statement, exit() to exit")
     while running:
-        line = input(ps1 if not continuation else ps2) # blocking input
+        line = input(ps2 if continuation else ps1) # blocking input
         push(line)
 
 if __name__ == '__main__':

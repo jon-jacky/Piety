@@ -2,7 +2,8 @@
 branches
 ========
 
-This is the **master** branch.  
+This is the **modes** branch.   Simplify, generalize use of modes in 
+*console*.  Begun 25 Oct 2017.
 
 Branches recently merged into **master**:
 

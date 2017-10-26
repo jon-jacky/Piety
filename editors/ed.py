@@ -1,11 +1,9 @@
 """
 ed.py - line-oriented text editor in pure Python based on classic Unix ed.
-
 """
 
-import re, os, sys, enum
+import re, os, sys
 import time # only used for sleep() in do_commands, FIXME write piety.sleep
-import pysh  # callable Python shell for ! command
 import buffer
 from updates import Op
 
@@ -588,12 +586,6 @@ def do_command(line):
         # special prefix characters, don't parse these lines
         if line and line[0] == '#': # comment
             return 
-        if line and line[0] == '!': 
-            pysh.push(line[1:]) # push line to Python interpreter
-            return
-        if line and pysh.continuation:
-            pysh.push(line)
-            return            
         items = parse_cmd(line)
         if items[0] == 'ERROR':
             return None # parse_cmd already printed message
@@ -697,25 +689,6 @@ def x(*args):
     else:
         print('? buffer name')
 
-def X(*args):
-    """
-    Execute Python statements in the current buffer: X(start, end, echo, delay)
-     start, end default to dot, so X cmd without range single-steps thru buffer
-     echo - optional, default False; delay - optional, default no delay
-    Leaves dot at last line executed, to single-step through file, repeat +X
-    """
-    valid,start,end,echo,delay_singleton = parse_check_range(args) # no bufname
-    if valid:
-        # delay if present is in a singleton tuple. If echo absent, so is delay
-        params = (echo,)+delay_singleton if echo else ()
-        params_valid, echo, delay = parse_echo_delay(params)
-        if params_valid:
-            echo = echo if echo != None else False
-            delay = delay if delay != None else None
-            do_commands(pysh.push, buffers[current].lines[start:end+1], 
-                        echo, delay)
-            buffers[current].dot = end 
-
 def K(): return 1/0  # raise exception on demand
 
 # Hooks to configure ed behavior for display editor
@@ -752,8 +725,7 @@ def main(*filename, **options):
     """
     startup(*filename, **options)
     while not quit:
-        ed_prompt = prompt if command_mode else ''
-        line = input(ed_prompt if not pysh.continuation else pysh.ps2)
+        line = input(prompt if command_mode else '')
         do_command(line)
 
 def cmd_options():
