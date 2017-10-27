@@ -583,8 +583,7 @@ def do_command(line):
     """
     global command_mode, cmd_name, args, start, end, dest
     if command_mode:
-        # special prefix characters, don't parse these lines
-        if line and line[0] == '#': # comment
+        if line and line[0] == '#': # comment, do nothing
             return 
         items = parse_cmd(line)
         if items[0] == 'ERROR':
