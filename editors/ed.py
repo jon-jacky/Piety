@@ -707,7 +707,10 @@ def configure(cmd_fcn=None, update_fcn=None, print_dest=None):
     update = update_fcn if update_fcn else noupdate
     buffer.update = update_fcn if update_fcn else noupdate
 
-prompt = '' # default no prompt
+ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
+ps2 = ''  # ed input mode prompt, empty
+
+prompt = ps1
 
 def startup(*filename, **options):
     global quit, prompt
@@ -724,7 +727,7 @@ def main(*filename, **options):
     """
     startup(*filename, **options)
     while not quit:
-        line = input(prompt if command_mode else '')
+        line = input(prompt if command_mode else ps2)
         do_command(line)
 
 def cmd_options():
