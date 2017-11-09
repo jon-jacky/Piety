@@ -450,6 +450,8 @@ def y(*args):
         return
     buf.y(iline)
 
+def K(): return 1/0  # raise exception on demand, for testing
+
 quit = False
 
 def q(*args):
@@ -567,6 +569,9 @@ def parse_cmd(cmd_string):
         return (cmd_name,start,end) + (tuple(params.split() if params else ()))
 
 # State variables that must persist between cmd invocations during input mode
+ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
+ps2 = ''  # ed input mode prompt, empty
+prompt = ps1
 command_mode = True # alternates with input mode used by a,i,c commands
 cmd_name = '' # command name, must persist through input mode
 args = []  # command arguments, must persist through input mode
@@ -581,7 +586,7 @@ def do_command(line):
     Process one input line without blocking in ed command or input mode
     Update buffers and control variables: command_mode,cmd_name,args,start,end
     """
-    global command_mode, cmd_name, args, start, end, dest
+    global command_mode, prompt, cmd_name, args, start, end, dest
     if command_mode:
         if line and line[0] == '#': # comment, do nothing
             return 
@@ -598,6 +603,7 @@ def do_command(line):
             globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in input_cmds:
             command_mode = False # enter input mode
+            prompt = ps2
             # Instead of using buf.a,i,c, we handle input mode cmds inline here
             # We add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once
@@ -605,6 +611,7 @@ def do_command(line):
                     else range_ok(start, end)):
                 print('? invalid address')
                 command_mode = True
+                prompt = ps1
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = start
@@ -625,6 +632,7 @@ def do_command(line):
     else: # input mode for a,i,c commands that collect text
         if line == '.':
             command_mode = True # exit input mode
+            prompt = ps1
             update(Op.command) # return from input (insert) mode to cmd mode
         else:
             # Recall raw_input returns each line with final \n stripped off,
@@ -639,7 +647,7 @@ def do_commands(do_command, lines, echo, delay):
      lines - list of lines, one command per line
      echo - if True, print each line before executing it
      delay - if not None, wait delay seconds after printing each line
-    This function *blocks* each time it reaches time.sleep(delay)
+    FIXME This function *blocks* each time it reaches time.sleep(delay)
     """
     for line in lines:
         line1 = line.rstrip() # remove terminal \n
@@ -688,8 +696,6 @@ def x(*args):
     else:
         print('? buffer name')
 
-def K(): return 1/0  # raise exception on demand
-
 # Hooks to configure ed behavior for display editor
 x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
 lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
@@ -706,29 +712,6 @@ def configure(cmd_fcn=None, update_fcn=None, print_dest=None):
     lz_print_dest = print_dest if print_dest else sys.stdout
     update = update_fcn if update_fcn else noupdate
     buffer.update = update_fcn if update_fcn else noupdate
-
-ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
-ps2 = ''  # ed input mode prompt, empty
-
-prompt = ps1
-
-def startup(*filename, **options):
-    global quit, prompt
-    quit = False # needed for restart
-    if filename:
-        e(filename[0])
-    if 'p' in options:
-        prompt = options['p'] 
-
-def main(*filename, **options):
-    """
-    Top level ed command to invoke from Python prompt or command line.
-    Won't work with cooperative multitasking, calls blocking input().
-    """
-    startup(*filename, **options)
-    while not quit:
-        line = input(prompt if command_mode else ps2)
-        do_command(line)
 
 def cmd_options():
     # import argparse inside this fcn so it isn't always a dependency.
@@ -750,6 +733,26 @@ def cmd_options():
 
 create_buf('main')  # initialize main buffer only once on import
 
+def startup(*filename, **options):
+    global ps1, prompt
+    if filename:
+        e(filename[0])
+    if 'p' in options:
+        ps1 = options['p'] 
+        prompt = ps1
+
+def main():
+    """
+    Top level ed command to invoke from Python prompt or command line.
+    Won't work with cooperative multitasking, calls blocking input().
+    """
+    global quit
+    quit = False
+    while not quit:
+        line = input(prompt)
+        do_command(line)
+
 if __name__ == '__main__':
     filename, options = cmd_options()
-    main(*filename, **options)
+    startup(*filename, **options)
+    main()

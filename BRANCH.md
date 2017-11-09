@@ -2,8 +2,10 @@
 branches
 ========
 
-This is the **modes** branch.   Simplify, generalize use of modes in 
-*console*.  Begun 25 Oct 2017.
+This is the **modes** branch.  Simplify and generalize use of modes to
+select prompts, keymaps, and handlers in *console*.  Make a new
+command line shell for console applications that provides modes
+for application commands and Python statements. Begun 25 Oct 2017.
 
 Branches recently merged into **master**:
 

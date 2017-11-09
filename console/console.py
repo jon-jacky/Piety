@@ -1,27 +1,6 @@
 """
-console.py - Console class, skeleton command line application.  
-
-Collects a command (string), with editing and history, and passes it
-  to a handler (callable) to execute.
-
-Collects the string one character at a time, so this class can be used 
-  in a cooperative multitasking system without blocking.
-
-Delegates in-line entry and editing of the command string to another class.
-
-Provides command history similar to readline.
-
-Provides for customization by assigning keymaps that map keycodes to
-  behaviors.
-
-Provides for modes that assign different keymaps to select different
-  behaviors, for example an editor's command and insert modes.
-
-Provides for transferring control when the application exits, or when
-  job control commands bypass or suspend the application.
-
-This module has some similar motivations to the Python standard
-  library cmd module, but does not provide the same API.
+console.py - Console class, skeleton non-blocking command line application
+               with command line editing and history.
 """
 
 import sys
@@ -29,25 +8,24 @@ import string # for string.printable
 import util, terminal, keyboard
 import inputline, key # define classes used in Console __init__
 
-# These keymaps are dicts from keycode string to Console method name string.
-# Keycodes in keymap can have multiple characters (for example escape sequences).
-# Values are name strings not function objects so they can refer to bound methods
-# Keymaps in this console module are just for controlling commands and jobs
-# Keymaps for entering and editing text are in the inputline module
+# Keymaps are dicts from keycode string to Console method name string.
+# Keycodes in keymap can have multiple chars (for example escape sequences).
+# Values are strings not function objects so they can refer to bound methods.
+# Keymaps in this console module are just for controlling commands and jobs.
+# Keymaps for entering and editing text are in the inputline module.
 
-# These keys are active in insert mode - just accept line and interrupt
-
-# This keymap works on a vt terminal or a printing terminal
+# These keys are active in ed (etc.) input mode.
+# This keymap works on a video terminal or a printing terminal.
 insert_keymap = {
     # any keycode that maps to accept_line exits from line entry/editing
     keyboard.cr: 'accept_line', # don't add to history, don't exit
     keyboard.C_c: 'interrupt',
     }
 
-# These keys are active in command mode note - we add history keys
-# This command mode keymap requires a video terminal with arrow keys
+# These keys are active in ed (etc.) command mode. 
+# This command mode keymap requires a video terminal with arrow keys.
 command_keys = {
-    # any keycode that maps to accept_command is a command terminator
+    # Any keycode that maps to accept_command is a command terminator.
     keyboard.cr: 'accept_command', # add to history, possibly exit
     keyboard.C_n: 'next_history',
     keyboard.C_p: 'previous_history',
@@ -55,14 +33,14 @@ command_keys = {
     keyboard.down: 'next_history',
     }
 
-# Combine the keymaps - commandmode adds several keys to insert mode
-# also reassigns method for keyboard.cr (RET key)
+# Combine the keymaps - command mode adds several keys to insert mode,
+#  also reassigns method for keyboard.cr (RET key)
 command_keymap = insert_keymap.copy()
 command_keymap.update(command_keys)
 
-# This command mode keymap works on a printing terminal with no arrow keys
+# This command mode keymap works on a printing terminal with no arrow keys.
 command_tty_keys = {
-    # any keycode that maps to accept_command is a command terminator
+    # Any keycode that maps to accept_command is a command terminator.
     keyboard.cr: 'accept_command', # add to history, possibly exit
     keyboard.C_n: 'next_history_tty',
     keyboard.C_p: 'previous_history_tty'
@@ -83,95 +61,69 @@ printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 
 class Console(object):
-    def __init__(self, prompt='', reader=key.Key(),
+    'Class that implements skeleton for non-blocking command line application'
+    def __init__(self, prompt=(lambda: ''), reader=key.Key(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
-                 command_keymap=command_keymap, 
-                 edit_keymap=inputline.keymap,
-                 job_commands=job_commands_keymap,
-                 mode=(lambda: True), specialmodes=None):
+                 command_keymap=(lambda: command_keymap), 
+                 edit_keymap=(lambda: inputline.keymap),
+                 job_commands=job_commands_keymap):
         """
-        All arguments are optional, with defaults.  Defaults were chosen
-         to simplify the editors ed, edsel, and eden.  For many applications,
-         it should only be necessary to specify these arguments: prompt,
-         do_command, stopped, and mode.
+        All arguments are optional, with defaults.  Many applications
+        only need the prompt, do_command, and stopped arguments.
 
-        prompt - Prompt string, appears unless overidden by mode and 
-          specialmodes args (below).  
-         Default is empty string '', no prompt.
+        prompt - Callable that returns prompt string, which might
+        depend on the state of the application.  Default returns the
+        empty string (no prompt).
 
-       reader - callable to read a keycode, which might be a single
-         character or several (an escape sequence, for example).
-         Takes no arguments and returns a keycode, or returns empty
-         string '' to indicate char was received but keycode is
-         incomplete.
+        reader - callable to read a keycode, which might be a single
+        character or several (an escape sequence, for example).  Takes
+        no arguments and returns a keycode, or returns empty string ''
+        to indicate char was received but keycode is incomplete.
         Default is key.Key(), handles single characters and a few ANSI
-         escape sequences
+        escape sequences.
 
-        do_command - callable to execute command string.  Takes one
-           argument, a string.  
-          Default is (lambda command: None), do nothing.
+        do_command - callable to execute a command.  Takes one
+        argument, the command string.  Default does nothing.
 
-        stopped - callable to test when the application should stop or
-          exit.  Takes one argument, a string.  Typically this is the
-          command string, so stopped() can check if command is
-          something like 'exit()' or 'quit' - but stopped() might
-          ignore this string and check some state variable instead.
-         Default is (lambda command: False), never exit -- but
-          can still suspend application using job_commands (below).
+        stopped - callable that returns True when the application
+        should stop or exit.  Takes one argument, a string, typically
+        the command string, so stopped() can check if command is
+        something like 'exit()' or 'quit' - but stopped() might check
+        application state instead.  Default returns False, never exits
+        (but we can still suspend the application using job_commands
+        arg, below).
 
-        command_keymap - dictionary from keycode to Console method name
-          string, used except in modes where it is overridden by mode
-          and specialmodes args (below).  Typically used in command modes.
-         Default: command_keymap (defined above in this module)
+        command_keymap - callable that returns the keymap for handling
+        commands, which might depend on the application state.
+        Default returns command_keymap defined in this module.
 
-        job_commands: dictionary from keycode to job control method
-          name string.  The method typically bypasses or suspends the
-          application.  Job control keycodes are only effective when
-          they appear alone at the beginning of an empty command line,
-          so they can be the same as keycodes in keymap.  For example
-          the job control exit command ^D is the same as the InputLine
-          delete character command ^D.  
-         Default: job_commands_keymap (defined in this module),
-          entries for ^D and ^Z that suspend the application.
+        edit_keymap - callable that returns the keymap for editing the
+        command line, which might depend on the application state.
+        Default returns keymap defined in the inputline module.
 
-        NOTE: Effects of mode and specialmodes are currently commented out.
-              See editors/edo.py and shell/wyshka.py for new modes scheme.
-
-        mode - callable to get current application mode, returns a
-          value (of some type) that depends on the application.  For
-          example, (lambda: ed.command_mode) returns True for ed
-          command mode and False for ed insert mode.  Used with
-          specialmodes argument (below) to select prompt and keymap.
-         Default: (lambda: True), always command mode, use prompt and
-          command_keymap args (above).
-
-        specialmodes - Customizes prompt and keymap for mode.  A dictionary
-          indexed by the values returned by calling mode() (above).  Each
-          key in the dict (a mode) is associated with a tuple:
-          (prompt, keymap) to use in that mode.  
-         Default is None, which selects { False: ('', insert_keymap) }.
-          This works with (for example) ed insert mode.
+        job_commands - job control keymap for suspending the
+        application (not a callable, the keymap itself). Job control
+        keycodes are only effective when they appear alone at the
+        beginning of an empty command line, so they can be the same as
+        keycodes in other keymaps.  For example the job control exit
+        command ^D is the same as the line editing delete command ^D.
+        Default: job_commands_keymap defined in this module.
         """
         # initialize attributes from __init__ arguments
-        self.default_prompt = prompt # prompt string used in command mode
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string 
         self.do_command = (lambda: do_command(self.command.line))
         self.stopped = (lambda: stopped(self.command.line))
-        self.job_commands = job_commands
         self.keymap = command_keymap
-        self.mode = mode
-        # call this arg specialmodes because othermodes=None is misleading
-        self.othermodes = ({ False: ('', insert_keymap) }
-                           if specialmodes is None else specialmodes)
+        self.job_commands = job_commands
         # initialize other attributes
         self.initline = ''    # some do_command might assign ...
         self.initpoint = None # ..non-default values for initial command string
-        self.command=inputline.InputLine(prompt=self.prompt, 
-                                         line=self.initline,
-                                         point=self.initpoint,
-                                         keymap=edit_keymap) # __init__ arg
+        self.command=inputline.InputLine(prompt=prompt, 
+                                         keymap=edit_keymap,
+                                         line = self.initline,
+                                         point = self.initpoint)
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         # if not None, controller must be an object with a method stop(self)
@@ -187,14 +139,14 @@ class Console(object):
             self.handler() # blocks in self.reader at each character
         self.restore()
 
-    # alternative run_noreader passes keycode to handler, use getchar as default
+    # alternative run_noreader passes keycode to handler,use getchar as default
 
     def handler(self):
         'Read char, add to keycode sequence.  If seq complete, handle keycode'
-        # to avoid blocking in self.reader(), must only call when input is ready
+        # To avoid blocking in self.reader(),must only call when input is ready
         keycode = self.reader() # returns '' when keycode is not yet complete
         # keycode might be single character or a sequence of characters.
-        # Check job keymap before ordinary keymap, same keys can appear in both.
+        # Check job keymap before ordinary keymap, same keys can appear in both
         # Job control commands must be a single keycode at start of line.
         if keycode and (keycode in self.job_commands 
                         and self.command.line == ''):
@@ -206,11 +158,11 @@ class Console(object):
             if self.controller:
                 self.controller.stop() # callback to job control
             return
-        elif keycode and keycode in self.keymap:
-            method = getattr(self, self.keymap[keycode])
+        elif keycode and keycode in self.keymap():
+            method = getattr(self, self.keymap()[keycode])
             method()
         elif keycode and (keycode in printing_chars or 
-                          keycode in self.command.keymap):
+                          keycode in self.command.keymap()):
             self.command.handler(keycode)
         elif keycode:
             util.putstr(keyboard.bel) # sound indicates key not handled
@@ -241,8 +193,8 @@ class Console(object):
     # accept_line (when the user finishes entering/editing text in insert mode)
     # or accept_command (when the user finishes entering/editing a command).
     # The user typically indicates this by typing RET, but the actual keycodes
-    # (for each mode) are set by keymaps in self.keymap and self.othermodes.
-    # Complications arise due to commands that might exit or suspend application
+    # (for each mode) are set by keymaps in self.keymap.
+    # Complications arise from commands that might exit or suspend application
     # (so control must be transferred elsewhere) and commands that might 
     # initialize the command (or text) line, overriding defaults 
     # (which must be restored later).
@@ -262,16 +214,15 @@ class Console(object):
 
     # accept_line and accept_command invoke the other methods in this section.
     # These are the commands that are invoked from the keymaps.
-    # accept_line is used in text insert modes, accept_command in command modes.
-
+    # accept_line is used in insert modes, accept_command in command modes.
     def accept_line(self):
-        'For ed insert mode: handle line, but no history, exit, or job control'
+        'For insert modes: handle line, but no history, exit, or job control'
         self.restore()      # advance line and put terminal in line mode 
         self.do_command_1() # might reassign self.mode, self.command.line
         self.restart()      # print prompt and put term in character mode
 
     def accept_command(self):
-        'For ed command mode: handle line, with history, exit, and job control'
+        'For command modes: handle line, with history, exit, and job control'
         self.history.append(self.command.line)
         self.hindex = len(self.history) - 1
         self.restore()      # advance line and put terminal in line mode 
@@ -289,23 +240,9 @@ class Console(object):
             return # application continues
 
     def restart(self):
-        """ 
-        Prepare to collect a command string using the command object.
-        Assign prompt and keymap for current mode.  Assign initial
-        command string (default empty) for in-line editing.  Print
-        command prompt and command line (if any), set single-char
-        mode.
-        """
-        mode = self.mode() # do_command may have changed mode
-        if mode in self.othermodes:
-            self.prompt, self.keymap = self.othermodes[mode]
-        #else:
-        #   self.prompt, self.keymap = self.default_prompt, command_keymap
-        # Re-initialize command object with previously assigned attributes.
-        # Only now do we have self.prompt to accompany initline and initpoint.
-        self.command.reinit(prompt=self.prompt, line=self.initline, 
-                            point=self.initpoint)
-        util.putstr(self.prompt + self.command.line) # might be empty
+        'Prepare to collect a command string using the command object.'
+        self.command.reinit(line=self.initline, point=self.initpoint)
+        util.putstr(self.prompt() + self.command.line) # line might be empty
         self.command.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
@@ -314,8 +251,7 @@ class Console(object):
             length = len(self.history)
             self.hindex = self.hindex if self.hindex < length else length-1
             self.initline = self.history[self.hindex]
-            self.command.reinit(prompt=self.prompt, line=self.initline, 
-                                point=self.initpoint)
+            self.command.reinit(line=self.initline, point=self.initpoint)
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
 
     def retrieve_next_history(self):
@@ -323,8 +259,7 @@ class Console(object):
         self.hindex = self.hindex + 1 if self.hindex < length else length
         self.initline = (self.history[self.hindex] 
                           if self.hindex < length else '')
-        self.command.reinit(prompt=self.prompt, line=self.initline, 
-                            point=self.initpoint)
+        self.command.reinit(line=self.initline, point=self.initpoint)
 
     # Command history, separate methods for video and printing terminals
 
@@ -346,7 +281,11 @@ class Console(object):
 
 
 # Test: echo input lines, use job control commands ^D ^Z to exit.
-echo = Console(prompt='> ', do_command=(lambda command: print(command)))
+echo = Console(prompt=(lambda: '> '), 
+               do_command=(lambda command: print(command)))
+
+def main():
+    echo.run()
 
 if __name__ == '__main__':
-    echo.run()
+    main()

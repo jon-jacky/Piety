@@ -7,19 +7,15 @@ inputline.py - InputLine class, entry and editing of single-line strings.
 import string
 import display, keyboard, util
 
-# A keymap is a dictionary from keycode string to a method name string.
-# Keymap alues are name strings not objects, so they can refer to bound methods.
-
-# Keycodes in keymap can be multicharacter sequences, not just single characters.
 # Most method names in the keymap are derived from GNU readline or Emacs,
 # but line operand is implicit: redraw-current-line is just redraw here etc.
-# Also remove confusing use of 'self', self-insert-char is just insert_char here.
+# Also remove confusing 'self', self-insert-char is just insert_char here.
 # Retain _char suffix, we might add delete_word, insert_word etc.
 
 printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 
-# This keymap requires a video terminal with cursor addressing
+# This keymap requires a video terminal with cursor addressing.
 keymap = {
     # insert_char requires special-case handling
     #  because it takes an additional argument: the keycode.
@@ -57,13 +53,14 @@ tty_keymap = {
 }
 
 class InputLine(object):
-    def __init__(self, prompt='', line='', point=None, keymap=keymap):
-        self.reinit(prompt=prompt, line=line, point=point)
+    def __init__(self, prompt=(lambda: ''), line='', point=None, 
+                 keymap=(lambda: keymap)):
+        self.prompt = prompt
         self.keymap = keymap
+        self.reinit(line=line, point=point)
 
-    def reinit(self, prompt=None, line=None, point=None):
-        self.prompt = self.prompt if prompt is None else prompt
-        self.start_col = len(self.prompt)+1 # 1-based indexing, not 0-based
+    def reinit(self, line=None, point=None):
+        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
         self.line = self.line if line is None else line
         self.point = len(self.line) if point is None else point
         
@@ -73,10 +70,10 @@ class InputLine(object):
         # Printable keys require special-case handling,
         #  because their method takes an additional argument: the key itself.
         if keycode in printing_chars:
-            method = getattr(self, self.keymap[printable])
+            method = getattr(self, self.keymap()[printable])
             method(keycode)
-        elif keycode in self.keymap:
-            method = getattr(self, self.keymap[keycode])
+        elif keycode in self.keymap():
+            method = getattr(self, self.keymap()[keycode])
             method()
         else:
             pass # caller should ensure we never get here
@@ -157,11 +154,11 @@ class InputLine(object):
     def discard_tty(self): # name like gnu readline unix-line-discard
         'discard entire line including prompt on printing terminal'
         self.line = ''
-        util.putstr('^U\r\n' + self.prompt)  # prompt on new line
+        util.putstr('^U\r\n' + self.prompt())  # prompt on new line
 
     def redraw_with_prefix(self, prefix):
         'redraw entire line with prefix and prompt on printing terminal'
-        util.putstr(prefix + self.prompt)
+        util.putstr(prefix + self.prompt())
         self.redraw()
 
     def redraw_tty(self):
@@ -170,26 +167,29 @@ class InputLine(object):
 
 # Test - shows how much setup, teardown, event handling inputline needs
 
-command = InputLine(prompt='> ') # outside main() so we can inspect from >>>
-
-# uncomment this line, comment out the previous, to test TTY mode
-#command = InputLine(prompt='> ', keymap=tty_keymap)
+# Define command outside main() so we can inspect from >>> after main exits.
+fresh_line = True # mode that selects prompt and keymap
+command = InputLine(prompt=(lambda: '> ' if fresh_line else '>> '),
+                    keymap=(lambda: tty_keymap if fresh_line else keymap))
 
 def main():
     import terminal # only needed for this test
+    global fresh_line
+    fresh_line = True
 
     def edit():
         'event loop for testing inputline'
         while True:
-            # reads single chars, arrow keys won't work
+            # reads single characters only, arrow keys won't work
             key = terminal.getchar()
-            if key in printing_chars or key in command.keymap:
+            if key in printing_chars or key in command.keymap():
                 command.handler(key)
             else:
                 break
 
-    print('Enter and edit a fresh line:')
-    util.putstr(command.prompt)
+    print('Enter and edit a fresh line, using the printing terminal keymap')
+    command.reinit(line='', point=0)
+    util.putstr(command.prompt())
     terminal.set_char_mode()
     # inputline event loop
     edit()
@@ -200,9 +200,10 @@ def main():
     print()
 
     # Caller can reassign prompt, line to edit, and point
-    print('Now edit a previously entered line:')
-    command.reinit(prompt='>> ', line='Here is some text to edit.', point=0)
-    util.putstr(command.prompt)
+    print('Now edit a previously entered line, using the video terminal keymap')
+    fresh_line = False
+    command.reinit(line='Here is some text to edit.', point=0)
+    util.putstr(command.prompt())
     # command.redraw() # no good - resets point
     util.putstr(command.line) # preserves point
     command.move_to_point()   # restore cursor to point
