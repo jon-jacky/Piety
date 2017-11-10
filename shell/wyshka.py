@@ -23,14 +23,32 @@ class Namespace(object): pass
 
 python_mode = False
 
-# FIXME: parameterize by application and console
-def do_command(line):
-    'Send command to Python or app, manage prompt'
+def wyshka(line, do_command=(lambda line: None), command_mode=(lambda: True), 
+           prompt=(lambda: '')):
+    """
+    Send command to Python or application, manage prompt.
+    There is one positional argument with no default:
+
+    line - Command line (string) to execute by Python or the
+    application.
+
+    There are several optional keyword arguments with defaults:
+
+    do_command is a callable with one string argument - the command line -
+    that executes an application command.  Default does nothing.
+
+    command_mode is a callable with no arguments that returns True
+    when the application is in a state where its command interpreter
+    can be switched to Python mode.  Default always returns True.
+
+    prompt is a callable with no arguments that returns the application
+    prompt string.  Default always returns the empty string.
+    """
     global python_mode
-    if app.command_mode:
+    if command_mode():
         if python_mode:
             if len(line) > 1 and line[0] == ':':
-                app.do_command(line[1:])
+                do_command(line[1:])
             elif line == ':':
                 python_mode = False
             else:
@@ -43,10 +61,10 @@ def do_command(line):
             elif pysh.continuation:
                 pysh.push(line)
             else: 
-                app.do_command(line)        
-    else: # not app.command_mode
-        app.do_command(line)
-    return (pysh.prompt if python_mode else app.prompt)
+                do_command(line)        
+    else: # not command_mode()
+        do_command(line)
+    return (pysh.prompt if python_mode else prompt())
 
 # stub application for testing
 
@@ -74,6 +92,11 @@ def app_do_command(line):
 
 app.do_command = app_do_command
 
+do_command = (lambda line: wyshka(line, 
+                                  do_command=app.do_command,
+                                  command_mode=(lambda: app.command_mode),
+                                  prompt=(lambda: app.prompt)))
+                                  
 def main():
     pysh.start()
     app.running = True

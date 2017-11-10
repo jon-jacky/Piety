@@ -69,19 +69,20 @@ class Console(object):
                  edit_keymap=(lambda: inputline.keymap),
                  job_commands=job_commands_keymap):
         """
-        All arguments are optional, with defaults.  Many applications
-        only need the prompt, do_command, and stopped arguments.
+        All arguments are optional keyword arguments with defaults.
+        Many applications only need the prompt, do_command, and
+        stopped arguments.
 
-        prompt - Callable that returns prompt string, which might
-        depend on the state of the application.  Default returns the
-        empty string (no prompt).
+        prompt - callable with no arguments that returns the prompt
+        string, which might depend on the state of the application.
+        Default returns the empty string (no prompt).
 
-        reader - callable to read a keycode, which might be a single
-        character or several (an escape sequence, for example).  Takes
-        no arguments and returns a keycode, or returns empty string ''
-        to indicate char was received but keycode is incomplete.
-        Default is key.Key(), handles single characters and a few ANSI
-        escape sequences.
+        reader - callable with no arguments to read a keycode, which
+        might be a single character or several (an escape sequence,
+        for example).  Takes no arguments and returns a keycode, or
+        returns empty string '' to indicate char was received but
+        keycode is incomplete.  Default is key.Key(), handles single
+        characters and a few ANSI escape sequences.
 
         do_command - callable to execute a command.  Takes one
         argument, the command string.  Default does nothing.
@@ -91,24 +92,27 @@ class Console(object):
         the command string, so stopped() can check if command is
         something like 'exit()' or 'quit' - but stopped() might check
         application state instead.  Default returns False, never exits
-        (but we can still suspend the application using job_commands
-        arg, below).
+        (but we can still suspend the application using the
+        job_commands arg, below).
 
-        command_keymap - callable that returns the keymap for handling
-        commands, which might depend on the application state.
-        Default returns command_keymap defined in this module.
+        command_keymap - callable with no arguments that returns the
+        keymap for handling commands, which might depend on the
+        application state.  Default returns command_keymap defined in
+        this module.
 
-        edit_keymap - callable that returns the keymap for editing the
-        command line, which might depend on the application state.
-        Default returns keymap defined in the inputline module.
+        edit_keymap - callable with no arguments that returns the
+        keymap for editing the command line, which might depend on the
+        application state.  Default returns keymap defined in the
+        inputline module.
 
-        job_commands - job control keymap for suspending the
-        application (not a callable, the keymap itself). Job control
-        keycodes are only effective when they appear alone at the
-        beginning of an empty command line, so they can be the same as
-        keycodes in other keymaps.  For example the job control exit
-        command ^D is the same as the line editing delete command ^D.
-        Default: job_commands_keymap defined in this module.
+        job_commands - job control keymap (not a callable, the keymap
+        itself).  This is a hook for job control keys, for example to
+        suspend the application.  Job control keycodes are only
+        effective when they appear alone at the beginning of an empty
+        command line, so they can be the same as keycodes in other
+        keymaps.  For example the job control exit command ^D is the
+        same as the line editing delete command ^D.  Default:
+        job_commands_keymap defined in this module.
         """
         # initialize attributes from __init__ arguments
         self.prompt = prompt # can be other prompt or '' in other modes
