@@ -23,16 +23,13 @@ class Namespace(object): pass
 
 python_mode = False
 
-def wyshka(line, do_command=(lambda line: None), command_mode=(lambda: True), 
+def wyshka(do_command=(lambda line: None), command_mode=(lambda: True), 
            prompt=(lambda: '')):
     """
-    Send command to Python or application, manage prompt.
-    There is one positional argument with no default:
+    Return a function with one argument (as string, the command line) to 
+    send command to Python or the application.  
 
-    line - Command line (string) to execute by Python or the
-    application.
-
-    There are several optional keyword arguments with defaults:
+    This function has three optional keyword arguments with defaults:
 
     do_command is a callable with one string argument - the command line -
     that executes an application command.  Default does nothing.
@@ -44,27 +41,29 @@ def wyshka(line, do_command=(lambda line: None), command_mode=(lambda: True),
     prompt is a callable with no arguments that returns the application
     prompt string.  Default always returns the empty string.
     """
-    global python_mode
-    if command_mode():
-        if python_mode:
-            if len(line) > 1 and line[0] == ':':
-                do_command(line[1:])
-            elif line == ':':
-                python_mode = False
-            else:
-                pysh.push(line)
-        else: # not python_mode
-            if len(line) > 1 and line[0] == '!':
-                pysh.push(line[1:])
-            elif line == '!':
-                python_mode = True
-            elif pysh.continuation:
-                pysh.push(line)
-            else: 
-                do_command(line)        
-    else: # not command_mode()
-        do_command(line)
-    return (pysh.prompt if python_mode else prompt())
+    def wyshka_do_command(line):
+        global python_mode
+        if command_mode():
+            if python_mode:
+                if len(line) > 1 and line[0] == ':':
+                    do_command(line[1:])
+                elif line == ':':
+                    python_mode = False
+                else:
+                    pysh.push(line)
+            else: # not python_mode
+                if len(line) > 1 and line[0] == '!':
+                    pysh.push(line[1:])
+                elif line == '!':
+                    python_mode = True
+                elif pysh.continuation:
+                    pysh.push(line)
+                else: 
+                    do_command(line)        
+        else: # not command_mode()
+            do_command(line)
+        return (pysh.prompt if python_mode else prompt())
+    return wyshka_do_command
 
 # stub application for testing
 
@@ -92,10 +91,9 @@ def app_do_command(line):
 
 app.do_command = app_do_command
 
-do_command = (lambda line: wyshka(line, 
-                                  do_command=app.do_command,
-                                  command_mode=(lambda: app.command_mode),
-                                  prompt=(lambda: app.prompt)))
+do_command = wyshka(do_command=app.do_command,
+                    command_mode=(lambda: app.command_mode),
+                    prompt=(lambda: app.prompt))
                                   
 def main():
     pysh.start()
