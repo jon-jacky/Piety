@@ -741,15 +741,16 @@ def startup(*filename, **options):
         ps1 = options['p'] 
         prompt = ps1
 
-def main():
+def main(do_command=do_command, prompt=(lambda: prompt)):
     """
     Top level ed command to invoke from Python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
+    do_command argument provides a hook for other modules that add commands.
     """
     global quit
     quit = False
     while not quit:
-        line = input(prompt)
+        line = input(prompt())
         do_command(line)
 
 if __name__ == '__main__':

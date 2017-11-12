@@ -19,15 +19,11 @@ wyshka.py - shell that alternates between the pysh (python) REPL
 
 import pysh
 
-class Namespace(object): pass
-
-python_mode = False
-
 def wyshka(do_command=(lambda line: None), command_mode=(lambda: True), 
-           prompt=(lambda: '')):
+           command_prompt=(lambda: '')):
     """
-    Return a function with one argument (as string, the command line) to 
-    send command to Python or the application.  
+    Return a function with one argument (a string, the command line) that
+    sends a command either to Python or to another application.  
 
     This function has three optional keyword arguments with defaults:
 
@@ -36,13 +32,14 @@ def wyshka(do_command=(lambda line: None), command_mode=(lambda: True),
 
     command_mode is a callable with no arguments that returns True
     when the application is in a state where its command interpreter
-    can be switched to Python mode.  Default always returns True.
+    can be replaced by Python.  Default always returns True.
 
-    prompt is a callable with no arguments that returns the application
-    prompt string.  Default always returns the empty string.
+    command_prompt is a callable with no arguments that returns the
+    application prompt string, which might depend on application
+    state.  Default always returns the empty string.
     """
-    def wyshka_do_command(line):
-        global python_mode
+    def specialized_do_command(line):
+        global python_mode, prompt
         if command_mode():
             if python_mode:
                 if len(line) > 1 and line[0] == ':':
@@ -62,10 +59,13 @@ def wyshka(do_command=(lambda line: None), command_mode=(lambda: True),
                     do_command(line)        
         else: # not command_mode()
             do_command(line)
-        return (pysh.prompt if python_mode else prompt())
-    return wyshka_do_command
+        prompt = pysh.prompt if python_mode else command_prompt()
+        return 
+    return specialized_do_command
 
 # stub application for testing
+
+class Namespace(object): pass
 
 app = Namespace()
 
@@ -91,17 +91,22 @@ def app_do_command(line):
 
 app.do_command = app_do_command
 
+# end stub application
+
+# globals used by wyshka
+python_mode = False
+prompt = app.prompt
+
 do_command = wyshka(do_command=app.do_command,
                     command_mode=(lambda: app.command_mode),
-                    prompt=(lambda: app.prompt))
+                    command_prompt=(lambda: app.prompt))
                                   
 def main():
     pysh.start()
     app.running = True
-    prompt = (pysh.prompt if python_mode else app.prompt)
     while app.running:
         line = input(prompt)
-        prompt = do_command(line)
+        do_command(line)
 
 if __name__ == '__main__':
     main()
