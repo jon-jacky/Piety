@@ -3,7 +3,6 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed.
 """
 
 import re, os, sys
-import time # only used for sleep() in do_commands, FIXME write piety.sleep
 import buffer
 from updates import Op
 
@@ -459,7 +458,7 @@ def q(*args):
     global quit
     quit = True
 
-complete_cmds = 'AbBdDeEfkKlmnpqrstwxXyz' # commands that require no more input
+complete_cmds = 'AbBdDeEfkKlmnpqrstwyz' # commands that require no more input
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -639,62 +638,6 @@ def do_command(line):
             # BUT buf.a requires \n at end of each line
             buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
         return
-
-def do_commands(do_command, lines, echo, delay):
-    """
-    Execute a sequence of command lines.
-     do_command - function to call on each line to execute one command
-     lines - list of lines, one command per line
-     echo - if True, print each line before executing it
-     delay - if not None, wait delay seconds after printing each line
-    FIXME This function *blocks* each time it reaches time.sleep(delay)
-    """
-    for line in lines:
-        line1 = line.rstrip() # remove terminal \n
-        if echo: 
-            print(line1)
-        do_command(line1) 
-        if delay and delay > 0:
-            time.sleep(delay)
-
-falses, trues = ('0','f','F','False'), ('1','t','T','True')
-booleans = falses + trues
-
-def parse_echo_delay(params):
-    'Parse echo and delay from params, a sequence of 0, 1, or 2 strings'
-    valid, echo, delay = True, None, None
-    if params:
-        if params[0] in booleans:
-            echo = False if params[0] in falses else True
-        else:
-            print('%s ? echo, 0 f F False or 1 t T True expected' % params[0])
-            valid = False
-        if len(params) > 1:
-            try:
-                delay = float(params[1])
-            except ValueError:
-                print('%s ? delay, float expected' % params[1])
-                valid = False
-    return valid, echo, delay
-
-def x(*args):
-    """
-    Execute ed commands in another buffer: x(bufname, echo, delay)
-     No start, end arugments - the range is always the entire buffer.
-     bufname is not optional - it cannot be the current buffer.
-     echo - optional, default True; delay - optional, default 0.2 sec
-    """
-    _, _, bufname, params = parse_args(args)
-    bufname = match_prefix(bufname, buffers)
-    if bufname in buffers:
-        valid, echo, delay = parse_echo_delay(params)
-        if valid:
-            echo = echo if echo != None else True
-            delay = delay if delay != None else 0.2
-            do_commands(x_cmd_fcn, buffers[bufname].lines[1:], echo, delay)
-            # cmds in buffer advance dot
-    else:
-        print('? buffer name')
 
 # Hooks to configure ed behavior for display editor
 x_cmd_fcn = do_command  # default: ed do_command does not update display etc.

@@ -1,5 +1,5 @@
 """
-samysh.py - Run a pysh Python shell session.
+salysh.py - Run a pysh Python shell session.
  Use console module instead of Python input to enter and edit command line.
  Contrast to pysh.py main function.
 """

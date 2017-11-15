@@ -1,5 +1,5 @@
-# shells.wyshka - switch between ed commands and python shell
-#                   python3 -i -m wyshka < shells.wyshka
+# shells_api.wyshka - switch between ed commands and python shell + ed API
+#                       python3 -i -m edda < shells_api.wyshka
 #
 # ed commands
 e lines.txt
@@ -19,12 +19,12 @@ line b
 p
 !datetime.datetime.now()
 p
-# Comment out ed API calls for now - ed not imported by shells.wyshka
-#!ed.a('Append single line with ed.a() API call')
+# ed API calls
+!ed.a('Append single line with ed.a() API call')
 5,12p
-#!ed.a("""Append multiple lines with ed.a() API call
-#line i
-#line ii""")
+!ed.a("""Append multiple lines with ed.a() API call
+line i
+line ii""")
 5,15p
 # switch to python shell
 !

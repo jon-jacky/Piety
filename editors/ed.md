@@ -181,19 +181,13 @@ to the system command shell as in classic *ed*.
 
 ## Commands not present in classic ed ##
 
-The *x* and *X* commands execute *ed* commands or Python statements 
-from an editor buffer, to support scripting and testing.
-
-The *x* command requires the buffer name parameter, it cannot execute
-*ed* commands in the current buffer.  It ignores any line address
-arguments; it always executes the entire buffer.  The *X* command has
-no buffer name parameter; it always executes Python statements in the current
-buffer.  It only executes the statements specified by the line address
-arguments, which, if absent, default to the current line (called
-*dot*).  Both *x* and *X* take optional parameters echo (boolean) and
-delay (float), which are helpful for visualizing execution.  With *x*
-the defaults are echo *True* and delay 0.2 sec, with *X* defaults are
-*False* and no delay.
+The *x* command executes *ed* commands from an editor buffer, to
+support scripting and testing.  It requires the buffer name parameter,
+it cannot execute *ed* commands in the current buffer.  It ignores any
+line address arguments; it always executes the entire buffer.  It
+takes optional parameters echo (boolean) and delay (float), which are
+helpful for visualizing execution.  The defaults are echo *True* and
+delay 0.2 sec.
 
 The *y* (yank) command inserts the lines most recently deleted by the
 *d* command (possibly from a different buffer).  A *d* command
