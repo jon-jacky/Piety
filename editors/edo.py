@@ -24,11 +24,11 @@ def x(paramstring):
                     delay = float(params[2])
                 except ValueError:
                     pass # use default
-            # FIXME? Do we still need ed.x_cmd_fcn? or just ed.do_command?
-            do_command = samysh.samysh(do_command=ed.x_cmd_fcn, 
-                                       echo=echo, delay=delay)
+            # do_command passed to samysh is defined below, includes wyshka
+            samysh_do_command = samysh.samysh(do_command=do_command,
+                                              echo=echo, delay=delay)
             for line in ed.buffers[bufname].lines[1:]: # lines[0] always empty
-                do_command(line.rstrip()) # remove terminal \n 
+                samysh_do_command(line.rstrip()) # remove terminal \n 
         else:
             print('? buffer name')
     else:
