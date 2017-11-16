@@ -1,11 +1,14 @@
 """
-edsel - Display editor based on the line editor ed.py.  
+edsel - Display editor based on the line editor ed.py
+   BUT import edo, ed + wyshka + samysh shell and scripting enhancements
 """
 
 import traceback, os
-import ed, frame, display # display only used in cleanup()
+import edo, wyshka, frame, display # display only used in cleanup()
 from updates import Op
 from updatecall import update
+
+ed = edo.ed  # so we can call ed API without edo. prefix
 
 def refresh():
     update(Op.refresh)
@@ -26,7 +29,7 @@ def do_window_command(line):
     else:
         print('? integer 1 or 2 expected at %s' % param_string) 
 
-def do_command(line):
+def edsel_do_command(line):
     'Process one command line without blocking.'
     # try/except ensures we restore display, especially scrolling
     try:
@@ -37,11 +40,15 @@ def do_command(line):
         elif ed.command_mode and line.lstrip().startswith('o'):
             do_window_command(line)
         else:
-            ed.do_command(line) # non-blocking
+            edo.do_command_x(line)
     except BaseException as e:
         cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         ed.quit = True # exit() here raises another exception
+
+do_command = wyshka.wyshka(do_command=edsel_do_command,
+                           command_mode=(lambda: ed.command_mode),
+                           command_prompt=(lambda: ed.prompt))
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
@@ -63,10 +70,10 @@ def main(*filename, **options):
     Top level edsel command to invoke from python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
     """
+    ed.quit = False
     startup(*filename, **options)
     while not ed.quit:
-        ed_prompt = ed.prompt if ed.command_mode else ''
-        line = input(ed_prompt if not ed.pysh.continuation else ed.pysh.ps2)
+        line = input((lambda: wyshka.prompt)())
         do_command(line) # non-blocking
     cleanup()
 

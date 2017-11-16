@@ -34,14 +34,14 @@ def x(paramstring):
     else:
         print('? buffername echo delay')
 
-def x_do_command(line):
+def do_command_x(line):
     'Augment ed.do_command with one more command: x execute script from buffer'
     if ed.command_mode and line.lstrip().startswith('x'):
         x(line.lstrip()[1:])
     else:
         ed.do_command(line)
 
-do_command = wyshka.wyshka(do_command=x_do_command, 
+do_command = wyshka.wyshka(do_command=do_command_x, 
                            command_mode=(lambda: ed.command_mode),
                            command_prompt=(lambda: ed.prompt))
 
