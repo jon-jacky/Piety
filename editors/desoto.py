@@ -23,7 +23,7 @@ def main(*filename,**options):
     edsel.cleanup()
 
 def resume():
-    main() # no filename, options - do not disturb present state.
+    main() # no filename, no options - do not disturb present state.
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

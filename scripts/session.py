@@ -14,7 +14,7 @@ jobs from the Python prompt using function call syntax (which invokes
 each job's __run__ method).  Exit from each job to return to the
 Python interpreter.  Each job (including the Python interpreter)
 preserves its state between invocations, so work in progress can be
-resumed.  Moreover the line editor ed and the display editor eden
+resumed.  Moreover the line editor ed and the display editor desoto
 share the same state including editor buffers and insertion points.
 
 ...$ python3 -m session
@@ -26,7 +26,7 @@ share the same state including editor buffers and insertion points.
 :q
 >> import datetime
 ...
->> eden()
+>> desoto()
 ... display editor appears, shows README.md
 ... continue editing README.md
 :q
@@ -40,35 +40,36 @@ share the same state including editor buffers and insertion points.
 
 """
 
-import sys, piety, pyshc, edc, eden as editor
+import sys, piety, salysh, edda, desoto as editor
 
 session = piety.Session(name='session', input=sys.stdin)
 
 pysh = piety.Job(supervisor=session,
-                 application=pyshc.console,
-                 handler=pyshc.console.handler,
-                 startup=pyshc.console.restart, # no separate pysh.startup
+                 application=salysh.console,
+                 handler=salysh.console.handler,
+                 startup=salysh.console.restart, # no separate pysh.startup
                  cleanup=piety.stop) # sets piety.cycle.running = False
 
 def edstartup():
-    edc.ed.quit = False
-    edc.ed.configure() # restore ed to no display, no updates
-    edc.console.restart()
+    edda.ed.quit = False
+    edda.ed.configure() # restore ed to no display, no updates
+    edda.console.restart()
 
 ed = piety.Job(supervisor=session,
-               application=edc.console,
-               handler=edc.console.handler,
+               application=edda.console,
+               handler=edda.console.handler,
                startup=edstartup)
 
-def edenstartup():
+def desotostartup():
+    editor.ed.quit = False
     editor.edsel.startup(c=12)
     editor.console.restart()
  
 # copied from editor_job.py
-eden = piety.Job(supervisor=session,
+desoto = piety.Job(supervisor=session,
                  application=editor.console,
                  handler=editor.console.handler,
-                 startup=edenstartup,
+                 startup=desotostartup,
                  cleanup=editor.edsel.cleanup)
 
 # So update() can restore cursor after updates from background task
