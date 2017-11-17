@@ -2,11 +2,11 @@
 run_editor.py- Run Task made from display editor Console with Piety event loop.
   Just an exercise, no need for Piety if there is just one application.
   This long-winded module demonstrates the motivation for the Job class.
-  Contrast to eden.py and editor_job.py
+  Contrast to desoto.py and editor_job.py
 """
 
 import sys, piety  
-import eden as editor
+import desoto as editor
 
 task = piety.Task(name='editor',handler=editor.console.handler,input=sys.stdin)
 

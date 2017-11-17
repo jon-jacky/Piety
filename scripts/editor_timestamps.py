@@ -6,7 +6,7 @@ To update ts1 buffer with new timestamp: !print(next(ts1),file=ts1buf)
 """
 
 import timestamp
-import eden as editor 
+import desoto as editor 
 
 # We haven't started display editor yet, window not initialized, 
 #  so use ed commands.
@@ -28,4 +28,4 @@ print(next(ts1), file=ts1buf)
 print(next(ts2), file=ts2buf)
 
 # start interactive editor session, its own blocking main event loop
-editor.main()
+editor.main(c=12)
