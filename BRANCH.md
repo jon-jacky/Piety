@@ -6,8 +6,10 @@ This is the **modes** branch.  Simplify and generalize use of modes to
 select prompts, keymaps, and handlers in *console*.  Add *wyshka*, a
 new command line shell for console applications that provides modes
 for application commands and Python statements.  Shorten and focus
-*ed* by moving out code that supports test scripts.  Also shorten and
-focus ed by moving out *parse_* functions etc.  Begun 25 Oct 2017.
+*ed* by moving out code that supports test scripts to the new *samysh*
+module that can execute a command with optional echo and delay.
+Revise contents of *editors/* to use revised *console*, *wyshka*, and
+*samysh*.  Begun 25 Oct 2017.
 
 Branches recently merged into **master**:
 

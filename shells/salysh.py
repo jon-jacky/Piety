@@ -1,7 +1,7 @@
 """
-salysh.py - Run a pysh Python shell session.
- Use console module instead of Python input to enter and edit command line.
- Contrast to pysh.py main function.
+salysh.py - Run a pysh Python shell session.  Use console module
+ instead of Python builtin input to collect and edit inpu lines
+ without blocking.  Contrast to pysh.py main function.
 """
 
 import pysh, console as con

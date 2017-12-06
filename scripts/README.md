@@ -18,6 +18,9 @@ imported, or started with *python -m* .
 See docstrings (comment headers) and inline comments in each module
 for directions and explanations.
 
+SOME OF THESE SCRIPTS MIGHT NOT WORK BECAUSE WE HAVE CHANGED THE API
+FOR THE CONSOLE MODULE.  THEY WILL BE FIXED OR REPLACED IN THE FUTURE.
+
 - **editor_job.py**: Makes a *Job* instance that runs a display editor
    in a *while* loop.  Does not use *Console*, uses Python *input*.
    Contrast to *eden* and *run_editor*.
@@ -56,4 +59,4 @@ for directions and explanations.
 - **writers.py**: Creates writer tasks used by *embedded* and
     *run_writers*.
 
-Revised December 2016
+Revised December 2017

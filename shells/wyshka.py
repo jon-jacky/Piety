@@ -1,7 +1,9 @@
 """
-wyshka.py - shell that alternates between the pysh (python) REPL
+wyshka.py - Shell that can alternate between pysh (Python)
             and the command line interface to another application program,
-            (such as ed), like this:
+            such as ed.  You can use Python without leaving the application.
+
+It works like this:
 
  :<command>       execute ed <command>
  :!<statement>    push Python <statement> to pysh, return to ed command mode
