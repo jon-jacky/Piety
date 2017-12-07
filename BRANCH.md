@@ -2,7 +2,8 @@
 branches
 ========
 
-This is the **master** branch.  
+This is the **parse_check** branch: separate *parse* and *check* modules
+out of *ed*, other *ed* cleanup.
 
 Branches recently merged into **master**:
 
