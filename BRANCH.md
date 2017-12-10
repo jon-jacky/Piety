@@ -23,14 +23,14 @@ standard library *code* module.  Begun 10 Oct 2017.
 windows concurrently with display editing in other windows.  Begun 14
 Sep 2017.
 
-- **resume**, merged 8 Sep 2017. ed and edsel evisions to restore session
-    by calling main() after quit or crash.  Fix bugs some in display
-    updates.  Begun 14 Aug 2017.
+- **resume**, merged 8 Sep 2017. *ed* and *edsel* revisions to restore
+    session by calling *main()* after quit or crash.  Fix bugs in
+    display updates.  Begun 14 Aug 2017.
 
 - **frame**, merged 12 Aug 2017. Separate display and window
     management code out of *edsel* into new *frame* module.  New
     *frame* does not depend on *edsel*, *ed*, or any other
-    application.  Applications communicate with *frame* using the
-    new *update* and *updatecall* modules.  Begun 8 Mar 2017.
+    application.  Applications communicate with *frame* using the new
+    *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
 Revised 23 Oct 2017
