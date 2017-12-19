@@ -115,7 +115,7 @@ set the region to 12 lines, type: *!cmd_h = 12*
 
 ## Frame commands ##
 
-The $L$ command refreshes the entire frame including all windows, and
+The *L* command refreshes the entire frame including all windows, and
 also the command line in the scrolling region.  This command can be
 used to recover if display contents get corrupted.
 
@@ -132,13 +132,13 @@ seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
 ## Modules ##
 
 **edsel.py** imports *edo*, which in turn imports *ed*.  Here
-**edsel* imports the update* function from the *updates* module and
-*passes it to *ed*, which assigns it to its own *update* function.
-*Then *edsel* collects commands and passes most of them to *ed*.  Then
-**ed* performs the commanded editing operations and calls its newly
-*assigned *update* function to cause *frame* to display their effects.
-*(The default *ed.update* does nothing, so *ed* without edsel* runs
-*without any display.)
+*edsel* imports the *update* function from the *updates* module and
+passes it to *ed*, which assigns it to its own *update* function.
+Then *edsel* collects commands and passes most of them to *ed*.  Then
+*ed* performs the commanded editing operations and calls its newly
+assigned *update* function to cause *frame* to display their effects.
+(The default *ed.update* does nothing, so *ed* without edsel* runs
+without any display.)
 
 The only commands that *edsel* does not pass to *ed* are the windowing
 commands that create, destroy, or rearrange windows, or change

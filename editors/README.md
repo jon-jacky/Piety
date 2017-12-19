@@ -12,11 +12,11 @@ simpler program with fewer features, and adds a few features of its
 own.  Ordered from the most features to the fewest, the editor
 programs are:
 
--- **Display editors**: *eden > desoto > edsel > edo > ed*
+- **Display editors**: *eden > desoto > edsel > edo > ed*
    
--- **Line editors** with command line editing for display terminals: *edda > edo > ed*
+- **Line editors** with command line editing for display terminals: *edda > edo > ed*
 
--- **Line editor** with command line editing teletype style: *etty > ed*
+- **Line editor** with command line editing teletype style: *etty > ed*
 
 Files in this directory:
 
