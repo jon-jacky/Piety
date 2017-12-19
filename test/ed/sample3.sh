@@ -1,7 +1,9 @@
 # sample.sh - test ed.py command mode and input mode  with example from ed.md
 #              additional commands confirm file got written and show its contents
-python3 -c "import ed; ed.ps1=''; ed.prompt = ed.ps1; ed.main()" <<'END'
-e test.txt
+# next line suppresses : prompt, uses blank prompt
+# python3 -c "import ed; ed.ps1=''; ed.prompt = ed.ps1; ed.main()" <<'END'
+python3 -c "import ed; ed.main()" <<'END'
+e sample.txt
 a
 ed() enters ed command mode.  By default, there is no command prompt.
 'e <name>' loads the named file into the current buffer.
@@ -11,9 +13,9 @@ ed() enters ed command mode.  By default, there is no command prompt.
 To quit input mode, type a period by itself at the start of a line.
 .
 w
-B test.txt
+B sample.txt
 1,$p
 q
 END
 echo ""
-echo "Remove test.txt before running this again, to get the same results"
+echo "Remove sample.txt before running this again, to get the same results"
