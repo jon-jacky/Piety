@@ -137,7 +137,7 @@ passes it to *ed*, which assigns it to its own *update* function.
 Then *edsel* collects commands and passes most of them to *ed*.  Then
 *ed* performs the commanded editing operations and calls its newly
 assigned *update* function to cause *frame* to display their effects.
-(The default *ed.update* does nothing, so *ed* without edsel* runs
+(The default *ed.update* does nothing, so *ed* without edsel runs
 without any display.)
 
 The only commands that *edsel* does not pass to *ed* are the windowing

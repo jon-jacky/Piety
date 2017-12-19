@@ -31,7 +31,7 @@ The *wyshka* shell works like this in Python mode:
     >>:<command>     execute ed <command>, return to pysh interpreter
     >>:              switch to ed command mode
 
-So hou can use *:command* to execute an *ed* *command* without exiting
+So you can use *:command* to execute an *ed* *command* without exiting
 Python.
 
 ## Scripting ##
@@ -41,11 +41,11 @@ Python statements from an editor buffer, to support scripting and
 testing.  (The classic *ed* command *x* prompts for an encryption
 key.)
 
-The *x* command requires the buffer name parameter, it cannot execute
-*ed* commands in the current buffer.  It ignores any line address
-arguments; it always executes the entire buffer.  It takes optional
-parameters *echo* (boolean) and *delay* (float), which are helpful for
-visualizing execution.  The defaults are *echo* *True* and *delay* 0.2
-sec.
+The *x* command requires the buffer name parameter.  It does not make
+sense to execute *ed* commands in the same buffer that holds the
+script.  The *x* command ignores any line address arguments; it always
+executes the entire buffer.  It takes optional parameters *echo*
+(boolean) and *delay* (float), which are helpful for visualizing
+execution.  The defaults are *echo* *True* and *delay* 0.2 sec.
 
 Revised Dec 2017

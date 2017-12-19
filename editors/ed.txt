@@ -3,7 +3,6 @@ ed.py summary.  Commands from classic ed:
  (empty command) advance to next line and print
  <address> move to addressed line and print
  = calculate and print line number from line address
- ! execute Python statement
  . exit input mode
  A calculate and print address (same as =)
  a append lines (enter input mode)
@@ -35,11 +34,7 @@ Commands inspired by emacs:
  
  y insert the lines most recently deleted by the d command (from any buffer)
 
-Other commands, that support scripting and testing:
-
- x execute ed commands from all of the named buffer
- X execute Python statements from specified lines in the current buffer
- # in the first column of a command indicates a comment, useful in command scripts
+# in the first column of a command indicates a comment, useful in command scripts
 
 Line addresses:
 
@@ -66,7 +61,7 @@ Command format:
  start,endC parameters
 
  All fields are optional, with helpful defaults.
- Here C is command name, all names are one character, default is l.
+ Here C is command name.  All names are one character, case senstive, default is l.
  start, end are line addresses.
  If both are present, command applies to all lines in range.  
  If only start is present, command applies to that line.  
@@ -80,5 +75,4 @@ Command format:
 
 For more information, type man ed on any Unix-like system.
 
-
-Revised February 2016
+Revised Dec 2017
