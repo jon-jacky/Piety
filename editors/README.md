@@ -3,18 +3,39 @@ editors
 =======
 
 Text editors, including the line editor *ed.py* inspired by the
-    classic *Unix ed*, and a new display editor *edsel*:
+    classic *Unix ed*, and a new display editor *edsel*.
 
-- **buffer.md**: description of *buffer.py*
+There are several top-level editor programs here that can be invoked
+from the system command shell or from the Python prompt.  These
+programs have an onion-like structure where each program imports a
+simpler program with fewer features, and adds a few features of its
+own.  Ordered from the most features to the fewest, the editor
+programs are:
 
-- **buffer.py**: defines *Buffer* class used by *ed.py* and *edsel*
+-- **Display editors**: *eden > desoto > edsel > edo > ed*
+   
+-- **Line editors** with command line editing for display terminals: *edda > edo > ed*
 
-- **desoto.py**: run *edsel.py* display editor including *wyshka*
-  enhanced shell and *samysh* script execution.  Use *console* module
-  instead of Python builtin *input* to collect and edit input lines
-  without blocking.  Contrast to *edsel* *main*.
+-- **Line editor** with command line editing teletype style: *etty > ed*
 
-- **ed.md**: description of *ed.py*.  REVISIONS STILL NEEDED
+Files in this directory:
+
+- **buffer.md**: description of *buffer.py*.
+
+- **buffer.py**: defines *Buffer* class used by *ed.py*.
+
+- **check.py**: check command line arguments and provide default
+    argumentss for *ed.py*.
+
+- **desoto.py**: run *edsel.py* display editor based on *ed.py* line
+  editor.  including *wyshka*.  Like *desoto* imports *edsel*, which
+  in turn imports *edo*, which in turn imports* and long with the
+  *wyshka* enhanced shell and *samysh* script execution.  *desoto*
+  uses the *console* module instead of Python builtin *input* to
+  collect and edit input lines without blocking.  Contrast to *edsel*
+  *main*.
+
+- **ed.md**: description of *ed.py*.
 
 - **ed.py**: line editor inspired by the classic Unix editor *ed*.
   Uses Python builtin *input* to collect and edit command lines and inserted
@@ -33,28 +54,27 @@ Text editors, including the line editor *ed.py* inspired by the
   commands.  Use *console* module instead of Python builtin *input* 
   to collect and edit
   input lines.  Contrast to *edsel* *main* function and *desoto*.
-  MIGHT NOT WORK, WILL BE REVISED/FIXED IN THE FUTURE
+  MIGHT NOT WORK, WILL BE REVISED/FIXED IN THE FUTURE.
 
-- **edo.py**: *ed* + *wyshka*, *ed* with command interpreter that also
-    provides Python + *samysh*, run script from buffer with optional
-    echo and delay.
+- **edo.md**: description of *edo.py*.
+
+- **edo.py**: run *ed.py* line editor along with *wyshka* enhanced
+  shell and *samysh* script execution.  Use Python builtin *input()*
+  to collect and edit input lines with blocking.  Contrast to *ed.py*
+  *main* function and *etty.py*.
 
 - **edsel.md**: description of *edsel.py*.  REVISIONS MAY BE NEEDED.
 
-- **edsel.py**: display editor based on the line editor *ed.py* but
-   import *edo*, *ed* + *wyshka* + *samysh* shell and scripting
-   enhancements
-
-- **edselc.py**: run *edsel* display editor, use *console*
-  module instead of Python builtin *input* to collect and edit
-  input lines.  Contrast to *edsel* *main* function and *eden*.
-  MIGHT NOT WORK, ALREADY SUPERCEDED BY DESOTO.
+- **edsel.py**: display editor based on the line editor *ed.py*.
+  Import *edo*, which runs *ed.py* along with *wyshka* enhanced
+  shell and *samysh* script execution.  Use Python builtin *input()*
+  to collect and edit input lines with blocking.
 
 - **etty.py**: run *ed.py* line editor, use *console*,
   module to collect and edit input lines.  Use
   non-default keymaps with *Command* class to provide retro
   printing-terminal-style editing and history.  Contrast to *ed.py*
-  *main* function and *desoto*.  MIGHT NOT WORK.
+  *main* function and *edda*.  MIGHT NOT WORK.
 
 - **frame.md**: description of *frame.py*, *updates.py*, and *updatecall.py*.
 
@@ -65,6 +85,8 @@ Text editors, including the line editor *ed.py* inspired by the
 - **lines5.txt, lines20.txt, lines40.txt, lines120.txt**: sample text
     files for experimenting with the editor.
 
+- **parse.py**: command line parsing for *ed.py*.
+
 - **updatecall.py**: define function *update* to update display in
      *frame* by making and sending an *UpdateRec*.
 
@@ -73,4 +95,4 @@ Text editors, including the line editor *ed.py* inspired by the
 
 - **window.py**: defines Window class used by *frame*
 
-Revised December 2017
+Revised Dec 2017

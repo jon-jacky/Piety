@@ -1,6 +1,6 @@
 # sample.sh - test ed.py command mode and input mode  with example from ed.md
 #              additional commands confirm file got written and show its contents
-python3 -c "import ed; ed.main()" <<'END'
+python3 -c "import ed; ed.ps1=''; ed.prompt = ed.ps1; ed.main()" <<'END'
 e test.txt
 a
 ed() enters ed command mode.  By default, there is no command prompt.

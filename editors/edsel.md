@@ -74,9 +74,9 @@ command.
 Conventional full-screen display editing is (will be) provided by an
 enhanced version of *edsel* called *eden*.
 
-As in *ed*, you can execute any Python statement at the *edsel*
-command line by preceding it with the *!* character, for example
-*!dir(ed)*.
+**edsel** imports *[edo](edo.md)*, so it includes the *wyshka* shell
+that provides both the *ed* command line and a Python interpreter.
+
 
 ## Window commands ##
 
@@ -131,19 +131,19 @@ seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
 
 ## Modules ##
 
-**edsel.py** is a wrapper around *ed.py*.  Here *edsel* imports the
-*update* function from the *updates* module and passes it to *ed*,
-which assigns it to its own *update* function.  Then *edsel* collects
-commands and passes most of them to *ed*.  Then *ed* performs the
-commanded editing operations and calls its newly assigned *update*
-function to cause *frame* to display their effects.
-(The default *ed.update* does nothing, so *ed* without
-*edsel* runs without any display.)
+**edsel.py** imports *edo*, which in turn imports *ed*.  Here
+**edsel* imports the update* function from the *updates* module and
+*passes it to *ed*, which assigns it to its own *update* function.
+*Then *edsel* collects commands and passes most of them to *ed*.  Then
+**ed* performs the commanded editing operations and calls its newly
+*assigned *update* function to cause *frame* to display their effects.
+*(The default *ed.update* does nothing, so *ed* without edsel* runs
+*without any display.)
 
 The only commands that *edsel* does not pass to *ed* are the windowing
 commands that create, destroy, or rearrange windows, or change
 the input focus from one window to another.   For these, *edsel* itself calls
 *update* to cause *frame* to display the effects.
 
-Revised Aug 2017
+Revised Dec 2017
 

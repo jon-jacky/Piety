@@ -1,6 +1,6 @@
 
 ed.py
-==
+=====
 
 **[ed.py](ed.py)** is a text editor in pure Python inspired by the classic Unix
 editor *ed*.  It provides many of the commands from *ed*, augmented
@@ -9,8 +9,9 @@ later Unix (and Plan 9) editor *sam*.  You can use **ed.py** in a
 command mode that emulates classic *ed*, or use its API to edit from
 the Python prompt or write editing scripts in Python.
 
-**ed.py** can wait for input without blocking, so it can run with a
-cooperative multitasking system such as [Piety](../piety/README.md).
+**ed.py** provides a *do_command* function that runs without blocking,
+so it can run with a cooperative multitasking system such as
+[Piety](../piety/README.md).
 
 **ed.py** provides the command line and internals for the display editor
   [edsel](edsel.md).
@@ -67,7 +68,7 @@ and optional keyword argument for a prompt string:
 
 **ed.py** supports these commands from classic *ed*:
 
- *= ! a c d e E f i k l m p q r s t w z*
+ *= a c d e E f i k l m p q r s t w z*
 
 **ed.py** supports these line address forms from classic *ed*:
 
@@ -79,10 +80,7 @@ and optional keyword argument for a prompt string:
 
 **ed.py** also adds some new commands:
 
- *x X y #*
-
-The *x* and *X* commands execute *ed* commands or Python statements 
-from an editor buffer, to support scripting and testing.
+ *y #*
 
 The *y* (yank) command inserts the lines most recently deleted by the
 *d* command (possibly from a different buffer).  
@@ -133,12 +131,6 @@ After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by typing
 *ed.main()* again.
 
-In *!command*, the *command* is passed to the Python interpreter, not
-to the system command shell as in classic *ed*.  Use this to execute
-Python statements without leaving *ed* command mode.  For example, you
-can use this to change the command prompt at any time during an editing session:
-*!ed.prompt = ':'*
-
 ## Limitations and differences from classic ed ##
 
 **ed.py** does not support these classic *ed* commands: 
@@ -147,9 +139,6 @@ future.
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
-
-**ed.py** supports a new command *x* (execute *ed* commands in buffer)
-instead of the classic *ed* command *x* (prompt for encryption key).
 
 **ed.py** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).
@@ -176,18 +165,7 @@ end).
 The *B* (and *D*) commands accept only one file (or buffer) name argument, 
 not multiple names as in *sam*.
 
-In *!command*, the *command* is passed to the Python interpreter, not
-to the system command shell as in classic *ed*.  
-
 ## Commands not present in classic ed ##
-
-The *x* command executes *ed* commands from an editor buffer, to
-support scripting and testing.  It requires the buffer name parameter,
-it cannot execute *ed* commands in the current buffer.  It ignores any
-line address arguments; it always executes the entire buffer.  It
-takes optional parameters echo (boolean) and delay (float), which are
-helpful for visualizing execution.  The defaults are echo *True* and
-delay 0.2 sec.
 
 The *y* (yank) command inserts the lines most recently deleted by the
 *d* command (possibly from a different buffer).  A *d* command
@@ -198,10 +176,11 @@ also move lines to another buffer.
 The *#* character in the first column of a command indicates a comment.  It is
 useful for annotating command scripts.
 
-In the *b* and *x* commands, the buffer name parameter can be abbreviated 
-by providing a prefix followed by a hyphen.  For example, the command *b key-*
-might switch to the buffer *keyboard.py*.  If more than one buffer name begins
-with the same prefix, *ed.py* just chooses one.
+In the *b* and *x* commands, the buffer name parameter can be
+abbreviated by providing a prefix followed by a hyphen -- a sort of
+"poor person's tab completion".  For example, the command *b key-*
+might switch to the buffer *keyboard.py*.  If more than one buffer
+name begins with the same prefix, *ed.py* just chooses one.
 
 ## API ##
 
@@ -228,10 +207,11 @@ triple-quoted string.  (The dots ... preceding each continuation line
 are printed by the interactive Python interpreter, they are not part
 of the string argument.)
 
-For every supported *ed* command there is a corresponding API function
-with the same name (the *A* (for address) function implements *=*).
-Usually all of the arguments are optional (the functions are all
-defined with *args argument lists).
+For every supported *ed* command there is a corresponding API *command
+function* with the same single-letter name (the *A* (for address) function
+implements *=*).  Usually all of the arguments are optional (the
+functions are all defined with *args argument lists).    Each API command
+function gathers and checks its own arguments, providing defaults as needed.
 
 Arguments appear in the same order as they do in command mode, so the
 *ed* print commands *p* *1p* and *1,4p* correspond to the API print
@@ -273,29 +253,26 @@ Python API described above, including command line parsing, argument
 checking, and error messages.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
 
-**ed.py** imports *[buffer.py](buffer.py)*, which provides the *Buffer* class,
-which defines the core data structure and the internal API for
-updating it.  Many *Buffer* methods correspond to functions in the
-API, but here each method has a fixed argument list, provides no error
-checking, and no error messages or progress messages.  The *Buffer*
-class does not access the console, but updates text buffers and reads
-and writes files.
+**ed.py** imports the *[buffer.py](buffer)* module, which provides the
+*Buffer* class, which defines the core data structure and the internal
+API for updating it.  Many *Buffer* methods correspond to functions in
+the API, but here each method has a fixed argument list, provides no
+error checking, and no error messages or progress messages.  The
+*Buffer* class does not access the console, but updates text buffers
+and reads and writes files.
 
-The *Buffer* class provides a *write* method so other code can update
-text buffers without using the *ed.py* user interface or API, by
-calling the standard Python *print* function, with the *file=...* optional
-argument pointing to the buffer.
+**ed.py** imports the *[parse.py](parse)* module that provides
+functions for parsing the *ed* command line, and the
+*[check.py](check)* module that provides functions for checking
+command arguments and supplying default arguments.
 
-The *buffer* module defines an *update* function that can optionally
-be reassigned to a callable that may be used to update a display
-whenever buffer contents change.  The default definition of this
-function does nothing (has an empty body), so the *buffer* module can
-be used by programs like *ed.py* that do not use a display.
+**ed.py** imports the *Op* data type from the *[updates.py](updates)*
+module.  This is only used by display editors that import *ed*.  When
+*ed* is used without a display, the *update* function that uses *Op* does
+nothing.
 
-**ed.py** also imports *[pysh.py](../shell/pysh.py)*, which provides a
-callable Python interpreter used by the *!* command.  
+The *buffer*, *parse*, *check*, and *updates*  modules are included in this
+directory.   **ed.py** also uses the Python standard library modules
+*re*, *os*, and *sys*.  Other than that, **ed.py** has no dependencies.
 
-The *buffer* and *pysh* modules are included here.  Other than Python
-itself, *ed.py* has no dependencies.
-
-Revised Aug 2017
+Revised Dec 2017

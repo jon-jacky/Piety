@@ -2,7 +2,7 @@
 buffer.py
 =========
 
-**buffer.py** defines the *Buffer* class for line-oriented text editrs.
+**buffer.py** defines the *Buffer* class for line-oriented text editors.
 
 In this class, the text in the buffer is a list of strings
 named *lines*.  Each string in the list is a single line of text that
