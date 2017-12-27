@@ -1,0 +1,113 @@
+:::42, 0 lines
+:test_ed.txt, 0 lines
+:ed.py.txt, 441 lines
+:C M Buffer            Size  File
+.   ed.py.txt          441  ed.py.txt
+    main                 0  None
+    42                   0  42
+    test_ed.txt          0  test_ed.txt
+:.   ed.py.txt          441  ed.py.txt
+:"""
+ed.py - ed is the standard text editor.
+
+ed is a line-oriented text editor written in pure Python.  It provides
+some of the commands from the classic Unix editor ed, augmented with
+commands for managing multiple buffers and files from the later Unix
+:(and Plan 9) editor, sam.  You can use it in a command mode that
+:emulates Unix ed, or use its API to edit from the Python prompt or
+:write editing scripts in Python.
+:
+:For more explanation see ed.md and the docstrings here.
+:For more explanation see ed.md and the docstrings here.
+:        start, end, string = 0, 1, '' # empty buffer, 0:1 is a valid slice
+:        start, end, string = 0, 1, '' # empty buffer, 0:1 is a valid slice
+:100
+:441
+:.   ed.py.txt          441  ed.py.txt
+:C M Buffer            Size  File
+.   ed.py.txt          441  ed.py.txt
+    main                 0  None
+    42                   0  42
+    test_ed.txt          0  test_ed.txt
+:.   test_ed.txt          0  test_ed.txt
+:.   test_ed.txt          0  test_ed.txt
+:C M Buffer            Size  File
+    ed.py.txt          441  ed.py.txt
+    main                 0  None
+    42                   0  42
+.   test_ed.txt          0  test_ed.txt
+:? buffer name
+:ed.py.txt, buffer deleted
+:C M Buffer            Size  File
+    main                 0  None
+    42                   0  42
+.   test_ed.txt          0  test_ed.txt
+::Line 3
+:Line 1
+Line 2
+Line 3
+::Line C
+:Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+::Line c
+:Line a
+Line b
+Line c
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+:Line 1
+::Line iii
+:Line a
+Line b
+Line c
+Line i
+Line ii
+Line iii
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+::Line III
+:Line a
+Line b
+Line c
+Line i
+Line ii
+Line iii
+Line I
+Line II
+Line III
+Line 1
+Line 2
+Line 3
+Line A
+Line B
+Line C
+:test_ed.txt, 15 lines
+:Line A
+:Line A
+::Line B
+::Line 3
+:Line a
+Line b
+Line c
+Line i
+Line ii
+Line iii
+Line I
+Line II
+Line III
+Line 1
+Line 2
+Line 3
+:::

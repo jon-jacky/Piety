@@ -1,0 +1,39 @@
+::line20.txt, 20 lines
+:C M Buffer            Size  File
+.   main                20  line20.txt
+:ed.md.txt, 248 lines
+:C M Buffer            Size  File
+.   ed.md.txt          248  ed.md.txt
+    main                20  line20.txt
+:ed.py.txt, 441 lines
+:C M Buffer            Size  File
+    ed.md.txt          248  ed.md.txt
+.   ed.py.txt          441  ed.py.txt
+    main                20  line20.txt
+:.   main                20  line20.txt
+:line01
+line02
+line03
+line04
+line05
+:.   ed.md.txt          248  ed.md.txt
+:
+ed
+==
+
+**ed** is a text editor written in pure Python.  It can run as a
+:.   ed.py.txt          441  ed.py.txt
+:"""
+ed.py - ed is the standard text editor.
+
+ed is a line-oriented text editor written in pure Python.  It provides
+some of the commands from the classic Unix editor ed, augmented with
+:ed.md.txt, buffer deleted
+:C M Buffer            Size  File
+.   ed.py.txt          441  ed.py.txt
+    main                20  line20.txt
+:ed.py.txt, buffer deleted
+:C M Buffer            Size  File
+.   main                20  line20.txt
+:? Can't delete main buffer
+:::
