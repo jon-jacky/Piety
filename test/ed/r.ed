@@ -1,0 +1,15 @@
+# r.ed - - Test ed.py r(ead)
+#
+a
+Line 0
+Line 1
+Line 2
+.
+1,$p
+b
+r
+101r rtest0.txt
+r rtest0.txt
+1,$p
+1r rtest1.txt
+1,$p

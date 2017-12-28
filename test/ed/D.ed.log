@@ -1,0 +1,29 @@
+:::new.txt, 0 lines
+::C M Buffer            Size  File
+. * new.txt              1  new.txt
+    main                 0  None
+:? unsaved changes, repeat D to delete
+:new.txt, buffer deleted
+:C M Buffer            Size  File
+.   main                 0  None
+:new1.txt, 0 lines
+::C M Buffer            Size  File
+. * new1.txt             1  new1.txt
+    main                 0  None
+:new1.txt, 1 lines
+:new1.txt, buffer deleted
+:C M Buffer            Size  File
+.   main                 0  None
+:new2.txt, 0 lines
+::C M Buffer            Size  File
+. * new2.txt             1  new2.txt
+    main                 0  None
+:new2.txt, 1 lines
+:.   main                 0  None
+:C M Buffer            Size  File
+    new2.txt             1  new2.txt
+.   main                 0  None
+:new2.txt, buffer deleted
+:C M Buffer            Size  File
+.   main                 0  None
+::

@@ -1,0 +1,22 @@
+::::ed is an editor based on the classic Unix editor ed.
+Again we mention ed.  This is test of ed.
+In this line there is no mention of it.
+In this line there is a single mention of ed.
+And in this last line we mention ed, then ed again, twice altogether.
+:And in this last line we mention ed, then ed again, twice altogether.
+::And in this last line we mention emacs, then emacs again, twice altogether.
+::And in this last line we mention vi, then emacs again, twice altogether.
+::emacs is an emacsitor basemacs on the classic Unix emacsitor emacs.
+::vi is an emacsitor basemacs on the classic Unix emacsitor emacs.
+::vi is an editor based on the classic Unix editor ed.
+::vi is an editor based on the classic Unix editor ed.
+Again we mention vi.  This is test of vi.
+In this line there is no mention of it.
+In this line there is a single mention of vi.
+And in this last line we mention vi, then emacs again, twice altogether.
+::vi is an editor based on the classic Unix editor ed.
+Again we mention emacs.  This is test of vi.
+In this line there is no mention of it.
+In this line there is a single mention of emacs.
+And in this last line we mention vi, then emacs again, twice altogether.
+:

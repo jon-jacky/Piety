@@ -1,0 +1,19 @@
+# urc.ed - Test ed.py functions b(uffer), r(ead), c(hange)
+#          don't print buffer after every command, just at end
+b new.txt
+n
+r test_cmd.py
+1,$p
+10l
+r README.md.txt
+p
+c
+### This is the changed line ###
+.
+b
+1,$p
+27l
+.,$c
+### This line replaces all that follows ###
+.
+1,$p

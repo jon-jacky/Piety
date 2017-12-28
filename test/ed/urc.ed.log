@@ -1,0 +1,101 @@
+:::.   new.txt              0  new.txt
+:C M Buffer            Size  File
+    main                 0  None
+.   new.txt              0  new.txt
+:test_cmd.py, 23 lines
+:"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print('> %s%s # %s' % (f.__name__, args, descrip))
+    f(*args) if args != ((),) else f() # empty args special case
+    print("> b() # print buffer status")
+    b()
+    if buf.lines:
+        print("> p() # print the current line")
+        p()
+    saved_dot = o() # save dot because...
+
+    # print the entire buffer leaves dot at the last line
+    print("> p(1,S())   # print the entire buffer")
+    p(1,S())
+    print()
+    buf.dot = saved_dot # put it back where it was, undo effect of p(...)
+
+:    f(*args) if args != ((),) else f() # empty args special case
+:README.md.txt, 17 lines
+:    instances
+::. * new.txt             40  new.txt
+:"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print('> %s%s # %s' % (f.__name__, args, descrip))
+    f(*args) if args != ((),) else f() # empty args special case
+Piety samples
+=============
+
+Sample applications to run under the Piety scheduler.  For directions,
+see the docstrings in each module, and the *.md* files.  More tests are
+in *Piety/tests*.
+
+- **ed**: text editor
+
+- **ed.md**: description of *ed*
+
+- **test_ed, test_ed_small, test_ed_urc**: test, demonstrate Python API for *ed*
+
+- **writer**: write to files to demonstrate interleaving concurrency
+
+- **test_writers**: demonstrate *writer* with two concurrent *Writer*
+### This is the changed line ###
+    print("> b() # print buffer status")
+    b()
+    if buf.lines:
+        print("> p() # print the current line")
+        p()
+    saved_dot = o() # save dot because...
+
+    # print the entire buffer leaves dot at the last line
+    print("> p(1,S())   # print the entire buffer")
+    p(1,S())
+    print()
+    buf.dot = saved_dot # put it back where it was, undo effect of p(...)
+
+:### This is the changed line ###
+::"""
+test_cmd - utility function for testing ed.py
+
+"""
+
+from ed import *
+
+def test_cmd(f, descrip, *args):
+    print('> %s%s # %s' % (f.__name__, args, descrip))
+    f(*args) if args != ((),) else f() # empty args special case
+Piety samples
+=============
+
+Sample applications to run under the Piety scheduler.  For directions,
+see the docstrings in each module, and the *.md* files.  More tests are
+in *Piety/tests*.
+
+- **ed**: text editor
+
+- **ed.md**: description of *ed*
+
+- **test_ed, test_ed_small, test_ed_urc**: test, demonstrate Python API for *ed*
+
+- **writer**: write to files to demonstrate interleaving concurrency
+
+- **test_writers**: demonstrate *writer* with two concurrent *Writer*
+### This line replaces all that follows ###
+:

@@ -1,0 +1,48 @@
+# small.ed - test commands on small buffers of 0, 1, 2 lines
+#
+B test_ed_small.txt
+i
+Line i
+.
+1,$p
+d
+1,$p
+a
+Line a
+.
+1,$p
+d
+1,$p
+i
+Line i
+.
+1,$p
+1l
+a
+Line a
+.
+1,$p
+w
+d
+i
+Line ii
+.
+w test_ed_small_2.txt
+d
+b new.txt
+a
+Line 1
+.
+a
+Line 2
+.
+1,$p
+c
+Changed line 2
+.
+1c
+Changed line 1
+.
+1,$p
+# Remove test_ed_small.txt and test_ed_small_2.txt
+# before running this script again, to obtain the same result

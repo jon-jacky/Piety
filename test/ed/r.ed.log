@@ -1,0 +1,18 @@
+::::Line 0
+Line 1
+Line 2
+:. * main                 3  None
+:? no current filename
+:? invalid address
+:rtest0.txt, 1 lines
+:Line 0
+Line 1
+Line 2
+This is rtest0
+:rtest1.txt, 1 lines
+:Line 0
+This is rtest1
+Line 1
+Line 2
+This is rtest0
+:

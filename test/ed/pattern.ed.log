@@ -1,0 +1,36 @@
+:::ed.py.txt, 441 lines
+:                buf().dot = i
+:"""
+:ed.py - ed is the standard text editor.
+:.   ed.py.txt          441  ed.py.txt
+:ed is a line-oriented text editor written in pure Python.  It provides
+:.   ed.py.txt          441  ed.py.txt
+:Limitations: for now line addresses must be integers. text patterns
+:.   ed.py.txt          441  ed.py.txt
+:        New text buffer
+:.   ed.py.txt          441  ed.py.txt
+:Limitations: for now line addresses must be integers. text patterns
+:.   ed.py.txt          441  ed.py.txt
+:ed is a line-oriented text editor written in pure Python.  It provides
+:.   ed.py.txt          441  ed.py.txt
+:ed.py - ed is the standard text editor.
+:.   ed.py.txt          441  ed.py.txt
+:ed is a line-oriented text editor written in pure Python.  It provides
+:"""
+:ed.py - ed is the standard text editor.
+:.   ed.py.txt          441  ed.py.txt
+:ed is a line-oriented text editor written in pure Python.  It provides
+:.   ed.py.txt          441  ed.py.txt
+:Limitations: for now line addresses must be integers. text patterns
+:.   ed.py.txt          441  ed.py.txt
+:        New text buffer
+:.   ed.py.txt          441  ed.py.txt
+:Limitations: for now line addresses must be integers. text patterns
+:.   ed.py.txt          441  ed.py.txt
+:ed is a line-oriented text editor written in pure Python.  It provides
+:.   ed.py.txt          441  ed.py.txt
+:ed.py - ed is the standard text editor.
+:.   ed.py.txt          441  ed.py.txt
+:ed.py - ed is the standard text editor.
+:.   ed.py.txt          441  ed.py.txt
+:
