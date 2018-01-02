@@ -2,10 +2,15 @@
 branches
 ========
 
-This is the **parse_check** branch: separate *parse* and *check* modules
-out of *ed*, other *ed* cleanup.
+This is the **master** branch.  
 
 Branches recently merged into **master**:
+
+- **parse_check**, merged 2 Jan 2018.  Separate *parse* and *check*
+modules out of *ed*.  Remove unnecessary globals from *ed*.  Simplify
+*ed* *do_command*.  In *Piety/test/ed*, revise and add *.ed* and
+*.edo* scripts, revise and add reference *.log* and *.txt* files, add
+*.sh* scripts for test automation.  Begun 6 Dec 2017.
 
 - **modes**, merged 6 Dec 2017.  Simplify and generalize use of modes to
 select prompts, keymaps, and handlers in *console*.  Add *wyshka*, a
