@@ -77,7 +77,9 @@ or compared to an earlier reference to check whether behavior has changed.
 The *.log* files are output from *python test_ed.py > test_ed.log*,
 *./test_ed.sh > test_ed.sh.log* etc.  The contents of the *.log* file
 in this repository should be the same as the output you get when you
-run that test script on your recent version of *ed.py*.
+run that test script on your recent version of *ed.py*, except dictionary
+elements might be printed in different orders (including the lines printed
+by the *ed* *n* command).
 
 The *.txt* files here are samples used to demonstrate text editing.
 The *ed.py.txt*, *ed.md.txt*, and *README.md.txt* here are not
@@ -90,9 +92,12 @@ run that test script on your recent version of *ed.py*.
 
 The command scripts *check_ed.sh* and *check_ed_txt.sh* automate
 running *.ed* or *.edo* scripts non-interactively and using the *diff*
-command to compare the resulting *.log* and *.txt* files against reference
-versions.  These two scripts are used by *check_many.sh* to run all
-the *.ed* and *.edo* scripts.
+command to compare the resulting *.log* and *.txt* files against
+reference versions.  If the *diff* commands produce no output (or the
+only differences are in the order of dictionary elements, or the order
+of the buffers listed by the *ed* *n* command), then the test invoked
+by the script passed.  These two scripts are used by *check_many.sh*
+to run all the *.ed* and *.edo* scripts.
 
 Revised Jan 2018
 
