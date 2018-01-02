@@ -38,4 +38,4 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised 23 Oct 2017
+Revised 2 Jan 2018
