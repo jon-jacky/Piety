@@ -1,29 +1,29 @@
-:::new.txt, 0 lines
+:::D.txt, 0 lines
 ::C M Buffer            Size  File
-. * new.txt              1  new.txt
+. * D.txt                1  D.txt
     main                 0  None
 :? unsaved changes, repeat D to delete
-:new.txt, buffer deleted
+:D.txt, buffer deleted
 :C M Buffer            Size  File
 .   main                 0  None
-:new1.txt, 0 lines
+:D.txt, 0 lines
 ::C M Buffer            Size  File
-. * new1.txt             1  new1.txt
+. * D.txt                1  D.txt
     main                 0  None
-:new1.txt, 1 lines
-:new1.txt, buffer deleted
+:D.txt, 1 lines
+:D.txt, buffer deleted
 :C M Buffer            Size  File
 .   main                 0  None
-:new2.txt, 0 lines
+:D1.txt, 0 lines
 ::C M Buffer            Size  File
-. * new2.txt             1  new2.txt
     main                 0  None
-:new2.txt, 1 lines
+. * D1.txt               1  D1.txt
+:D1.txt, 1 lines
 :.   main                 0  None
 :C M Buffer            Size  File
-    new2.txt             1  new2.txt
 .   main                 0  None
-:new2.txt, buffer deleted
+    D1.txt               1  D1.txt
+:D1.txt, buffer deleted
 :C M Buffer            Size  File
 .   main                 0  None
 ::

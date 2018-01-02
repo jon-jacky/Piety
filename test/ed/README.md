@@ -13,11 +13,22 @@ commands, along with shell commands to start *ed* and read the *ed*
 commands from the file.  To execute these tests, run them as shell
 scripts.
 
+The *.sh* files whose basenames end in *3* (for example *sample3.sh*)
+use the *python3* command instead of *python* to run Python version 
+3 on systems where the *python* command runs Python version 2.
+
 The *.ed* files also test command mode.  They contain sequences of
 *ed* commands.  Each *.ed* file contains the same *ed* commands as in
 the corresponding *.sh* files, but without any shell commands and
-without the *ed* *q* (quit) command.  We use *.ed* scripts in two
-ways: interactively and non-interactively.
+without the *ed* *q* (quit) command.  
+
+The *.edo* files are like *.ed* files except, in addition to *ed*
+commands, they also contain Python commands prefixed with *!*.  The
+*ed* program cannot process tjhese commands; it is necessary to use
+*edo*.
+
+We use *.ed* and *.edo* scripts in two ways: interactively and
+non-interactively.
 
 It is helpful to execute *.ed* test scripts interactively at first to
 observe the behavior and confirm that the editor performs as intended.
@@ -68,10 +79,6 @@ The *.log* files are output from *python test_ed.py > test_ed.log*,
 in this repository should be the same as the output you get when you
 run that test script on your recent version of *ed.py*.
 
-The *.sh* files whose basenames end in *3* (for example *sample3.sh*)
-use the *python3* command instead of *python* to run Python version 
-3 on systems where the *python* command runs Python version 2.
-
 The *.txt* files here are samples used to demonstrate text editing.
 The *ed.py.txt*, *ed.md.txt*, and *README.md.txt* here are not
 up-to-date with their original namesakes.
@@ -81,4 +88,11 @@ with the corresponding names.   The contents of the *.txt.save* file
 in this repository should be the same as the *.txt* file you get when you
 run that test script on your recent version of *ed.py*.
 
-Revised December 2017
+The command scripts *check_ed.sh* and *check_ed_txt.sh* automate
+running *.ed* or *.edo* scripts non-interactively and using the *diff*
+command to compare the resulting *.log* and *.txt* files against reference
+versions.  These two scripts are used by *check_many.sh* to run all
+the *.ed* and *.edo* scripts.
+
+Revised Jan 2018
+

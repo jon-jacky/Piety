@@ -1,6 +1,6 @@
 # small.ed - test commands on small buffers of 0, 1, 2 lines
 #
-B test_ed_small.txt
+B small.txt
 i
 Line i
 .
@@ -22,12 +22,12 @@ a
 Line a
 .
 1,$p
-w
+w 
 d
 i
 Line ii
 .
-w test_ed_small_2.txt
+w small2.txt
 d
 b new.txt
 a
@@ -44,5 +44,4 @@ Changed line 2
 Changed line 1
 .
 1,$p
-# Remove test_ed_small.txt and test_ed_small_2.txt
-# before running this script again, to obtain the same result
+# Remove small.txt before running this script again, to obtain the same result

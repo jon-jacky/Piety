@@ -19,6 +19,6 @@ i
 Here is a new line at the start
 .
 1,3p 
-w ed.py.txt.1
+w ef.txt
 f
 e

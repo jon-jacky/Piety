@@ -22,6 +22,7 @@ def do_command(chars):
         dot = buf.dot
         console.initline = buf.lines[dot].rstrip() # strip \n at eol
         console.initpoint = 0
+        # FIXME ed.cmd_name is gone, and edsel no longer imports ed.
         edsel.ed.cmd_name = 'c' # needed by edsel functions, following
         edsel.ed.command_mode = False 
         win = edsel.frame.win

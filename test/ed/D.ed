@@ -1,6 +1,6 @@
 # D.sh - extracted from test_ed_D.sh, test D delete buffer command
 #
-B new.txt
+B D.txt
 i
 Here is a line
 .
@@ -8,7 +8,7 @@ n
 D
 D
 n
-B new1.txt
+B D.txt
 i
 Here is a line
 .
@@ -16,7 +16,7 @@ n
 w
 D
 n
-B new2.txt
+B D1.txt
 i 
 Here is a line
 .
@@ -24,6 +24,6 @@ n
 w
 b main
 n
-D new2.txt
+D D1.txt
 n
-# "Remove new1.txt, new2.txt before running script again to obtain same results"
+# "Remove D.txt, D1.txt before running script again to obtain same results"

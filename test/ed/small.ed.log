@@ -1,4 +1,4 @@
-:::test_ed_small.txt, 0 lines
+:::small.txt, 0 lines
 ::Line i
 ::? invalid address
 ::Line a
@@ -7,11 +7,11 @@
 :Line i
 ::Line i
 Line a
-:test_ed_small.txt, 2 lines
-:::test_ed_small_2.txt, 2 lines
+:small.txt, 2 lines
+:::small2.txt, 2 lines
 ::.   new.txt              0  new.txt
 :::Line 1
 Line 2
 :::Changed line 1
 Changed line 2
-:::
+::

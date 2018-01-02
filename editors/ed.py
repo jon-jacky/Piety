@@ -361,37 +361,27 @@ def q(*args):
     global quit
     quit = True
 
-# State variables that must persist between cmd invocations during input mode
+# Variables that must persist between do_command invocations, imported elsewhere
 ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
 ps2 = ''  # ed input mode prompt, empty
 prompt = ps1
 command_mode = True # alternates with input mode used by a,i,c commands
-cmd_name = ''
-args = []
-
-# Assigned from parse.command return values before any insertions or deletions
-start = 0  # line address, first line of affected region, often dot
-end = 0    # line address, last line of affected region
-dest = 0   # line address, destination for m(ove), t(ransfer, copy) commands
 
 def do_command(line):
     """
     Process one input line without blocking in ed command or input mode
     Update buffers and control variables: command_mode,cmd_name,args,start,end
     """
-    global command_mode, prompt, cmd_name, args, start, end, dest
+    global command_mode, prompt
     if command_mode:
         if line and line[0] == '#': # comment, do nothing
             return 
         items = parse.command(buf, line)
         if items[0] == 'ERROR':
-            return None # parse.command already printed error message
+            return # parse.command already printed error message
         else:
             tokens = tuple([ t for t in items if t != None ])
         cmd_name, args = tokens[0], tokens[1:]
-        start, end, params, _ = parse.arguments(args) # might be int or None
-        start, end = check.mk_range(buf, start, end) # int only
-        dest, _ = (None,None) if params is None else parse.line_address(buf, params)
         if cmd_name in parse.complete_cmds:
             globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in parse.input_cmds:
@@ -400,6 +390,8 @@ def do_command(line):
             # Instead of using buf.a,i,c, we handle input mode cmds inline here
             # We add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once
+            start, end, params, _ = parse.arguments(args) # might be int or None
+            start, end = check.mk_range(buf, start, end) # int only
             if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
                     else check.range_ok(buf, start, end)):
                 print('? invalid address')
