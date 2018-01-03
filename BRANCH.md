@@ -2,7 +2,8 @@
 branches
 ========
 
-This is the **master** branch.  
+This is the **nojob** branch: investigate eliminating the *Job* class.  It 
+seems a *Session* should be able to connect directly to a *Console*.
 
 Branches recently merged into **master**:
 
