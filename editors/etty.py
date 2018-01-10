@@ -6,13 +6,15 @@ etty.py - Run ed line editor session, but use console module
 
 import ed, console as con, terminal, inputline
 
-console = con.Console(prompt=':', reader=terminal.getchar,
+console = con.Console(prompt=(lambda: ed.prompt), 
+                      reader=terminal.getchar,
                       do_command=ed.do_command,
                       stopped=(lambda command: ed.quit),
                       # specify two non-default tty_keymap 
-                      command_keymap=con.command_tty_keymap,
-                      edit_keymap=inputline.tty_keymap,
-                      mode=(lambda: ed.command_mode))
+                      command_keymap=(lambda: (con.command_tty_keymap 
+                                               if ed.command_mode 
+                                               else con.insert_keymap)),
+                      edit_keymap=(lambda: inputline.tty_keymap))
 
 def main():
     ed.startup()

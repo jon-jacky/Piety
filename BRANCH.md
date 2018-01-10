@@ -2,8 +2,9 @@
 branches
 ========
 
-This is the **nojob** branch: investigate eliminating the *Job* class.  It 
-seems a *Session* should be able to connect directly to a *Console*.
+This is the **nojob** branch: investigate eliminating the *Job* class.
+It seems a *Session* should be able to connect directly to a
+*Console*.  Begun 2 Jan 2018.
 
 Branches recently merged into **master**:
 

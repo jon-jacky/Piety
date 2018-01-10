@@ -28,9 +28,8 @@ Files in this directory:
     argumentss for *ed.py*.
 
 - **desoto.py**: run *edsel.py* display editor based on *ed.py* line
-  editor.  including *wyshka*.  Like *desoto* imports *edsel*, which
-  in turn imports *edo*, which in turn imports* and long with the
-  *wyshka* enhanced shell and *samysh* script execution.  *desoto*
+  editor.  Includes *wyshka* enhanced shell and *samysh* script 
+  execution.  *desoto*
   uses the *console* module instead of Python builtin *input* to
   collect and edit input lines without blocking.  Contrast to *edsel*
   *main*.
