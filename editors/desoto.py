@@ -12,9 +12,9 @@ ed = edsel.edo.ed  # so we can call ed API without edsel.edo. prefix
 console = con.Console(prompt=(lambda: wyshka.prompt), 
                       do_command=edsel.do_command,
                       stopped=(lambda command: ed.quit),
-                      command_keymap=(lambda: (con.command_keymap 
-                                               if ed.command_mode 
-                                               else con.insert_keymap)))
+                      keymap=(lambda: (con.command_keymap 
+                                       if ed.command_mode 
+                                       else con.insert_keymap)))
 
 def main(*filename,**options):
     ed.quit = False
@@ -28,4 +28,3 @@ def resume():
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
     main(*filename, **options)
-

@@ -12,9 +12,9 @@ ed = edo.ed  # so we can call ed API without edo. prefix
 console = con.Console(prompt=(lambda: wyshka.prompt), 
                       do_command=edo.do_command,
                       stopped=(lambda command: ed.quit),
-                      command_keymap=(lambda: (con.command_keymap 
-                                               if ed.command_mode 
-                                               else con.insert_keymap)))
+                      keymap=(lambda: (con.command_keymap 
+                                       if ed.command_mode 
+                                       else con.insert_keymap)))
 
 def main():
     ed.quit = False
