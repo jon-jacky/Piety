@@ -63,12 +63,21 @@ command_keys = {
     keyboard.C_p: 'previous_history',
     keyboard.up: 'previous_history',
     keyboard.down: 'next_history',
+}
+
+# These keys have job control function only if they are alone at start of line.
+# Otherwise they can have editing function - C_d appears in lineedit_keymap.
+job_control_keys = {
+    keyboard.C_d: 'ctrl_d',
+    keyboard.C_z: 'ctrl_z'
     }
 
 # Combine the keymaps - command mode adds several keys to insert mode,
 #  also reassigns method for keyboard.cr (RET key)
+# job_control_keys replaces ^D del in insert_keymap with eof and adds ^Z suspend
 command_keymap = insert_keymap.copy()
 command_keymap.update(command_keys)
+command_keymap.update(job_control_keys)
 
 # This keymap works on a printing terminal.
 lineedit_tty_keymap = {
@@ -97,6 +106,7 @@ command_tty_keys = {
 # This combined keymap works on a printing terminal.
 command_tty_keymap = insert_tty_keymap.copy()
 command_tty_keymap.update(command_tty_keys)
+command_tty_keymap.update(job_control_keys)
 
 class Console(object):
     'Class that implements skeleton for non-blocking command line application'
@@ -131,10 +141,10 @@ class Console(object):
         (but we can still suspend the application using the
         job_commands arg, below).
 
-        command_keymap - callable with no arguments that returns the
-        keymap for handling commands, which might depend on the
-        application state.  Default returns command_keymap defined in
-        this module.
+        keymap - callable with no arguments that returns the keymap
+        for handling both commands and input text.  Keymap contents
+        might depend on the application state.  Default returns
+        command_keymap defined in this module.
         """
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string 
@@ -158,7 +168,8 @@ class Console(object):
         For testing only - blocks, can only run one Console at a time this way.
         """
         self.restart()
-        while not self.stopped():
+        while not (self.stopped()
+                   or self.command in job_control_keys):
             self.handler() # blocks in self.reader at each character
         self.restore()
 
@@ -188,16 +199,29 @@ class Console(object):
         else:
             pass # incomplete keycode, do nothing
 
-    # Job control commands, suspend application via self.job_commands, 
-    # Two for now just to show we can distinguish commands.
+    # These keys have job control fcn only if they are alone at start of line.
+    # Otherwise they can have editing function - C_d appears in lineedit_keymap.
 
-    # FIXME ^D ^Z unreachable now that job_commands keymap gone
     def ctrl_d(self):
-        util.putstr('^D')  # no newline, caller handles it.
+        if self.command == '':
+            self.command = keyboard.C_d # FIXME? so job control code can find it
+            util.putstr('^D')  # no newline, caller handles it.
+            self.restore()     # calls print() for newline
+            if self.controller:
+                self.controller.stop() # callback to job control
+        else:
+            self.delete_char()
 
     def ctrl_z(self):
-        print('^Z')
-        util.putstr('\rStopped') # still in raw mode, print didn't RET
+        if self.command == '':
+            self.command = keyboard.C_z # FIXME? so job control code can find it
+            print('^Z')
+            util.putstr('\rStopped') # still in raw mode, print didn't RET
+            self.restore()     # calls print() for newline
+            if self.controller:
+                self.controller.stop() # callback to job control
+        else: 
+            util.putstr(keyboard.bel) # sound indicates no handler
 
     # ^C exit is more drastic than job control, exits to top-level Python
 
