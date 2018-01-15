@@ -14,13 +14,13 @@ console = con.Console(prompt=(lambda: wyshka.prompt),
                       stopped=(lambda command: ed.quit),
                       keymap=(lambda: (con.command_keymap 
                                        if ed.command_mode 
-                                       else con.insert_keymap)))
+                                       else con.insert_keymap)),
+                      startup=edsel.startup,
+                      cleanup=edsel.cleanup)
 
 def main(*filename,**options):
     ed.quit = False
-    edsel.startup(*filename, **options)
-    console.run()
-    edsel.cleanup()
+    console.run() # FIXME - ignores filename, options for now
 
 def resume():
     main() # no filename, no options - do not disturb present state.

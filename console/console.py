@@ -1,6 +1,8 @@
 """
-console.py - Console class, skeleton non-blocking command line application
-               with command line editing and history.
+console.py - Console class, a wrapper that adapts console applications
+ for cooperative multitasking. Collects input string without blocking,
+ then passes it to application.  Provides line editing and history
+ similar to readline.  Provides hooks for job control.
 """
 
 import sys
@@ -109,15 +111,14 @@ command_tty_keymap.update(command_tty_keys)
 command_tty_keymap.update(job_control_keys)
 
 class Console(object):
-    'Class that implements skeleton for non-blocking command line application'
+    'Wrapper that adapts console applications for cooperative multitasking'
     def __init__(self, prompt=(lambda: ''), reader=key.Key(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
-                 keymap=(lambda: command_keymap)):
+                 keymap=(lambda: command_keymap),
+                 startup=(lambda: None), cleanup=(lambda: None)):
         """
         All arguments are optional keyword arguments with defaults.
-        Many applications only need the prompt, do_command, and
-        stopped arguments.
 
         prompt - callable with no arguments that returns the prompt
         string, which might depend on the state of the application.
@@ -145,6 +146,13 @@ class Console(object):
         for handling both commands and input text.  Keymap contents
         might depend on the application state.  Default returns
         command_keymap defined in this module.
+
+        startup - callable to execute when application starts up or
+        resumes, for example to initialize display. Default does
+        nothing.
+
+        cleanup - callable to run when application exits or suspends,
+        for example to clean up display.  Default does nothing.
         """
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string 
@@ -157,23 +165,31 @@ class Console(object):
         self.point = self.initpoint  # index into self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
-        # if not None, controller must be an object with a method stop(self)
-        # and a Boolean attribute named 'replaced', such as a piety.Job.
-        # We might assign some piety.Job object to self.controller later.
-        self.controller = None  
-                                 
+        self.startup = startup
+        self.cleanup = cleanup
+           
+    def __call__(self):
+        # self.start() # FIXME job control
+        self.startup()
+        self.restart()
+
+    def stop(self):
+        self.restore() # calls print() for newline
+        self.cleanup()
+        # self.exit # FIXME job control
+
     def run(self):
         """
         Console event loop - run a single Console instance as an application.
-        For testing only - blocks, can only run one Console at a time this way.
+        For testing only; handler() blocks, can only run one Console at a time.
         """
-        self.restart()
+        self.__call__()
         while not (self.stopped()
                    or self.command in job_control_keys):
             self.handler() # blocks in self.reader at each character
-        self.restore()
+        self.stop()
 
-    # alternative run_noreader passes keycode to handler,use getchar as default
+    # alternative run_noreader could pass keycode to handler, default getchar
 
     def reinit(self, command=None, point=None):
         're-initialize command line in self.command'
@@ -184,6 +200,7 @@ class Console(object):
     def handler(self):
         # Read char, add to keycode sequence.  If seq complete, return keycode
         # To avoid blocking in self.reader(),must only call when input is ready
+        # An alternative way would run reader first, pass keycode to handler
         keycode = self.reader() # returns '' when keycode is not yet complete
         # keycode might be single character or a sequence of characters.
         # Printable keys require special-case handling,
@@ -206,9 +223,7 @@ class Console(object):
         if self.command == '':
             self.command = keyboard.C_d # FIXME? so job control code can find it
             util.putstr('^D')  # no newline, caller handles it.
-            self.restore()     # calls print() for newline
-            if self.controller:
-                self.controller.stop() # callback to job control
+            self.stop()
         else:
             self.delete_char()
 
@@ -217,9 +232,7 @@ class Console(object):
             self.command = keyboard.C_z # FIXME? so job control code can find it
             print('^Z')
             util.putstr('\rStopped') # still in raw mode, print didn't RET
-            self.restore()     # calls print() for newline
-            if self.controller:
-                self.controller.stop() # callback to job control
+            self.stop()
         else: 
             util.putstr(keyboard.bel) # sound indicates no handler
 
@@ -273,12 +286,7 @@ class Console(object):
         self.do_command_1() # might reassign self.mode, self.command
         # do_command might exit or invoke job control to suspend application
         if self.stopped():
-            if self.controller:
-                self.controller.stop() # callback to job control
-            else:
-                return  # no job - just exit application
-        elif self.controller and self.controller.replaced: 
-            return # command may replace or stop app
+            self.stop()
         else:
             self.restart() # print prompt and put term in character mode
             return # application continues

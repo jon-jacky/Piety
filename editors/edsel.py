@@ -52,7 +52,7 @@ do_command = wyshka.wyshka(do_command=edsel_do_command,
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
-    cmd_h = options['c'] if 'c' in options else None
+    cmd_h = options['c'] if 'c' in options else 12 # else None # FIXME stopgap
     ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
                  update_fcn=update,  # replace ed's no-op update function
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
