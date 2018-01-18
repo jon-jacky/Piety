@@ -1,5 +1,5 @@
 """
-piety.py - defines Task, Session, Job, schedule, and run (the event loop).
+piety.py - defines Task, Session, schedule, and run (the event loop).
            Imports eventloop used by run.
 """
 
@@ -150,13 +150,9 @@ class Session(Task):
         # Typically the old job (if any) is the Python interpreter, 
         # which starts the new job.  To start a console session, 
         # call this method with the Python interpreter as the new job.
-        if self.foreground:
-            self.foreground.replaced = True
         self.jobs.append(job)
         self.foreground = job
         self.handler = self.foreground.handler
-        self.foreground.replaced = False # enable new foreground job
-        # new foreground job calls its own run() method
 
     def switch(self):
         'Remove foreground job, resume running preceding job (if any).'
@@ -168,78 +164,9 @@ class Session(Task):
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
             self.foreground.replaced = False # enable new foreground job
-            self.foreground.run()
+            # Hack, assumes foreground job has a method named resume
+            self.foreground.resume()
         # else ... last job exits, its cleanup method has to handle it.
-
-class Job(object):
-    'Provide standard interface to an application that can be used by Session'
-    def __init__(self, supervisor=None, application=None, handler=(lambda: ''),
-                 startup=(lambda: None), cleanup=(lambda: None)):
-        """
-        All arguments are optional, with defaults
-
-        supervisor - object or module used for job control, when this
-        Job instance is multiplexed with other Jobs that use the same
-        event.  Default: None, use when no other jobs contend for the
-        same event.  If present, the supervisor object must have
-        start() and switch() mathods.
-
-        application - object that indicates when the application wants
-        to stop or pause, by calling stop() in this Job object.  The
-        application object must have an attribute named 'controller',
-        which is assigned a reference back to this Job object.
-
-        handler - callable to read one or more characters to build
-        command string.  Takes no arguments and returns a string
-        (might be just a single character).  Default returns empty
-        string.   Typically, the handler invokes the application 
-        on the command, when the command string is complete.
-
-        startup - callable to execute when application starts up or
-        resumes, for example to initialize display. Takes a variable
-        number of arguments (no arguments is okay).  Also must begin
-        another activity cycle in the application.  For example, in a
-        command line application, print the prompt.  Default does
-        nothing.
-
-        cleanup - callable to run when application exits or suspends,
-        for example to clean up display.  Default does nothing.
-        """
-        self.supervisor = supervisor
-        # Currently Job (controller) and Console (application)
-        # make assumptions about each other.  Job assumes that Console
-        # has an attribute named 'controller' which will hold ref back to Job,
-        # Console assumes Job has method named 'stop' and attribute 'replaced'
-        # which it calls/uses when it wants to stop or pause. We could remove 
-        # these assumptions by passing these names as arguments to Job.
-        # Job is supposed to serve as an adapter so applications need not
-        # provide or use particular names, but we're not quite there yet.
-        application.controller = self # so app. can call methods here
-        self.handler = handler 
-        self.startup = startup
-        self.cleanup = cleanup
-        self.replaced = False 
-
-    def __call__(self, *args, **kwargs):
-        """
-        Make this Job instance into a callable so it can be invoked by name.
-        Give this Job the focus, put it in the foreground, and start it.
-        """
-        if self.supervisor: # this might be a standalone job with no supervisor
-            self.supervisor.start(self) # make this the new foreground job
-        self.run(*args, **kwargs)
-
-    # Can't merge this into __call__ above, Session switch() also calls it.
-    def run(self, *args, **kwargs):
-        'Execute startup function if it exists, then restart handler'
-        self.startup(*args, **kwargs) 
-
-    # The application calls this method when it wants to stop.
-    def stop(self):
-        'This job is done for now.  Clean up, resume previous job if any'
-        self.cleanup()
-        if self.supervisor:
-            self.supervisor.switch() 
 
 # Test
 

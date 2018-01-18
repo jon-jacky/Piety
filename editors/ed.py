@@ -356,8 +356,13 @@ def K(): return 1/0  # raise exception on demand, for testing
 
 quit = False
 
+def start():
+    'enable begin or resume main loop'
+    global quit
+    quit = False
+
 def q(*args):
-    'quit command mode, ignore args, caller quits'
+    'exit from main loop'
     global quit
     quit = True
 
@@ -476,8 +481,7 @@ def main(do_command=do_command, prompt=(lambda: prompt)):
     Won't work with cooperative multitasking, calls blocking input().
     do_command argument provides a hook for other modules that add commands.
     """
-    global quit
-    quit = False
+    start()
     while not quit:
         line = input(prompt())
         do_command(line)

@@ -112,11 +112,15 @@ command_tty_keymap.update(job_control_keys)
 
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
+
+    replaced = False
+
     def __init__(self, prompt=(lambda: ''), reader=key.Key(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
                  keymap=(lambda: command_keymap),
-                 startup=(lambda: None), cleanup=(lambda: None)):
+                 startup=(lambda: None), cleanup=(lambda: None),
+                 start=(lambda: None), exit=(lambda: None)):
         """
         All arguments are optional keyword arguments with defaults.
 
@@ -147,12 +151,23 @@ class Console(object):
         might depend on the application state.  Default returns
         command_keymap defined in this module.
 
-        startup - callable to execute when application starts up or
-        resumes, for example to initialize display. Default does
-        nothing.
+        startup - callable that invokes application code to run
+        when application starts up or resumes, for example to
+        initialize display. Default does nothing.
 
-        cleanup - callable to run when application exits or suspends,
-        for example to clean up display.  Default does nothing.
+        cleanup - callable that invokes application code to run when
+        application exits or suspends, for example to clean up
+        display.  Default does nothing.
+
+        start - callable that invokes job control code to run when
+        application starts up or resumes, for example to place any
+        previously running application in the background.  Default
+        does nothing.
+
+        exit - callable that invokes job control code to run when
+        application exits or suspends, for example to place any
+        previously suspended application back in the foreground.
+        Default does nothing.
         """
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string 
@@ -165,18 +180,25 @@ class Console(object):
         self.point = self.initpoint  # index into self.command
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
-        self.startup = startup
+        self.startup = startup # hooks in to application
         self.cleanup = cleanup
-           
-    def __call__(self):
-        # self.start() # FIXME job control
+        self.start = start # hooks out to job control
+        self.exit = exit
+
+    # Piety Session switch method requires job has method named resume
+    def resume(self):
         self.startup()
         self.restart()
+
+    def __call__(self):
+        self.start()
+        self.resume()
+        Console.replaced = True
 
     def stop(self):
         self.restore() # calls print() for newline
         self.cleanup()
-        # self.exit # FIXME job control
+        self.exit()
 
     def run(self):
         """
@@ -221,7 +243,7 @@ class Console(object):
 
     def ctrl_d(self):
         if self.command == '':
-            self.command = keyboard.C_d # FIXME? so job control code can find it
+            self.command = keyboard.C_d # so job control code can find it
             util.putstr('^D')  # no newline, caller handles it.
             self.stop()
         else:
@@ -229,7 +251,7 @@ class Console(object):
 
     def ctrl_z(self):
         if self.command == '':
-            self.command = keyboard.C_z # FIXME? so job control code can find it
+            self.command = keyboard.C_z # so job control code can find it
             print('^Z')
             util.putstr('\rStopped') # still in raw mode, print didn't RET
             self.stop()
@@ -283,13 +305,14 @@ class Console(object):
         self.history.append(self.command)
         self.hindex = len(self.history) - 1
         self.restore()      # advance line and put terminal in line mode 
-        self.do_command_1() # might reassign self.mode, self.command
-        # do_command might exit or invoke job control to suspend application
+        self.do_command_1() # might reassign self.command, Console.replaced
+        # do_command might invoke job control to suspend or replace application
         if self.stopped():
             self.stop()
-        else:
+        elif not Console.replaced:
             self.restart() # print prompt and put term in character mode
-            return # application continues
+        else:
+            Console.replaced = False
 
     def restart(self):
         'Prepare to collect a command string using the command object.'

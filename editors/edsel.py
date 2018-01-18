@@ -58,9 +58,11 @@ def startup(*filename, **options):
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
     update(Op.rescale, start=cmd_h)  # rescale before ed.startup can call e()
     ed.startup(*filename, **options)
+    ed.start()
 
 def cleanup():
     'Restore ed no display modes, full-screen scrolling, cursor to bottom.'
+    ed.q()
     ed.configure() 
     display.set_scroll_all()
     display.put_cursor(frame.nlines,1)

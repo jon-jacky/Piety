@@ -4,16 +4,16 @@ salysh.py - Run a pysh Python shell session.  Use console module
  without blocking.  Contrast to pysh.py main function.
 """
 
-import pysh, console as con
+import pysh as repl, console
 
-console = con.Console(prompt=(lambda: pysh.prompt), do_command=pysh.push,
-                      stopped=(lambda command: not pysh.running))
+pysh = console.Console(prompt=(lambda: repl.prompt), do_command=repl.push,
+                       stopped=(lambda command: not repl.running),
+                       startup=repl.start, cleanup=repl.stop)
 
 def main():
     'Python REPL using pysh shell'
-    pysh.start()
-    print("pysh shell, type any Python statement, exit() or ^D to exit")
-    console.run()
+    print("pysh shell, type any Python statement, exit(), ^D, or ^Z to exit")
+    pysh.run()
 
 if __name__ == '__main__':
     main()

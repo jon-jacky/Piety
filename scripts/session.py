@@ -26,7 +26,7 @@ share the same state including editor buffers and insertion points.
 :q
 >> import datetime
 ...
->> desoto()
+>> edsel()
 ... display editor appears, shows README.md
 ... continue editing README.md
 :q
@@ -40,47 +40,30 @@ share the same state including editor buffers and insertion points.
 
 """
 
-import sys, piety, salysh, edda, desoto as editor
+import sys, piety
+from salysh import pysh
+from edda import ed
+from desoto import edsel
 
 session = piety.Session(name='session', input=sys.stdin)
 
-pysh = piety.Job(supervisor=session,
-                 application=salysh.console,
-                 handler=salysh.console.handler,
-                 startup=salysh.console.restart, # no separate pysh.startup
-                 cleanup=piety.stop) # sets piety.cycle.running = False
+pysh.start = (lambda: session.start(pysh))
+ed.start = (lambda: session.start(ed))
+edsel.start = (lambda: session.start(edsel))
+pysh.exit = ed.exit = edsel.exit = session.switch
+pysh.cleanup = piety.stop # sets piety.cycle.running = False
 
-def edstartup():
-    edda.ed.quit = False
-    edda.ed.configure() # restore ed to no display, no updates
-    edda.console.restart()
-
-ed = piety.Job(supervisor=session,
-               application=edda.console,
-               handler=edda.console.handler,
-               startup=edstartup)
-
-def desotostartup():
-    editor.ed.quit = False
-    editor.edsel.startup(c=12)
-    editor.console.restart()
- 
-# copied from editor_job.py
-desoto = piety.Job(supervisor=session,
-                 application=editor.console,
-                 handler=editor.console.handler,
-                 startup=desotostartup,
-                 cleanup=editor.edsel.cleanup)
-
+# FIXME we didn't import desoto!  Also InputLine is gone
 # So update() can restore cursor after updates from background task
-editor.edsel.ed.buffer.inputline = editor.console.command # InputLine instance
+# desoto.edsel.ed.buffer.inputline = desoto.console.command # InputLine instance
 
 # Test
 
 def main():
     piety.cycle.running = True # not using Piety scheduler, just this flag
-    pysh() # start the first job, which can start others
-    while piety.cycle.running: # job.pysh.cleanup sets this False
+    pysh.start()  # start the first job, which can start others
+    pysh.resume() # cannot call pysh() here because it sets Console.replaced
+    while piety.cycle.running: # pysh.cleanup sets this False
         session.handler()  # block waiting for each single character 
 
 if __name__ == '__main__':
