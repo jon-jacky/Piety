@@ -169,10 +169,9 @@ class Session(Task):
 
     def switch(self):
         'Suspend foreground job, resume running background job if any.'
-        self.foreground.state = State.suspended
         job = self.running.pop()
-        self.suspended.append(job)
         job.state = State.suspended
+        self.suspended.append(job)
         if self.running:
             self.foreground = self.running[-1]
             self.foreground.state = State.foreground
