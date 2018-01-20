@@ -5,9 +5,9 @@ console.py - Console class, a wrapper that adapts console applications
  similar to readline.  Provides hooks for job control.
 """
 
-import sys
-import string # for string.printable
+import sys, string, pprint
 import util, terminal, keyboard, display, key
+from piety import State
 
 # Keymaps are dicts from keycode string to Console method name string.
 # Keycodes in keymap can have multiple chars (for example escape sequences).
@@ -110,12 +110,15 @@ command_tty_keymap = insert_tty_keymap.copy()
 command_tty_keymap.update(command_tty_keys)
 command_tty_keymap.update(job_control_keys)
 
+job_list = list() # inventory of all Console instances
+def jobs():
+    'Print the list of all Console instances, their names, and states'
+    pprint.pprint([(c,c.name,c.state) for c in job_list])
+
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
-
-    replaced = False
-
-    def __init__(self, prompt=(lambda: ''), reader=key.Key(),
+    def __init__(self, name=__module__,
+                 prompt=(lambda: ''), reader=key.Key(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
                  keymap=(lambda: command_keymap),
@@ -123,6 +126,9 @@ class Console(object):
                  start=(lambda: None), exit=(lambda: None)):
         """
         All arguments are optional keyword arguments with defaults.
+
+        name - string that names this instance, default __module__,
+        that is 'console'.  Useful when jobs are listed, etc.
 
         prompt - callable with no arguments that returns the prompt
         string, which might depend on the state of the application.
@@ -169,6 +175,8 @@ class Console(object):
         previously suspended application back in the foreground.
         Default does nothing.
         """
+        job_list.append(self)
+        self.name = name
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string 
         self.do_command = (lambda: do_command(self.command))
@@ -184,7 +192,9 @@ class Console(object):
         self.cleanup = cleanup
         self.start = start # hooks out to job control
         self.exit = exit
-
+        # self.state can only be updated by job control in another module
+        self.state = State.suspended # can still run if no other job control
+    
     # Piety Session switch method requires job has method named resume
     def resume(self):
         self.startup()
@@ -193,7 +203,6 @@ class Console(object):
     def __call__(self):
         self.start()
         self.resume()
-        Console.replaced = True
 
     def stop(self):
         self.restore() # calls print() for newline
@@ -297,22 +306,21 @@ class Console(object):
     def accept_line(self):
         'For insert modes: handle line, but no history, exit, or job control'
         self.restore()      # advance line and put terminal in line mode 
-        self.do_command_1() # might reassign self.mode, self.command
+        self.do_command_1() # might reassign self.command
         self.restart()      # print prompt and put term in character mode
 
     def accept_command(self):
         'For command modes: handle line, with history, exit, and job control'
         self.history.append(self.command)
         self.hindex = len(self.history) - 1
-        self.restore()      # advance line and put terminal in line mode 
-        self.do_command_1() # might reassign self.command, Console.replaced
-        # do_command might invoke job control to suspend or replace application
+        self.restore()
+        self.do_command_1() # might stop this job or run another
         if self.stopped():
             self.stop()
-        elif not Console.replaced:
-            self.restart() # print prompt and put term in character mode
+        elif self.state != State.background: # State.suspended if no job control
+            self.restart()
         else:
-            Console.replaced = False
+            return # a different job continues
 
     def restart(self):
         'Prepare to collect a command string using the command object.'
@@ -441,11 +449,10 @@ class Console(object):
         'redraw entire line including prompt on printing terminal'
         self.redraw_with_prefix('^L\r\n')
 
-# Test: echo input lines, use job control commands ^D ^Z to exit.
-echo = Console(prompt=(lambda: '> '), 
-               do_command=(lambda command: print(command)))
-
 def main():
+    # Test: echo input lines, use job control commands ^D ^Z to exit.
+    echo = Console(prompt=(lambda: '> '), 
+                   do_command=(lambda command: print(command)))
     echo.run()
 
 if __name__ == '__main__':

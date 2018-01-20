@@ -41,28 +41,33 @@ share the same state including editor buffers and insertion points.
 """
 
 import sys, piety
+import console # just type console.jobs() to see the list
+
 from salysh import pysh
 from edda import ed
 from desoto import edsel
 
 session = piety.Session(name='session', input=sys.stdin)
 
+pysh.name = 'pysh'
 pysh.start = (lambda: session.start(pysh))
-ed.start = (lambda: session.start(ed))
-edsel.start = (lambda: session.start(edsel))
-pysh.exit = ed.exit = edsel.exit = session.switch
 pysh.cleanup = piety.stop # sets piety.cycle.running = False
+
+ed.name = 'ed'
+ed.start = (lambda: session.start(ed))
+
+edsel.name = 'edsel'
+edsel.start = (lambda: session.start(edsel))
+
+pysh.exit = ed.exit = edsel.exit = session.switch
 
 # FIXME we didn't import desoto!  Also InputLine is gone
 # So update() can restore cursor after updates from background task
 # desoto.edsel.ed.buffer.inputline = desoto.console.command # InputLine instance
 
-# Test
-
 def main():
     piety.cycle.running = True # not using Piety scheduler, just this flag
-    pysh.start()  # start the first job, which can start others
-    pysh.resume() # cannot call pysh() here because it sets Console.replaced
+    pysh()  # start the first job, which can start others
     while piety.cycle.running: # pysh.cleanup sets this False
         session.handler()  # block waiting for each single character 
 

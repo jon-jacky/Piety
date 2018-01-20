@@ -3,7 +3,8 @@ piety.py - defines Task, Session, schedule, and run (the event loop).
            Imports eventloop used by run.
 """
 
-import collections # for deque
+from enum import Enum
+from collections import deque
 
 # Import the eventloop module for the platform where piety runs.
 # The eventloop implementation is platform-dependent but its interface is not,
@@ -121,6 +122,12 @@ def tasks():
              # '  ???', # placeholder if we can't use ievent
              ename(t.input), oname(t.handler)))
 
+class State(Enum):
+    'Job state'
+    suspended = 1
+    foreground = 2
+    background = 3
+
 class Session(Task):
     """
     Manage multiple jobs (applications) that use the same input event,in one task.
@@ -132,41 +139,39 @@ class Session(Task):
     def __init__(self, name=None, input=None, enabled=true):
         """
         Same args as Task __init__ , except no handler.
-        Add jobs later, the foreground job's handler becomes the Task handler
-
+        The foreground job's handler becomes the Task handler
         The collection of jobs is a stack implemented by a deque.
         Job on top of stack runs in foreground (has focus), gets input.
         Top of the stack is the right end of the deque at self.jobs[-1]
         """
         # Typically the bottom of the stack is the Python interpreter,
         # and the top of the stack is a job that it started.
-        self.jobs = collections.deque()
+        self.jobs = deque()
         self.foreground = None
         super(Session, self).__init__(name=name, input=input, enabled=enabled)
 
     def start(self, job):
-        'Put a new job in the foreground, replace any current job'
-        # This is currently the only way to add a job to a Session instance.
-        # Typically the old job (if any) is the Python interpreter, 
-        # which starts the new job.  To start a console session, 
-        # call this method with the Python interpreter as the new job.
-        self.jobs.append(job)
+        'Put a new job in the foreground, put any current job in the background'
+        # To start a console session, call this with the Python interpreter job
+        if self.foreground:
+            self.foreground.state = State.background
+        job.state = State.foreground
         self.foreground = job
+        self.jobs.append(job)
         self.handler = self.foreground.handler
 
     def switch(self):
-        'Remove foreground job, resume running preceding job (if any).'
-        # Typically, the preceding job here (if any) is the Python interpreter,
-        #  this returns to the interpreter after stopping the job it started.
-        # If current job here is the Python interpreter, this exits session.
+        'Remove foreground job, resume running background job (if any).'
+        if self.foreground:
+            self.foreground.state = State.suspended
         self.jobs.pop()
         if self.jobs:
             self.foreground = self.jobs[-1]
             self.handler = self.foreground.handler
-            self.foreground.replaced = False # enable new foreground job
-            # Hack, assumes foreground job has a method named resume
+            self.foreground.state = State.foreground
             self.foreground.resume()
-        # else ... last job exits, its cleanup method has to handle it.
+        else:
+            self.foreground = None
 
 # Test
 
