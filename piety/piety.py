@@ -5,6 +5,7 @@ piety.py - defines Task, Session, schedule, and run (the event loop).
 
 from enum import Enum
 from collections import deque
+from pprint import pprint
 
 # Import the eventloop module for the platform where piety runs.
 # The eventloop implementation is platform-dependent but its interface is not,
@@ -124,55 +125,68 @@ def tasks():
 
 class State(Enum):
     'Job state'
-    suspended = 1
+    loaded = 1
     foreground = 2
     background = 3
+    suspended = 4
 
 class Session(Task):
     """
-    Manage multiple jobs (applications) that use the same input event,in one task.
+    Manage jobs (applications) that use the same input event, in one task.
     """
-    # This class was created to support a console terminal session 
-    #  that initially runs a Python interpreter, which then starts other jobs.
-    # But there is no dependence here on a console or Python interpreter,
-    #  so this class might also manage other kinds of sessions and jobs.
-    def __init__(self, name=None, input=None, enabled=true):
+    def __init__(self, name=None, input=None, enabled=true, jobs=None):
         """
         Same args as Task __init__ , except no handler.
         The foreground job's handler becomes the Task handler
-        The collection of jobs is a stack implemented by a deque.
+        The collection of running jobs is a stack implemented by a deque.
         Job on top of stack runs in foreground (has focus), gets input.
-        Top of the stack is the right end of the deque at self.jobs[-1]
+        Top of the stack is the right end of the deque at self.running[-1]
         """
-        # Typically the bottom of the stack is the Python interpreter,
-        # and the top of the stack is a job that it started.
-        self.jobs = deque()
+        self.loaded=deque(jobs) if jobs is not None else deque()
+        self.running = deque()
+        self.suspended = deque()
         self.foreground = None
         super(Session, self).__init__(name=name, input=input, enabled=enabled)
 
+    def jobs(self):
+        'Print list of all jobs, their names, and states'
+        for j in (list(reversed(self.running))
+                  + list(reversed(self.suspended)) + list(self.loaded)):
+            print('%s   %-8s %s' % (j, j.name, j.state))
+
     def start(self, job):
-        'Put a new job in the foreground, put any current job in the background'
-        # To start a console session, call this with the Python interpreter job
+        'Put job in the foreground, put any current job in the background'
         if self.foreground:
             self.foreground.state = State.background
         job.state = State.foreground
+        if job in self.loaded:
+            self.loaded.remove(job)
+        if job in self.suspended:
+            self.suspended.remove(job)
+        self.running.append(job)
         self.foreground = job
-        self.jobs.append(job)
         self.handler = self.foreground.handler
 
     def switch(self):
-        'Remove foreground job, resume running background job (if any).'
-        if self.foreground:
-            self.foreground.state = State.suspended
-        self.jobs.pop()
-        if self.jobs:
-            self.foreground = self.jobs[-1]
-            self.handler = self.foreground.handler
+        'Suspend foreground job, resume running background job if any.'
+        self.foreground.state = State.suspended
+        job = self.running.pop()
+        self.suspended.append(job)
+        job.state = State.suspended
+        if self.running:
+            self.foreground = self.running[-1]
             self.foreground.state = State.foreground
+            self.handler = self.foreground.handler
             self.foreground.resume()
         else:
             self.foreground = None
 
+    def fg(self):
+        'Resume running most recently suspended job'
+        if self.suspended:
+            self.suspended[-1]()
+            
+            
 # Test
 
 def task0(): print('task 0')

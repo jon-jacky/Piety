@@ -47,7 +47,9 @@ from salysh import pysh
 from edda import ed
 from desoto import edsel
 
-session = piety.Session(name='session', input=sys.stdin)
+session = piety.Session(name='session', input=sys.stdin, jobs=[pysh,ed,edsel])
+jobs = session.jobs # jobs() list jobs and their states
+fg = session.fg # fg() resume most recently suspended job
 
 pysh.name = 'pysh'
 pysh.start = (lambda: session.start(pysh))

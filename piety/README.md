@@ -78,6 +78,11 @@ session can be stopped and then resumed later without losing work
 in progress.  *Session* could also work with other kinds of jobs (besides
 terminal applications).
 
+    # This class was created to support a console terminal session 
+    #  that initially runs a Python interpreter, which then starts other jobs.
+    # But there is no dependence here on a console or Python interpreter,
+    #  so this class might also manage other kinds of sessions and jobs.
+
 ### Job class ###
 
 The *Job* class provides a standard interface to an application to

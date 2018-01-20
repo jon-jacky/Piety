@@ -5,7 +5,7 @@ console.py - Console class, a wrapper that adapts console applications
  similar to readline.  Provides hooks for job control.
 """
 
-import sys, string, pprint
+import sys, string
 import util, terminal, keyboard, display, key
 from piety import State
 
@@ -110,11 +110,6 @@ command_tty_keymap = insert_tty_keymap.copy()
 command_tty_keymap.update(command_tty_keys)
 command_tty_keymap.update(job_control_keys)
 
-job_list = list() # inventory of all Console instances
-def jobs():
-    'Print the list of all Console instances, their names, and states'
-    pprint.pprint([(c,c.name,c.state) for c in job_list])
-
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
     def __init__(self, name=__module__,
@@ -175,7 +170,6 @@ class Console(object):
         previously suspended application back in the foreground.
         Default does nothing.
         """
-        job_list.append(self)
         self.name = name
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build command string 
@@ -192,8 +186,7 @@ class Console(object):
         self.cleanup = cleanup
         self.start = start # hooks out to job control
         self.exit = exit
-        # self.state can only be updated by job control in another module
-        self.state = State.suspended # can still run if no other job control
+        self.state = State.loaded # run in this state if no other job control
     
     # Piety Session switch method requires job has method named resume
     def resume(self):
@@ -317,7 +310,7 @@ class Console(object):
         self.do_command_1() # might stop this job or run another
         if self.stopped():
             self.stop()
-        elif self.state != State.background: # State.suspended if no job control
+        elif self.state != State.background: # State.loaded if no job control
             self.restart()
         else:
             return # a different job continues
