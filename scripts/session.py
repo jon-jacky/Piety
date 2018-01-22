@@ -45,7 +45,7 @@ import console # just type console.jobs() to see the list
 
 from salysh import pysh
 from edda import ed
-from desoto import edsel
+from desoto import edsel, editor # desoto edsel is Console, editor is edsel.py
 
 session = piety.Session(name='session', input=sys.stdin, jobs=[pysh,ed,edsel])
 jobs = session.jobs # jobs() list jobs and their states
@@ -63,9 +63,8 @@ edsel.start = (lambda: session.start(edsel))
 
 pysh.exit = ed.exit = edsel.exit = session.switch
 
-# FIXME we didn't import desoto!  Also InputLine is gone
 # So update() can restore cursor after updates from background task
-# desoto.edsel.ed.buffer.inputline = desoto.console.command # InputLine instance
+editor.ed.buffer.inputline = edsel # Console instance
 
 def main():
     piety.cycle.running = True # not using Piety scheduler, just this flag

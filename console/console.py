@@ -177,16 +177,24 @@ class Console(object):
         self.stopped = (lambda: stopped(self.command))
         self.keymap = keymap
         self.initcommand = '' # command string at the beginning of the cycle
-        self.initpoint = None # index into command string at beginnig of cycle
+        self.initpoint = None # index into command string at begining of cycle
         self.command = self.initcommand
-        self.point = self.initpoint  # index into self.command
+        self.point = 0 # # index into self.command
+        self.start_col = 0
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         self.startup = startup # hooks in to application
         self.cleanup = cleanup
         self.start = start # hooks out to job control
         self.exit = exit
-        self.state = State.loaded # run in this state if no other job control
+        # self.state is reassigned only by job control code in another module
+        self.state = State.loaded # remain in this state if no job control
+
+    def reinit(self, command=None, point=None):
+        'Re-initialize command line.'
+        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
+        self.command = self.command if command is None else command
+        self.point = len(self.command) if point is None else point
     
     # Piety Session switch method requires job has method named resume
     def resume(self):
@@ -214,12 +222,6 @@ class Console(object):
         self.stop()
 
     # alternative run_noreader could pass keycode to handler, default getchar
-
-    def reinit(self, command=None, point=None):
-        're-initialize command line in self.command'
-        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
-        self.command = self.command if command is None else command
-        self.point = len(self.command) if point is None else point
 
     def handler(self):
         # Read char, add to keycode sequence.  If seq complete, return keycode
@@ -287,7 +289,7 @@ class Console(object):
 
     def do_command_1(self):
         'Call do_command, but first prepare to restore default command line'
-        # initcommand initpoint assigned here, might be reassigned by do_command
+        #initcommand initpoint assigned here, might be reassigned by do_command
         # but are not used until self.restart calls self.reinit
         self.initcommand = '' # default restart value for self.command
         self.initpoint = None  #  "    "   self.point
@@ -307,10 +309,10 @@ class Console(object):
         self.history.append(self.command)
         self.hindex = len(self.history) - 1
         self.restore()
-        self.do_command_1() # might stop this job or run another
+        self.do_command_1() # might stop or preempt this job, assign self.state
         if self.stopped():
             self.stop()
-        elif self.state != State.background: # State.loaded if no job control
+        elif self.state != State.background: #assigned by job control elsewhere
             self.restart()
         else:
             return # a different job continues

@@ -14,6 +14,8 @@ Some interesting ed commands to type at the editor command prompt:
 Some interesting Python commands to type at the editor command prompt
 (prefix command with !) or at python prompt:
 
+ jobs() - show information about jobs
+
  piety.tasks() - show information about tasks
 
  ts1task.enabled=piety.false - disable ts1task so ts1 buffer stops updating
@@ -36,30 +38,29 @@ Some interesting Python commands to type at the editor command prompt
     text line where next typed character will appear.
 """
 
-import terminal, display, piety, timestamp, session
+import terminal, display, piety, timestamp
 
-# We haven't started display editor yet, window not initialized, 
-#  so use ed commands
-edsel = session.editor.edsel
-ed = session.editor.ed
+from session import pysh, ed, edsel, jobs, fg # so we can say ed() etc.
+
+import ed as ed_api  # we already imported ed from session 
 
 # Put some content in main buffer
-ed.i('This is the main buffer') 
+ed_api.i('This is the main buffer') 
 
 # create timestamp generators
 ts1 = timestamp.timestamp('ts1')
 ts2 = timestamp.timestamp('ts2')
 
 # create buffers for timestamp messages
-ed.b('ts1')
-ed.b('ts2')
+ed_api.b('ts1')
+ed_api.b('ts2')
 
 # return to main buffer
-ed.b('main')
+ed_api.b('main')
 
 # aliases for timestamp buffers
-ts1buf = ed.buffers['ts1']
-ts2buf = ed.buffers['ts2']
+ts1buf = ed_api.buffers['ts1']
+ts2buf = ed_api.buffers['ts2']
 
 # add content to timestamp buffers
 print(next(ts1), file=ts1buf)
@@ -79,7 +80,7 @@ ts1task = piety.Task(handler=ts1handler, input=piety.timer, enabled=piety.true)
 ts2task = piety.Task(handler=ts2handler, input=piety.timer, enabled=alternate)
 
 def main():
-    session.pysh()
+    pysh()
     piety.run()
 
 if __name__ == '__main__':
