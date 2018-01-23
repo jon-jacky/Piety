@@ -3,7 +3,7 @@ scripts
 =======
 
 Python modules that test and demonstrate *Piety*, especially the
-*Task*, *Session*, *Job*, and *Console* classes.  Most modules 
+*Task*, *Session*, and *Console* classes.  Most modules 
 provide a *main* method that runs when the module is invoked from 
 the command line.  Some of these
 *main* methods run one or more applications as *Piety* tasks, using the
@@ -18,13 +18,6 @@ imported, or started with *python -m* .
 See docstrings (comment headers) and inline comments in each module
 for directions and explanations.
 
-SOME OF THESE SCRIPTS MIGHT NOT WORK BECAUSE WE HAVE CHANGED THE API
-FOR THE CONSOLE MODULE.  THEY WILL BE FIXED OR REPLACED IN THE FUTURE.
-
-- **editor_job.py**: Makes a *Job* instance that runs a display editor
-   in a *while* loop.  Does not use *Console*, uses Python *input*.
-   Contrast to *eden* and *run_editor*.
-
 - **editor_timestamps.py**: Demonstrate printing to editor buffers.  Use
      a while loop, not the Piety event loop.
 
@@ -37,10 +30,6 @@ FOR THE CONSOLE MODULE.  THEY WILL BE FIXED OR REPLACED IN THE FUTURE.
   that Piety can use different event loops, *select/eventloop.py* or
   *asyncio/eventloop.py*. The *embedded* script (above) can also use
   different event loops.
-
-- **run_editor.py** - Uses *piety_run* to run a display editor
-    *Console* instance, without using *Job* or *Session*.  Contrast to
-    *eden* and *editor_job*.
 
 - **run_timestamps.py**: Uses *piety.run* to run the three jobs
   created by *session*, concurrently with two timestamp tasks created
@@ -59,4 +48,4 @@ FOR THE CONSOLE MODULE.  THEY WILL BE FIXED OR REPLACED IN THE FUTURE.
 - **writers.py**: Creates writer tasks used by *embedded* and
     *run_writers*.
 
-Revised December 2017
+Revised Jan 2018

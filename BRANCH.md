@@ -2,9 +2,10 @@
 branches
 ========
 
-This is the **nojob** branch: investigate eliminating the *Job* class.
-It seems a *Session* should be able to connect directly to a
-*Console*.  Begun 2 Jan 2018.
+This is the **nojob** branch.  Simplify and generalize job control.
+Eliminate the *Job* class, absorb its functionality into *Session* 
+and *Console*.  Eliminate the *InputLine* class, absorb its functionality
+into *Console*.  Revise some modules in *scripts/*, eliminate others.
 
 Branches recently merged into **master**:
 

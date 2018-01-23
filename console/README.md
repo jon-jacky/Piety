@@ -2,34 +2,29 @@
 console
 =======
 
-Modules used by terminal applications, including a non-blocking
-alternative to Python *input*, with command line editing and history
-similar to Unix *readline*.
+Modules used by terminal applications.
 
-- **console.py**: defines *Console* class, a skeleton command line
-  application.  A *Console* instance collects a command (string),
-  passes it to a handler (callable) to execute.  Can collect a command
+- **console.py**: defines the *Console* class, a wrapper that adapts
+  a terminal application for cooperative multitasking.  A *Console*
+  instance is a Piety job that can be scheduled by a *Session*
+  instance.
+
+  A *Console* instance collects a command (string), passes it to an
+  application handler (callable) to execute.  Can collect a command
   one character at a time without blocking to permit cooperative
   multitasking (unlike Python *input*, which blocks until the command
-  is complete).  Provides command history and editing similar to Unix
-  *readline* (but no tab completion).  Provides hooks for optional job
-  control commands that bypass the application.
+  is complete).  Provides command history and line editing similar to
+  Unix *readline* (but no tab completion).  Provides hooks for job
+  control.
 
-  *Console* works with *Key* and *InputLine* (see below) to read
-  keycodes and edit the input line.
+  *Console* works with *Key* (see below) to read keycodes.
 
-  This *console* module has some similarities to the Python standard
-  library *cmd* module, but does not provide the same API.
-
-- **console.txt**: command summary for *Console* with *Key* and *InputLine*,
+- **console.txt**: command summary for *Console* with *Key*,
    similar to Unix *readline*.  How to edit the command line and
    access its history in any application the uses *console*
-   with the *inputline* and *key* modules.
+   with the *key* module.
 
 - **key.py**: defines *Key* class that can collect, store, and return
     single character or multi-character keycodes, used by *Console*.
 
-- **inputline.py**: Defines *InputLine* class that provides input and
-    editing within a single line, used by *Console*.
-
-Revised November 2016
+Revised Jan 2018

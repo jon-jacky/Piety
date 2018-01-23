@@ -3,7 +3,7 @@ piety
 =====
 
 The *piety* module is the core of the Piety operating system.  It
-defines the *Task*, *Session*, and *Job* classes. It imports the
+defines the *Task* and *Session*. It imports the
 *cycle* module and the *eventloop* module, which defines *run*,
 the non-blocking event loop.  To run tasks in Piety, import the
 *piety* module, create some *piety.Task* instances, then call
@@ -78,21 +78,19 @@ session can be stopped and then resumed later without losing work
 in progress.  *Session* could also work with other kinds of jobs (besides
 terminal applications).
 
-    # This class was created to support a console terminal session 
-    #  that initially runs a Python interpreter, which then starts other jobs.
-    # But there is no dependence here on a console or Python interpreter,
-    #  so this class might also manage other kinds of sessions and jobs.
+### Jobs ###
 
-### Job class ###
-
-The *Job* class provides a standard interface to an application to
+A *job* class provides a standard interface to an application to
 enable *Session* (or another job control facility) to start, run, and
-stop it, by itself or along with other applications.  A *Job* instance
+stop it, by itself or along with other applications.  A *job* instance
 provides a protocol (method names and arguments) for several of the
 application's routines, including the handler it uses to collect input
 and execute commands, and the callables it uses to start (or resume)
-and stop (or pause).  The *Job* class was motivated by terminal
-applications, but it could work with other kinds.
+and stop (or pause).  
+
+The *Console* class defined in *console/console.py* is the *job* class
+for terminal applications.  Applications that use other events (than
+terminal input) require another job class.
 
 ### Event Loop: run function, eventloop and cycle modules ###
 
