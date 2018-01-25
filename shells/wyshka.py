@@ -2,21 +2,6 @@
 wyshka.py - Shell that can alternate between pysh (Python)
             and the command line interface to another application program,
             such as ed.  You can use Python without leaving the application.
-
-It works like this:
-
- :<command>       execute ed <command>
- :!<statement>    push Python <statement> to pysh, return to ed command mode
- .. <statement>   push Python continuation line <statement> to pysh
- :!               switch to Python mode
-
- and Python mode:
-
- >> <statement>   push Python <statement> to pysh
- .. <statment>    push Python continuation line <statement> to pysh
- >>:<command>     execute ed <command>, return to pysh interpreter
- >>:              switch to ed command mode
-
 """
 
 import pysh

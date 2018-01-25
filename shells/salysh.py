@@ -1,7 +1,6 @@
 """
-salysh.py - Run a pysh Python shell session.  Use console module
- instead of Python builtin input to collect and edit inpu lines
- without blocking.  Contrast to pysh.py main function.
+salysh.py - Defines the pysh Console job that wraps the pysh.py Python shell.
+             Contrast to pysh.py main function.
 """
 
 import pysh as repl, console

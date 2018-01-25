@@ -31,6 +31,8 @@ for directions and explanations.
   *asyncio/eventloop.py*. The *embedded* script (above) can also use
   different event loops.
 
+- **run_timestamps.md**: Description of *run_timestamps.py*.
+
 - **run_timestamps.py**: Uses *piety.run* to run the three jobs
   created by *session*, concurrently with two timestamp tasks created
   in this script.  The two timestamp tasks can be seen updating editor
@@ -41,9 +43,11 @@ for directions and explanations.
     by *session*, concurrently with the two writer tasks created by
     *writers*.
 
-- **session.py**: Creates a *Session* instance with three console
-    jobs: a shell, a line editor, and a display editor.  Used by 
-    *run_timestamps* and *run_writers*.
+- **session.md**: Description of *session.py*.
+
+- **session.py**: Creates a *Session* instance with three *Console*
+    jobs: the *pysh* shell, the *ed* line editor, and the *edsel*
+    display editor.  Used by *run_timestamps* and *run_writers*.
 
 - **writers.py**: Creates writer tasks used by *embedded* and
     *run_writers*.

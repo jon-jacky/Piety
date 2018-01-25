@@ -1,8 +1,7 @@
 """
-edda.py - Run *edo.py* line editor including *wyshka* enhanced shell
-  and *samysh* script execution.  Use *console* module instead of
-  Python builtin *input()* to collect and edit input lines.  Contrast
-  to *ed.py* *main* function and *etty.py*.
+edda.py - Defines the ed Console job that wraps the ed.py line editor,
+  along with the wyshka enhanced Python shell and samysh script execution.
+  Contrast to the ed.py main function and etty.py.
 """
 
 import edo, wyshka, console

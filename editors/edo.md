@@ -8,6 +8,11 @@ module in the *shells* directory.  It also supports a new command *x*
 for executing scripts with optional echo and delay, supported by the
 *[samysh](../shells/samysh.py)* module in the *shells* directory.
 
+The enhanced shell and the *x* command are also available in programs
+and objects that use *edo*, including *edda* and the *ed* *Console* job 
+it defines, the *edsel* display editor, *desoto* and the *edsel* *Console*
+job it defines.
+
 ## Enhanced shell ##
 
 The *wyshka* command line shell used by *edo* provides both the *ed*

@@ -80,17 +80,18 @@ terminal applications).
 
 ### Jobs ###
 
-A *job* class provides a standard interface to an application to
-enable *Session* (or another job control facility) to start, run, and
-stop it, by itself or along with other applications.  A *job* instance
-provides a protocol (method names and arguments) for several of the
-application's routines, including the handler it uses to collect input
-and execute commands, and the callables it uses to start (or resume)
-and stop (or pause).  
+A *job* class wraps an application to provide a standard interface
+that enables *Session* (or another job control facility) to start,
+run, and stop it, along with other applications.  The interface
+includes the handler that the job uses to collect input and execute
+commands, and the callables it uses to start (or resume) and stop (or
+pause).
 
 The *Console* class defined in *console/console.py* is the *job* class
-for terminal applications.  Applications that use other events (than
-terminal input) require another job class.
+for terminal applications.  The module *scripts/session.py*
+demonstrates how to connect *Console* jobs to a *Session* instance.
+Applications that use other events (than terminal input) require
+another job class.
 
 ### Event Loop: run function, eventloop and cycle modules ###
 
@@ -118,4 +119,4 @@ The *piety* module imports *eventloop*.  Both modules import the
 and separates the platform-independent code in this directory from 
 platform-dependent code in the *eventloop* modules.
  
-Revised June 2016
+Revised Jan 2018

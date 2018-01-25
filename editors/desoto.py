@@ -1,8 +1,7 @@
 """
-desoto.py - Run *edsel.py* display editor including *wyshka* enhanced shell
-  and *samysh* script execution.  Use *console* module instead of
-  Python builtin *input()* to collect and edit input lines.  Contrast
-  to *edsel.py* *main* function.
+desoto.py - Defines the edsel Console job that wraps the edsel.py
+  display editor, along with the wyshka enhanced Python shell and
+  samysh script execution.  Contrast to the edsel.py main function.
 """
 
 import edsel as editor, wyshka, console as con

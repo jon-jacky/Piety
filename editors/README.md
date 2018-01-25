@@ -27,12 +27,9 @@ Files in this directory:
 - **check.py**: check command line arguments and provide default
     argumentss for *ed.py*.
 
-- **desoto.py**: run *edsel.py* display editor based on *ed.py* line
-  editor.  Includes *wyshka* enhanced shell and *samysh* script 
-  execution.  *desoto*
-  uses the *console* module instead of Python builtin *input* to
-  collect and edit input lines without blocking.  Contrast to *edsel*
-  *main*.
+- **desoto.py**: defines the *edsel* *Console* job that wraps the *edsel.py*
+  display editor, along with the *wyshka* enhanced Python shell and
+  *samysh* script execution.  Contrast to the *edsel.py* *main* function.
 
 - **ed.md**: description of *ed.py*.
 
@@ -42,10 +39,10 @@ Files in this directory:
 
 - **ed.txt**: command summary for *ed.py*
 
-- **edda.py**: run  *edo.py* line editor including *wyshka* enhanced shell
-  and *samysh* script execution.  Use *console* module instead of
-  Python builtin *input()* to collect and edit input lines.  Contrast
-  to *ed.py* *main* function and *etty.py*.
+- **edda.py**: defines the *ed* *Console* job that wraps the *ed.py*
+  line editor, along with the *wyshka* enhanced Python shell and
+  *samysh* script execution.  Contrast to the *ed.py* *main* function
+  and *etty.py*.
 
 - **eden.md**: description of *eden.py*.  REVISIONS MAY BE NEEDED.
 
@@ -94,4 +91,4 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*
 
-Revised Dec 2017
+Revised Jan 2018
