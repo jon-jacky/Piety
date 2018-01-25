@@ -28,11 +28,14 @@ lot of work by others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
 
 For now, Piety runs in an ordinary Python interpreter session on a
-host operating system.  We plan to run Piety on a bare machine (or
-bare VM) with no other operating system, but only a Python interpreter
-(with the minimum of hardware support in C or assembler).  There are
-only a few platform-dependent modules.  Most modules developed for
-Piety on a host operating system should also work on a bare machine.
+host operating system.  A [script](scripts/run_timestamps.py) that
+demonstrates many Piety features is described
+[here](scripts/run_timestamps.md).  We plan to run Piety on a bare
+machine (or bare VM) with no other operating system, but only a Python
+interpreter (with the minimum of hardware support in C or assembler).
+There are only a few platform-dependent modules.  Most modules
+developed for Piety on a host operating system should also work on a
+bare machine.
 
 Piety might be used for ---
 

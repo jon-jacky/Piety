@@ -20,7 +20,7 @@ exiting the editor.  It works like this in *ed* command line mode:
 With *edo*, in *!command*, the *command* is passed to the Python
 interpreter, not to the system command shell as in classic *ed*.
 
-The *wyshka* shell works like this in Python mode:
+The **wyshka** shell works like this in Python mode:
 
     >> <statement>   push Python <statement> to pysh
     .. <statment>    push Python continuation line <statement> to pysh
