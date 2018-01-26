@@ -11,7 +11,8 @@ or in the command line.
 
 Here is a sample session that demonstrates this.  Here *>>* is the
 Python prompt and *:* is the *edsel* display editor command
-prompt, you type the commands that follow.
+prompt, you type the commands that follow.  First, start the script and
+run the *edsel* display editor.  The *edsel* screen with one window appears:
 
     ... $ python3 run_timestamps.py
     .   ts1                  0  ts1
@@ -19,7 +20,8 @@ prompt, you type the commands that follow.
     . * main                 1  None
     >> edsel()
 
-*edsel* screen with one window appears
+Next, create two new windows that show timestamps updating, then traverse to
+the original *main* window:
 
     :o2
     :b ts1
@@ -30,17 +32,16 @@ prompt, you type the commands that follow.
     :o
     :o
 
-(above) create two new windows that show timestamps updating, then traverse to
-the original *main* window.
+Then, type the *edsel* *a* (append) command.  The cursor moves into the *main*
+window. Type two lines of text, then type the period by itself on the
+third line to exit append mode and get back to the *edsel* command
+prompt:
 
     :a
     Here is a new line ...
     Here is another 
     .
     :
-
-(above) append lines of text in the *main* window, then exit append mode
-and get back to the *edsel* command prompt.
 
 Some interesting commands to type at the *edsel* command prompt:
 
