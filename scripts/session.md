@@ -36,9 +36,10 @@ share the same state including editor buffers and insertion points.
     >> exit()
     ...$
 
-The *session* module also demonstrates job control, including the *^Z*
-command for suspending a job and the *fg* (foreground) function that
-resumes the most recently suspended job:
+The *session* module also demonstrates job control, including the
+*job* function that lists the jobs, the *^Z* command for suspending a job
+and the *fg* (foreground) function that resumes the most recently
+suspended job:
 
     $ python3 session.py
     >> jobs()

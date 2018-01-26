@@ -15,8 +15,8 @@ Despite the directory name *scripts*, these are all proper Python
 modules (with *.py* suffixes and without *#!* lines) that can be
 imported, or started with *python -m* .  
 
-See docstrings (comment headers) and inline comments in each module
-for directions and explanations.
+See *.md* files, docstrings (comment headers), and inline comments in
+each module for directions and explanations.
 
 - **editor_timestamps.py**: Demonstrate printing to editor buffers.  Use
      a while loop, not the Piety event loop.
