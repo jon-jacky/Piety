@@ -31,6 +31,9 @@ each module for directions and explanations.
   *asyncio/eventloop.py*. The *embedded* script (above) can also use
   different event loops.
 
+- **lines20.txt**: Sample text file for demonstrating editor jobs
+  in *session* and *run_timestamps*.
+
 - **run_timestamps.md**: Description of *run_timestamps.py*.
 
 - **run_timestamps.py**: Uses *piety.run* to run the three jobs
