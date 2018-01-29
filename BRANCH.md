@@ -2,12 +2,13 @@
 branches
 ========
 
-This is the **nojob** branch.  Simplify and generalize job control.
-Eliminate the *Job* class, absorb its functionality into *Session* 
-and *Console*.  Eliminate the *InputLine* class, absorb its functionality
-into *Console*.  Revise some modules in *scripts/*, eliminate others.
+This is the **master** branch.  Branches recently merged into **master**:
 
-Branches recently merged into **master**:
+- **nojob**, merged 28 Jan 2018.  Simplify and generalize job control.
+Eliminate the *Job* class, absorb its functionality into *Session* and
+*Console*.  Add *Job* Enum.  Eliminate the *InputLine* class, absorb its
+functionality into *Console*.  Revise some modules in *scripts/*,
+eliminate others.  Begun 2 Jan 2018.
 
 - **parse_check**, merged 2 Jan 2018.  Separate *parse* and *check*
 modules out of *ed*.  Remove unnecessary globals from *ed*.  Simplify

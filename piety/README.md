@@ -85,13 +85,15 @@ that enables *Session* (or another job control facility) to start,
 run, and stop it, along with other applications.  The interface
 includes the handler that the job uses to collect input and execute
 commands, and the callables it uses to start (or resume) and stop (or
-pause).
+pause).  
 
 The *Console* class defined in *console/console.py* is the *job* class
 for terminal applications.  The module *scripts/session.py*
 demonstrates how to connect *Console* jobs to a *Session* instance.
 Applications that use other events (than terminal input) require
 another job class.
+
+The *Job* Enum represents the states a job can be in.
 
 ### Event Loop: run function, eventloop and cycle modules ###
 
