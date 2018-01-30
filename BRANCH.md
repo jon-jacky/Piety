@@ -2,7 +2,11 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into **master**:
+This is the **args** branch: add arguments to *Console* *__call__*, to
+be used like the command line arguments in the standalone
+applications.  Begun 30 Jan 2018.
+
+Branches recently merged into **master**:
 
 - **nojob**, merged 28 Jan 2018.  Simplify and generalize job control.
 Eliminate the *Job* class, absorb its functionality into *Session* and
