@@ -2,7 +2,7 @@
 Modular structure
 =================
 
-The Piety [directories](directories.md) and modules are designed to
+The Piety [directories](../DIRECTORIES.md) and modules are designed to
 enable Piety to run on different platforms and in different
 configurations.  
 
@@ -67,7 +67,7 @@ design attempts to minimize dependencies among modules.
   *vt_terminal*.
 
 - The modules in the directories *applications*, *editors*, and
-  *shell* are applications (the Python shell is just another
+  *shells* are applications (the Python shell is just another
   application).  An application does not depend on any modules in
   *piety*; in fact, it must be able to run without the Piety event loop.
   To demonstrate this, every application can be run from the host's

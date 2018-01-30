@@ -11,9 +11,9 @@ The Piety repository is organized into these directories:
 
 - **bin**: shell scripts that configure Piety for Unix-like platforms.
 
-- **console**: modules used by terminal applications, including a
-    non-blocking alternative to Python *input*, with command line	
-    editing and history similar to Unix *readline*.
+- **console**: modules used by terminal applications, including 
+    one that defines the *Console* class, a wrapper that adapts
+    a terminal application for cooperative multitasking.
 
 - **doc**: notes and documents.
 
@@ -31,13 +31,16 @@ The Piety repository is organized into these directories:
 - **select**: Non-blocking event loop using Unix *select*, used by *piety.run*.
    An alternative to *asyncio* (above).
 
-- **shell**: Python shell, *pysh*.
+- **shells**: Callable Python shells: *pysh*a plain Python shell,
+    *wyshka*, which can alternate between a Python shell and an 
+    application shell, and *samysh*, which can execute commands 
+    with an optional echo and delay.
 
 - **test**: shell scripts and modules that test code in other
      directories.
 
-- **unikernel**: an unfinished experiment to build a NetBSD Rumprun unikernel for
-    running Piety. 
+- **unikernel**: an unfinished experiment to build a NetBSD Rumprun
+    unikernel for running Piety.
 
 - **unix**: modules for running Piety on a Unix-like host.
      We may add directories for other platforms in the future.
@@ -52,6 +55,6 @@ The Piety repository is organized into these directories:
     the future.
 
 Each directory contains a *README* file with more information.
-Another page explains the [rationale](modules.md) for this organization.
+Another page explains the [rationale](doc/modules.md) for this organization.
 
-Revised June 2016
+Revised Jan 2018

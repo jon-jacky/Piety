@@ -54,11 +54,13 @@ Piety might be used for ---
 
 - **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), [Erlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
 
-Another page describes the Piety [directories](doc/directories.md) and
+Another page describes the Piety [directories](DIRECTORIES.md) and
 their contents.
+
+Ongoing and recent work on Piety is described [here](BRANCHES.md).
 
 Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).
 
-Revised June 2016
+Revised Jan 2018
