@@ -57,7 +57,7 @@ Piety might be used for ---
 Another page describes the Piety [directories](DIRECTORIES.md) and
 their contents.
 
-Ongoing and recent work on Piety is described [here](BRANCHES.md).
+Ongoing and recent work on Piety is described [here](BRANCH.md).
 
 Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described

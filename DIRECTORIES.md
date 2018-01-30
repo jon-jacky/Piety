@@ -31,7 +31,7 @@ The Piety repository is organized into these directories:
 - **select**: Non-blocking event loop using Unix *select*, used by *piety.run*.
    An alternative to *asyncio* (above).
 
-- **shells**: Callable Python shells: *pysh*a plain Python shell,
+- **shells**: Callable Python shells: *pysh*, a plain Python shell,
     *wyshka*, which can alternate between a Python shell and an 
     application shell, and *samysh*, which can execute commands 
     with an optional echo and delay.
