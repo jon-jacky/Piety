@@ -39,6 +39,62 @@ The *wyshka* shell works like this in Python mode:
 So you can use *:command* to execute an *ed* *command* without exiting
 Python.
 
+Here is a sample session that uses *wyshka* to demonstrate both
+the classic *ed* command line and the new *ed.py* Python API:
+
+    ...$ python3 -i edo.py
+    :!from ed import *
+    :a
+    line a
+    line b
+    line c
+    .
+    :,p
+    line a
+    line b
+    line c
+    :!ed.a('line D')
+    :,p
+    line a
+    line b
+    line c
+    line D
+    :!
+    >> ed.a("""line E
+    .. line F
+    .. line G""")
+    >> import datetime
+    >> datetime.datetime.now()
+    datetime.datetime(2018, 1, 30, 16, 46, 1, 390455)
+    >> _.__str__()
+    '2018-01-30 16:46:01.390455'
+    >> ed.a(datetime.datetime.now().__str__())
+    >> ed.p()
+    2018-01-30 16:47:01.093327
+    >> ed.p(1,S())
+    line a
+    line b
+    line c
+    line D
+    line E
+    line F
+    line G
+    2018-01-30 16:47:01.093327
+    >> :
+    :,p
+    line a
+    line b
+    line c
+    line D
+    line E
+    line F
+    line G
+    2018-01-30 16:47:01.093327
+    :q
+    >>> ^D
+    ...$
+
+
 ## Scripting ##
 
 **edo.py** also adds a new *x* command that executes *ed* commands or
