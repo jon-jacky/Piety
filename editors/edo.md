@@ -103,6 +103,11 @@ the classic *ed* command line and the new *ed.py* Python API:
     >>> ^D
     ...$ 
 
+The *ed* line editor commands and API are described
+[here](../editors/ed.md) and [here](../editors/ed.txt).  How to edit
+within any command line or text contents line is described
+[here](../console/console.txt).
+
 ## Scripting ##
 
 **edo.py** also adds a new *x* command that executes *ed* commands or

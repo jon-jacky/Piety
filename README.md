@@ -59,6 +59,9 @@ their contents.
 
 Ongoing and recent work on Piety is described [here](BRANCH.md).
 
+A [script](scripts/run_timestamps.py) that demonstrates many Piety
+features is described [here](scripts/run_timestamps.md).
+
 Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).

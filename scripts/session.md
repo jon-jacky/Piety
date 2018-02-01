@@ -36,6 +36,12 @@ share the same state including editor buffers and insertion points.
     >> exit()
     ...$
 
+The *ed* line editor commands and API are described
+[here](../editors/ed.md) and [here](../editors/ed.txt).  The *edsel*
+display editor commands are described [here](../editors/edsel.md).
+How to edit within any command line or text contents line is described
+[here](../console/console.txt).
+
 The *session* module also demonstrates job control, including the
 *job* function that lists the jobs, the *^Z* command for suspending a job
 and the *fg* (foreground) function that resumes the most recently
