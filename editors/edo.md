@@ -11,8 +11,10 @@ for executing scripts with optional echo and delay, supported by the
 The enhanced shell and the *x* command are also available in the
 applications, modules, and objects that use the *edo* module,
 including the *edda* module and the *ed* *Console* job it defines, the
-*edsel* display editor application, and the *desoto* module and the
-*edsel* *Console* job it defines.
+*edsel* display editor application, the *desoto* module and the
+*edsel* *Console* job it defines, the *session* module that uses the
+*ed* and *edsel* jobs, and the *run_timestamps* module that uses
+*session*.
 
 ## Enhanced shell ##
 
@@ -108,11 +110,38 @@ Python statements from an editor buffer, to support scripting and
 testing.  (The classic *ed* command *x* prompts for an encryption
 key.)
 
-The *x* command requires the buffer name parameter.  It does not make
+The *x* command requires the buffer name parameter (it does not make
 sense to execute *ed* commands in the same buffer that holds the
-script.  The *x* command ignores any line address arguments; it always
+script).  The *x* command ignores any line address arguments; it always
 executes the entire buffer.  It takes optional parameters *echo*
 (boolean) and *delay* (float), which are helpful for visualizing
 execution.  The defaults are *echo* *True* and *delay* 0.2 sec.
 
-Revised Dec 2017
+Here is a sample that uses the *x* command to execute the *sample.ed*
+script in the *test/ed* directory.  That is the default directory in 
+this sample.   First, we load the script into an
+editor buffer using an *e*, *r*, or *B* command: *B sample.ed*, for
+example.  Then, we change back to the *main* buffer with *b main* and
+execute the test in that buffer with the *x* command: *x sample.ed*.
+Each command echoes as it executes, then there is a short delay before
+the next command so you can see its effect. The echo and delay can be
+adjusted or suppressed by two optional *x* parameters that follow the
+buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example:
+
+    ... $ python3 -i -m edo
+    :B sample.ed
+    sample.ed, 18 lines
+    :b main
+    .   main                 0  None
+    :x sample.ed 1 2
+    ...
+    ... sample.ed executes, echoes commands, waits 2 sec after each command
+    ...
+    :q
+    >>> ^D
+    ... $
+
+After the script finishes, you can type *q* at the prompt to exit the editor,
+then exit from Python.
+
+Revised Jan 2018

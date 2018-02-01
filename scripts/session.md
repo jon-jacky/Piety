@@ -83,5 +83,8 @@ suspended job:
     <console.Console object at 0x10301af60>   pysh     State.foreground
     <console.Console object at 0x1030462e8>   edsel    State.suspended
     <console.Console object at 0x1030274a8>   ed       State.suspended
+
+**session.py** can also demonstrate the enhanced shell provided
+by *[edo.py](../editors/edo.md)*.
     
 Revised Jan 2018

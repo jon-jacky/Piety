@@ -2,10 +2,13 @@
 run_timestamps.py
 =================
 
-**run_timestamps.py** demonstrates many features of the Piety system.
-It uses the Piety scheduler to run the three jobs created by
+**run_timestamps.py** demonstrates many features of the Piety system,
+including concurrent tasks, job control, editors, a windowing system,
+and an enhanced shell.  
+
+**run_timestamps.py** uses the Piety scheduler to run the three jobs created by
 *session.py*, concurrently with two timestamp tasks.  Each timestamp
-task uses the print function to update an editor buffer.  You can
+task uses the *print* function to update an editor buffer.  You can
 see these buffers update in their windows as you edit in another window
 or in the command line.   
 
@@ -76,7 +79,8 @@ Some interesting Python commands to type at the *edsel* command prompt
  - *session.editor.console.command.point* - print index in command line or
     text line where next typed character will appear.
 
-**run_timestamps.py** can also demonstrate all the commands provided
-by *[session.py](session.md)*.
+**run_timestamps.py** can also demonstrate the jobs and job control
+provided by *[session.py](session.md)* and the enhanced shell provided
+by *[edo.py](../editors/edo.md)*.
 
 Revised Jan 2018
