@@ -8,10 +8,11 @@ module in the *shells* directory.  It also supports a new command *x*
 for executing scripts with optional echo and delay, supported by the
 *[samysh](../shells/samysh.py)* module in the *shells* directory.
 
-The enhanced shell and the *x* command are also available in programs
-and objects that use *edo*, including *edda* and the *ed* *Console* job 
-it defines, the *edsel* display editor, *desoto* and the *edsel* *Console*
-job it defines.
+The enhanced shell and the *x* command are also available in the
+applications, modules, and objects that use the *edo* module,
+including the *edda* module and the *ed* *Console* job it defines, the
+*edsel* display editor application, and the *desoto* module and the
+*edsel* *Console* job it defines.
 
 ## Enhanced shell ##
 
@@ -42,58 +43,63 @@ Python.
 Here is a sample session that uses *wyshka* to demonstrate both
 the classic *ed* command line and the new *ed.py* Python API:
 
-    ...$ python3 -i edo.py
-    :!from ed import *
+    Jonathans-MacBook-Pro:editors jon$ python3 -i -m edo
+    :!from ed import * # so we can use a() p() etc. without ed. prefix
     :a
-    line a
-    line b
-    line c
+    line 1
+    line 2
     .
-    :,p
-    line a
-    line b
-    line c
-    :!ed.a('line D')
-    :,p
-    line a
-    line b
-    line c
-    line D
+    :p
+    line 2
+    :1,$p
+    line 1
+    line 2
+    :!a('line A')
+    :!p()
+    line A
+    :!p(1,S())
+    line 1
+    line 2
+    line A
     :!
-    >> ed.a("""line E
-    .. line F
-    .. line G""")
+    >> a("""line B
+    .. line C
+    .. line D""")
+    >> p()
+    line D
+    >> p(1,S())
+    line 1
+    line 2
+    line A
+    line B
+    line C
+    line D
     >> import datetime
     >> datetime.datetime.now()
-    datetime.datetime(2018, 1, 30, 16, 46, 1, 390455)
+    datetime.datetime(2018, 1, 31, 20, 51, 50, 275079)
     >> _.__str__()
-    '2018-01-30 16:46:01.390455'
-    >> ed.a(datetime.datetime.now().__str__())
-    >> ed.p()
-    2018-01-30 16:47:01.093327
-    >> ed.p(1,S())
-    line a
-    line b
-    line c
-    line D
-    line E
-    line F
-    line G
-    2018-01-30 16:47:01.093327
+    '2018-01-31 20:51:50.275079'
+    >> a(_)
+    >> p()
+    2018-01-31 20:51:50.275079
+    >> a(datetime.datetime.now().__str__())
+    >> p()
+    2018-01-31 20:52:45.504836
     >> :
-    :,p
-    line a
-    line b
-    line c
+    :p
+    2018-01-31 20:52:45.504836
+    :1,$p
+    line 1
+    line 2
+    line A
+    line B
+    line C
     line D
-    line E
-    line F
-    line G
-    2018-01-30 16:47:01.093327
+    2018-01-31 20:51:50.275079
+    2018-01-31 20:52:45.504836
     :q
     >>> ^D
-    ...$
-
+    ...$ 
 
 ## Scripting ##
 
