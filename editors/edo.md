@@ -117,7 +117,13 @@ key.)
 
 The *x* command requires the buffer name parameter (it does not make
 sense to execute *ed* commands in the same buffer that holds the
-script).  The *x* command ignores any line address arguments; it always
+script).  The buffer name can be abbreviated by providing a prefix
+followed by a hyphen -- a sort of "poor person's tab completion".  For
+example, the command *x samp-* or even *x s-* might run the test script in
+*sample.ed*.  If more than one buffer name begins with the same
+prefix, the *x* command just chooses one.
+
+The *x* command ignores any line address arguments; it always
 executes the entire buffer.  It takes optional parameters *echo*
 (boolean) and *delay* (float), which are helpful for visualizing
 execution.  The defaults are *echo* *True* and *delay* 0.2 sec.
@@ -125,8 +131,8 @@ execution.  The defaults are *echo* *True* and *delay* 0.2 sec.
 Here is a sample that uses the *x* command to execute the *sample.ed*
 script in the *test/ed* directory.  That is the default directory in 
 this sample.   First, we load the script into an
-editor buffer using an *e*, *r*, or *B* command: *B sample.ed*, for
-example.  Then, we change back to the *main* buffer with *b main* and
+editor buffer: *B sample.ed*.
+Then, we change back to the *main* buffer with *b main* and
 execute the test in that buffer with the *x* command: *x sample.ed*.
 Each command echoes as it executes, then there is a short delay before
 the next command so you can see its effect. The echo and delay can be

@@ -34,9 +34,14 @@ It is helpful to execute *.ed* test scripts interactively at first to
 observe the behavior and confirm that the editor performs as intended.
 To do this, you must run *edo* not *ed*, because *edo* provides
 the *x* script execution command.  Load the script into an
-editor buffer using an *e*, *r*, or *B* command: *B sample.ed*, for
-example.  Then change back to the *main* buffer with *b main* and
+editor buffer:  *B sample.ed*.
+Then change back to the *main* buffer with *b main* and
 execute the test in that buffer with the *x* command: *x sample.ed*.
+The buffer name can be abbreviated by providing a prefix
+followed by a hyphen -- a sort of "poor person's tab completion".  For
+example, the command *x samp-* or even *x s-* might run the test script in
+*sample.ed*.
+
 Each command echoes as it executes, then there is a short delay before
 the next command so you can see its effect. The echo and delay can be
 adjusted or suppressed by two optional *x* parameters that follow the
@@ -57,6 +62,7 @@ buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example:
 
 After the script finishes, type *q* at the prompt to exit the editor,
 then exit from Python.
+
 
 We execute *.ed* scripts non-interactively to save editor output for
 regression testing.  For this we do not need the *x* command so we can

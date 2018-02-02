@@ -176,9 +176,9 @@ also move lines to another buffer.
 The *#* character in the first column of a command indicates a comment.  It is
 useful for annotating command scripts.
 
-In the *b* and *x* commands, the buffer name parameter can be
-abbreviated by providing a prefix followed by a hyphen -- a sort of
-"poor person's tab completion".  For example, the command *b key-*
+In the *b* command, the buffer name parameter can be abbreviated by
+providing a prefix followed by a hyphen -- a sort of "poor person's
+tab completion".  For example, the command *b key-* or even *b k-*
 might switch to the buffer *keyboard.py*.  If more than one buffer
 name begins with the same prefix, *ed.py* just chooses one.
 
