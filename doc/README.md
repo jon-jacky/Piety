@@ -2,17 +2,29 @@ Piety notes and documents
 =========================
 
 **Piety** is a notional operating system to be written in Python.
-  This directory contains some notes and documents:
+  This directory contains some notes and documents.
 
-- **directories.md**, list of Piety directories and their contents.
+These documents discuss the Piety design:
+
+- **analogies.md**, describes how elements of conventional operating systems
+    are related to components of the Piety System.
+
+- **modules.md**, explanation of the Piety repository modular
+    structure and directory organization.
+
+- **pieces.md**, discusses the Python coding techniques we use to
+    build up a Piety configuration from independent parts.
+
+These documents discuss the Piety project history:
+
+- **python3.md**, notes about the conversion from Python 2 to Python 3.
+
+These documents discuss background and related work:
 
 - **gracle_excerpts.txt**, notes about a report on the proposed Gracle
     operating system.
 
 - **language.md**, language processors for Python.
-
-- **modules.md**, explanation of the Piety repository modular
-    structure and directory organization.
 
 - **other.md**, pertinent system software and utilities written in
     languages other than Python.
@@ -21,9 +33,7 @@ Piety notes and documents
     experiments with motivation similar to Piety.  Several are in
     Python.
 
-- **python3.md**, notes about the conversion from Python 2 to Python 3.
-
 - **utilities.md**, system software and utilities written in Python,
     or programmable in Python.
 
-Revised June 2015
+Revised February 2018
