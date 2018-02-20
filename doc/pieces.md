@@ -11,7 +11,7 @@ In Piety, all operating system and application code runs in a single
 Python session so any object might access (read and/or update) any
 other object just by naming it (possibly through a long dotted path of
 module and object names etc.).  This can be convenient, but it is
-necessary to use discipline to ensure that the OS components remain
+necessary to use care to ensure that the OS components remain
 separable and able to be used in different combinations, and to ensure
 that applications remain separable from the OS, so they can run
 standalone (without Piety).
@@ -21,9 +21,11 @@ build up a Piety configuration from independent parts.  We describe
 how the OS components and applications are combined, and how they
 communicate with each other.
 
+(The following are just rough notes and placeholders)
+
 1. Changing configurations by changing PYTHONPATH, so that modules
 with the same names, but from different directories, are used.
-Explained in detail in modules.md.
+Explained in detail [here](modules.md).
 
 2. Avoid dependencies (imports) by passing parameters instead.  Of
 course this is an obvious and age-old technique.  We use it in several
@@ -48,7 +50,7 @@ __init__.  Also Piety job control fcns are passed to Console __init__.
 Console collects input without blocking, calls handler fcn from app,
 also connects application to Piety job control.
 
-4a. Use of "thunks" (callables, usually lambda exprs.) as parameters
+4. a. Use of "thunks" (callables, usually lambda exprs.) as parameters
 in Console __init__ and maybe elsewhere, to reference variables in
 other components.  IN this way, connections to different objects or
 modules can be passed as parameters (instead of being hard-coded).
@@ -66,7 +68,7 @@ falls through to call next inner editor's do_command.  I recall
 shells wyshka > pysh use a variant of this technique also.  Or was
 that just in samysh x (echo/delay) command?
 
-5a. Monkey patching (vocab?): outer layers of "onion" can add/change
+5. a. Monkey patching (vocab?): outer layers of "onion" can add/change
 functionality of inner layers in "onion" by reassigning functions and
 variables.  For example edsel calls ed.configure to reassign ed's
 do_command and update.

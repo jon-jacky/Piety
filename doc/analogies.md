@@ -3,63 +3,65 @@ Operating System Analogies in Piety
 ===================================
 
 Piety is an operating system, but it is not much like a conventional
-operating system such as Unix or Linux.  
+operating system such as Unix or Linux.  Instead, our whole world ---
+the entire computer system that Piety manages --- is a long-running
+Python session and its contents.  We made no attempt to code something
+like Unix, but using Python instead of C.  Instead we code the
+facilities needed to operate a simple personal computer all within a
+single Python session.  Here we identify analogies between some
+conventional operating system concepts and the Piety system.
 
-Instead, our whole world --- the entire computer system that Piety
-manages --- is a long-running Python session and its contents.
-
-We made no attempt to code something like Unix, but using Python
-instead of C.  Instead we identify analogies between some conventional
-operating system concepts and a system that runs entirely in a Python
-session.
-
-- **task**: collection of functions (actually, methods or any other
+- **task**: In piety, a collection of functions (actually, methods or any other
 callables) that can be invoked by a single kind of event (keyboard
-input, or timer expires, etc.).  In Piety, unctions that are invoked
+input, or timer expires, etc.).  In Piety, functions that are invoked
 by events are called *handlers*.  Each handler should exit before the
 next event (of any kind) occurs --- this is *cooperative multitasking*.
 Handlers are not pure functions, most have side effects such as updating
 editor buffers and display windows.  A task can include several *jobs*.
 More details [here](../piety/README.md).
 
+- **concurrency**: In Piety, when two or more tasks that handle
+different kinds of events are loaded into the system, each
+kind of event might invoke a handler from a different task.  In this
+way, tasks can interleave.  Or, several jobs are loaded, so that
+different events of the the same kind might invoke a handler from a
+different job.
+
+- **context save/restore**: In Piety, every handler runs to completion
+and all data persists in the always-running Python session, so no
+context save/restore is needed when different tasks run.
+
+- **parallelism**: Piety does not support true parallelism, where
+different tasks are executing simultaneously on different processors.
+
+- **application**: a module or group of modules that provides a
+collection of related functions (or other callables) that can be
+invoked as a task or a job.
+
+- **job**: a collection of functions in a task that are provided by a
+single application.  A single task can contain several jobs
+(applications).
+
 - **terminal session**: a task whose handlers are invoked by keyboard
 input.  A terminal session can include several console jobs.
-
-- **application**: a conceptually unified service that provides a collection
-of functions (or other callables) that can be invoked as a task or a
-job.
-
-- **job**: a collection of functions within a task that comprises a single
-application.  
 
 - **console job**: a single application in a terminal session.
 
 - **background task**: a task whose handlers are invoked by a periodic timer.
 
-- **concurrency**: two or more tasks that handle different events are loaded
-into the system, so that each kind of event might invoke a handler
-from a different task.  In this way, tasks can interleave.  Or,
-several jobs are loaded, so that different events of the the same kind
-might invoke a handler from a different job.
-
-- **parallelism**: Piety does not support true parallelism, where different
-tasks are executing simultaneously on different processors.
-
-- **context save/restore**: everything persists in the always-running Python
-session so no context save/restore needed.
-
 - **memory management**: including allocation and reclamation (that is,
-garbage collection).  Python language built-in runtime.
+garbage collection).  Provided by Python language runtime.
 
-- **memory protection**: Python language built-in runtime prevents buffer
+- **memory protection**: Python language runtime prevents buffer
 overflows, etc.   Invalid list indices etc. just throw exceptions, do not
-overwrite other objects.  BUT there is no access protection, Python
-can access any object in the session, that is, anything in the
-"computer".
+overwrite other objects.  BUT there is no access protection, any object
+can access any other object in the Python session.
 
 - **user accounts, multiuser operation**: No protection or access controls
 are possible within a single Python session, so Piety does not support
 these.  Piety is a single-user system.
+
+- **shell**: In Piety, the Python REPL.
 
 - **files**: In Piety, much of the functionality of files is provided by
 editor text buffers in memory.  For example we plan to do Python
@@ -95,7 +97,5 @@ different scripts for different Piety configurations.
 
 - **shutdown**: write editor buffers to host file system, exit Piety Python
 REPL Console job, stop Piety scheduler, exit Python.
-
-- etc, more analogies ...
 
 Revised February 2018
