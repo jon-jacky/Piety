@@ -6,8 +6,9 @@ Piety notes and documents
 
 Piety design:
 
-- **analogies.md**, describes how elements of conventional operating systems
-    are related to components of the Piety system.
+- **analogies.md**, an overview of the Piety design, that describes
+    how elements of conventional operating systems are related to
+    components of the Piety system.
 
 - **modules.md**, explanation of the Piety modular structure and
     directory organization.

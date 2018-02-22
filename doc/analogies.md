@@ -3,99 +3,125 @@ Operating System Analogies in Piety
 ===================================
 
 Piety is an operating system, but it is not much like a conventional
-operating system such as Unix or Linux.  Instead, our whole world ---
-the entire computer system that Piety manages --- is a long-running
-Python session and its contents.  We made no attempt to code something
-like Unix, but using Python instead of C.  Instead we code the
-facilities needed to operate a simple personal computer all within a
-single Python session.  Here we identify analogies between some
+operating system such as Linux or Windows.  Instead, our whole world
+--- the entire computer system that Piety manages --- is a single
+long-running Python session and its contents.  We make no attempt to
+code something like Linux, but using Python instead of C.  Instead we
+do something quite different: we code the facilities needed to operate
+a simple personal computer, including its applications, all within a single
+Python session.  The result does not much resemble a conventional
+operating system, but we can still identify some analogies between
 conventional operating system concepts and the Piety system.
 
-- **task**: In piety, a collection of functions (actually, methods or any other
-callables) that can be invoked by a single kind of event (keyboard
-input, or timer expires, etc.).  In Piety, functions that are invoked
-by events are called *handlers*.  Each handler should exit before the
-next event (of any kind) occurs --- this is *cooperative multitasking*.
-Handlers are not pure functions, most have side effects such as updating
-editor buffers and display windows.  A task can include several *jobs*.
-More details [here](../piety/README.md).
+For now, Piety runs in an ordinary Python session running in a
+terminal on some host computer.  At this stage, Piety depends on the
+host operating system code running outside the Python session to
+provide access to the terminal and the file system.  A long-range goal
+of the Piety project is to replace the host operating system with code
+that runs in a Python session on an otherwise bare machine.  
+
+In the meantime, we avoid using the host operating system as much as
+we can.  Our short-term goal is to create and run Python code entirely
+within Piety, using in-memory data structures instead of the host file
+system, and using multiple windows in our single terminal instead of
+the host desktop.  This will enable Piety development to be largely
+self-hosted within the already existing Piety system.  We will only
+need the host to initialize the Piety session and persist the
+results.  The analogies described here apply to this interim system.
+
+- **task**: In Piety, a collection of functions (actually, methods or
+any other callables) that can be invoked by a single kind of event
+(keyboard input, or timer expires, etc.).  In Piety, functions that
+are invoked by events are called *handlers*.  Piety runs an *event
+loop* that detects events and invokes their handlers.  Each handler
+should exit before the next event (of any kind) occurs --- this is
+*cooperative multitasking*.  Handlers are not pure functions; most
+have side effects such as updating editor buffers and display windows.
+A task can include several *jobs*.  More details
+[here](../piety/README.md).
 
 - **concurrency**: In Piety, when two or more tasks that handle
-different kinds of events are loaded into the system, each
-kind of event might invoke a handler from a different task.  In this
-way, tasks can interleave.  Or, several jobs are loaded, so that
-different events of the the same kind might invoke a handler from a
-different job.
+different kinds of events are loaded into the system, each kind of
+event might invoke a handler from a different task.  In this way,
+tasks can interleave --- this is *interleaving concurrency*.
+Interleaving tasks may alternate many times per second, providing an
+illusion of parallelism.
 
 - **context save/restore**: In Piety, every handler runs to completion
-and all data persists in the always-running Python session, so no
+and all data persists in the long-running Python session, so no
 context save/restore is needed when different tasks run.
 
 - **parallelism**: Piety does not support true parallelism, where
-different tasks are executing simultaneously on different processors.
+different tasks run at the same time on different processors.
 
 - **application**: a module or group of modules that provides a
 collection of related functions (or other callables) that can be
-invoked as a task or a job.
+invoked as handlers for a Piety task.  An application can also run
+standalone, without the Piety system.
 
-- **job**: a collection of functions in a task that are provided by a
-single application.  A single task can contain several jobs
-(applications).
+- **job**: a single application within a task.  A task can contain
+multiple jobs.  The jobs within a task do not interleave with each
+other (although they can interleave with other tasks).  Instead, one
+job runs in the foreground while other jobs are suspended.  Suspended
+jobs can be resumed.
 
 - **terminal session**: a task whose handlers are invoked by keyboard
 input.  A terminal session can include several console jobs.
 
 - **console job**: a single application in a terminal session.
 
+- **shell**: In Piety, a console job that provides a Python REPL.
+
 - **background task**: a task whose handlers are invoked by a periodic timer.
 
 - **memory management**: including allocation and reclamation (that is,
 garbage collection).  Provided by Python language runtime.
 
-- **memory protection**: Python language runtime prevents buffer
-overflows, etc.   Invalid list indices etc. just throw exceptions, do not
-overwrite other objects.  BUT there is no access protection, any object
-can access any other object in the Python session.
+- **memory protection**: The Python language itself prevents
+corruption of its memory from programming errors (or deliberate
+attacks) such as buffer overflows, etc.  Invalid list indices
+etc. just raise exceptions; they do not overwrite other objects.  BUT there
+is no access protection; any object can access any other object in the
+Python session.
 
-- **user accounts, multiuser operation**: No protection or access controls
+- **user accounts, multiuser operation**: No access controls
 are possible within a single Python session, so Piety does not support
 these.  Piety is a single-user system.
 
-- **shell**: In Piety, the Python REPL.
+- **files**: We try to avoid using the host file system.  Instead, we
+use in-memory data structures that can persist through the
+long-running Python session.  In particular, we use text buffers,
+instances of the *Buffer* class used in *ed.py* and other editors.
+They provide a *write* method so Python *print* can print into them.
+We will configure Python *import* to import directly from these
+buffers so they don't need to be saved in the host file system. (Not
+yet implemented)
 
-- **files**: In Piety, much of the functionality of files is provided by
-editor text buffers in memory.  For example we plan to do Python
-*import* from a text buffer (not yet implemented).  (Maybe can expand
-this into single-level store.  When running hosted, just read all the
-buffers from host file system at Piety startup and store all in host
-file system at Piety shutdown.  Then maybe add a checkpointing scheme
-for crash/error protection.  When running in VM, no host files are
-needed, all buffers are implicitly saved in and restored from the VM
-image.)
+- **i/o redirection**: In Piety, redirecting the output of
+a task to some text buffer.  We will do this by reassigning the
+*print* function or the *sys.stdout* variable.  This should work
+because we use cooperative multitasking, and we do not have true
+parallelism.  Therefore we can always explicitly reassign *print* and
+*stdout* when we start each handler.  (Not yet implemented)
 
-- **desktop, window manager**: editor display and window commands
-act as a tiling window manager.  The *frame* (display) module is separate from
-any particular editor or other application so it is in effect a
-separate window manager.
+- **desktop, window manager**: Our display editor *edsel* and its
+derivatives *desoto* and *eden* provide multiple tiled windows in a
+single terminal, where each window displays (part of) the contents of
+a text buffer.  The display module *frame* used by these editors does
+not depend on *edsel* or any other application so it is in effect a
+separate window manager; it can display windows that are updated by
+different applications.
 
-- **windows**: editor windows into different text buffers.  Different tasks
-can write into different text buffers, all update in displayed windows
-as updates appear.
+- **boot**: start Python, import needed operating system and
+application modules, start Piety event loop, start Python REPL console
+job.  Optionally, start other applications.
 
-- **i/o redirection**: reassign (monkey patch) Python *print*, to
-print to any text buffer (not yet implemented). Reassign *stdout* to
-write to any text buffers (not yet implemented). (These only work
-because we do not have true parallelism, and we do have cooperative
-multitasking.  We can always explicitly reassign *print* and *stdout* when we
-switch tasks)
+- **shutdown**: Optionally, stop applications.  Then exit Python
+REPL console job, stop Piety event loop, exit Python.
 
-- **boot**: start Python, import needed modules from host file system, start
-piety scheduler, start Piety Python REPL Console job.  Maybe start editor +
-window manager, maybe load some editor buffers from host file system.
-All this can be done from .py scripts, host file system can have
-different scripts for different Piety configurations.
-
-- **shutdown**: write editor buffers to host file system, exit Piety Python
-REPL Console job, stop Piety scheduler, exit Python.
+The operating system that Piety resembles the most is
+[Oberon](http://www.projectoberon.com/).  Oberon uses cooperative
+multitasking, uses a text buffer class as a building block, and uses a
+multiwindow text editor as its desktop and system shell.
 
 Revised February 2018

@@ -16,23 +16,19 @@ machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
 is an experiment to see if we can achieve something similar today with
 Python, but running on ordinary hardware.  (For other projects in a 
 similar spirit, again see [doc/precursors.md](doc/precursors.md).)
-
 We aim to produce, in Python, a simple but self-contained personal
-computer operating system capable of -- what else? -- writing and
-running Python programs.  A minimal system requires only a text
-console, a Python interpreter, some standard library modules, and
-persistent storage (not necessarily a file system).  We also hope to
-experiment with TCP/IP networking (including the web) and graphics.
+computer operating system.
 We aim to see how far we can get with just Python.  There is already a
 lot of work by others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
 
 For now, Piety runs in an ordinary Python interpreter session on a
-host operating system.  A [script](scripts/run_timestamps.py) that
-demonstrates many Piety features is described
+host operating system.  An overview of its design appears
+[here](doc/analogies.md).  We have a [script](scripts/run_timestamps.py) that
+demonstrates many Piety features, described
 [here](scripts/run_timestamps.md).  We plan to run Piety on a bare
 machine (or bare VM) with no other operating system, but only a Python
-interpreter (with the minimum of hardware support in C or assembler).
+interpreter with minimal support.
 There are only a few platform-dependent modules.  Most modules
 developed for Piety on a host operating system should also work on a
 bare machine.
@@ -41,8 +37,7 @@ Piety might be used for ---
 
 - **Education** - Exhibit and explain almost all of the code for an
     entire system, expressed in a readable high-level language (as
-    they did for
-    [Oberon](http://www.inf.ethz.ch/personal/wirth/ProjectOberon/)).
+    they did for [Oberon](http://www.projectoberon.com)).
     Use the Python interpreter to inspect and manipulate any data
     structures in a running system.
 
@@ -57,10 +52,12 @@ Piety might be used for ---
 Another page describes the Piety [directories](DIRECTORIES.md) and
 their contents.
 
-Ongoing and recent work on Piety is described [here](BRANCH.md).
+An overview of the Piety design appears [here](doc/analogies.md).
 
 A [script](scripts/run_timestamps.py) that demonstrates many Piety
 features is described [here](scripts/run_timestamps.md).
+
+Ongoing and recent work on Piety is described [here](BRANCH.md).
 
 Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
