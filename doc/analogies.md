@@ -47,12 +47,12 @@ tasks can interleave --- this is *interleaving concurrency*.
 Interleaving tasks may alternate many times per second, providing an
 illusion of parallelism.
 
+- **parallelism**: Piety does not support true parallelism, where
+different tasks run at the same time on different processors.
+
 - **context save/restore**: In Piety, every handler runs to completion
 and all data persists in the long-running Python session, so no
 context save/restore is needed when different tasks run.
-
-- **parallelism**: Piety does not support true parallelism, where
-different tasks run at the same time on different processors.
 
 - **application**: a module or group of modules that provides a
 collection of related functions (or other callables) that can be
