@@ -80,7 +80,7 @@ Some interesting Python commands to type at the *edsel* command prompt
     text line where next typed character will appear.
 
 **run_timestamps.py** can also demonstrate the jobs and job control
-provided by *[session.py](session.md)* and the enhanced shell provided
-by *[edo.py](../editors/edo.md)*.
+provided by *[session.py](session.md)* and the enhanced shell and
+scripting provided by *[edo.py](../editors/edo.md)*.
 
 Revised Jan 2018

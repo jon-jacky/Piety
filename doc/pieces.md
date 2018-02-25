@@ -5,9 +5,14 @@ Putting the Pieces Together in Piety
 The Piety system is not just a single big program or an ad-hoc
 collection of modules.  It is a collection of operating system
 components and applications that can be put together systematically
-into different configurations.
+into different configurations.  In this document we describe the
+Python coding techniques we use to build up a Piety configuration from
+independent parts.  We describe how the OS components and applications
+are combined, and how they communicate with each other.
 
-In Piety, all operating system and application code runs in a single
+(The following are just rough notes and placeholders)
+
+- In Piety, all operating system and application code runs in a single
 Python session so any object might access (read and/or update) any
 other object just by naming it (possibly through a long dotted path of
 module and object names etc.).  This can be convenient, but it is
@@ -15,13 +20,6 @@ necessary to use care to ensure that the OS components remain
 separable and able to be used in different combinations, and to ensure
 that applications remain separable from the OS, so they can run
 standalone (without Piety).
-
-In this document we describe the Python coding techniques we use to
-build up a Piety configuration from independent parts.  We describe
-how the OS components and applications are combined, and how they
-communicate with each other.
-
-(The following are just rough notes and placeholders)
 
 1. Changing configurations by changing PYTHONPATH, so that modules
 with the same names, but from different directories, are used.

@@ -56,8 +56,9 @@ context save/restore is needed when different tasks run.
 
 - **application**: a module or group of modules that provides a
 collection of related functions (or other callables) that can be
-invoked as handlers for a Piety task.  An application can also run
-standalone, without the Piety system.
+invoked as handlers for a Piety task.  Editors and shells are examples
+of applications.  An application can also run standalone, without the
+Piety system.
 
 - **job**: a single application within a task.  A task can contain
 multiple jobs.  The jobs within a task do not interleave with each
@@ -70,7 +71,9 @@ input.  A terminal session can include several console jobs.
 
 - **console job**: a single application in a terminal session.
 
-- **shell**: In Piety, a console job that provides a Python REPL.
+- **shell**: In Piety, a console job that provides a Python REPL
+(Read-Evaluate-Print Loop).  In Piety, Python itself is the shell
+command language.
 
 - **background task**: a task whose handlers are invoked by a periodic timer.
 
@@ -91,11 +94,11 @@ these.  Piety is a single-user system.
 - **files**: We try to avoid using the host file system.  Instead, we
 use in-memory data structures that can persist through the
 long-running Python session.  In particular, we use text buffers,
-instances of the *Buffer* class used in *ed.py* and other editors.
-They provide a *write* method so Python *print* can print into them.
-We will configure Python *import* to import directly from these
-buffers so they don't need to be saved in the host file system. (Not
-yet implemented)
+instances of the *Buffer* class used in *ed.py*
+and other editors.  They provide a *write* method so Python *print*
+can print into them.  We will configure Python *import* to import
+directly from these buffers so they don't need to be saved in the host
+file system. (Not yet implemented)
 
 - **i/o redirection**: In Piety, redirecting the output of
 a task to some text buffer.  We will do this by reassigning the
@@ -114,7 +117,9 @@ different applications.
 
 - **boot**: start Python, import needed operating system and
 application modules, start Piety event loop, start Python REPL console
-job.  Optionally, start other applications.
+job.  Optionally, start other applications.  This can all be accomplished
+by a Python script.  The Piety *scripts* directory contains several
+Python modules that boot Piety in different configurations.
 
 - **shutdown**: Optionally, stop applications.  Then exit Python
 REPL console job, stop Piety event loop, exit Python.
