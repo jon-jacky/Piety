@@ -30,6 +30,9 @@ or
 
 Use the command *python3 -m edsel -h* to print help.
 
+**edsel** provides the the enhanced shell and scripting
+provided by *[edo.py](../editors/edo.md)*.
+
 ## Display ##
 
 **edsel** looks similar to other multiwindow display editors such as

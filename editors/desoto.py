@@ -16,12 +16,8 @@ edsel = con.Console(prompt=(lambda: wyshka.prompt),
                                        else con.insert_keymap)),
                       startup=editor.startup, cleanup=editor.cleanup)
 
-def main(*filename,**options):
-    ed.quit = False
-    edsel.run() # FIXME - ignores filename, options for now
-
-def resume():
-    main() # no filename, no options - do not disturb present state.
+def main(*filename, **options):
+    edsel.run((*filename, **options)
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

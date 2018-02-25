@@ -356,11 +356,6 @@ def K(): return 1/0  # raise exception on demand, for testing
 
 quit = False
 
-def start():
-    'enable begin or resume main loop'
-    global quit
-    quit = False
-
 def q(*args):
     'exit from main loop'
     global quit
@@ -395,7 +390,7 @@ def do_command(line):
             # Instead of using buf.a,i,c, we handle input mode cmds inline here
             # We add each line to buffer when user types RET at end-of-line,
             # *unlike* in Python API where we pass multiple input lines at once
-            start, end, params, _ = parse.arguments(args) # might be int or None
+            start, end, params, _ = parse.arguments(args) # can be int or None
             start, end = check.mk_range(buf, start, end) # int only
             if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
                     else check.range_ok(buf, start, end)):
@@ -468,12 +463,13 @@ def cmd_options():
 create_buf('main')  # initialize main buffer only once on import
 
 def startup(*filename, **options):
-    global ps1, prompt
+    global ps1, prompt, quit
     if filename:
         e(filename[0])
     if 'p' in options:
         ps1 = options['p'] 
         prompt = ps1
+    quit = False
 
 def main(do_command=do_command, prompt=(lambda: prompt)):
     """
@@ -481,7 +477,6 @@ def main(do_command=do_command, prompt=(lambda: prompt)):
     Won't work with cooperative multitasking, calls blocking input().
     do_command argument provides a hook for other modules that add commands.
     """
-    start()
     while not quit:
         line = input(prompt())
         do_command(line)

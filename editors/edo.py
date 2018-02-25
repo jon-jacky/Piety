@@ -45,7 +45,14 @@ do_command = wyshka.wyshka(do_command=do_command_x,
                            command_mode=(lambda: ed.command_mode),
                            command_prompt=(lambda: ed.prompt))
 
+def startup(*filename, **options):
+    ed.startup(*filename, **options)
+    wyshka.prompt = ed.prompt
+
+def main(*filename, **options):
+    startup(*filename, **options)
+    ed.main(do_command=do_command, prompt=(lambda: wyshka.prompt))
+
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    ed.startup(*filename, **options)
-    ed.main(do_command=do_command, prompt=(lambda: wyshka.prompt))
+    main(*filename, **options)

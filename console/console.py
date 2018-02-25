@@ -197,25 +197,25 @@ class Console(object):
         self.point = len(self.command) if point is None else point
     
     # Piety Session switch method requires job has method named resume
-    def resume(self):
-        self.startup()
+    def resume(self, *args, **kwargs):
+        self.startup(*args, **kwargs)
         self.restart()
 
-    def __call__(self):
+    def __call__(self, *args, **kwargs):
         self.start()
-        self.resume()
+        self.resume(*args, **kwargs)
 
     def stop(self):
         self.restore() # calls print() for newline
         self.cleanup()
         self.exit()
 
-    def run(self):
+    def run(self, *args, **kwargs):
         """
         Console event loop - run a single Console instance as an application.
         For testing only; handler() blocks, can only run one Console at a time.
         """
-        self.__call__()
+        self.__call__(*args, **kwargs)
         while not (self.stopped()
                    or self.command in job_control_keys):
             self.handler() # blocks in self.reader at each character

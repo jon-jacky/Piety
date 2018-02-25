@@ -12,12 +12,11 @@ ed = console.Console(prompt=(lambda: wyshka.prompt),
                      keymap=(lambda: (console.command_keymap 
                                       if edo.ed.command_mode 
                                       else console.insert_keymap)),
-                     startup=edo.ed.start, cleanup=edo.ed.q)
+                     startup=edo.startup, cleanup=edo.ed.q)
 
-def main():
-    ed.run()
+def main(*filename, **options):
+    ed.run(*filename, **options)
 
 if __name__ == '__main__':
     filename, options = edo.ed.cmd_options()
-    edo.ed.startup(*filename, **options)
-    main()
+    main(*filename, **options)

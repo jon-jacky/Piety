@@ -57,8 +57,7 @@ def startup(*filename, **options):
                  update_fcn=update,  # replace ed's no-op update function
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
     update(Op.rescale, start=cmd_h)  # rescale before ed.startup can call e()
-    ed.startup(*filename, **options)
-    ed.start()
+    edo.startup(*filename, **options)
 
 def cleanup():
     'Restore ed no display modes, full-screen scrolling, cursor to bottom.'
@@ -72,7 +71,6 @@ def main(*filename, **options):
     Top level edsel command to invoke from python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
     """
-    ed.quit = False
     startup(*filename, **options)
     while not ed.quit:
         line = input((lambda: wyshka.prompt)())
