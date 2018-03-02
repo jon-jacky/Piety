@@ -7,7 +7,7 @@ edda.py - Defines the ed Console job that wraps the ed.py line editor,
 import edo, wyshka, console
 
 ed = console.Console(prompt=(lambda: wyshka.prompt), 
-                     do_command=edo.do_command,
+                     do_command=edo.wyshka_do_command,
                      stopped=(lambda command: edo.ed.quit),
                      keymap=(lambda: (console.command_keymap 
                                       if edo.ed.command_mode 

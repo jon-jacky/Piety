@@ -14,6 +14,7 @@ c_command, buf, dot = False, None, 0
 def do_command(chars):
     'Handle new eden commands here, pass other commands to edsel'
     global c_command, buf, dot
+    chars = chars.lstrip()
 
     # command mode, 'c' with no address range, c(hange) just one line
     if edsel.ed.command_mode and chars == 'c':

@@ -365,14 +365,16 @@ def q(*args):
 ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
 ps2 = ''  # ed input mode prompt, empty
 prompt = ps1
+prompt_thunk = (lambda: prompt)
 command_mode = True # alternates with input mode used by a,i,c commands
 
-def do_command(line):
+def _do_command(line):
     """
     Process one input line without blocking in ed command or input mode
     Update buffers and control variables: command_mode,cmd_name,args,start,end
     """
     global command_mode, prompt
+    line = line.lstrip()
     if command_mode:
         if line and line[0] == '#': # comment, do nothing
             return 
@@ -425,6 +427,8 @@ def do_command(line):
             buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
         return
 
+do_command = _do_command
+
 # Hooks to configure ed behavior for display editor
 x_cmd_fcn = do_command  # default: ed do_command does not update display etc.
 lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
@@ -471,17 +475,19 @@ def startup(*filename, **options):
         prompt = ps1
     quit = False
 
-def main(do_command=do_command, prompt=(lambda: prompt)):
+def loop():
+    while not quit:
+        line = input(prompt_thunk())
+        do_command(line)
+
+def main(*filename, **options):
     """
     Top level ed command to invoke from Python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
-    do_command argument provides a hook for other modules that add commands.
     """
-    while not quit:
-        line = input(prompt())
-        do_command(line)
+    startup(*filename, **options)
+    loop()
 
 if __name__ == '__main__':
     filename, options = cmd_options()
-    startup(*filename, **options)
-    main()
+    main(*filename, **options)

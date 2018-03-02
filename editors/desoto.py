@@ -17,7 +17,7 @@ edsel = con.Console(prompt=(lambda: wyshka.prompt),
                       startup=editor.startup, cleanup=editor.cleanup)
 
 def main(*filename, **options):
-    edsel.run((*filename, **options)
+    edsel.run(*filename, **options)
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

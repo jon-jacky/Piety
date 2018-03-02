@@ -34,16 +34,20 @@ def x(paramstring):
     else:
         print('? buffername echo delay')
 
-def do_command_x(line):
+def x_do_command(line):
     'Augment ed.do_command with one more command: x execute script from buffer'
-    if ed.command_mode and line.lstrip().startswith('x'):
-        x(line.lstrip()[1:])
+    line = line.lstrip()
+    if ed.command_mode and line.startswith('x'):
+        x(line[1:])
     else:
-        ed.do_command(line)
+        ed._do_command(line)
 
-do_command = wyshka.wyshka(do_command=do_command_x, 
-                           command_mode=(lambda: ed.command_mode),
-                           command_prompt=(lambda: ed.prompt))
+wyshka_do_command = wyshka.wyshka(do_command=x_do_command, 
+                                  command_mode=(lambda: ed.command_mode),
+                                  command_prompt=(lambda: ed.prompt))
+
+ed.do_command = wyshka_do_command
+ed.prompt_thunk = (lambda: wyshka.prompt)
 
 def startup(*filename, **options):
     ed.startup(*filename, **options)
@@ -51,7 +55,7 @@ def startup(*filename, **options):
 
 def main(*filename, **options):
     startup(*filename, **options)
-    ed.main(do_command=do_command, prompt=(lambda: wyshka.prompt))
+    ed.loop()
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

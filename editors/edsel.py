@@ -31,16 +31,17 @@ def do_window_command(line):
 
 def edsel_do_command(line):
     'Process one command line without blocking.'
+    line = line.lstrip()
     # try/except ensures we restore display, especially scrolling
     try:
         # Intercept special commands used by frame only, not ed.
         # Only in command mode!  Otherwise line might be text to add to buffer.
-        if ed.command_mode and line.lstrip() == 'L': # similar to ^L
+        if ed.command_mode and line == 'L': # similar to ^L
             refresh()
-        elif ed.command_mode and line.lstrip().startswith('o'):
+        elif ed.command_mode and line.startswith('o'):
             do_window_command(line)
         else:
-            edo.do_command_x(line)
+            edo.x_do_command(line)
     except BaseException as e:
         cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
