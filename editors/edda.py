@@ -14,9 +14,9 @@ ed = console.Console(prompt=(lambda: wyshka.prompt),
                                       else console.insert_keymap)),
                      startup=edo.startup, cleanup=edo.ed.q)
 
-def main(*filename, **options):
+def edda(*filename, **options):
     ed.run(*filename, **options)
 
 if __name__ == '__main__':
     filename, options = edo.ed.cmd_options()
-    main(*filename, **options)
+    edda(*filename, **options)

@@ -16,9 +16,9 @@ edsel = con.Console(prompt=(lambda: wyshka.prompt),
                                        else con.insert_keymap)),
                       startup=editor.startup, cleanup=editor.cleanup)
 
-def main(*filename, **options):
+def desoto(*filename, **options):
     edsel.run(*filename, **options)
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    main(*filename, **options)
+    desoto(*filename, **options)

@@ -67,7 +67,7 @@ def cleanup():
     display.set_scroll_all()
     display.put_cursor(frame.nlines,1)
 
-def main(*filename, **options):
+def edsel(*filename, **options):
     """
     Top level edsel command to invoke from python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
@@ -83,4 +83,4 @@ frame.init(ed.buf) # import ed above initializes ed.buf
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    main(*filename, **options)
+    edsel(*filename, **options)
