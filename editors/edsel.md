@@ -5,8 +5,12 @@ edsel
 **edsel** is a display editor in pure Python based on the line editor
   [ed.py](ed.md).
 
+**edsel** provides the the enhanced shell and scripting
+provided by *[edo.py](../editors/edo.md)*.
+
 **edsel** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
+
 
 ## Running edsel ##
 
@@ -16,22 +20,24 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 [ed.py](ed.md).  It adds one more option, *c*, the number of lines in
 the scrolling command region (see below), for example:
 
-    python3 -i -m edsel lines.txt -p : -c 12
+    python3 -i -m edsel lines20.txt -c 12
+    ... main window appears ...
+
+    lines20.txt, 20 lines
+    :
 
 or 
-
+    
     python3 -i
     ...
-    >>> import edsel
-    >>> edsel.main('lines.txt', p=':', c=12)
-    ....
-    lines.txt, 40 lines
-    : 
+    >>> from edsel import *
+    >>> edsel('lines20.txt', c=12)
+    .... main window appears ...
+
+    lines20.txt, 20 lines
+    :
 
 Use the command *python3 -m edsel -h* to print help.
-
-**edsel** provides the the enhanced shell and scripting
-provided by *[edo.py](../editors/edo.md)*.
 
 ## Display ##
 
@@ -112,9 +118,11 @@ By default, the *edsel* command region displays just two lines.  This
 is usually not enough to show all of the output from some commands,
 for example *n* (list buffers).  Use the *c* option to set more lines
 when you invoke *edsel* (see examples above).  Or, to change the
-number command lines at any time during an editing session, type a
-Python statement that assigns the *cmd_h* variable.  For example, to
-set the region to 12 lines, type: *!cmd_h = 12*
+number command lines at any time during an editing session, use Python
+commands to reassign *cmd_h*, then rescale the display:
+
+    :!frame.cmd_h=12
+    :!update(Op.rescale)
 
 ## Frame commands ##
 
@@ -134,19 +142,19 @@ seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
 
 ## Modules ##
 
-**edsel.py** imports *edo*, which in turn imports *ed*.  Here
-*edsel* imports the *update* function from the *updates* module and
-passes it to *ed*, which assigns it to its own *update* function.
-Then *edsel* collects commands and passes most of them to *ed*.  Then
-*ed* performs the commanded editing operations and calls its newly
-assigned *update* function to cause *frame* to display their effects.
-(The default *ed.update* does nothing, so *ed* without edsel runs
-without any display.)
+**edsel.py** imports *edo*, which in turn imports *ed*.  Here edsel
+imports the *update* function from the *updates* module and passes it
+to *ed*, which assigns it to its own *update* function.  The *update*
+function updates the display by calling the *frame* module.
+Here *edsel* collects commands and
+passes most of them to *ed*.  Then *ed* performs the commanded editing
+operations and calls its newly assigned *update* function to cause
+*frame* to display their effects.  (The default *ed.update* does
+*nothing, so *ed* without edsel runs without any display.)
 
 The only commands that *edsel* does not pass to *ed* are the windowing
 commands that create, destroy, or rearrange windows, or change
 the input focus from one window to another.   For these, *edsel* itself calls
 *update* to cause *frame* to display the effects.
 
-Revised Dec 2017
-
+Revised Mar 2018

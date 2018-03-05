@@ -46,7 +46,6 @@ Here is a sample session that uses *wyshka* to demonstrate both
 the classic *ed* command line and the new *ed.py* Python API:
 
     Jonathans-MacBook-Pro:editors jon$ python3 -i -m edo
-    :!from ed import * # so we can use a() p() etc. without ed. prefix
     :a
     line 1
     line 2
@@ -56,20 +55,20 @@ the classic *ed* command line and the new *ed.py* Python API:
     :1,$p
     line 1
     line 2
-    :!a('line A')
-    :!p()
+    :!ed.a('line A')
+    :!ed.p()
     line A
-    :!p(1,S())
+    :!ed.p(1,ed.S())
     line 1
     line 2
     line A
     :!
-    >> a("""line B
+    >> ed.a("""line B
     .. line C
     .. line D""")
-    >> p()
+    >> ed.p()
     line D
-    >> p(1,S())
+    >> ed.p(1,ed.S())
     line 1
     line 2
     line A
@@ -81,11 +80,11 @@ the classic *ed* command line and the new *ed.py* Python API:
     datetime.datetime(2018, 1, 31, 20, 51, 50, 275079)
     >> _.__str__()
     '2018-01-31 20:51:50.275079'
-    >> a(_)
-    >> p()
+    >> ed.a(_)
+    >> ed.p()
     2018-01-31 20:51:50.275079
-    >> a(datetime.datetime.now().__str__())
-    >> p()
+    >> ed.a(datetime.datetime.now().__str__())
+    >> ed.p()
     2018-01-31 20:52:45.504836
     >> :
     :p
@@ -103,10 +102,26 @@ the classic *ed* command line and the new *ed.py* Python API:
     >>> ^D
     ...$ 
 
+You can also run *edo* from an interactive Python session.  The *edo.py*
+main function is named *edo* (not *main*) so you can use it like this:
+
+    python3 -i
+    ...
+    >>> from edo import *
+    >>> edo()
+    :a 
+    ... etc. ... 
+    :!ed.a('line A')
+    ... etc. ...
+
 The *ed* line editor commands and API are described
 [here](../editors/ed.md) and [here](../editors/ed.txt).  How to edit
 within any command line or text contents line is described
 [here](../console/console.txt).
+
+The *edo.py* program accepts the same optional command line arguments
+as *ed.py*, and the *edo* function accepts the same optional arguments
+as the *ed* function.
 
 ## Scripting ##
 
@@ -137,7 +152,8 @@ execute the test in that buffer with the *x* command: *x sample.ed*.
 Each command echoes as it executes, then there is a short delay before
 the next command so you can see its effect. The echo and delay can be
 adjusted or suppressed by two optional *x* parameters that follow the
-buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example:
+buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example,
+in the *test/ed* directory:
 
     ... $ python3 -i -m edo
     :B sample.ed
@@ -155,4 +171,4 @@ buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example:
 After the script finishes, you can type *q* at the prompt to exit the editor,
 then exit from Python.
 
-Revised Jan 2018
+Revised Mar 2018
