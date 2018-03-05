@@ -55,8 +55,8 @@ precent sign *%* as the prompt string:
 The default prompt string is the colon *:*.  To run with no prompt string,
 like classic *ed*, use *-p ''*.
 
-To run *ed.py* in an interactive Python session, type *from import ed
- import ** to import the entire API.   Then type *ed()* to start the editor:
+To run *ed.py* in an interactive Python session, type *from ed import* *
+to import the entire API.   Then type *ed()* to start the editor:
 
     python3 -i
     ...
@@ -200,7 +200,7 @@ name begins with the same prefix, *ed.py* just chooses one.
 
 **ed.py** has a Python API so you can edit from the Python prompt or
 write editing scripts in Python.  Here is the preceding example
-expressed using the API.  Here we use the *from ed import ...* form
+expressed using the API.  Here we use the *from ed import* * form
 so we don't have to prefix each function call with *ed.*
 
     >>> from ed import *
@@ -290,3 +290,4 @@ directory.   **ed.py** also uses the Python standard library modules
 *re*, *os*, and *sys*.  Other than that, **ed.py** has no dependencies.
 
 Revised Mar 2018
+
