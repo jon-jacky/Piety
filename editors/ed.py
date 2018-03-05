@@ -454,13 +454,13 @@ def cmd_options():
                         help='name of file to load into main buffer at startup (omit to start with empty main buffer)',
                         nargs='?',
                         default=None),
-    parser.add_argument('-p', '--prompt', help='command prompt string (default no prompt)',
-                        default='')
+    parser.add_argument('-p', '--prompt', help="command prompt string (default ':')",
+                        default=':')
     parser.add_argument('-c', '--cmd_h', help='number of lines in scrolling command region (display editor only, default 2)',
                         type=int, default=2)
     args = parser.parse_args()
     filename = [args.file] if args.file else []
-    options = {'p': args.prompt } if args.prompt else {}
+    options = {'p': args.prompt }
     options.update({'c': args.cmd_h } if args.cmd_h else {})
     return filename, options
 
@@ -480,7 +480,7 @@ def loop():
         line = input(prompt_thunk())
         do_command(line)
 
-def main(*filename, **options):
+def ed(*filename, **options):
     """
     Top level ed command to invoke from Python prompt or command line.
     Won't work with cooperative multitasking, calls blocking input().
@@ -490,4 +490,4 @@ def main(*filename, **options):
 
 if __name__ == '__main__':
     filename, options = cmd_options()
-    main(*filename, **options)
+    ed(*filename, **options)

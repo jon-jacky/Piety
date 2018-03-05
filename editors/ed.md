@@ -27,8 +27,8 @@ The recommended way to run **ed.py** as a standalone program is:
     python3 -i -m ed
 
 Here the *-i* option runs Python in interactive mode so you can use
-*readline*-style editing within command lines.  The *-m* option finds
-and runs **ed.py** from any directory on your Python path (you provide
+*readline*-style editing in commands and input text.  The *-m* option finds
+and runs **ed.py** from any directory on your Python path (here you provide
 the module name *ed*, not the file name *ed.py*).
 
 **ed.py** provides a few command line arguments and options, explained in this
@@ -43,25 +43,34 @@ output from *ed -h*:
     optional arguments:
       -h, --help            show this help message and exit
       -p PROMPT, --prompt PROMPT
-                            command prompt string (default no prompt)
+                            command prompt string (default ':')
 
-For example, to load the file *lines.txt* on startup and use colon *:* as the prompt string:
+For example, to load the file *lines20.txt* on startup and use the
+precent sign *%* as the prompt string:
 
-    python3 -i -m ed lines.txt -p : 
+    python3 -i -m ed lines20.txt -p %
+    lines20.txt, 20 lines
+    % 
 
-To run *ed.py* in an interactive Python session, import *ed* then run its *main* function:
+The default prompt string is the colon *:*.  To run with no prompt string,
+like classic *ed*, use *-p ''*.
+
+To run *ed.py* in an interactive Python session, type *from import ed
+ import ** to import the entire API.   Then type *ed()* to start the editor:
 
     python3 -i
     ...
-    >>> import ed
-    >>> ed.main()
+    >>> from ed import *
+    >>> ed()
+    :
 
-The *main* function accepts an optional positional argument for a file name and 
-and optional keyword argument for a prompt string:
+The *ed* function accepts an optional positional argument for a file name and 
+and optional keyword argument for a prompt string, so the *ed* function call
+can resemble the *ed* command line:
 
-    >>> ed.main('lines.txt', p=':')
-    lines.txt, 40 lines
-    : 
+    >>> ed('lines20.txt', p='%')
+    lines20.txt, 20 lines
+    %
 
 
 ## Commands ##
@@ -101,7 +110,7 @@ and
 There is a manual at [GNU](http://www.gnu.org/software/ed/manual/ed_manual.html), 
 and a brief tutorial at a [blog](http://blog.sanctum.geek.nz/actually-using-ed/), 
 with more comments and links
-at [HN](https://news.ycombinator.com/item?id=4120513).
+at [HN](https://news.ycombinator.com/item?id=4120513).  There is even a [POSIX standard](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ed.html).
 
 The *sam* editor is described at
 [http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
@@ -110,11 +119,11 @@ and [http://sam.cat-v.org/](http://sam.cat-v.org/).
 This brief example that shows how to invoke **ed.py** in an
 interactive Python session and run some commands:
 
-    >>> import ed
-    >>> ed.main()
-    e test.txt
+    >>> from ed import *
+    >>> ed()
+    :e test.txt
     test.txt, 0 lines
-    a
+    :a
     ed.main() enters ed command mode.  By default, there is no command prompt.
     'e <name>' loads the named file into the current buffer.
     'a' enters ed input mode and appends the text after the current line.
@@ -122,14 +131,15 @@ interactive Python session and run some commands:
     'q' quits ed command mode.
     To quit input mode, type a period by itself at the start of a line.
     .
-    w
+    :w
     test.txt, 6 lines
-    q
+    :q
     >>>
 
 After the *q* command, all the editor buffers and other context
-remain, so the editing session can be resumed at any time by typing
-*ed.main()* again.
+remain, so the editing session can be resumed at any time by calling
+*ed()* again.  Or, any of the other API functions can be called 
+at the Python prompt.
 
 ## Limitations and differences from classic ed ##
 
@@ -152,6 +162,10 @@ resumed by calling *ed.main()* at the Python interpreter prompt again.
 **ed.py** always prints the error message following the *?* character.
 There is no way to suppress printing the error messages as in classic
 *ed*.
+
+The default prompt is the colon *:*, not the empty string.  If no
+prompt is desired, that must be requested with *-p ''* on the command
+line or *p=''* in the *ed* function call.
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
@@ -226,25 +240,25 @@ calls *o() S() F(text) R(text)*.  For example, the print commands *.,$p* and
 The API also provides a function *do_command* with a single string
 argument, which is exactly the command string you would type to *ed*
 in command mode or the text string you would type in input mode.  Here
-is the preceding example expressed once more using *ed.do_command*:
+is the preceding example expressed once more using *do_command*:
 
-    >>> import ed
-    >>> ed.do_command('e test.txt')
+    >>> from ed import *
+    >>> do_command('e test.txt')
     test.txt, 0 lines
-    >>> ed.do_command('a')
-    >>> ed.do_command('ed() enters ed command mode.  By default, there is no command prompt.')
-    >>> ed.do_command("'e <name>' loads the named file into the current buffer.")
-    >>> ed.do_command("'a' enters ed input mode and appends the text after the current line.")
-    >>> ed.do_command("'w' writes the buffer contents back to the file")
-    >>> ed.do_command("'q' quits ed command mode.")
-    >>> ed.do_command('To quit input mode, type a period by itself at the start of a line.')
-    >>> ed.do_command('.')
-    >>> ed.do_command('w')
+    >>> do_command('a')
+    >>> do_command('ed() enters ed command mode.  By default, there is no command prompt.')
+    >>> do_command("'e <name>' loads the named file into the current buffer.")
+    >>> do_command("'a' enters ed input mode and appends the text after the current line.")
+    >>> do_command("'w' writes the buffer contents back to the file")
+    >>> do_command("'q' quits ed command mode.")
+    >>> do_command('To quit input mode, type a period by itself at the start of a line.')
+    >>> do_command('.')
+    >>> do_command('w')
     test.txt, 6 lines
 
 When **ed.py** is running with the *Piety* cooperative multitasking
 scheduler, *Piety* collects a command line or input line without
-blocking, and then passes that line to *ed.do_command*.
+blocking, and then passes that line to *do_command*.
 
 ## Modules ##
 
@@ -275,4 +289,4 @@ The *buffer*, *parse*, *check*, and *updates*  modules are included in this
 directory.   **ed.py** also uses the Python standard library modules
 *re*, *os*, and *sys*.  Other than that, **ed.py** has no dependencies.
 
-Revised Dec 2017
+Revised Mar 2018

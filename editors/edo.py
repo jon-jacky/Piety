@@ -24,8 +24,8 @@ def x(paramstring):
                     delay = float(params[2])
                 except ValueError:
                     pass # use default
-            # do_command passed to samysh is defined below, includes wyshka
-            samysh_do_command = samysh.samysh(do_command=do_command,
+            # wyshka_do_command passed to samysh is defined below
+            samysh_do_command = samysh.samysh(do_command=wyshka_do_command,
                                               echo=echo, delay=delay)
             for line in ed.buffers[bufname].lines[1:]: # lines[0] always empty
                 samysh_do_command(line.rstrip()) # remove terminal \n 
@@ -53,10 +53,10 @@ def startup(*filename, **options):
     ed.startup(*filename, **options)
     wyshka.prompt = ed.prompt
 
-def main(*filename, **options):
+def edo(*filename, **options):
     startup(*filename, **options)
     ed.loop()
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    main(*filename, **options)
+    edo(*filename, **options)
