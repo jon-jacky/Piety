@@ -59,18 +59,18 @@ Files in this directory:
   to collect and edit input lines with blocking.  Contrast to *ed.py*
   *main* function and *etty.py*.
 
-- **edsel.md**: description of *edsel.py*.  REVISIONS MAY BE NEEDED.
+- **edsel.md**: description of *edsel.py*.
 
 - **edsel.py**: display editor based on the line editor *ed.py*.
   Import *edo*, which runs *ed.py* along with *wyshka* enhanced
   shell and *samysh* script execution.  Use Python builtin *input()*
   to collect and edit input lines with blocking.
 
-- **etty.py**: run *ed.py* line editor, use *console*,
-  module to collect and edit input lines.  Use
-  non-default keymaps with *Command* class to provide retro
+- **etty.py**: run *ed.py* line editor in a *Console*
+  job to collect and edit input lines.  Use
+  non-default keymaps with *Console* class to provide retro
   printing-terminal-style editing and history.  Contrast to *ed.py*
-  *main* function and *edda*.  MIGHT NOT WORK.
+  *main* function and *edda*.
 
 - **frame.md**: description of *frame.py*, *updates.py*, and *updatecall.py*.
 

@@ -1,6 +1,6 @@
 
 edsel
-===
+=====
 
 **edsel** is a display editor in pure Python based on the line editor
   [ed.py](ed.md).
@@ -126,7 +126,6 @@ commands to reassign *cmd_h*, then rescale the display:
 
 The *ed* API is avaiable in *edsel* by prefixing each call by *ed.*
 for example:
-
 
     :!ed.a('append line after dot')
     :q   

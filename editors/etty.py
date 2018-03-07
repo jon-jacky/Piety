@@ -4,20 +4,21 @@ etty.py - Run ed line editor session, but use console module
  Use keymaps to provide retro printing-terminal-style editing and history.
 """
 
-import ed, console as con, terminal
+import ed, console, terminal
 
-console = con.Console(prompt=(lambda: ed.prompt), 
+tty = console.Console(prompt=(lambda: ed.prompt), 
                       reader=terminal.getchar,
                       do_command=ed.do_command,
                       stopped=(lambda command: ed.quit),
                       # specify non-default tty_keymap 
-                      keymap=(lambda: (con.command_tty_keymap 
-                                               if ed.command_mode 
-                                               else con.insert_tty_keymap)))
+                      keymap=(lambda: (console.command_tty_keymap 
+                                       if ed.command_mode 
+                                       else console.insert_tty_keymap)),
+                      startup=ed.startup, cleanup=ed.q)
 
-def main():
-    ed.startup()
-    console.run()
+def etty(*filename, **options):
+    tty.run(*filename, **options)
 
 if __name__ == '__main__':
-    main()
+    filename, options = ed.cmd_options()
+    etty(*filename, **options)
