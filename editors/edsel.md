@@ -14,7 +14,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 ## Running edsel ##
 
-**edsel** can run as a standalone program or in an interactive Python session.
+v**edsel** can run as a standalone program or in an interactive Python session.
 
 **edsel** is invoked using a similar command line or fuction call as
 [ed.py](ed.md).  It adds one more option, *c*, the number of lines in
@@ -124,6 +124,14 @@ commands to reassign *cmd_h*, then rescale the display:
     :!frame.cmd_h=12
     :!update(Op.rescale)
 
+The *ed* API is avaiable in *edsel* by prefixing each call by *ed.*
+for example:
+
+
+    :!ed.a('append line after dot')
+    :q   
+    >>> ed.a('append another line after dot')
+
 ## Frame commands ##
 
 The *L* command refreshes the entire frame including all windows, and
@@ -139,22 +147,5 @@ you can observe its effect.  The echo and delay can be adjusted or
 suppressed by two optional *x* parameters that follow the buffer name:
 echo (boolean) and delay (float), which default to *True* and *0.2*
 seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
-
-## Modules ##
-
-**edsel.py** imports *edo*, which in turn imports *ed*.  Here edsel
-imports the *update* function from the *updates* module and passes it
-to *ed*, which assigns it to its own *update* function.  The *update*
-function updates the display by calling the *frame* module.
-Here *edsel* collects commands and
-passes most of them to *ed*.  Then *ed* performs the commanded editing
-operations and calls its newly assigned *update* function to cause
-*frame* to display their effects.  (The default *ed.update* does
-*nothing, so *ed* without edsel runs without any display.)
-
-The only commands that *edsel* does not pass to *ed* are the windowing
-commands that create, destroy, or rearrange windows, or change
-the input focus from one window to another.   For these, *edsel* itself calls
-*update* to cause *frame* to display the effects.
 
 Revised Mar 2018

@@ -15,11 +15,10 @@ preserves its state between invocations, so work in progress can be
 resumed.  Moreover the line editor *ed* and the display editor *edsel*
 share the same state including editor buffers and insertion points.
 
-    ...$ python3 session.py
+    $ python3 session.py
     >> dir()
     ...
-    >> ed()
-    : e README.md
+    >> ed('README.md')
     ... edit in README.md
     :q
     >> import datetime
@@ -36,11 +35,22 @@ share the same state including editor buffers and insertion points.
     >> exit()
     ...$
 
+The Python *-i* option is not needed in the command line because here
+*pysh*, *ed*, and *edsel* are *Console* jobs that include built-in
+line editing.
+
 The *ed* line editor commands and API are described
 [here](../editors/ed.md) and [here](../editors/ed.txt).  The *edsel*
 display editor commands are described [here](../editors/edsel.md).
 How to edit within any command line or text contents line is described
 [here](../console/console.txt).
+
+The *ed* API is avaiable in *session* by prefixing each call by *editor.ed.*
+for example:
+
+    :!editor.ed.a('append line after dot')
+    :q   
+    >>> editor.ed.a('append another line after dot')
 
 The *session* module also demonstrates job control, including the
 *job* function that lists the jobs, the *^Z* command for suspending a job

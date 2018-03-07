@@ -79,6 +79,8 @@ Some interesting Python commands to type at the *edsel* command prompt
  - *session.editor.console.command.point* - print index in command line or
     text line where next typed character will appear.
 
+ - *ed_api.a('append line after dot')* - or any other call from the *ed* API.
+
 **run_timestamps.py** can also demonstrate the jobs and job control
 provided by *[session.py](session.md)* and the enhanced shell and
 scripting provided by *[edo.py](../editors/edo.md)*.

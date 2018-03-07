@@ -461,7 +461,7 @@ def cmd_options():
     args = parser.parse_args()
     filename = [args.file] if args.file else []
     options = {'p': args.prompt }
-    options.update({'c': args.cmd_h } if args.cmd_h else {})
+    options.update({'c': args.cmd_h })
     return filename, options
 
 create_buf('main')  # initialize main buffer only once on import
