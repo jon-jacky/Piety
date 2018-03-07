@@ -66,6 +66,8 @@ Files in this directory:
   shell and *samysh* script execution.  Use Python builtin *input()*
   to collect and edit input lines with blocking.
 
+- **etty.md**: description of *etty.py*.
+
 - **etty.py**: run *ed.py* line editor in a *Console*
   job to collect and edit input lines.  Use
   non-default keymaps with *Console* class to provide retro
