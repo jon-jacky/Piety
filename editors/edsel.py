@@ -54,8 +54,7 @@ do_command = wyshka.wyshka(do_command=edsel_do_command,
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
     cmd_h = options['c'] if 'c' in options else 2
-    ed.configure(cmd_fcn=do_command, # so x uses edsel not ed do_command()
-                 update_fcn=update,  # replace ed's no-op update function
+    ed.configure(update_fcn=update,  # replace ed's no-op update function
                  print_dest=open(os.devnull, 'w')) # discard l z printed output
     update(Op.rescale, start=cmd_h)  # rescale before ed.startup can call e()
     edo.startup(*filename, **options)
