@@ -25,7 +25,7 @@ def wyshka(do_command=(lambda line: None), command_mode=(lambda: True),
     application prompt string, which might depend on application
     state.  Default always returns the empty string.
     """
-    def specialized_do_command(line):
+    def _do_command(line):
         global python_mode, prompt
         if command_mode():
             if python_mode:
@@ -48,7 +48,7 @@ def wyshka(do_command=(lambda line: None), command_mode=(lambda: True),
             do_command(line)
         prompt = pysh.prompt if python_mode else command_prompt()
         return 
-    return specialized_do_command
+    return _do_command
 
 # stub application for testing
 

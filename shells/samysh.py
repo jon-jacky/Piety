@@ -20,13 +20,13 @@ def samysh(do_command=(lambda line: None), echo=True, delay=None):
     delay - seconds to wait after executing line (float, can be < 1.0).
     Default no delay.
     """
-    def specialized_do_command(line):
+    def _do_command(line):
         if echo: 
             print(line)
         do_command(line) 
         if delay and delay > 0:
             time.sleep(delay) # FIXME replace with non-blocking piety.sleep()
-    return specialized_do_command
+    return _do_command
 
 # Test
 

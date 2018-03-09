@@ -365,14 +365,10 @@ def q(*args):
 ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
 ps2 = ''  # ed input mode prompt, empty
 prompt = ps1
-prompt_thunk = (lambda: prompt)
 command_mode = True # alternates with input mode used by a,i,c commands
 
-def _do_command(line):
-    """
-    Process one input line without blocking in ed command or input mode
-    Update buffers and control variables: command_mode,cmd_name,args,start,end
-    """
+def do_command(line):
+    'Process one line without blocking in ed command or input mode'
     global command_mode, prompt
     line = line.lstrip()
     if command_mode:
@@ -427,8 +423,6 @@ def _do_command(line):
             buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
         return
 
-do_command = _do_command
-
 # Hooks to configure ed behavior for display editor
 lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
 def noupdate(op, **kwargs): pass 
@@ -473,18 +467,12 @@ def startup(*filename, **options):
         prompt = ps1
     quit = False
 
-def loop():
-    while not quit:
-        line = input(prompt_thunk())
-        do_command(line)
-
 def ed(*filename, **options):
-    """
-    Top level ed command to invoke from Python prompt or command line.
-    Won't work with cooperative multitasking, calls blocking input().
-    """
+    'Top level ed command to invoke from Python REPL or __main__'
     startup(*filename, **options)
-    loop()
+    while not quit:
+        line = input(prompt) # blocks!
+        do_command(line)
 
 if __name__ == '__main__':
     filename, options = cmd_options()
