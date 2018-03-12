@@ -14,7 +14,7 @@ cooperative multitasking system such as [Piety](../piety/README.md).
 
 ## Running edsel ##
 
-v**edsel** can run as a standalone program or in an interactive Python session.
+**edsel** can run as a standalone program or in an interactive Python session.
 
 **edsel** is invoked using a similar command line or fuction call as
 [ed.py](ed.md).  It adds one more option, *c*, the number of lines in

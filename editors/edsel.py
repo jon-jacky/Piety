@@ -29,7 +29,7 @@ def do_window_command(line):
     else:
         print('? integer 1 or 2 expected at %s' % param_string) 
 
-def edsel_do_command(line):
+def do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     # try/except ensures we restore display, especially scrolling
@@ -41,15 +41,19 @@ def edsel_do_command(line):
         elif ed.command_mode and line.startswith('o'):
             do_window_command(line)
         else:
-            edo.x_do_command(line)
+            ed.do_command(line)
     except BaseException as e:
         cleanup() # so we can see entire traceback 
         traceback.print_exc() # looks just like unhandled exception
         ed.quit = True # exit() here raises another exception
 
-do_command = wyshka.wyshka(do_command=edsel_do_command,
-                           command_mode=(lambda: ed.command_mode),
-                           command_prompt=(lambda: ed.prompt))
+# wyshka adds embedded python interpreter to do_command
+_do_command = wyshka.wyshka(do_command=do_command,
+                            command_mode=(lambda: ed.command_mode),
+                            command_prompt=(lambda: ed.prompt))
+
+# mk_x_do_command adds x execute script command to _do_command
+_do_command = edo.mk_x_do_command(_do_command)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
@@ -74,7 +78,7 @@ def edsel(*filename, **options):
     startup(*filename, **options)
     while not ed.quit:
         line = input((lambda: wyshka.prompt)())
-        do_command(line) # non-blocking
+        _do_command(line) # non-blocking
     cleanup()
 
 # initialize first window only once on import

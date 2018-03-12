@@ -6,11 +6,12 @@ wyshka.py - Shell that can alternate between pysh (Python)
 
 import pysh
 
-def wyshka(do_command=(lambda line: None), command_mode=(lambda: True), 
-           command_prompt=(lambda: '')):
+def shell(do_command=(lambda line: None), command_mode=(lambda: True), 
+          command_prompt=(lambda: '')):
     """
-    Return a function with one argument (a string, the command line) that
-    sends a command either to Python or to another application.  
+    Return a shell: a function with one argument (a string, the
+    command line) that sends a command either to Python or to another
+    application.
 
     This function has three optional keyword arguments with defaults:
 
@@ -84,9 +85,9 @@ app.do_command = app_do_command
 python_mode = False
 prompt = app.prompt
 
-do_command = wyshka(do_command=app.do_command,
-                    command_mode=(lambda: app.command_mode),
-                    command_prompt=(lambda: app.prompt))
+do_command = shell(do_command=app.do_command,
+                   command_mode=(lambda: app.command_mode),
+                   command_prompt=(lambda: app.prompt))
                                   
 def main():
     pysh.start()

@@ -5,10 +5,10 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 
 import ed, samysh, wyshka
 
-# x defined here not in samysh because it depends on ed module and ed cmd fmt
-def x(paramstring, do_command):
+# defined here not in samysh because it depends on ed module and ed cmd fmt
+def run_script(paramstring, do_command):
     """
-    Execute script of commands from another buffer with optional echo and delay
+    Run script of commands from another buffer with optional echo and delay
      paramstring is usually 'bufname echo delay'
      bufname is not optional, and it cannot be the current buffer.
      echo - optional, default True; delay - optional, default 0.2 sec
@@ -27,8 +27,8 @@ def x(paramstring, do_command):
                 except ValueError:
                     pass # use default
             # Must define samysh_do... here, echo, delay might differ each call
-            _do_command = samysh.samysh(do_command=do_command,
-                                        echo=echo, delay=delay)
+            _do_command = samysh.show_command(do_command=do_command,
+                                              echo=echo, delay=delay)
             for line in ed.buffers[bufname].lines[1:]: # lines[0] always empty
                 _do_command(line.rstrip()) # remove terminal \n 
         else:
@@ -36,25 +36,23 @@ def x(paramstring, do_command):
     else:
         print('? buffername echo delay')
 
-def mk_x_do_command(do_command):
-    'Augment do_command with x command to execute script from buffer'
+def add_scripting(name, do_command):
+    'Augment do_command with a new command (name) to run script from buffer'
     def _do_command(line):
         line = line.lstrip()
-        if ed.command_mode and line.startswith('x'):
-            x(line[1:], do_command)
+        if ed.command_mode and line.startswith(name):
+            run_script(line[1:], do_command) # assumes command name is 1 char
         else:
             do_command(line)
     return _do_command
 
-## Below here might be the model for the boilerplate parts of edsel, eden etc.
+# add embedded python interpreter
+_do_command = wyshka.shell(do_command=ed.do_command, 
+                           command_mode=(lambda: ed.command_mode),
+                           command_prompt=(lambda: ed.prompt))
 
-# wyshka adds embedded python interpreter to ed.do_command
-_do_command = wyshka.wyshka(do_command=ed.do_command, 
-                            command_mode=(lambda: ed.command_mode),
-                            command_prompt=(lambda: ed.prompt))
-
-# x_do_command adds x execute script command to _do_command
-do_command = mk_x_do_command(_do_command)
+# add x command to run script with optional echo and delay
+do_command = add_scripting('x', _do_command)
 
 def startup(*filename, **options):
     ed.startup(*filename, **options)
