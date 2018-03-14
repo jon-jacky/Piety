@@ -5,29 +5,35 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 
 import ed, samysh, wyshka
 
+def x_command(do_command):
+    """
+    Return function to run script from buffer using do_command, 
+    with optional echo and delay
+    """
+    def x(line):
+        'run script from buffer, with optional echo and delay'
+        line = line.lstrip()
+        command, rest = line[0], line[1:].lstrip()
+        if command == 'x':
+            bufname, _, params = rest.partition(' ')
+            bufname = ed.match_prefix(bufname, ed.buffers)
+            if bufname in ed.buffers and bufname != ed.current:
+                lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
+                samysh.run_script(params, lines, do_command)
+            else:
+                print('? buffer name')
+            return True
+        else:
+            return False
+    return x
+
 # add embedded python interpreter
 _do_command = wyshka.shell(do_command=ed.do_command, 
                            command_mode=(lambda: ed.command_mode),
                            command_prompt=(lambda: ed.prompt))
 
-def x_command(line):
-    'run script from buffer with optional echo and delay'
-    line = line.lstrip()
-    command, rest = line[0], line[1:].lstrip()
-    if command == 'x':
-        bufname, _, params = rest.partition(' ')
-        bufname = ed.match_prefix(bufname, ed.buffers)
-        if bufname in ed.buffers and bufname != ed.current:
-            lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
-            samysh.run_script(params, lines, _do_command)
-        else:
-            print('? buffer name')
-        return True
-    else:
-        return False
-
 # add command to run script from buffer with optional echo and delay
-do_command = samysh.add_command(x_command, _do_command)
+do_command = samysh.add_command(x_command(_do_command), _do_command)
 
 def startup(*filename, **options):
     ed.startup(*filename, **options)
