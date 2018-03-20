@@ -5,13 +5,19 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 
 import ed, samysh, wyshka
 
+# Define x command so it can also be imported by edsel, eden etc.
+# to use with their own do_commands, by calling samysh.add_command.
+
 def x_command(do_command):
     """
     Return function to run script from buffer using do_command, 
-    with optional echo and delay
+    with optional echo and delay.
     """
     def x(line):
-        'run script from buffer, with optional echo and delay'
+        """
+        Run script from buffer with optional echo and delay, coded in line arg.
+        Named x for eXecute, a single letter like other ed command functions.
+        """
         line = line.lstrip()
         command, rest = line[0], line[1:].lstrip()
         if command == 'x':
@@ -22,7 +28,7 @@ def x_command(do_command):
                 samysh.run_script(params, lines, do_command)
             else:
                 print('? buffer name')
-            return True
+            return True # needed by samysh.add_command
         else:
             return False
     return x
@@ -41,10 +47,10 @@ def startup(*filename, **options):
 
 def edo(*filename, **options):
     'Top level edo command to invoke from Python REPL or __main__'
-    startup(*filename, **options) # startup in this module, based on ed.startup
+    startup(*filename, **options) # defined above, based on ed.startup
     while not ed.quit:
         line = input(wyshka.prompt) # blocks!
-        do_command(line) # do_command in this module, based on ed.do_command
+        do_command(line) # defined above, based on ed.do_command
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

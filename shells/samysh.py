@@ -50,8 +50,8 @@ def run_script(paramstring, lines, do_command):
 
 def add_command(new_command, do_command):
     """
-    Augment do_command with new_command.  
-    When new_command returns False, run do_command.
+    Return a function that augments do_command with new_command.  
+    The function runs new_command; if that returns False, it runs do_command.
     """
     def _do_command(line):
         attempted = new_command(line)
