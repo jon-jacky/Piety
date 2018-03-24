@@ -3,7 +3,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 """
 
 import re, os, sys
-import parse, check, buffer
+import parse, check, buffer, config
 from updates import Op
 
 # Each ed command is implemented here by a command function with the same
@@ -74,14 +74,14 @@ def create_buf(bufname):
     buf = buffer.Buffer(bufname)
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
     current = bufname
-    update(Op.create, buffer=buf)
+    config.update(Op.create, buffer=buf)
 
 def select_buf(bufname):
     'Make buffer with given name the current buffer'
     global current, buf
     current = bufname
     buf = buffers[current]
-    update(Op.select, buffer=buf)
+    config.update(Op.select, buffer=buf)
 
 # command functions: buffers and files
 
@@ -178,7 +178,7 @@ def DD(*args):
         if name == current: # pick a new current buffer
             keys = list(buffers.keys()) # always nonempty due to main
             select_buf(keys[0])
-        update(Op.remove, sourcebuf=delbuf, buffer=buf)
+        config.update(Op.remove, sourcebuf=delbuf, buffer=buf)
         print('%s, buffer deleted' % name)
 
 D_count = 0 # number of consecutive times D command has been invoked
@@ -225,7 +225,7 @@ def l(*args):
     if not check.iline_ok(buf, iline):
         print('? invalid address')
         return
-    print(buf.l(iline), file=lz_print_dest) # null destination suppresses print
+    print(buf.l(iline), file=config.lz_print_dest)
 
 def p_lines(start, end, destination): # arg here shadows global destination
     'Print lines start through end, inclusive, at destination'
@@ -261,7 +261,7 @@ def z(*args):
             iline += buf.npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= buf.nlines() else buf.nlines()
-        p_lines(iline, end, lz_print_dest) # null destination suppresses print
+        p_lines(iline, end, config.lz_print_dest)
         if buf.npage < 0:
             buf.dot = iline
 
@@ -398,15 +398,15 @@ def do_command(line):
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = start
-                update(Op.input)
+                config.update(Op.input)
             elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
-                update(Op.input)
+                config.update(Op.input)
             elif cmd_name == 'c': #c(hange) command deletes changed lines first
                 buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
                 buf.dot = start - 1 # supercede dot assigned in preceding
-                update(Op.input)  # queues Op.input after Op.delete from buf.d
+                config.update(Op.input) # queues Op.input after buf.d Op.delete
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:
@@ -416,27 +416,12 @@ def do_command(line):
         if line == '.':
             command_mode = True # exit input mode
             prompt = ps1
-            update(Op.command) # return from input (insert) mode to cmd mode
+            config.update(Op.command) # return from input mode to cmd mode
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
             buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
         return
-
-# Hooks to configure ed behavior for display editor
-lz_print_dest = sys.stdout  # default: l and z commands print in scroll region
-def noupdate(op, **kwargs): pass 
-update = noupdate # default: ed has no display, update does nothing
-
-def configure(update_fcn=None, print_dest=None):
-    """
-    Call from display editor with kw args to configure ed to update display.
-    Call again with no kw args to restore ed to no display, no updates.
-    """
-    global lz_print_dest, update
-    lz_print_dest = print_dest if print_dest else sys.stdout
-    update = update_fcn if update_fcn else noupdate
-    buffer.update = update_fcn if update_fcn else noupdate
 
 def cmd_options():
     # import argparse inside this fcn so it isn't always a dependency.
@@ -466,6 +451,8 @@ def startup(*filename, **options):
         ps1 = options['p'] 
         prompt = ps1
     quit = False
+    config.update = config.noupdate
+    config.lz_print_dest = sys.stdout
 
 def ed(*filename, **options):
     'Top level ed command to invoke from Python REPL or __main__'

@@ -5,11 +5,8 @@ buffer.py - Buffer class for line-oriented text editors.
 
 import os.path
 from enum import Enum
+import config
 from updates import Op, background_task
-
-# Hook to configure behavior for display editor
-def noupdate(op, **kwargs): pass 
-update = noupdate # default: ed has no display, update does nothing
 
 # Hook for display updates from background tasks to restore cursor etc.
 inputline = None  # default: no updates from background tasks,no restore needed
@@ -124,8 +121,9 @@ class Buffer(object):
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
         # start and end of inserted text, end == destination == dot
-        update(Op.insert, buffer=self, origin=origin, destination=self.dot,
-               start=iline, end=self.dot, column=column)
+        config.update(Op.insert, buffer=self, origin=origin, 
+                      destination=self.dot, start=iline, end=self.dot, 
+                      column=column)
 
     # files
 
@@ -142,7 +140,7 @@ class Buffer(object):
                 strings = fd.readlines() # each string in lines ends with \n
             self.insert(iline+1, strings) # like append, below
         else:
-            update(Op.select, buffer=self) # new empty buffer for new file
+            config.update(Op.select, buffer=self) # new buffer for new file
 
     def w(self, name):
         'Write current buffer contents to file name'
@@ -157,7 +155,7 @@ class Buffer(object):
         'Advance dot to iline and return it (so caller can print it)'
         prev_dot = self.dot
         self.dot = iline
-        update(Op.locate, buffer=self, origin=prev_dot, destination=iline)
+        config.update(Op.locate, buffer=self,origin=prev_dot,destination=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -199,8 +197,8 @@ class Buffer(object):
         self.mark = new_mark
         # origin, start, end are before deletion
         # destination == dot after deletion, first line following deleted lines
-        update(Op.delete, buffer=self, origin=start, destination=self.dot,
-               start=start, end=end) # destination?
+        config.update(Op.delete, buffer=self, 
+                      origin=start, destination=self.dot, start=start, end=end)
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
@@ -221,8 +219,8 @@ class Buffer(object):
                 self.dot = i
                 self.unsaved = True
         # Update.end and .destination are last line actually changed
-        update(Op.mutate, buffer=self, origin=origin,
-               start=start, end=self.dot, destination=self.dot)
+        config.update(Op.mutate, buffer=self, origin=origin,
+                      start=start, end=self.dot, destination=self.dot)
 
     def y(self, iline):
         'Insert most recently deleted lines before iline.'

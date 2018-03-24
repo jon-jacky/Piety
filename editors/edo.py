@@ -13,24 +13,18 @@ def x_command(do_command):
     Return function to run script from buffer using do_command, 
     with optional echo and delay.
     """
-    def x(line):
+    def x(paramstring):
         """
         Run script from buffer with optional echo and delay, coded in line arg.
         Named x for eXecute, a single letter like other ed command functions.
         """
-        line = line.lstrip()
-        command, rest = line[0], line[1:].lstrip()
-        if command == 'x':
-            bufname, _, params = rest.partition(' ')
-            bufname = ed.match_prefix(bufname, ed.buffers)
-            if bufname in ed.buffers and bufname != ed.current:
-                lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
-                samysh.run_script(params, lines, do_command)
-            else:
-                print('? buffer name')
-            return True # needed by samysh.add_command
+        bufname, _, params = paramstring.partition(' ')
+        bufname = ed.match_prefix(bufname, ed.buffers)
+        if bufname in ed.buffers and bufname != ed.current:
+            lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
+            samysh.run_script(params, lines, do_command)
         else:
-            return False
+            print('? buffer name')
     return x
 
 # add embedded python interpreter

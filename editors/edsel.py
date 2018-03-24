@@ -4,32 +4,31 @@ edsel - Display editor based on the line editor ed.py
 """
 
 import traceback, os
-import edo, wyshka, frame, display # display only used in cleanup()
+import edo, frame, display, config, updatecall, wyshka, samysh # FIXME display only used in cleanup(), frame shouldn't be needed
 from updates import Op
-from updatecall import update
 
 ed = edo.ed  # so we can call ed API without edo. prefix
 
 def refresh():
-    update(Op.refresh)
+    config.update(Op.refresh)
 
 def do_window_command(line):
     'Window manager commands'
-    param_string = line.lstrip()[1:].lstrip()
-    if not param_string: # o: switch to next window
+    parastring = line.lstrip()[1:].lstrip()
+    if not parastring: # o: switch to next window
         next_i = (frame.ifocus+1 if frame.ifocus+1 < len(frame.windows)
                   else 0)
         ed.current = frame.windows[next_i].buf.name
         ed.buf = ed.buffers[ed.current]
-        update(Op.next)
-    elif param_string.startswith('1'): # o1: return to single window
-        update(Op.single)
-    elif param_string.startswith('2'): # o2: split window, horizontal
-        update(Op.hsplit)
+        config.update(Op.next)
+    elif parastring.startswith('1'): # o1: return to single window
+        config.update(Op.single)
+    elif parastring.startswith('2'): # o2: split window, horizontal
+        config.update(Op.hsplit)
     else:
-        print('? integer 1 or 2 expected at %s' % param_string) 
+        print('? integer 1 or 2 expected at %s' % parastring) 
 
-def do_command(line):
+def base_do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     # try/except ensures we restore display, especially scrolling
@@ -48,25 +47,26 @@ def do_command(line):
         ed.quit = True # exit() here raises another exception
 
 # wyshka adds embedded python interpreter to do_command
-_do_command = wyshka.wyshka(do_command=do_command,
-                            command_mode=(lambda: ed.command_mode),
-                            command_prompt=(lambda: ed.prompt))
+_do_command = wyshka.shell(do_command=base_do_command,
+                           command_mode=(lambda: ed.command_mode),
+                           command_prompt=(lambda: ed.prompt))
 
-# mk_x_do_command adds x execute script command to _do_command
-_do_command = edo.mk_x_do_command(_do_command)
+# do_command: add edo.x_command that executes script using samysh
+do_command = samysh.add_command(edo.x_command(_do_command), _do_command)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
-    cmd_h = options['c'] if 'c' in options else 2
-    ed.configure(update_fcn=update,  # replace ed's no-op update function
-                 print_dest=open(os.devnull, 'w')) # discard l z printed output
-    update(Op.rescale, start=cmd_h)  # rescale before ed.startup can call e()
+    global cmd_h
+    if 'c' in options:
+        cmd_h = options['c'] 
+    updatecall.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
     edo.startup(*filename, **options)
+    config.lz_print_dest = config.null # reassign configs made in edo.startup
+    config.update = updatecall.update
 
 def cleanup():
-    'Restore ed no display modes, full-screen scrolling, cursor to bottom.'
+    'Restore full-screen scrolling, cursor to bottom.'
     ed.q()
-    ed.configure() 
     display.set_scroll_all()
     display.put_cursor(frame.nlines,1)
 
@@ -78,10 +78,11 @@ def edsel(*filename, **options):
     startup(*filename, **options)
     while not ed.quit:
         line = input((lambda: wyshka.prompt)())
-        _do_command(line) # non-blocking
+        do_command(line) # non-blocking
     cleanup()
 
-# initialize first window only once on import
+# initialize scrolling region and first window only once on import
+cmd_h = 2
 frame.init(ed.buf) # import ed above initializes ed.buf
 
 if __name__ == '__main__':

@@ -47,15 +47,25 @@ def run_script(paramstring, lines, do_command):
     for line in lines:
         _do_command(line.rstrip()) # remove terminal \n 
 
-
-def add_command(new_command, do_command):
+def add_command(command, do_command):
     """
-    Return a function that augments do_command with new_command.  
-    The function runs new_command; if that returns False, it runs do_command.
+    Return a function that augments do_command with a new command.
+    The new command is a function with a single string argument, that
+    contains all its parameters.  A command line for the new command
+    starts with the command name, which must be the same as the name
+    of the command function.  The rest of the command line is the
+    string of parameters that is passed to the command function.  Any
+    command lines that do not start with the new command name are
+    passed on to do_command.   The command line cannot begin with line
+    addresses preceding the command name, as in classic ed commands.
+    The command name can be more than one character, unlike in classic ed.
     """
     def _do_command(line):
-        attempted = new_command(line)
-        if not attempted:
+        line = line.lstrip()
+        if line.startswith(command.__name__):
+            _, _, paramstring = line.partition(command.__name__)
+            command(paramstring.lstrip())
+        else:
             do_command(line)
     return _do_command
 
