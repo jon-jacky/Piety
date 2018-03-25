@@ -4,17 +4,20 @@ branches
 
 This is the **args** branch: add arguments to the *Console* *__call__*
 method that are analogous to command line arguments, so Piety console
-jobs can be invoked in an interactive Python session in the same way
-that the corresponding standalone programs are invoked from the system
-command line.  Revise the *startup* and *main* functions in *ed*,
-*edsel* and other programs, to adopt a uniform organization that works
-in both an interactive Python session and a standalone program.
-Revise or replace several instances of confusing or overly complicated
-code: Replace the *ed.configure* function and the variables it updated
-by a new *config* module.  Untangle *do_command* in *ed* and *edsel*.
-Simplify the *x* (script execution) command in *edo* and
-*samysh*.  Make many minor revisions in style and naming.  Add some
-documentation *.md* files and revise others.  Begun 30 Jan 2018.
+jobs can be invoked in an interactive Python session with the same
+names and same arguments that the corresponding standalone programs
+are invoked from the system command line.  Revise the *startup* and
+*main* functions in *ed*, *edsel* and other programs, to adopt a
+uniform organization that works the same in both an interactive Python
+session and a standalone program.  Rename each program's *main*
+function to the same name as the standalone program (the module name,
+that is).  Revise or replace several instances of confusing or overly
+complicated code: Replace the *ed.configure* function and the
+variables it updated by a new *config* module.  Untangle *do_command*
+in *ed* and *edsel*.  Simplify the *x* (script execution) command in
+*edo* and *samysh*.  Make many minor revisions in style and naming.
+Add some documentation *.md* files and revise others.  Begun 30 Jan
+2018.
 
 Branches recently merged into **master**:
 
