@@ -40,6 +40,8 @@ have side effects such as updating editor buffers and display windows.
 A task can include several *jobs*.  More details
 [here](../piety/README.md).
 
+- **background task**: a task whose handlers are invoked by a periodic timer.
+
 - **concurrency**: In Piety, when two or more tasks that handle
 different kinds of events are loaded into the system, each kind of
 event might invoke a handler from a different task.  In this way,
@@ -71,11 +73,17 @@ input.  A terminal session can include several console jobs.
 
 - **console job**: a single application in a terminal session.
 
+- **foreground job**: the job that is handling a task's events.  In a
+    terminal session, the application that is currently running on the
+    terminal.
+
+- **background job**: the job that will resume when the foreground job
+    exits or is suspended.  In a terminal session, the shell is
+    usually the background job when another application is running.
+
 - **shell**: In Piety, a console job that provides a Python REPL
 (Read-Evaluate-Print Loop).  In Piety, Python itself is the shell
 command language.
-
-- **background task**: a task whose handlers are invoked by a periodic timer.
 
 - **memory management**: including allocation and reclamation (that is,
 garbage collection).  Provided by Python language runtime.

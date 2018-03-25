@@ -13,9 +13,6 @@ Piety design:
 - **modules.md**, explanation of the Piety modular structure and
     directory organization.
 
-- **pieces.md**, discusses Python coding techniques used to
-    build up a Piety configuration from independent parts.
-
 Piety project history:
 
 - **python3.md**, notes about the conversion from Python 2 to Python 3.
@@ -37,4 +34,4 @@ Background and related work:
 - **utilities.md**, system software and utilities written in Python,
     or programmable in Python.
 
-Revised February 2018
+Revised Mar 2018

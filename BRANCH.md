@@ -4,7 +4,8 @@ branches
 
 This is the **args** branch: add arguments to *Console* *__call__*, to
 be used like the command line arguments in the standalone
-applications.  Begun 30 Jan 2018.
+applications.  Also, several simplifications and untanglements.
+Revisions to explanations in several .md files.  Begun 30 Jan 2018.
 
 Branches recently merged into **master**:
 

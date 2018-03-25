@@ -267,7 +267,7 @@ Python API described above, including command line parsing, argument
 checking, and error messages.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
 
-**ed.py** imports the *[buffer.py](buffer)* module, which provides the
+**ed.py** imports the *buffer.py* module, which provides the
 *Buffer* class, which defines the core data structure and the internal
 API for updating it.  Many *Buffer* methods correspond to functions in
 the API, but here each method has a fixed argument list, provides no
@@ -275,19 +275,24 @@ error checking, and no error messages or progress messages.  The
 *Buffer* class does not access the console, but updates text buffers
 and reads and writes files.
 
-**ed.py** imports the *[parse.py](parse)* module that provides
+**ed.py** imports the *parse.py* module that provides
 functions for parsing the *ed* command line, and the
-*[check.py](check)* module that provides functions for checking
+*check.py* module that provides functions for checking
 command arguments and supplying default arguments.
 
-**ed.py** imports the *Op* data type from the *[updates.py](updates)*
-module.  This is only used by display editors that import *ed*.  When
-*ed* is used without a display, the *update* function that uses *Op* does
-nothing.
+**ed.py** imports the *config.py* module, which contains configuration
+variables that are read and written by both *ed* and the display
+editor *edsel*, in order to configure code used by both programs to
+run with or without a display.
 
-The *buffer*, *parse*, *check*, and *updates*  modules are included in this
-directory.   **ed.py** also uses the Python standard library modules
-*re*, *os*, and *sys*.  Other than that, **ed.py** has no dependencies.
+**ed.py** imports the *Op* data type from the *updates.py* module,
+which is appears in code in *ed* that is also used by the *edsel* display
+editor.
+
+The *buffer*, *parse*, *check*, *config*, and *updates* modules are
+included in this directory.  **ed.py** also uses the Python standard
+library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
+no dependencies.
 
 Revised Mar 2018
 
