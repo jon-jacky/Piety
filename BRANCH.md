@@ -2,10 +2,19 @@
 branches
 ========
 
-This is the **args** branch: add arguments to *Console* *__call__*, to
-be used like the command line arguments in the standalone
-applications.  Also, several simplifications and untanglements.
-Revisions to explanations in several .md files.  Begun 30 Jan 2018.
+This is the **args** branch: add arguments to the *Console* *__call__*
+method that are analogous to command line arguments, so Piety console
+jobs can be invoked in an interactive Python session in the same way
+that the corresponding standalone programs are invoked from the system
+command line.  Revise the *startup* and *main* functions in *ed*,
+*edsel* and other programs, to adopt a uniform organization that works
+in both an interactive Python session and a standalone program.
+Revise or replace several instances of confusing or overly complicated
+code: Replace the *ed.configure* function and the variables it updated
+by a new *config* module.  Untangle *do_command* in *ed* and *edsel*.
+Simplify the *x* (script execution) command in *edo* and
+*samysh*.  Make many minor revisions in style and naming.  Add some
+documentation *.md* files and revise others.  Begun 30 Jan 2018.
 
 Branches recently merged into **master**:
 
@@ -47,4 +56,4 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised 28 Jan 2018
+Revised 24 Mar 2018
