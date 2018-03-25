@@ -9,7 +9,7 @@ names and same arguments that the corresponding standalone programs
 are invoked from the system command line.  Revise the *startup* and
 *main* functions in *ed*, *edsel* and other programs, to adopt a
 uniform organization that works the same in both an interactive Python
-session and a standalone program.  Rename each program's *main*
+session and a standalone program.  Rename each modules's *main*
 function to the same name as the standalone program (the module name,
 that is).  Revise or replace several instances of confusing or overly
 complicated code: Replace the *ed.configure* function and the
