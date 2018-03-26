@@ -2,7 +2,10 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into **master**:
+This is the **noframe** branch.  Remove *import frame* from *edsel*.
+Now *edsel* will communicate with *frame* only through *update*.
+
+Branches recently merged into **master**:
 
 - **args**, merged 24 Mar 2018.  Improvements to usability,
 organization, style, and documentation.  Add arguments to the
