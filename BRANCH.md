@@ -4,7 +4,7 @@ branches
 
 This is the **master** branch.  Branches recently merged into **master**:
 
--- **args**, merged 24 Mar 2018.  Improvements to usability,
+- **args**, merged 24 Mar 2018.  Improvements to usability,
 organization, style, and documentation.  Add arguments to the
 *Console* *__call__* method that are analogous to command line
 arguments, so Piety console jobs can be invoked in an interactive
