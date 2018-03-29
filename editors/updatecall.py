@@ -12,4 +12,5 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     update_record = UpdateRecord(op, sourcebuf=sourcebuf, buffer=buffer, 
                                  origin=origin, destination=destination, 
                                  start=start, end=end, column=column)
-    frame.update(**update_record._asdict())
+    win = frame.update(**update_record._asdict())
+    return win # caller might need to know which window was selected

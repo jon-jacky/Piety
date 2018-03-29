@@ -28,6 +28,8 @@ class Op(Enum):
     hsplit = 12  # edsel o2, split window, horizontal
     refresh = 13 # clear screen and redraw all windows
     rescale = 14 # rescale frame and window sizes, then refresh
+    # update operations on terminal where frame lives
+    restore = 15 # restore full-screen scrolling and put cursor at bottom
 
 background_task = -1  # used in update(Op.input, origin=background_task, ...)
 

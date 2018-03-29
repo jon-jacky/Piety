@@ -2,8 +2,9 @@
 branches
 ========
 
-This is the **noframe** branch.  Remove *import frame* from *edsel*.
-Now *edsel* will communicate with *frame* only through *update*.
+This is the **noframe** branch.  Remove *import display* from
+*edsel*.  Now *edsel* will communicate with *display* only
+through *frame.update*.  Begun 26 Mar 2018.
 
 Branches recently merged into **master**:
 

@@ -85,6 +85,11 @@ def update(op, sourcebuf, buffer, origin, destination, start, end, column):
     if op == Op.refresh:
         refresh()
 
+    # Restore full screen scrolling, cursor to bottom
+    elif op == Op.restore:
+        display.set_scroll_all()
+        display.put_cursor(nlines,1)
+
     # Rescale frame and window sizes, then refresh.
     if op == Op.rescale:
         cmd_h = start if start else cmd_h
@@ -208,3 +213,6 @@ def update(op, sourcebuf, buffer, origin, destination, start, end, column):
     # Then we can call standard Python input() or Piety Console restart().
     if command_mode:
         put_command_cursor(column=column) # background task can set column
+    
+    return win # caller might need to know which window was selected
+

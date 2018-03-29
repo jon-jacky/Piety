@@ -4,7 +4,7 @@ edsel - Display editor based on the line editor ed.py
 """
 
 import traceback, os
-import edo, frame, display, config, updatecall, wyshka, samysh # FIXME display only used in cleanup(), frame shouldn't be needed
+import edo, frame, config, updatecall, wyshka, samysh # FIXME display only used in cleanup(), frame shouldn't be needed
 from updates import Op
 
 ed = edo.ed  # so we can call ed API without edo. prefix
@@ -14,19 +14,17 @@ def refresh():
 
 def do_window_command(line):
     'Window manager commands'
-    parastring = line.lstrip()[1:].lstrip()
-    if not parastring: # o: switch to next window
-        next_i = (frame.ifocus+1 if frame.ifocus+1 < len(frame.windows)
-                  else 0)
-        ed.current = frame.windows[next_i].buf.name
-        ed.buf = ed.buffers[ed.current]
-        config.update(Op.next)
-    elif parastring.startswith('1'): # o1: return to single window
+    paramstring = line.lstrip()[1:].lstrip()
+    if not paramstring: # o: switch to next window
+        win = config.update(Op.next)
+        ed.buf = win.buf
+        ed.current = ed.buf.name
+    elif paramstring.startswith('1'): # o1: return to single window
         config.update(Op.single)
-    elif parastring.startswith('2'): # o2: split window, horizontal
+    elif paramstring.startswith('2'): # o2: split window, horizontal
         config.update(Op.hsplit)
     else:
-        print('? integer 1 or 2 expected at %s' % parastring) 
+        print('? integer 1 or 2 expected at %s' % paramstring) 
 
 def base_do_command(line):
     'Process one command line without blocking.'
@@ -61,14 +59,13 @@ def startup(*filename, **options):
         cmd_h = options['c'] 
     updatecall.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
     edo.startup(*filename, **options)
-    config.lz_print_dest = config.null # reassign configs made in edo.startup
-    config.update = updatecall.update
+    config.lz_print_dest = config.null # Reassign configs made in edo.startup,
+    config.update = updatecall.update  #  so they can be used by ed and buffer.
 
 def cleanup():
-    'Restore full-screen scrolling, cursor to bottom.'
+    'Exit editor, restore display screen'
     ed.q()
-    display.set_scroll_all()
-    display.put_cursor(frame.nlines,1)
+    config.update(Op.restore)
 
 def edsel(*filename, **options):
     """
