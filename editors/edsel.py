@@ -62,7 +62,9 @@ def startup(*filename, **options):
     config.lz_print_dest = config.null # Reassign configs made in edo.startup,
     config.update = frame.update  #  so it can be used by ed and buffer.
     if filename:
-        ed.e(filename[0]) # seems redundant, must ensure contents are displayed
+        frame.update(Op.insert, frame.win.buf, origin=0,
+                     destination=frame.win.buf.dot, start=1, 
+                     end=frame.win.buf.dot, column=1)
 
 def cleanup():
     'Exit editor, restore display screen'
