@@ -73,12 +73,10 @@ def rescale():
         win.resize(frame_top + iwin*win_hdiv, win_h-1, ncols) # -1 excl status
     refresh()
 
-def update(op, sourcebuf, buffer, origin, destination, start, end, column):
-    """
-    Update the display: one window, several, or the entire frame.
-    Arguments here are the fields of the UpdateRecord namedtuple.
-    Other data used here are already stored in the frame, windows, and buffers.
-    """
+def update(op, sourcebuf=None, buffer=None, origin=0, destination=0, 
+           start=0, end=0, column=1): # display column numbers are 1-based
+    'Update the display: one window, several, or the entire frame.'
+
     global command_mode, win, ifocus, cmd_h
 
     # Clear display, redraw all the windows and scrolling command region.

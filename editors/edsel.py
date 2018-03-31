@@ -4,25 +4,25 @@ edsel - Display editor based on the line editor ed.py
 """
 
 import traceback, os
-import edo, frame, config, updatecall, wyshka, samysh # FIXME display only used in cleanup(), frame shouldn't be needed
+import edo, frame, config, wyshka, samysh
 from updates import Op
 
 ed = edo.ed  # so we can call ed API without edo. prefix
 
 def refresh():
-    config.update(Op.refresh)
+    frame.update(Op.refresh)
 
 def do_window_command(line):
     'Window manager commands'
     paramstring = line.lstrip()[1:].lstrip()
     if not paramstring: # o: switch to next window
-        win = config.update(Op.next)
+        win = frame.update(Op.next)
         ed.buf = win.buf
         ed.current = ed.buf.name
     elif paramstring.startswith('1'): # o1: return to single window
-        config.update(Op.single)
+        frame.update(Op.single)
     elif paramstring.startswith('2'): # o2: split window, horizontal
-        config.update(Op.hsplit)
+        frame.update(Op.hsplit)
     else:
         print('? integer 1 or 2 expected at %s' % paramstring) 
 
@@ -57,15 +57,17 @@ def startup(*filename, **options):
     global cmd_h
     if 'c' in options:
         cmd_h = options['c'] 
-    updatecall.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
+    frame.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
     edo.startup(*filename, **options)
     config.lz_print_dest = config.null # Reassign configs made in edo.startup,
-    config.update = updatecall.update  #  so they can be used by ed and buffer.
+    config.update = frame.update  #  so it can be used by ed and buffer.
+    if filename:
+        ed.e(filename[0]) # seems redundant, must ensure contents are displayed
 
 def cleanup():
     'Exit editor, restore display screen'
     ed.q()
-    config.update(Op.restore)
+    frame.update(Op.restore)
 
 def edsel(*filename, **options):
     """
