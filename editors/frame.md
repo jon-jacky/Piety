@@ -23,7 +23,7 @@ different programs can simultaneously use different windows on the
 same display.  So *frame* can act as a text-only tiling window
 manager.
 
-The *frame* module provides functions and data but no classes.  We
+**frame.py** provides functions and data but no classes.  We
 expect there will only be a single frame instance in a session, so a
 module suffices.
 
