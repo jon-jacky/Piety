@@ -87,6 +87,10 @@ Files in this directory:
 
 - **updates.py**: define display operations enumeration *Op*.
 
-- **window.py**: defines Window class used by *frame*
+- **view.py**: variables that are used by both *ed* and *edsel*, to
+   configure code used by both programs to run with or without a
+   display.
+
+- **window.py**: defines Window class used by *frame*.
 
 Revised Mar 2018
