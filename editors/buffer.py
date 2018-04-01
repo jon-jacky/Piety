@@ -5,7 +5,7 @@ buffer.py - Buffer class for line-oriented text editors.
 
 import os.path
 from enum import Enum
-import config
+import view
 from updates import Op, background_task
 
 # Hook for display updates from background tasks to restore cursor etc.
@@ -121,7 +121,7 @@ class Buffer(object):
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
         # start and end of inserted text, end == destination == dot
-        config.update(Op.insert, buffer=self, origin=origin, 
+        view.update(Op.insert, buffer=self, origin=origin, 
                       destination=self.dot, start=iline, end=self.dot, 
                       column=column)
 
@@ -140,7 +140,7 @@ class Buffer(object):
                 strings = fd.readlines() # each string in lines ends with \n
             self.insert(iline+1, strings) # like append, below
         else:
-            config.update(Op.select, buffer=self) # new buffer for new file
+            view.update(Op.select, buffer=self) # new buffer for new file
 
     def w(self, name):
         'Write current buffer contents to file name'
@@ -155,7 +155,7 @@ class Buffer(object):
         'Advance dot to iline and return it (so caller can print it)'
         prev_dot = self.dot
         self.dot = iline
-        config.update(Op.locate, buffer=self,origin=prev_dot,destination=iline)
+        view.update(Op.locate, buffer=self,origin=prev_dot,destination=iline)
         return (self.lines[iline]).rstrip() # strip trailing \n
 
     # adding, changing, and deleting text
@@ -197,7 +197,7 @@ class Buffer(object):
         self.mark = new_mark
         # origin, start, end are before deletion
         # destination == dot after deletion, first line following deleted lines
-        config.update(Op.delete, buffer=self, 
+        view.update(Op.delete, buffer=self, 
                       origin=start, destination=self.dot, start=start, end=end)
 
     def c(self, start, end, string):
@@ -215,11 +215,12 @@ class Buffer(object):
         origin = self.dot 
         for i in range(start,end+1): # ed range is inclusive, unlike Python
             if old in self.lines[i]: # test to see if we should advance dot
-                self.lines[i] = self.lines[i].replace(old,new, -1 if glbl else 1)
+                self.lines[i] = self.lines[i].replace(old,new, -1 if glbl 
+                                                      else 1)
                 self.dot = i
                 self.unsaved = True
         # Update.end and .destination are last line actually changed
-        config.update(Op.mutate, buffer=self, origin=origin,
+        view.update(Op.mutate, buffer=self, origin=origin,
                       start=start, end=self.dot, destination=self.dot)
 
     def y(self, iline):

@@ -4,13 +4,10 @@ edsel - Display editor based on the line editor ed.py
 """
 
 import traceback, os
-import edo, frame, config, wyshka, samysh
+import edo, frame, view, wyshka, samysh
 from updates import Op
 
 ed = edo.ed  # so we can call ed API without edo. prefix
-
-def refresh():
-    frame.update(Op.refresh)
 
 def do_window_command(line):
     'Window manager commands'
@@ -34,7 +31,7 @@ def base_do_command(line):
         # Intercept special commands used by frame only, not ed.
         # Only in command mode!  Otherwise line might be text to add to buffer.
         if ed.command_mode and line == 'L': # similar to ^L
-            refresh()
+            frame.update(Op.refresh)
         elif ed.command_mode and line.startswith('o'):
             do_window_command(line)
         else:
@@ -59,12 +56,12 @@ def startup(*filename, **options):
         cmd_h = options['c'] 
     frame.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
     edo.startup(*filename, **options)
-    config.lz_print_dest = config.null # Reassign configs made in edo.startup,
-    config.update = frame.update  #  so it can be used by ed and buffer.
-    if filename:
-        frame.update(Op.insert, frame.win.buf, origin=0,
+    view.lz_print_dest = view.null # Reassign configs made in edo.startup,
+    view.update = frame.update  #  so it can be used by ed and buffer.
+    if filename: # update only works now, call based on buf.insert(...)
+        frame.update(Op.insert, sourcebuf=frame.win.buf,
                      destination=frame.win.buf.dot, start=1, 
-                     end=frame.win.buf.dot, column=1)
+                     end=frame.win.buf.dot)
 
 def cleanup():
     'Exit editor, restore display screen'

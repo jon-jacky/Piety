@@ -3,7 +3,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 """
 
 import re, os, sys
-import parse, check, buffer, config
+import parse, check, buffer, view
 from updates import Op
 
 # Each ed command is implemented here by a command function with the same
@@ -74,14 +74,14 @@ def create_buf(bufname):
     buf = buffer.Buffer(bufname)
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
     current = bufname
-    config.update(Op.create, buffer=buf)
+    view.update(Op.create, buffer=buf)
 
 def select_buf(bufname):
     'Make buffer with given name the current buffer'
     global current, buf
     current = bufname
     buf = buffers[current]
-    config.update(Op.select, buffer=buf)
+    view.update(Op.select, buffer=buf)
 
 # command functions: buffers and files
 
@@ -178,7 +178,7 @@ def DD(*args):
         if name == current: # pick a new current buffer
             keys = list(buffers.keys()) # always nonempty due to main
             select_buf(keys[0])
-        config.update(Op.remove, sourcebuf=delbuf, buffer=buf)
+        view.update(Op.remove, sourcebuf=delbuf, buffer=buf)
         print('%s, buffer deleted' % name)
 
 D_count = 0 # number of consecutive times D command has been invoked
@@ -225,7 +225,7 @@ def l(*args):
     if not check.iline_ok(buf, iline):
         print('? invalid address')
         return
-    print(buf.l(iline), file=config.lz_print_dest)
+    print(buf.l(iline), file=view.lz_print_dest)
 
 def p_lines(start, end, destination): # arg here shadows global destination
     'Print lines start through end, inclusive, at destination'
@@ -261,7 +261,7 @@ def z(*args):
             iline += buf.npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= buf.nlines() else buf.nlines()
-        p_lines(iline, end, config.lz_print_dest)
+        p_lines(iline, end, view.lz_print_dest)
         if buf.npage < 0:
             buf.dot = iline
 
@@ -398,15 +398,15 @@ def do_command(line):
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = start
-                config.update(Op.input)
+                view.update(Op.input)
             elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
-                config.update(Op.input)
+                view.update(Op.input)
             elif cmd_name == 'c': #c(hange) command deletes changed lines first
                 buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
                 buf.dot = start - 1 # supercede dot assigned in preceding
-                config.update(Op.input) # queues Op.input after buf.d Op.delete
+                view.update(Op.input) # queues Op.input after buf.d Op.delete
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:
@@ -416,7 +416,7 @@ def do_command(line):
         if line == '.':
             command_mode = True # exit input mode
             prompt = ps1
-            config.update(Op.command) # return from input mode to cmd mode
+            view.update(Op.command) # return from input mode to cmd mode
         else:
             # Recall raw_input returns each line with final \n stripped off,
             # BUT buf.a requires \n at end of each line
@@ -451,8 +451,8 @@ def startup(*filename, **options):
         ps1 = options['p'] 
         prompt = ps1
     quit = False
-    config.update = config.noupdate
-    config.lz_print_dest = sys.stdout
+    view.update = view.noupdate
+    view.lz_print_dest = sys.stdout
 
 def ed(*filename, **options):
     'Top level ed command to invoke from Python REPL or __main__'
