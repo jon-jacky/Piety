@@ -280,16 +280,16 @@ functions for parsing the *ed* command line, and the
 *check.py* module that provides functions for checking
 command arguments and supplying default arguments.
 
-**ed.py** imports the *config.py* module, which contains configuration
+**ed.py** imports the *view.py* module, which contains configuration
 variables that are read and written by both *ed* and the display
 editor *edsel*, in order to configure code used by both programs to
 run with or without a display.
 
-**ed.py** imports the *Op* data type from the *updates.py* module,
-which is appears in code in *ed* that is also used by the *edsel* display
-editor.
+**ed.py** imports the *Op* display operations enumeration from the
+*updates.py* module, which appears in code in *ed* that is also used
+by the *edsel* display editor.
 
-The *buffer*, *parse*, *check*, *config*, and *updates* modules are
+The *buffer*, *parse*, *check*, *view*, and *updates* modules are
 included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
 no dependencies.

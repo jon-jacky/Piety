@@ -85,12 +85,8 @@ Files in this directory:
 
 - **parse.py**: command line parsing for *ed.py*.
 
-- **updatecall.py**: define function *update* to update display in
-     *frame* by making and sending an *UpdateRec*.
-
-- **updates.py**: define display operations *Op* and display update record 
-  *UpdateRec* used to update display in *frame*.
+- **updates.py**: define display operations enumeration *Op*.
 
 - **window.py**: defines Window class used by *frame*
 
-Revised Jan 2018
+Revised Mar 2018
