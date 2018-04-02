@@ -4,12 +4,12 @@ branches
 
 This is the **noframe** branch.  Branches recently merged into **master**:
 
--**noframe**, merged 1 Apr 2018.  Remove *import display* from edsel*.
-Now *edsel* will communicate with *display* only through *frame.update*.  
-Remove *updatecall* module, rename *config* module to *view*.
-Revise some *.md* documentation. Begun 26 Mar 2018.
+- **noframe**, merged 1 Apr 2018.  Reorganize communication between
+applications and graphics.  Break dependence of *edsel* on *display*,
+now only depends on *frame*.  Several other simplifications.  Begun 26
+Mar 2018.
 
--**args**, merged 24 Mar 2018.  Improvements to usability,
+- **args**, merged 24 Mar 2018.  Improvements to usability,
 organization, style, and documentation.  Add arguments to the
 *Console* *__call__* method that are analogous to command line
 arguments, so Piety console jobs can be invoked in an interactive
