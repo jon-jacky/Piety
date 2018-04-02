@@ -2,7 +2,7 @@
 branches
 ========
 
-This is the **noframe** branch.  Branches recently merged into **master**:
+This is the **master** branch.  Branches recently merged into **master**:
 
 - **noframe**, merged 1 Apr 2018.  Reorganize communication between
 applications and graphics.  Break dependence of *edsel* on *display*,
