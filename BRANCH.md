@@ -2,7 +2,10 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into **master**:
+This is the **eden** branch.  Add full screen editing to the *eden*
+display editor.
+
+Branches recently merged into **master**:
 
 - **noframe**, merged 1 Apr 2018.  Reorganize communication between
 applications and graphics.  Break dependence of *edsel* on *display*,
