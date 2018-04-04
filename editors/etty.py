@@ -9,8 +9,8 @@ import util, terminal, keyboard, ed, console
 
 class Console(console.Console):
     'Console subclass that adds methods and keymaps for printing terminals'
-    def __init_(self, **kwargs):
-        super.__init__(**kwargs)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.keymap = self.init_tty_keymaps()
 
     # These methods and keymaps all have new names, so they are added 
@@ -55,7 +55,7 @@ class Console(console.Console):
         self.lineedit_tty_keymap = {
             # append_char requires special-case handling
             #  because it takes an additional argument: the key.
-            printable: self.append_char,
+            console.printable: self.append_char,
             # Rudimentary in-line editing, just delete last char in line
             keyboard.bs: self.backward_delete_last_char,
             keyboard.delete: self.backward_delete_last_char,
