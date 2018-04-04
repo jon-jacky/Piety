@@ -83,7 +83,7 @@ class Console(object):
         self.cleanup = cleanup
         self.start = start # hooks out to job control
         self.exit = exit
-        self.keymap = self.init_keymap() # define below, minimize clutter here
+        self.keymap = self.init_keymaps() # define below, minimize clutter here
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
 
@@ -341,7 +341,7 @@ class Console(object):
         'redraw entire line including prompt on printing terminal'
         self.redraw_with_prefix('^L\r\n')
 
-    def init_keymap(self):
+    def init_keymaps(self):
         """
         Returns a callable with no arguments that returns the keymap
         for handling both commands and input text.  We return a
