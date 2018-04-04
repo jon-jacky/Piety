@@ -9,106 +9,9 @@ import sys, string
 import util, terminal, keyboard, display, key
 from piety import State
 
-# Keymaps are dicts from keycode string to Console method name string.
-# Keycodes in keymap can have multiple chars (for example escape sequences).
-# Values are strings not function objects so they can refer to bound methods.
-
-# Most method names in lineedit keymaps are derived from GNU readline or Emacs,
-# but line operand is implicit: redraw-current-line is just redraw here etc.
-# Also remove confusing 'self', self-insert-char is just insert_char here.
-# Retain _char suffix, we might add delete_word, insert_word etc.
-
+# used by keymaps, below
 printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
-
-# This keymap requires a video terminal with cursor addressing.
-lineedit_keymap = {
-    # insert_char requires special-case handling
-    #  because it takes an additional argument: the keycode.
-    printable: 'insert_char',
-
-    keyboard.bs: 'backward_delete_char',
-    keyboard.delete: 'backward_delete_char',
-    keyboard.C_a: 'move_beginning',
-    keyboard.C_b: 'backward_char',
-    keyboard.C_d: 'delete_char',
-    keyboard.C_e: 'move_end',
-    keyboard.C_f: 'forward_char',
-    keyboard.C_k: 'kill',
-    keyboard.C_l: 'redraw',
-    keyboard.C_u: 'discard',
-
-    # These keys are multicharacter control sequences
-    # require keyboard that sends ANSI control sequences
-    # and keyboard reader that handles multicharacter keycodes
-    keyboard.right: 'forward_char',
-    keyboard.left: 'backward_char',
-    }
-
-# These keys are active in ed (etc.) input mode.
-# This keymap works on a video terminal or a printing terminal.
-stub_insert_keymap = {
-    # any keycode that maps to accept_line exits from line entry/editing
-    keyboard.cr: 'accept_line', # don't add to history, don't exit
-    keyboard.C_c: 'interrupt',
-    }
-
-insert_keymap = stub_insert_keymap.copy()
-insert_keymap.update(lineedit_keymap)
-
-# These keys are active in ed (etc.) command mode. 
-# This command mode keymap requires a video terminal with arrow keys.
-command_keys = {
-    # Any keycode that maps to accept_command is a command terminator.
-    keyboard.cr: 'accept_command', # add to history, possibly exit
-    keyboard.C_n: 'next_history',
-    keyboard.C_p: 'previous_history',
-    keyboard.up: 'previous_history',
-    keyboard.down: 'next_history',
-}
-
-# These keys have job control function only if they are alone at start of line.
-# Otherwise they can have editing function - C_d appears in lineedit_keymap.
-job_control_keys = {
-    keyboard.C_d: 'ctrl_d',
-    keyboard.C_z: 'ctrl_z'
-    }
-
-# Combine the keymaps - command mode adds several keys to insert mode,
-#  also reassigns method for keyboard.cr (RET key)
-# job_control_keys replaces ^D del in insert_keymap with eof and adds ^Z suspend
-command_keymap = insert_keymap.copy()
-command_keymap.update(command_keys)
-command_keymap.update(job_control_keys)
-
-# This keymap works on a printing terminal.
-lineedit_tty_keymap = {
-    # append_char requires special-case handling
-    #  because it takes an additional argument: the key.
-    printable: 'append_char',
-    # Rudimentary in-line editing, just delete last char in line
-    keyboard.bs: 'backward_delete_last_char',
-    keyboard.delete: 'backward_delete_last_char',
-    # Show the line, useful after several edits
-    keyboard.C_l: 'redraw_tty',
-    keyboard.C_u: 'discard_tty',
-}
-
-insert_tty_keymap = stub_insert_keymap.copy()
-insert_tty_keymap.update(lineedit_tty_keymap)
-
-# This command mode keymap works on a printing terminal with no arrow keys.
-command_tty_keys = {
-    # Any keycode that maps to accept_command is a command terminator.
-    keyboard.cr: 'accept_command', # add to history, possibly exit
-    keyboard.C_n: 'next_history_tty',
-    keyboard.C_p: 'previous_history_tty'
-    }
-
-# This combined keymap works on a printing terminal.
-command_tty_keymap = insert_tty_keymap.copy()
-command_tty_keymap.update(command_tty_keys)
-command_tty_keymap.update(job_control_keys)
 
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
@@ -116,7 +19,6 @@ class Console(object):
                  prompt=(lambda: ''), reader=key.Key(),
                  do_command=(lambda command: None),
                  stopped=(lambda command: False),
-                 keymap=(lambda: command_keymap),
                  startup=(lambda: None), cleanup=(lambda: None),
                  start=(lambda: None), exit=(lambda: None)):
         """
@@ -147,11 +49,6 @@ class Console(object):
         (but we can still suspend the application using the
         job_commands arg, below).
 
-        keymap - callable with no arguments that returns the keymap
-        for handling both commands and input text.  Keymap contents
-        might depend on the application state.  Default returns
-        command_keymap defined in this module.
-
         startup - callable that invokes application code to run
         when application starts up or resumes, for example to
         initialize display. Default does nothing.
@@ -175,7 +72,6 @@ class Console(object):
         self.reader = reader # callable, reads char(s) to build command string 
         self.do_command = (lambda: do_command(self.command))
         self.stopped = (lambda: stopped(self.command))
-        self.keymap = keymap
         self.initcommand = '' # command string at the beginning of the cycle
         self.initpoint = None # index into command string at begining of cycle
         self.command = self.initcommand
@@ -187,6 +83,7 @@ class Console(object):
         self.cleanup = cleanup
         self.start = start # hooks out to job control
         self.exit = exit
+        self.keymap = self.init_keymap() # define below, minimize clutter here
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
 
@@ -217,7 +114,7 @@ class Console(object):
         """
         self.__call__(*args, **kwargs)
         while not (self.stopped()
-                   or self.command in job_control_keys):
+                   or self.command in self.job_control_keys):
             self.handler() # blocks in self.reader at each character
         self.stop()
 
@@ -232,10 +129,10 @@ class Console(object):
         # Printable keys require special-case handling,
         # because their method takes an additional argument: the key itself.
         if keycode in printing_chars:
-            method = getattr(self, self.keymap()[printable])
+            method = self.keymap()[printable]
             method(keycode)
         elif keycode in self.keymap():
-            method = getattr(self, self.keymap()[keycode])
+            method = self.keymap()[keycode]
             method()
         elif keycode:
             util.putstr(keyboard.bel) # sound indicates no handler
@@ -243,8 +140,7 @@ class Console(object):
             pass # incomplete keycode, do nothing
 
     # These keys have job control fcn only if they are alone at start of line.
-    # Otherwise they can have editing function - C_d appears in lineedit_keymap.
-
+    # Otherwise they can edit - C_d appears in lineedit_keymap.
     def ctrl_d(self):
         if self.command == '':
             self.command = keyboard.C_d # so job control code can find it
@@ -378,7 +274,8 @@ class Console(object):
 
     def backward_delete_char(self):
         if self.point > 0:
-            self.command = (self.command[:self.point-1] + self.command[self.point:])
+            self.command = (self.command[:self.point-1] + 
+                            self.command[self.point:])
             self.point -= 1
             display.backward_delete_char()
 
@@ -444,6 +341,115 @@ class Console(object):
         'redraw entire line including prompt on printing terminal'
         self.redraw_with_prefix('^L\r\n')
 
+    def init_keymap(self):
+        """
+        Returns a callable with no arguments that returns the keymap
+        for handling both commands and input text.  We return a
+        callable, not just a keymap, because the needed keymap
+        contents might need to be computed because they can depend on
+        the application state (mode).  This method returns
+        command_keymap defined below (actually it returns lambda:
+        command_keymap).  This method also defines several other
+        keymaps that the caller can use to construct and assign more
+        complex keymap callables.
+
+        A keymap is a dict from a keycode to one of the Console
+        methods above.  Keycodes in the keymap can have multiple chars
+        (for example esc sequences).
+        """
+        # This keymap requires a video terminal with cursor addressing.
+        self.lineedit_keymap = {
+            # insert_char requires special-case handling
+            #  because it takes an additional argument: the keycode.
+            printable: self.insert_char,
+
+            keyboard.bs: self.backward_delete_char,
+            keyboard.delete: self.backward_delete_char,
+            keyboard.C_a: self.move_beginning,
+            keyboard.C_b: self.backward_char,
+            keyboard.C_d: self.delete_char,
+            keyboard.C_e: self.move_end,
+            keyboard.C_f: self.forward_char,
+            keyboard.C_k: self.kill,
+            keyboard.C_l: self.redraw,
+            keyboard.C_u: self.discard,
+
+            # These keys are multicharacter control sequences
+            # require keyboard that sends ANSI control sequences
+            # and keyboard reader that handles multicharacter keycodes
+            keyboard.right: self.forward_char,
+            keyboard.left: self.backward_char,
+            }
+
+        # These keys are active in ed (etc.) input mode.
+        # This keymap works on a video terminal or a printing terminal.
+        self.stub_insert_keymap = {
+            # any keycode that maps to accept_line exits from line entry/edit
+            keyboard.cr: self.accept_line, # don't add to history, don't exit
+            keyboard.C_c: self.interrupt,
+            }
+
+        self.insert_keymap = self.stub_insert_keymap.copy()
+        self.insert_keymap.update(self.lineedit_keymap)
+
+        # These keys are active in ed (etc.) command mode. 
+        # This command mode keymap requires a video terminal with arrow keys.
+        self.command_keys = {
+            # Any keycode that maps to accept_command is a command terminator.
+            keyboard.cr: self.accept_command, # add to history, possibly exit
+            keyboard.C_n: self.next_history,
+            keyboard.C_p: self.previous_history,
+            keyboard.up: self.previous_history,
+            keyboard.down: self.next_history,
+        }
+
+        # These keys have job ctrl function only when alone at start of line.
+        # Otherwise they can edit - C_d appears in lineedit_keymap.
+        self.job_control_keys = {
+            keyboard.C_d: self.ctrl_d,
+            keyboard.C_z: self.ctrl_z,
+            }
+
+        # Combine the keymaps - command mode adds several keys to insert mode,
+        #  also reassigns method for keyboard.cr (RET key).
+        # job_control_keys replaces ^D del in insert_keymap with eof 
+        #  and adds ^Z suspend.
+        # This keymap is the default that __init__ assigns to self.keymap.
+        self.command_keymap = self.insert_keymap.copy()
+        self.command_keymap.update(self.command_keys)
+        self.command_keymap.update(self.job_control_keys)
+
+        # This keymap works on a printing terminal.
+        self.lineedit_tty_keymap = {
+            # append_char requires special-case handling
+            #  because it takes an additional argument: the key.
+            printable: self.append_char,
+            # Rudimentary in-line editing, just delete last char in line
+            keyboard.bs: self.backward_delete_last_char,
+            keyboard.delete: self.backward_delete_last_char,
+            # Show the line, useful after several edits
+            keyboard.C_l: self.redraw_tty,
+            keyboard.C_u: self.discard_tty,
+        }
+
+        self.insert_tty_keymap = self.stub_insert_keymap.copy()
+        self.insert_tty_keymap.update(self.lineedit_tty_keymap)
+
+        # This keymap works on a printing terminal with no arrow keys.
+        self.command_tty_keys = {
+            # Any keycode that maps to accept_command is a command terminator.
+            keyboard.cr: self.accept_command, # add to history, possibly exit
+            keyboard.C_n: self.next_history_tty, 
+            keyboard.C_p: self.previous_history_tty,
+            }
+
+        # This combined keymap works on a printing terminal.
+        self.command_tty_keymap = self.insert_tty_keymap.copy()
+        self.command_tty_keymap.update(self.command_tty_keys)
+        self.command_tty_keymap.update(self.job_control_keys)
+
+        return (lambda: self.command_keymap) # default keymap
+        
 def main():
     # Test: echo input lines, use job control commands ^D ^Z to exit.
     echo = Console(prompt=(lambda: '> '), 

@@ -12,10 +12,11 @@ import edo, wyshka, console
 ed = console.Console(prompt=(lambda: wyshka.prompt), 
                      do_command=edo.do_command,
                      stopped=(lambda command: edo.ed.quit),
-                     keymap=(lambda: (console.command_keymap 
-                                      if edo.ed.command_mode 
-                                      else console.insert_keymap)),
                      startup=edo.startup, cleanup=edo.ed.q)
+
+ed.keymap=(lambda: (ed.command_keymap 
+                    if edo.ed.command_mode 
+                    else ed.insert_keymap))
 
 def edda(*filename, **options):
     ed.run(*filename, **options)

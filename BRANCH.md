@@ -3,14 +3,15 @@ branches
 ========
 
 This is the **eden** branch.  Add full screen editing to the *eden*
-display editor.
+display editor, in addition to the classic *ed* *insert* and *append*
+commands.
 
 Branches recently merged into **master**:
 
-- **noframe**, merged 1 Apr 2018.  Reorganize communication between
-applications and graphics.  Break dependence of *edsel* on *display*,
-now only depends on *frame*.  Several other simplifications.  Begun 26
-Mar 2018.
+- **noframe**, merged 1 Apr 2018.  Reorganize and simplify
+communication between applications and display.  Break dependence of
+*edsel* on *display*, now only depends on *frame*.  Several related
+revisions.  Begun 26 Mar 2018.
 
 - **args**, merged 24 Mar 2018.  Improvements to usability,
 organization, style, and documentation.  Add arguments to the

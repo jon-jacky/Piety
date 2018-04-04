@@ -10,11 +10,12 @@ tty = console.Console(prompt=(lambda: ed.prompt),
                       reader=terminal.getchar,
                       do_command=ed.do_command,
                       stopped=(lambda command: ed.quit),
-                      # specify non-default tty_keymap 
-                      keymap=(lambda: (console.command_tty_keymap 
-                                       if ed.command_mode 
-                                       else console.insert_tty_keymap)),
                       startup=ed.startup, cleanup=ed.q)
+
+# use non-default tty keymaps
+tty.keymap=(lambda: (tty.command_tty_keymap 
+                     if ed.command_mode 
+                     else tty.insert_tty_keymap))
 
 def etty(*filename, **options):
     tty.run(*filename, **options)
