@@ -14,8 +14,8 @@ edsel = con.Console(prompt=(lambda: wyshka.prompt),
                       startup=editor.startup, cleanup=editor.cleanup)
 
 edsel.keymap = keymap=(lambda: (edsel.command_keymap 
-                                if ed.command_mode 
-                                else edsel.insert_keymap))
+                                if ed.mode == ed.Mode.command
+                                else edsel.input_keymap))
 
 def desoto(*filename, **options):
     edsel.run(*filename, **options)

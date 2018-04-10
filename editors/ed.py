@@ -3,6 +3,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 """
 
 import re, os, sys
+from enum import Enum
 import parse, check, buffer, view
 from updates import Op
 
@@ -365,13 +366,20 @@ def q(*args):
 ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
 ps2 = ''  # ed input mode prompt, empty
 prompt = ps1
-command_mode = True # alternates with input mode used by a,i,c commands
+
+class Mode(Enum):
+    'edit mode'
+    command = 1 # classic ed, most commands
+    input = 2   # classic ed a i c commands
+    display = 3 # eden display editor, full-screen editing
+
+mode = Mode.command
 
 def do_command(line):
     'Process one line without blocking in ed command or input mode'
-    global command_mode, prompt
+    global mode, prompt
     line = line.lstrip()
-    if command_mode:
+    if mode == Mode.command:
         if line and line[0] == '#': # comment, do nothing
             return 
         items = parse.command(buf, line)
@@ -383,7 +391,7 @@ def do_command(line):
         if cmd_name in parse.complete_cmds:
             globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in parse.input_cmds:
-            command_mode = False # enter input mode
+            mode = Mode.input
             prompt = ps2
             # Instead of using buf.a,i,c, we handle input mode cmds inline here
             # We add each line to buffer when user types RET at end-of-line,
@@ -393,7 +401,7 @@ def do_command(line):
             if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
                     else check.range_ok(buf, start, end)):
                 print('? invalid address')
-                command_mode = True
+                mode = Mode.command # exit input mode
                 prompt = ps1
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
@@ -414,7 +422,7 @@ def do_command(line):
         return
     else: # input mode for a,i,c commands that collect text
         if line == '.':
-            command_mode = True # exit input mode
+            mode = Mode.command # exit input mode
             prompt = ps1
             view.update(Op.command) # return from input mode to cmd mode
         else:

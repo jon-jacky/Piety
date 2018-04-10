@@ -15,8 +15,8 @@ ed = console.Console(prompt=(lambda: wyshka.prompt),
                      startup=edo.startup, cleanup=edo.ed.q)
 
 ed.keymap=(lambda: (ed.command_keymap 
-                    if edo.ed.command_mode 
-                    else ed.insert_keymap))
+                    if edo.ed.mode == edo.ed.Mode.command
+                    else ed.input_keymap))
 
 def edda(*filename, **options):
     ed.run(*filename, **options)

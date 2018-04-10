@@ -319,13 +319,20 @@ class Console(object):
         A keymap is a dict from a keycode to one of the Console
         methods above.  Keycodes in the keymap can have multiple chars
         (for example esc sequences).
+
+        Keymaps in this class require a video terminal with cursor addressing.
         """
-        # This keymap requires a video terminal with cursor addressing.
-        self.lineedit_keymap = {
-            # insert_char requires special-case handling
-            #  because it takes an additional argument: the keycode.
+        # This keymap is used in ed (etc.) input mode
+        self.input_keymap = {
+            # Printable characters require special case in handler method
+            #  because their method takes an additional argument: the keycode.
             printable: self.insert_char,
 
+            # any keycode that maps to accept_line exits from line entry/edit
+            keyboard.cr: self.accept_line, # but don't add to history
+            keyboard.C_c: self.interrupt,
+
+            # line editing
             keyboard.bs: self.backward_delete_char,
             keyboard.delete: self.backward_delete_char,
             keyboard.C_a: self.move_beginning,
@@ -344,17 +351,6 @@ class Console(object):
             keyboard.left: self.backward_char,
             }
 
-        # These keys are active in ed (etc.) input mode.
-        # This keymap works on a video terminal or a printing terminal.
-        self.stub_insert_keymap = {
-            # any keycode that maps to accept_line exits from line entry/edit
-            keyboard.cr: self.accept_line, # don't add to history, don't exit
-            keyboard.C_c: self.interrupt,
-            }
-
-        self.insert_keymap = self.stub_insert_keymap.copy()
-        self.insert_keymap.update(self.lineedit_keymap)
-
         # These keys are active in ed (etc.) command mode. 
         # This command mode keymap requires a video terminal with arrow keys.
         self.command_keys = {
@@ -366,19 +362,19 @@ class Console(object):
             keyboard.down: self.next_history,
         }
 
-        # These keys have job ctrl function only when alone at start of line.
-        # Otherwise they can edit - C_d appears in lineedit_keymap.
+        # These keys have job ctrl function only when alone at start of line
+        # in cmd mode. Otherwise they can edit - C_d appears in input_keymap.
         self.job_control_keys = {
             keyboard.C_d: self.ctrl_d,
             keyboard.C_z: self.ctrl_z,
             }
 
-        # Combine the keymaps - command mode adds several keys to insert mode,
+        # Combine the keymaps - command mode adds several keys to inputt mode,
         #  also reassigns method for keyboard.cr (RET key).
-        # job_control_keys replaces ^D del in insert_keymap with eof 
+        # job_control_keys replaces ^D del in input_keymap with eof 
         #  and adds ^Z suspend.
         # This keymap is the default that __init__ assigns to self.keymap.
-        self.command_keymap = self.insert_keymap.copy()
+        self.command_keymap = self.input_keymap.copy()
         self.command_keymap.update(self.command_keys)
         self.command_keymap.update(self.job_control_keys)
 

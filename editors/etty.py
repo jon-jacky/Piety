@@ -52,10 +52,10 @@ class Console(console.Console):
 
     def init_tty_keymaps(self):
         # This keymap works on a printing terminal.
-        self.lineedit_tty_keymap = {
-            # append_char requires special-case handling
-            #  because it takes an additional argument: the key.
-            console.printable: self.append_char,
+        self.input_tty_keymap = {
+            console.printable: self.append_char, 
+            keyboard.cr: self.accept_line,
+            keyboard.C_c: self.interrupt,
             # Rudimentary in-line editing, just delete last char in line
             keyboard.bs: self.backward_delete_last_char,
             keyboard.delete: self.backward_delete_last_char,
@@ -63,9 +63,6 @@ class Console(console.Console):
             keyboard.C_l: self.redraw_tty,
             keyboard.C_u: self.discard_tty,
         }
-
-        self.insert_tty_keymap = self.stub_insert_keymap.copy()
-        self.insert_tty_keymap.update(self.lineedit_tty_keymap)
 
         # This keymap works on a printing terminal with no arrow keys.
         self.command_tty_keys = {
@@ -76,7 +73,7 @@ class Console(console.Console):
             }
 
         # This combined keymap works on a printing terminal.
-        self.command_tty_keymap = self.insert_tty_keymap.copy()
+        self.command_tty_keymap = self.input_tty_keymap.copy()
         self.command_tty_keymap.update(self.command_tty_keys)
         self.command_tty_keymap.update(self.job_control_keys)
 
@@ -90,8 +87,8 @@ tty = Console(prompt=(lambda: ed.prompt),
 
 # use non-default tty keymaps
 tty.keymap=(lambda: (tty.command_tty_keymap 
-                     if ed.command_mode 
-                     else tty.insert_tty_keymap))
+                     if ed.mode == ed.Mode.command
+                     else tty.input_tty_keymap))
 
 def etty(*filename, **options):
     tty.run(*filename, **options)
