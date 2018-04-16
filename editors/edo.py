@@ -29,7 +29,7 @@ def x_command(do_command):
 
 # add embedded python interpreter
 _do_command = wyshka.shell(do_command=ed.do_command, 
-                           command_mode=(lambda: ed.mode == ed.Mode.command),
+                           command_mode=(lambda: ed.command_mode),
                            command_prompt=(lambda: ed.prompt))
 
 # add command to run script from buffer with optional echo and delay

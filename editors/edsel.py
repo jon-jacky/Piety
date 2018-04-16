@@ -30,9 +30,9 @@ def base_do_command(line):
     try:
         # Intercept special commands used by frame only, not ed.
         # Only in command mode!  Otherwise line might be text to add to buffer.
-        if ed.mode == ed.Mode.command and line == 'L': # similar to ^L
+        if ed.command_mode and line == 'L': # similar to ^L
             frame.update(Op.refresh)
-        elif ed.mode == ed.Mode.command and line.startswith('o'):
+        elif ed.command_mode and line.startswith('o'):
             do_window_command(line)
         else:
             ed.do_command(line)
@@ -43,7 +43,7 @@ def base_do_command(line):
 
 # wyshka adds embedded python interpreter to do_command
 _do_command = wyshka.shell(do_command=base_do_command,
-                           command_mode=(lambda: ed.mode == ed.Mode.command),
+                           command_mode=(lambda: ed.command_mode),
                            command_prompt=(lambda: ed.prompt))
 
 # do_command: add edo.x_command that executes script using samysh

@@ -367,19 +367,13 @@ ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
 ps2 = ''  # ed input mode prompt, empty
 prompt = ps1
 
-class Mode(Enum):
-    'edit mode'
-    command = 1 # classic ed, most commands
-    input = 2   # classic ed a i c commands
-    display = 3 # eden display editor, full-screen editing
-
-mode = Mode.command
+command_mode = True
 
 def do_command(line):
     'Process one line without blocking in ed command or input mode'
-    global mode, prompt
+    global command_mode, prompt
     line = line.lstrip()
-    if mode == Mode.command:
+    if command_mode:
         if line and line[0] == '#': # comment, do nothing
             return 
         items = parse.command(buf, line)
@@ -391,7 +385,7 @@ def do_command(line):
         if cmd_name in parse.complete_cmds:
             globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in parse.input_cmds:
-            mode = Mode.input
+            command_mode = False
             prompt = ps2
             # Instead of using buf.a,i,c, we handle input mode cmds inline here
             # We add each line to buffer when user types RET at end-of-line,
@@ -401,7 +395,7 @@ def do_command(line):
             if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
                     else check.range_ok(buf, start, end)):
                 print('? invalid address')
-                mode = Mode.command # exit input mode
+                command_mode = True
                 prompt = ps1
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
@@ -420,9 +414,9 @@ def do_command(line):
         else:
             print('? command not implemented: %s' % cmd_name)
         return
-    else: # input mode for a,i,c commands that collect text
+    else: # not command_mode, input mode for a i c commands that collect text
         if line == '.':
-            mode = Mode.command # exit input mode
+            command_mode = True
             prompt = ps1
             view.update(Op.command) # return from input mode to cmd mode
         else:

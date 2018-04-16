@@ -52,7 +52,7 @@ class Console(console.Console):
 
     def init_tty_keymaps(self):
         # This keymap works on a printing terminal.
-        self.input_tty_keymap = {
+        self.tty_input_keymap = {
             console.printable: self.append_char, 
             keyboard.cr: self.accept_line,
             keyboard.C_c: self.interrupt,
@@ -65,7 +65,7 @@ class Console(console.Console):
         }
 
         # This keymap works on a printing terminal with no arrow keys.
-        self.command_tty_keys = {
+        self.tty_command_keys = {
             # Any keycode that maps to accept_command is a command terminator.
             keyboard.cr: self.accept_command, # add to history, possibly exit
             keyboard.C_n: self.next_history_tty, 
@@ -73,11 +73,11 @@ class Console(console.Console):
             }
 
         # This combined keymap works on a printing terminal.
-        self.command_tty_keymap = self.input_tty_keymap.copy()
-        self.command_tty_keymap.update(self.command_tty_keys)
-        self.command_tty_keymap.update(self.job_control_keys)
+        self.tty_command_keymap = self.tty_input_keymap.copy()
+        self.tty_command_keymap.update(self.tty_command_keys)
+        self.tty_command_keymap.update(self.job_control_keys)
 
-        return (lambda: self.command_tty_keymap) # default keymap
+        return (lambda: self.tty_command_keymap) # default keymap
 
 tty = Console(prompt=(lambda: ed.prompt), 
               reader=terminal.getchar,
@@ -86,9 +86,9 @@ tty = Console(prompt=(lambda: ed.prompt),
               startup=ed.startup, cleanup=ed.q)
 
 # use non-default tty keymaps
-tty.keymap=(lambda: (tty.command_tty_keymap 
-                     if ed.mode == ed.Mode.command
-                     else tty.input_tty_keymap))
+tty.keymap = (lambda: (tty.tty_command_keymap 
+                       if ed.command_mode
+                       else tty.tty_input_keymap))
 
 def etty(*filename, **options):
     tty.run(*filename, **options)
