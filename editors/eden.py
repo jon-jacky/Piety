@@ -3,7 +3,8 @@ eden - Full screen display editing, with screen editing keys defined
         in a new Console subclass.
 """
 
-import keyboard, console, edsel, wyshka, samysh
+import keyboard, console, edsel, view, wyshka, samysh
+from updates import Op
 
 ed = edsel.edo.ed  # so we can use it without prefix
 
@@ -11,8 +12,7 @@ def base_do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     if ed.command_mode and line == 'C':
-        # ed.command_mode = False # enter display editing mode 
-        pass # FIXME - more to come
+        ed.do_command('c') # FIXME stub, for now behave like classic ed 'c'
     else:
         edsel.base_do_command(line)
 
@@ -34,8 +34,8 @@ class Console(console.Console):
     #  to the ones in the base class, they do not replace any.
     def command_mode(self):
         'Resume command mode'
-        #ed.command_mode = True # FIXME - Console shouldn't depend on ed
-        pass # FIXME - more to come
+        self.command = '.'
+        self.accept_line()
 
     def init_eden_keymaps(self):
         self.display_keys = {
