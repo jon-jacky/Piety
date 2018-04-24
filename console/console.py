@@ -72,10 +72,8 @@ class Console(object):
         self.reader = reader # callable, reads char(s) to build command string 
         self.do_command = (lambda: do_command(self.command))
         self.stopped = (lambda: stopped(self.command))
-        self.initcommand = '' # command string at the beginning of the cycle
-        self.initpoint = None # index into command string at begining of cycle
-        self.command = self.initcommand
-        self.point = 0 # # index into self.command
+        self.command = '' # empty command string at beginning of cycle
+        self.point = 0 # index into self.command at beginning of cycle
         self.start_col = 0
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
@@ -86,12 +84,6 @@ class Console(object):
         self.keymap = self.init_keymaps() # define below, minimize clutter here
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
-
-    def reinit(self, command=None, point=None):
-        'Re-initialize command line.'
-        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
-        self.command = self.command if command is None else command
-        self.point = len(self.command) if point is None else point
     
     # Piety Session switch method requires job has method named resume
     def resume(self, *args, **kwargs):
@@ -183,21 +175,13 @@ class Console(object):
         terminal.set_line_mode()
         print()
 
-    def do_command_1(self):
-        'Call do_command, but first prepare to restore default command line'
-        #initcommand initpoint assigned here, might be reassigned by do_command
-        # but are not used until self.restart calls self.reinit
-        self.initcommand = '' # default restart value for self.command
-        self.initpoint = None  #  "    "   self.point
-        self.do_command() # Might assign non-default to initcommand, initpoint.
-
     # accept_line and accept_command invoke the other methods in this section.
     # These are the commands that are invoked from the keymaps.
     # accept_line is used in insert modes, accept_command in command modes.
     def accept_line(self):
         'For insert modes: handle line, but no history, exit, or job control'
         self.restore()      # advance line and put terminal in line mode 
-        self.do_command_1() # might reassign self.command
+        self.do_command() # might reassign self.command
         self.restart()      # print prompt and put term in character mode
 
     def accept_command(self):
@@ -205,7 +189,7 @@ class Console(object):
         self.history.append(self.command)
         self.hindex = len(self.history) - 1
         self.restore()
-        self.do_command_1() # might stop or preempt this job, assign self.state
+        self.do_command() # might stop or preempt this job, assign self.state
         if self.stopped():
             self.stop()
         elif self.state != State.background: #assigned by job control elsewhere
@@ -215,31 +199,35 @@ class Console(object):
 
     def restart(self):
         'Prepare to collect a command string using the command object.'
-        self.reinit(command=self.initcommand, point=self.initpoint)
+        self.command = '' # empty command string at beginning of cycle
+        self.point = 0 # index into self.command at beginning of cycle
+        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
         util.putstr(self.prompt() + self.command) # command might be empty
         self.move_to_point() # might not be end of line
         terminal.set_char_mode()
+
+    # Command history
 
     def retrieve_previous_history(self):
         if self.history:
             length = len(self.history)
             self.hindex = self.hindex if self.hindex < length else length-1
-            self.initcommand = self.history[self.hindex]
-            self.reinit(command=self.initcommand, point=self.initpoint)
+            self.command = self.history[self.hindex]
+            self.point = len(self.command)
+            self.start_col = len(self.prompt())+1 # 1-based indexing, not 0
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
 
     def retrieve_next_history(self):
         length = len(self.history)
         self.hindex = self.hindex + 1 if self.hindex < length else length
-        self.initcommand = (self.history[self.hindex] 
+        self.command = (self.history[self.hindex] 
                           if self.hindex < length else '')
-        self.reinit(command=self.initcommand, point=self.initpoint)
-
-    # Command history
+        self.point = len(self.command)
+        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0
 
     def previous_history(self):
         self.retrieve_previous_history()
-        self.redraw()
+        self.redraw() # tty requires a different method here
 
     def next_history(self):
         self.retrieve_next_history()
