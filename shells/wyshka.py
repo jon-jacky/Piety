@@ -81,7 +81,7 @@ app.do_command = app_do_command
 
 # end stub application
 
-# globals used by wyshka
+# globals used by wyshka, reassigned by shell _do_command, see above
 python_mode = False
 prompt = app.prompt
 

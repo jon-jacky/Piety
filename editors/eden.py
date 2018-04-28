@@ -32,10 +32,18 @@ class Console(console.Console):
 
     # These methods and keymaps all have new names, so they are added 
     #  to the ones in the base class, they do not replace any.
+
+    # This method is based on expanding code inline here 
+    # from ed.py append and '.' handling, and Console accept_line method.
     def command_mode(self):
-        'Resume command mode'
-        self.command = '.'
-        self.accept_line()
+        'Add current line to buffer and resume command mode'
+        ed.buf.a(ed.buf.dot, self.command + '\n') #append after dot,advance dot
+        self.restore() # advance line and put terminal in line mode 
+        ed.command_mode = True
+        ed.prompt = ed.ps1
+        wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
+        view.update(Op.command) # return from input mode to cmd mode
+        self.restart()      # print prompt and put term in character mode
 
     def init_eden_keymaps(self):
         self.display_keys = {
