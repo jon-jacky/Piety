@@ -37,8 +37,8 @@ class Console(console.Console):
     # from ed.py append and '.' handling, and Console accept_line method.
     def command_mode(self):
         'Add current line to buffer and resume command mode'
-        ed.buf.a(ed.buf.dot, self.command + '\n') #append after dot,advance dot
         self.restore() # advance line and put terminal in line mode 
+        ed.buf.a(ed.buf.dot, self.command + '\n') #append after dot,advance dot
         ed.command_mode = True
         ed.prompt = ed.ps1
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
