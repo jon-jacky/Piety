@@ -12,7 +12,12 @@ def base_do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     if ed.command_mode and line == 'C':
-        ed.do_command('c') # FIXME stub, for now behave like classic ed 'c'
+        # ed.do_command('c') # FIXME stub, for now behave like classic ed 'c'
+        ed.command_mode = False
+        ed.prompt = ed.ps2
+        wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
+        eden.command = ed.buf.lines[ed.buf.dot].rstrip() # strip \n at eol
+        view.update(Op.input)
     else:
         edsel.base_do_command(line)
 
