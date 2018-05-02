@@ -125,6 +125,12 @@ class Buffer(object):
                       destination=self.dot, start=iline, end=self.dot, 
                       column=column)
 
+    def replace(self, iline, line):
+        'replace the line at iline with another single line'
+        self.lines[iline] = line
+        self.unsaved = True
+        # No update
+
     # files
 
     def f(self, filename):

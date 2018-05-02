@@ -3,7 +3,8 @@ eden - Full screen display editing, with screen editing keys defined
         in a new Console subclass.
 """
 
-import keyboard, console, edsel, view, wyshka, samysh
+import util, terminal # used only in restart
+import keyboard, display, console, view, edsel, wyshka, samysh
 from updates import Op
 
 ed = edsel.edo.ed  # so we can use it without prefix
@@ -11,13 +12,20 @@ ed = edsel.edo.ed  # so we can use it without prefix
 def base_do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
+
+    # Begin full-screen display editing
     if ed.command_mode and line == 'C':
-        # ed.do_command('c') # FIXME stub, for now behave like classic ed 'c'
+        # following lines based on ed.py do_command 'c' case
         ed.command_mode = False
         ed.prompt = ed.ps2
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         eden.command = ed.buf.lines[ed.buf.dot].rstrip() # strip \n at eol
-        view.update(Op.input)
+        eden.clear_command = False
+        # following lines based on frame Op.input
+        win = edsel.frame.win
+        wdot = win.wline(win.buf.dot)
+        display.put_cursor(wdot,1)
+
     else:
         edsel.base_do_command(line)
 
@@ -34,8 +42,23 @@ class Console(console.Console):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.keymap = self.init_eden_keymaps()
+        self.clear_command = True # used by restart method
 
-    # These methods and keymaps all have new names, so they are added 
+    # The following methods override methods in console.Console
+
+    def restart(self):
+        'Prepare to collect a command string in self.command'
+        if self.clear_command: # default, but not always
+            self.command = ''
+            self.point = 0 # index into self.command
+        else:
+            self.clear_command = True # restore default
+        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
+        util.putstr(self.prompt() + self.command) # command might be empty
+        self.move_to_point() # might not be end of line
+        terminal.set_char_mode()
+
+    # The following  methods and keymaps all have new names, so they are added 
     #  to the ones in the base class, they do not replace any.
 
     # This method is based on expanding code inline here 
@@ -43,11 +66,11 @@ class Console(console.Console):
     def command_mode(self):
         'Add current line to buffer and resume command mode'
         self.restore() # advance line and put terminal in line mode 
-        ed.buf.a(ed.buf.dot, self.command + '\n') #append after dot,advance dot
+        ed.buf.replace(ed.buf.dot, self.command + '\n')
         ed.command_mode = True
         ed.prompt = ed.ps1
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
-        view.update(Op.command) # return from input mode to cmd mode
+        edsel.frame.put_command_cursor()
         self.restart()      # print prompt and put term in character mode
 
     def init_eden_keymaps(self):
