@@ -3,7 +3,7 @@ eden - Full screen display editing, with screen editing keys defined
         in a new Console subclass.
 """
 
-import util, terminal # used only in restart
+import util, terminal
 import keyboard, display, console, view, edsel, wyshka, samysh
 from updates import Op
 
@@ -20,6 +20,8 @@ def base_do_command(line):
         ed.prompt = ed.ps2
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         eden.command = ed.buf.lines[ed.buf.dot].rstrip() # strip \n at eol
+        eden.point = 0 # 0-based
+        eden.start_col = 1 # 1-based
         eden.clear_command = False
         # following lines based on frame Op.input
         win = edsel.frame.win
@@ -51,20 +53,20 @@ class Console(console.Console):
         if self.clear_command: # default, but not always
             self.command = ''
             self.point = 0 # index into self.command
+            self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-
+            util.putstr(self.prompt() + self.command) # command might be empty
+            self.move_to_point() # might not be end of line
         else:
             self.clear_command = True # restore default
-        self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
-        util.putstr(self.prompt() + self.command) # command might be empty
-        self.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
     # The following  methods and keymaps all have new names, so they are added 
-    #  to the ones in the base class, they do not replace any.
+    #  to the ones in the Console base class, they do not replace any.
 
     # This method is based on expanding code inline here 
     # from ed.py append and '.' handling, and Console accept_line method.
     def command_mode(self):
-        'Add current line to buffer and resume command mode'
+        '^Z: Replace or add current line in buffer and resume command mode'
         self.restore() # advance line and put terminal in line mode 
         ed.buf.replace(ed.buf.dot, self.command + '\n')
         ed.command_mode = True
@@ -73,12 +75,25 @@ class Console(console.Console):
         edsel.frame.put_command_cursor()
         self.restart()      # print prompt and put term in character mode
 
+    def open_line(self):
+        """
+        RET: Split line at point, replace line in buffer at dot 
+        with its prefix, append suffix after line at dot.
+        """
+        prefix = self.command[:self.point]
+        suffix = self.command[self.point:].rstrip()
+        ed.buf.replace(ed.buf.dot, prefix + '\n')
+        display.kill_line() # from cursor to end of line
+        terminal.set_line_mode()
+        ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
+
     def init_eden_keymaps(self):
         self.display_keys = {
-            keyboard.C_z: self.command_mode
+            keyboard.C_z: self.command_mode,
+            keyboard.cr: self.open_line
             }
         self.display_keymap = self.input_keymap.copy()
-        self.display_keymap.update(self.display_keys)
+        self.display_keymap.update(self.display_keys) # override some keys
         return (lambda: self.command_keymap)
 
 eden = Console(prompt=(lambda: wyshka.prompt), 

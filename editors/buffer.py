@@ -129,7 +129,7 @@ class Buffer(object):
         'replace the line at iline with another single line'
         self.lines[iline] = line
         self.unsaved = True
-        # No update
+        # No update needed when line is edited in place on screen
 
     # files
 

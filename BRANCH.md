@@ -4,7 +4,7 @@ branches
 
 This is the **eden** branch.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*
-commands.
+commands.  Begun 1 Apr 2018.
 
 Branches recently merged into **master**:
 

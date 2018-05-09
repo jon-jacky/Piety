@@ -74,7 +74,7 @@ class Console(object):
         self.stopped = (lambda: stopped(self.command))
         self.command = '' # empty command string at beginning of cycle
         self.point = 0 # index into self.command at beginning of cycle
-        self.start_col = 0
+        self.start_col = 1 # index of first col on display, 1-based not 0-based
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
         self.startup = startup # hooks in to application
@@ -236,6 +236,7 @@ class Console(object):
     # Editing that requires a display terminal with cursor addressing
 
     def move_to_point(self):
+        # move_to_column and start_col are 1-based but self.point is 0-based
         display.move_to_column(self.start_col + self.point)
  
     def move_beginning(self):
