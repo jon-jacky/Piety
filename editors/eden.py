@@ -84,8 +84,16 @@ class Console(console.Console):
         suffix = self.command[self.point:].rstrip()
         ed.buf.replace(ed.buf.dot, prefix + '\n')
         display.kill_line() # from cursor to end of line
-        terminal.set_line_mode()
+        terminal.set_line_mode() # needed by update called by buf.a() below
         ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
+        self.command = suffix
+        self.point = 0
+        self.start_col = 1
+        terminal.set_char_mode()
+        # buf.a() update moved cursor so we have to put it back
+        win = edsel.frame.win
+        wdot = win.wline(win.buf.dot)
+        display.put_cursor(wdot,1)
 
     def init_eden_keymaps(self):
         self.display_keys = {
