@@ -286,6 +286,15 @@ def d(*args):
     if valid:
         buf.d(start, end)
 
+def j(*args):
+    'Delete lines from start to end, replace with single line of joined text'
+    valid, start, end, _, _ = check.irange(buf, args)
+    # For j command only, default end is start+1
+    end = (start + 1 if end == start and check.iline_ok(buf, start+1)
+           else end)
+    if valid:
+        buf.j(start, end)
+
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
     valid, start, end, lines, _ = check.irange(buf, args)

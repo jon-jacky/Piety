@@ -214,6 +214,13 @@ class Buffer(object):
         # ...but API c method does handle string argument.  
         self.i(start,string) # This i calls string.splitlines(True)
 
+    def j(self, start, end):
+        'Delete lines from start to end, replace with single line joined text'
+        lines = [ line.rstrip() for line in self.lines[start:end+1] ]
+        joined = ''.join(lines)+'\n'
+        self.d(start, end)
+        self.i(start, joined)
+
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,

@@ -50,7 +50,7 @@ class Console(console.Console):
 
     def restart(self):
         'Prepare to collect a command string in self.command'
-        if self.clear_command: # default, but not always
+        if self.clear_command: # default case, usually True
             self.command = ''
             self.point = 0 # index into self.command
             self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-
@@ -66,7 +66,7 @@ class Console(console.Console):
     # This method is based on expanding code inline here 
     # from ed.py append and '.' handling, and Console accept_line method.
     def command_mode(self):
-        '^Z: Replace or add current line in buffer and resume command mode'
+        '^Z: Replace current line in buffer and resume command mode'
         self.restore() # advance line and put terminal in line mode 
         ed.buf.replace(ed.buf.dot, self.command + '\n')
         ed.command_mode = True
@@ -95,10 +95,42 @@ class Console(console.Console):
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
 
+    def delete_or_join(self):
+        """
+        DEL: If point is not at start of line, delete preceding character.
+        Otherwise join to previous line.
+        """
+        if self.point > 0:
+            self.backward_delete_char()
+        else:
+            ed.buf.join()
+
+    def prev_line(self):
+        """
+        ^P, up arrow: Move cursor from current line in window to line above.
+        When cursor would leave top, redraw window with current line in middle
+        Replace current line in buffer and copy preceding buffer line into line
+        """
+        pass
+
+    def next_line(self):
+        """
+        ^N, down arrow: Move cursor from current line in window to line below.
+        When cursor would leave bottom, redraw window w/current line in middle
+        Replace current line in buffer and copy following buffer line into line
+        """
+        pass
+
     def init_eden_keymaps(self):
         self.display_keys = {
             keyboard.C_z: self.command_mode,
-            keyboard.cr: self.open_line
+            keyboard.cr: self.open_line,
+            keyboard.C_p: self.prev_line,
+            keyboard.C_n: self.next_line
+            keyboard.up: self.prev_line,
+            keyboard.down: self.next_line,
+            keyboard.bs: self.delete_or_join,
+            keyboard.delete: self.delete_or_join
             }
         self.display_keymap = self.input_keymap.copy()
         self.display_keymap.update(self.display_keys) # override some keys

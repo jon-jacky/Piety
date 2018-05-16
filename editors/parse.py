@@ -4,7 +4,7 @@ parse.py - command line parsing for ed.py
 
 import re
 
-complete_cmds = 'AbBdDeEfkKlmnpqrstwyz' # commands that do not use input mode
+complete_cmds = 'AbBdDeEfjkKlmnpqrstwyz' # commands that do not use input mode
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 

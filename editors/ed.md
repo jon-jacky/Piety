@@ -77,7 +77,7 @@ can resemble the *ed* command line:
 
 **ed.py** supports these commands from classic *ed*:
 
- *= a c d e E f i k l m p q r s t w z*
+ *= a c d e E f i j k l m p q r s t w z*
 
 **ed.py** supports these line address forms from classic *ed*:
 
