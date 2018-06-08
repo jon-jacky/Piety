@@ -4,7 +4,7 @@ eden - Full screen display editing, with screen editing keys defined
 """
 
 import util, terminal
-import keyboard, display, console, view, edsel, wyshka, samysh
+import keyboard, display, frame, console, check, edsel, wyshka, samysh
 from updates import Op
 
 ed = edsel.edo.ed  # so we can use it without prefix
@@ -75,6 +75,12 @@ class Console(console.Console):
         edsel.frame.put_command_cursor()
         self.restart()      # print prompt and put term in character mode
 
+    def refresh(self):
+        ed.buf.replace(ed.buf.dot, self.command + '\n') 
+        terminal.set_line_mode() # needed by update called by buf.l() below
+        frame.update(Op.refresh)
+        terminal.set_char_mode()
+
     def open_line(self):
         """
         RET: Split line at point, replace line in buffer at dot 
@@ -95,7 +101,7 @@ class Console(console.Console):
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
 
-    def delete_or_join(self):
+    def del_or_join_up(self):
         """
         DEL: If point is not at start of line, delete preceding character.
         Otherwise join to previous line.
@@ -103,34 +109,95 @@ class Console(console.Console):
         if self.point > 0:
             self.backward_delete_char()
         else:
-            ed.buf.join()
+            new_point = len(ed.buf.lines[ed.buf.dot-1])
+            terminal.set_line_mode() # needed by update called by buf.j() below
+            ed.buf.j(ed.buf.dot-1, ed.buf.dot)
+            self.command = ed.buf.lines[ed.buf.dot].rstrip()
+            self.point = new_point # FIXME what about marker?
+            terminal.set_char_mode()
+            # buf.j() update moved cursor to bottom so we have to put it back
+            win = edsel.frame.win
+            wdot = win.wline(win.buf.dot)
+            display.put_cursor(wdot, self.point)
 
-    def prev_line(self):
+    def del_or_join_down(self):
         """
-        ^P, up arrow: Move cursor from current line in window to line above.
-        When cursor would leave top, redraw window with current line in middle
-        Replace current line in buffer and copy preceding buffer line into line
+        ^D: If point is not at end of line, delete character under cursor.
+        Otherwise join next line to this one.
         """
         pass
 
+    def goto_line(self, iline, jcol):
+        if check.iline_ok(ed.buf, iline):
+            w.saved_point = jcol
+            ed.buf.replace(ed.buf.dot, self.command + '\n')
+            terminal.set_line_mode() # needed by update called by buf.l() below
+            ed.buf.l(iline)
+            line = ed.buf.lines[ed.buf.dot].rstrip()  # [iline] - ?
+            self.command = line
+            self.point = min(w.saved_point, len(line)+1)
+            terminal.set_char_mode()
+            # buf.l() update moved cursor to bottom so we have to put it back
+            # replace below with new win.put_cursor_at_dot(...) method ?
+            win = edsel.frame.win
+            wdot = win.wline(ed.buf.dot)
+            display.put_cursor(wdot, self.point)
+
+    def prev_line(self):
+        """
+        ^P, up arrow: Move cursor from current line in window to same
+        column in line above, or end of line - whichever comes first.
+        When cursor would leave top, redraw window with current line in middle
+        Replace current line in buffer and copy preceding buffer line into line
+        """
+        self.goto_line(ed.buf.dot-1, self.point)
+
     def next_line(self):
-        """
-        ^N, down arrow: Move cursor from current line in window to line below.
-        When cursor would leave bottom, redraw window w/current line in middle
-        Replace current line in buffer and copy following buffer line into line
-        """
+        '^N, down arrow: Like prev_line, but line below/bottom'
+        self.goto_line(ed.buf.dot+1, self.point)
+
+    def page_down(self):
+        '^v, page down'
+        pass
+
+    def page_up(self):
+        '^x (for now, change to M_v later) - page up'
+        pass
+        
+    def set_mark(self):
+        '^space, set mark'
+        pass
+
+    def exchange(self):
+        '^x, exchange point and mark'
+        pass
+
+    def cut(self):
+        '^w, delete from mark to point, store deleted text in paste buffer'
+        pass
+
+    def paste(self):
+        '^y, insert text from paste buffer'
         pass
 
     def init_eden_keymaps(self):
         self.display_keys = {
             keyboard.C_z: self.command_mode,
+            keyboard.C_l: self.refresh,
             keyboard.cr: self.open_line,
             keyboard.C_p: self.prev_line,
-            keyboard.C_n: self.next_line
+            keyboard.C_n: self.next_line,
             keyboard.up: self.prev_line,
             keyboard.down: self.next_line,
-            keyboard.bs: self.delete_or_join,
-            keyboard.delete: self.delete_or_join
+            keyboard.bs: self.del_or_join_up,
+            keyboard.delete: self.del_or_join_up,
+            keyboard.C_d: self.del_or_join_down,
+            keyboard.C_v: self.page_down,
+            keyboard.C_x: self.page_up, #C_x is placeholder, use something else
+            keyboard.C_space: self.set_mark,
+            keyboard.C_w: self.cut,
+            keyboard.C_y: self.paste,
+            # keyboard.C_x: self.page_up, #C_x is placeholder, use something else
             }
         self.display_keymap = self.input_keymap.copy()
         self.display_keymap.update(self.display_keys) # override some keys

@@ -59,8 +59,15 @@ features is described [here](scripts/run_timestamps.md).
 
 Ongoing and recent work on Piety is described [here](BRANCH.md).
 
+The Piety system has no dependencies, other than Python itself
+(including a few standard library modules).  This makes Piety a
+minimal self-contained system, written in a uniform style throughout.
+Alternatively, it might be possible to assemble similar functionality
+from [other projects](doc/utilities.md), but we expect the resulting
+system would be larger and harder to understand than Piety.
+
 Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).
 
-Revised Jan 2018
+Revised May 2018

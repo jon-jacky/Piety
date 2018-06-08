@@ -19,6 +19,10 @@ This page says 'Line and column numbers start at 1':
 
 """
 
+# Names of characters
+
+space = ' '
+
 # ASCII codes for control characters
 
 bel = '\a'   # bell
@@ -38,8 +42,12 @@ C_l = '\f'   # ^L, ff
 C_n = '\x0E' # ^N, so
 C_p = '\x10' # ^P, dle
 C_u = '\x15' # ^U, nak
+C_v = '\x16' # ^V, syn
 C_w = '\x17' # ^W, etb
-C_z = '\x1a'  # ^Z, sub
+C_x = '\x18' # ^X, can
+C_y = '\x19' # ^Y, em
+C_z = '\x1a' # ^Z, sub
+C_space = '\x99' # placeholder for'\x0' # ^space, alias for ^@, nul
 
 # ANSI codes for arrow keys
 

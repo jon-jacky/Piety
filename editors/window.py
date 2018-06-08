@@ -31,7 +31,8 @@ class Window(object):
         """
         self.focus = False # True when this window has the input focus
         self.buf = buf
-        self.saved_dot = self.buf.dot 
+        self.saved_dot = self.buf.dot  # line
+        self.saved_point = 1           # column            
         self.btop = 1 # index in buffer of first line displayed in window
         self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
         self.blast = self.blastline() # buffer can get out of synch
