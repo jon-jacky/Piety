@@ -163,12 +163,14 @@ class Console(console.Console):
         self.goto_line(ed.buf.dot+1, self.point)
 
     def page_down(self):
-        '^v, page down'
-        pass
+        '^v, page down.'
+        dest = min(ed.buf.dot + ed.buf.npage, ed.buf.nlines())
+        self.goto_line(dest, self.point)
 
     def page_up(self):
         '^x (for now, change to M_v later) - page up'
-        pass
+        dest = max(ed.buf.dot - ed.buf.npage, 1)
+        self.goto_line(dest, self.point)
         
     def set_mark(self):
         '^space, set mark'
