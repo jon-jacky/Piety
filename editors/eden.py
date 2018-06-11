@@ -17,14 +17,17 @@ def base_do_command(line):
     if ed.command_mode and line == 'C':
         # following lines based on ed.py do_command 'c' case
         ed.command_mode = False
+        # but not frame command_mode= False, that means ed input mode for a i c
+        frame.display_mode = True # probably should use update(Op...) for this
         ed.prompt = ed.ps2
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         eden.command = ed.buf.lines[ed.buf.dot].rstrip() # strip \n at eol
         eden.point = 0 # 0-based
         eden.start_col = 1 # 1-based
         eden.clear_command = False
-        # following lines based on frame Op.input
+        # following lines based on frame Op.input and Op.command
         win = edsel.frame.win
+        win.clear_marker(win.buf.dot)
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
 
@@ -70,8 +73,12 @@ class Console(console.Console):
         self.restore() # advance line and put terminal in line mode 
         ed.buf.replace(ed.buf.dot, self.command + '\n')
         ed.command_mode = True
+        # but not frame command_mode = True, it was never False
+        frame.display_mode = False # probably should use update(Op...) for this
         ed.prompt = ed.ps1
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
+        win = edsel.frame.win
+        win.set_marker(win.buf.dot)
         edsel.frame.put_command_cursor()
         self.restart()      # print prompt and put term in character mode
 
@@ -118,7 +125,7 @@ class Console(console.Console):
             # buf.j() update moved cursor to bottom so we have to put it back
             win = edsel.frame.win
             wdot = win.wline(win.buf.dot)
-            display.put_cursor(wdot, self.point)
+            display.put_cursor(wdot, self.start_col + self.point)
 
     def del_or_join_down(self):
         """
@@ -129,19 +136,18 @@ class Console(console.Console):
 
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
-            w.saved_point = jcol
             ed.buf.replace(ed.buf.dot, self.command + '\n')
             terminal.set_line_mode() # needed by update called by buf.l() below
             ed.buf.l(iline)
             line = ed.buf.lines[ed.buf.dot].rstrip()  # [iline] - ?
             self.command = line
-            self.point = min(w.saved_point, len(line)+1)
+            self.point = min(jcol, len(line)+1)
             terminal.set_char_mode()
             # buf.l() update moved cursor to bottom so we have to put it back
             # replace below with new win.put_cursor_at_dot(...) method ?
             win = edsel.frame.win
             wdot = win.wline(ed.buf.dot)
-            display.put_cursor(wdot, self.point)
+            display.put_cursor(wdot, self.start_col + self.point)
 
     def prev_line(self):
         """

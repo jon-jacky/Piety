@@ -23,7 +23,8 @@ win = None # window with input focus
 windows = list() # list of windows, windows[ifocus] has input focus
 
 # Control state variables
-command_mode = True # alternates with input (insert) mode used by ed a,i,c cmds
+command_mode = True # really means not ed_input_mode, not in ed a,i,c commands
+display_mode = False # really means eden display mode, suppress marker
 
 def scale(nlines, cmd_h):
     'Calculate dimensions and location of windows and scrolling command region'
@@ -116,7 +117,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
 
     # Switch to input (insert) mode, for ed a i c commands
     elif op == Op.input:
-        command_mode = False 
+        command_mode = False
         win.update_for_input()
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot+1,1)
@@ -130,7 +131,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
 
     # Dot moved, ed l command
     elif op == Op.locate:
-        win.locate(origin, destination)
+        win.locate(origin, destination, show_marker=(not display_mode))
 
     # Insert text: ed a i c m r t y commands
     # start, end are after insert, start == destination, end == win.buf.dot
