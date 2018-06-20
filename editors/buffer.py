@@ -237,7 +237,7 @@ class Buffer(object):
                       start=start, end=self.dot, destination=self.dot)
 
     def y(self, iline):
-        'Insert most recently deleted lines before iline.'
+        'Insert (yank) most recently deleted lines before iline.'
         # based on def i ... above
         self.insert(iline if iline > 0 else iline+1, Buffer.deleted)
         # restore marks, if any
