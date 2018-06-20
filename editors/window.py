@@ -228,13 +228,13 @@ class Window(object):
         else:
             self.reupdate(show_marker)
 
-    def insert(self, origin, start, end):
+    def insert(self, origin, start, end, show_marker=True):
         'Update window after insert lines from origin to start..end'
         if self.contains(end):
             if origin != 0:
                 self.clear_marker(origin)
             self.update_from(start)
-            if self.focus:
+            if self.focus and show_marker:
                 self.set_marker(end)
         else:
             self.reupdate()

@@ -337,7 +337,7 @@ def t(*args):
         buf.t(start, end, dest)
 
 def y(*args):
-    'Insert most recently deleted lines *before* destination line address'
+    'Insert (yank) most recently deleted lines *before* dest. line address'
     iline, _, _, _ = parse.arguments(args)
     iline = check.mk_iline(buf, iline)
     if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer

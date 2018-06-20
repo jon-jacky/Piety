@@ -15,22 +15,7 @@ def base_do_command(line):
 
     # Begin full-screen display editing
     if ed.command_mode and line == 'C':
-        # following lines based on ed.py do_command 'c' case
-        ed.command_mode = False
-        # but not frame command_mode= False, that means ed input mode for a i c
-        frame.display_mode = True # probably should use update(Op...) for this
-        ed.prompt = ed.ps2
-        wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
-        eden.command = ed.buf.lines[ed.buf.dot].rstrip() # strip \n at eol
-        eden.point = 0 # 0-based
-        eden.start_col = 1 # 1-based
-        eden.clear_command = False
-        # following lines based on frame Op.input and Op.command
-        win = edsel.frame.win
-        win.clear_marker(win.buf.dot)
-        wdot = win.wline(win.buf.dot)
-        display.put_cursor(wdot,1)
-
+        eden.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
     else:
         edsel.base_do_command(line)
 
@@ -66,9 +51,25 @@ class Console(console.Console):
     # The following  methods and keymaps all have new names, so they are added 
     #  to the ones in the Console base class, they do not replace any.
 
-    # This method is based on expanding code inline here 
-    # from ed.py append and '.' handling, and Console accept_line method.
+    def display_mode(self, line):
+        # Based on ed.py do_command 'c' case
+        ed.command_mode = False
+        # but not frame command_mode= False, that means ed input mode for a i c
+        frame.display_mode = True # probably should use update(Op...) for this
+        ed.prompt = ed.ps2
+        wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
+        eden.command = line # not including final \n at eol
+        eden.point = 0 # 0-based
+        eden.start_col = 1 # 1-based
+        eden.clear_command = False
+        # following lines based on frame Op.input and Op.command
+        win = edsel.frame.win
+        win.clear_marker(win.buf.dot)
+        wdot = win.wline(win.buf.dot)
+        display.put_cursor(wdot,1)
+
     def command_mode(self):
+        # Based on ed.py append and '.' handling, Console accept_line method.
         '^Z: Replace current line in buffer and resume command mode'
         self.restore() # advance line and put terminal in line mode 
         ed.buf.replace(ed.buf.dot, self.command + '\n')
@@ -84,7 +85,7 @@ class Console(console.Console):
 
     def refresh(self):
         ed.buf.replace(ed.buf.dot, self.command + '\n') 
-        terminal.set_line_mode() # needed by update called by buf.l() below
+        terminal.set_line_mode() # needed by update
         frame.update(Op.refresh)
         terminal.set_char_mode()
 
@@ -147,6 +148,7 @@ class Console(console.Console):
             # replace below with new win.put_cursor_at_dot(...) method ?
             win = edsel.frame.win
             wdot = win.wline(ed.buf.dot)
+            # here start_col + ... converts zero-based point to 1-based col
             display.put_cursor(wdot, self.start_col + self.point)
 
     def prev_line(self):
@@ -172,6 +174,14 @@ class Console(console.Console):
         dest = max(ed.buf.dot - ed.buf.npage, 1)
         self.goto_line(dest, self.point)
         
+    def search(self):
+        '^s, go to ed line address, can be search pattern or line number or ..'
+        # Seems this could be implemented eden ^Z; ed do_command; eden C
+        #self.command_mode()
+        #ed.do_command(...)
+        #self.display_mode(...)
+        pass
+
     def set_mark(self):
         '^space, set mark'
         pass
@@ -185,27 +195,33 @@ class Console(console.Console):
         pass
 
     def paste(self):
-        '^y, insert text from paste buffer'
-        pass
+        '^y, (yank) insert text from paste buffer'
+        terminal.set_line_mode() # needed by updates called by buf.y()
+        ed.buf.y(ed.buf.dot) 
+        terminal.set_char_mode()
+        # buf.y() update moved cursor so we have to put it back
+        win = edsel.frame.win
+        wdot = win.wline(win.buf.dot)
+        display.put_cursor(wdot,1)
 
     def init_eden_keymaps(self):
         self.display_keys = {
-            keyboard.C_z: self.command_mode,
+            keyboard.C_d: self.del_or_join_down,
             keyboard.C_l: self.refresh,
-            keyboard.cr: self.open_line,
-            keyboard.C_p: self.prev_line,
             keyboard.C_n: self.next_line,
+            keyboard.C_p: self.prev_line,
+            keyboard.C_s: self.search,
+            keyboard.C_v: self.page_down,
+            keyboard.C_w: self.cut,
+            keyboard.C_x: self.page_up, #C_x is placeholder, use something else
+            keyboard.C_y: self.paste, # yank
+            keyboard.C_z: self.command_mode,
+            keyboard.C_space: self.set_mark,
+            keyboard.cr: self.open_line,
             keyboard.up: self.prev_line,
             keyboard.down: self.next_line,
             keyboard.bs: self.del_or_join_up,
             keyboard.delete: self.del_or_join_up,
-            keyboard.C_d: self.del_or_join_down,
-            keyboard.C_v: self.page_down,
-            keyboard.C_x: self.page_up, #C_x is placeholder, use something else
-            keyboard.C_space: self.set_mark,
-            keyboard.C_w: self.cut,
-            keyboard.C_y: self.paste,
-            # keyboard.C_x: self.page_up, #C_x is placeholder, use something else
             }
         self.display_keymap = self.input_keymap.copy()
         self.display_keymap.update(self.display_keys) # override some keys

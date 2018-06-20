@@ -137,7 +137,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # start, end are after insert, start == destination, end == win.buf.dot
     elif op == Op.insert and origin != background_task:
         if command_mode: # ed commands m r t y
-            win.insert(origin, start, end)
+            win.insert(origin, start, end, show_marker=(not display_mode))
         else: # input mode after ed commands a i c    
             # Text at dot is already up-to-date on display, open next line.
             win.update_for_input()
@@ -153,7 +153,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         for w in windows:
             if w.buf == buffer:
                 terminal.set_line_mode()
-                w.insert(origin, start, end)
+                w.insert(origin, start, end, show_marker=(not display_mode))
                 for w1 in windows:
                     if w1.samebuf(w):
                         w1.adjust_insert(start, end, destination)
