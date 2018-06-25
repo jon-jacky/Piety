@@ -30,5 +30,6 @@ class Op(Enum):
     rescale = 14 # rescale frame and window sizes, then refresh
     # update operations on terminal where frame lives
     restore = 15 # restore full-screen scrolling and put cursor at bottom
-
+    display = 16 # one more mode, in addition to Op.input 8 and Op.command 9
+    
 background_task = -1  # used in update(Op.input, origin=background_task, ...)

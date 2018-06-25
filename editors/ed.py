@@ -395,6 +395,7 @@ def do_command(line):
             globals()[cmd_name](*args) # dict from name (str) to object (fcn)
         elif cmd_name in parse.input_cmds:
             command_mode = False
+            view.update(Op.input)
             prompt = ps2
             # Instead of using buf.a,i,c, we handle input mode cmds inline here
             # We add each line to buffer when user types RET at end-of-line,
@@ -409,15 +410,12 @@ def do_command(line):
             # assign dot to prepare for input mode, where we a(ppend) each line
             elif cmd_name == 'a':
                 buf.dot = start
-                view.update(Op.input)
             elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
                 buf.dot = start - 1 if start > 0 else 0 
                 # so we can a(ppend) instead of i(nsert)
-                view.update(Op.input)
             elif cmd_name == 'c': #c(hange) command deletes changed lines first
                 buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
                 buf.dot = start - 1 # supercede dot assigned in preceding
-                view.update(Op.input) # queues Op.input after buf.d Op.delete
             else:
                 print('? command not supported in input mode: %s' % cmd_name)
         else:

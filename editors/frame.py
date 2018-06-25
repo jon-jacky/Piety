@@ -3,6 +3,7 @@ frame.py - Multiwindow display implemented by a list of window instances,
             with a scrolling command region at the bottom of the display.
 """
 
+from enum import Enum
 import terminal, terminal_util, display, window
 from updates import Op, background_task
 
@@ -22,9 +23,12 @@ ifocus = None # index of window with input focus
 win = None # window with input focus
 windows = list() # list of windows, windows[ifocus] has input focus
 
-# Control state variables
-command_mode = True # really means not ed_input_mode, not in ed a,i,c commands
-display_mode = False # really means eden display mode, suppress marker
+class Mode(Enum):
+    command = 1 # ed command mode
+    input = 2   # ed input mode for a,i,c commmands
+    display = 3 # eden display mode
+
+mode = Mode.command
 
 def scale(nlines, cmd_h):
     'Calculate dimensions and location of windows and scrolling command region'
@@ -55,12 +59,14 @@ def put_command_cursor(column=1):
     display.put_cursor(cmd_n, column) # last line on display
 
 def refresh():
-    'Clear and update the entire frame'
-    display.put_cursor(1,1) # upper left corner
-    display.erase() 
+    'Clear and update entire frame in command mode, otherwise just the windows'
+    if mode == Mode.command:
+        display.put_cursor(1,1) # upper left corner
+        display.erase() 
     update_windows()
-    display.set_scroll(cmd_1, cmd_n) 
-    put_command_cursor(column=1) 
+    if mode == Mode.command:
+        display.set_scroll(cmd_1, cmd_n) 
+        put_command_cursor(column=1) 
 
 def rescale():
     'Recalculate frame and all window dimensions, then display all.'
@@ -78,7 +84,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
            start=0, end=0, column=1): # display column numbers are 1-based
     'Update the display: one window, several, or the entire frame.'
 
-    global command_mode, win, ifocus, cmd_h
+    global mode, win, ifocus, cmd_h
 
     # Clear display, redraw all the windows and scrolling command region.
     if op == Op.refresh:
@@ -115,36 +121,40 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
                 w.buf = buffer     # new current buffer
                 w.reupdate()
 
-    # Switch to input (insert) mode, for ed a i c commands
+    # Switch to ed input mode, for ed a i c commands
     elif op == Op.input:
-        command_mode = False
+        mode = Mode.input
         win.update_for_input()
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot+1,1)
 
-    # Switch to command mode, ed . while in input mode
+    # Switch to ed command mode, ed . while in input mode
     elif op == Op.command:
-        command_mode = True
+        mode = Mode.command
         # Overwrite '.' line on display, and lines below.
         win.update_from(win.buf.dot + 1)
         win.set_marker(win.buf.dot)
 
+    # Switch to eden display mode
+    elif op == Op.display:
+        mode = Mode.display
+
     # Dot moved, ed l command
     elif op == Op.locate:
-        win.locate(origin, destination, show_marker=(not display_mode))
+        win.locate(origin, destination, show_marker=(mode==Mode.command))
 
     # Insert text: ed a i c m r t y commands
     # start, end are after insert, start == destination, end == win.buf.dot
     elif op == Op.insert and origin != background_task:
-        if command_mode: # ed commands m r t y
-            win.insert(origin, start, end, show_marker=(not display_mode))
-        else: # input mode after ed commands a i c    
+        if mode != Mode.input: # ed commands m r t y
+            win.insert(origin, start, end, show_marker=(mode==Mode.command))
+        elif mode == Mode.input: # input mode after ed commands a i c    
             # Text at dot is already up-to-date on display, open next line.
             win.update_for_input()
         for w in windows:
             if w.samebuf(win):
                 w.adjust_insert(start, end, destination)
-        if not command_mode: # can't put input cursor til other windows done
+        if mode == Mode.input: # can't put input cursor til other windows done
             win.put_cursor_for_input(column=1)
 
     # Background task inserts text by calling buffer write() method.
@@ -153,12 +163,12 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         for w in windows:
             if w.buf == buffer:
                 terminal.set_line_mode()
-                w.insert(origin, start, end, show_marker=(not display_mode))
+                w.insert(origin, start, end, show_marker=(mode==Mode.command))
                 for w1 in windows:
                     if w1.samebuf(w):
                         w1.adjust_insert(start, end, destination)
                 terminal.set_char_mode()
-                if not command_mode:
+                if mode == Mode.input:
                     win.put_cursor_for_input(column=column) # win not w
                 break # might be other w with same buf, just update the first
 
@@ -210,8 +220,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
 
     # Put ed command cursor back in scrolling command region.
     # Then we can call standard Python input() or Piety Console restart().
-    if command_mode:
+    if mode == Mode.command:
         put_command_cursor(column=column) # background task can set column
     
     return win # caller might need to know which window was selected
-

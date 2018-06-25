@@ -4,7 +4,7 @@ eden - Full screen display editing, with screen editing keys defined
 """
 
 import util, terminal
-import keyboard, display, frame, console, check, edsel, wyshka, samysh
+import keyboard, display, console, check, edsel, frame, wyshka, samysh
 from updates import Op
 
 ed = edsel.edo.ed  # so we can use it without prefix
@@ -54,8 +54,7 @@ class Console(console.Console):
     def display_mode(self, line):
         # Based on ed.py do_command 'c' case
         ed.command_mode = False
-        # but not frame command_mode= False, that means ed input mode for a i c
-        frame.display_mode = True # probably should use update(Op...) for this
+        frame.update(Op.display) 
         ed.prompt = ed.ps2
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         eden.command = line # not including final \n at eol
@@ -63,7 +62,7 @@ class Console(console.Console):
         eden.start_col = 1 # 1-based
         eden.clear_command = False
         # following lines based on frame Op.input and Op.command
-        win = edsel.frame.win
+        win = frame.win
         win.clear_marker(win.buf.dot)
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
@@ -74,13 +73,12 @@ class Console(console.Console):
         self.restore() # advance line and put terminal in line mode 
         ed.buf.replace(ed.buf.dot, self.command + '\n')
         ed.command_mode = True
-        # but not frame command_mode = True, it was never False
-        frame.display_mode = False # probably should use update(Op...) for this
+        frame.update(Op.command)
         ed.prompt = ed.ps1
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
-        win = edsel.frame.win
+        win = frame.win
         win.set_marker(win.buf.dot)
-        edsel.frame.put_command_cursor()
+        frame.put_command_cursor()
         self.restart()      # print prompt and put term in character mode
 
     def refresh(self):
@@ -105,7 +103,7 @@ class Console(console.Console):
         self.start_col = 1
         terminal.set_char_mode()
         # buf.a() update moved cursor so we have to put it back
-        win = edsel.frame.win
+        win = frame.win
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
 
@@ -124,7 +122,7 @@ class Console(console.Console):
             self.point = new_point # FIXME what about marker?
             terminal.set_char_mode()
             # buf.j() update moved cursor to bottom so we have to put it back
-            win = edsel.frame.win
+            win = frame.win
             wdot = win.wline(win.buf.dot)
             display.put_cursor(wdot, self.start_col + self.point)
 
@@ -146,7 +144,7 @@ class Console(console.Console):
             terminal.set_char_mode()
             # buf.l() update moved cursor to bottom so we have to put it back
             # replace below with new win.put_cursor_at_dot(...) method ?
-            win = edsel.frame.win
+            win = frame.win
             wdot = win.wline(ed.buf.dot)
             # here start_col + ... converts zero-based point to 1-based col
             display.put_cursor(wdot, self.start_col + self.point)
@@ -170,7 +168,7 @@ class Console(console.Console):
         self.goto_line(dest, self.point)
 
     def page_up(self):
-        '^x (for now, change to M_v later) - page up'
+        '^r (for now, change to M_v later) - page up'
         dest = max(ed.buf.dot - ed.buf.npage, 1)
         self.goto_line(dest, self.point)
         
@@ -200,20 +198,21 @@ class Console(console.Console):
         ed.buf.y(ed.buf.dot) 
         terminal.set_char_mode()
         # buf.y() update moved cursor so we have to put it back
-        win = edsel.frame.win
+        win = frame.win
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
-
+    
     def init_eden_keymaps(self):
         self.display_keys = {
             keyboard.C_d: self.del_or_join_down,
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
             keyboard.C_p: self.prev_line,
+            keyboard.C_r: self.page_up,
             keyboard.C_s: self.search,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,
-            keyboard.C_x: self.page_up, #C_x is placeholder, use something else
+            keyboard.C_x: self.exchange, # exchange point and mark
             keyboard.C_y: self.paste, # yank
             keyboard.C_z: self.command_mode,
             keyboard.C_space: self.set_mark,

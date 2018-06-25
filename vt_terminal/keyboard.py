@@ -41,6 +41,7 @@ C_k = '\v'   # ^K, vt
 C_l = '\f'   # ^L, ff
 C_n = '\x0E' # ^N, so
 C_p = '\x10' # ^P, dle
+C_r = '\x12' # ^R, dc2
 C_s = '\x13' # ^S, dc3, xoff
 C_u = '\x15' # ^U, nak
 C_v = '\x16' # ^V, syn
