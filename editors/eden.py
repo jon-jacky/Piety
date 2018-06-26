@@ -142,12 +142,7 @@ class Console(console.Console):
             self.command = line
             self.point = min(jcol, len(line)+1)
             terminal.set_char_mode()
-            # buf.l() update moved cursor to bottom so we have to put it back
-            # replace below with new win.put_cursor_at_dot(...) method ?
-            win = frame.win
-            wdot = win.wline(ed.buf.dot)
-            # here start_col + ... converts zero-based point to 1-based col
-            display.put_cursor(wdot, self.start_col + self.point)
+            frame.put_display_cursor(self.start_col + self.point)
 
     def prev_line(self):
         """

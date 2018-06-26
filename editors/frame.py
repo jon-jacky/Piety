@@ -58,6 +58,10 @@ def put_command_cursor(column=1):
     'Put cursor at input line in scrolling command region, at given column'
     display.put_cursor(cmd_n, column) # last line on display
 
+def put_display_cursor(column=1):
+    wdot = win.wline(win.buf.dot)
+    display.put_cursor(wdot,column)
+
 def refresh():
     'Clear and update entire frame in command mode, otherwise just the windows'
     if mode == Mode.command:
@@ -138,6 +142,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to eden display mode
     elif op == Op.display:
         mode = Mode.display
+        put_display_cursor(column=column)
 
     # Dot moved, ed l command
     elif op == Op.locate:
@@ -218,9 +223,10 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         windows.insert(ifocus, win)
         win.reupdate()
 
-    # Put ed command cursor back in scrolling command region.
+    # In command mode put ed command cursor back in scrolling command region.
     # Then we can call standard Python input() or Piety Console restart().
     if mode == Mode.command:
         put_command_cursor(column=column) # background task can set column
-    
+    # But caller calls put_display_cursor because caller knows column 
+        
     return win # caller might need to know which window was selected
