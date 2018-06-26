@@ -51,7 +51,7 @@ def update_windows():
     'Redraw all windows, called by refresh, for example after resize.'
     for w in windows:
         w.update()
-        if w.focus:
+        if w.focus and mode == Mode.command:
             w.set_marker(w.buf.dot)
 
 def put_command_cursor(column=1):
@@ -62,7 +62,7 @@ def put_display_cursor(column=1):
     wdot = win.wline(win.buf.dot)
     display.put_cursor(wdot,column)
 
-def refresh():
+def refresh(column=1):
     'Clear and update entire frame in command mode, otherwise just the windows'
     if mode == Mode.command:
         display.put_cursor(1,1) # upper left corner
@@ -70,8 +70,10 @@ def refresh():
     update_windows()
     if mode == Mode.command:
         display.set_scroll(cmd_1, cmd_n) 
-        put_command_cursor(column=1) 
-
+        # update() sets cursor
+    elif mode == Mode.display:
+        put_display_cursor(column=column)
+    
 def rescale():
     'Recalculate frame and all window dimensions, then display all.'
     # Makes all windows (almost) the same height, unlike after o2 command
@@ -92,7 +94,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
 
     # Clear display, redraw all the windows and scrolling command region.
     if op == Op.refresh:
-        refresh()
+        refresh(column=column)
 
     # Restore full screen scrolling, cursor to bottom
     elif op == Op.restore:
@@ -100,7 +102,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         display.put_cursor(nlines,1)
 
     # Rescale frame and window sizes, then refresh.
-    if op == Op.rescale:
+    elif op == Op.rescale:
         cmd_h = start if start else cmd_h
         rescale()
 

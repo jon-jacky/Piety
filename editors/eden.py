@@ -84,7 +84,7 @@ class Console(console.Console):
     def refresh(self):
         ed.buf.replace(ed.buf.dot, self.command + '\n') 
         terminal.set_line_mode() # needed by update
-        frame.update(Op.refresh)
+        frame.update(Op.refresh, column=(self.start_col + self.point))
         terminal.set_char_mode()
 
     def open_line(self):
@@ -138,9 +138,9 @@ class Console(console.Console):
             ed.buf.replace(ed.buf.dot, self.command + '\n')
             terminal.set_line_mode() # needed by update called by buf.l() below
             ed.buf.l(iline)
-            line = ed.buf.lines[ed.buf.dot].rstrip()  # [iline] - ?
+            line = ed.buf.lines[ed.buf.dot].rstrip()  # FIXME? [iline] - ?
             self.command = line
-            self.point = min(jcol, len(line)+1)
+            self.point = min(jcol, len(line))
             terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
 
