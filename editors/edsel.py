@@ -76,7 +76,7 @@ def edsel(*filename, **options):
     startup(*filename, **options)
     while not ed.quit:
         line = input((lambda: wyshka.prompt)())
-        do_command(line) # non-blocking
+        do_command(line)
     cleanup()
 
 # initialize scrolling region and first window only once on import

@@ -101,3 +101,7 @@ def put_render(line, column, text, *attributes):
     """
     put_cursor(line, column)
     putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+
+def next_line():
+    'replacement for print() in terminal char mode, explicitly sends \n\r'
+    putstr('\n\r')

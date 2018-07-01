@@ -52,7 +52,7 @@ class Console(console.Console):
     #  to the ones in the Console base class, they do not replace any.
 
     def display_mode(self, line):
-        # Based on ed.py do_command 'c' case
+        # eden 'C' command, Based on ed.py do_command 'c' case
         ed.command_mode = False
         frame.update(Op.display) 
         ed.prompt = ed.ps2
@@ -82,10 +82,10 @@ class Console(console.Console):
         self.restart()      # print prompt and put term in character mode
 
     def refresh(self):
-        ed.buf.replace(ed.buf.dot, self.command + '\n') 
-        terminal.set_line_mode() # needed by update
+        ed.buf.replace(ed.buf.dot, self.command + '\n') # so refresh renders it
+        # terminal.set_line_mode() # needed by update
         frame.update(Op.refresh, column=(self.start_col + self.point))
-        terminal.set_char_mode()
+        # terminal.set_char_mode()
 
     def open_line(self):
         """
@@ -96,12 +96,14 @@ class Console(console.Console):
         suffix = self.command[self.point:].rstrip()
         ed.buf.replace(ed.buf.dot, prefix + '\n')
         display.kill_line() # from cursor to end of line
-        terminal.set_line_mode() # needed by update called by buf.a() below
+        # terminal.set_line_mode() # needed by update called by buf.a() below
         ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
         self.command = suffix
         self.point = 0
         self.start_col = 1
-        terminal.set_char_mode()
+        # terminal.set_char_mode()
+        frame.put_display_cursor()
+
         # buf.a() update moved cursor so we have to put it back
         win = frame.win
         wdot = win.wline(win.buf.dot)
@@ -115,16 +117,13 @@ class Console(console.Console):
         if self.point > 0:
             self.backward_delete_char()
         else:
-            new_point = len(ed.buf.lines[ed.buf.dot-1])
-            terminal.set_line_mode() # needed by update called by buf.j() below
+            new_point = len(ed.buf.lines[ed.buf.dot-1])-1 # don't count \n
+            # terminal.set_line_mode() #needed by update called by buf.j()below
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
             self.command = ed.buf.lines[ed.buf.dot].rstrip()
-            self.point = new_point # FIXME what about marker?
-            terminal.set_char_mode()
-            # buf.j() update moved cursor to bottom so we have to put it back
-            win = frame.win
-            wdot = win.wline(win.buf.dot)
-            display.put_cursor(wdot, self.start_col + self.point)
+            self.point = new_point
+            # terminal.set_char_mode()
+            frame.put_display_cursor(self.start_col + self.point)
 
     def del_or_join_down(self):
         """
@@ -136,12 +135,12 @@ class Console(console.Console):
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
             ed.buf.replace(ed.buf.dot, self.command + '\n')
-            terminal.set_line_mode() # needed by update called by buf.l() below
+            #terminal.set_line_mode() #needed by update called by buf.l() below
             ed.buf.l(iline)
             line = ed.buf.lines[ed.buf.dot].rstrip()  # FIXME? [iline] - ?
             self.command = line
             self.point = min(jcol, len(line))
-            terminal.set_char_mode()
+            #terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
 
     def prev_line(self):
@@ -189,13 +188,10 @@ class Console(console.Console):
 
     def paste(self):
         '^y, (yank) insert text from paste buffer'
-        terminal.set_line_mode() # needed by updates called by buf.y()
+        # terminal.set_line_mode() # needed by updates called by buf.y()
         ed.buf.y(ed.buf.dot) 
-        terminal.set_char_mode()
-        # buf.y() update moved cursor so we have to put it back
-        win = frame.win
-        wdot = win.wline(win.buf.dot)
-        display.put_cursor(wdot,1)
+        # terminal.set_char_mode()
+        frame.put_display_cursor()
     
     def init_eden_keymaps(self):
         self.display_keys = {
@@ -227,8 +223,10 @@ eden = Console(prompt=(lambda: wyshka.prompt),
                startup=edsel.startup, cleanup=edsel.cleanup)
 
 eden.keymap = (lambda: (eden.command_keymap 
-                        if ed.command_mode
-                        else eden.display_keymap))
+                        if frame.mode == frame.Mode.command
+                        else eden.input_keymap
+			    if frame.mode == frame.Mode.input
+			    else eden.display_keymap)) # Mode.display
 
 def main(*filename, **options):
     eden.run(*filename, **options)
