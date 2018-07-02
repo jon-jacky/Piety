@@ -27,13 +27,21 @@ def x_command(do_command):
             print('? buffer name')
     return x
 
-# add embedded python interpreter
-_do_command = wyshka.shell(do_command=ed.do_command, 
-                           command_mode=(lambda: ed.command_mode),
-                           command_prompt=(lambda: ed.prompt))
+# Add command to run script from buffer with optional echo and delay.
+_do_command = samysh.add_command(x_command(ed.do_command), ed.do_command)
 
-# add command to run script from buffer with optional echo and delay
-do_command = samysh.add_command(x_command(_do_command), _do_command)
+# Keep new do_command with new x_command separate from ed.add_line
+def _process_line(line):
+    'process one line without blocking, according to mode'
+    if ed.command_mode:
+        _do_command(line)
+    else:
+        ed.add_line(line)
+
+# add embedded python interpreter
+process_line = wyshka.shell(process_line=_process_line,
+                            command_mode=(lambda: ed.command_mode),
+                            command_prompt=(lambda: ed.prompt))
 
 def startup(*filename, **options):
     ed.startup(*filename, **options)
@@ -44,7 +52,7 @@ def edo(*filename, **options):
     startup(*filename, **options) # defined above, based on ed.startup
     while not ed.quit:
         line = input(wyshka.prompt) # blocks!
-        do_command(line) # defined above, based on ed.do_command
+        process_line(line)
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

@@ -23,16 +23,15 @@ def do_window_command(line):
     else:
         print('? integer 1 or 2 expected at %s' % paramstring) 
 
-def base_do_command(line):
+def do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     # try/except ensures we restore display, especially scrolling
     try:
         # Intercept special commands used by frame only, not ed.
-        # Only in command mode!  Otherwise line might be text to add to buffer.
-        if ed.command_mode and line == 'L': # similar to ^L
+        if line == 'L': # similar to ^L
             frame.update(Op.refresh)
-        elif ed.command_mode and line.startswith('o'):
+        elif line.startswith('o'):
             do_window_command(line)
         else:
             ed.do_command(line)
@@ -41,13 +40,21 @@ def base_do_command(line):
         traceback.print_exc() # looks just like unhandled exception
         ed.quit = True # exit() here raises another exception
 
-# wyshka adds embedded python interpreter to do_command
-_do_command = wyshka.shell(do_command=base_do_command,
-                           command_mode=(lambda: ed.command_mode),
-                           command_prompt=(lambda: ed.prompt))
+# Add command to run script from buffer with optional echo and delay.
+_do_command = samysh.add_command(edo.x_command(do_command), do_command)
 
-# do_command: add edo.x_command that executes script using samysh
-do_command = samysh.add_command(edo.x_command(_do_command), _do_command)
+# Keep new do_command with new x_command separate from ed.add_line
+def _process_line(line):
+    'process one line without blocking, according to mode'
+    if ed.command_mode:
+        _do_command(line)
+    else:
+        ed.add_line(line)
+
+# add embedded python interpreter
+process_line = wyshka.shell(process_line=_process_line,
+                            command_mode=(lambda: ed.command_mode),
+                            command_prompt=(lambda: ed.prompt))
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
@@ -69,14 +76,11 @@ def cleanup():
     frame.update(Op.restore)
 
 def edsel(*filename, **options):
-    """
-    Top level edsel command to invoke from python prompt or command line.
-    Won't work with cooperative multitasking, calls blocking input().
-    """
+    'Top level edsel command to invoke from python prompt or command line.'
     startup(*filename, **options)
     while not ed.quit:
-        line = input((lambda: wyshka.prompt)())
-        do_command(line)
+        line = input(wyshka.prompt)
+        process_line(line)
     cleanup()
 
 # initialize scrolling region and first window only once on import

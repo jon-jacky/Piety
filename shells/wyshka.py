@@ -6,7 +6,11 @@ wyshka.py - Shell that can alternate between pysh (Python)
 
 import pysh
 
-def shell(do_command=(lambda line: None), command_mode=(lambda: True), 
+# globals reassigned by shell _process_line below
+python_mode = False
+prompt = ''
+
+def shell(process_line=(lambda line: None), command_mode=(lambda: True), 
           command_prompt=(lambda: '')):
     """
     Return a shell: a function with one argument (a string, the
@@ -15,8 +19,9 @@ def shell(do_command=(lambda line: None), command_mode=(lambda: True),
 
     This function has three optional keyword arguments with defaults:
 
-    do_command is a callable with one string argument - the command line -
-    that executes an application command.  Default does nothing.
+    process_line is a callable with one string argument that performs
+    the application's action.  It might execute a command line or 
+    add a text line to a buffer.
 
     command_mode is a callable with no arguments that returns True
     when the application is in a state where its command interpreter
@@ -26,12 +31,12 @@ def shell(do_command=(lambda line: None), command_mode=(lambda: True),
     application prompt string, which might depend on application
     state.  Default always returns the empty string.
     """
-    def _do_command(line):
+    def _process_line(line):
         global python_mode, prompt
         if command_mode():
             if python_mode:
                 if len(line) > 1 and line[0] == ':':
-                    do_command(line[1:])
+                    process_line(line[1:])
                 elif line == ':':
                     python_mode = False
                 else:
@@ -44,57 +49,53 @@ def shell(do_command=(lambda line: None), command_mode=(lambda: True),
                 elif pysh.continuation:
                     pysh.push(line)
                 else: 
-                    do_command(line)        
+                    process_line(line)        
         else: # not command_mode()
-            do_command(line)
+            process_line(line)
         prompt = pysh.prompt if python_mode else command_prompt()
         return 
-    return _do_command
+    return _process_line
 
-# stub application for testing
-
-class Namespace(object): pass
-
-app = Namespace()
-
-app.command_mode = True # False is insert mode
-app.running = True
-app.ps1 = ':' # command mode prompt
-app.ps2 = ' '  # insert mode, no prompt, but indent to indicate mode
-app.prompt = app.ps1
-
-def app_do_command(line):
-    if app.command_mode:
-        print('Executing ' + line)
-        if line in ('a','i','c'):  # insert mode commands
-            app.command_mode = False
-            app.prompt = app.ps2
-        if line == 'q':
-            app.running = False
-    else: # app insert mode
-        print(' inserting ' + line)
-        if line == '.': # exit insert mode
-            app.command_mode = True
-            app.prompt = app.ps1
-
-app.do_command = app_do_command
-
-# end stub application
-
-# globals used by wyshka, reassigned by shell _do_command, see above
-python_mode = False
-prompt = app.prompt
-
-do_command = shell(do_command=app.do_command,
-                   command_mode=(lambda: app.command_mode),
-                   command_prompt=(lambda: app.prompt))
-                                  
-def main():
-    pysh.start()
-    app.running = True
-    while app.running:
-        line = input(prompt)
-        do_command(line)
 
 if __name__ == '__main__':
+
+    class Namespace(object): pass
+
+    app = Namespace()
+
+    app.command_mode = True # False is insert mode
+    app.running = True
+    app.command_prompt = ':'
+    app.input_prompt = ' ' # no prompt, but indent to indicate mode
+    app.prompt = app.command_prompt
+
+    def app_process_line(line):
+        if app.command_mode:
+            print('Executing ' + line)
+            if line in ('a','i','c'):  # insert mode commands
+                app.command_mode = False
+                app.prompt = app.input_prompt
+            if line == 'q':
+                app.running = False
+        else: # app insert mode
+            print(' inserting ' + line)
+            if line == '.': # exit insert mode
+                app.command_mode = True
+                app.prompt = app.command_prompt
+
+    app.process_line = app_process_line
+
+    prompt = app.prompt # global initialized above
+
+    process_line = shell(process_line=app.process_line,
+                         command_mode=(lambda: app.command_mode),
+                         command_prompt=(lambda: app.prompt))
+
+    def main():
+        pysh.start()
+        app.running = True
+        while app.running:
+            line = input(prompt)
+            process_line(line)
+
     main()

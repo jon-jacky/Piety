@@ -12,7 +12,7 @@ from updates import Op
 # The current buffer is used by many of these functions, but to
 # make the API similar to ed commands, it cannot appear as an argument.
 # So the current buffer, buf, must be global.  The command functions
-# form an API that can be used without running the ed command line, 
+# must form an API that can be used without running the ed command line, 
 # so each command function must gather and check its own arguments.
 
 # Data structures and variables. Initialize these with create_buf (below)
@@ -372,67 +372,77 @@ def q(*args):
     quit = True
 
 # Variables that must persist between do_command invocations, imported elsewhere
-ps1 = ':' # ed command prompt, named like python prompts sys.ps1 and .ps2
-ps2 = ''  # ed input mode prompt, empty
-prompt = ps1
+command_prompt = ':' # might be reassigned by startup() from -p option
+input_prompt = ''    # input mode, a i c commands - empty prompt
+prompt = command_prompt
 
 command_mode = True
 
 def do_command(line):
-    'Process one line without blocking in ed command or input mode'
+    'Process one line without blocking in ed command mode'
     global command_mode, prompt
     line = line.lstrip()
-    if command_mode:
-        if line and line[0] == '#': # comment, do nothing
-            return 
-        items = parse.command(buf, line)
-        if items[0] == 'ERROR':
-            return # parse.command already printed error message
-        else:
-            tokens = tuple([ t for t in items if t != None ])
-        cmd_name, args = tokens[0], tokens[1:]
-        if cmd_name in parse.complete_cmds:
-            globals()[cmd_name](*args) # dict from name (str) to object (fcn)
-        elif cmd_name in parse.input_cmds:
-            command_mode = False
-            prompt = ps2
-            # Instead of using buf.a,i,c, we handle input mode cmds inline here
-            # We add each line to buffer when user types RET at end-of-line,
-            # *unlike* in Python API where we pass multiple input lines at once
-            start, end, params, _ = parse.arguments(args) # can be int or None
-            start, end = check.mk_range(buf, start, end) # int only
-            if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
-                    else check.range_ok(buf, start, end)):
-                print('? invalid address')
-                command_mode = True
-                prompt = ps1
-            # assign dot to prepare for input mode, where we a(ppend) each line
-            elif cmd_name == 'a':
-                buf.dot = start
-                view.update(Op.input) # depends on buf.dot so can't be moved up
-            elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
-                buf.dot = start - 1 if start > 0 else 0 
-                # so we can a(ppend) instead of i(nsert)
-                view.update(Op.input) # depends on buf.dot so can't be moved up
-            elif cmd_name == 'c': #c(hange) command deletes changed lines first
-                buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
-                buf.dot = start - 1 # supercede dot assigned in preceding
-                view.update(Op.input) # queues Op.input after buf.d Op.delete
-            else:
-                print('? command not supported in input mode: %s' % cmd_name)
-        else:
-            print('? command not implemented: %s' % cmd_name)
-        return
-    else: # not command_mode, input mode for a i c commands that collect text
-        if line == '.':
+    if line and line[0] == '#': # comment, do nothing
+        return 
+    items = parse.command(buf, line)
+    if items[0] == 'ERROR':
+        return # parse.command already printed error message
+    else:
+        tokens = tuple([ t for t in items if t != None ])
+    cmd_name, args = tokens[0], tokens[1:]
+    if cmd_name in parse.complete_cmds:
+        globals()[cmd_name](*args) # dict from name (str) to object (fcn)
+    elif cmd_name in parse.input_cmds:
+        command_mode = False
+        prompt = input_prompt
+        # Instead of using buf.a i c fcns we handle input mode cmds inline here
+        # We add each line to buffer when user types RET at end-of-line,
+        # *unlike* in Python API where we pass multiple input lines at once
+        start, end, params, _ = parse.arguments(args) # can be int or None
+        start, end = check.mk_range(buf, start, end) # int only
+        if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
+                else check.range_ok(buf, start, end)):
+            print('? invalid address')
             command_mode = True
-            prompt = ps1
-            view.update(Op.command) # return from input mode to cmd mode
+            prompt = command_prompt
+        # assign dot to prepare for input mode, where we a(ppend) each line
+        elif cmd_name == 'a':
+            buf.dot = start
+            view.update(Op.input) # depends on buf.dot so can't be moved up
+        elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
+            buf.dot = start - 1 if start > 0 else 0 
+            # so we can a(ppend) instead of i(nsert)
+            view.update(Op.input) # depends on buf.dot so can't be moved up
+        elif cmd_name == 'c': #c(hange) command deletes changed lines first
+            buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
+            buf.dot = start - 1 # supercede dot assigned in preceding
+            view.update(Op.input) # queues Op.input after buf.d Op.delete
         else:
-            # Recall raw_input returns each line with final \n stripped off,
-            # BUT buf.a requires \n at end of each line
-            buf.a(buf.dot, line + '\n') # append new line after dot,advance dot
-        return
+            print('? command not supported in input mode: %s' % cmd_name)
+    else:
+        print('? command not implemented: %s' % cmd_name)
+    return
+
+def add_line(line):
+    'Process one line without blocking in ed input mode'
+    global command_mode, prompt
+    line = line.lstrip()
+    if line == '.':
+        command_mode = True
+        prompt = command_prompt
+        view.update(Op.command)
+    else:
+        # Recall input() returns each line with final \n stripped off,
+        # BUT buf.a requires \n at end of each line.
+        buf.a(buf.dot, line + '\n') # Append new line after dot, advance dot.
+    return
+
+def process_line(line):
+    'process one line without blocking, according to mode'
+    if command_mode:
+        do_command(line)
+    else:
+        add_line(line)
 
 def cmd_options():
     # import argparse inside this fcn so it isn't always a dependency.
@@ -455,12 +465,12 @@ def cmd_options():
 create_buf('main')  # initialize main buffer only once on import
 
 def startup(*filename, **options):
-    global ps1, prompt, quit
+    global command_prompt, prompt, quit
     if filename:
         e(filename[0])
     if 'p' in options:
-        ps1 = options['p'] 
-        prompt = ps1
+        command_prompt = options['p']
+        prompt = command_prompt
     quit = False
     view.update = view.noupdate
     view.lz_print_dest = sys.stdout
@@ -470,8 +480,8 @@ def ed(*filename, **options):
     startup(*filename, **options)
     while not quit:
         line = input(prompt) # blocks!
-        do_command(line)
-
+        process_line(line)
+        
 if __name__ == '__main__':
     filename, options = cmd_options()
     ed(*filename, **options)
