@@ -18,30 +18,23 @@ def x_command(do_command):
         Run script from buffer with optional echo and delay, coded in line arg.
         Named x for eXecute, a single letter like other ed command functions.
         """
-        bufname, _, params = paramstring.partition(' ')
-        bufname = ed.match_prefix(bufname, ed.buffers)
-        if bufname in ed.buffers and bufname != ed.current:
-            lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
-            samysh.run_script(params, lines, do_command)
-        else:
-            print('? buffer name')
+        if ed.command_mode:
+            bufname, _, params = paramstring.partition(' ')
+            bufname = ed.match_prefix(bufname, ed.buffers)
+            if bufname in ed.buffers and bufname != ed.current:
+                lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
+                samysh.run_script(params, lines, do_command)
+            else:
+                print('? buffer name')
     return x
 
-# Add command to run script from buffer with optional echo and delay.
-_do_command = samysh.add_command(x_command(ed.do_command), ed.do_command)
-
-# Keep new do_command with new x_command separate from ed.add_line
-def _process_line(line):
-    'process one line without blocking, according to mode'
-    if ed.command_mode:
-        _do_command(line)
-    else:
-        ed.add_line(line)
-
-# add embedded python interpreter
-process_line = wyshka.shell(process_line=_process_line,
+# Add embedded python interpreter to ed command line.
+_process_line = wyshka.shell(process_line=ed.process_line,
                             command_mode=(lambda: ed.command_mode),
                             command_prompt=(lambda: ed.prompt))
+
+# Add command to run script from buffer with optional echo and delay.
+process_line = samysh.add_command(x_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     ed.startup(*filename, **options)
