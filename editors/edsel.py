@@ -23,7 +23,7 @@ def do_window_command(line):
     else:
         print('? integer 1 or 2 expected at %s' % paramstring) 
 
-def do_command(line):
+def base_do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     # try/except ensures we restore display, especially scrolling
@@ -40,21 +40,20 @@ def do_command(line):
         traceback.print_exc() # looks just like unhandled exception
         ed.quit = True # exit() here raises another exception
 
-# Add command to run script from buffer with optional echo and delay.
-_do_command = samysh.add_command(edo.x_command(do_command), do_command)
-
-# Keep new do_command with new x_command separate from ed.add_line
-def _process_line(line):
+def base_process_line(line):
     'process one line without blocking, according to mode'
     if ed.command_mode:
-        _do_command(line)
+        base_do_command(line)
     else:
         ed.add_line(line)
 
 # add embedded python interpreter
-process_line = wyshka.shell(process_line=_process_line,
-                            command_mode=(lambda: ed.command_mode),
-                            command_prompt=(lambda: ed.prompt))
+_process_line = wyshka.shell(process_line=base_process_line,
+                             command_mode=(lambda: ed.command_mode),
+                             command_prompt=(lambda: ed.prompt))
+
+# Add command to run script from buffer with optional echo and delay.
+process_line = samysh.add_command(edo.x_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
