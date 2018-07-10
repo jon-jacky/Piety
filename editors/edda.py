@@ -10,7 +10,7 @@ To use the ed API from the Python prompt, use prefix as in edo.ed.p()
 import edo, wyshka, console
 
 ed = console.Console(prompt=(lambda: wyshka.prompt), 
-                     do_command=edo.do_command,
+                     process_line=edo.process_line,
                      stopped=(lambda command: edo.ed.quit),
                      startup=edo.startup, cleanup=edo.ed.q)
 

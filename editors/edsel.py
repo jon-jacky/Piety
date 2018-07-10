@@ -40,6 +40,7 @@ def base_do_command(line):
         traceback.print_exc() # looks just like unhandled exception
         ed.quit = True # exit() here raises another exception
 
+# We redefined do_command so we have to redefine process_line
 def base_process_line(line):
     'process one line without blocking, according to mode'
     if ed.command_mode:

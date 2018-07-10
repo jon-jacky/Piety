@@ -17,8 +17,8 @@ class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
     def __init__(self, name=__module__,
                  prompt=(lambda: ''), reader=key.Key(),
-                 do_command=(lambda command: None),
-                 stopped=(lambda command: False),
+                 process_line=(lambda line: None),
+                 stopped=(lambda line: False),
                  startup=(lambda: None), cleanup=(lambda: None),
                  start=(lambda: None), exit=(lambda: None)):
         """
@@ -38,16 +38,15 @@ class Console(object):
         keycode is incomplete.  Default is key.Key(), handles single
         characters and a few ANSI escape sequences.
 
-        do_command - callable to execute a command.  Takes one
-        argument, the command string.  Default does nothing.
+        process_line - callable to process a line, for example to
+        execute a command or add text to a buffer.  Takes one
+        argument, the line.  Default does nothing.
 
         stopped - callable that returns True when the application
         should stop or exit.  Takes one argument, a string, typically
         the command string, so stopped() can check if command is
         something like 'exit()' or 'quit' - but stopped() might check
-        application state instead.  Default returns False, never exits
-        (but we can still suspend the application using the
-        job_commands arg, below).
+        application state instead.  Default returns False, never exits.
 
         startup - callable that invokes application code to run
         when application starts up or resumes, for example to
@@ -69,11 +68,11 @@ class Console(object):
         """
         self.name = name
         self.prompt = prompt # can be other prompt or '' in other modes
-        self.reader = reader # callable, reads char(s) to build command string 
-        self.do_command = (lambda: do_command(self.command))
-        self.stopped = (lambda: stopped(self.command))
-        self.command = '' # empty command string at beginning of cycle
-        self.point = 0 # index into self.command at beginning of cycle
+        self.reader = reader # callable, reads char(s) to build line 
+        self.process_line = (lambda: process_line(self.line))
+        self.stopped = (lambda: stopped(self.line))
+        self.line = '' # empty line at beginning of cycle
+        self.point = 0 # index into self.line at beginning of cycle
         self.start_col = 1 # index of first col on display, 1-based not 0-based
         self.history = list() # list of previous commands, earliest first
         self.hindex = 0 # index into history
@@ -106,7 +105,7 @@ class Console(object):
         """
         self.__call__(*args, **kwargs)
         while not (self.stopped()
-                   or self.command in self.job_control_keys):
+                   or self.line in self.job_control_keys):
             self.handler() # blocks in self.reader at each character
         self.stop()
 
@@ -134,16 +133,16 @@ class Console(object):
     # These keys have job control fcn only if they are alone at start of line.
     # Otherwise they can edit - C_d appears in lineedit_keymap.
     def ctrl_d(self):
-        if self.command == '':
-            self.command = keyboard.C_d # so job control code can find it
+        if self.line == '':
+            self.line = keyboard.C_d # so job control code can find it
             util.putstr('^D')  # no newline, caller handles it.
             self.stop()
         else:
             self.delete_char()
 
     def ctrl_z(self):
-        if self.command == '':
-            self.command = keyboard.C_z # so job control code can find it
+        if self.line == '':
+            self.line = keyboard.C_z # so job control code can find it
             print('^Z')
             util.putstr('\rStopped') # still in raw mode, print didn't RET
             self.stop()
@@ -161,7 +160,7 @@ class Console(object):
         raise KeyboardInterrupt
 
     # The following methods, restore through restart, are invoked by
-    # accept_line (when the user finishes entering/editing text in insert mode)
+    # accept_line (when the user finishes entering/editing text in input mode)
     # or accept_command (when the user finishes entering/editing a command).
     # The user typically indicates this by typing RET, but the actual keycodes
     # (for each mode) are set by keymaps in self.keymap.
@@ -176,20 +175,20 @@ class Console(object):
         print()
 
     # accept_line and accept_command invoke the other methods in this section.
-    # These are the commands that are invoked from the keymaps.
+    # These are the methods that are invoked from the keymaps.
     # accept_line is used in insert modes, accept_command in command modes.
     def accept_line(self):
         'For insert modes: handle line, but no history, exit, or job control'
         self.restore()      # advance line and put terminal in line mode 
-        self.do_command() # might reassign self.command
+        self.process_line() # might reassign self.line
         self.restart()      # print prompt and put term in character mode
 
     def accept_command(self):
         'For command modes: handle line, with history, exit, and job control'
-        self.history.append(self.command)
+        self.history.append(self.line)
         self.hindex = len(self.history) - 1
         self.restore()
-        self.do_command() # might stop or preempt this job, assign self.state
+        self.process_line() # might stop or preempt this job, assign self.state
         if self.stopped():
             self.stop()
         elif self.state != State.background: #assigned by job control elsewhere
@@ -198,11 +197,11 @@ class Console(object):
             return # a different job continues
 
     def restart(self):
-        'Prepare to collect a command string using the command object.'
-        self.command = '' # empty command string at beginning of cycle
-        self.point = 0 # index into self.command at beginning of cycle
+        'Prepare to collect a line'
+        self.line = '' # empty line at beginning of cycle
+        self.point = 0 # index into self.line at beginning of cycle
         self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
-        util.putstr(self.prompt() + self.command) # command might be empty
+        util.putstr(self.prompt() + self.line) # line might be empty
         self.move_to_point() # might not be end of line
         terminal.set_char_mode()
 
@@ -212,17 +211,17 @@ class Console(object):
         if self.history:
             length = len(self.history)
             self.hindex = self.hindex if self.hindex < length else length-1
-            self.command = self.history[self.hindex]
-            self.point = len(self.command)
+            self.line = self.history[self.hindex]
+            self.point = len(self.line)
             self.start_col = len(self.prompt())+1 # 1-based indexing, not 0
         self.hindex = self.hindex - 1 if self.hindex > 0 else 0
 
     def retrieve_next_history(self):
         length = len(self.history)
         self.hindex = self.hindex + 1 if self.hindex < length else length
-        self.command = (self.history[self.hindex] 
+        self.line = (self.history[self.hindex] 
                           if self.hindex < length else '')
-        self.point = len(self.command)
+        self.point = len(self.line)
         self.start_col = len(self.prompt())+1 # 1-based indexing, not 0
 
     def previous_history(self):
@@ -244,19 +243,19 @@ class Console(object):
         self.move_to_point()
 
     def move_end(self):
-        self.point = len(self.command)
+        self.point = len(self.line)
         self.move_to_point()
 
     def insert_char(self, keycode):
-        self.command = (self.command[:self.point] + keycode +
-                      self.command[self.point:])
+        self.line = (self.line[:self.point] + keycode +
+                      self.line[self.point:])
         self.point += 1
         display.insert_char(keycode)
 
     def backward_delete_char(self):
         if self.point > 0:
-            self.command = (self.command[:self.point-1] + 
-                            self.command[self.point:])
+            self.line = (self.line[:self.point-1] + 
+                            self.line[self.point:])
             self.point -= 1
             display.backward_delete_char()
 
@@ -266,30 +265,30 @@ class Console(object):
             display.backward_char()
 
     def delete_char(self):
-        self.command = (self.command[:self.point] + self.command[self.point+1:])
+        self.line = (self.line[:self.point] + self.line[self.point+1:])
         display.delete_char() # point does not change
 
     def forward_char(self):
-        if self.point < len(self.command):
+        if self.point < len(self.line):
             self.point += 1
             display.forward_char()
 
     def kill(self):
         'delete line from point to end-of-line'
-        self.command = self.command[:self.point] # point does not change
+        self.line = self.line[:self.point] # point does not change
         display.kill_line()
 
     def redraw(self):
         'redraw line'
         # Maybe ^L on vt should refresh whole window or even whole frame?
         display.move_to_column(self.start_col)
-        self.point = len(self.command)
-        util.putstr(self.command)
-        display.kill_line() # remove any leftover text past self.command
+        self.point = len(self.line)
+        util.putstr(self.line)
+        display.kill_line() # remove any leftover text past self.line
 
     def discard(self): # name like gnu readline unix-line-discard
         'discard line'
-        self.command = str() 
+        self.line = str() 
         self.move_beginning() # accounts for prompt, assigns point
         display.kill_line() # erase from cursor to end of line
 
@@ -372,7 +371,7 @@ class Console(object):
 def main():
     # Test: echo input lines, use job control commands ^D ^Z to exit.
     echo = Console(prompt=(lambda: '> '), 
-                   do_command=(lambda command: print(command)))
+                   process_line=(lambda line: print(line)))
     echo.run()
 
 if __name__ == '__main__':
