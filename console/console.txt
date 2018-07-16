@@ -1,8 +1,5 @@
-Commands (keystrokes) to edit the command line and access its history in any
-application that uses the console module.  Commands are similar to Unix readline.
-
-Functions are assigned to keys in each Command object's keymap.  This
-document describes the default keymap.
+Keycodes to edit within a line and access command history in any application 
+that uses the console module. Keycodes are similar to Unix readline.
 
 Dedicated function keys:
 
@@ -14,7 +11,8 @@ Dedicated function keys:
  up   (arrow key) retrieve previous line from history
  down (arrow key) retrieve next line from history
 
-Control keys: hold down control key while typing the named key, upper or lowercase
+Control keys: hold down control key while typing the named key, upper
+or lowercase work the same.
 
  ^A  move cursor to start of line 
  ^B  move cursor (b)ack one character
@@ -41,4 +39,8 @@ These keys must be removed from the keymap for printing terminals.
 There is an alternate method to put in the keymap to support bs del ^H
  on printing terminals, by printing \x to indicate x has been deleted.
 
-Revised November 2016
+Functions are assigned to keycodes in each Console object's keymap.
+This document describes the default keymap for the Console class
+defined in console.py
+
+Revised July 2018
