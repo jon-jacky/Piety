@@ -9,43 +9,25 @@ from updates import Op
 
 ed = edsel.edo.ed  # so we can use it without prefix
 
-def base_do_command(line):
-    'Process one command line without blocking.'
-    line = line.lstrip()
-
-    # Begin full-screen display editing
-    if ed.command_mode and line == 'C':
-        eden.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
-    else:
-        edsel.base_do_command(line)
-
-# wyshka adds embedded python interpreter to do_command
-_do_command = wyshka.shell(do_command=base_do_command,
-                           command_mode=(lambda: ed.command_mode),
-                           command_prompt=(lambda: ed.prompt))
-
-# do_command: add edo.x_command that executes script using samysh
-do_command = samysh.add_command(edsel.edo.x_command(_do_command), _do_command)
-
 class Console(console.Console):
     'Console subclass that adds methods and keymaps for screen editing'
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.keymap = self.init_eden_keymaps()
-        self.clear_command = True # used by restart method
+        self.clear_line = True # used by restart method
 
     # The following methods override methods in console.Console
 
     def restart(self):
-        'Prepare to collect a command string in self.command'
-        if self.clear_command: # default case, usually True
-            self.command = ''
-            self.point = 0 # index into self.command
+        'Prepare to collect a command string in self.line'
+        if self.clear_line: # default case, usually True
+            self.line = ''
+            self.point = 0 # index into self.line
             self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-
-            util.putstr(self.prompt() + self.command) # command might be empty
+            util.putstr(self.prompt() + self.line) # command might be empty
             self.move_to_point() # might not be end of line
         else:
-            self.clear_command = True # restore default
+            self.clear_line = True # restore default
         terminal.set_char_mode()
 
     # The following  methods and keymaps all have new names, so they are added 
@@ -55,12 +37,12 @@ class Console(console.Console):
         # eden 'C' command, Based on ed.py do_command 'c' case
         ed.command_mode = False
         frame.update(Op.display) 
-        ed.prompt = ed.ps2
+        ed.prompt = ed.input_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
-        eden.command = line # not including final \n at eol
+        eden.line = line # not including final \n at eol
         eden.point = 0 # 0-based
         eden.start_col = 1 # 1-based
-        eden.clear_command = False
+        eden.clear_line = False
         # following lines based on frame Op.input and Op.command
         win = frame.win
         win.clear_marker(win.buf.dot)
@@ -71,10 +53,10 @@ class Console(console.Console):
         # Based on ed.py append and '.' handling, Console accept_line method.
         '^Z: Replace current line in buffer and resume command mode'
         self.restore() # advance line and put terminal in line mode 
-        ed.buf.replace(ed.buf.dot, self.command + '\n')
+        ed.buf.replace(ed.buf.dot, self.line + '\n')
         ed.command_mode = True
         frame.update(Op.command)
-        ed.prompt = ed.ps1
+        ed.prompt = ed.command_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         win = frame.win
         win.set_marker(win.buf.dot)
@@ -82,7 +64,7 @@ class Console(console.Console):
         self.restart()      # print prompt and put term in character mode
 
     def refresh(self):
-        ed.buf.replace(ed.buf.dot, self.command + '\n') # so refresh renders it
+        ed.buf.replace(ed.buf.dot, self.line + '\n') # so refresh renders it
         # terminal.set_line_mode() # needed by update
         frame.update(Op.refresh, column=(self.start_col + self.point))
         # terminal.set_char_mode()
@@ -92,13 +74,13 @@ class Console(console.Console):
         RET: Split line at point, replace line in buffer at dot 
         with its prefix, append suffix after line at dot.
         """
-        prefix = self.command[:self.point]
-        suffix = self.command[self.point:].rstrip()
+        prefix = self.line[:self.point]
+        suffix = self.line[self.point:].rstrip()
         ed.buf.replace(ed.buf.dot, prefix + '\n')
         display.kill_line() # from cursor to end of line
         # terminal.set_line_mode() # needed by update called by buf.a() below
         ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
-        self.command = suffix
+        self.line = suffix
         self.point = 0
         self.start_col = 1
         # terminal.set_char_mode()
@@ -120,7 +102,7 @@ class Console(console.Console):
             new_point = len(ed.buf.lines[ed.buf.dot-1])-1 # don't count \n
             # terminal.set_line_mode() #needed by update called by buf.j()below
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
-            self.command = ed.buf.lines[ed.buf.dot].rstrip()
+            self.line = ed.buf.lines[ed.buf.dot].rstrip()
             self.point = new_point
             # terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
@@ -134,11 +116,11 @@ class Console(console.Console):
 
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
-            ed.buf.replace(ed.buf.dot, self.command + '\n')
+            ed.buf.replace(ed.buf.dot, self.line + '\n')
             #terminal.set_line_mode() #needed by update called by buf.l() below
             ed.buf.l(iline)
             line = ed.buf.lines[ed.buf.dot].rstrip()  # FIXME? [iline] - ?
-            self.command = line
+            self.line = line
             self.point = min(jcol, len(line))
             #terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
@@ -217,8 +199,35 @@ class Console(console.Console):
         self.display_keymap.update(self.display_keys) # override some keys
         return (lambda: self.command_keymap)
 
+def base_do_command(line):
+    'Process one command line without blocking.'
+    line = line.lstrip()
+
+    # Begin full-screen display editing
+    if line == 'C':
+        eden.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+    else:
+        edsel.base_do_command(line)
+
+# We redefined do_command so we have to redefine process_line
+def base_process_line(line):
+    'process one line without blocking, according to mode'
+    if ed.command_mode:
+        base_do_command(line)
+    else:
+        ed.add_line(line)
+
+# Add embedded python interpreter.
+_process_line = wyshka.shell(process_line=base_process_line,
+                             command_mode=(lambda: ed.command_mode),
+                             command_prompt=(lambda: ed.prompt))
+
+# Add command to run script from buffer with optional echo and delay.
+process_line = samysh.add_command(edsel.edo.x_command(_process_line), 
+                                  _process_line)
+
 eden = Console(prompt=(lambda: wyshka.prompt), 
-               do_command=do_command,
+               process_line=process_line,
                stopped=(lambda command: ed.quit),
                startup=edsel.startup, cleanup=edsel.cleanup)
 

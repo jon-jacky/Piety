@@ -48,7 +48,7 @@ def base_process_line(line):
     else:
         ed.add_line(line)
 
-# add embedded python interpreter
+# Add embedded python interpreter.
 _process_line = wyshka.shell(process_line=base_process_line,
                              command_mode=(lambda: ed.command_mode),
                              command_prompt=(lambda: ed.prompt))
