@@ -109,13 +109,8 @@ class Console(object):
             self.handler() # blocks in self.reader at each character
         self.stop()
 
-    # alternative run_noreader could pass keycode to handler, default getchar
-
-    def handler(self):
-        # Read char, add to keycode sequence.  If seq complete, return keycode
-        # To avoid blocking in self.reader(),must only call when input is ready
-        # An alternative way would run reader first, pass keycode to handler
-        keycode = self.reader() # returns '' when keycode is not yet complete
+    def handle_key(self, keycode):
+        'Call this handle_key as handler when keycode is already available'
         # keycode might be single character or a sequence of characters.
         # Printable keys require special-case handling,
         # because their method takes an additional argument: the key itself.
@@ -128,7 +123,16 @@ class Console(object):
         elif keycode:
             util.putstr(keyboard.bel) # sound indicates no handler
         else:
-            pass # incomplete keycode, do nothing
+            pass # incomplete or unrecognized keycode, do nothing
+
+    def handler(self):
+        """
+        Call this handler when keycode is not yet available, it calls reader.
+        To avoid blocking in reader, must only call handler when input is ready
+        """
+        keycode = self.reader() # returns '' when keycode is not complete
+        if keycode:
+            self.handle_key(keycode)
 
     # These keys have job control fcn only if they are alone at start of line.
     # Otherwise they can edit - C_d appears in lineedit_keymap.
@@ -280,7 +284,6 @@ class Console(object):
 
     def redraw(self):
         'redraw line'
-        # Maybe ^L on vt should refresh whole window or even whole frame?
         display.move_to_column(self.start_col)
         self.point = len(self.line)
         util.putstr(self.line)

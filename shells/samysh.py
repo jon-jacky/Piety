@@ -25,12 +25,13 @@ def show_command(do_command=(lambda line: None), echo=True, delay=None):
             time.sleep(delay) # FIXME replace with non-blocking piety.sleep()
     return _do_command
 
-def run_script(paramstring, lines, do_command):
+def run_script(paramstring, commands, do_command):
     """
-    Run script of commands from another buffer with optional echo and delay
-     paramstring is usually 'bufname echo delay'
+    Run script of commands with optional echo and delay
+     commands can be any sequence: list of lines or keycodes, string of chars
+     paramstring is usually 'echo delay'
      echo - optional, default True; delay - optional, default 0.2 sec
-     do_command is fcn to call on command string after applying echo, delay
+     do_command is fcn to call on command after applying echo, delay
     """
     params = paramstring.split()
     echo, delay = True, 0.2
@@ -44,8 +45,8 @@ def run_script(paramstring, lines, do_command):
     # Must define show_command here, echo and delay might differ on each call.
     _do_command = show_command(do_command=do_command,
                                echo=echo, delay=delay)
-    for line in lines:
-        _do_command(line.rstrip()) # remove terminal \n 
+    for command in commands:
+        _do_command(command.rstrip()) # remove terminal \n if there is one
 
 def add_command(command, do_command):
     """
