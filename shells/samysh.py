@@ -6,43 +6,36 @@ samysh.py - Execute command with optional echo and delay.
 
 import time # for blocking time.sleep(), FIXME write nonblocking piety.sleep()
 
-def show_command(do_command=(lambda line: None), echo=True, delay=None):
+def show_command(do_command=(lambda line: None), echo=(lambda: True), 
+                 delay=None):
     """
     Return a function with one argument (a string, the command line) that
      executes a command with optional echo and delay.
     This function has three optional keyword arguments with defaults:
     do_command is a callable with one string argument - the command line -
      that executes an application command.  Default does nothing.
-    echo - if True, print each line before executing it.  Default False.
+    echo - callable that returns a boolean.  Default returns True, 
+     print each line before executing it.  To suppress command echo,
+     pass callable that returns False, but only in ed command mode.
     delay - seconds to wait after executing line (float, can be < 1.0).
      Default no delay.
     """
     def _do_command(line):
-        if echo: 
+        if echo():
             print(line)
         do_command(line) 
         if delay and delay > 0:
             time.sleep(delay) # FIXME replace with non-blocking piety.sleep()
     return _do_command
 
-def run_script(paramstring, commands, do_command):
+def run_script(do_command, commands, echo=(lambda: True), delay=1.0):
     """
-    Run script of commands with optional echo and delay
+    Run script of commands with optional echo and delay of each command
      commands can be any sequence: list of lines or keycodes, string of chars
-     paramstring is usually 'echo delay'
-     echo - optional, default True; delay - optional, default 0.2 sec
-     do_command is fcn to call on command after applying echo, delay
+     do_command executes a single command: a line of text, a keycode, a char...
+     delay is in units of seconds, can be a fraction of a second.
     """
-    params = paramstring.split()
-    echo, delay = True, 0.2
-    if len(params) > 0:
-        echo = params[0] not in ('0','f','false','F','False')
-    if len(params) > 1:
-        try:
-            delay = float(params[1])
-        except ValueError:
-            pass # use default
-    # Must define show_command here, echo and delay might differ on each call.
+    # Must define _do_command here, echo and delay might differ on each call.
     _do_command = show_command(do_command=do_command,
                                echo=echo, delay=delay)
     for command in commands:
