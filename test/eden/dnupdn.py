@@ -1,4 +1,19 @@
-# dnupdn.py - Just run cursor down, then up, then down with ^N and ^P
+"""
+dnupdn.py - Test eden: run the cursor down, then up, then down with ^N and ^P
+
+Run the test from the eden command line. Type the Python command to
+import this module, using the ! prefix:
+
+    :!import dnupdn
+
+After the test finishes, type ^Z to exit from display mode and return
+to command mode.
+
+To run the test again in the same session, call this module's main function:
+
+    :!dnupdn.main()
+"""
+
 import eden, ed, samysh
 from keyboard import * # ^N ^P keycodes, and all the others
 
