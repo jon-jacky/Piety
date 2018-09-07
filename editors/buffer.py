@@ -127,7 +127,10 @@ class Buffer(object):
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'
-        self.lines[iline] = line
+        if iline == 0: # empty buffer
+            self.a(iline, line)
+        else:
+            self.lines[iline] = line
         self.unsaved = True
         # No update needed when line is edited in place on screen
 

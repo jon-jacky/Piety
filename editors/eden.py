@@ -177,7 +177,7 @@ class Console(console.Console):
     
     def init_eden_keymaps(self):
         self.display_keys = {
-            keyboard.C_d: self.del_or_join_down,
+            # keyboard.C_d: self.del_or_join_down, # FIXME not yet implemented
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
             keyboard.C_p: self.prev_line,

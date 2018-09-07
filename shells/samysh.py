@@ -39,7 +39,7 @@ def run_script(do_command, commands, echo=(lambda: True), delay=1.0):
     _do_command = show_command(do_command=do_command,
                                echo=echo, delay=delay)
     for command in commands:
-        _do_command(command.rstrip()) # remove terminal \n if there is one
+        _do_command(command.rstrip('\n')) # remove terminal \n from line
 
 def add_command(command, do_command):
     """

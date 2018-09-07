@@ -6,10 +6,10 @@ import this module, using the ! prefix:
 
     :!import dnupdn
 
-After the test finishes, type ^Z to exit from display mode and return
-to command mode.
+After the test finishes, the command prompt will appear.  
 
-To run the test again in the same session, call this module's main function:
+To run the test again in the same session, call this module's main
+function:
 
     :!dnupdn.main()
 """
@@ -25,6 +25,7 @@ def main():
     ed.l(10)
     eden.base_do_command('C')
     samysh.run_script(eden.eden.handle_key, keycodes, echo=(lambda: False))
+    eden.eden.command_mode()
 
 # so we don't have to call main after initial import
 main()

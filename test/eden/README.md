@@ -8,5 +8,5 @@ user might type.
 
 Directions for each module appear in their comment headers.
 
-Revised Aug 2018
+Revised Sep 2018
 
