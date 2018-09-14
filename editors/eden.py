@@ -98,7 +98,7 @@ class Console(console.Console):
         """
         if self.point > 0:
             self.backward_delete_char()
-        else:
+        elif ed.buf.dot > 1:
             new_point = len(ed.buf.lines[ed.buf.dot-1])-1 # don't count \n
             # terminal.set_line_mode() #needed by update called by buf.j()below
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
@@ -106,6 +106,8 @@ class Console(console.Console):
             self.point = new_point
             # terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
+        else:
+            pass
 
     def del_or_join_down(self):
         """
