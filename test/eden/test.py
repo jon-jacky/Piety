@@ -72,7 +72,7 @@ lines = ('line 1' + cr +
 
 # Enter text, navigate around: cr bs ^P ^N ^A ^F ^B.  Self-contained. 
 # Tuple of strings
-lines = (tuple('line 1' + cr) +
+lines_arrows = (tuple('line 1' + cr) +
          tuple('line 2' + cr) +
          tuple('line 3' + cr) +
          tuple('line 4' + cr) +
