@@ -65,9 +65,7 @@ class Console(console.Console):
 
     def refresh(self):
         ed.buf.replace(ed.buf.dot, self.line + '\n') # so refresh renders it
-        # terminal.set_line_mode() # needed by update
         frame.update(Op.refresh, column=(self.start_col + self.point))
-        # terminal.set_char_mode()
 
     def open_line(self):
         """
@@ -78,15 +76,13 @@ class Console(console.Console):
         suffix = self.line[self.point:].rstrip()
         ed.buf.replace(ed.buf.dot, prefix + '\n')
         display.kill_line() # from cursor to end of line
-        # terminal.set_line_mode() # needed by update called by buf.a() below
         ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
         self.line = suffix
         self.point = 0
         self.start_col = 1
-        # terminal.set_char_mode()
         frame.put_display_cursor()
 
-        # buf.a() update moved cursor so we have to put it back
+        # buf.a() update moved cursor so we have to put it back. FIXME? Redundant?
         win = frame.win
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
@@ -94,37 +90,42 @@ class Console(console.Console):
     def del_or_join_up(self):
         """
         DEL: If point is not at start of line, delete preceding character.
-        Otherwise join to previous line.
+        Otherwise join to previous line.  At start of first line do nothing.
         """
         if self.point > 0:
             self.backward_delete_char()
         elif ed.buf.dot > 1:
             new_point = len(ed.buf.lines[ed.buf.dot-1])-1 # don't count \n
-            # terminal.set_line_mode() #needed by update called by buf.j()below
+            ed.buf.replace(ed.buf.dot, self.line)
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
             self.line = ed.buf.lines[ed.buf.dot].rstrip()
             self.point = new_point
-            # terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
 
     def del_or_join_down(self):
         """
-        ^D: If point is not at end of line, delete character under cursor.
-        Otherwise join next line to this one.
+       ^D: If point is not at end of line, delete character under cursor.
+        Otherwise join next line to this one.  At end of last line do nothing.
         """
-        pass
+        if self.point < len(self.line):
+            self.delete_char()
+        elif ed.buf.dot < ed.buf.nlines():
+            ed.buf.replace(ed.buf.dot, self.line)
+            ed.buf.j(ed.buf.dot, ed.buf.dot+1)
+            self.line = ed.buf.lines[ed.buf.dot].rstrip()
+            frame.put_display_cursor(self.start_col + self.point)
+        else:
+            pass
 
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
             ed.buf.replace(ed.buf.dot, self.line + '\n')
-            #terminal.set_line_mode() #needed by update called by buf.l() below
             ed.buf.l(iline)
             line = ed.buf.lines[ed.buf.dot].rstrip()  # FIXME? [iline] - ?
             self.line = line
             self.point = min(jcol, len(line))
-            #terminal.set_char_mode()
             frame.put_display_cursor(self.start_col + self.point)
 
     def prev_line(self):
@@ -172,14 +173,18 @@ class Console(console.Console):
 
     def paste(self):
         '^y, (yank) insert text from paste buffer'
-        # terminal.set_line_mode() # needed by updates called by buf.y()
         ed.buf.y(ed.buf.dot) 
-        # terminal.set_char_mode()
         frame.put_display_cursor()
-    
+
+    def status(self):
+        '^T handler, override base class, print items used by del_or_join_down'
+        util.putstr('%s.%s point %s len %s dot %s nlines %s' %
+                    (self.line[:self.point], self.line[self.point:], 
+                     self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
+
     def init_eden_keymaps(self):
         self.display_keys = {
-            # keyboard.C_d: self.del_or_join_down, # FIXME not yet implemented
+            keyboard.C_d: self.del_or_join_down,
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
             keyboard.C_p: self.prev_line,

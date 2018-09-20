@@ -84,7 +84,23 @@ lines_arrows = (tuple('line 1' + cr) +
          tuple('line 1a' + cr) +
          3*(right,) + 4*(down,) + 2*(left,) + 7*(up,) + 
          10*(right,) + 6*(down,) + 10*(left,) + 7*(up,))
-         
+
+# Delete backwards until join lines
+del_join = ('line 1' + cr +
+            'line 2' + cr +
+            'line 3' + cr +
+            'line 4' + cr +
+            'line 5' + 
+            C_a +2*C_p + 3*C_f + 18*bs)
+
+# Delete forwards until join lines
+del_join_down = ('line 1' + cr +
+            'line 2' + cr +
+            'line 3' + cr +
+            'line 4' + cr +
+            'line 5' + 
+            C_a +4*C_p + 3*C_f + 18*C_d)
+
 def run(script, delay=0.2): # seconds
     eden.base_do_command('C')
     samysh.run_script(eden.eden.handle_key, script, echo=(lambda: False), 

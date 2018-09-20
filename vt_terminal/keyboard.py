@@ -43,6 +43,7 @@ C_n = '\x0E' # ^N, so
 C_p = '\x10' # ^P, dle
 C_r = '\x12' # ^R, dc2
 C_s = '\x13' # ^S, dc3, xoff
+C_t = '\x14' # ^T, dc4
 C_u = '\x15' # ^U, nak
 C_v = '\x16' # ^V, syn
 C_w = '\x17' # ^W, etb

@@ -295,6 +295,10 @@ class Console(object):
         self.move_beginning() # accounts for prompt, assigns point
         display.kill_line() # erase from cursor to end of line
 
+    def status(self):
+        '^T handler, can override this method with custom handlers in subclasses'
+        util.putstr(' '.join(sys.argv)) # just echo the command line for now
+        
     def init_keymaps(self):
         """
         Returns a callable with no arguments that returns the keymap
@@ -333,6 +337,7 @@ class Console(object):
             keyboard.C_f: self.forward_char,
             keyboard.C_k: self.kill,
             keyboard.C_l: self.redraw,
+            keyboard.C_t: self.status,
             keyboard.C_u: self.discard,
 
             # These keys are multicharacter control sequences
