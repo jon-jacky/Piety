@@ -34,11 +34,11 @@ any other callables) that can be invoked by a single kind of event
 (keyboard input, or timer expires, etc.).  In Piety, functions that
 are invoked by events are called *handlers*.  Piety runs an *event
 loop* that detects events and invokes their handlers.  Each handler
-should exit before the next event (of any kind) occurs --- this is
-*cooperative multitasking*.  Handlers are not pure functions; most
-have side effects such as updating editor buffers and display windows.
-A task can include several *jobs*.  More details
-[here](../piety/README.md).
+should be *non-blocking*; it should exit promptly before the next
+event (of any kind) occurs --- this is *cooperative multitasking*.
+Handlers are not pure functions; most have side effects such as
+updating editor buffers and display windows.  A task can include
+several *jobs*.  More details [here](../piety/README.md).
 
 - **background task**: a task whose handlers are invoked by a periodic timer.
 
@@ -83,7 +83,10 @@ input.  A terminal session can include several console jobs.
 
 - **shell**: In Piety, a console job that provides a Python REPL
 (Read-Evaluate-Print Loop).  In Piety, Python itself is the shell
-command language.
+command language.  However, the standard Python interpreter cannot
+serve as the Piety shell because it blocks while waiting for the
+next statement, which would prevent other tasks from running.  Piety
+provides its own non-blocking Python shell.
 
 - **memory management**: including allocation and reclamation (that is,
 garbage collection).  Provided by Python language runtime.
@@ -123,18 +126,20 @@ not depend on *edsel* or any other application so it is in effect a
 separate window manager; it can display windows that are updated by
 different applications.
 
-- **boot**: start Python, import needed operating system and
-application modules, start Piety event loop, start Python REPL console
-job.  Optionally, start other applications.  This can all be accomplished
-by a Python script.  The Piety *scripts* directory contains several
-Python modules that boot Piety in different configurations.
+- **boot**: start the standard blocking Python interpreter, import
+needed operating system and application modules, start Piety event
+loop, start non-blocking Piety Python REPL console job.  Optionally,
+start other applications.  This can all be accomplished by a Python
+script.  The Piety *scripts* directory contains several Python modules
+that boot Piety in different configurations.
 
-- **shutdown**: Optionally, stop applications.  Then exit Python
-REPL console job, stop Piety event loop, exit Python.
+- **shutdown**: Optionally, stop applications.  Then exit non-blocking
+Python REPL console job and return to standard blocking Python
+interpreter, stop Piety event loop, exit Python.
 
 The operating system that Piety resembles the most is
 [Oberon](http://www.projectoberon.com/).  Oberon uses cooperative
 multitasking, uses a text buffer class as a building block, and uses a
 multiwindow text editor as its desktop and system shell.
 
-Revised Mar 2018
+Revised Sep 2018
