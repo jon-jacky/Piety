@@ -1,0 +1,72 @@
+
+Notes on terminals
+
+<http://xn--rpa.cc/essays/term> - everything you ever wanted to know
+about terminals (but were afraid to ask) by Lexi Summer Hale
+
+"so here's a short tutorial on ansi escape codes and terminal control,
+because you philistines won't stop using ncurses ..."
+
+"almost all UI changes in a terminal are accomplished through in-band
+signalling. these signals are triggered with the ASCII/UTF-8 character
+‹ESC› (0x1B or 27). it's the same ‹ESC› character that you send to the
+terminal when you press the Escape key on your keyboard or a key
+sequence involving the Alt key. (typing ‹A-c› for instance sends the
+characters ‹ESC› and ‹c› in very rapid succession; this is why you'll
+notice a delay in some terminal programs after you press the escape
+key — it's waiting to try and determine whether the user hit Escape or
+an alt-key chord.)"
+
+"but hang on, where's that semicolon coming from? it turns out, ansi
+escape codes let you specify multiple formats per sequence. you can
+separate each command with a ;. this would allow us to write
+formatting commands like fmt(underline with bright with no italic),
+which translates into \x1b[4;1;23m at compile time."
+
+"to pick from a 256-color palette, we use a slightly different sort of
+escape: \x1b[38;5;(color)m to set the foreground and
+\x1b[48;5;(color)m to set the background, where (color) is the palette
+index we want to address. these escapes are even more unwieldy than
+the 8+8 color selectors, so it's even more important to have good
+abstraction."
+
+"of course, this is still pretty restrictive. 8-bit color may have
+been enough to '90s CD-ROM games on Windows, but it's long past it's
+expiration date. using true color is much more flexible. we can do
+this through the escape sequence \x1b[38;2;(r);(g);(b)m where each
+component is an integer between 0 and 255.
+
+sadly, true color isn't supported on many terminals, urxvt tragically
+included. for this reason, your program should never rely on it, and
+abstract these settings away to be configured by the user. defaulting
+to 8-bit color is a good choice, as every reasonable modern terminal
+has supported it for a long time now."
+
+"the first thing you should always do when writing a TUI application
+is to send the TI or smcup escape. this notifies the terminal to
+switch to TUI mode (the "alternate buffer"), protecting the existing
+buffer so that it won't be overwritten and users can return to it when
+your application closes."
+
+"now we've set the stage for our slick ncurses-free TUI, we just need
+to figure out how to put things on it. ..."
+
+"that's it for the tutorial. i hope you learned something and will
+reconsider using fucking ncurses next time ..."
+
+"my hope is that this tutorial will curtail some of the more
+egregiously trivial uses of ncurses ..."
+
+Lots of sample C code in this page demonstrating everything she
+discusses.
+
+One comment  in <https://news.ycombinator.com/item?id=18125167> :
+"Sorry, unfortunately hardcoding escape sequences still won't work.
+The smcup this uses is the one for st and kitty, and it's not valid
+for xterm, iterm, konsole, vte (e.g. gnome-terminal),...."
+
+<https://news.ycombinator.com/item?id=4545265>
+C code sample using VMIN and VTIME "... Then if a read on your tty
+only returns the escape character, you know it was the escape key and
+not arrow keys or whatever.. It's fairly simple to do, but certainly
+hackish."
