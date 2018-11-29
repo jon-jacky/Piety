@@ -23,13 +23,14 @@ The *.edsel* scripts here in *test/edsel/* are files of *ed* and
 When you execute an *.ed* or *.edsel* script, you can see the window contents
 update as the test runs.  Each command echoes in the scrolling command
 region, followed by a short delay so you can observe its effect.  The
-echo and delay can be adjusted or suppressed by two optional *x*
+echo and delay can be adjusted or suppressed by two optional *X*
 parameters that follow the buffer name: echo (boolean) and delay
-(float), which default to *True* and *0.2* seconds.  So *x sample.ed 0
+(float), which default to *True* and *0.2* seconds.  So *X sample.ed 0
 0* suppresses both echo and delay.
 
 The names of some scripts are made from the sequence of commands
 they contain, for example *lio2o1xn.edsel*.
 
 
-Revised March 2016
+Revised Nov 2018
+

@@ -24,7 +24,7 @@ without the *ed* *q* (quit) command.
 
 The *.edo* files are like *.ed* files except, in addition to *ed*
 commands, they also contain Python commands prefixed with *!*.  The
-*ed* program cannot process tjhese commands; it is necessary to use
+*ed* program cannot process these commands; it is necessary to use
 *edo*.
 
 We use *.ed* and *.edo* scripts in two ways: interactively and
@@ -33,26 +33,26 @@ non-interactively.
 It is helpful to execute *.ed* test scripts interactively at first to
 observe the behavior and confirm that the editor performs as intended.
 To do this, you must run *edo* not *ed*, because *edo* provides
-the *x* script execution command.  Load the script into an
-editor buffer:  *B sample.ed*.
+the *X* script execution command (that is an uppercase *X*).  
+Load the script into an editor buffer:  *B sample.ed*.
 Then change back to the *main* buffer with *b main* and
-execute the test in that buffer with the *x* command: *x sample.ed*.
+execute the test in that buffer with the *X* command: *X sample.ed*.
 The buffer name can be abbreviated by providing a prefix
 followed by a hyphen -- a sort of "poor person's tab completion".  For
-example, the command *x samp-* or even *x s-* might run the test script in
+example, the command *X samp-* or even *X s-* might run the test script in
 *sample.ed*.
 
 Each command echoes as it executes, then there is a short delay before
 the next command so you can see its effect. The echo and delay can be
-adjusted or suppressed by two optional *x* parameters that follow the
-buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example:
+adjusted or suppressed by two optional *X* parameters that follow the
+buffer name: *X sample.ed 0 0* suppresses both echo and delay.  For example:
 
     ... $ python3 -i -m edo
     :B sample.ed
     sample.ed, 18 lines
     :b main
     .   main                 0  None
-    :x sample.ed 1 2
+    :X sample.ed 1 2
     ...
     ... sample.ed executes, echoes commands, waits 2 sec after each command
     ...
@@ -65,7 +65,7 @@ then exit from Python.
 
 
 We execute *.ed* scripts non-interactively to save editor output for
-regression testing.  For this we do not need the *x* command so we can
+regression testing.  For this we do not need the *X* command so we can
 run *ed* not *edo*.  We use redirection at the command line
 to feed the commands to the editor and collect the output:
 
@@ -105,5 +105,5 @@ of the buffers listed by the *ed* *n* command), then the test invoked
 by the script passed.  These two scripts are used by *check_many.sh*
 to run all the *.ed* and *.edo* scripts.
 
-Revised Jan 2018
+Revised Nov 2018
 

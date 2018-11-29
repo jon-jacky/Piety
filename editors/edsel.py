@@ -54,7 +54,7 @@ _process_line = wyshka.shell(process_line=base_process_line,
                              command_prompt=(lambda: ed.prompt))
 
 # Add command to run script from buffer with optional echo and delay.
-process_line = samysh.add_command(edo.x_command(_process_line), _process_line)
+process_line = samysh.add_command(edo.X_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'

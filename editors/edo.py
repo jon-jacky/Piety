@@ -8,12 +8,12 @@ import ed, samysh, wyshka
 # Define x command so it can also be imported by edsel, eden etc.
 # to use with their own do_commands, by calling samysh.add_command.
 
-def x_command(do_command):
+def X_command(do_command):
     """
     Return function to run script from buffer using do_command, 
     with optional echo and delay.
     """
-    def x(paramstring):
+    def X(paramstring):
         """
         Run script from buffer with optional echo and delay, coded in line arg.
         Named x for eXecute, a single letter like other ed command functions.
@@ -40,7 +40,7 @@ def x_command(do_command):
                 samysh.run_script(do_command, lines, echo=echo, delay=delay)
             else:
                 print('? buffer name')
-    return x
+    return X
 
 # Add embedded python interpreter to ed command line.
 _process_line = wyshka.shell(process_line=ed.process_line,
@@ -48,7 +48,7 @@ _process_line = wyshka.shell(process_line=ed.process_line,
                             command_prompt=(lambda: ed.prompt))
 
 # Add command to run script from buffer with optional echo and delay.
-process_line = samysh.add_command(x_command(_process_line), _process_line)
+process_line = samysh.add_command(X_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     ed.startup(*filename, **options)

@@ -4,11 +4,11 @@ edo.py
 
 **edo.py** provides the *[ed.py](ed.md)* line editor with an enhanced
 command line shell, provided by the *[wyshka](../shells/wyshka.py)*
-module in the *shells* directory.  It also supports a new command *x*
+module in the *shells* directory.  It also supports a new command *X*
 for executing scripts with optional echo and delay, supported by the
 *[samysh](../shells/samysh.py)* module in the *shells* directory.
 
-The enhanced shell and the *x* command are also available in the
+The enhanced shell and the *X* command are also available in the
 applications, modules, and objects that use the *edo* module,
 including the *edda* module and the *ed* *Console* job it defines, the
 *edsel* display editor application, the *desoto* module and the
@@ -31,6 +31,9 @@ command line mode:
 
 With *edo*, in *!command*, the *command* is passed to the Python
 interpreter, not to the system command shell as in classic *ed*.
+When you type a bare *!* without a command, the command interpreter switches
+to the Python REPL, so you can type a series of Python statements without
+prefixing each with *!*.
 
 The *wyshka* shell works like this in Python mode:
 
@@ -40,7 +43,8 @@ The *wyshka* shell works like this in Python mode:
     >>:              switch to ed command mode
 
 So you can use *:command* to execute an *ed* *command* without exiting
-Python.
+Python.  Type a bare *:*  without a command to switch back to the *ed* 
+command interpreter.
 
 Here is a sample session that uses *wyshka* to demonstrate both
 the classic *ed* command line and the new *ed.py* Python API:
@@ -125,34 +129,35 @@ as the *ed* function.
 
 ## Scripting ##
 
-**edo.py** also adds a new *x* command that executes *ed* commands or
+**edo.py** also adds a new *X* command that executes *ed* commands or
 Python statements from an editor buffer, to support scripting and
-testing.  (The classic *ed* command *x* prompts for an encryption
-key.)
+testing.  (That is an uppercase *X*.  The *ed.py* lower case *x*
+command is different.  It pastes recently copied or deleted lines into
+the current text buffer).
 
-The *x* command requires the buffer name parameter (it does not make
+The *X* command requires the buffer name parameter (it does not make
 sense to execute *ed* commands in the same buffer that holds the
 script).  The buffer name can be abbreviated by providing a prefix
 followed by a hyphen -- a sort of "poor person's tab completion".  For
-example, the command *x samp-* or even *x s-* might run the test script in
+example, the command *X samp-* or even *X s-* might run the test script in
 *sample.ed*.  If more than one buffer name begins with the same
-prefix, the *x* command just chooses one.
+prefix, the *X* command just chooses one.
 
-The *x* command ignores any line address arguments; it always
+The *X* command ignores any line address arguments; it always
 executes the entire buffer.  It takes optional parameters *echo*
 (boolean) and *delay* (float), which are helpful for visualizing
 execution.  The defaults are *echo* *True* and *delay* 0.2 sec.
 
-Here is a sample that uses the *x* command to execute the *sample.ed*
+Here is a sample that uses the *X* command to execute the *sample.ed*
 script in the *test/ed* directory.  That is the default directory in 
 this sample.   First, we load the script into an
 editor buffer: *B sample.ed*.
 Then, we change back to the *main* buffer with *b main* and
-execute the test in that buffer with the *x* command: *x sample.ed*.
+execute the test in that buffer with the *X* command: *X sample.ed*.
 Each command echoes as it executes, then there is a short delay before
 the next command so you can see its effect. The echo and delay can be
-adjusted or suppressed by two optional *x* parameters that follow the
-buffer name: *x sample.ed 0 0* suppresses both echo and delay.  For example,
+adjusted or suppressed by two optional *X* parameters that follow the
+buffer name: *X sample.ed 0 0* suppresses both echo and delay.  For example,
 in the *test/ed* directory:
 
     ... $ python3 -i -m edo
@@ -160,7 +165,7 @@ in the *test/ed* directory:
     sample.ed, 18 lines
     :b main
     .   main                 0  None
-    :x sample.ed 1 2
+    :X sample.ed 1 2
     ...
     ... sample.ed executes, echoes commands, waits 2 sec after each command
     ...
@@ -171,4 +176,4 @@ in the *test/ed* directory:
 After the script finishes, you can type *q* at the prompt to exit the editor,
 then exit from Python.
 
-Revised Mar 2018
+Revised Nov 2018
