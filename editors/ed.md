@@ -2,14 +2,15 @@
 ed.py
 =====
 
-**[ed.py](ed.py)** is a text editor in pure Python inspired by the classic Unix
-editor *ed*.  It provides many of the commands from *ed*, augmented
-with a few commands for handling multiple buffers and files from the
-later Unix (and Plan 9) editor *sam*.  You can use **ed.py** in a
-command mode that emulates classic *ed*, or use its API to edit from
-the Python prompt or write editing scripts in Python.
+**[ed.py](ed.py)** is a text editor in pure Python inspired by the
+classic Unix editor *ed*.  It provides many of the commands from
+classic *ed* and *GNU ed*, augmented with a few commands for handling
+multiple buffers and files from the later Unix (and Plan 9) editor
+*sam*.  You can use **ed.py** in a command mode that emulates classic
+*ed*, or use its API to edit from the Python prompt or write editing
+scripts in Python.
 
-**ed.py** provides a *do_command* function that runs without blocking,
+**ed.py** runs its editor functions quickly without blocking,
 so it can run with a cooperative multitasking system such as
 [Piety](../piety/README.md).
 
@@ -79,23 +80,23 @@ can resemble the *ed* command line:
 
  *= a c d e E f i j k l m p q r s t w z*
 
-**ed.py** supports these line address forms from classic *ed*:
+**ed.py** supports these commands from *GNU ed*:
 
- *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
+ *# x y*
 
 **ed.py** supports these commands from *sam*:
 
  *b B D n*
 
-**ed.py** also adds some new commands:
+In the *b* command, the buffer name parameter can be abbreviated by
+providing a prefix followed by a hyphen -- a sort of "poor person's
+tab completion".  For example, the command *b key-* or even *b k-*
+might switch to the buffer *keyboard.py*.  If more than one buffer
+name begins with the same prefix, *ed.py* just chooses one.
 
- *y #*
+**ed.py** supports these line address forms from classic *ed*:
 
-The *y* (yank) command inserts the lines most recently deleted by the
-*d* command (possibly from a different buffer).  
-
-The *#* character in the first column of a command indicates a comment.  It is
-useful for annotating command scripts.
+ *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
 
 Here is a [command summary](ed.txt).
 
@@ -141,10 +142,10 @@ remain, so the editing session can be resumed at any time by calling
 *ed()* again.  Or, any of the other API functions can be called 
 at the Python prompt.
 
-## Limitations and differences from classic ed ##
+## Limitations and differences from classic ed and sam ##
 
 **ed.py** does not support these classic *ed* commands: 
-*H h j n P Q u wq W x*.  Some of these might be supported in the
+*H h n P Q u wq W*.  Some of these might be supported in the
 future.
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
@@ -178,23 +179,6 @@ end).
 
 The *B* (and *D*) commands accept only one file (or buffer) name argument, 
 not multiple names as in *sam*.
-
-## Commands not present in classic ed ##
-
-The *y* (yank) command inserts the lines most recently deleted by the
-*d* command (possibly from a different buffer).  A *d* command
-followed by one or two *y* commands can achieve the effect of the
-classic *ed* *m* (move) or *t* (transfer, or copy) commands, and can
-also move lines to another buffer.
-
-The *#* character in the first column of a command indicates a comment.  It is
-useful for annotating command scripts.
-
-In the *b* command, the buffer name parameter can be abbreviated by
-providing a prefix followed by a hyphen -- a sort of "poor person's
-tab completion".  For example, the command *b key-* or even *b k-*
-might switch to the buffer *keyboard.py*.  If more than one buffer
-name begins with the same prefix, *ed.py* just chooses one.
 
 ## API ##
 
@@ -294,5 +278,5 @@ included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
 no dependencies.
 
-Revised Mar 2018
+Revised Nov 2018
 
