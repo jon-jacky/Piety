@@ -14,9 +14,10 @@ inputline = None  # default: no updates from background tasks,no restore needed
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
 
-    # assigned by d(elete) in current buffer, may be used by y(ank) in another
-    deleted = list() # most recently deleted lines from any buffer, for yank
-    deleted_mark = list() # markers for deleted lines, for yank command
+    # assigned by y(ank), that is copy, or d(elete) in current buffer, 
+    # may be used by x (put, paste) in same or any other buffer
+    cut_buffer = list() # most recently deleted (or "yanked") lines from any buffer
+    cut_buffer_mark = dict() # markers for deleted lines, for yank command
 
     def __init__(self, name):
         'New text buffer'
@@ -183,8 +184,8 @@ class Buffer(object):
                     origin=iline)
 
     def d(self, start, end):
-        'Delete text from start up through end.'
-        Buffer.deleted = self.lines[start:end+1] # save lines for yank
+        'Delete text from start up through end'
+        self.y(start, end) # yank (copy, do not remove) lines to cut buffer
         self.lines[start:end+1] = [] # ed range is inclusive, unlike Python
         self.unsaved = True
         if self.lines[1:]: # retain empty line 0
@@ -194,10 +195,10 @@ class Buffer(object):
             self.dot = 0
         # new_mark needed because we can't remove items from dict as we iterate
         new_mark = dict() #new_mark is self.mark without marks at deleted lines
-        Buffer.deleted_mark = dict() 
+        Buffer.cut_buffer_mark = dict() 
         for c in self.mark: 
             if (start <= self.mark[c] <= end): # save marks from deleted lines
-                Buffer.deleted_mark[c] = self.mark[c]-start+1
+                Buffer.cut_buffer_mark[c] = self.mark[c]-start+1
             else:
                 # adjust marks below deleted lines
                 markc = self.mark[c]
@@ -231,6 +232,7 @@ class Buffer(object):
         origin = self.dot 
         for i in range(start,end+1): # ed range is inclusive, unlike Python
             if old in self.lines[i]: # test to see if we should advance dot
+                self.y(i,i) # Cut buf only holds last line where subst, like GNU ed
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl 
                                                       else 1)
                 self.dot = i
@@ -239,14 +241,17 @@ class Buffer(object):
         view.update(Op.mutate, buffer=self, origin=origin,
                       start=start, end=self.dot, destination=self.dot)
 
-    def y(self, iline):
-        'Insert (yank) most recently deleted lines before iline.'
-        # based on def i ... above
-        self.insert(iline if iline > 0 else iline+1, Buffer.deleted)
+    def y(self, start, end):
+        'Yank (copy, do not remove) lines to cut buffer'
+        Buffer.cut_buffer = self.lines[start:end+1]
+
+    def x(self, iline):
+        'Append (put, paste) cut buffer contents after iline.'
+        self.insert(iline+1, Buffer.cut_buffer) # append
         # restore marks, if any
-        for c in Buffer.deleted_mark:
+        for c in Buffer.cut_buffer_mark:
             if c not in self.mark: # do not replace existing marks
-                self.mark[c] = Buffer.deleted_mark[c]+iline-1
+                self.mark[c] = Buffer.cut_buffer_mark[c]+iline
 
     def t(self, start, end, dest):
         'Transfer (copy) lines to after destination line.'

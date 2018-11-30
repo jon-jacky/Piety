@@ -337,13 +337,19 @@ def t(*args):
         buf.t(start, end, dest)
 
 def y(*args):
-    'Insert (yank) most recently deleted lines *before* dest. line address'
+    'Yank (copy, do not remove) lines to cut buffer'
+    valid, start, end, _, _ = check.irange(buf, args)
+    if valid:
+        buf.y(start, end)
+
+def x(*args):
+    'Append (put, paste) cut buffer contents after dest. line address'
     iline, _, _, _ = parse.arguments(args)
     iline = check.mk_iline(buf, iline)
     if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer
         print('? invalid address')
         return
-    buf.y(iline)
+    buf.x(iline)
 
 # command functions: markers
 
