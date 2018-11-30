@@ -53,19 +53,14 @@ def add_command(command, do_command):
     passed on to do_command.   The command line cannot begin with line
     addresses preceding the command name, as in classic ed commands.
     The command name can be more than one character, unlike in classic ed.
-
-    After executing the new command, go on and execute do_command. 
-    So the new command should be coded with a guard, and its body should
-    do nothing if its guard fails.  The guard should be strong enough
-    so that none of the cases in do_command runs if the guard succeeds.
     """
     def _do_command(line):
         line = line.lstrip()
         if line.startswith(command.__name__):
             _, _, paramstring = line.partition(command.__name__)
             command(paramstring.lstrip())
-        # Always execute do_command after command
-        do_command(line)
+        else:
+            do_command(line)
     return _do_command
 
 # Test
