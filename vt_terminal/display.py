@@ -51,6 +51,9 @@ def insert_char(key):
     'Insert character in front of cursor'
     putstr((ich % 1) + key) # open space to insert char
 
+def insert_string(string):
+    putstr((ich % len(string)) + string)
+
 def delete_char():
     'Delete character under the cursor'
     putstr(dch % 1)

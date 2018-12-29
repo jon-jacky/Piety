@@ -34,7 +34,8 @@ class Console(console.Console):
     #  to the ones in the Console base class, they do not replace any.
 
     def display_mode(self, line):
-        # eden 'C' command, Based on ed.py do_command 'c' case
+        'eden C command'
+        # Based on ed.py do_command 'c' case
         ed.command_mode = False
         frame.update(Op.display) 
         ed.prompt = ed.input_prompt
@@ -50,8 +51,8 @@ class Console(console.Console):
         display.put_cursor(wdot,1)
 
     def command_mode(self):
-        # Based on ed.py append and '.' handling, Console accept_line method.
         '^Z: Replace current line in buffer and resume command mode'
+        # Based on ed.py append and '.' handling, Console accept_line method.
         self.restore() # advance line and put terminal in line mode 
         ed.buf.replace(ed.buf.dot, self.line + '\n')
         ed.command_mode = True
@@ -64,6 +65,7 @@ class Console(console.Console):
         self.restart()      # print prompt and put term in character mode
 
     def refresh(self):
+        '^L '
         ed.buf.replace(ed.buf.dot, self.line + '\n') # so refresh renders it
         frame.update(Op.refresh, column=(self.start_col + self.point))
 
@@ -82,14 +84,14 @@ class Console(console.Console):
         self.start_col = 1
         frame.put_display_cursor()
 
-        # buf.a() update moved cursor so we have to put it back. FIXME? Redundant?
+        # buf.a() update moved cursor so we have to put it back.FIXME?Redundant?
         win = frame.win
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
 
-    def del_or_join_up(self):
+    def del_or_join_prev(self):
         """
-        DEL: If point is not at start of line, delete preceding character.
+        DEL or BS: If point is not at start of line, delete preceding character
         Otherwise join to previous line.  At start of first line do nothing.
         """
         if self.point > 0:
@@ -104,20 +106,25 @@ class Console(console.Console):
         else:
             pass
 
-    def del_or_join_down(self):
-        """
-       ^D: If point is not at end of line, delete character under cursor.
-        Otherwise join next line to this one.  At end of last line do nothing.
-        """
-        if self.point < len(self.line):
-            self.delete_char()
-        elif ed.buf.dot < ed.buf.nlines():
+    def join_next(self):
+        'Helper - join next line to this one. At last line do nothing.'
+        if ed.buf.dot < ed.buf.nlines():
             ed.buf.replace(ed.buf.dot, self.line)
             ed.buf.j(ed.buf.dot, ed.buf.dot+1)
             self.line = ed.buf.lines[ed.buf.dot].rstrip()
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
+
+    def del_or_join_next(self):
+        """
+        ^D: If point is not at end of line, delete character under cursor.
+        Otherwise join next line to this one.  At end of last line do nothing.
+        """
+        if self.point < len(self.line):
+            self.delete_char()
+        else:
+            self.join_next()
 
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
@@ -127,6 +134,7 @@ class Console(console.Console):
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(self.start_col + self.point)
+        # FIXME? else: ... bad line address ...
 
     def prev_line(self):
         """
@@ -142,17 +150,17 @@ class Console(console.Console):
         self.goto_line(ed.buf.dot+1, self.point)
 
     def page_down(self):
-        '^v, page down.'
+        '^V, page down.'
         dest = min(ed.buf.dot + ed.buf.npage, ed.buf.nlines())
         self.goto_line(dest, self.point)
 
     def page_up(self):
-        '^r (for now, change to M_v later) - page up'
+        '^R (for now, change to M_v later) - page up'
         dest = max(ed.buf.dot - ed.buf.npage, 1)
         self.goto_line(dest, self.point)
         
     def search(self):
-        '^s, go to ed line address, can be search pattern or line number or ..'
+        '^S, go to ed line address, can be search pattern or line number or ..'
         # Seems this could be implemented eden ^Z; ed do_command; eden C
         #self.command_mode()
         #ed.do_command(...)
@@ -160,31 +168,62 @@ class Console(console.Console):
         pass
 
     def set_mark(self):
-        '^space, set mark'
-        pass
+        '^@, set mark. ^space also works as ^@ on many terminals'
+        ed.buf.mark['@'] = ed.buf.dot
+        frame.put_command_cursor()
+        util.putstr('Mark set\n')
+        frame.put_display_cursor() # Or display.put_cursor(wdot,1) ?
 
     def exchange(self):
-        '^x, exchange point and mark'
-        pass
+        '^X, exchange point and mark'
+        if '@' in ed.buf.mark:
+            frame.win.clear_marker(ed.buf.dot)
+            ed.buf.dot, ed.buf.mark['@'] = ed.buf.mark['@'], ed.buf.dot
+            frame.win.set_marker(ed.buf.dot)
+            # FIXME? What if the two lines aren't already in same window?
 
     def cut(self):
-        '^w, delete from mark to point, store deleted text in paste buffer'
-        pass
+        """
+        ^W, delete from mark to line before dot, store deleted text in paste buffer
+        If no mark, do nothing
+        If mark follows dot, delete from dot to one before mark, reassign dot
+        """
+        if '@' in ed.buf.mark:
+            start = ed.buf.mark['@']
+            end = ed.buf.dot
+            if start > end:
+                start, end = end, start
+            end -= 1 # exclude last line, dot (usually) or mark
+            if check.range_ok(ed.buf, start, end):
+                ed.buf.d(start, end)
+                frame.put_display_cursor()
+            # FIXME? else: ... bad range ...
+            eden.yank_enabled = False # ^Y invokes self.paste not console.yank
+        # FIXME? else: "The mark is not set now, so there is no region"
 
     def paste(self):
-        '^y, (yank) insert text from paste buffer'
-        ed.buf.y(ed.buf.dot) 
-        frame.put_display_cursor()
-
+        '^Y, (yank) insert text from paste buffer'
+        if eden.yank_enabled:
+            eden.yank() # insert into same line from console yank_buffer 
+        else:
+            ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
+            ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
+            frame.put_display_cursor()
+        
     def status(self):
-        '^T handler, override base class, print items used by del_or_join_down'
+        '^T handler, override base class, print items used by del_or_join_next'
         util.putstr('%s.%s point %s len %s dot %s nlines %s' %
                     (self.line[:self.point], self.line[self.point:], 
                      self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
 
+    def crash(self):
+        '^K for now just crash' # FIXME - ^K is console kill line
+        return 1/0  # raise exception on demand (crash), for testing
+    
     def init_eden_keymaps(self):
         self.display_keys = {
-            keyboard.C_d: self.del_or_join_down,
+            keyboard.C_d: self.del_or_join_next,
+            # keyboard.C_k: self.crash, # FIXME ^K is console kill line
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
             keyboard.C_p: self.prev_line,
@@ -192,15 +231,15 @@ class Console(console.Console):
             keyboard.C_s: self.search,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,
-            keyboard.C_x: self.exchange, # exchange point and mark
+            keyboard.C_x: self.exchange,
             keyboard.C_y: self.paste, # yank
             keyboard.C_z: self.command_mode,
-            keyboard.C_space: self.set_mark,
+            keyboard.C_at: self.set_mark,
             keyboard.cr: self.open_line,
             keyboard.up: self.prev_line,
             keyboard.down: self.next_line,
-            keyboard.bs: self.del_or_join_up,
-            keyboard.delete: self.del_or_join_up,
+            keyboard.bs: self.del_or_join_prev,
+            keyboard.delete: self.del_or_join_prev,
             }
         self.display_keymap = self.input_keymap.copy()
         self.display_keymap.update(self.display_keys) # override some keys
@@ -230,7 +269,7 @@ _process_line = wyshka.shell(process_line=base_process_line,
                              command_prompt=(lambda: ed.prompt))
 
 # Add command to run script from buffer with optional echo and delay.
-process_line = samysh.add_command(edsel.edo.x_command(_process_line), 
+process_line = samysh.add_command(edsel.edo.X_command(_process_line), 
                                   _process_line)
 
 eden = Console(prompt=(lambda: wyshka.prompt), 

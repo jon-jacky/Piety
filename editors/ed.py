@@ -366,7 +366,7 @@ def k(*args):
 
 # command functions: control, debugging, etc.
 
-def K(): return 1/0  # raise exception on demand, for testing
+def K(): return 1/0  # raise exception on demand (crash), for testing
 
 # control
 

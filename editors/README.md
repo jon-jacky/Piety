@@ -39,10 +39,9 @@ Files in this directory:
 
 - **ed.txt**: command summary for *ed.py*
 
-- **edda.py**: defines the *ed* *Console* job that wraps the *ed.py*
+- **edda.py**: defines the *ed* *Console* job that wraps *edo.py* (the *ed.py*
   line editor, along with the *wyshka* enhanced Python shell and
-  *samysh* script execution.  Contrast to the *ed.py* *main* function
-  and *etty.py*.
+  *samysh* script execution).  Contrast to the *edo.py* *main* function.
 
 - **eden.md**: description of *eden.py*.  REVISIONS MAY BE NEEDED.
 

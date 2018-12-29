@@ -34,3 +34,16 @@ they contain, for example *lio2o1xn.edsel*.
 
 Revised Nov 2018
 
+D-10-72-58-222:editors jon$ git commit edo.py edsel.py edo.md ../test/ed/README.md ../test/edsel/README.md -m 'Rename x command to X, eXecute script'
+[eden f8ffbd3] Rename x command to X, eXecute script
+ 5 files changed, 40 insertions(+), 34 deletions(-)
+
+D-10-72-58-222:editors jon$ git push
+Counting objects: 11, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (11/11), done.
+Writing objects: 100% (11/11), 1.44 KiB | 0 bytes/s, done.
+Total 11 (delta 9), reused 0 (delta 0)
+remote: Resolving deltas: 100% (9/9), completed with 9 local objects.
+
+Now add x and y commands to ed.py.  Begin 

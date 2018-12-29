@@ -12,8 +12,10 @@ Python commands with !  For example:
     :!test.run(test.dnupdn)
 
 The test.run function switches from eden command mode to display mode,
-runs the named test script, and then returns to command mode and prints a
-prompt.  Then you can type a Python command to run another script.
+runs the named test script, and then returns to command mode and
+prints a prompt. Then you can type the ed command ,d to empty the
+buffer and clear the window, and type a Python command to run another
+script.
 
 When running scripts, the default delay between simulated keystrokes
 is 0.2 seconds.  You can override this by including an optional
@@ -27,7 +29,6 @@ See comments before each test case.
 
 import eden, samysh
 from keyboard import * # ^A ^B ... keycodes
-
 
 # This script is just a string, all keycodes are single chars ^N ^P
 # First load several lines of text, for example :E lines20.txt
@@ -85,7 +86,7 @@ lines_arrows = (tuple('line 1' + cr) +
          3*(right,) + 4*(down,) + 2*(left,) + 7*(up,) + 
          10*(right,) + 6*(down,) + 10*(left,) + 7*(up,))
 
-# Delete backwards until join lines
+# Delete backwards until join lines, self-contained
 del_join = ('line 1' + cr +
             'line 2' + cr +
             'line 3' + cr +
@@ -93,13 +94,32 @@ del_join = ('line 1' + cr +
             'line 5' + 
             C_a +2*C_p + 3*C_f + 18*bs)
 
-# Delete forwards until join lines
+# Delete forwards until join lines, self-contained
 del_join_down = ('line 1' + cr +
             'line 2' + cr +
             'line 3' + cr +
             'line 4' + cr +
             'line 5' + 
             C_a +4*C_p + 3*C_f + 18*C_d)
+
+
+# Set mark, exchange mark and point, cut, paste (yank)
+# First load some text, for example, :E lines20.txt
+#  then place cursor on first line, :1
+# Show that after yank, mark is always the first line of yanked region.
+# mark lines 1, move to line 5, cut, yank, move down 5 lines, yank again,
+# move down five more lines, yank again.
+yank = (C_at + 4*C_n +
+        C_x + C_x + 
+        C_w +
+        C_y +
+        C_x + C_x + 
+        5*C_n + 
+        C_y +
+        C_x + C_x +
+        5*C_n + 
+        C_y +
+        C_x + C_x)
 
 def run(script, delay=0.2): # seconds
     eden.base_do_command('C')

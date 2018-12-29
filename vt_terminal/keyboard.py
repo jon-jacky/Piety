@@ -30,6 +30,8 @@ bs  = '\b'   # backspace
 cr  = '\r'   # carriage return
 
 delete = '\x7F' # del is a python keyword
+
+C_at = '\x00' # ^@, nul, also obtained by ^space on many terminals
 C_a = '\x01' # ^A, soh
 C_b = '\x02' # ^B, stx
 C_c = '\x03' # ^C, etx

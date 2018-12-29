@@ -3,7 +3,7 @@ ed.py
 =====
 
 **[ed.py](ed.py)** is a text editor in pure Python inspired by the
-classic Unix editor *ed*.  It provides many of the commands from
+classic Unix editor *ed*.  It provides most of the commands from
 classic *ed* and *GNU ed*, augmented with a few commands for handling
 multiple buffers and files from the later Unix (and Plan 9) editor
 *sam*.  You can use **ed.py** in a command mode that emulates classic
