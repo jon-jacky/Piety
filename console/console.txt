@@ -21,13 +21,13 @@ or lowercase work the same.
  ^E  move cursor to (e)nd of line
  ^F  move cursor (f)orward one character
  ^H  delete character before cursor (like bs)
- ^J  enter newline to create multi-line input, do not execute command
  ^K  delete (kill) line from cursor to end
  ^L  redraw line (useful if line has become garbled with control characters)
  ^M  execute command (like ret)
  ^N  retrieve (n)ext line from history
  ^P  retrieve (p)revious line from history
  ^U  discard line, start over with an empty line
+ ^Y  insert text removed by last ^K or ^U
  ^Z  if line is empty, exit application.
 
 Printing characters are inserted before the cursor.

@@ -15,6 +15,7 @@ class Console(console.Console):
         super().__init__(**kwargs)
         self.keymap = self.init_eden_keymaps()
         self.clear_line = True # used by restart method
+        self.collecting_command = False # used by execute, accept methods
 
     # The following methods override methods in console.Console
 
@@ -160,11 +161,7 @@ class Console(console.Console):
         self.goto_line(dest, self.point)
         
     def search(self):
-        '^S, go to ed line address, can be search pattern or line number or ..'
-        # Seems this could be implemented eden ^Z; ed do_command; eden C
-        #self.command_mode()
-        #ed.do_command(...)
-        #self.display_mode(...)
+        '^S, search for previous search string, forward  or back'
         pass
 
     def set_mark(self):
@@ -216,6 +213,27 @@ class Console(console.Console):
                     (self.line[:self.point], self.line[self.point:], 
                      self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
 
+    def execute(self):
+        """
+        ^Q, execute command: cursor moves to command line, prompt appears,
+        then type any ed/edo/edsel command, then type RET to return to display
+        mode (without having to type C then RET).  The command can simply be a
+        line address: a line number, $ (end), a search string in /.../ etc 
+        So this command acts as go-to-line or search command also.
+        """
+        self.collecting_command = True
+        self.command_mode() # like eden ^Z command
+        # Now console will collect command line
+        # BUT collecting_command tells console not to call accept_command
+        # but (via keymap lambda with if...) to call accept_eden_command
+        # instead, which returns immediately to display mode.
+
+    def accept_eden_command(self):
+        'After execute() above, execute the line, then return to display mode'
+        self.collecting_command = False
+        self.accept_command()
+        self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+
     def crash(self):
         '^K for now just crash' # FIXME - ^K is console kill line
         return 1/0  # raise exception on demand (crash), for testing
@@ -227,6 +245,7 @@ class Console(console.Console):
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
             keyboard.C_p: self.prev_line,
+            keyboard.C_q: self.execute,
             keyboard.C_r: self.page_up,
             keyboard.C_s: self.search,
             keyboard.C_v: self.page_down,
@@ -241,9 +260,15 @@ class Console(console.Console):
             keyboard.bs: self.del_or_join_prev,
             keyboard.delete: self.del_or_join_prev,
             }
-        self.display_keymap = self.input_keymap.copy()
+        self.display_keymap = self.input_keymap.copy()# FIXME? Why?
         self.display_keymap.update(self.display_keys) # override some keys
-        return (lambda: self.command_keymap)
+        self.eden_command_keys = {
+            keyboard.cr: self.accept_eden_command,
+            }
+        # Be sure to preserve console command_keymap, we stil use it
+        self.eden_command_keymap = self.command_keymap.copy()
+        self.eden_command_keymap.update(self.eden_command_keys)
+        return (lambda: self.eden_display_keymap)
 
 def base_do_command(line):
     'Process one command line without blocking.'
@@ -277,11 +302,13 @@ eden = Console(prompt=(lambda: wyshka.prompt),
                stopped=(lambda command: ed.quit),
                startup=edsel.startup, cleanup=edsel.cleanup)
 
-eden.keymap = (lambda: (eden.command_keymap 
-                        if frame.mode == frame.Mode.command
+eden.keymap = (lambda: (eden.eden_command_keymap 
+                        if eden.collecting_command
+                        else eden.display_keymap
+                        if frame.mode == frame.Mode.display
                         else eden.input_keymap
-			    if frame.mode == frame.Mode.input
-			    else eden.display_keymap)) # Mode.display
+                        if frame.mode == frame.Mode.input
+                        else eden.command_keymap)) # frame.Mode.command
 
 def main(*filename, **options):
     eden.run(*filename, **options)

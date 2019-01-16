@@ -25,11 +25,11 @@ space = ' '
 
 # ASCII codes for control characters
 
-bel = '\a'   # bell
-bs  = '\b'   # backspace 
-cr  = '\r'   # carriage return
+bel = '\a'   # bell, ^G
+bs  = '\b'   # backspace, ^H
+cr  = '\r'   # carriage return, ^M
 
-delete = '\x7F' # del is a python keyword
+delete = '\x7F' # del is a python keyword, ^?
 
 C_at = '\x00' # ^@, nul, also obtained by ^space on many terminals
 C_a = '\x01' # ^A, soh
@@ -43,6 +43,7 @@ C_k = '\v'   # ^K, vt
 C_l = '\f'   # ^L, ff
 C_n = '\x0E' # ^N, so
 C_p = '\x10' # ^P, dle
+C_q = '\x11' # ^Q, dc1, xon
 C_r = '\x12' # ^R, dc2
 C_s = '\x13' # ^S, dc3, xoff
 C_t = '\x14' # ^T, dc4

@@ -379,12 +379,13 @@ class Console(object):
             keyboard.C_z: self.ctrl_z,
             }
 
-        # Combine the keymaps - command mode adds several keys to inputt mode,
+        # Combine the keymaps - command mode adds several keys to input mode,
         #  also reassigns method for keyboard.cr (RET key).
         # job_control_keys replaces ^D del in input_keymap with eof 
         #  and adds ^Z suspend.
         # This keymap is the default that __init__ assigns to self.keymap.
-        self.command_keymap = self.input_keymap.copy()
+        # Be sure to preserve original input_keymap, we use it in input mode
+        self.command_keymap = self.input_keymap.copy() # preserve original
         self.command_keymap.update(self.command_keys)
         self.command_keymap.update(self.job_control_keys)
 
