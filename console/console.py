@@ -189,12 +189,16 @@ class Console(object):
         self.process_line() # might reassign self.line
         self.restart()      # print prompt and put term in character mode
 
-    def accept_command(self):
-        'For command modes: handle line, with history, exit, and job control'
+    def process_command(self):
+        'add command to history then execute it'
         self.history.append(self.line)
         self.hindex = len(self.history) - 1
         self.restore()
         self.process_line() # might stop or preempt this job, assign self.state
+
+    def accept_command(self):
+        'For command modes: handle line, with history, exit, and job control'
+        self.process_command()
         if self.stopped():
             self.stop()
         elif self.state != State.background: #assigned by job control elsewhere

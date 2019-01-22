@@ -19,17 +19,14 @@ class Console(console.Console):
 
     # The following methods override methods in console.Console
 
-    def restart(self):
+    def restart(self): # add _hide so we just run super() instead
         'Prepare to collect a command string in self.line'
         if self.clear_line: # default case, usually True
-            self.line = ''
-            self.point = 0 # index into self.line
-            self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-
-            util.putstr(self.prompt() + self.line) # command might be empty
-            self.move_to_point() # might not be end of line
+            super().restart() # clear self.line=''; show prompt; set_char_mode
         else:
-            self.clear_line = True # restore default
-        terminal.set_char_mode()
+            # display_mode sets clear_line = False - but does not call restart
+            self.clear_line = True # restore default,leave self.line,no prompt
+            terminal.set_char_mode()
 
     # The following  methods and keymaps all have new names, so they are added 
     #  to the ones in the Console base class, they do not replace any.
@@ -63,7 +60,7 @@ class Console(console.Console):
         win = frame.win
         win.set_marker(win.buf.dot)
         frame.put_command_cursor()
-        self.restart()      # print prompt and put term in character mode
+        super().restart() # not self.restart.  print prompt and enter char mode
 
     def refresh(self):
         '^L '
@@ -231,11 +228,12 @@ class Console(console.Console):
     def accept_eden_command(self):
         'After execute() above, execute the line, then return to display mode'
         self.collecting_command = False
-        self.accept_command()
+        self.process_command()
+        terminal.set_char_mode()
         self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
     def crash(self):
-        '^K for now just crash' # FIXME - ^K is console kill line
+        '^K for now just crash' # FIXME - ^K is now console kill line
         return 1/0  # raise exception on demand (crash), for testing
     
     def init_eden_keymaps(self):

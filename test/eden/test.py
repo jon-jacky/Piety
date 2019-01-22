@@ -121,6 +121,18 @@ yank = (C_at + 4*C_n +
         C_y +
         C_x + C_x)
 
+# Test exiting display mode with ^Z, restoring display with C 
+# then exit display mode with ^Q three times, eden restores display after each
+# then exit display mode with ^Z again.  Confirm we get proper prompt each time
+# Not self-contained, first do E lines20.txt then 1
+commands = (C_z + 
+            '3' + cr + '5' + cr + '7' + cr + 
+            'C' + cr + 
+            C_q + '3' + cr + C_q + '5' + cr + C_q + '7' + cr + 
+            C_z + 
+            '3' + cr + '5' + cr + '7' + cr + 
+            'C' + cr)
+
 def run(script, delay=0.2): # seconds
     eden.base_do_command('C')
     samysh.run_script(eden.eden.handle_key, script, echo=(lambda: False), 
