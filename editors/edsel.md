@@ -2,11 +2,17 @@
 edsel
 =====
 
-**edsel** is a display editor in pure Python based on the line editor
-  [ed.py](ed.md).
+**edsel** is a simple display editor in pure Python based on the line editor
+[ed.py](ed.md).
+
+**edsel** is still line- and command-oriented like *ed.py*, but it also shows
+buffers update in display windows as you edit with *ed* commands.  *edsel* adds
+a few new commands for managing display windows.  
+We also provide a more capable display editor, [eden](eden.md),
+which is based on *edsel*.
 
 **edsel** provides the the enhanced shell and scripting
-provided by *[edo.py](../editors/edo.md)*.
+provided by [edo.py](../editors/edo.md).
 
 **edsel** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
@@ -26,8 +32,8 @@ the scrolling command region (see below), for example:
     lines20.txt, 20 lines
     :
 
-or 
-    
+or
+
     python3 -i
     ...
     >>> from edsel import *
@@ -44,7 +50,7 @@ Use the command *python3 -m edsel -h* to print help.
 **edsel** looks similar to other multiwindow display editors such as
 *emacs*.  It divides its display into two main regions: a scrolling
 command region at the bottom, and above it a *frame* that holds one
-or more windows that show the contents of editor buffers.  
+or more windows that show the contents of editor buffers.
 
 The command region behaves like a terminal running *ed*: you type a
 command, *edsel* prints the response, and any preceding commands and
@@ -53,7 +59,7 @@ command to adjust the size of the command region (along with the
 frame) to retain more (or fewer) lines.
 
 As you type in text, or type commands in the scrolling region, windows
-update to show the current text in the buffers.  
+update to show the current text in the buffers.
 
 Each window has a status line at its bottom that shows whether the
 buffer has unsaved changes, the buffer name, the location and line
@@ -80,8 +86,8 @@ type a period at the start of a line to exit input mode.  Then *edsel*
 puts the cursor back in the command region for you to type another
 command.
 
-Conventional full-screen display editing is (will be) provided by an
-enhanced version of *edsel* called *eden*.
+Conventional full-screen display editing is provided by *[eden](eden.md)*,
+a more complete editor that is based on *edsel*.
 
 **edsel** imports *[edo](edo.md)*, so it includes the *wyshka* shell
 that provides both the *ed* command line and a Python interpreter.
@@ -122,7 +128,7 @@ number command lines at any time during an editing session, use Python
 commands to reassign *cmd_h*, then rescale the display:
 
     :!frame.cmd_h=12
-    :!update(Op.rescale)
+    :!frame.update(Op.rescale)
 
 The *ed* API is avaiable in *edsel* by prefixing each call by *ed.*
 for example:
@@ -147,4 +153,4 @@ suppressed by two optional *x* parameters that follow the buffer name:
 echo (boolean) and delay (float), which default to *True* and *0.2*
 seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
 
-Revised Mar 2018
+Revised Jan 2019

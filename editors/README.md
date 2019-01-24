@@ -3,7 +3,8 @@ editors
 =======
 
 Text editors, including the line editor *ed.py* inspired by the
-    classic *Unix ed*, and a new display editor *edsel*.
+    classic *Unix ed*, a simple display editor *edsel*, and a more
+    capable display editor *eden*.
 
 There are several top-level editor programs here that can be invoked
 from the system command shell or from the Python prompt.  These
@@ -13,7 +14,7 @@ own.  Ordered from the most features to the fewest, the editor
 programs are:
 
 - **Display editors**: *eden > desoto > edsel > edo > ed*
-   
+
 - **Line editors** with command line editing for display terminals: *edda > edo > ed*
 
 - **Line editor** with command line editing teletype style: *etty > ed*
@@ -43,13 +44,9 @@ Files in this directory:
   line editor, along with the *wyshka* enhanced Python shell and
   *samysh* script execution).  Contrast to the *edo.py* *main* function.
 
-- **eden.md**: description of *eden.py*.  REVISIONS MAY BE NEEDED.
+- **eden.md**: description of *eden.py*.
 
-- **eden.py**: run *edsel* display editor, with additional screen editing 
-  commands.  Use *console* module instead of Python builtin *input* 
-  to collect and edit
-  input lines.  Contrast to *edsel* *main* function and *desoto*.
-  MIGHT NOT WORK, WILL BE REVISED/FIXED IN THE FUTURE.
+- **eden.py**: display editor based on *edsel* and *ed.py*.
 
 - **edo.md**: description of *edo.py*.
 
@@ -60,7 +57,7 @@ Files in this directory:
 
 - **edsel.md**: description of *edsel.py*.
 
-- **edsel.py**: display editor based on the line editor *ed.py*.
+- **edsel.py**: simple display editor based on the line editor *ed.py*.
   Import *edo*, which runs *ed.py* along with *wyshka* enhanced
   shell and *samysh* script execution.  Use Python builtin *input()*
   to collect and edit input lines with blocking.
@@ -92,4 +89,4 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Mar 2018
+Revised Jan 2019
