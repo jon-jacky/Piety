@@ -5,7 +5,7 @@ eden
 **eden** is a display editor in pure Python based on the line editor
   [ed.py](ed.md) and the simpler display editor [edsel](edsel.md).
 
-**eden** provides all the functionality of *edsel*, but also adds a display
+**eden** provides all the functionality of *edsel*, and also adds a display
 editing mode
 that inserts or deletes printing characters anywhere and uses control characters
 to move the cursor and to select, cut, and paste text.
@@ -52,32 +52,76 @@ forward (or backward) for the same *string*.
 
 ## Display Editing Commands ##
 
-At this time, all display editing commands are control characters: hold
-down the control key while typing the other key.   There are no 'meta' commands
-formed by typing the *esc* or *alt* keys.   These are the commands:
+At this time, most display editing commands are single control characters
+(hold down the control key while typing the named key).  The rest are dedicated
+function keys.  We try to use the
+same commands as the *emacs* editor when that is possible, but in this version
+there are no multi-character commands, and no meta commands
+formed by typing the *esc* or *alt* keys.   These are the control key commands:
+    
+    ^@  set mark, mark (included) to dot (excluded) defines region cut by ^W
+    ^space  set mark, like ^@
+    ^A  move cursor to start of line
+    ^B  move cursor (b)ack one character
+    ^D  (d)elete character under cursor
+    ^E  move cursor to (e)nd of line
+    ^F  move cursor (f)orward one character
+    ^H  delete character before cursor
+    ^K  delete (kill) line from cursor to end, save in paste buffer
+    ^L  refresh screen (useful if screen has become garbled with control characters)
+    ^M  open new line below, or break line at cursor
+    ^N  move cursor down to (n)ext line
+    ^P  move cursor up to to (p)revious line
+    ^Q  enter and execute an ed or edsel command, then return to display mode
+    ^R  page up
+    ^U  delete entire line, save in paste buffer
+    ^V  page down
+    ^W  delete from mark (included) to dot (excluded), save in paste buffer
+    ^X  exchange mark and dot (to show which lines are included)
+    ^Y  paste or (y)ank text removed by last ^W, ^K, or ^U, or by *ed* *d* command etc.
+    ^Z  exit display editing and return to command mode
 
-  ^A  move cursor to start of line
+These are the dedicated function keys:
 
-  ...
-
-  ^Z  return to command mode
-
-The four arrow keys can also be used to move the cursor.
+    ret  open new line below, or break line at cursor
+    bs   delete character before cursor
+    del  delete character before cursor
+    left (arrow key) move cursor back one character
+    right (arrow key) move cursor forward one character
+    up   (arrow key) move cursor up to previous line
+    down (arrow key) move cursor down to next line
 
 ## Editing Commmand Lines ##
 
-The right- and left-arrow keys and these control characters can also be used
-in command mode to edit command lines: ^A ^B ...
+It is also possible to edit command lines in the scrolling command region.
+These control keys behave the same when editing the command line: *^A ^B ^D
+^E ^F ^H ^K*.
 
-The up- and down-arrow arrow keys and the ^N and ^P control characters
-can be used in command mode to access command history.  The retrieved commands
-can then be edited and submitted.   Command line history can be
-accessed during *^Q* commmands.
+These control characters behave differently when editing the command line:
+
+    ^C  interrupt application, write traceback
+    ^D  (d)elete character under cursor; if line is empty, exit application
+    ^L  redraw line (useful if line has become garbled with control characters)
+    ^M  execute command (like ret)
+    ^N  retrieve (n)ext line from history
+    ^P  retrieve (p)revious line from history
+    ^Z  if line is empty, exit application
+
+The *bs del left* and *right* function keys can also be used to edit the command
+line.  These function keys  behave differently on the command line:
+
+    ret  execute command line
+    up   (arrow key) retrieve previous line from history
+    down (arrow key) retrieve next line from history
+
+Commands retrieved from the history
+can be edited and submitted.   Command line history including previous
+search strings can be accessed during *^Q* commmands.
 
 ## Limitations ##
 
 **eden** is *ed.py* underneath.  In display editing mode, you can insert or
-delete characters anywhere, but some commands are still line-oriented.  
+delete characters anywhere, but some commands are still line-oriented.
 
 The command to set the mark, *^@* (or *^-space*), only marks the line
 (not the character within the line), so the region defined by the mark and
