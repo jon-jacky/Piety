@@ -145,12 +145,12 @@ used to recover if display contents get corrupted.
 
 ## Script commands ##
 
-When you use the *x* command to execute *ed* commands from a buffer,
+When you use the *X* command to execute *ed* commands from a buffer,
 you can see window contents update as the commands run.  Each command
 echoes in the scrolling command region, followed by a short delay so
 you can observe its effect.  The echo and delay can be adjusted or
-suppressed by two optional *x* parameters that follow the buffer name:
+suppressed by two optional *X* parameters that follow the buffer name:
 echo (boolean) and delay (float), which default to *True* and *0.2*
-seconds.  So *x sample.ed 0 0* suppresses both echo and delay.
+seconds.  So *X sample.ed 0 0* suppresses both echo and delay.
 
 Revised Jan 2019

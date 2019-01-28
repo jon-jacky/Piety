@@ -28,14 +28,14 @@ class Console(console.Console):
             self.clear_line = True # restore default,leave self.line,no prompt
             terminal.set_char_mode()
 
-    # The following  methods and keymaps all have new names, so they are added 
+    # The following  methods and keymaps all have new names, so they are added
     #  to the ones in the Console base class, they do not replace any.
 
     def display_mode(self, line):
         'eden C command'
         # Based on ed.py do_command 'c' case
         ed.command_mode = False
-        frame.update(Op.display) 
+        frame.update(Op.display)
         ed.prompt = ed.input_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         eden.line = line # not including final \n at eol
@@ -51,7 +51,7 @@ class Console(console.Console):
     def command_mode(self):
         '^Z: Replace current line in buffer and resume command mode'
         # Based on ed.py append and '.' handling, Console accept_line method.
-        self.restore() # advance line and put terminal in line mode 
+        self.restore() # advance line and put terminal in line mode
         ed.buf.replace(ed.buf.dot, self.line + '\n')
         ed.command_mode = True
         frame.update(Op.command)
@@ -69,7 +69,7 @@ class Console(console.Console):
 
     def open_line(self):
         """
-        RET: Split line at point, replace line in buffer at dot 
+        RET: Split line at point, replace line in buffer at dot
         with its prefix, append suffix after line at dot.
         """
         prefix = self.line[:self.point]
@@ -153,7 +153,7 @@ class Console(console.Console):
         self.goto_line(dest, self.point)
 
     def page_up(self):
-        '^R (for now, change to M_v later) - page up'
+        '^C (for now, change to M_v later) - page up'
         dest = max(ed.buf.dot - ed.buf.npage, 1)
         self.goto_line(dest, self.point)
         
@@ -169,7 +169,7 @@ class Console(console.Console):
         frame.put_display_cursor() # Or display.put_cursor(wdot,1) ?
 
     def exchange(self):
-        '^X, exchange point and mark'
+        '^Q, exchange point and mark'
         if '@' in ed.buf.mark:
             frame.win.clear_marker(ed.buf.dot)
             ed.buf.dot, ed.buf.mark['@'] = ed.buf.mark['@'], ed.buf.dot
@@ -198,24 +198,35 @@ class Console(console.Console):
     def paste(self):
         '^Y, (yank) insert text from paste buffer'
         if eden.yank_enabled:
-            eden.yank() # insert into same line from console yank_buffer 
+            eden.yank() # insert into same line from console yank_buffer
         else:
             ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
             ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
             frame.put_display_cursor()
-        
+
+    def other_window(self):
+        '^O, other window, next in sequence'
+        ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
+        edsel.do_window_command('') # reassign win, ed.buf, call update(Op.next)
+        self.line = ed.buf.lines[ed.buf.dot].rstrip() # from several methods
+        # From display_mode
+        self.point = 0
+        self.start_col = 1
+        wdot = frame.win.wline(frame.win.buf.dot)
+        display.put_cursor(wdot, 1)
+
     def status(self):
         '^T handler, override base class, print items used by del_or_join_next'
         util.putstr('%s.%s point %s len %s dot %s nlines %s' %
-                    (self.line[:self.point], self.line[self.point:], 
+                    (self.line[:self.point], self.line[self.point:],
                      self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
 
     def execute(self):
         """
-        ^Q, execute command: cursor moves to command line, prompt appears,
+        ^X, execute command: cursor moves to command line, prompt appears,
         then type any ed/edo/edsel command, then type RET to return to display
         mode (without having to type C then RET).  The command can simply be a
-        line address: a line number, $ (end), a search string in /.../ etc 
+        line address: a line number, $ (end), a search string in /.../ etc
         So this command acts as go-to-line or search command also.
         """
         self.collecting_command = True
@@ -235,20 +246,21 @@ class Console(console.Console):
     def crash(self):
         '^K for now just crash' # FIXME - ^K is now console kill line
         return 1/0  # raise exception on demand (crash), for testing
-    
+
     def init_eden_keymaps(self):
         self.display_keys = {
+            keyboard.C_c: self.page_up,
             keyboard.C_d: self.del_or_join_next,
             # keyboard.C_k: self.crash, # FIXME ^K is console kill line
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
+            keyboard.C_o: self.other_window,
             keyboard.C_p: self.prev_line,
-            keyboard.C_q: self.execute,
-            keyboard.C_r: self.page_up,
+            keyboard.C_q: self.exchange,
             keyboard.C_s: self.search,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,
-            keyboard.C_x: self.exchange,
+            keyboard.C_x: self.execute,
             keyboard.C_y: self.paste, # yank
             keyboard.C_z: self.command_mode,
             keyboard.C_at: self.set_mark,
@@ -292,15 +304,15 @@ _process_line = wyshka.shell(process_line=base_process_line,
                              command_prompt=(lambda: ed.prompt))
 
 # Add command to run script from buffer with optional echo and delay.
-process_line = samysh.add_command(edsel.edo.X_command(_process_line), 
+process_line = samysh.add_command(edsel.edo.X_command(_process_line),
                                   _process_line)
 
-eden = Console(prompt=(lambda: wyshka.prompt), 
+eden = Console(prompt=(lambda: wyshka.prompt),
                process_line=process_line,
                stopped=(lambda command: ed.quit),
                startup=edsel.startup, cleanup=edsel.cleanup)
 
-eden.keymap = (lambda: (eden.eden_command_keymap 
+eden.keymap = (lambda: (eden.eden_command_keymap
                         if eden.collecting_command
                         else eden.display_keymap
                         if frame.mode == frame.Mode.display

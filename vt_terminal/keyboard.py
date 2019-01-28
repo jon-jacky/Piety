@@ -42,6 +42,7 @@ C_j = '\n'   # ^J, lf
 C_k = '\v'   # ^K, vt
 C_l = '\f'   # ^L, ff
 C_n = '\x0E' # ^N, so
+C_o = '\x0F' # ^O, si
 C_p = '\x10' # ^P, dle
 C_q = '\x11' # ^Q, dc1, xon
 C_r = '\x12' # ^R, dc2
