@@ -38,6 +38,7 @@ C_c = '\x03' # ^C, etx
 C_d = '\x04' # ^D, eot
 C_e = '\x05' # ^E, enq
 C_f = '\x06' # ^F, ack
+C_g = '\x07' # ^G, bel
 C_j = '\n'   # ^J, lf
 C_k = '\v'   # ^K, vt
 C_l = '\f'   # ^L, ff

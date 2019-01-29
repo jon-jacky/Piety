@@ -68,7 +68,7 @@ formed by typing the *esc* or *alt* keys.   These are the control key commands
     ^D  (d)elete character under cursor
     ^E  move cursor to (e)nd of line
     ^F  move cursor (f)orward one character
-    ^G  cancel ^X command in progress (not yet implemented)
+    ^G  cancel ^X command in progress
     ^H  delete character before cursor
     ^I
     ^J
@@ -76,7 +76,7 @@ formed by typing the *esc* or *alt* keys.   These are the control key commands
     ^L  refresh screen (useful if screen has become garbled with control characters)
     ^M  open new line below, or break line at cursor
     ^N  move cursor down to (n)ext line
-    ^O  move cursor to (o)ther window, next in sequence (not yet implemented)
+    ^O  move cursor to (o)ther window, next in sequence
     ^P  move cursor up to to (p)revious line
     ^Q  exchange mark and dot (to show where they are)
     ^R  search backwards (reverse) for previously entered search string (not yet)

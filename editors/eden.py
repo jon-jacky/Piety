@@ -243,6 +243,16 @@ class Console(console.Console):
         terminal.set_char_mode()
         self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
+    def cancel_eden_command(self):
+        'After execute() above, discard the line, then return to display mode'
+        self.collecting_command = False
+        # self.process_command()
+        # next two lines from console discard, ^U handler:
+        self.move_beginning()
+        display.kill_line()
+        terminal.set_char_mode()
+        self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+
     def crash(self):
         '^K for now just crash' # FIXME - ^K is now console kill line
         return 1/0  # raise exception on demand (crash), for testing
@@ -273,6 +283,7 @@ class Console(console.Console):
         self.display_keymap = self.input_keymap.copy()# FIXME? Why?
         self.display_keymap.update(self.display_keys) # override some keys
         self.eden_command_keys = {
+            keyboard.C_g: self.cancel_eden_command,
             keyboard.cr: self.accept_eden_command,
             }
         # Be sure to preserve console command_keymap, we stil use it
