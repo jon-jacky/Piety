@@ -79,8 +79,8 @@ formed by typing the *esc* or *alt* keys.   These are the control key commands
     ^O  move cursor to (o)ther window, next in sequence
     ^P  move cursor up to to (p)revious line
     ^Q  exchange mark and dot (to show where they are)
-    ^R  search backwards (reverse) for previously entered search string (not yet)
-    ^S  search forwards for previously entered search string (not yet impl.)
+    ^R  search backwards (reverse) for previously entered search string
+    ^S  search forwards for previously entered search string
     ^T  move cursor forward one word (not yet implemented)
     ^U  delete entire line, save in paste buffer
     ^V  move cursor forward one page (page down)

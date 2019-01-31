@@ -156,10 +156,14 @@ class Console(console.Console):
         '^C (for now, change to M_v later) - page up'
         dest = max(ed.buf.dot - ed.buf.npage, 1)
         self.goto_line(dest, self.point)
-        
+
     def search(self):
-        '^S, search for previous search string, forward  or back'
-        pass
+        '^S, search forward for previous search string'
+        self.goto_line(ed.F(''), self.point)
+
+    def rsearch(self):
+        '^R, search backward for previous search string'
+        self.goto_line(ed.R(''), self.point)
 
     def set_mark(self):
         '^@, set mark. ^space also works as ^@ on many terminals'
@@ -267,6 +271,7 @@ class Console(console.Console):
             keyboard.C_o: self.other_window,
             keyboard.C_p: self.prev_line,
             keyboard.C_q: self.exchange,
+            keyboard.C_r: self.rsearch,
             keyboard.C_s: self.search,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,
