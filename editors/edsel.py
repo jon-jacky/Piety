@@ -9,9 +9,18 @@ from updates import Op
 
 ed = edo.ed  # so we can call ed API without edo. prefix
 
-def do_window_command(line):
+def do_rescale_command(paramstring):
+    'Change number of lines in scrolling command region'
+    frame.cmd_h = 2 # default
+    if paramstring:
+        try:
+            frame.cmd_h = int(paramstring)
+        except ValueError:
+            pass # keep default
+    frame.update(Op.rescale)
+
+def do_window_command(paramstring):
     'Window manager commands'
-    paramstring = line.lstrip()[1:].lstrip()
     if not paramstring: # o: switch to next window
         win = frame.update(Op.next)
         ed.buf = win.buf
@@ -21,22 +30,25 @@ def do_window_command(line):
     elif paramstring.startswith('2'): # o2: split window, horizontal
         frame.update(Op.hsplit)
     else:
-        print('? integer 1 or 2 expected at %s' % paramstring) 
+        print('? integer 1 or 2 expected at %s' % paramstring)
 
 def base_do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
+    paramstring = line[1:].lstrip()
     # try/except ensures we restore display, especially scrolling
     try:
         # Intercept special commands used by frame only, not ed.
-        if line == 'L': # similar to ^L
+        if line.startswith('L'):
             frame.update(Op.refresh)
+        elif line.startswith('h'):
+            do_rescale_command(paramstring)
         elif line.startswith('o'):
-            do_window_command(line)
+            do_window_command(paramstring)
         else:
             ed.do_command(line)
     except BaseException as e:
-        cleanup() # so we can see entire traceback 
+        cleanup() # so we can see entire traceback
         traceback.print_exc() # looks just like unhandled exception
         ed.quit = True # exit() here raises another exception
 

@@ -43,11 +43,11 @@ to type and execute a single *ed* or *edsel* command and then return immediately
 to display editing mode.  This makes it easy to alternate display editing with
 commands.
 
-After typing *^Q* you can type any *ed* line address: a line number, a search string,
-or a special character (like *$* for the last line).  Then *eden* will move
-the cursor to that line and resume display editing.  Therefore, *^Q* can act
-as a search command: type *^Q* then */string/* (or *?string?*) to search forward
-(or backward) for *string*.  After that, type *^Q* then *//* (or *??*) to search
+After typing *^X* you can type any *ed* line address: a line number, a search string,
+or any other address form (like *$* for the last line).  Then *eden* will move
+the cursor to that line and resume display editing.  Therefore, *^X* can act
+as a search command: type *^X* then */string/* (or *?string?*) to search forward
+(or backward) for *string*.  After that, type *^S* (or *^R*) to search
 forward (or backward) for the same *string*.
 
 ## Display Editing Commands ##

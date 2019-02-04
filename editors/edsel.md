@@ -108,7 +108,7 @@ current window.
 
 - **o2** creates a new window by spliting the current window.  Initially
    both windows show the same contents.  The upper window is the current
-   window, where commands can change the current line, dot.  The lower 
+   window, where commands can change the current line, dot.  The lower
    window saves the current location of dot and its cursor disappears.
 
 - **o** moves the focus to the next window, which becomes the new
@@ -118,17 +118,17 @@ current window.
     restores its saved cursor location.  This becomes the new current
     line, dot.
 
-- **o1** deletes all windows except the current window. 
+- **o1** deletes all windows except the current window.
 
 By default, the *edsel* command region displays just two lines.  This
 is usually not enough to show all of the output from some commands,
 for example *n* (list buffers).  Use the *c* option to set more lines
 when you invoke *edsel* (see examples above).  Or, to change the
-number command lines at any time during an editing session, use Python
-commands to reassign *cmd_h*, then rescale the display:
+number command lines at any time during an editing session, use the *h* command:
 
-    :!frame.cmd_h=12
-    :!frame.update(Op.rescale)
+- **h** assign number of lines in scrolling command region, in the parameter,
+  for example *h 12* to assign 12 lines.  If there is no parameter, the 
+  default of 2 lines is assigned.
 
 The *ed* API is avaiable in *edsel* by prefixing each call by *ed.*
 for example:
