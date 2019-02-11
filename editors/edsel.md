@@ -2,7 +2,7 @@
 edsel  
 =====
 
-**edsel** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edsel_advertisement)*
+**edsel** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edsel_advertisement)
 
 **edsel** is a simple display editor in pure Python based on the line editor
 [ed.py](ed.md).
