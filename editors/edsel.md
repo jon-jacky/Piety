@@ -1,5 +1,5 @@
 
-edsel
+edsel  - *It has the new ideas next year's software is copying!* [link](http://all-classic-ads.com/ford-vintage-ads-1950.html)
 =====
 
 **edsel** is a simple display editor in pure Python based on the line editor
@@ -103,8 +103,8 @@ buffer.  *edsel* updates the current window to ensure that it always
 shows the *current line* (also called *dot*) in the current buffer,
 where text is inserted and changed.
 
-There are commands to add windows, delete windows, and change the
-current window.
+There are commands to add windows, delete windows, change the
+current window, and change window sizes:
 
 - **o2** creates a new window by spliting the current window.  Initially
    both windows show the same contents.  The upper window is the current
@@ -120,24 +120,23 @@ current window.
 
 - **o1** deletes all windows except the current window.
 
-By default, the *edsel* command region displays just two lines.  This
-is usually not enough to show all of the output from some commands,
-for example *n* (list buffers).  Use the *c* option to set more lines
-when you invoke *edsel* (see examples above).  Or, to change the
-number command lines at any time during an editing session, use the *h* command:
-
-- **h** assign number of lines in scrolling command region, in the parameter,
-  for example *h 12* to assign 12 lines.  If there is no parameter, the 
-  default of 2 lines is assigned.
-
-The *ed* API is avaiable in *edsel* by prefixing each call by *ed.*
-for example:
-
-    :!ed.a('append line after dot')
-    :q   
-    >>> ed.a('append another line after dot')
+- **h** if there are multiple windows, "balance" them (make them all
+    about the same size)
 
 ## Frame commands ##
+
+By default, the frame is made large enough so the *edsel* command region 
+displays just two lines.  This
+is usually not enough to show all of the output from some commands,
+for example *n* (list buffers).  Use the *-c* option to set more lines
+when you invoke *edsel* (see examples above).  Or, to change the
+number command lines at any time during an editing session, use the *h*
+command:
+
+- **h** assign number of lines in scrolling command region, in the parameter,
+  for example *h 12* to assign 12 lines.  Also, multiple windows (if any)
+  are balanced.  If there is no parameter, the *h* command merely balances
+  windows.
 
 The *L* command refreshes the entire frame including all windows, and
 also the command line in the scrolling region.  This command can be
@@ -153,4 +152,13 @@ suppressed by two optional *X* parameters that follow the buffer name:
 echo (boolean) and delay (float), which default to *True* and *0.2*
 seconds.  So *X sample.ed 0 0* suppresses both echo and delay.
 
-Revised Jan 2019
+## Using the *ed* API ##
+
+The ed API is avaiable in edsel by prefixing each call by ed. for example:
+
+    :!ed.a('append line after dot')
+    :q
+    >>> ed.a('append another line after dot')
+
+
+Revised Feb 2019

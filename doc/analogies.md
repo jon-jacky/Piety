@@ -137,13 +137,11 @@ that boot Piety in different configurations.
 Python REPL console job and return to standard blocking Python
 interpreter, stop Piety event loop, exit Python.
 
-- **virtual machine**: It is possible to run a guest operating system
-(such as Linux) in a *virtual machine* on a host operating system (such as
-Windows), by using a *virtual machine monitor (VMM)* (also called a *hypervisor*)
-such as QEMU or VirtualBox to make the host's hardware and OS available to
-the guest.  Piety only uses Python, so the host's Python interpreter is the only
-VMM that it needs to run Piety as a guest.  The Python session running Piety is
-the virtual machine.
+- **virtual machine**: On a conventional operating system, it is possible
+to use a *virtual machine monitor (VMM)* (or *hypervisor*)
+such as QEMU or VirtualBox to run another operating system in a *virtual machine*.
+Piety only uses Python, so a Python interpreter is the only
+VMM needed to run Piety.  The Python session is the entire virtual machine.
 
 The operating system that Piety resembles the most is
 [Oberon](http://www.projectoberon.com/).  Oberon uses cooperative

@@ -10,13 +10,12 @@ from updates import Op
 ed = edo.ed  # so we can call ed API without edo. prefix
 
 def do_rescale_command(paramstring):
-    'Change number of lines in scrolling command region'
-    frame.cmd_h = 2 # default
+    'Change n of lines in scrolling command region, or balance windows'
     if paramstring:
         try:
             frame.cmd_h = int(paramstring)
         except ValueError:
-            pass # keep default
+            pass # keep current cmd_h, but .rescale balances windows
     frame.update(Op.rescale)
 
 def do_window_command(paramstring):
