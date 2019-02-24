@@ -9,6 +9,7 @@ def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
     return min(max(first, iline), last)
 
+show_marker = True # True in command mode when cursor is not in window
 show_diagnostics = True # on status line
 
 class Window(object):
@@ -107,6 +108,11 @@ class Window(object):
         return (self.contains(start) or self.contains(end)
                 or (start < self.btop and end > self.bbottom()))
 
+    # Marker is only displayed during command modes when cursor is not in window.
+    # Then marker shows where text will be inserted, where cursor will appear
+    # in display editing modes.  Marker is not shown in display editing modes
+    # because then the terminal's cursor is in the window, that is sufficient.
+
     def ch0(self, iline):
         'First character in line iline in buffer, or space if line empty'
         return ' ' if self.empty_line(iline) else self.buf.lines[iline][0]
@@ -119,7 +125,8 @@ class Window(object):
         
     def set_marker(self, iline):
         'Set marker on buffer line iline, or top line if buffer empty'
-        self.put_marker(iline)
+        if show_marker:
+            self.put_marker(iline)
 
     def clear_marker(self, iline):
         'Clear marker from buffer line iline, or top line if buffer empty'
@@ -208,7 +215,7 @@ class Window(object):
         'Write all lines in window'
         self.update_from(self.btop)
 
-    def move_update(self, iline, show_marker=True):
+    def move_update(self, iline):
         'Move window to show buffer line iline then update window'
         self.locate_segment(iline)
         self.update()
@@ -216,11 +223,11 @@ class Window(object):
             if show_marker:
                 self.set_marker(iline)
 
-    def reupdate(self, show_marker=True):
+    def reupdate(self):
         'Move window to show its buf.dot then update window'
-        self.move_update(self.buf.dot, show_marker)
+        self.move_update(self.buf.dot)
 
-    def locate(self, origin, destination, show_marker=True):
+    def locate(self, origin, destination):
         'Update window after cursor moves from origin to destination'
         if self.contains(destination):
             if show_marker:
@@ -228,9 +235,9 @@ class Window(object):
                 self.set_marker(destination)
             self.update_status()
         else:
-            self.reupdate(show_marker)
+            self.reupdate()
 
-    def insert(self, origin, start, end, show_marker=True):
+    def insert(self, origin, start, end):
         'Update window after insert lines from origin to start..end'
         if self.contains(end):
             if origin != 0:

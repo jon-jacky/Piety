@@ -29,6 +29,7 @@ class Mode(Enum):
     display = 3 # eden display mode
 
 mode = Mode.command
+window.show_marker = True
 
 def scale(nlines, cmd_h):
     'Calculate dimensions and location of windows and scrolling command region'
@@ -130,6 +131,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to ed input mode, for ed a i c commands
     elif op == Op.input:
         mode = Mode.input
+        window.show_marker = False
         win.update_for_input()
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot+1,1)
@@ -137,6 +139,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to ed command mode, ed . while in input mode
     elif op == Op.command:
         mode = Mode.command
+        window.show_marker = True
         # Overwrite '.' line on display, and lines below.
         win.update_from(win.buf.dot + 1)
         win.set_marker(win.buf.dot)
@@ -144,18 +147,19 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to eden display mode
     elif op == Op.display:
         mode = Mode.display
+        window.show_marker = False
         put_display_cursor(column=column)
 
     # Dot moved, ed l command
     elif op == Op.locate:
-        win.locate(origin, destination, show_marker=(mode==Mode.command))
+        win.locate(origin, destination)
 
     # Insert text: ed a i c m r t y commands
     # start, end are after insert, start == destination, end == win.buf.dot
     elif op == Op.insert and origin != background_task:
         if mode != Mode.input: # ed commands m r t y
-            win.insert(origin, start, end, show_marker=(mode==Mode.command))
-        elif mode == Mode.input: # input mode after ed commands a i c    
+            win.insert(origin, start, end)
+        elif mode == Mode.input: # input mode after ed commands a i c
             # Text at dot is already up-to-date on display, open next line.
             win.update_for_input()
         for w in windows:
@@ -170,7 +174,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         for w in windows:
             if w.buf == buffer:
                 terminal.set_line_mode()
-                w.insert(origin, start, end, show_marker=(mode==Mode.command))
+                w.insert(origin, start, end)
                 for w1 in windows:
                     if w1.samebuf(w):
                         w1.adjust_insert(start, end, destination)
