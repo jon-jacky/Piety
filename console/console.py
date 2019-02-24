@@ -84,7 +84,6 @@ class Console(object):
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
         self.yank_buffer = ''  # string from previous ^K kill or ^U discard
-        self.yank_enabled = False # might be overridden by multiline yank
 
     # Piety Session switch method requires job has method named resume
     def resume(self, *args, **kwargs):
@@ -282,13 +281,6 @@ class Console(object):
         if self.point < len(self.line):
             self.point += 1
             display.forward_char()
-
-    def kill(self):
-        '^K, delete line from point to end-of-line'
-        self.yank_buffer = self.line[self.point:]
-        self.yank_enabled = True
-        self.line = self.line[:self.point] # point does not change
-        display.kill_line()
         
     def redraw(self):
         'redraw line'
@@ -297,16 +289,28 @@ class Console(object):
         util.putstr(self.line)
         display.kill_line() # remove any leftover text past self.line
 
+
+    def kill(self):
+        '^K, delete line from point to end-of-line'
+        killed_segment = self.line[self.point:]
+        if killed_segment: # Do not overwrite yank buffer with empty segment
+            self.yank_buffer = killed_segment
+        self.line = self.line[:self.point] # point does not change
+        display.kill_line()
+
     def discard(self): # name like gnu readline unix-line-discard
-        'discard line'
-        self.yank_buffer = self.line
-        self.yank_enabled = True
-        self.line = str() 
+        '^U, delete line from start-of-line to point'
+        killed_segment = self.line[:self.point]
+        if killed_segment: # Do not overwrite yank buffer with empty segment
+            self.yank_buffer = killed_segment
+        self.line = self.line[self.point:]
         self.move_beginning() # accounts for prompt, assigns point
-        display.kill_line() # erase from cursor to end of line
+        util.putstr(self.line)
+        display.kill_line() # remove any leftover text past self.line
+        self.move_beginning() # replace cursor again
 
     def yank(self):
-        '^Y, paste line previously ^K killed or ^U discarded'
+        '^J, paste string previously ^K killed or ^U discarded'
         self.line = (self.line[:self.point] + self.yank_buffer +
                       self.line[self.point:])
         self.point += len(self.yank_buffer)
@@ -356,7 +360,7 @@ class Console(object):
             keyboard.C_l: self.redraw,
             keyboard.C_t: self.status,
             keyboard.C_u: self.discard,
-            keyboard.C_y: self.yank,
+            keyboard.C_j: self.yank,
 
             # These keys are multicharacter control sequences
             # require keyboard that sends ANSI control sequences

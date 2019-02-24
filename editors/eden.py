@@ -195,18 +195,13 @@ class Console(console.Console):
             if check.range_ok(ed.buf, start, end):
                 ed.buf.d(start, end)
                 frame.put_display_cursor()
-            # FIXME? else: ... bad range ...
-            eden.yank_enabled = False # ^Y invokes self.paste not console.yank
         # FIXME? else: "The mark is not set now, so there is no region"
 
     def paste(self):
         '^Y, (yank) insert text from paste buffer'
-        if eden.yank_enabled:
-            eden.yank() # insert into same line from console yank_buffer
-        else:
-            ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
-            ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
-            frame.put_display_cursor()
+        ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
+        ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
+        frame.put_display_cursor()
 
     def other_window(self):
         '^O, other window, next in sequence'
