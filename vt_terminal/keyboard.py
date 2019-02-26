@@ -28,6 +28,7 @@ space = ' '
 bel = '\a'   # bell, ^G
 bs  = '\b'   # backspace, ^H
 cr  = '\r'   # carriage return, ^M
+tab = '\t',  # tab, ^I
 
 delete = '\x7F' # del is a python keyword, ^?
 
@@ -38,10 +39,13 @@ C_c = '\x03' # ^C, etx
 C_d = '\x04' # ^D, eot
 C_e = '\x05' # ^E, enq
 C_f = '\x06' # ^F, ack
-C_g = '\x07' # ^G, bel
+C_g = '\a'   # ^G, bel
+C_h = '\b'   # ^H, bs
+C_i = '\t'   # ^I, ht
 C_j = '\n'   # ^J, lf
 C_k = '\v'   # ^K, vt
 C_l = '\f'   # ^L, ff
+C_m = '\r'   # ^M, cr
 C_n = '\x0E' # ^N, so
 C_o = '\x0F' # ^O, si
 C_p = '\x10' # ^P, dle

@@ -16,7 +16,7 @@ class Console(console.Console):
         self.keymap = self.init_eden_keymaps()
         self.clear_line = True # used by restart method
         self.collecting_command = False # used by execute, accept methods
-
+        
     # The following methods override methods in console.Console
 
     def restart(self): # add _hide so we just run super() instead
@@ -32,7 +32,7 @@ class Console(console.Console):
     #  to the ones in the Console base class, they do not replace any.
 
     def display_mode(self, line):
-        'eden C command'
+        'Enter display editing mode.'
         # Based on ed.py do_command 'c' case
         ed.command_mode = False
         frame.update(Op.display)
@@ -49,7 +49,7 @@ class Console(console.Console):
         display.put_cursor(wdot,1)
 
     def command_mode(self):
-        '^Z: Replace current line in buffer and resume command mode'
+        'Replace current line in buffer and resume command mode.'
         # Based on ed.py append and '.' handling, Console accept_line method.
         self.restore() # advance line and put terminal in line mode
         ed.buf.replace(ed.buf.dot, self.line + '\n')
@@ -63,13 +63,13 @@ class Console(console.Console):
         super().restart() # not self.restart.  print prompt and enter char mode
 
     def refresh(self):
-        '^L '
+        'Refresh entire display including whole frame and scrolling command region.'
         ed.buf.replace(ed.buf.dot, self.line + '\n') # so refresh renders it
         frame.update(Op.refresh, column=(self.start_col + self.point))
 
     def open_line(self):
         """
-        RET: Split line at point, replace line in buffer at dot
+        Split line at point, replace line in buffer at dot
         with its prefix, append suffix after line at dot.
         """
         prefix = self.line[:self.point]
@@ -89,7 +89,7 @@ class Console(console.Console):
 
     def del_or_join_prev(self):
         """
-        DEL or BS: If point is not at start of line, delete preceding character
+        If point is not at start of line, delete preceding character
         Otherwise join to previous line.  At start of first line do nothing.
         """
         if self.point > 0:
@@ -116,7 +116,7 @@ class Console(console.Console):
 
     def del_or_join_next(self):
         """
-        ^D: If point is not at end of line, delete character under cursor.
+        If point is not at end of line, delete character under cursor.
         Otherwise join next line to this one.  At end of last line do nothing.
         """
         if self.point < len(self.line):
@@ -136,7 +136,7 @@ class Console(console.Console):
 
     def prev_line(self):
         """
-        ^P, up arrow: Move cursor from current line in window to same
+        Move cursor from current line in window to same
         column in line above, or end of line - whichever comes first.
         When cursor would leave top, redraw window with current line in middle
         Replace current line in buffer and copy preceding buffer line into line
@@ -144,36 +144,36 @@ class Console(console.Console):
         self.goto_line(ed.buf.dot-1, self.point)
 
     def next_line(self):
-        '^N, down arrow: Like prev_line, but line below/bottom'
+        'Like prev_line, but line below/bottom.'
         self.goto_line(ed.buf.dot+1, self.point)
 
     def page_down(self):
-        '^V, page down.'
+        'Move cursor forward several/many lines.'
         dest = min(ed.buf.dot + ed.buf.npage, ed.buf.nlines())
         self.goto_line(dest, self.point)
 
     def page_up(self):
-        '^C (for now, change to M_v later) - page up'
+        'Move cursor backward several/many lines.'
         dest = max(ed.buf.dot - ed.buf.npage, 1)
         self.goto_line(dest, self.point)
 
     def search(self):
-        '^S, search forward for previous search string'
+        'Search forward for previous search string.'
         self.goto_line(ed.F(''), self.point)
 
     def rsearch(self):
-        '^R, search backward for previous search string'
+        'Search backward for previous search string.'
         self.goto_line(ed.R(''), self.point)
 
     def set_mark(self):
-        '^@, set mark. ^space also works as ^@ on many terminals'
+        'Define region from mark (inclusive) to dot (exclusive) that is deleted by cut'
         ed.buf.mark['@'] = ed.buf.dot
         frame.put_command_cursor()
         util.putstr('Mark set\n')
         frame.put_display_cursor() # Or display.put_cursor(wdot,1) ?
 
     def exchange(self):
-        '^Q, exchange point and mark'
+        'Exchange point and mark (to make mark visible by putting cursor there).'
         if '@' in ed.buf.mark:
             frame.win.clear_marker(ed.buf.dot)
             ed.buf.dot, ed.buf.mark['@'] = ed.buf.mark['@'], ed.buf.dot
@@ -182,9 +182,9 @@ class Console(console.Console):
 
     def cut(self):
         """
-        ^W, delete from mark to line before dot, store deleted text in paste buffer
-        If no mark, do nothing
-        If mark follows dot, delete from dot to one before mark, reassign dot
+        Delete from mark to line before dot, store deleted text in paste buffer.
+        If no mark, do nothing.
+        If mark follows dot, delete from dot to one before mark, reassign dot/
         """
         if '@' in ed.buf.mark:
             start = ed.buf.mark['@']
@@ -195,16 +195,29 @@ class Console(console.Console):
             if check.range_ok(ed.buf, start, end):
                 ed.buf.d(start, end)
                 frame.put_display_cursor()
+                self.inline_yank = False
         # FIXME? else: "The mark is not set now, so there is no region"
 
-    def paste(self):
-        '^Y, (yank) insert text from paste buffer'
-        ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
-        ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
-        frame.put_display_cursor()
+    def kill(self):
+        super().kill()
+        self.inline_yank = True
+
+    def discard(self):
+        super().discard()
+        self.inline_yank = True
+
+    def yank(self):
+        if ed.command_mode or self.inline_yank == True:
+            # Insert string from self.yank_buffer at point.
+            super().yank()
+        else: 
+            # Insert lines from Buffer class cut_buffer before dot.
+            ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
+            ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
+            frame.put_display_cursor()
 
     def other_window(self):
-        '^O, other window, next in sequence'
+        'Move cursor to other window, next in sequence.'
         ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
         edsel.do_window_command('') # reassign win, ed.buf, call update(Op.next)
         self.line = ed.buf.lines[ed.buf.dot].rstrip() # from several methods
@@ -215,14 +228,14 @@ class Console(console.Console):
         display.put_cursor(wdot, 1)
 
     def status(self):
-        '^T handler, override base class, print items used by del_or_join_next'
+        '^T handler, override base class, for now print items used by del_or_join_next'
         util.putstr('%s.%s point %s len %s dot %s nlines %s' %
                     (self.line[:self.point], self.line[self.point:],
                      self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
 
     def execute(self):
         """
-        ^X, execute command: cursor moves to command line, prompt appears,
+        Execute command: cursor moves to command line, prompt appears,
         then type any ed/edo/edsel command, then type RET to return to display
         mode (without having to type C then RET).  The command can simply be a
         line address: a line number, $ (end), a search string in /.../ etc
@@ -236,31 +249,32 @@ class Console(console.Console):
         # instead, which returns immediately to display mode.
 
     def accept_eden_command(self):
-        'After execute() above, execute the line, then return to display mode'
+        'After execute() above, execute the line, then return to display mode.'
         self.collecting_command = False
         self.process_command()
         terminal.set_char_mode()
         self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
     def cancel_eden_command(self):
-        'After execute() above, discard the line, then return to display mode'
+        'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         # self.process_command()
-        # next two lines from console discard, ^U handler:
+        # next two lines from discard method
         self.move_beginning()
         display.kill_line()
         terminal.set_char_mode()
         self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
     def crash(self):
-        '^K for now just crash' # FIXME - ^K is now console kill line
+        'For now, just crash' # FIXME - not used, ^K is now console kill line
         return 1/0  # raise exception on demand (crash), for testing
 
     def init_eden_keymaps(self):
         self.display_keys = {
             keyboard.C_c: self.page_up,
             keyboard.C_d: self.del_or_join_next,
-            # keyboard.C_k: self.crash, # FIXME ^K is console kill line
+            # keyboard.C_k: self.crash, # FIXME? Now ^K is kill
+            keyboard.C_k: self.kill,
             keyboard.C_l: self.refresh,
             keyboard.C_n: self.next_line,
             keyboard.C_o: self.other_window,
@@ -268,11 +282,13 @@ class Console(console.Console):
             keyboard.C_q: self.exchange,
             keyboard.C_r: self.rsearch,
             keyboard.C_s: self.search,
+            keyboard.C_u: self.discard,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,
             keyboard.C_x: self.execute,
-            keyboard.C_y: self.paste, # yank
+            keyboard.C_y: self.yank,
             keyboard.C_z: self.command_mode,
+            # ^space also works as ^@ on many terminals
             keyboard.C_at: self.set_mark,
             keyboard.cr: self.open_line,
             keyboard.up: self.prev_line,

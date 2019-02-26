@@ -53,6 +53,9 @@ Use the command *python3 -m edsel -h* to print help.
 *emacs*.  It divides its display into two main regions: a scrolling
 command region at the bottom, and above it a *frame* that holds one
 or more windows that show the contents of editor buffers.
+One of the windows is the *current window* that shows where commands
+take effect.  The current window always shows a *cursor* or *marker* that
+shows where the next insertion or deletion will take place.
 
 The command region behaves like a terminal running *ed*: you type a
 command, *edsel* prints the response, and any preceding commands and
@@ -86,7 +89,8 @@ within your current line in any way provided by your Python's
 (that you have already finished by typing RETURN).  When you are done,
 type a period at the start of a line to exit input mode.  Then *edsel*
 puts the cursor back in the command region for you to type another
-command.
+command.  A marker remains in the window where the cursor was, to show
+where subsequent commands will take effect.
 
 Conventional full-screen display editing is provided by *[eden](eden.md)*,
 a more complete editor that is based on *edsel*.
@@ -142,7 +146,8 @@ command:
 
 The *L* command refreshes the entire frame including all windows, and
 also the command line in the scrolling region.  This command can be
-used to recover if display contents get corrupted.
+used to recover if display contents get corrupted or out of synch with
+buffer contents.
 
 ## Script commands ##
 

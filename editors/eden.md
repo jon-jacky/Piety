@@ -70,10 +70,10 @@ formed by typing the *esc* or *alt* keys.   These are the control key commands
     ^F  move cursor (f)orward one character
     ^G  cancel ^X command in progress
     ^H  delete character before cursor
-    ^I
-    ^J
-    ^K  delete (kill) line from cursor to end, save in paste buffer
-    ^L  refresh screen (useful if screen has become garbled with control characters)
+    ^I  tab, go to first tab stop, or insert 4 spaces
+    ^J  (j)ump cursor forward to beginning of next word
+    ^K  delete (kill) from cursor to end of line, save in paste buffer
+    ^L  refresh screen (useful after screen is marked by ^T output etc.)
     ^M  open new line below, or break line at cursor
     ^N  move cursor down to (n)ext line
     ^O  move cursor to (o)ther window, next in sequence
@@ -81,12 +81,12 @@ formed by typing the *esc* or *alt* keys.   These are the control key commands
     ^Q  exchange mark and dot (to show where they are)
     ^R  search backwards (reverse) for previously entered search string
     ^S  search forwards for previously entered search string
-    ^T  move cursor forward one word (not yet implemented)
-    ^U  delete entire line, save in paste buffer
+    ^T  print status 
+    ^U  discard from start of line to cursor, save in paste buffer
     ^V  move cursor forward one page (page down)
-    ^W  delete from mark (included) to dot (excluded), save in paste buffer
+    ^W  delete lines from mark (included) to dot (excluded), save in paste buffer
     ^X  enter and execute ed or edsel command, then return to display mode
-    ^Y  paste or (y)ank text removed by last ^W, ^K, or ^U, or by ed d command etc.
+    ^Y  insert (paste or (y)ank) contents last deleted by ^K, ^U, or ^W
     ^Z  exit display editing and return to command mode
 
 These are the dedicated function keys:

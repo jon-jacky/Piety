@@ -83,7 +83,8 @@ class Console(object):
         self.keymap = self.init_keymaps() # define below, minimize clutter here
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
-        self.yank_buffer = ''  # string from previous ^K kill or ^U discard
+        self.yank_buffer = '' # string previously deleted by kill or discard
+        self.tab_spaces = 4   # FIXME? Parametrize with optional arg?
 
     # Piety Session switch method requires job has method named resume
     def resume(self, *args, **kwargs):
@@ -283,15 +284,14 @@ class Console(object):
             display.forward_char()
         
     def redraw(self):
-        'redraw line'
+        'Redraw line'
         display.move_to_column(self.start_col)
         self.point = len(self.line)
         util.putstr(self.line)
         display.kill_line() # remove any leftover text past self.line
 
-
     def kill(self):
-        '^K, delete line from point to end-of-line'
+        'Delete line from point to end-of-line'
         killed_segment = self.line[self.point:]
         if killed_segment: # Do not overwrite yank buffer with empty segment
             self.yank_buffer = killed_segment
@@ -299,7 +299,7 @@ class Console(object):
         display.kill_line()
 
     def discard(self): # name like gnu readline unix-line-discard
-        '^U, delete line from start-of-line to point'
+        'Delete line from start-of-line to point'
         killed_segment = self.line[:self.point]
         if killed_segment: # Do not overwrite yank buffer with empty segment
             self.yank_buffer = killed_segment
@@ -308,13 +308,25 @@ class Console(object):
         util.putstr(self.line)
         display.kill_line() # remove any leftover text past self.line
         self.move_beginning() # replace cursor again
-
+ 
     def yank(self):
-        '^J, paste string previously ^K killed or ^U discarded'
+        'Paste (yank) string previously deleted by kill or discard'
         self.line = (self.line[:self.point] + self.yank_buffer +
                       self.line[self.point:])
         self.point += len(self.yank_buffer)
         display.insert_string(self.yank_buffer)
+
+    def tab(self):
+        'Insert spaces'
+        # FIXME? If at start of line, fill with spaces to first tab stop
+        self.line = (self.line[:self.point] + ' '*self.tab_spaces +
+                      self.line[self.point:])
+        self.point += len(self.yank_buffer)
+        display.insert_string(self.yank_buffer)        
+
+    def forward_word(self):
+        'Jump to start of next word (not end of next word like in emacs)'
+        pass
 
     def status(self):
         '^T handler, can override this method with custom handlers in subclasses'
@@ -345,23 +357,27 @@ class Console(object):
             printable: self.insert_char,
 
             # any keycode that maps to accept_line exits from line entry/edit
-            keyboard.cr: self.accept_line, # but don't add to history
+            keyboard.cr: self.accept_line, # but don't add to history, C_m
             keyboard.C_c: self.interrupt,
 
             # line editing
-            keyboard.bs: self.backward_delete_char,
+            keyboard.bs: self.backward_delete_char, # C_h
             keyboard.delete: self.backward_delete_char,
+            keyboard.tab: self.tab, # C_i
             keyboard.C_a: self.move_beginning,
             keyboard.C_b: self.backward_char,
             keyboard.C_d: self.delete_char,
             keyboard.C_e: self.move_end,
             keyboard.C_f: self.forward_char,
+            # keyboard.C_h is keyboard.bs above
+            # keyboard.C_i is keyboard.tab above
+            keyboard.C_j: self.forward_word,
             keyboard.C_k: self.kill,
             keyboard.C_l: self.redraw,
+            # keyboard.C_m is keyboard.cr above
             keyboard.C_t: self.status,
             keyboard.C_u: self.discard,
-            keyboard.C_j: self.yank,
-
+            keyboard.C_y: self.yank,
             # These keys are multicharacter control sequences
             # require keyboard that sends ANSI control sequences
             # and keyboard reader that handles multicharacter keycodes
@@ -373,7 +389,7 @@ class Console(object):
         # This command mode keymap requires a video terminal with arrow keys.
         self.command_keys = {
             # Any keycode that maps to accept_command is a command terminator.
-            keyboard.cr: self.accept_command, # add to history, possibly exit
+            keyboard.cr: self.accept_command, # C_m, add to history, possibly exit
             keyboard.C_n: self.next_history,
             keyboard.C_p: self.previous_history,
             keyboard.up: self.previous_history,
