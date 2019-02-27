@@ -2,12 +2,15 @@
 eden - Full screen display editing, with screen editing keys defined
         in a new Console subclass.
 """
-
+        
+import re
 import util, terminal
 import keyboard, display, console, check, edsel, frame, wyshka, samysh
 from updates import Op
 
 ed = edsel.edo.ed  # so we can use it without prefix
+
+next_text = re.compile(r'\s\S') # White space char then non-white space char
 
 class Console(console.Console):
     'Console subclass that adds methods and keymaps for screen editing'
@@ -16,10 +19,10 @@ class Console(console.Console):
         self.keymap = self.init_eden_keymaps()
         self.clear_line = True # used by restart method
         self.collecting_command = False # used by execute, accept methods
-        
-    # The following methods override methods in console.Console
 
-    def restart(self): # add _hide so we just run super() instead
+    # The following methods override methods in console.Console
+    
+    def restart(self):
         'Prepare to collect a command string in self.line'
         if self.clear_line: # default case, usually True
             super().restart() # clear self.line=''; show prompt; set_char_mode
@@ -47,7 +50,7 @@ class Console(console.Console):
         win.clear_marker(win.buf.dot)
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
-
+        
     def command_mode(self):
         'Replace current line in buffer and resume command mode.'
         # Based on ed.py append and '.' handling, Console accept_line method.
@@ -81,7 +84,7 @@ class Console(console.Console):
         self.point = 0
         self.start_col = 1
         frame.put_display_cursor()
-
+        
         # buf.a() update moved cursor so we have to put it back.FIXME?Redundant?
         win = frame.win
         wdot = win.wline(win.buf.dot)
@@ -103,7 +106,7 @@ class Console(console.Console):
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
-
+            
     def join_next(self):
         'Helper - join next line to this one. At last line do nothing.'
         if ed.buf.dot < ed.buf.nlines():
@@ -113,7 +116,7 @@ class Console(console.Console):
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
-
+            
     def del_or_join_next(self):
         """
         If point is not at end of line, delete character under cursor.
@@ -123,7 +126,7 @@ class Console(console.Console):
             self.delete_char()
         else:
             self.join_next()
-
+            
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
             ed.buf.replace(ed.buf.dot, self.line + '\n')
@@ -210,11 +213,35 @@ class Console(console.Console):
         if ed.command_mode or self.inline_yank == True:
             # Insert string from self.yank_buffer at point.
             super().yank()
-        else: 
+        else:
             # Insert lines from Buffer class cut_buffer before dot.
             ed.buf.x(ed.buf.dot-1) # ed x appends, eden ^Y inserts
             ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
             frame.put_display_cursor()
+
+    def prev_indent(self, prev_line):
+        """
+        Return indentation level: index of first non-whitespace character
+        in nearest non-empty preceding line, working back from prev_line.
+        Also return that line number, 0 means no preceding non-empty lines
+        """
+        indent = self.n_tab_spaces # default
+        match = None
+        while not match and prev_line > 0:
+            match = next_text.search(ed.buf.lines[prev_line], 0)
+            if match:
+                indent = match.start()+1
+            else:
+                prev_line -= 1
+        return indent, prev_line
+
+    def tab(self):
+        'For first tab stop, try to match indentation of preceding line'
+        if self.point == 0:
+            indent, _ = self.prev_indent(ed.buf.dot - 1)
+        else:
+            indent = self.n_tab_spaces
+        tab_n(indent)
 
     def other_window(self):
         'Move cursor to other window, next in sequence.'

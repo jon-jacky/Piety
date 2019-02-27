@@ -5,13 +5,14 @@ console.py - Console class, a wrapper that adapts console applications
  similar to readline.  Provides hooks for job control.
 """
 
-import sys, string
+import sys, string, re
 import util, terminal, keyboard, display, key
 from piety import State
 
 # used by keymaps, below
 printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
+next_word = re.compile(r'\W\w') # Non-word char then word char
 
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
@@ -20,7 +21,8 @@ class Console(object):
                  process_line=(lambda line: None),
                  stopped=(lambda line: False),
                  startup=(lambda: None), cleanup=(lambda: None),
-                 start=(lambda: None), exit=(lambda: None)):
+                 start=(lambda: None), exit=(lambda: None),
+                 n_tab_spaces=4):
         """
         All arguments are optional keyword arguments with defaults.
 
@@ -68,7 +70,7 @@ class Console(object):
         """
         self.name = name
         self.prompt = prompt # can be other prompt or '' in other modes
-        self.reader = reader # callable, reads char(s) to build line 
+        self.reader = reader # callable, reads char(s) to build line
         self.process_line = (lambda: process_line(self.line))
         self.stopped = (lambda: stopped(self.line))
         self.line = '' # empty line at beginning of cycle
@@ -84,7 +86,7 @@ class Console(object):
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
         self.yank_buffer = '' # string previously deleted by kill or discard
-        self.tab_spaces = 4   # FIXME? Parametrize with optional arg?
+        self.n_tab_spaces = n_tab_spaces
 
     # Piety Session switch method requires job has method named resume
     def resume(self, *args, **kwargs):
@@ -282,9 +284,16 @@ class Console(object):
         if self.point < len(self.line):
             self.point += 1
             display.forward_char()
-        
+
+    def forward_word(self):
+        'Move to next beginning of word, not next char (space) after word'
+        m = next_word.search(self.line, self.point)
+        if m:
+            self.point = m.start()+1
+            self.move_to_point()
+
     def redraw(self):
-        'Redraw line'
+        'Refresh line'
         display.move_to_column(self.start_col)
         self.point = len(self.line)
         util.putstr(self.line)
@@ -316,17 +325,16 @@ class Console(object):
         self.point += len(self.yank_buffer)
         display.insert_string(self.yank_buffer)
 
-    def tab(self):
-        'Insert spaces'
-        # FIXME? If at start of line, fill with spaces to first tab stop
-        self.line = (self.line[:self.point] + ' '*self.tab_spaces +
-                      self.line[self.point:])
-        self.point += len(self.yank_buffer)
-        display.insert_string(self.yank_buffer)        
+    def tab_n(self, n_spaces):
+        'Insert n spaces at point'
+        spaces = ' ' * n_spaces
+        self.line = self.line[:self.point] + spaces + self.line[self.point:]
+        self.point += self.n_tab_spaces
+        display.insert_string(spaces)
 
-    def forward_word(self):
-        'Jump to start of next word (not end of next word like in emacs)'
-        pass
+    def tab(self):
+        'Insert standard number of spaces at point'
+        self.tab_n(self.n_tab_spaces)
 
     def status(self):
         '^T handler, can override this method with custom handlers in subclasses'
@@ -363,14 +371,14 @@ class Console(object):
             # line editing
             keyboard.bs: self.backward_delete_char, # C_h
             keyboard.delete: self.backward_delete_char,
-            keyboard.tab: self.tab, # C_i
+            keyboard.htab: self.tab, # C_i
             keyboard.C_a: self.move_beginning,
             keyboard.C_b: self.backward_char,
             keyboard.C_d: self.delete_char,
             keyboard.C_e: self.move_end,
             keyboard.C_f: self.forward_char,
             # keyboard.C_h is keyboard.bs above
-            # keyboard.C_i is keyboard.tab above
+            # keyboard.C_i: self.tab, # C_i is htab above
             keyboard.C_j: self.forward_word,
             keyboard.C_k: self.kill,
             keyboard.C_l: self.redraw,
@@ -405,7 +413,7 @@ class Console(object):
 
         # Combine the keymaps - command mode adds several keys to input mode,
         #  also reassigns method for keyboard.cr (RET key).
-        # job_control_keys replaces ^D del in input_keymap with eof 
+        # job_control_keys replaces ^D del in input_keymap with eof
         #  and adds ^Z suspend.
         # This keymap is the default that __init__ assigns to self.keymap.
         # Be sure to preserve original input_keymap, we use it in input mode

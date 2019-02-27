@@ -30,9 +30,9 @@ or
 
 When *eden* starts up, it resembles *edsel*, with a command prompt in
 the scrolling region at the bottom of the terminal window.  You must
-use *ed* and *edsel* [commands](ed.txt) to read and write files, and
-to manage buffers and windows. You may also use *ed* commands to edit
-the text.
+use [ed commands](ed.txt) to read and write files, and to manage
+buffers. You may also use *ed* commands to edit the text.  You must
+used [edsel commands](edsel.txt) to manage windows.
 
 **eden** adds a command *C* to switch from command mode to display
 editing mode (that's capital *C*, case is significant).  In display
@@ -59,7 +59,7 @@ editing.  Therefore, *^X* can act as a search command: type *^X* then
 
 **eden** provides scripting through
 [samysh](../shells/samysh.md). Scripts can include control characters
-that invoke display editing commands.
+that invoke display editing commands (see [here](../test/eden/test.py)).
 
 ## Display Editing Commands ##
 
@@ -68,8 +68,8 @@ down the control key while typing the named key.  Control characters
 are case insensitive; *^A* is the same as *^a*.  A few display editing
 commands are also bound to dedicated function keys on the keyboard.
 
-These are the control characters and function keys, and the display
-editing commands bound to them:
+These are the control characters, and the display editing commands
+bound to them:
 
     ^@  set mark, mark (included) to dot (excluded) defines region cut by ^W
     ^space  set mark, like ^@
@@ -100,16 +100,16 @@ editing commands bound to them:
     ^Y  insert (paste or (y)ank) contents last deleted by ^K kill, ^U discard, or ^W cut
     ^Z  exit display editing and return to command mode
 
-These are the dedicated function keys:
+These are the dedicated function keys and their commands
 
     return  open new line below, or break line at cursor (same as ^M)
     delete  delete character before cursor (same as ^H)
     backspace  delete character before cursor (same as ^H)
-    tab insert spaces
-    left (arrow key) move cursor back one character
-    right (arrow key) move cursor forward one character
-    up   (arrow key) move cursor up to previous line
-    down (arrow key) move cursor down to next line
+    tab insert spaces (same as ^I)
+    left (arrow key) move cursor back one character (same as ^B)
+    right (arrow key) move cursor forward one character (same as ^F)
+    up   (arrow key) move cursor up to previous line (same as ^P)
+    down (arrow key) move cursor down to next line (same as ^N)
 
 ## Editing Commmand Lines ##
 
@@ -141,15 +141,17 @@ during *^X* commmands.
 
 ## Limitations ##
 
-**eden** is *ed.py* underneath.  In display editing mode, you can
-insert or delete characters anywhere, but some commands are still
-line-oriented.
+**eden** is *ed.py* underneath.  In display editing mode, you can put
+the cursor and insert or delete characters anywhere, but some commands
+are still line-oriented.
+
+All *ed* commands leave the cursor at the beginning of the line.
 
 Search commands only find the line containing the search string.  They
 leave the cursor at the beginning of that line, not at the search
 string within the line.  
 
-Some other commands also leave the cursor at the beginning of the
+Some display editing commands also leave the cursor at the beginning of the
 line.  For example, the *C* command that enters (or re-enters) display
 editing mode, the *^X* command that enters and executes a single
 command line, and the *^O* command that moves the cursor to the next
@@ -173,7 +175,7 @@ commands to inline mode, while *^W* toggles *^Y* to multiline mode.
 
 All display editing commands are bound to single control characters.
 *eden* does not support sequences of multiple control characters, or
-"meta" characters formed by typing the *esc* or *alt* keys.  We have
+*meta* characters formed by typing the *esc* or *alt* keys.  We have
 bound a command to every control character, so no more display editing
 commands can be added to *eden*.  Any additional functionality must 
 be provided at the command line, reached through *^X* or *^Z*.
