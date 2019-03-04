@@ -113,7 +113,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         win.buf = buffer
         win.locate_segment(win.buf.dot)
         win.saved_dot = win.buf.dot
-        win.update_status()
+        win.reupdate()
 
     # Change buffer in current window, ed b E D
     elif op == Op.select:
@@ -233,6 +233,6 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Then we can call standard Python input() or Piety Console restart().
     if mode == Mode.command:
         put_command_cursor(column=column) # background task can set column
-    # But caller calls put_display_cursor because caller knows column 
-        
+    # But caller calls put_display_cursor because caller knows column
+
     return win # caller might need to know which window was selected

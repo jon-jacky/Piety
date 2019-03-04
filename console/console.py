@@ -329,7 +329,7 @@ class Console(object):
         'Insert n spaces at point'
         spaces = ' ' * n_spaces
         self.line = self.line[:self.point] + spaces + self.line[self.point:]
-        self.point += self.n_tab_spaces
+        self.point += n_spaces
         display.insert_string(spaces)
 
     def tab(self):

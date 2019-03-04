@@ -2,7 +2,7 @@
 eden - Full screen display editing, with screen editing keys defined
         in a new Console subclass.
 """
-        
+
 import re
 import util, terminal
 import keyboard, display, console, check, edsel, frame, wyshka, samysh
@@ -152,12 +152,12 @@ class Console(console.Console):
 
     def page_down(self):
         'Move cursor forward several/many lines.'
-        dest = min(ed.buf.dot + ed.buf.npage, ed.buf.nlines())
+        dest = min(ed.buf.dot + frame.win.nlines - 1, ed.buf.nlines())
         self.goto_line(dest, self.point)
 
     def page_up(self):
         'Move cursor backward several/many lines.'
-        dest = max(ed.buf.dot - ed.buf.npage, 1)
+        dest = max(ed.buf.dot - frame.win.nlines + 1, 1)
         self.goto_line(dest, self.point)
 
     def search(self):
@@ -241,7 +241,7 @@ class Console(console.Console):
             indent, _ = self.prev_indent(ed.buf.dot - 1)
         else:
             indent = self.n_tab_spaces
-        tab_n(indent)
+        self.tab_n(indent)
 
     def other_window(self):
         'Move cursor to other window, next in sequence.'
