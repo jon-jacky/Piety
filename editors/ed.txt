@@ -8,15 +8,16 @@ ed.py summary.  Commands from classic ed:
  a append lines (enter input mode)
  c change (replace) lines (enter input mode)
  d delete lines
- e read named file into current buffer (replace previous contents)
- E read file into buffer, replace contents even if unsaved changes
+ e read named file into current buffer, unless there are unsaved changes
+ E read named file into current buffer, despite unsaved changes
  f change file name for current buffer
  i insert lines (enter input mode)
  k mark addressed line with single character label
  l go to addressed line and print (default next line)
  m move lines to after destination line
  p print lines
- q quit (exit editor)
+ q quit (exit editor), unless there are unsaved changes
+ Q quit despite unsaved changes
  r read named file, insert lines at current position
  s substitute (search/replace) in lines
  t transfer (copy) lines to after destination line

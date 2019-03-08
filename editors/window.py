@@ -49,9 +49,8 @@ class Window(object):
          ncols - maximum number of characters in a line
         """
         self.top = top
-        self.nlines = nlines 
+        self.nlines = nlines
         self.ncols = ncols
-        self.buf.npage = self.nlines #initial page size for ed z page cmd
 
     def wline(self, iline):
         'Line number on display of iline in buffer.'
@@ -274,7 +273,7 @@ class Window(object):
 
     def update_status(self):
         'Print information about window and its buffer in its status line.'
-        unsaved = '-----**-     ' if self.buf.unsaved else '--------     ' # 13
+        modified = '-----**-     ' if self.buf.modified else '--------     ' # 13
         bufname = '%-13s' % self.buf.name
         dot = self.buf.dot if self.focus else self.saved_dot
         position = (' All ' if self.buf.nlines() <= self.nlines else
@@ -282,7 +281,7 @@ class Window(object):
                     ' Bot ' if self.blast == self.buf.nlines() else
                     ' %2.0f%% ' % (100*dot/self.buf.nlines()))
         linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
-        statustext = unsaved + bufname + position + linenums + '(Text)' 
+        statustext = modified + bufname + position + linenums + '(Text)' 
         nstatus = len(statustext)
         Window.nupdates += 1 # ensure at least this changes in status line
         diagnostics = '  N%6d f%3d n%3d' % \

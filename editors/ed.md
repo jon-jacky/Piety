@@ -78,7 +78,7 @@ can resemble the *ed* command line:
 
 **ed.py** supports these commands from classic *ed*:
 
- *= a c d e E f i j k l m p q r s t w z*
+ *= a c d e E f i j k l m p q Q r s t w z*
 
 **ed.py** supports these commands from *GNU ed*:
 
@@ -145,28 +145,20 @@ at the Python prompt.
 ## Limitations and differences from classic ed and sam ##
 
 **ed.py** does not support these classic *ed* commands: 
-*H h n P Q u wq W*.  Some of these might be supported in the
+*H h n P u wq W*.  Some of these might be supported in the
 future.
 
-**ed.py** supports the *sam* command *n* (print list of buffers),
-not the classic *ed* command *n* (print line numbers).
+**ed.py** does not support the classic *ed* iteration commands *g G v V*.
 
 **ed.py** does not support the classic *ed* *p* command suffix (for
 printing the current line after any command).
 
-**ed.py** does not support the classic *ed* iteration commands *g G v V*.
-
-**ed.py** does not warn about the quit command *q* when there are
-unsaved buffers, because the session with all its buffers can be
-resumed by calling *ed.main()* at the Python interpreter prompt again.
+**ed.py** supports the *sam* command *n* (print list of buffers),
+not the classic *ed* command *n* (print line numbers).
 
 **ed.py** always prints the error message following the *?* character.
 There is no way to suppress printing the error messages as in classic
 *ed*.
-
-The default prompt is the colon *:*, not the empty string.  If no
-prompt is desired, that must be requested with *-p ''* on the command
-line or *p=''* in the *ed* function call.
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
@@ -179,6 +171,13 @@ end).
 
 The *B* (and *D*) commands accept only one file (or buffer) name argument, 
 not multiple names as in *sam*.
+
+The default prompt is the colon *:*, not the empty string.  If no
+prompt is desired, that must be requested with *-p ''* on the command
+line or *p=''* in the *ed* function call.
+
+The *z* command accepts a negative parameter to scroll backward,
+unlike classic *ed*.
 
 ## API ##
 

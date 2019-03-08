@@ -4,7 +4,7 @@ parse.py - command line parsing for ed.py
 
 import re
 
-complete_cmds = 'AbBdDeEfjkKlmnpqrstwxyz' # commands that do not use input mode
+complete_cmds = 'AbBdDeEfjkKlmnpqQrstwxyz' # commands that do not use input mode
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -80,7 +80,6 @@ def command(buf, cmd_string):
      params - string containing other command parameters
     All are optional except cmd_name, assign None if an item is not present
     """
-    global D_count
     cmd_name, start, end, params = None, None, None, None
     # look for start addr, optional. if no match start,tail == None,cmd_string
     start, tail = line_address(buf, cmd_string)
@@ -102,8 +101,6 @@ def command(buf, cmd_string):
     else:
         print('? command expected at %s' % tail)
         return 'ERROR', start, end, params
-    # special handling for commands that must be repeated to confirm
-    D_count = 0 if cmd_name != 'D' else D_count
     # command-specific parameter parsing
     if cmd_name == 's' and len(params.split('/')) == 4: #s/old/new/g,g optional
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent

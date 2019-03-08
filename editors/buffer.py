@@ -26,9 +26,8 @@ class Buffer(object):
         self.lines = [''] # text in current buffer, a list of strings
         self.dot = 0 # index of current line, 0 when buffer is empty
         self.filename = None # file name (string) to read/write buffer contents
-        self.unsaved = False # True if buffer contains unsaved changes
+        self.modified = False # True if buffer contains unsaved changes
         self.pattern = '' # search string - default '' matches any line
-        self.npage = 22 # page length used, optionally set by z scroll command
         self.mark = dict() # dict from mark char to line num, for 'c addresses
         self.end_phase = False # control variable used by write method
 
@@ -37,8 +36,8 @@ class Buffer(object):
         return self.dot == 0
 
     def info(self):
-        'return string with unsaved flag, buffer name, size in lines, filename'
-        return ((' * ' if self.unsaved else '   ') +  # reserve col 1 for readonly flag
+        'return string with modified flag, buffer name, size in lines, filename'
+        return ((' * ' if self.modified else '   ') +  # reserve col 1 for readonly flag
                 '%-15s' % self.name + '%7d' % self.nlines() + '  %s' % self.filename)
 
     # write method for other programs (besides editors) to write into buffers
@@ -116,7 +115,7 @@ class Buffer(object):
         self.lines[iline:iline] = lines # sic, insert lines at this position
         nlines = len(lines)
         self.dot = iline + nlines - 1
-        self.unsaved = True # usually the right thing but ed.B .E override it.
+        self.modified = True # usually the right thing but ed.B .E override it.
         # adjust line numbers for marks below the insertion point
         for c in self.mark:
             if self.mark[c] >= iline:
@@ -132,7 +131,7 @@ class Buffer(object):
             self.a(iline, line)
         else:
             self.lines[iline] = line
-        self.unsaved = True
+        self.modified = True
         # No update needed when line is edited in place on screen
 
     # files
@@ -157,7 +156,7 @@ class Buffer(object):
         with open(name, 'w') as fd:
             for line in self.lines[1:]: # don't print empty line 0
                 fd.write(line)
-        self.unsaved = False
+        self.modified = False
 
     # displaying and navigating text
 
@@ -187,7 +186,7 @@ class Buffer(object):
         'Delete text from start up through end'
         self.y(start, end) # yank (copy, do not remove) lines to cut buffer
         self.lines[start:end+1] = [] # ed range is inclusive, unlike Python
-        self.unsaved = True
+        self.modified = True
         if self.lines[1:]: # retain empty line 0
             # first line after deletes, or last line in buffer
             self.dot = min(start,self.nlines()) # nlines() if we del end of buf
@@ -236,7 +235,7 @@ class Buffer(object):
                 self.lines[i] = self.lines[i].replace(old,new, -1 if glbl 
                                                       else 1)
                 self.dot = i
-                self.unsaved = True
+                self.modified = True
         # Update.end and .destination are last line actually changed
         view.update(Op.mutate, buffer=self, origin=origin,
                       start=start, end=self.dot, destination=self.dot)
@@ -263,5 +262,5 @@ class Buffer(object):
         nlines = (end-start) + 1
         # start, end refer to origin *before* move
         # now dest must be adjusted to refer to destination *after* move
-        dest = (dest+1) - nlines if start < dest else dest+1 
-        self.y(dest) # d then y maintain self.mark
+        dest = dest - nlines if start < dest else dest
+        self.x(dest) # d then x maintain self.mark

@@ -203,10 +203,12 @@ class Console(console.Console):
 
     def kill(self):
         super().kill()
+        ed.buf.modified = True
         self.inline_yank = True
 
     def discard(self):
         super().discard()
+        ed.buf.modified = True
         self.inline_yank = True
 
     def yank(self):
@@ -242,6 +244,7 @@ class Console(console.Console):
         else:
             indent = self.n_tab_spaces
         self.tab_n(indent)
+        ed.buf.modified = True
 
     def other_window(self):
         'Move cursor to other window, next in sequence.'

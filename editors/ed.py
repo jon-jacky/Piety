@@ -33,12 +33,12 @@ def S(): # looks like ed $
 # helper functions: search
 
 def F(pattern):
-    """Forward Search for pattern, 
+    """Forward Search for pattern,
     return line number where found, dot if not found"""
     return buf.F(pattern)
 
 def R(pattern):
-    """Backward search for pattern, 
+    """Backward search for pattern,
     return line number where found, dot if not found"""
     return buf.R(pattern)
 
@@ -46,7 +46,7 @@ def R(pattern):
 
 def match_prefix(prefix, names):
     """
-    If prefix ends with -, return name (if any) that matches, 
+    If prefix ends with -, return name (if any) that matches,
     otherwise return same prefix.  'Poor person's tab completion'.
     """
     if isinstance(prefix, str) and prefix.endswith('-'): # might be None
@@ -131,11 +131,11 @@ def E(*args):
         return
     buf.d(1, buf.nlines())
     r(0, filename)
-    buf.unsaved = False
+    buf.modified = False
 
 def e(*args):
     'read in file, replace buffer contents unless unsaved changes'
-    if buf.unsaved:
+    if buf.modified:
         print('? warning: file modified')
         return
     E(*args)
@@ -154,7 +154,7 @@ def B(*args):
     create_buf(bufname)
     buf.filename = filename
     r(0, filename)
-    buf.unsaved = False # insert in r sets unsaved = True, this is exception
+    buf.modified = False # insert in r sets modified = True, this is exception
 
 def w(*args):
     'write current buffer contents to file name'
@@ -185,11 +185,11 @@ def DD(*args):
 D_count = 0 # number of consecutive times D command has been invoked
 
 def D(*args):
-    'Delete the named buffer, if unsaved changes print message and exit'
+    'Delete the named buffer, but if unsaved changes print message and exit'
     global D_count
     _, _, bufname, _ = parse.arguments(args)
     name = bufname if bufname else current
-    if name in buffers and buffers[name].unsaved and not D_count:
+    if name in buffers and buffers[name].modified and not D_count:
         print('? unsaved changes, repeat D to delete')
         D_count += 1 # must invoke D twice to confirm, see message below
         return
@@ -234,36 +234,42 @@ def p_lines(start, end, destination): # arg here shadows global destination
         print(buf.l(iline), file=destination) # file can be null or stdout or..
 
 def p(*args):
-    'Print lines from start up to end, leave dot at last line printed'
+    'Print lines from start through end, leave dot at last line printed'
     valid, start, end, _, _ = check.irange(buf, args)
     if valid:
         p_lines(start, end, sys.stdout) # print unconditionally
-    
+
+npage = 22 # n of lines printed by z command, can be changed by optional param
+
 def z(*args):
     """
-    Scroll: print buf.npage lines, scroll backwards if npage is negative.
-    If parameter is present, update buf.npage
+    Scroll: print npage lines. If parameter is present, update npage.
     If npage is non-negative, start at iline, leave dot at last line printed.
-    if npage is negative, start at iline+npage, leave dot at first line printed
+    If iline arg is not given (that's typical), set iline to dot+1 not dot
+     like classic ed, so repeated z commands print with no repeated lines
+    if npage is negative, scroll back up (not supported in classic ed):
+     start at iline+npage (preceding iline), leave dot at first line printed.
     """
+    global npage
     valid, iline, npage_string = check.iline_valid(buf, args)
-    if valid: 
+    if valid:
         if npage_string:
             try:
                 npage = int(npage_string)
             except:
                 print('? integer expected at %s' % npage_string)
-                return 
-            buf.npage = npage
-        if buf.npage >= 0:
-            end = iline + buf.npage 
+                return
+        if npage >= 0:
+            if not args or isinstance(args[0],str): # args[0] might be npage
+                iline = buf.dot + 1
+            end = iline + npage - 1
         else:
-            end = iline
-            iline += buf.npage # npage negative, go backward
+            end = iline - 1
+            iline += npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= buf.nlines() else buf.nlines()
         p_lines(iline, end, view.lz_print_dest)
-        if buf.npage < 0:
+        if npage < 0:
             buf.dot = iline
 
 # command functions: adding, changing, and deleting text
@@ -372,10 +378,21 @@ def K(): return 1/0  # raise exception on demand (crash), for testing
 
 quit = False
 
-def q(*args):
-    'exit from main loop'
+def Q():
+    'Quit ed, despite unsaved changes'
     global quit
     quit = True
+
+q_count = 0
+
+def q(*args):
+    'Quit ed, unless unsaved changes'
+    global q_count
+    if any([buffers[b].modified for b in buffers]) and not q_count:
+        print('? unsaved changes, repeat q to quit')
+        q_count += 1 # must invoke q twice to confirm
+        return
+    Q()
 
 # Variables that must persist between do_command invocations, imported elsewhere
 command_prompt = ':' # might be reassigned by startup() from -p option
@@ -385,11 +402,11 @@ prompt = command_prompt
 command_mode = True
 
 def do_command(line):
-    'Process one line without blocking in ed command mode'
-    global command_mode, prompt
+    'Process one line without blocking in ed command mode or input mode'
+    global command_mode, prompt, D_count, q_count
     line = line.lstrip()
     if line and line[0] == '#': # comment, do nothing
-        return 
+        return
     items = parse.command(buf, line)
     if items[0] == 'ERROR':
         return # parse.command already printed error message
@@ -416,7 +433,7 @@ def do_command(line):
             buf.dot = start
             view.update(Op.input) # depends on buf.dot so can't be moved up
         elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
-            buf.dot = start - 1 if start > 0 else 0 
+            buf.dot = start - 1 if start > 0 else 0
             # so we can a(ppend) instead of i(nsert)
             view.update(Op.input) # depends on buf.dot so can't be moved up
         elif cmd_name == 'c': #c(hange) command deletes changed lines first
@@ -427,6 +444,9 @@ def do_command(line):
             print('? command not supported in input mode: %s' % cmd_name)
     else:
         print('? command not implemented: %s' % cmd_name)
+    # special handling for commands that must be repeated to confirm
+    D_count = 0 if cmd_name != 'D' else D_count
+    q_count = 0 if cmd_name != 'q' else q_count
     return
 
 def add_line(line):

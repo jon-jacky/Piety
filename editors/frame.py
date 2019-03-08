@@ -85,6 +85,7 @@ def rescale():
         win_h = (win_hdiv if iwin < nwindows-1 
                  else windows_h - (nwindows-1)*win_hdiv) # including status
         win.resize(frame_top + iwin*win_hdiv, win_h-1, ncols) # -1 excl status
+        win.locate_segment(win.buf.dot if win.focus else win.saved_dot)
     refresh()
 
 def update(op, sourcebuf=None, buffer=None, origin=0, destination=0, 
