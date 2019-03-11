@@ -5,7 +5,7 @@ salysh.py - Defines the pysh Console job that wraps the pysh.py Python shell.
 
 import pysh as repl, console
 
-pysh = console.Console(prompt=(lambda: repl.prompt), do_command=repl.push,
+pysh = console.Console(prompt=(lambda: repl.prompt), process_line=repl.push,
                        stopped=(lambda command: not repl.running),
                        startup=repl.start, cleanup=repl.stop)
 

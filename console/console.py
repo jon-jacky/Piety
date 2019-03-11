@@ -72,7 +72,8 @@ class Console(object):
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build line
         self.process_line = (lambda: process_line(self.line))
-        self.stopped = (lambda: stopped(self.line))
+        self.stopped = (lambda: (self.line in self.job_control_keys) or
+                        stopped(self.line))
         self.line = '' # empty line at beginning of cycle
         self.point = 0 # index into self.line at beginning of cycle
         self.start_col = 1 # index of first col on display, 1-based not 0-based
@@ -108,8 +109,7 @@ class Console(object):
         For testing only; handler() blocks, can only run one Console at a time.
         """
         self.__call__(*args, **kwargs)
-        while not (self.stopped()
-                   or self.line in self.job_control_keys):
+        while not self.stopped():
             self.handler() # blocks in self.reader at each character
         self.stop()
 

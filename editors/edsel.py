@@ -82,8 +82,7 @@ def startup(*filename, **options):
                      end=frame.win.buf.dot)
 
 def cleanup():
-    'Exit editor, restore display screen'
-    ed.q()
+    'Restore display screen'
     frame.update(Op.restore)
 
 def edsel(*filename, **options):

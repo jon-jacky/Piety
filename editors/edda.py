@@ -12,7 +12,7 @@ import edo, wyshka, console
 ed = console.Console(prompt=(lambda: wyshka.prompt), 
                      process_line=edo.process_line,
                      stopped=(lambda command: edo.ed.quit),
-                     startup=edo.startup, cleanup=edo.ed.q)
+                     startup=edo.startup)
 
 ed.keymap = (lambda: (ed.command_keymap 
                       if edo.ed.command_mode
