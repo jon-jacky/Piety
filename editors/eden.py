@@ -282,8 +282,11 @@ class Console(console.Console):
         'After execute() above, execute the line, then return to display mode.'
         self.collecting_command = False
         self.process_command()
-        terminal.set_char_mode()
-        self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+        if self.stopped() and not self.quit: # if .quit, stop() already called
+            self.stop()
+        else:
+            terminal.set_char_mode()
+            self.display_mode(ed.buf.lines[ed.buf.dot].rstrip())
 
     def cancel_eden_command(self):
         'After execute() above, just discard the line, then return to display mode.'

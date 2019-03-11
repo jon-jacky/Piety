@@ -72,8 +72,8 @@ class Console(object):
         self.prompt = prompt # can be other prompt or '' in other modes
         self.reader = reader # callable, reads char(s) to build line
         self.process_line = (lambda: process_line(self.line))
-        self.stopped = (lambda: (self.line in self.job_control_keys) or
-                        stopped(self.line))
+        self.quit = False # True exits to job control, bypassing application
+        self.stopped = (lambda: self.quit or stopped(self.line))
         self.line = '' # empty line at beginning of cycle
         self.point = 0 # index into self.line at beginning of cycle
         self.start_col = 1 # index of first col on display, 1-based not 0-based
@@ -111,7 +111,6 @@ class Console(object):
         self.__call__(*args, **kwargs)
         while not self.stopped():
             self.handler() # blocks in self.reader at each character
-        self.stop()
 
     def handle_key(self, keycode):
         'Call this handle_key as handler when keycode is already available'
@@ -139,10 +138,10 @@ class Console(object):
             self.handle_key(keycode)
 
     # These keys have job control fcn only if they are alone at start of line.
-    # Otherwise they can edit - C_d appears in lineedit_keymap.
+    # Otherwise they can invoke edit methods - C_d appears in lineedit_keymap.
     def ctrl_d(self):
         if self.line == '':
-            self.line = keyboard.C_d # so job control code can find it
+            self.quit = True
             util.putstr('^D')  # no newline, caller handles it.
             self.stop()
         else:
@@ -150,7 +149,7 @@ class Console(object):
 
     def ctrl_z(self):
         if self.line == '':
-            self.line = keyboard.C_z # so job control code can find it
+            self.quit = True
             print('^Z')
             util.putstr('\rStopped') # still in raw mode, print didn't RET
             self.stop()
