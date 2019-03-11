@@ -208,7 +208,7 @@ def A(*args):
 
 def n(*args):
     'Print information about all buffers'
-    print('C M Buffer            Size  File') # C current  M modified (unsaved)
+    print('CRM Buffer             Size  Mode     File') #Current Readonly Modified
     for name in buffers:
         print (('.' if name == current else ' ') + buffers[name].info())
     
@@ -378,7 +378,7 @@ def K(): return 1/0  # raise exception on demand (crash), for testing
 
 quit = False
 
-def Q():
+def Q(*args):
     'Quit ed, despite unsaved changes'
     global quit
     quit = True
@@ -392,7 +392,7 @@ def q(*args):
         print('? unsaved changes, repeat q to quit')
         q_count += 1 # must invoke q twice to confirm
         return
-    Q()
+    Q(*args)
 
 # Variables that must persist between do_command invocations, imported elsewhere
 command_prompt = ':' # might be reassigned by startup() from -p option

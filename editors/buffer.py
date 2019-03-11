@@ -21,6 +21,8 @@ class Buffer(object):
 
     def __init__(self, name):
         'New text buffer'
+        self.mode = 'Text' # other modes to come, maybe
+        self.readonly = False
         self.name = name
         # Buffer always contains empty line at index 0, never used or printed
         self.lines = [''] # text in current buffer, a list of strings
@@ -36,9 +38,11 @@ class Buffer(object):
         return self.dot == 0
 
     def info(self):
-        'return string with modified flag, buffer name, size in lines, filename'
-        return ((' * ' if self.modified else '   ') +  # reserve col 1 for readonly flag
-                '%-15s' % self.name + '%7d' % self.nlines() + '  %s' % self.filename)
+        'return string with flags, name, size in lines, mode, filename'
+        return (('%' if self.readonly else ' ') +
+                ('*' if self.modified else ' ') + 
+                ' %-15s' % self.name + ' %7d' % self.nlines() +
+                '  %-8s' % self.mode + ' %s' % self.filename)
 
     # write method for other programs (besides editors) to write into buffers
     # The call print(s, file=buffer), invokes this method to write s to buffer

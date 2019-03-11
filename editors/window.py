@@ -10,7 +10,7 @@ def clip(iline, first, last):
     return min(max(first, iline), last)
 
 show_marker = True # True in command mode when cursor is not in window
-show_diagnostics = True # on status line
+show_diagnostics = False # on status line - for now, don't show
 
 class Window(object):
     """
@@ -271,9 +271,11 @@ class Window(object):
         else:
             self.reupdate()
 
-    def update_status(self):
-        'Print information about window and its buffer in its status line.'
-        modified = '-----**-     ' if self.buf.modified else '--------     ' # 13
+    def status_text(self):
+        'Return string about window and its buffer for its status line.'
+        current = '----.' if self.focus else '-----'
+        readonly = '%' if self.buf.readonly else '-'
+        modified = '*-     ' if self.buf.modified else '--     '
         bufname = '%-13s' % self.buf.name
         dot = self.buf.dot if self.focus else self.saved_dot
         position = (' All ' if self.buf.nlines() <= self.nlines else
@@ -281,19 +283,29 @@ class Window(object):
                     ' Bot ' if self.blast == self.buf.nlines() else
                     ' %2.0f%% ' % (100*dot/self.buf.nlines()))
         linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
-        statustext = modified + bufname + position + linenums + '(Text)' 
+        mode = '%-10s' % ('(%s)' % self.buf.mode)
+        statustext = (current + readonly + modified + bufname + position + 
+                      linenums + mode)
         nstatus = len(statustext)
-        Window.nupdates += 1 # ensure at least this changes in status line
+        Window.nupdates += 1 # ensure at least this changes in diagnostics
         diagnostics = '  N%6d f%3d n%3d' % \
             (Window.nupdates, self.first, self.nprinted)
         nsuffix = len(diagnostics)
         suffix = diagnostics if show_diagnostics else '-'*nsuffix
         nstrut = self.ncols - (nstatus + nsuffix)
         statustext += '-'*nstrut + suffix
-        display.put_render(self.statusline(), 1, statustext, display.white_bg)
-        self.first = 0    # reset after each update
-        self.nprinted = 0
+        return statustext
 
+    def update_status_line(self, text):
+        'display text on status line with white_bg'
+        display.put_render(self.statusline(), 1, text, display.white_bg)
+
+    def update_status(self):
+        'display status text on status line'
+        self.update_status_line(self.status_text())
+        self.first = 0    # diagnostics, reset after each update
+        self.nprinted = 0
+       
 # The following methods are only used with input mode
 
     def update_for_input(self):
