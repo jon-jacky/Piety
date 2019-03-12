@@ -283,8 +283,9 @@ class Window(object):
                     ' Bot ' if self.blast == self.buf.nlines() else
                     ' %2.0f%% ' % (100*dot/self.buf.nlines()))
         linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
-        mode = '%-10s' % ('(%s)' % self.buf.mode)
-        statustext = (current + readonly + modified + bufname + position + 
+        modetext = '(%s)' % (self.buf.mode,)
+        mode = modetext + '-'*(10 - len(modetext))
+        statustext = (current + readonly + modified + bufname + position +
                       linenums + mode)
         nstatus = len(statustext)
         Window.nupdates += 1 # ensure at least this changes in diagnostics

@@ -205,6 +205,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     elif op == Op.next:
         w0 = win
         w0.release_focus()
+        w0.update_status()
         ifocus = ifocus+1 if ifocus+1 < len(windows) else 0
         win = windows[ifocus]
         win.set_focus()

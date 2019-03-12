@@ -131,7 +131,7 @@ def E(*args):
         return
     buf.d(1, buf.nlines())
     r(0, filename)
-    buf.modified = False
+    buf.modified = False # insert in r sets modified = True, this is exception
 
 def e(*args):
     'read in file, replace buffer contents unless unsaved changes'

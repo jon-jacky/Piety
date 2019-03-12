@@ -56,7 +56,7 @@ def startup(*filename, **options):
 
 def edo(*filename, **options):
     'Top level edo command to invoke from Python REPL or __main__'
-    startup(*filename, **options) # defined above, based on ed.startup
+    startup(*filename, **options)
     while not ed.quit:
         line = input(wyshka.prompt) # blocks!
         process_line(line)

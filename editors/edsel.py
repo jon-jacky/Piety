@@ -71,18 +71,18 @@ def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
     global cmd_h
     if 'c' in options:
-        cmd_h = options['c'] 
+        cmd_h = options['c']
     frame.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
     edo.startup(*filename, **options)
     view.lz_print_dest = view.null # Reassign configs made in edo.startup,
     view.update = frame.update  #  so it can be used by ed and buffer.
     if filename: # update only works now, call based on buf.insert(...)
         frame.update(Op.insert, sourcebuf=frame.win.buf,
-                     destination=frame.win.buf.dot, start=1, 
+                     destination=frame.win.buf.dot, start=1,
                      end=frame.win.buf.dot)
 
 def cleanup():
-    'Restore display screen'
+    'Restore display screen.'
     frame.update(Op.restore)
 
 def edsel(*filename, **options):

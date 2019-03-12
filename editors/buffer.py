@@ -133,7 +133,7 @@ class Buffer(object):
         'replace the line at iline with another single line'
         if self.empty(): # previously empty buffer, must create line
             self.a(iline, line) # sets modified True
-            self.modified = not (line == '\n')
+            self.modified = not (line == '\n') # resets it on empty line only
         else:
             old_line  = self.lines[iline]
             self.lines[iline] = line
