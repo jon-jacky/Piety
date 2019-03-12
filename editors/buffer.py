@@ -131,12 +131,14 @@ class Buffer(object):
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'
-        if iline == 0: # empty buffer
-            self.a(iline, line)
+        if self.empty(): # previously empty buffer, must create line
+            self.a(iline, line) # sets modified True
+            self.modified = not (line == '\n')
         else:
+            old_line  = self.lines[iline]
             self.lines[iline] = line
-        self.modified = True
-        # No update needed when line is edited in place on screen
+            if not (line == old_line):
+                self.modified = True
 
     # files
 

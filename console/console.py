@@ -209,6 +209,7 @@ class Console(object):
 
     def restart(self):
         'Prepare to collect a line'
+        self.quit = False
         self.line = '' # empty line at beginning of cycle
         self.point = 0 # index into self.line at beginning of cycle
         self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
