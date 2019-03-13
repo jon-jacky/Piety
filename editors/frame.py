@@ -88,7 +88,7 @@ def rescale():
         win.locate_segment(win.buf.dot if win.focus else win.saved_dot)
     refresh()
 
-def update(op, sourcebuf=None, buffer=None, origin=0, destination=0, 
+def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
            start=0, end=0, column=1): # display column numbers are 1-based
     'Update the display: one window, several, or the entire frame.'
 
@@ -219,7 +219,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         win.reupdate()
 
     # Split window, new window above becomes current window, edsel o2 command
-    elif op == Op.hsplit: 
+    elif op == Op.hsplit:
         win_top = win.top
         win_nlines = win.nlines // 2
         w0 = win
@@ -230,6 +230,12 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         win.focus = True
         windows.insert(ifocus, win)
         win.reupdate()
+
+    # Update status line for given buffer in all of its windows
+    elif op == Op.status:
+        for w in windows:
+            if w.buf == buffer:
+                w.update_status()
 
     # In command mode put ed command cursor back in scrolling command region.
     # Then we can call standard Python input() or Piety Console restart().

@@ -31,5 +31,6 @@ class Op(Enum):
     # update operations on terminal where frame lives
     restore = 15 # restore full-screen scrolling and put cursor at bottom
     display = 16 # one more mode, in addition to Op.input 8 and Op.command 9
-    
+    status = 17  # update status line for given buffer in all of its windows
+
 background_task = -1  # used in update(Op.input, origin=background_task, ...)

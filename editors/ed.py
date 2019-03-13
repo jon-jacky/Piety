@@ -162,6 +162,7 @@ def w(*args):
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
+        view.update(Op.status, buffer=buf)
         print('%s, %d lines' % (filename, buf.nlines()))
 
 def DD(*args):
