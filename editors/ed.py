@@ -209,7 +209,7 @@ def A(*args):
 
 def n(*args):
     'Print information about all buffers'
-    print('CRM Buffer             Size  Mode     File') #Current Readonly Modified
+    print('CRM Buffer            Lines  Mode     File') #Current Readonly Modified
     for name in buffers:
         print (('.' if name == current else ' ') + buffers[name].info())
     

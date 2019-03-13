@@ -14,8 +14,8 @@ scripts in Python.
 so it can run with a cooperative multitasking system such as
 [Piety](../piety/README.md).
 
-**ed.py** provides the command line and internals for the display editor
-  [edsel](edsel.md).
+**ed.py** provides the command line and internals for the display editors
+  [edsel](edsel.md) and [eden](eden.md).
 
 **ed.py** has no dependencies.
 
@@ -28,7 +28,11 @@ The recommended way to run **ed.py** as a standalone program is:
     python3 -i -m ed
 
 Here the *-i* option runs Python in interactive mode so you can use
-*readline*-style editing in commands and input text.  The *-m* option finds
+*readline*-style editing in commands and input text.  The *-i* option
+also makes it possible to resume an *ed.py* session
+after exiting or after a program crash (see below).
+
+The *-m* option finds
 and runs **ed.py** from any directory on your Python path (here you provide
 the module name *ed*, not the file name *ed.py*).
 
@@ -51,7 +55,7 @@ precent sign *%* as the prompt string:
 
     python3 -i -m ed lines20.txt -p %
     lines20.txt, 20 lines
-    % 
+    %
 
 The default prompt string is the colon *:*.  To run with no prompt string,
 like classic *ed*, use *-p ''*.
@@ -65,7 +69,7 @@ to import the entire API.   Then type *ed()* to start the editor:
     >>> ed()
     :
 
-The *ed* function accepts an optional positional argument for a file name and 
+The *ed* function accepts an optional positional argument for a file name and
 and optional keyword argument for a prompt string, so the *ed* function call
 can resemble the *ed* command line:
 
@@ -73,6 +77,21 @@ can resemble the *ed* command line:
     lines20.txt, 20 lines
     %
 
+## Stopping and resuming ed.py ##
+
+The usual way to stop *ed.py* is to use its *q* (quit) command.
+You can also interrupt *ed.py* by typing *^C*.  It is possible
+that *ed.py* might crash due to a programming error or other
+unhandled exception.
+
+If you start *ed.py* with a Python command that includes
+the *-i* option, control transfers to an
+interactive Python prompt when *ed.py* stops for any reason.
+All the editing buffers and their contents are still intact.
+You can use the *ed.py* API or any other Python statements.
+You can type *ed()* to resume running *ed.py* again.
+You can exit the Python session in the usual
+way, by typing *exit()* or *^D*.
 
 ## Commands ##
 
@@ -108,8 +127,8 @@ same, and is described in a completely rewritten man page at
 [http://plan9.bell-labs.com/magic/man2html/1/ed](http://plan9.bell-labs.com/magic/man2html/1/ed)
 and
 [http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
-There is a manual at [GNU](http://www.gnu.org/software/ed/manual/ed_manual.html), 
-and a brief tutorial at a [blog](http://blog.sanctum.geek.nz/actually-using-ed/), 
+There is a manual at [GNU](http://www.gnu.org/software/ed/manual/ed_manual.html),
+and a brief tutorial at a [blog](http://blog.sanctum.geek.nz/actually-using-ed/),
 with more comments and links
 at [HN](https://news.ycombinator.com/item?id=4120513).  There is even a [POSIX standard](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ed.html).
 
@@ -139,12 +158,26 @@ interactive Python session and run some commands:
 
 After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by calling
-*ed()* again.  Or, any of the other API functions can be called 
+*ed()* again.  Or, any of the other API functions can be called
 at the Python prompt.
+
+The *n* command prints information about all the buffers,
+for example:
+
+    CRM Buffer            Lines  Mode     File
+        ed.py                 1  Text     ed.py
+      * notes.txt        104528  Text     /users/jon/notes/piety/notes/notes.txt
+        main                  1  Text     None
+    .   ed.md               300  Text     ed.md
+
+The dot in the *C* (current) column indicates the current buffer.
+A percent sign *%* in the *R* (readonly) column indicates that
+buffer is read-only.  An asterisk *** in the M (modified) column
+indicates the buffer contains unsaved changes.
 
 ## Limitations and differences from classic ed and sam ##
 
-**ed.py** does not support these classic *ed* commands: 
+**ed.py** does not support these classic *ed* commands:
 *H h n P u wq W*.  Some of these might be supported in the
 future.
 
@@ -169,7 +202,7 @@ forward to the end of the buffer (or backward to the beginning). It
 does not wrap around and continue searching from the beginning (or
 end).
 
-The *B* (and *D*) commands accept only one file (or buffer) name argument, 
+The *B* (and *D*) commands accept only one file (or buffer) name argument,
 not multiple names as in *sam*.
 
 The default prompt is the colon *:*, not the empty string.  If no
@@ -214,7 +247,7 @@ Arguments appear in the same order as they do in command mode, so the
 *ed* print commands *p* *1p* and *1,4p* correspond to the API print
 function calls *p()* *p(1)* and *p(1,4)*.  Likewise, the
 substitute command *14s/old/new/g* correponds to the function call
-*s(14,'old','new',True)*. 
+*s(14,'old','new',True)*.
 
 The line address forms *. $ /text/ ?text?* correspond to the function
 calls *o() S() F(text) R(text)*.  For example, the print commands *.,$p* and
@@ -277,5 +310,5 @@ included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
 no dependencies.
 
-Revised Nov 2018
+Revised Mar 2019
 

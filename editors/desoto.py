@@ -17,9 +17,6 @@ edsel.keymap = (lambda: (edsel.command_keymap
                          if ed.command_mode
                          else edsel.input_keymap))
 
-def desoto(*filename, **options):
-    edsel.run(*filename, **options)
-
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    desoto(*filename, **options)
+    edsel.run(*filename, **options)

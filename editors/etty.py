@@ -24,21 +24,21 @@ class Console(console.Console):
         self.redraw_with_prefix('^N\r\n')
     
     def append_char(self, keycode):
-        self.command += keycode
+        self.line += keycode
         self.point += 1
         util.putstr(keycode)
 
     def backward_delete_last_char(self):
         if self.point > 0:
-            ch = self.command[-1]
-            self.command = self.command[:-1]
+            ch = self.line[-1]
+            self.line = self.line[:-1]
             self.point -= 1
             # util.putstr('^H') # omit, it is more helpful to echo
             util.putstr('\\%s' % ch) # echo \c where c is deleted char
 
     def discard_tty(self): # name like gnu readline unix-line-discard
         'discard entire line including prompt on printing terminal'
-        self.command = ''
+        self.line = ''
         util.putstr('^U\r\n' + self.prompt())  # prompt on new line
 
     def redraw_with_prefix(self, prefix):
@@ -68,7 +68,7 @@ class Console(console.Console):
         self.tty_command_keys = {
             # Any keycode that maps to accept_command is a command terminator.
             keyboard.cr: self.accept_command, # add to history, possibly exit
-            keyboard.C_n: self.next_history_tty, 
+            keyboard.C_n: self.next_history_tty,
             keyboard.C_p: self.previous_history_tty,
             }
 
@@ -79,20 +79,17 @@ class Console(console.Console):
 
         return (lambda: self.tty_command_keymap) # default keymap
 
-tty = Console(prompt=(lambda: ed.prompt), 
-              reader=terminal.getchar,
-              do_command=ed.do_command,
-              stopped=(lambda command: ed.quit),
-              startup=ed.startup, cleanup=ed.q)
+etty = Console(prompt=(lambda: ed.prompt),
+               reader=terminal.getchar,
+               process_line=ed.process_line,
+               stopped=(lambda command: ed.quit),
+               startup=ed.startup, cleanup=ed.q)
 
 # use non-default tty keymaps
-tty.keymap = (lambda: (tty.tty_command_keymap 
-                       if ed.command_mode
-                       else tty.tty_input_keymap))
-
-def etty(*filename, **options):
-    tty.run(*filename, **options)
+etty.keymap = (lambda: (etty.tty_command_keymap
+                        if ed.command_mode
+                        else etty.tty_input_keymap))
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    etty(*filename, **options)
+    etty.run(*filename, **options)

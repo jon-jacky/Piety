@@ -380,9 +380,6 @@ eden.keymap = (lambda: (eden.eden_command_keymap
                         if frame.mode == frame.Mode.input
                         else eden.command_keymap)) # frame.Mode.command
 
-def main(*filename, **options):
-    eden.run(*filename, **options)
-
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    main(*filename, **options)
+    eden.run(*filename, **options)
