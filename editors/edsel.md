@@ -1,30 +1,33 @@
 
-edsel  
+edsel
 =====
 
 **edsel** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edsel_advertisement)
 
-**edsel** is a simple display editor in pure Python based on the line editor
-[ed.py](ed.md).
+**edsel** is a simple display editor in pure Python.
+It is still line- and command-oriented like *ed.py*,
+but it also shows buffers update in display windows as
+you edit with ed commands. *edsel* adds a few new commands
+for managing display windows.
 
-**edsel** is still line- and command-oriented like *ed.py*, but it also shows
-buffers update in display windows as you edit with *ed* commands.  *edsel* adds
-a few new commands for managing display windows.  
-We also provide a more capable display editor, [eden](eden.md),
-which is based on *edsel*.
-
-**edsel** provides the the enhanced shell and scripting
-provided by [edo.py](../editors/edo.md).
+**edsel** is  based on the line editor [ed.py](ed.md).
+It also provides the built-in Python shell and scripting provided
+by [edo.py](../editors/edo.md).  The documentation at those two links
+provides most of the information you need to use *edsel*.
 
 **edsel** can wait for input without blocking, so it can run with a
 cooperative multitasking system such as [Piety](../piety/README.md).
 
+**edsel** has no dependencies.
+
+We also provide a more capable display editor, [eden](eden.md),
+which is based on *edsel*.
 
 ## Running edsel ##
 
 **edsel** can run as a standalone program or in an interactive Python session.
 
-**edsel** is invoked using a similar command line or fuction call as
+**edsel** is invoked using a similar command line or function call as
 [ed.py](ed.md).  It adds one more option, *c*, the number of lines in
 the scrolling command region (see below), for example:
 
@@ -47,6 +50,11 @@ or
 
 Use the command *python3 -m edsel -h* to print help.
 
+If you use the Python *-i* option, control transfers to a interactive
+Python prompt when *edsel* stops for any reason.  The data for all buffers and
+windows remains intact, so you can resume by typing *edsel()*.  No function arguments
+are needed here, because the data assigned at startup is still present.
+
 ## Display ##
 
 **edsel** looks similar to other multiwindow display editors such as
@@ -66,8 +74,11 @@ frame) to retain more (or fewer) lines.
 As you type in text, or type commands in the scrolling region, windows
 update to show the current text in the buffers.
 
-Each window has a status line at its bottom that shows whether the
-buffer has unsaved changes, the buffer name, the location and line
+Each window has a status line at its bottom.  Near the left edge of
+the status line, a dot indicates this is the current window, a percent sign
+indicates that the buffer in the window is read-only, and an asterisk 
+indicates that the buffer in the window has unsaved changes.   Then the
+status line shows the buffer name, the location and line
 number of the current line in the buffer, the total number of
 lines in the buffer, and perhaps some other information.
 
@@ -168,4 +179,4 @@ The ed API is avaiable in edsel by prefixing each call by ed. for example:
     >>> ed.a('append another line after dot')
 
 
-Revised Feb 2019
+Revised Mar 2019

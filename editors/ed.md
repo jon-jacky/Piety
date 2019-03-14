@@ -58,7 +58,7 @@ precent sign *%* as the prompt string:
     %
 
 The default prompt string is the colon *:*.  To run with no prompt string,
-like classic *ed*, use *-p ''*.
+like classic *ed*, you must specify the empty string: *-p ''*.
 
 To run *ed.py* in an interactive Python session, type *from ed import* *
 to import the entire API.   Then type *ed()* to start the editor:
@@ -172,7 +172,7 @@ for example:
 
 The dot in the *C* (current) column indicates the current buffer.
 A percent sign *%* in the *R* (readonly) column indicates that
-buffer is read-only.  An asterisk *** in the M (modified) column
+buffer is read-only.  An asterisk * in the *M* (modified) column
 indicates the buffer contains unsaved changes.
 
 ## Limitations and differences from classic ed and sam ##
