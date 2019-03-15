@@ -9,27 +9,53 @@ from updates import Op
 
 ed = edo.ed  # so we can call ed API without edo. prefix
 
+# edsel API functions
+
+def L():
+    'Refresh'
+    frame.update(Op.refresh)
+
+def o(*args):
+    'Window commands: o(2) horiz. split, o(1) one window, o() next window'
+    if not args:
+        win = frame.update(Op.next)
+        ed.buf = win.buf
+        ed.current = ed.buf.name
+    elif args[0] == 1:
+        frame.update(Op.single)
+    elif args[0] == 2:
+        frame.update(Op.hsplit)
+
+def h(*args):
+    'Resize/balance frame: h(n) set scrolling region to n lines, h() balance only'
+    if args:
+        frame.cmd_h = args[0]
+    frame.update(Op.rescale)
+
+# Wrappers for API functions
+
 def do_rescale_command(paramstring):
     'Change n of lines in scrolling command region, or balance windows'
     if paramstring:
         try:
-            frame.cmd_h = int(paramstring)
+            nlines = int(paramstring)
+            h(nlines)
         except ValueError:
-            pass # keep current cmd_h, but .rescale balances windows
-    frame.update(Op.rescale)
+            pass # keep current nlines, but .rescale balances windows
+    else:
+        h()
 
 def do_window_command(paramstring):
     'Window manager commands'
     if not paramstring: # o: switch to next window
-        win = frame.update(Op.next)
-        ed.buf = win.buf
-        ed.current = ed.buf.name
+        o()
     elif paramstring.startswith('1'): # o1: return to single window
-        frame.update(Op.single)
+        o(1)
     elif paramstring.startswith('2'): # o2: split window, horizontal
-        frame.update(Op.hsplit)
+        o(2)
     else:
         print('? integer 1 or 2 expected at %s' % paramstring)
+
 
 def base_do_command(line):
     'Process one command line without blocking.'
@@ -39,7 +65,7 @@ def base_do_command(line):
     try:
         # Intercept special commands used by frame only, not ed.
         if line.startswith('L'):
-            frame.update(Op.refresh)
+            L()
         elif line.startswith('h'):
             do_rescale_command(paramstring)
         elif line.startswith('o'):

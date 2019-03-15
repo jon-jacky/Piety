@@ -9,22 +9,24 @@ Modules used by terminal applications.
   instance is a Piety job that can be scheduled by a *Session*
   instance.
 
-  A *Console* instance collects a command (string), passes it to an
-  application handler (callable) to execute.  Can collect a command
+  A *Console* instance collects a line (string), then passes it to an
+  application handler (callable) to process.  It collects the line
   one character at a time without blocking to permit cooperative
-  multitasking (unlike Python *input*, which blocks until the command
-  is complete).  Provides command history and line editing similar to
-  Unix *readline* (but no tab completion).  Provides hooks for job
+  multitasking (unlike Python *input*, which blocks until the line
+  is complete).  It provides command history and in-line editing similar to
+  Unix *readline* (but no tab completion).  It provides hooks for job
   control.
+
+  The editing keycodes and their effects are configured by a table.
 
   *Console* works with *Key* (see below) to read keycodes.
 
 - **console.txt**: command summary for *Console* with *Key*,
    similar to Unix *readline*.  How to edit the command line and
    access its history in any application the uses *console*
-   with the *key* module.
+   with the *key* module, and the built-in default table.
 
 - **key.py**: defines *Key* class that can collect, store, and return
     single character or multi-character keycodes, used by *Console*.
 
-Revised Jan 2018
+Revised Mar 2019

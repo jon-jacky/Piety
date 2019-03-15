@@ -7,21 +7,15 @@ edsel
 **edsel** is a simple display editor in pure Python.
 It is still line- and command-oriented like *ed.py*,
 but it also shows buffers update in display windows as
-you edit with ed commands. *edsel* adds a few new commands
+you edit with *ed* commands. *edsel* adds a few new commands
 for managing display windows.
 
 **edsel** is  based on the line editor [ed.py](ed.md).
 It also provides the built-in Python shell and scripting provided
-by [edo.py](../editors/edo.md).  The documentation at those two links
-provides most of the information you need to use *edsel*.
-
-**edsel** can wait for input without blocking, so it can run with a
-cooperative multitasking system such as [Piety](../piety/README.md).
+by [edo.py](../editors/edo.md).  Those two pages
+provide much of what you need need to know to use *edsel*.
 
 **edsel** has no dependencies.
-
-We also provide a more capable display editor, [eden](eden.md),
-which is based on *edsel*.
 
 ## Running edsel ##
 
@@ -50,9 +44,10 @@ or
 
 Use the command *python3 -m edsel -h* to print help.
 
-If you use the Python *-i* option, control transfers to a interactive
+If you use the Python *-i* option, control transfers to an interactive
 Python prompt when *edsel* stops for any reason.  The data for all buffers and
-windows remains intact, so you can resume by typing *edsel()*.  No function arguments
+windows remains intact, so you can resume by typing *edsel()*.
+No function arguments
 are needed here, because the data assigned at startup is still present.
 
 ## Display ##
@@ -104,7 +99,7 @@ command.  A marker remains in the window where the cursor was, to show
 where subsequent commands will take effect.
 
 Conventional full-screen display editing is provided by *[eden](eden.md)*,
-a more complete editor that is based on *edsel*.
+a more capable editor that is based on *edsel*.
 
 **edsel** imports *[edo](edo.md)*, so it includes the *wyshka* shell
 that provides both the *ed* command line and a Python interpreter.
@@ -164,19 +159,35 @@ buffer contents.
 
 When you use the *X* command to execute *ed* commands from a buffer,
 you can see window contents update as the commands run.  Each command
-echoes in the scrolling command region, followed by a short delay so
-you can observe its effect.  The echo and delay can be adjusted or
+echoes in the scrolling command region, followed by a short delay before
+processing the next command so
+you have time to observe its effect.  The echo and delay can be adjusted or
 suppressed by two optional *X* parameters that follow the buffer name:
 echo (boolean) and delay (float), which default to *True* and *0.2*
-seconds.  So *X sample.ed 0 0* suppresses both echo and delay.
+seconds.  So *X sample.ed 0 0* suppresses both echo and delay,
+*X sample.ed 1 1* echoes with a 1 second delay, etc.
 
-## Using the *ed* API ##
+## API ##
 
-The ed API is avaiable in edsel by prefixing each call by ed. for example:
+The *edsel* commands are also available as an API.  The single-letter
+command name is the function name and any optional command suffix or
+parameter is the command argument.  So the refresh command *L*
+becomes the API call *L()*.  The window commands *o* *o1* *o2*
+become the API calls *o()* *o(1)* *o(2)*.  The frame balance/resize commands
+*h* *h 12* (etc.) become *h()* *h(12)* (etc.).
 
-    :!ed.a('append line after dot')
-    :q
-    >>> ed.a('append another line after dot')
+In *edsel*, calls to the *ed* API must be prefixed by
+the module name *ed.*  For example: *ed.a('append line after dot')*.
 
+## Related programs ##
+
+**edsel** runs an event loop that blocks waiting for a complete line
+to be entered at the terminal.
+[desoto](desoto.py) wraps *edsel* in a [Console](../console/README.md)
+object that collects the line without blocking,
+so *desoto* can run in the cooperative multitasking system,
+[Piety](../piety/README.md).
+
+**edsel** is the core of a more capable display editor, [eden](eden.md).
 
 Revised Mar 2019

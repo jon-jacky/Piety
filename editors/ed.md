@@ -27,7 +27,7 @@ The recommended way to run **ed.py** as a standalone program is:
 Here the *-i* option runs Python in interactive mode so you can use
 *readline*-style editing in commands and input text.  The *-i* option
 also makes it possible to resume an *ed.py* session
-after exiting or after a program crash (see below).
+after exiting or after a program crash.
 
 The *-m* option finds
 and runs **ed.py** from any directory on your Python path (here you provide
@@ -166,21 +166,22 @@ The *n* command prints information about all the buffers,
 for example:
 
     CRM Buffer            Lines  Mode     File
-        ed.py                 1  Text     ed.py
+        ed.py               514  Text     ed.py
       * notes.txt        104528  Text     /users/jon/notes/piety/notes/notes.txt
         main                  1  Text     None
-    .   ed.md               300  Text     ed.md
+    .   ed.md               335  Text     ed.md
 
 The dot in the *C* (current) column indicates the current buffer.
 A percent sign *%* in the *R* (readonly) column indicates that
 buffer is read-only.  An asterisk * in the *M* (modified) column
-indicates the buffer contains unsaved changes.
+indicates the buffer contains unsaved changes.  The buffer size
+is given in lines (not characters). At this time
+the only mode we provide is *Text*.
 
 ## Limitations and differences from classic ed and sam ##
 
 **ed.py** does not support these classic *ed* commands:
-*H h n P u wq W*.  Some of these might be supported in the
-future.
+*H h n P u wq W*. 
 
 **ed.py** does not support the classic *ed* iteration commands *g G v V*.
 
@@ -196,7 +197,7 @@ There is no way to suppress printing the error messages as in classic
 
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
-expression.  Regular expressions might be supported in the future.
+expression.
 
 In the */text/* and *?text?* address forms, **ed.py** only searches
 forward to the end of the buffer (or backward to the beginning). It
@@ -207,8 +208,8 @@ The *B* (and *D*) commands accept only one file (or buffer) name argument,
 not multiple names as in *sam*.
 
 The default prompt is the colon *:*, not the empty string.  If no
-prompt is desired, that must be requested with *-p ''* on the command
-line or *p=''* in the *ed* function call.
+prompt is desired, the empty string must be requested with *-p ''* 
+on the command line or *p=''* in the *ed* function call.
 
 The *z* command accepts a negative parameter to scroll backward,
 unlike classic *ed*.
@@ -275,7 +276,7 @@ is the preceding example expressed once more using *process_line*:
 
 When **ed.py** is running with the [Piety](../piety/README.md) 
 cooperative multitasking
-system, a Piety [Console](../console/README.md) object collects 
+system, a Piety [Console](../console/README.md) object collects
 a command line or input line without
 blocking, and then passes that line to *process_line*.
 
@@ -318,10 +319,11 @@ no dependencies.
 **ed.py** is the core of [edo](edo.md), which adds a built-in
 Python interpreter and scripting.
 
-**ed.py** runs an event loop that blocks waiting for each character
-from the terminal.   [edda](edda.py) wraps *ed.py* in a [Console](../console/README.md)
-object that waits for characters without blocking,
-so it can run in the cooperative multitasking system,
+**ed.py** runs an event loop that blocks waiting for a complete line
+to be entered at the terminal.   
+[edda](edda.py) wraps *ed.py* in a [Console](../console/README.md)
+object that collects the line without blocking,
+so *edda* can run in the cooperative multitasking system,
 [Piety](../piety/README.md).
 
 **ed.py** is the core of [etty](etty.py), which makes the terminal

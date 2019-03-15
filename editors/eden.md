@@ -18,12 +18,13 @@ for example:
     python3 -i -m eden lines20.txt -c 12
     ...
 
-or
+To start *eden* in a python session, call the method *eden.run*, which
+takes the same optional arguments as can appear on the command line:
 
     python3 -i
     ...
     >>> from eden import *
-    >>> eden('lines20.txt', c=12)
+    >>> eden.run('lines20.txt', c=12)
     ...
 
 ## Using eden ##
@@ -183,5 +184,5 @@ be provided at the command line, reached through *^X* or *^Z*.
 In the future, we may provide another display editor without these
 limitations.
 
-Revised Feb 2019
+Revised Mar 2019
 
