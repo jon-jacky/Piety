@@ -6,16 +6,11 @@ ed.py
 classic Unix editor *ed*.  It provides most of the commands from
 classic *ed* and *GNU ed*, augmented with a few commands for handling
 multiple buffers and files from the later Unix (and Plan 9) editor
-*sam*.  You can use **ed.py** in a command mode that emulates classic
-*ed*, or use its API to edit from the Python prompt or write editing
-scripts in Python.
+*sam*.  
 
-**ed.py** runs its editor functions quickly without blocking,
-so it can run with a cooperative multitasking system such as
-[Piety](../piety/README.md).
-
-**ed.py** provides the command line and internals for the display editors
-  [edsel](edsel.md) and [eden](eden.md).
+**ed.py** runs in a command mode that emulates classic
+*ed*.  It also provides an API so you can edit from the Python prompt
+or write editing scripts in Python.
 
 **ed.py** has no dependencies.
 
@@ -87,9 +82,13 @@ unhandled exception.
 If you start *ed.py* with a Python command that includes
 the *-i* option, control transfers to an
 interactive Python prompt when *ed.py* stops for any reason.
-All the editing buffers and their contents are still intact.
+All the editing buffers, their contents, and other
+context -- such as the current line in each buffer -- are still intact.
 You can use the *ed.py* API or any other Python statements.
-You can type *ed()* to resume running *ed.py* again.
+You can type *ed()* to restart *ed.py*, resuming just where
+you left off.  No function arguments
+are needed here, because the data assigned at startup are still present.
+
 You can exit the Python session in the usual
 way, by typing *exit()* or *^D*.
 
@@ -309,6 +308,20 @@ The *buffer*, *parse*, *check*, *view*, and *updates* modules are
 included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
 no dependencies.
+
+## Related programs ##
+
+**ed.py** is the core of [edo](edo.md), which adds a built-in 
+Python interpreter and scripting.
+
+**ed.py** runs an event loop that blocks waiting for each character
+from the terminal.   [edda](edda.py) wraps *ed.py* in a [Console](../console/README.md)
+object that waits for characters without blocking,
+so it can run in the cooperative multitasking system,
+[Piety](../piety/README.md).
+
+**ed.py** provides the command line and internals for the display editors
+  [edsel](edsel.md) and [eden](eden.md).
 
 Revised Mar 2019
 
