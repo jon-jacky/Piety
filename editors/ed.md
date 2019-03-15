@@ -3,10 +3,12 @@ ed.py
 =====
 
 **[ed.py](ed.py)** is a text editor in pure Python inspired by the
-classic Unix editor *ed*.  It provides most of the commands from
+classic Unix editor *ed*.  
+
+**ed.py** provides most of the commands from
 classic *ed* and *GNU ed*, augmented with a few commands for handling
 multiple buffers and files from the later Unix (and Plan 9) editor
-*sam*.  
+*sam*.
 
 **ed.py** runs in a command mode that emulates classic
 *ed*.  It also provides an API so you can edit from the Python prompt
@@ -252,28 +254,30 @@ The line address forms *. $ /text/ ?text?* correspond to the function
 calls *o() S() F(text) R(text)*.  For example, the print commands *.,$p* and
 */text/p* correspond to function calls *p(o(),S())* and *p(F('text'))*.
 
-The API also provides a function *do_command* with a single string
+The API also provides a function *process_line* with a single string
 argument, which is exactly the command string you would type to *ed*
 in command mode or the text string you would type in input mode.  Here
-is the preceding example expressed once more using *do_command*:
+is the preceding example expressed once more using *process_line*:
 
     >>> from ed import *
-    >>> do_command('e test.txt')
+    >>> process_line('e test.txt')
     test.txt, 0 lines
-    >>> do_command('a')
-    >>> do_command('ed() enters ed command mode.  By default, there is no command prompt.')
-    >>> do_command("'e <name>' loads the named file into the current buffer.")
-    >>> do_command("'a' enters ed input mode and appends the text after the current line.")
-    >>> do_command("'w' writes the buffer contents back to the file")
-    >>> do_command("'q' quits ed command mode.")
-    >>> do_command('To quit input mode, type a period by itself at the start of a line.')
-    >>> do_command('.')
-    >>> do_command('w')
+    >>> process_line('a')
+    >>> process_line('ed() enters ed command mode.  By default, there is no command prompt.')
+    >>> process_line("'e <name>' loads the named file into the current buffer.")
+    >>> process_line("'a' enters ed input mode and appends the text after the current line.")
+    >>> process_line("'w' writes the buffer contents back to the file")
+    >>> process_line("'q' quits ed command mode.")
+    >>> process_line('To quit input mode, type a period by itself at the start of a line.')
+    >>> process_line('.')
+    >>> process_line('w')
     test.txt, 6 lines
 
-When **ed.py** is running with the *Piety* cooperative multitasking
-scheduler, *Piety* collects a command line or input line without
-blocking, and then passes that line to *do_command*.
+When **ed.py** is running with the [Piety](../piety/README.md) 
+cooperative multitasking
+system, a Piety [Console](../console/README.md) object collects 
+a command line or input line without
+blocking, and then passes that line to *process_line*.
 
 ## Modules ##
 
@@ -311,7 +315,7 @@ no dependencies.
 
 ## Related programs ##
 
-**ed.py** is the core of [edo](edo.md), which adds a built-in 
+**ed.py** is the core of [edo](edo.md), which adds a built-in
 Python interpreter and scripting.
 
 **ed.py** runs an event loop that blocks waiting for each character
@@ -319,6 +323,9 @@ from the terminal.   [edda](edda.py) wraps *ed.py* in a [Console](../console/REA
 object that waits for characters without blocking,
 so it can run in the cooperative multitasking system,
 [Piety](../piety/README.md).
+
+**ed.py** is the core of [etty](etty.py), which makes the terminal
+behave like an old-fashioned teletype.
 
 **ed.py** provides the command line and internals for the display editors
   [edsel](edsel.md) and [eden](eden.md).
