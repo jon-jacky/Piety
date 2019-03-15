@@ -2,13 +2,19 @@
 eden
 ====
 
-**eden** is a display editor in pure Python based on the line editor
-  [ed.py](ed.md) and the simpler display editor [edsel](edsel.md).
+**eden** is a display editor in pure Python.
+It provides all the functionality of *edsel*, and also adds a
+display editing mode that inserts or deletes printing characters
+anywhere, and uses control characters to move the cursor and to
+select, cut, and paste text.
 
-**eden** provides all the functionality of *edsel*, and also adds a
-  display editing mode that inserts or deletes printing characters
-  anywhere, and uses control characters to move the cursor and to
-  select, cut, and paste text.
+**eden** is  based on the line editor [ed.py](ed.md) and
+the simpler display editor [edsel](edsel.md).
+It also provides the built-in Python shell and scripting provided
+by [edo.py](../editors/edo.md).  Those three pages
+provide much of what you need to know to use *eden*.
+
+**eden** has no dependencies.
 
 ## Running eden ##
 
@@ -46,21 +52,6 @@ key while typing the Z key) that returns to command mode.  There is
 also a command *^X* that enables you to type and execute any single
 *ed* or *edsel* command and then return immediately to display editing
 mode.  This makes it easy to alternate display editing with commands.
-
-After typing *^X* you can type any *ed* line address: a line number, a
-search string, or any other address form (like *$* for the last line).
-Then *eden* will move the cursor to that line and resume display
-editing.  Therefore, *^X* can act as a search command: type *^X* then
-*/string/* (or *?string?*) to search forward (or backward) for
-*string*.  After that, when display editing, you can type the commands
-*^S* (or *^R*) to search forward (or backward) for the same *string*.
-
-**eden** provides access to the Python interpreter through
-[wyshka](../shells/wyshka.md).
-
-**eden** provides scripting through
-[samysh](../shells/samysh.md). Scripts can include control characters
-that invoke display editing commands (see [here](../test/eden/test.py)).
 
 ## Display Editing Commands ##
 
@@ -140,26 +131,24 @@ Commands retrieved from the history can be edited and submitted.
 Command line history including previous search strings can be accessed
 during *^X* commmands.
 
-## Limitations ##
+## Using eden commands ##
 
-**eden** is *ed.py* underneath.  In display editing mode, you can put
-the cursor and insert or delete characters anywhere, but some commands
-are still line-oriented.
+The most effective way to use some *eden* commands is not always obvious.
+Here are some hints.
 
-All *ed* commands leave the cursor at the beginning of the line.
+# Search #
 
-Search commands only find the line containing the search string.  They
-leave the cursor at the beginning of that line, not at the search
-string within the line.  
+After typing *^X* you can type any *ed* line address: a line number, a
+search string, or any other address form (like *$* for the last line).
+Then *eden* will move the cursor to that line and resume display
+editing.
 
-Some display editing commands also leave the cursor at the beginning of the
-line.  For example, the *C* command that enters (or re-enters) display
-editing mode, the *^X* command that enters and executes a single
-command line, and the *^O* command that moves the cursor to the next
-window.  
+Therefore, *^X* can act as a search command: type *^X* then
+*/string/* (or *?string?*) to search forward (or backward) for
+*string*.  After that, when display editing, you can type the commands
+*^S* (or *^R*) to search forward (or backward) for that same *string*.
 
-These limitations might be mitigated somewhat by using the *^J*
-command that moves the cursor to the beginning of the next word.
+# Cut and Paste #
 
 The command to set the mark, *^@* (or *^-space*), only marks the line
 (not the character within the line), so the region defined by the mark
@@ -168,21 +157,43 @@ lines (that includes mark but excludes dot).  Therefore, the cut (delete)
 command *^W* followed by the paste (yank) command *^Y* always act on a
 sequence of complete lines, inserting the lines before the current line.
 
-The kill *^K* and discard *^U commands each cut a segment from a
+In contrast to *^W*, the kill *^K* and discard *^U* commands
+each cut a segment delimited by the cursor from a
 single line, and a subsequent *^Y* command pastes that
-segment right at the cursor, anywhere within a line.  So the
-*^K* and *^Y* commands have the effect of toggling subsequent *^Y*
+same segment right at the cursor, anywhere within the same
+line or a different line.
+
+So the
+*^K* and *^U* commands have the effect of toggling subsequent *^Y*
 commands to inline mode, while *^W* toggles *^Y* to multiline mode.
+
+## Limitations ##
+
+**eden** is *ed.py* underneath.  In display editing mode, you can place
+the cursor and insert or delete characters anywhere, but some commands
+are still line-oriented.
+
+All *ed* commands leave the cursor at the beginning of the line.
+
+Search commands only find the line containing the search string.  They
+leave the cursor at the beginning of that line, not at the search
+string within the line.
+
+Some display editing commands also leave the cursor at the beginning of the
+line.  For example, the *C* command that enters (or re-enters) display
+editing mode, the *^X* command that enters and executes a single
+command line, and the *^O* command that moves the cursor to the next
+window.
+
+These limitations might be mitigated somewhat by using the *^J*
+command that quickly moves the cursor to the beginning of the next word.
 
 All display editing commands are bound to single control characters.
 *eden* does not support sequences of multiple control characters, or
 *meta* characters formed by typing the *esc* or *alt* keys.  We have
 bound a command to every control character, so no more display editing
-commands can be added to *eden*.  Any additional functionality must 
+commands can be added to *eden*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
-
-In the future, we may provide another display editor without these
-limitations.
 
 Revised Mar 2019
 

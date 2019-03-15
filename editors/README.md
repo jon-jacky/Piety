@@ -2,22 +2,26 @@
 editors
 =======
 
-Text editors, including the line editor *ed.py* inspired by the
-    classic *Unix ed*, a simple display editor *edsel*, and a more
-    capable display editor *eden*.
+Text editors, including a line editor *ed.py* and a display editor *eden*.
 
-There are several top-level editor programs here that can be invoked
-from the system command shell or from the Python prompt.  These
-programs have an onion-like structure where each program imports a
-simpler program with fewer features, and adds a few features of its
-own.  Ordered from the most features to the fewest, the editor
-programs are:
+There are several editors here, a series of experiments beginning with *ed.py*
+and culminating in *eden*.  We expect to use *eden* most of the time, but are
+keeping the intermediate experiments as well.
 
-- **Display editors**: *eden > desoto > edsel > edo > ed*
+The main steps in the sequence of increasing functionality are:
+*ed.py* (line editor), *edo* (adds built-in Python interpreter and
+scripting), *edsel* (adds display, but still provides only ed commands for
+line editing), and *eden* (adds display editing at any character position).
 
-- **Line editors** with command line editing for display terminals: *edda > edo > ed*
+Another dimension arises from wrapping these programs in a
+[Console](../console/README.md) object that collects input without blocking,
+so they can run in the cooperative multitasking system,
+[Piety](../piety/README.md).  Here *etty* wraps *ed*, *edda* wraps *edo*,
+and *desoto* wraps *edsel*.  *eden* is already a *Console* object,
+so it doesn't require a wrapper.
 
-- **Line editor** with command line editing teletype style: *etty > ed*
+Several of the programs and modules here are described by
+their own *.md* and *.txt* files (*ed.md* and *ed.txt* for *ed.py*, etc.)
 
 Files in this directory:
 
@@ -35,8 +39,6 @@ Files in this directory:
 - **ed.md**: description of *ed.py*.
 
 - **ed.py**: line editor inspired by the classic Unix editor *ed*.
-  Uses Python builtin *input* to collect and edit command lines and inserted
-  text lines.
 
 - **ed.txt**: command summary for *ed.py*
 
@@ -57,24 +59,21 @@ Files in this directory:
 
 - **edsel.md**: description of *edsel.py*.
 
-- **edsel.py**: simple display editor based on the line editor *ed.py*.
-  Import *edo*, which runs *ed.py* along with *wyshka* enhanced
-  shell and *samysh* script execution.  Use Python builtin *input()*
-  to collect and edit input lines with blocking.
+- **edsel.py**: simple display editor based on the line editor *ed.py*
+  with the *edo* enhancements.
 
 - **etty.md**: description of *etty.py*.
 
-- **etty.py**: run *ed.py* line editor in a *Console*
-  job to collect and edit input lines.  Use
-  non-default keymaps with *Console* class to provide retro
-  printing-terminal-style editing and history.  Contrast to *ed.py*
+- **etty.py**: wraps *ed.py* in a *Console* object
+  that uses non-default keymaps to make the terminal behave
+  like an old-fashioned teletype. Contrast to *ed.py*
   *main* function and *edda*.
 
-- **frame.md**: description of *frame.py*, *updates.py*, and *updatecall.py*.
+- **frame.md**: description of *frame.py* and *updates.py*
 
 - **frame.py**: multiwindow display implemented by list of *window*
    instances, with a scrolling command region at the bottom of the
-   display.  Used by *edsel*.
+   display.  Used by *edsel* *desoto* and *eden*.
 
 - **lines5.txt, lines20.txt, lines40.txt, lines120.txt**: sample text
     files for experimenting with the editor.
@@ -83,10 +82,10 @@ Files in this directory:
 
 - **updates.py**: define display operations enumeration *Op*.
 
-- **view.py**: variables that are used by both *ed* and *edsel*, to
-   configure code used by both programs to run with or without a
-   display.
+- **view.py**: defines variables that are used by *ed*, *edsel*,
+   *desoto* and *eden*, to
+   configure code in *ed* to run with or without a display.
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Jan 2019
+Revised Mar 2019

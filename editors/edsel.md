@@ -13,7 +13,7 @@ for managing display windows.
 **edsel** is  based on the line editor [ed.py](ed.md).
 It also provides the built-in Python shell and scripting provided
 by [edo.py](../editors/edo.md).  Those two pages
-provide much of what you need need to know to use *edsel*.
+provide much of what you need to know to use *edsel*.
 
 **edsel** has no dependencies.
 
