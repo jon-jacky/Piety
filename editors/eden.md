@@ -3,7 +3,8 @@ eden
 ====
 
 **eden** is a display editor in pure Python.
-It provides all the functionality of *edsel*, and also adds a
+
+**eden** provides all the functionality of *edsel*, and also adds a
 display editing mode that inserts or deletes printing characters
 anywhere, and uses control characters to move the cursor and to
 select, cut, and paste text.
@@ -32,6 +33,8 @@ takes the same optional arguments as can appear on the command line:
     >>> from eden import *
     >>> eden.run('lines20.txt', c=12)
     ...
+
+After *eden* stops, you can resume at the Python prompt with *eden.run()*.
 
 ## Using eden ##
 
@@ -136,7 +139,7 @@ during *^X* commmands.
 The most effective way to use some *eden* commands is not always obvious.
 Here are some hints.
 
-# Search #
+#### Search ####
 
 After typing *^X* you can type any *ed* line address: a line number, a
 search string, or any other address form (like *$* for the last line).
@@ -148,7 +151,7 @@ Therefore, *^X* can act as a search command: type *^X* then
 *string*.  After that, when display editing, you can type the commands
 *^S* (or *^R*) to search forward (or backward) for that same *string*.
 
-# Cut and Paste #
+#### Cut and Paste ####
 
 The command to set the mark, *^@* (or *^-space*), only marks the line
 (not the character within the line), so the region defined by the mark
