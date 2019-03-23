@@ -17,6 +17,7 @@ from updates import Op
 
 # Data structures and variables. Initialize these with create_buf (below)
 buf = None       # current buffer
+previous = str() # name of previous buffer
 current = str()  # name of current buffer
 buffers = dict() # dict from buffer names (strings) to Buffer instances
 
@@ -58,28 +59,31 @@ def match_prefix(prefix, names):
 def current_filename(filename):
     """
     Return filename arg if present, if not return current filename.
-    Do not change current filename, assign only if it was previously absent.
+    If neither is present, print warning and return None
+    SIDE EFFECT! Assign current filename only if it was previously absent.
     """
     if filename:
         if not buf.filename:
-            buf.filename = filename
+            buf.filename = filename # side effect!
         return filename
     if buf.filename:
-        return buf.filename 
+        return buf.filename
     print('? no current filename')
     return None
 
 def create_buf(bufname):
     'Create buffer with given name. Replace any existing buffer with same name'
-    global current, buf
+    global previous, current, buf
     buf = buffer.Buffer(bufname)
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
+    previous = current
     current = bufname
     view.update(Op.create, buffer=buf)
 
 def select_buf(bufname):
     'Make buffer with given name the current buffer'
-    global current, buf
+    global previous, current, buf
+    previous = current
     current = bufname
     buf = buffers[current]
     view.update(Op.select, buffer=buf)
@@ -89,9 +93,10 @@ def select_buf(bufname):
 def b(*args):
     """
     Set current buffer to name.  If no buffer with that name, create one.
-    Then print current buffer name.  If none given, print current name + info
+    If no name given, set current buffer to previous current buffer.
+    Then print current buffer name.
     """
-    global current, buf
+    global previous, current, buf
     _, _, bufname, _ = parse.arguments(args)
     bufname = match_prefix(bufname, buffers)
     if bufname in buffers:
@@ -99,6 +104,8 @@ def b(*args):
     elif bufname:
         create_buf(bufname)
         buf.filename = bufname
+    else:
+        select_buf(previous)
     print('.' + buf.info()) # even if no bufname given
 
 def f(*args):
@@ -122,19 +129,27 @@ def r(*args):
             print('%s, %d lines' % (filename, buf.nlines() - nlines0))
 
 def E(*args):
-    'read in file, replace buffer contents despite unsaved changes'
+    """
+    Read in named file, replace buffer contents.
+    File arg not optional, replaces current file.
+    """
     _, _, filename, _ = parse.arguments(args)
-    if not filename:
-        filename = buf.filename
-    if not filename:
-        print('? no current filename')
+    if not current == 'main':
+        print('? e and E only work in main buffer')
         return
+    if not filename:
+        print('? no filename')
+        return
+    buf.filename = filename
     buf.d(1, buf.nlines())
     r(0, filename)
     buf.modified = False # insert in r sets modified = True, this is exception
 
 def e(*args):
-    'read in file, replace buffer contents unless unsaved changes'
+    """
+    Read in named file, replace buffer contents.
+    BUT exit with warning if buffer has unsaved changes.
+    """
     if buf.modified:
         print('? warning: file modified')
         return
@@ -146,11 +161,13 @@ def B(*args):
     if not filename:
         print('? file name')
         return
-    bufname = os.path.basename(filename) # may differ from filename
-    if bufname in buffers:
-        # FIXME? create new buffer name a la emacs name<1>, name<2> etc.
-        print('? buffer name %s already in use' % bufname)
-        return
+    basename = os.path.basename(filename)
+    bufname = basename
+    suffix = 1
+    # assign unique names: README.md README.md<2> ...
+    while bufname in buffers:
+        suffix += 1
+        bufname = basename + '<%d>' % suffix
     create_buf(bufname)
     buf.filename = filename
     r(0, filename)
@@ -167,7 +184,7 @@ def w(*args):
 
 def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
-    global current, buf
+    global previous, current, buf
     _, _, bufname, _ = parse.arguments(args)
     name = bufname if bufname else current
     if not name in buffers:
@@ -179,7 +196,8 @@ def DD(*args):
         del buffers[name]
         if name == current: # pick a new current buffer
             keys = list(buffers.keys()) # always nonempty due to main
-            select_buf(keys[0])
+            select_buf(keys[0]) # reassigns current
+            previous = current
         view.update(Op.remove, sourcebuf=delbuf, buffer=buf)
         print('%s, buffer deleted' % name)
 
@@ -212,9 +230,9 @@ def n(*args):
     print('CRM Buffer            Lines  Mode     File') #Current Readonly Modified
     for name in buffers:
         print (('.' if name == current else ' ') + buffers[name].info())
-    
+
 # command functions: displaying and navigating text
-    
+
 def l(*args):
     'Advance dot to iline and print it'
     iline, _, _, _ = parse.arguments(args)
@@ -490,6 +508,7 @@ def cmd_options():
     return filename, options
 
 create_buf('main')  # initialize main buffer only once on import
+previous = 'main'
 
 def startup(*filename, **options):
     global command_prompt, prompt, quit

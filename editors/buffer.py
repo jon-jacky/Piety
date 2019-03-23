@@ -14,7 +14,8 @@ inputline = None  # default: no updates from background tasks,no restore needed
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
 
-    # assigned by y(ank), that is copy, or d(elete) in current buffer, 
+    pattern = '' # search string - default '' matches any line
+    # assigned by y(ank), that is copy, or d(elete) in current buffer,
     # may be used by x (put, paste) in same or any other buffer
     cut_buffer = list() # most recently deleted (or "yanked") lines from any buffer
     cut_buffer_mark = dict() # markers for deleted lines, for yank command
@@ -29,7 +30,6 @@ class Buffer(object):
         self.dot = 0 # index of current line, 0 when buffer is empty
         self.filename = None # file name (string) to read/write buffer contents
         self.modified = False # True if buffer contains unsaved changes
-        self.pattern = '' # search string - default '' matches any line
         self.mark = dict() # dict from mark char to line num, for 'c addresses
         self.end_phase = False # control variable used by write method
 
@@ -76,7 +76,7 @@ class Buffer(object):
     # search
 
     def search_buf(self, forward):
-        """Search for self.pattern.  Search forward from .+1 to end of buffer
+        """Search for Buffer.pattern.  Search forward from .+1 to end of buffer
         (or if forward is False, search backward from .-1 to start of buffer)
         If found, return line number.  If not found, return None.
         This version stops at end (or start) of buffer, does not wrap around.
@@ -85,7 +85,7 @@ class Buffer(object):
         slines = self.lines[self.dot+1:] if forward \
             else reversed(self.lines[:self.dot-1])
         for imatch, line in enumerate(slines):
-            if self.pattern in line:
+            if Buffer.pattern in line:
                 found = True
                 break
         if not found:
@@ -93,21 +93,21 @@ class Buffer(object):
         return self.dot+1 + imatch if forward else self.dot-2 - imatch
 
     def search(self, pattern, forward):
-        """Update self.pattern if pattern is nonempty, otherwise retain old pattern
-        Search for self.pattern, return line number where found, dot if not found
+        """Update Buffer.pattern if pattern is nonempty, otherwise retain old pattern
+        Search for Buffer.pattern, return line number where found, dot if not found
         Search forward if forward is True, backward otherwise."""
         if pattern:
-            self.pattern = pattern 
+            Buffer.pattern = pattern
         imatch = self.search_buf(forward)
         return imatch if imatch else self.dot
 
     def F(self, pattern):
-        """Forward Search for pattern, 
+        """Forward Search for pattern,
         return line number where found, dot if not found"""
         return self.search(pattern, True)
 
     def R(self, pattern):
-        """Backward search for pattern, 
+        """Backward search for pattern,
         return line number where found, self.dot if not found"""
         return self.search(pattern, False)
 
@@ -148,7 +148,7 @@ class Buffer(object):
 
     def r(self, iline, filename):
         'Read file contents into buffer after iline'
-        if os.path.isfile(filename): 
+        if os.path.isfile(filename):
             strings = [] # in case readlines fails
             with open(filename, mode='r') as fd:
                 # fd.readlines reads file into a list of strings, one per line
@@ -188,9 +188,10 @@ class Buffer(object):
         self.insert(iline if iline else iline+1, string.splitlines(True),
                     origin=iline)
 
-    def d(self, start, end):
+    def d(self, start, end, yank=True):
         'Delete text from start up through end'
-        self.y(start, end) # yank (copy, do not remove) lines to cut buffer
+        if yank:
+            self.y(start, end) # yank (copy, do not remove) lines to cut buffer
         self.lines[start:end+1] = [] # ed range is inclusive, unlike Python
         self.modified = True
         if self.lines[1:]: # retain empty line 0
@@ -200,8 +201,8 @@ class Buffer(object):
             self.dot = 0
         # new_mark needed because we can't remove items from dict as we iterate
         new_mark = dict() #new_mark is self.mark without marks at deleted lines
-        Buffer.cut_buffer_mark = dict() 
-        for c in self.mark: 
+        Buffer.cut_buffer_mark = dict()
+        for c in self.mark:
             if (start <= self.mark[c] <= end): # save marks from deleted lines
                 Buffer.cut_buffer_mark[c] = self.mark[c]-start+1
             else:
@@ -212,7 +213,7 @@ class Buffer(object):
         self.mark = new_mark
         # origin, start, end are before deletion
         # destination == dot after deletion, first line following deleted lines
-        view.update(Op.delete, buffer=self, 
+        view.update(Op.delete, buffer=self,
                       origin=start, destination=self.dot, start=start, end=end)
 
     def c(self, start, end, string):
@@ -227,7 +228,7 @@ class Buffer(object):
         'Delete lines from start to end, replace with single line joined text'
         lines = [ line.rstrip() for line in self.lines[start:end+1] ]
         joined = ''.join(lines)+'\n'
-        self.d(start, end)
+        self.d(start, end, yank=False) # do not save joined lines in cut buffer
         self.i(start, joined)
 
     def s(self, start, end, old, new, glbl):

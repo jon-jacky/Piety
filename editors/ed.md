@@ -110,7 +110,7 @@ way, by typing *exit()* or *^D*.
 
 In the *b* command, the buffer name parameter can be abbreviated by
 providing a prefix followed by a hyphen -- a sort of "poor person's
-tab completion".  For example, the command *b key-* or even *b k-*
+auto completion".  For example, the command *b key-* or even *b k-*
 might switch to the buffer *keyboard.py*.  If more than one buffer
 name begins with the same prefix, *ed.py* just chooses one.
 
@@ -181,7 +181,7 @@ the only mode we provide is *Text*.
 ## Limitations and differences from classic ed and sam ##
 
 **ed.py** does not support these classic *ed* commands:
-*H h n P u wq W*. 
+*H h n P u wq W*.
 
 **ed.py** does not support the classic *ed* iteration commands *g G v V*.
 
@@ -195,20 +195,31 @@ not the classic *ed* command *n* (print line numbers).
 There is no way to suppress printing the error messages as in classic
 *ed*.
 
+The *e* and *E* commands only work in the *main* buffer.
+In *sam*, the *e* command works in any buffer.
+
+The *e* and *E* commands require a filename parameter.
+In classic *ed* (and *sam*), *e* with no filename
+reloads the current file into the current buffer, which
+erases any modifications made since the file was last loaded.
+
+The *B* (and *D*) commands accept only one file (or buffer) name argument,
+not multiple names as in *sam*.
+
 In the *s* (substitute) command and in the */text/* and *?text?*
 address forms, the text pattern is ordinary text, not a regular
 expression.
+
+The *j* (join) command does not save the lines that were joined
+in the cut buffer, unlike *GNU ed*.
 
 In the */text/* and *?text?* address forms, **ed.py** only searches
 forward to the end of the buffer (or backward to the beginning). It
 does not wrap around and continue searching from the beginning (or
 end).
 
-The *B* (and *D*) commands accept only one file (or buffer) name argument,
-not multiple names as in *sam*.
-
 The default prompt is the colon *:*, not the empty string.  If no
-prompt is desired, the empty string must be requested with *-p ''* 
+prompt is desired, the empty string must be requested with *-p ''*
 on the command line or *p=''* in the *ed* function call.
 
 The *z* command accepts a negative parameter to scroll backward,
