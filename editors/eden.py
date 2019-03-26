@@ -126,7 +126,7 @@ class Console(console.Console):
             self.delete_char()
         else:
             self.join_next()
-            
+
     def goto_line(self, iline, jcol):
         if check.iline_ok(ed.buf, iline):
             ed.buf.replace(ed.buf.dot, self.line + '\n')
@@ -178,10 +178,9 @@ class Console(console.Console):
     def exchange(self):
         'Exchange point and mark (to make mark visible by putting cursor there).'
         if '@' in ed.buf.mark:
-            frame.win.clear_marker(ed.buf.dot)
-            ed.buf.dot, ed.buf.mark['@'] = ed.buf.mark['@'], ed.buf.dot
-            frame.win.set_marker(ed.buf.dot)
-            # FIXME? What if the two lines aren't already in same window?
+            saved_dot = ed.buf.dot
+            self.goto_line(ed.buf.mark['@'], 1) # updates ed.buf.dot
+            ed.buf.mark['@'] = saved_dot
 
     def cut(self):
         """
