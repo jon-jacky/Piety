@@ -27,7 +27,8 @@ The recommended way to run **ed.py** as a standalone program is:
 Here the *-i* option runs Python in interactive mode so you can use
 *readline*-style editing in commands and input text.  The *-i* option
 also makes it possible to resume an *ed.py* session
-after exiting or after a program crash.
+after exiting, or to recover from a program crash, without losing buffer
+contents in memory that have not yet been saved to a file.
 
 The *-m* option finds
 and runs **ed.py** from any directory on your Python path (here you provide
@@ -58,7 +59,7 @@ The default prompt string is the colon *:*.  To run with no prompt string,
 like classic *ed*, you must specify the empty string: *-p ''*.
 
 To run *ed.py* in an interactive Python session, type *from ed import* *
-to import the entire API.   Then type *ed()* to start the editor:
+to import the entire API, including the *ed* function.  Then type *ed()* to start the editor:
 
     python3 -i
     ...
@@ -81,18 +82,19 @@ You can also interrupt *ed.py* by typing *^C*.  It is possible
 that *ed.py* might crash due to a programming error or other
 unhandled exception.
 
-If you start *ed.py* with a Python command that includes
-the *-i* option, control transfers to an
+If you start *ed.py* with a Python command that includes the *-i* option,
+control transfers to an
 interactive Python prompt when *ed.py* stops for any reason.
 All the editing buffers, their contents, and other
 context -- such as the current line in each buffer -- are still intact.
 You can use the *ed.py* API or any other Python statements.
 You can type *ed()* to restart *ed.py*, resuming just where
 you left off.  No function arguments
-are needed here, because the data assigned at startup are still present.
+are needed this time, because the arguments used at startup are still in effect.
 
 You can exit the Python session in the usual
-way, by typing *exit()* or *^D*.
+way, by typing *exit()* or *^D*.   Then the buffer contents are
+lost and it is no longer possible to resume the session.
 
 ## Commands ##
 
@@ -125,17 +127,13 @@ Environment* by Kernighan and Pike, *Software Tools* by Kernighan and
 Plauger, etc.  Or just type *man ed* on any Unix-like system
 (including Mac OS X).  The version of *ed* in Plan 9 is almost the
 same, and is described in a completely rewritten man page at
-[http://plan9.bell-labs.com/magic/man2html/1/ed](http://plan9.bell-labs.com/magic/man2html/1/ed)
-and
 [http://man.cat-v.org/plan_9/1/ed](http://man.cat-v.org/plan_9/1/ed).
 There is a manual at [GNU](http://www.gnu.org/software/ed/manual/ed_manual.html),
 and a brief tutorial at a [blog](http://blog.sanctum.geek.nz/actually-using-ed/),
 with more comments and links
 at [HN](https://news.ycombinator.com/item?id=4120513).  There is even a [POSIX standard](http://pubs.opengroup.org/onlinepubs/9699919799/utilities/ed.html).
 
-The *sam* editor is described at
-[http://plan9.bell-labs.com/sys/doc/sam/sam.html](http://plan9.bell-labs.com/sys/doc/sam/sam.html)
-and [http://sam.cat-v.org/](http://sam.cat-v.org/).
+The *sam* editor is described at [http://sam.cat-v.org/](http://sam.cat-v.org/).
 
 This brief example that shows how to invoke **ed.py** in an
 interactive Python session and run some commands:
@@ -228,8 +226,16 @@ unlike classic *ed*.
 ## API ##
 
 **ed.py** has a Python API so you can edit from the Python prompt or
-write editing scripts in Python.  Here is the preceding example
-expressed using the API.  Here we use the *from ed import* * form
+write editing scripts in Python.
+
+A convenient way to use the API is to start *ed.py* with the Python *-i* option
+as described above, edit some text using *ed* commands, then exit using the *q* command
+to return to the Python prompt.
+Then all the buffer contents that you entered in *ed* are still in memory for you to work on
+with the API.
+
+Here is the preceding example
+expressed using the API.  Here we use *from ed import* *
 so we don't have to prefix each function call with *ed.*
 
     >>> from ed import *
@@ -285,17 +291,18 @@ is the preceding example expressed once more using *process_line*:
     >>> process_line('w')
     test.txt, 6 lines
 
-When **ed.py** is running with the [Piety](../piety/README.md) 
+When **ed.py** is running with the [Piety](../piety/README.md)
 cooperative multitasking
 system, a Piety [Console](../console/README.md) object collects
 a command line or input line without
 blocking, and then passes that line to *process_line*.
 
+Finally, the API provides the *ed* function that runs the application.
+
 ## Modules ##
 
 **[ed.py](ed.py)** provides the user interface: the command line and the public
-Python API described above, including command line parsing, argument
-checking, and error messages.  **ed.py** reads and writes at the
+Python API described above.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
 
 **ed.py** imports the *buffer.py* module, which provides the
@@ -307,7 +314,7 @@ error checking, and no error messages or progress messages.  The
 and reads and writes files.
 
 **ed.py** imports the *parse.py* module that provides
-functions for parsing the *ed* command line, and the
+functions for parsing *ed* commands, and the
 *check.py* module that provides functions for checking
 command arguments and supplying default arguments.
 
@@ -325,13 +332,71 @@ included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
 no dependencies.
 
+## Data structures ##
+
+The editor data structures are at top level in the *ed.py* module,
+so you can easily inspect them at the Python prompt.  The most
+important are:
+
+- *current* is the name of the current buffer, a string.
+
+- *buf* is the current buffer, an instance of the *Buffer* class.
+  *buf.lines* is the text in the buffer, a list of strings.
+  *buf.dot* is the index of the current line in *buf.lines*.
+
+- *buffers* is the collection of all buffers, a dictionary whose keys
+  are the buffer names (strings) and whose values are the buffer
+  instances.  So *buffers['main'].lines* is the text in the *main* buffer.
+
+In this example we start an *ed.py* session, type a few *ed* commands, then
+quit to the Python prompt and type a few statements to inspect the data:
+
+    ... $ python3 -i -m ed
+    :a
+    Here is a line in main
+    .
+    :B ed.md
+    ed.md, 375 lines
+    :1,5p
+
+    ed.py
+    =====
+
+    **[ed.py](ed.py)** is a text editor in pure Python inspired by the
+    :n
+    CRM Buffer            Lines  Mode     File
+      * main                  1  Text     None
+    .   ed.md               375  Text     ed.md
+    :Q
+    >>> current
+    'ed.md'
+    >>> buf
+    <buffer.Buffer object at 0x10144ee48>
+    >>> buffers
+    {'main': <buffer.Buffer object at 0x10144eeb8>, 'ed.md': <buffer.Buffer object at 0x10144ee48>}
+    >>> buf.lines[:5]
+    ['', '\n', 'ed.py\n', '=====\n', '\n']
+
+We started this example by starting *ed.py* from the system command line.
+Alternatively we could start *ed.py* in the Python session with *import ed*
+then *ed.ed()*, then at the Python prompt, inspect the data with *ed.current* etc.
+But we cannot start with *from ed import* * because that form only imports the
+values the variables had at the time of the *import* command -- so in this
+example, typing *current* would show its initial value *'main'*, not its
+up-to-date value *'ed.md'*.
+
+Data structures are initialized (to one empty buffer, the *main* buffer)
+when the *ed.py* module is imported or reloaded.  But they are *not* reinitialized
+when the *ed* function is invoked.  This makes it possible to exit and resume
+*ed* without losing buffer contents or other context.
+
 ## Related programs ##
 
 **ed.py** is the core of [edo](edo.md), which adds a built-in
 Python interpreter and scripting.
 
 **ed.py** runs an event loop that blocks waiting for a complete line
-to be entered at the terminal.   
+to be entered at the terminal.
 [edda](edda.py) wraps *ed.py* in a [Console](../console/README.md)
 object that collects the line without blocking,
 so *edda* can run in the cooperative multitasking system,

@@ -43,7 +43,7 @@ Piety might be used for ---
 
 - **Research** - Experiment with new or unconventional operating
     system constructs (like the alternative to the file system
-    proposed for [Gracle](https://github.com/jon-jacky/Piety/blob/master/doc/gracle_excerpts.txt)).
+    proposed for [LispOs](https://github.com/robert-strandh/LispOS).
 
 - **Embedded computing** - Run standalone Python applications on minimal platforms (something like [PyMite](https://wiki.python.org/moin/PyMite) or [Micro Python](http://micropython.org/)).
 
