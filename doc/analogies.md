@@ -152,11 +152,12 @@ such as QEMU or VirtualBox to run another operating system in a *virtual machine
 Piety only uses Python, so a Python interpreter is the only
 VMM needed to run Piety.  The Python session is the entire virtual machine.
 
-- **process**: Piety does not have processes running in separate address
-spaces, just tasks in a single address space.
+- **process**: Piety does not have processes,
+just tasks in a single address space.  When Piety runs on a host
+operating system, the entire Piety session runs in a single host process.
 
 - **kernel mode**: Piety does not distinguish kernel and user modes.
-All code runs with the same privileges.
+All code, including applications, runs with the same privileges.
 
 The operating system that Piety resembles the most is
 [Oberon](http://www.projectoberon.com/).  Oberon uses cooperative
