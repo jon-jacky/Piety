@@ -14,22 +14,22 @@ operating system, but we can still identify some analogies between
 conventional operating system concepts and the Piety system.
 
 For now, Piety runs in an ordinary Python session running in a
-terminal on some host computer.  At this stage, Piety depends on the
+terminal on a host computer.  At this stage, Piety depends on the
 host operating system code running outside the Python session to
 provide access to the terminal and the file system.  A long-range goal
 of the Piety project is to replace the host operating system with code
-that runs in a Python session on an otherwise bare machine.  
+that runs in a Python session on an otherwise bare machine.
 
 In the meantime, we avoid using the host operating system as much as
 we can.  Our short-term goal is to create and run Python code entirely
 within Piety, using in-memory data structures instead of the host file
 system, and using multiple windows in our single terminal instead of
 the host desktop.  This will enable Piety development to be largely
-self-hosted within the already existing Piety system.  We will only
-need the host to initialize the Piety session and persist the
-results.  The analogies described here apply to this interim system.
+self-hosted within the already existing Piety system.
 
-- **task**: In Piety, a collection of functions (actually, methods or
+This is how some traditional operating system contructs are realized in Piety:
+
+- **task**: In Piety, a collection of functions (or methods or
 any other callables) that can be invoked by a single kind of event
 (keyboard input, or timer expires, etc.).  In Piety, functions that
 are invoked by events are called *handlers*.  Piety runs an *event
@@ -40,7 +40,9 @@ Handlers are not pure functions; most have side effects such as
 updating editor buffers and display windows.  A task can include
 several *jobs*.  More details [here](../piety/README.md).
 
-- **background task**: a task whose handlers are invoked by a periodic timer.
+- **background task**: a task whose handlers are invoked by
+events that are not under the user's direct control, such as
+a periodic timer.
 
 - **concurrency**: In Piety, when two or more tasks that handle
 different kinds of events are loaded into the system, each kind of
@@ -56,11 +58,14 @@ different tasks run at the same time on different processors.
 and all data persists in the long-running Python session, so no
 context save/restore is needed when different tasks run.
 
-- **application**: a module or group of modules that provides a
-collection of related functions (or other callables) that can be
-invoked as handlers for a Piety task.  Editors and shells are examples
-of applications.  An application can also run standalone, without the
-Piety system.
+- **application**: Software that a user can run to perform some activity.
+Editors and shells are examples of applications.  An application can run
+as a standalone program in its own Python session, or it can be adapted to
+run as a non-blocking task or job in a Piety session.
+A typical Piety session has a shell and editor loaded, and perhaps some
+other applications.   There are no barriers between applications
+in a Piety session -- the functions and data in each
+are accessible to all the others.
 
 - **job**: a single application within a task.  A task can contain
 multiple jobs.  The jobs within a task do not interleave with each
@@ -72,6 +77,8 @@ jobs can be resumed.
 input.  A terminal session can include several console jobs.
 
 - **console job**: a single application in a terminal session.
+  Piety provides a [console](../console/README.md) module that
+  adapts a terminal application to run as a console job.
 
 - **foreground job**: the job that is handling a task's events.  In a
     terminal session, the application that is currently running on the
@@ -86,7 +93,9 @@ input.  A terminal session can include several console jobs.
 command language.  However, the standard Python interpreter cannot
 serve as the Piety shell because it blocks while waiting for the
 next statement, which would prevent other tasks from running.  Piety
-provides its own non-blocking Python shell.
+provides a callable Python shell named *pysh*
+(rhymes with *fish*), along with [modules](../shells/README.md)
+that adapt it to run in Piety sessions.
 
 - **memory management**: including allocation and reclamation (that is,
 garbage collection).  Provided by Python language runtime.
@@ -107,7 +116,7 @@ use in-memory data structures that can persist through the
 long-running Python session.  In particular, we use text buffers,
 instances of the *Buffer* class used in *ed.py*
 and other editors.  They provide a *write* method so Python *print*
-can print into them.  We will configure Python *import* to import
+statements can write into them.  We will configure Python *import* to import
 directly from these buffers so they don't need to be saved in the host
 file system. (Not yet implemented)
 
@@ -127,7 +136,7 @@ separate window manager; it can display windows that are updated by
 different applications.
 
 - **boot**: start the standard blocking Python interpreter, import
-needed operating system and application modules, start Piety event
+Piety operating system and application modules, start Piety event
 loop, start non-blocking Piety Python REPL console job.  Optionally,
 start other applications.  This can all be accomplished by a Python
 script.  The Piety *scripts* directory contains several Python modules
@@ -143,9 +152,16 @@ such as QEMU or VirtualBox to run another operating system in a *virtual machine
 Piety only uses Python, so a Python interpreter is the only
 VMM needed to run Piety.  The Python session is the entire virtual machine.
 
+- **process**: Piety does not have processes running in separate address
+spaces, just tasks in a single address space.
+
+- **kernel mode**: Piety does not distinguish kernel and user modes.
+All code runs with the same privileges.
+
 The operating system that Piety resembles the most is
 [Oberon](http://www.projectoberon.com/).  Oberon uses cooperative
 multitasking, uses a text buffer class as a building block, and uses a
 multiwindow text editor as its desktop and system shell.
 
-Revised Sep 2018
+Revised Mar 2019
+
