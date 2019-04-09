@@ -45,7 +45,7 @@ def init(buffer):
     scale(nlines, cmd_h) # default cmd_h, may reassign before first update
     win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
     win.focus = True
-    windows.append(win) 
+    windows.append(win)
     ifocus = 0
 
 def update_windows():
@@ -67,14 +67,14 @@ def refresh(column=1):
     'Clear and update entire frame in command mode, otherwise just the windows'
     if mode == Mode.command:
         display.put_cursor(1,1) # upper left corner
-        display.erase() 
+        display.erase()
     update_windows()
     if mode == Mode.command:
-        display.set_scroll(cmd_1, cmd_n) 
+        display.set_scroll(cmd_1, cmd_n)
         # update() sets cursor
     elif mode == Mode.display:
         put_display_cursor(column=column)
-    
+
 def rescale():
     'Recalculate frame and all window dimensions, then display all.'
     # Makes all windows (almost) the same height, unlike after o2 command
@@ -82,10 +82,10 @@ def rescale():
     nwindows = len(windows)
     win_hdiv = windows_h // nwindows
     for iwin, win in enumerate(windows):
-        win_h = (win_hdiv if iwin < nwindows-1 
+        win_h = (win_hdiv if iwin < nwindows-1
                  else windows_h - (nwindows-1)*win_hdiv) # including status
         win.resize(frame_top + iwin*win_hdiv, win_h-1, ncols) # -1 excl status
-        win.locate_segment(win.buf.dot if win.focus else win.saved_dot)
+        win.locate_segment(win.buf.dot if (win.focus or win.updating) else win.saved_dot)
     refresh()
 
 def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
@@ -173,16 +173,17 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Search for window (if any) which displays that buffer.
     elif op == Op.insert and origin == background_task:
         for w in windows:
-            if w.buf == buffer:
+            if w.buf == buffer and w.updating:
+                w.saved_dot = w.buf.dot
                 terminal.set_line_mode()
                 w.insert(origin, start, end)
                 for w1 in windows:
                     if w1.samebuf(w):
-                        w1.adjust_insert(start, end, destination)
+                        pass # NOT! w1.adjust_insert(start, end, destination)
                 terminal.set_char_mode()
-                if mode == Mode.input:
-                    win.put_cursor_for_input(column=column) # win not w
-                break # might be other w with same buf, just update the first
+                # break # NOT! might be other w with same buf, just update the first
+        if mode == Mode.input: # can't put input cursor til other windows done
+              pass # NOT!  win.put_cursor_for_input(column=column) # win not w
 
     # Delete text: ed d m command
     # start,end are line numbers before delete, destination == win.buf.dot

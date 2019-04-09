@@ -6,14 +6,14 @@ To update ts1 buffer with new timestamp: !print(next(ts1),file=ts1buf)
 """
 
 import timestamp
-import desoto as editor
+import edsel
 
-# We haven't started display editor yet, window not initialized, 
+# We haven't started display editor yet, window not initialized,
 #  so use ed commands.
-ed = editor.ed
+ed = edsel.ed
 
 # Put some content in main buffer
-ed.i('This is the main buffer') 
+ed.i('This is the main buffer')
 # create timestamp generators
 ts1 = timestamp.timestamp('ts1')
 ts2 = timestamp.timestamp('ts2')
@@ -27,5 +27,12 @@ ts2buf = ed.buffers['ts2']
 print(next(ts1), file=ts1buf)
 print(next(ts2), file=ts2buf)
 
+# Start this from the Python prompt, not in this script
 # start interactive editor session, its own blocking main event loop
-editor.main(c=12)
+#edsel.edsel(c=12)
+
+def update(b):
+    for w in edsel.frame.windows:
+        if w.buf in (ts1buf,ts2buf):
+            w.updating = b # boolean
+

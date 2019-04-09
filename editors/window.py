@@ -9,7 +9,9 @@ def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
     return min(max(first, iline), last)
 
-show_marker = True # True in command mode when cursor is not in window
+# show_marker is just a proxy for frame.mode variable
+# True when mode == Mode.command, false when Mode.input and Mode.display
+show_marker = True
 show_diagnostics = False # on status line - for now, don't show
 
 class Window(object):
@@ -31,6 +33,7 @@ class Window(object):
          ncols - maximum number of characters in a line
         """
         self.focus = False # True when this window has the input focus
+        self.updating = False # Doesn't have input focus but update anyway
         self.buf = buf
         self.saved_dot = self.buf.dot  # line
         self.btop = 1 # index in buffer of first line displayed in window
@@ -229,7 +232,7 @@ class Window(object):
     def locate(self, origin, destination):
         'Update window after cursor moves from origin to destination'
         if self.contains(destination):
-            if show_marker:
+            if self.focus and show_marker:
                 self.clear_marker(origin)
                 self.set_marker(destination)
             self.update_status()
@@ -277,7 +280,7 @@ class Window(object):
         readonly = '%' if self.buf.readonly else '-'
         modified = '*-     ' if self.buf.modified else '--     '
         bufname = '%-13s' % self.buf.name
-        dot = self.buf.dot if self.focus else self.saved_dot
+        dot = self.buf.dot if (self.focus or self.updating) else self.saved_dot
         position = (' All ' if self.buf.nlines() <= self.nlines else
                     ' Top ' if self.btop == 1 else
                     ' Bot ' if self.blast == self.buf.nlines() else
@@ -388,7 +391,7 @@ class Window(object):
             elif self.saved_dot > end:
                 self.saved_dot = self.saved_dot + nlines
             else:
-                self.saved_dot = destination 
+                self.saved_dot = destination
             self.move_update(self.saved_dot)
             self.update_status()
         elif self.btop > end:

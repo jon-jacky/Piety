@@ -58,9 +58,9 @@ class Buffer(object):
             # ignore the end string, buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
             # self.a(self.dot, self.contents) # append command, advances dot
-            self.insert(self.nlines()+1, self.contents.splitlines(True), 
-                        origin=background_task, 
-                        column=(inputline.start_col + inputline.point 
+            self.insert(self.nlines()+1, self.contents.splitlines(True),
+                        origin=background_task,
+                        column=(inputline.start_col + inputline.point
                                 if inputline else 0))
         else:
             # store contents string until we get end string
@@ -113,7 +113,7 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert(self, iline, lines, origin=0, column=1): 
+    def insert(self, iline, lines, origin=0, column=1):
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
@@ -125,8 +125,8 @@ class Buffer(object):
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
         # start and end of inserted text, end == destination == dot
-        view.update(Op.insert, buffer=self, origin=origin, 
-                      destination=self.dot, start=iline, end=self.dot, 
+        view.update(Op.insert, buffer=self, origin=origin,
+                      destination=self.dot, start=iline, end=self.dot,
                       column=column)
 
     def replace(self, iline, line):
