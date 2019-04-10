@@ -33,7 +33,6 @@ class Window(object):
          ncols - maximum number of characters in a line
         """
         self.focus = False # True when this window has the input focus
-        self.updating = False # Doesn't have input focus but update anyway
         self.buf = buf
         self.saved_dot = self.buf.dot  # line
         self.btop = 1 # index in buffer of first line displayed in window
@@ -242,7 +241,7 @@ class Window(object):
     def insert(self, origin, start, end):
         'Update window after insert lines from origin to start..end'
         if self.contains(end):
-            if origin != 0:
+            if origin > 0:
                 self.clear_marker(origin)
             self.update_from(start)
             if self.focus and show_marker:
@@ -280,7 +279,7 @@ class Window(object):
         readonly = '%' if self.buf.readonly else '-'
         modified = '*-     ' if self.buf.modified else '--     '
         bufname = '%-13s' % self.buf.name
-        dot = self.buf.dot if (self.focus or self.updating) else self.saved_dot
+        dot = self.buf.dot if self.focus else self.saved_dot
         position = (' All ' if self.buf.nlines() <= self.nlines else
                     ' Top ' if self.btop == 1 else
                     ' Bot ' if self.blast == self.buf.nlines() else

@@ -85,7 +85,7 @@ def rescale():
         win_h = (win_hdiv if iwin < nwindows-1
                  else windows_h - (nwindows-1)*win_hdiv) # including status
         win.resize(frame_top + iwin*win_hdiv, win_h-1, ncols) # -1 excl status
-        win.locate_segment(win.buf.dot if (win.focus or win.updating) else win.saved_dot)
+        win.locate_segment(win.buf.dot if win.focus else win.saved_dot)
     refresh()
 
 def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
@@ -170,20 +170,20 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
             win.put_cursor_for_input(column=1)
 
     # Background task inserts text by calling buffer write() method.
-    # Search for window (if any) which displays that buffer.
+    # Search for windows (if any) which displays that buffer.
     elif op == Op.insert and origin == background_task:
         for w in windows:
-            if w.buf == buffer and w.updating:
+            if w.buf == buffer:
                 w.saved_dot = w.buf.dot
                 terminal.set_line_mode()
                 w.insert(origin, start, end)
-                for w1 in windows:
-                    if w1.samebuf(w):
-                        pass # NOT! w1.adjust_insert(start, end, destination)
                 terminal.set_char_mode()
-                # break # NOT! might be other w with same buf, just update the first
         if mode == Mode.input: # can't put input cursor til other windows done
-              pass # NOT!  win.put_cursor_for_input(column=column) # win not w
+            win.put_cursor_for_input(column=column)
+        elif mode == Mode.display:
+            put_display_cursor(column=column)
+        else:
+            pass # Mode.commmand handled at the end of this fcn
 
     # Delete text: ed d m command
     # start,end are line numbers before delete, destination == win.buf.dot
@@ -242,6 +242,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Then we can call standard Python input() or Piety Console restart().
     if mode == Mode.command:
         put_command_cursor(column=column) # background task can set column
-    # But caller calls put_display_cursor because caller knows column
+    # Each Op... case handles other modes, see refresh() and Op.refresh
+    # Is that necessary? I recall it's because some cases use default column=1
 
     return win # caller might need to know which window was selected

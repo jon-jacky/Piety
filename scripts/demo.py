@@ -9,12 +9,13 @@ run_timestamps.py - Demonstrates many features of the Piety system.
 
 import terminal, display, piety, timestamp
 
-from session import pysh, ed, edsel, jobs, fg # so we can say ed() etc.
+# session.editor is the edsel module, session.edsel is the edsel Console job
+from session import pysh, ed, edsel, jobs, fg, editor# so we can say ed() etc.
 
-import ed as ed_api  # we already imported ed from session 
+import ed as ed_api  # we already imported ed from session
 
 # Put some content in main buffer
-ed_api.i('This is the main buffer') 
+ed_api.i('This is the main buffer')
 
 # create timestamp generators
 ts1 = timestamp.timestamp('ts1')
@@ -42,11 +43,19 @@ def alternate():
     'Return True on every other timeout event.'
     return bool(piety.ievent[piety.timer]%2)
 
-ts1handler = (lambda: print(next(ts1),file=ts1buf))    
-ts2handler = (lambda: print(next(ts2),file=ts2buf))    
+ts1handler = (lambda: print(next(ts1),file=ts1buf))
+ts2handler = (lambda: print(next(ts2),file=ts2buf))
 
 ts1task = piety.Task(handler=ts1handler, input=piety.timer, enabled=piety.true)
 ts2task = piety.Task(handler=ts2handler, input=piety.timer, enabled=alternate)
+
+# windows showing ts1buf or ts2buf that are not focus window
+# do not update when we print into those buffers
+# until we call update(True).  Call update(False) to stop updating.
+def update(b):
+    for w in editor.frame.windows:
+        if w.buf in (ts1buf,ts2buf):
+            w.updating = b # boolean
 
 def main():
     pysh()
