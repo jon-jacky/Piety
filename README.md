@@ -24,9 +24,9 @@ lot of work by others that we might be able to use or adapt (see
 
 For now, Piety runs in an ordinary Python interpreter session on a
 host operating system.  An overview of its design appears
-[here](doc/analogies.md).  We have a [script](scripts/run_timestamps.py) that
+[here](doc/analogies.md).  We have a [script](scripts/demo.py) that
 demonstrates many Piety features, described
-[here](scripts/run_timestamps.md).  We plan to run Piety on a bare
+[here](scripts/demo.md).  We plan to run Piety on a bare
 machine (or bare VM) with no other operating system, but only a Python
 interpreter with minimal support.
 There are only a few platform-dependent modules.  Most modules
@@ -54,8 +54,8 @@ their contents.
 
 An overview of the Piety design appears [here](doc/analogies.md).
 
-A [script](scripts/run_timestamps.py) that demonstrates many Piety
-features is described [here](scripts/run_timestamps.md).
+A [script](scripts/demo.py) that demonstrates many Piety
+features is described [here](scripts/demo.md).
 
 Ongoing and recent work on Piety is described [here](BRANCH.md).
 
@@ -70,4 +70,4 @@ Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).
 
-Revised May 2018
+Revised Mar 2019

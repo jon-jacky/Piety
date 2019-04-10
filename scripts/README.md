@@ -21,6 +21,14 @@ each module for directions and explanations.
 - **background.py**: Demonstrate printing to editor buffers from
      the background.  Use a while loop, not the Piety event loop.
 
+- **demo.md**: Description of *demo.py*.
+
+- **demo.py**: Uses *piety.run* to run the three jobs
+  created by *session*, concurrently with two timestamp tasks created
+  in this script.  The two timestamp tasks can be seen updating editor
+  windows at the same time the user edits and updates text in other
+  windows or in the scrolling command region.
+
 - **embedded.py**: Uses *piety.run* with two concurrent file
    writer tasks created by *writers*, but without an interactive
    interpreter.  Shows that Piety can run in a "headless" mode with no
@@ -33,14 +41,6 @@ each module for directions and explanations.
 
 - **lines20.txt**: Sample text file for demonstrating editor jobs
   in *session* and *demo*.
-
-- **demo.md**: Description of *demo.py*.
-
-- **demo.py**: Uses *piety.run* to run the three jobs
-  created by *session*, concurrently with two timestamp tasks created
-  in this script.  The two timestamp tasks can be seen updating editor
-  windows at the same time the user edits and updates text in other
-  windows or in the scrolling command region.
 
 - **run_writers.py**: Uses *piety.run* to run the three jobs created
     by *session*, concurrently with the two writer tasks created by
