@@ -40,7 +40,7 @@ class Buffer(object):
     def info(self):
         'return string with flags, name, size in lines, mode, filename'
         return (('%' if self.readonly else ' ') +
-                ('*' if self.modified else ' ') + 
+                ('*' if self.modified else ' ') +
                 ' %-15s' % self.name + ' %7d' % self.nlines() +
                 '  %-8s' % self.mode + ' %s' % self.filename)
 
@@ -48,7 +48,7 @@ class Buffer(object):
     # The call print(s, file=buffer), invokes this method to write s to buffer
     # Experiments show that this Python print calls this write method twice,
     # first write for the contents s, second write for end string
-    # even when end string is default \n or empty ''     
+    # even when end string is default \n or empty ''
     # So here we alternate reading contents and discarding end string
     def write(self, s):
         'Invoked by print(s, file=buffer), writes s to buffer'

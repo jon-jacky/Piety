@@ -38,7 +38,7 @@ def main():
     piety.cycle.running = True # not using Piety scheduler, just this flag
     pysh()  # start the first job, which can start others
     while piety.cycle.running: # pysh.cleanup sets this False
-        session.handler()  # block waiting for each single character 
+        session.handler()  # block waiting for each single character
 
 if __name__ == '__main__':
     main()

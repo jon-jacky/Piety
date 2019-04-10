@@ -49,14 +49,6 @@ ts2handler = (lambda: print(next(ts2),file=ts2buf))
 ts1task = piety.Task(handler=ts1handler, input=piety.timer, enabled=piety.true)
 ts2task = piety.Task(handler=ts2handler, input=piety.timer, enabled=alternate)
 
-# windows showing ts1buf or ts2buf that are not focus window
-# do not update when we print into those buffers
-# until we call update(True).  Call update(False) to stop updating.
-def update(b):
-    for w in editor.frame.windows:
-        if w.buf in (ts1buf,ts2buf):
-            w.updating = b # boolean
-
 def main():
     pysh()
     piety.run()

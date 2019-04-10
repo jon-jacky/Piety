@@ -40,6 +40,10 @@ Handlers are not pure functions; most have side effects such as
 updating editor buffers and display windows.  A task can include
 several *jobs*.  More details [here](../piety/README.md).
 
+- **process**: Piety does not have processes,
+just tasks in a single address space.  When Piety runs on a host
+operating system, the entire Piety session runs in a single host process.
+
 - **background task**: a task whose handlers are invoked by
 events that are not under the user's direct control, such as
 a periodic timer.
@@ -151,10 +155,6 @@ to use a *virtual machine monitor (VMM)* (or *hypervisor*)
 such as QEMU or VirtualBox to run another operating system in a *virtual machine*.
 Piety only uses Python, so a Python interpreter is the only
 VMM needed to run Piety.  The Python session is the entire virtual machine.
-
-- **process**: Piety does not have processes,
-just tasks in a single address space.  When Piety runs on a host
-operating system, the entire Piety session runs in a single host process.
 
 - **kernel mode**: Piety does not distinguish kernel and user modes.
 All code, including applications, runs with the same privileges.
