@@ -150,6 +150,8 @@ Therefore, *^X* can act as a search command: type *^X* then
 */string/* (or *?string?*) to search forward (or backward) for
 *string*.  After that, when display editing, you can type the commands
 *^S* (or *^R*) to search forward (or backward) for that same *string*.
+The same search string remains in effect in all buffers until you
+re-assign it in another */.../* or *?...?* command.
 
 #### Cut and Paste ####
 

@@ -9,13 +9,14 @@ without the Piety scheduler.
 """
 
 import sys, piety
-import console # just type console.jobs() to see the list
 
+# Console jobs
 from salysh import pysh
 from edda import ed
-from desoto import edsel, editor # desoto edsel is Console, editor is edsel.py
+from desoto import edsel
+from eden import eden
 
-session = piety.Session(name='session', input=sys.stdin, jobs=[pysh,ed,edsel])
+session = piety.Session(name='session', input=sys.stdin, jobs=[pysh,ed,edsel,eden])
 jobs = session.jobs # jobs() list jobs and their states
 fg = session.fg # fg() resume most recently suspended job
 
@@ -29,10 +30,10 @@ ed.start = (lambda: session.start(ed))
 edsel.name = 'edsel'
 edsel.start = (lambda: session.start(edsel))
 
-pysh.exit = ed.exit = edsel.exit = session.switch
+eden.name = 'eden'
+eden.start = (lambda: session.start(eden))
 
-# So update() can restore cursor after updates from background task
-editor.ed.buffer.inputline = edsel # Console instance
+pysh.exit = ed.exit = edsel.exit = eden.exit = session.switch
 
 def main():
     piety.cycle.running = True # not using Piety scheduler, just this flag

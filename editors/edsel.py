@@ -3,7 +3,7 @@ edsel - Display editor based on the line editor ed.py
    BUT import edo, ed + wyshka + samysh shell and scripting enhancements
 """
 
-import traceback, os
+import traceback, os, sys
 import edo, frame, view, wyshka, samysh
 from updates import Op
 
@@ -108,8 +108,10 @@ def startup(*filename, **options):
                      end=frame.win.buf.dot)
 
 def cleanup():
-    'Restore display screen.'
+    'Restore display screen then turn off display updates etc.'
     frame.update(Op.restore)
+    view.update = view.noupdate
+    view.lz_print_dest = sys.stdout
 
 def edsel(*filename, **options):
     'Top level edsel command to invoke from python prompt or command line.'

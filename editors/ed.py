@@ -518,8 +518,6 @@ def startup(*filename, **options):
         command_prompt = options['p']
         prompt = command_prompt
     quit = False
-    view.update = view.noupdate
-    view.lz_print_dest = sys.stdout
 
 def ed(*filename, **options):
     'Top level ed command to invoke from Python REPL or __main__'
@@ -527,7 +525,7 @@ def ed(*filename, **options):
     while not quit:
         line = input(prompt) # blocks!
         process_line(line)
-        
+
 if __name__ == '__main__':
     filename, options = cmd_options()
     ed(*filename, **options)

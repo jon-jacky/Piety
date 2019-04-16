@@ -116,6 +116,10 @@ auto completion".  For example, the command *b key-* or even *b k-*
 might switch to the buffer *keyboard.py*.  If more than one buffer
 name begins with the same prefix, *ed.py* just chooses one.
 
+In the *b* command, if the buffer name parameter is omitted, 
+the previous buffer is selected.  This makes it easy to switch
+back and forth between two buffers.
+
 **ed.py** supports these line address forms from classic *ed*:
 
  *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.

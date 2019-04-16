@@ -9,7 +9,7 @@ import view
 from updates import Op, background_task
 
 # Hook for display updates from background tasks to restore cursor etc.
-inputline = None  # default: no updates from background tasks,no restore needed
+console = None  # default: no updates from background tasks,no restore needed
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
@@ -60,8 +60,8 @@ class Buffer(object):
             # self.a(self.dot, self.contents) # append command, advances dot
             self.insert(self.nlines()+1, self.contents.splitlines(True),
                         origin=background_task,
-                        column=(inputline.start_col + inputline.point
-                                if inputline else 0))
+                        column=(console.start_col + console.point
+                                if console else 0))
         else:
             # store contents string until we get end string
             self.contents = s

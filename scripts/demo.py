@@ -1,7 +1,7 @@
 """
-run_timestamps.py - Demonstrates many features of the Piety system.
-  Uses the Piety scheduler to run the three jobs created by
-  session.py, concurrently with the two timestamp tasks created here.
+demo.py - Demonstrates many features of the Piety system.
+  Uses the Piety scheduler to run the four jobs created by
+  session.py, concurrently with the two timestamp tasks created heredm.
   Each timestamp task uses the print function to update an editor
   buffer.  You can see these buffers update in their windows as you
   edit in another window
@@ -9,28 +9,36 @@ run_timestamps.py - Demonstrates many features of the Piety system.
 
 import terminal, display, piety, timestamp
 
-# session.editor is the edsel module, session.edsel is the edsel Console job
-from session import pysh, ed, edsel, jobs, fg, editor# so we can say ed() etc.
+import ed as edm # ed module, distinguish from ed Console job
+from session import pysh, ed, edsel, eden # Console jobs
+from session import jobs, fg # functions to type at Python command line
 
-import ed as ed_api  # we already imported ed from session
+# This assigment needed so view.update() can restore Console cursor
+#  after updates from background task
+# FIXME - This is not sufficiently general.
+#  This  is needed for each Console job when it reaches foreground.
+#  Here we have just hard-coded it for the eden Consoledm.
+#  On each timestamp tick, eden cursor will be restored
+#  but edsel cursor will reset to start of linedm.
+edm.buffer.console = eden # Console instance
 
 # Put some content in main buffer
-ed_api.i('This is the main buffer')
+edm.i('This is the main buffer')
 
 # create timestamp generators
 ts1 = timestamp.timestamp('ts1')
 ts2 = timestamp.timestamp('ts2')
 
 # create buffers for timestamp messages
-ed_api.b('ts1')
-ed_api.b('ts2')
+edm.b('ts1')
+edm.b('ts2')
 
 # return to main buffer
-ed_api.b('main')
+edm.b('main')
 
 # aliases for timestamp buffers
-ts1buf = ed_api.buffers['ts1']
-ts2buf = ed_api.buffers['ts2']
+ts1buf = edm.buffers['ts1']
+ts2buf = edm.buffers['ts2']
 
 # add content to timestamp buffers
 print(next(ts1), file=ts1buf)
