@@ -1,7 +1,7 @@
 """
 demo.py - Demonstrates many features of the Piety system.
   Uses the Piety scheduler to run the four jobs created by
-  session.py, concurrently with the two timestamp tasks created heredm.
+  session.py, concurrently with the two timestamp tasks created here.
   Each timestamp task uses the print function to update an editor
   buffer.  You can see these buffers update in their windows as you
   edit in another window

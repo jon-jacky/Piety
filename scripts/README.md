@@ -23,7 +23,7 @@ each module for directions and explanations.
 
 - **demo.md**: Description of *demo.py*.
 
-- **demo.py**: Uses *piety.run* to run the three jobs
+- **demo.py**: Uses *piety.run* to run the jobs
   created by *session*, concurrently with two timestamp tasks created
   in this script.  The two timestamp tasks can be seen updating editor
   windows at the same time the user edits and updates text in other
@@ -42,17 +42,17 @@ each module for directions and explanations.
 - **lines20.txt**: Sample text file for demonstrating editor jobs
   in *session* and *demo*.
 
-- **run_writers.py**: Uses *piety.run* to run the three jobs created
+- **run_writers.py**: Uses *piety.run* to run the jobs created
     by *session*, concurrently with the two writer tasks created by
     *writers*.
 
 - **session.md**: Description of *session.py*.
 
-- **session.py**: Creates a *Session* instance with three *Console*
+- **session.py**: Creates a *Session* instance with four *Console*
     jobs: the *pysh* shell, the *ed* line editor, and the *edsel*
-    display editor.  Used by *demo* and *run_writers*.
+    and *eden* display editors.  Used by *demo* and *run_writers*.
 
 - **writers.py**: Creates writer tasks used by *embedded* and
     *run_writers*.
 
-Revised Mar 2019
+Revised Apr 2019

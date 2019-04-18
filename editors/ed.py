@@ -519,7 +519,7 @@ def startup(*filename, **options):
         prompt = command_prompt
     quit = False
 
-def ed(*filename, **options):
+def main(*filename, **options):
     'Top level ed command to invoke from Python REPL or __main__'
     startup(*filename, **options)
     while not quit:
@@ -528,4 +528,4 @@ def ed(*filename, **options):
 
 if __name__ == '__main__':
     filename, options = cmd_options()
-    ed(*filename, **options)
+    main(*filename, **options)

@@ -34,6 +34,8 @@ The *-m* option finds
 and runs **ed.py** from any directory on your Python path (here you provide
 the module name *ed*, not the file name *ed.py*).
 
+Both options can be put together: *-im*
+
 **ed.py** provides a few command line arguments and options, explained in this
 output from *ed -h*:
 
@@ -51,27 +53,28 @@ output from *ed -h*:
 For example, to load the file *lines20.txt* on startup and use the
 precent sign *%* as the prompt string:
 
-    python3 -i -m ed lines20.txt -p %
+    python3 -im ed lines20.txt -p %
     lines20.txt, 20 lines
     %
 
 The default prompt string is the colon *:*.  To run with no prompt string,
 like classic *ed*, you must specify the empty string: *-p ''*.
 
-To run *ed.py* in an interactive Python session, type *from ed import* *
-to import the entire API, including the *ed* function.  Then type *ed()* to start the editor:
+To run *ed.py* in an interactive Python session, type *import ed*
+to import the entire API, including the *main* function.
+Then type *ed.main()* to start the editor:
 
-    python3 -i
+    ...$ python3 -i
     ...
-    >>> from ed import *
-    >>> ed()
+    >>> import ed
+    >>> ed.main()
     :
 
-The *ed* function accepts an optional positional argument for a file name and
-and optional keyword argument for a prompt string, so the *ed* function call
+The *main* function accepts an optional positional argument for a file name and
+and optional keyword argument for a prompt string, so the *main* function call
 can resemble the *ed* command line:
 
-    >>> ed('lines20.txt', p='%')
+    >>> ed.main('lines20.txt', p='%')
     lines20.txt, 20 lines
     %
 
@@ -88,7 +91,7 @@ interactive Python prompt when *ed.py* stops for any reason.
 All the editing buffers, their contents, and other
 context -- such as the current line in each buffer -- are still intact.
 You can use the *ed.py* API or any other Python statements.
-You can type *ed()* to restart *ed.py*, resuming just where
+You can type *main()* or *ed.main()* to restart *ed.py*, resuming just where
 you left off.  No function arguments
 are needed this time, because the arguments used at startup are still in effect.
 
@@ -116,7 +119,7 @@ auto completion".  For example, the command *b key-* or even *b k-*
 might switch to the buffer *keyboard.py*.  If more than one buffer
 name begins with the same prefix, *ed.py* just chooses one.
 
-In the *b* command, if the buffer name parameter is omitted, 
+In the *b* command, if the buffer name parameter is omitted,
 the previous buffer is selected.  This makes it easy to switch
 back and forth between two buffers.
 
@@ -142,12 +145,12 @@ The *sam* editor is described at [http://sam.cat-v.org/](http://sam.cat-v.org/).
 This brief example that shows how to invoke **ed.py** in an
 interactive Python session and run some commands:
 
-    >>> from ed import *
-    >>> ed()
+    >>> import ed
+    >>> ed.main()
     :e test.txt
     test.txt, 0 lines
     :a
-    ed.main() enters ed command mode.  By default, there is no command prompt.
+    main() enters ed command mode.  By default, the command prompt is :
     'e <name>' loads the named file into the current buffer.
     'a' enters ed input mode and appends the text after the current line.
     'w' writes the buffer contents back to the file.
@@ -161,7 +164,7 @@ interactive Python session and run some commands:
 
 After the *q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by calling
-*ed()* again.  Or, any of the other API functions can be called
+*main()* again.  Or, any of the other API functions can be called
 at the Python prompt.
 
 The *n* command prints information about all the buffers,
@@ -238,20 +241,20 @@ to return to the Python prompt.
 Then all the buffer contents that you entered in *ed* are still in memory for you to work on
 with the API.
 
-Here is the preceding example
-expressed using the API.  Here we use *from ed import* *
-so we don't have to prefix each function call with *ed.*
+Here is the preceding example expressed using the API.
+We import the *ed* module at the Python command, so we don't have to prefix each
+function call with *ed.*
 
-    >>> from ed import *
-    >>> e('test.txt')
+    >>> import ed
+    >>> ed.e('test.txt')
     test.txt, 0 lines
-    >>> a("""ed() enters ed command mode.  By default, there is no command prompt.
+    >>> ed.a("""main() enters ed command mode.  By default, the command prompt is :
     ... 'e <name>' loads the named file into the current buffer.
     ... 'a' enters ed input mode and appends the text after the current line.
     ... 'w' writes the buffer contents back to the file
     ... 'q' quits ed command mode.
     ... To quit input mode, type a period by itself at the start of a line.""")
-    >>> w()
+    >>> ed.w()
     test.txt, 6 lines
 
 All of the text for the append command *a* is handled here as the
@@ -281,18 +284,18 @@ argument, which is exactly the command string you would type to *ed*
 in command mode or the text string you would type in input mode.  Here
 is the preceding example expressed once more using *process_line*:
 
-    >>> from ed import *
-    >>> process_line('e test.txt')
+    >>> import ed
+    >>> ed.process_line('e test.txt')
     test.txt, 0 lines
-    >>> process_line('a')
-    >>> process_line('ed() enters ed command mode.  By default, there is no command prompt.')
-    >>> process_line("'e <name>' loads the named file into the current buffer.")
-    >>> process_line("'a' enters ed input mode and appends the text after the current line.")
-    >>> process_line("'w' writes the buffer contents back to the file")
-    >>> process_line("'q' quits ed command mode.")
-    >>> process_line('To quit input mode, type a period by itself at the start of a line.')
-    >>> process_line('.')
-    >>> process_line('w')
+    >>> ed.process_line('a')
+    >>> ed.process_line('main() enters ed command mode.  By default, the command prompt is :')
+    >>> ed.process_line("'e <name>' loads the named file into the current buffer.")
+    >>> ed.process_line("'a' enters ed input mode and appends the text after the current line.")
+    >>> ed.process_line("'w' writes the buffer contents back to the file")
+    >>> ed.process_line("'q' quits ed command mode.")
+    >>> ed.process_line('To quit input mode, type a period by itself at the start of a line.')
+    >>> ed.process_line('.')
+    >>> ed.process_line('w')
     test.txt, 6 lines
 
 When **ed.py** is running with the [Piety](../piety/README.md)
@@ -355,7 +358,7 @@ important are:
 In this example we start an *ed.py* session, type a few *ed* commands, then
 quit to the Python prompt and type a few statements to inspect the data:
 
-    ... $ python3 -i -m ed
+    ... $ python3 -im ed
     :a
     Here is a line in main
     .
@@ -383,11 +386,7 @@ quit to the Python prompt and type a few statements to inspect the data:
 
 We started this example by starting *ed.py* from the system command line.
 Alternatively we could start *ed.py* in the Python session with *import ed*
-then *ed.ed()*, then at the Python prompt, inspect the data with *ed.current* etc.
-But we cannot start with *from ed import* * because that form only imports the
-values the variables had at the time of the *import* command -- so in this
-example, typing *current* would show its initial value *'main'*, not its
-up-to-date value *'ed.md'*.
+then *ed.main()*, then at the Python prompt, inspect the data with *ed.current* etc.
 
 Data structures are initialized (to one empty buffer, the *main* buffer)
 when the *ed.py* module is imported or reloaded.  But they are *not* reinitialized
@@ -412,5 +411,5 @@ behave like an old-fashioned teletype.
 **ed.py** provides the command line and internals for the display editors
   [edsel](edsel.md) and [eden](eden.md).
 
-Revised Mar 2019
+Revised Apr 2019
 
