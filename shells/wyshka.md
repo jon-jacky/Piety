@@ -2,7 +2,7 @@
 wyshka.py
 =========
 
-**[wyshka.py](wyshka.py) ** provides any command line application with an enhanced
+**[wyshka.py](wyshka.py)** provides any command line application with an enhanced
 shell that provides a full Python interpreter as well as all of the
 application commands.
 
