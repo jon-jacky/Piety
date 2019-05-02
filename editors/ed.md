@@ -3,7 +3,7 @@ ed.py
 =====
 
 **[ed.py](ed.py)** is a text editor in pure Python inspired by the
-classic Unix editor *ed*.  
+classic Unix editor *ed*.
 
 **ed.py** provides most of the commands from
 classic *ed* and *GNU ed*, augmented with a few commands for handling
@@ -80,7 +80,8 @@ can resemble the *ed* command line:
 
 ## Stopping and resuming ed.py ##
 
-The usual way to stop *ed.py* is to use its *q* (quit) command.
+The usual way to stop *ed.py* is to use its *q* (quit) command
+(the *Q* command quits without warning about any unsaved changes).
 You can also interrupt *ed.py* by typing *^C*.  It is possible
 that *ed.py* might crash due to a programming error or other
 unhandled exception.
@@ -91,8 +92,10 @@ interactive Python prompt when *ed.py* stops for any reason.
 All the editing buffers, their contents, and other
 context -- such as the current line in each buffer -- are still intact.
 You can use the *ed.py* API or any other Python statements.
-You can type *main()* or *ed.main()* to restart *ed.py*, resuming just where
-you left off.  No function arguments
+
+To restart *ed.py* from the Python prompt, resuming just where
+you left off, type *main()* (or *ed.main()* if you started with *import ed*).
+No function arguments
 are needed this time, because the arguments used at startup are still in effect.
 
 You can exit the Python session in the usual
@@ -162,7 +165,7 @@ interactive Python session and run some commands:
     :q
     >>>
 
-After the *q* command, all the editor buffers and other context
+After the *q* or *Q* command, all the editor buffers and other context
 remain, so the editing session can be resumed at any time by calling
 *main()* again.  Or, any of the other API functions can be called
 at the Python prompt.
@@ -236,13 +239,14 @@ unlike classic *ed*.
 write editing scripts in Python.
 
 A convenient way to use the API is to start *ed.py* with the Python *-i* option
-as described above, edit some text using *ed* commands, then exit using the *q* command
+as described above, edit some text using *ed* commands, then exit using the *q* 
+or *Q* command
 to return to the Python prompt.
 Then all the buffer contents that you entered in *ed* are still in memory for you to work on
 with the API.
 
 Here is the preceding example expressed using the API.
-We import the *ed* module at the Python command, so we don't have to prefix each
+We import the *ed* module at the Python command, so we have to prefix each
 function call with *ed.*
 
     >>> import ed
@@ -304,7 +308,7 @@ system, a Piety [Console](../console/README.md) object collects
 a command line or input line without
 blocking, and then passes that line to *process_line*.
 
-Finally, the API provides the *ed* function that runs the application.
+Finally, the API provides the *main* function that runs the application.
 
 ## Modules ##
 
@@ -358,6 +362,8 @@ important are:
 In this example we start an *ed.py* session, type a few *ed* commands, then
 quit to the Python prompt and type a few statements to inspect the data:
 
+    Begin ed, add a line to the main buffer, and load the ed.md buffer.
+
     ... $ python3 -im ed
     :a
     Here is a line in main
@@ -374,6 +380,10 @@ quit to the Python prompt and type a few statements to inspect the data:
     CRM Buffer            Lines  Mode     File
       * main                  1  Text     None
     .   ed.md               375  Text     ed.md
+
+    Quit to the Python prompt with Q to avoid unsaved changes warning,
+    then inspect current, buf, and buffers.
+
     :Q
     >>> current
     'ed.md'
@@ -384,32 +394,42 @@ quit to the Python prompt and type a few statements to inspect the data:
     >>> buf.lines[:5]
     ['', '\n', 'ed.py\n', '=====\n', '\n']
 
+    You could even update the data structures from the Python prompt, 
+    completely bypassing the API.
+
+    >>> buf.lines[3] = '+++++\n'
+
 We started this example by starting *ed.py* from the system command line.
-Alternatively we could start *ed.py* in the Python session with *import ed*
-then *ed.main()*, then at the Python prompt, inspect the data with *ed.current* etc.
+Or, we could start *ed.py* in the Python session with *import ed*
+etc., then inspect the data with *ed.current* etc.
 
 Data structures are initialized (to one empty buffer, the *main* buffer)
 when the *ed.py* module is imported or reloaded.  But they are *not* reinitialized
-when the *ed* function is invoked.  This makes it possible to exit and resume
+when the *main* function is invoked.  This makes it possible to exit and resume
 *ed* without losing buffer contents or other context.
 
 ## Related programs ##
 
-**ed.py** is the core of [edo](edo.md), which adds a built-in
-Python interpreter and scripting.
+**ed.py** is at the core of several line editors and display editors.
+It provides the command line and text buffers for them all.
 
-**ed.py** runs an event loop that blocks waiting for a complete line
-to be entered at the terminal.
-[edda](edda.py) wraps *ed.py* in a [Console](../console/README.md)
-object that collects the line without blocking,
+**[edo](edo.md)** adds a built-in
+Python interpreter and scripting.  This turns *ed.py* into a
+minimal but self-contained Python programming environment.
+
+**[edda](edda.py)** wraps *ed.py* (via *edo*) in a [Console](../console/README.md)
+object that collects each line without blocking,
 so *edda* can run in the cooperative multitasking system,
-[Piety](../piety/README.md).
+[Piety](../piety/README.md).  This is necessary for Piety because
+*ed.py* runs an event loop that blocks waiting for a complete line
+to be entered at the terminal.
 
-**ed.py** is the core of [etty](etty.py), which makes the terminal
-behave like an old-fashioned teletype.
+**[etty](etty.py)** wraps *ed.py* in a
+*Console* object that makes it behave like an old-fashioned teletype
+(a printing terminal with limited cursor control).
 
-**ed.py** provides the command line and internals for the display editors
-  [edsel](edsel.md) and [eden](eden.md).
+**[edsel](edsel.md)** and **[eden](eden.md)** are display editors that
+use *ed.py* commands.
 
 Revised Apr 2019
 

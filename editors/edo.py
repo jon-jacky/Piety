@@ -54,7 +54,7 @@ def startup(*filename, **options):
     ed.startup(*filename, **options)
     wyshka.prompt = ed.prompt
 
-def edo(*filename, **options):
+def main(*filename, **options):
     'Top level edo command to invoke from Python REPL or __main__'
     startup(*filename, **options)
     while not ed.quit:
@@ -63,4 +63,4 @@ def edo(*filename, **options):
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    edo(*filename, **options)
+    main(*filename, **options)

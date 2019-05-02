@@ -2,27 +2,47 @@
 edo.py
 ======
 
-**edo.py** provides the *[ed.py](ed.md)* line editor with an enhanced
-command line shell, provided by the *[wyshka](../shells/wyshka.py)*
-module in the *shells* directory.  It also supports a new command *X*
-for executing scripts with optional echo and delay, supported by the
-*[samysh](../shells/samysh.py)* module in the *shells* directory.
+**[edo.py](edo.py)** provides the *[ed.py](ed.md)* line editor with an enhanced
+command line shell, including a Python interpreter
+provided by the *[wyshka](../shells/wyshka.py)* module.
 
-The enhanced shell and the *X* command are also available in the
-applications, modules, and objects that use the *edo* module,
-including the *edda* module and the *ed* *Console* job it defines, the
-*edsel* display editor application, the *desoto* module and the
-*edsel* *Console* job it defines, the *session* module that uses the
-*ed* and *edsel* jobs, and the *run_timestamps* module that uses
-*session*.
+This shell turns *ed.py* into a minimal but self-contained
+Python programming environment.  In *edo*, you can edit modules and
+write them out using *ed* commands, then use the built-in
+Python interpreter to import or reload modules, call their functions,
+and inspect and update their data structures.
 
-## Enhanced shell ##
+**edo.py** also provides a new command *X*
+for executing scripts from an editor buffer with optional echo and delay,
+supported by the *[samysh](../shells/samysh.py)* module.
+
+This command is provided for testing *ed.py* itself, as well as the
+several other programs built on it (see below).  The echo and delay make
+it easy to see the effect of each command in the script.  This is
+especially useful for testing the display editors based on *ed.py*.
+
+## Running edo.py ##
+
+You run *edo* just like *ed.py*.  From the system command line:
+
+    python3 -im edo
+
+From a Python session:
+
+    >>> import edo
+    >>> edo.main()
+
+*edo* takes the same command line arguments and *main* function arguments
+as *ed.py*.
+
+## Shell ##
 
 The *wyshka* command line shell used by *edo* provides both the *ed*
 command line and the *pysh* callable Python interpreter.  This makes
 it possible to use the *ed.py* Python API (or any other Python
-statements) without exiting the editor.  It works like this in *ed*
-command line mode:
+statements) without exiting the editor.
+
+The shell works like this in *ed* command line mode:
 
     :<command>       execute ed <command>
     :!<statement>    push Python <statement> to pysh, return to ed command mode
@@ -36,20 +56,22 @@ to the Python REPL, so you can type a series of Python statements without
 prefixing each with *!*.
 
 The *wyshka* shell works like this in Python mode:
-
+[Uwmcinfoline] Construction Bulletin for Thursday, May 2nd
     >> <statement>   push Python <statement> to pysh
     .. <statment>    push Python continuation line <statement> to pysh
     >>:<command>     execute ed <command>, return to pysh interpreter
     >>:              switch to ed command mode
 
 So you can use *:command* to execute an *ed* *command* without exiting
-Python.  Type a bare *:*  without a command to switch back to the *ed* 
+Python.  Type a bare *:*  without a command to switch back to the *ed*
 command interpreter.
 
 Here is a sample session that uses *wyshka* to demonstrate both
 the classic *ed* command line and the new *ed.py* Python API:
 
-    Jonathans-MacBook-Pro:editors jon$ python3 -i -m edo
+    Start edo and use ed editing commands.
+
+    Jonathans-MacBook-Pro:editors jon$ python3 -im edo
     :a
     line 1
     line 2
@@ -59,6 +81,9 @@ the classic *ed* command line and the new *ed.py* Python API:
     :1,$p
     line 1
     line 2
+
+    Use the ed Python API at the ed command prompt by prefixing each command with !
+
     :!ed.a('line A')
     :!ed.p()
     line A
@@ -66,6 +91,9 @@ the classic *ed* command line and the new *ed.py* Python API:
     line 1
     line 2
     line A
+
+    Switch to the pysh Python prompt by typing ! alone.  Continue using the ed API.
+
     :!
     >> ed.a("""line B
     .. line C
@@ -79,9 +107,15 @@ the classic *ed* command line and the new *ed.py* Python API:
     line B
     line C
     line D
+
+    Use any other Python statements at the Python prompt.
+
     >> import datetime
     >> datetime.datetime.now()
     datetime.datetime(2018, 1, 31, 20, 51, 50, 275079)
+
+    Use Python to compute arguments to the ed API.
+
     >> _.__str__()
     '2018-01-31 20:51:50.275079'
     >> ed.a(_)
@@ -90,6 +124,9 @@ the classic *ed* command line and the new *ed.py* Python API:
     >> ed.a(datetime.datetime.now().__str__())
     >> ed.p()
     2018-01-31 20:52:45.504836
+
+    To return to the ed command line, type : alone.
+
     >> :
     :p
     2018-01-31 20:52:45.504836
@@ -102,30 +139,28 @@ the classic *ed* command line and the new *ed.py* Python API:
     line D
     2018-01-31 20:51:50.275079
     2018-01-31 20:52:45.504836
+
+    Exit from edo and return to the standard Python prompt.
+
     :q
     >>> ^D
-    ...$ 
+    ...$
 
-You can also run *edo* from an interactive Python session.  The *edo.py*
-main function is named *edo* (not *main*) so you can use it like this:
+You can also run *edo* from an interactive Python session.  Just
+import *edo* and call its *main* function:
 
     python3 -i
     ...
-    >>> from edo import *
-    >>> edo()
-    :a 
-    ... etc. ... 
+    >>> import edo
+    >>> edo.main()
+    :a
+    ... etc. ...
     :!ed.a('line A')
     ... etc. ...
 
-The *ed* line editor commands and API are described
-[here](../editors/ed.md) and [here](../editors/ed.txt).  How to edit
-within any command line or text contents line is described
-[here](../console/console.txt).
-
 The *edo.py* program accepts the same optional command line arguments
-as *ed.py*, and the *edo* function accepts the same optional arguments
-as the *ed* function.
+as *ed.py*, and the *edo* *main* function accepts the same optional arguments
+as the *ed* *main* function.
 
 ## Scripting ##
 
@@ -142,14 +177,17 @@ followed by a hyphen -- a sort of "poor person's tab completion".  For
 example, the command *X samp-* or even *X s-* might run the test script in
 *sample.ed*.  If more than one buffer name begins with the same
 prefix, the *X* command just chooses one.
-
 The *X* command ignores any line address arguments; it always
-executes the entire buffer.  It takes optional parameters *echo*
-(boolean) and *delay* (float), which are helpful for visualizing
-execution.  The defaults are *echo* *True* and *delay* 0.2 sec.
+executes the entire buffer.
+
+The *X* command takes optional parameters *echo*
+(boolean) and *delay* (float), which are helpful for seeing the
+effects of each command in the script; they are especially useful
+for testing display editors.
+The defaults are *echo* *True* and *delay* 0.2 sec.
 
 Here is a sample that uses the *X* command to execute the *sample.ed*
-script in the *test/ed* directory.  That is the default directory in 
+script in the *test/ed* directory.  That is the default directory in
 this sample.   First, we load the script into an
 editor buffer: *B sample.ed*.
 Then, we change back to the *main* buffer with *b main* and
@@ -160,7 +198,7 @@ adjusted or suppressed by two optional *X* parameters that follow the
 buffer name: *X sample.ed 0 0* suppresses both echo and delay.  For example,
 in the *test/ed* directory:
 
-    ... $ python3 -i -m edo
+    ... $ python3 -im edo
     :B sample.ed
     sample.ed, 18 lines
     :b main
@@ -176,4 +214,41 @@ in the *test/ed* directory:
 After the script finishes, you can type *q* at the prompt to exit the editor,
 then exit from Python.
 
-Revised Nov 2018
+## Modules ##
+
+**[edo.py](edo.py)** imports *ed.py*, so it uses all the modules *ed.py* imports.
+
+**edo.py** also imports *wyshka.py* and *samysh.py* from the *shells* directory.
+
+## API and Data Structures ##
+
+You can access the editor API and data structures from the Python prompt
+via the imported *ed* module.
+
+If you start *edo* at the system command line, *ed.a* is the append function,
+*ed.current* is the name of the current buffer, *ed.buf* is the
+current buffer object, and *ed.buffers* is the dictionary of buffers
+indexed by name.
+
+If you import *edo* into a Python session, then
+you use *edo.ed.a*, *edo.ed.current* etc.
+
+## Related programs ##
+
+**edo.py** is at the core of several line editors and display editors.
+It provides the Python interpreter and scripting for them all.
+And, via its imported *ed.py*, it also provides their command lines
+and text buffers.
+
+**[edda](edda.py)** wraps *edo.py* in a [Console](../console/README.md)
+object that collects each line without blocking,
+so *edda* can run in the cooperative multitasking system,
+[Piety](../piety/README.md).  This is necessary for Piety because
+*edo.py* runs an event loop that blocks waiting for a complete line
+to be entered at the terminal.
+
+The **[edsel](edsel.md)** display editor imports *edo.py*.
+
+The **[eden](eden.md)** display editor imports *edsel* which imports *edo*.
+
+Revised May 2019

@@ -2,7 +2,7 @@
 session.py
 ==========
 
-**session.py**: Creates a *Session* instance with four *Console*
+**session.py** creates a *Session* instance with four *Console*
 jobs: the *pysh* Python shell, the [ed](../editors/ed.md) line editor,
 the [edsel](../editors/edsel.md) display editor, and the
 [eden](../editors/eden.md) display editor.
