@@ -2,8 +2,8 @@
 wyshka.py
 =========
 
-**wyshka.py** provides any command line application with an enhanced
-shell that provides a full Python interpreter as well as all of the 
+**[wyshka.py](wyshka.py) ** provides any command line application with an enhanced
+shell that provides a full Python interpreter as well as all of the
 application commands.
 
 For example, the **wyshka** command line shell used by the
@@ -30,4 +30,8 @@ The **wyshka** shell works like this in Python mode:
 So you can use *:command* to execute an *ed* *command* without exiting
 Python.
 
-Revised Jan 2018
+The *[edo](../editors/edo.py)* editor (explained
+[here](../editors/edo.md)) demonstrates how to use *wyshka*.
+
+Revised May 2019
+
