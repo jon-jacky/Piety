@@ -21,7 +21,7 @@ several other programs built on it (see below).  The echo and delay make
 it easy to see the effect of each command in the script.  This is
 especially useful for testing the display editors based on *ed.py*.
 
-## Running edo.py ##
+## Running and resuming edo.py ##
 
 You run *edo* just like *ed.py*.  From the system command line:
 
@@ -29,11 +29,18 @@ You run *edo* just like *ed.py*.  From the system command line:
 
 From a Python session:
 
+    $ python3 -i
+    ...
     >>> import edo
     >>> edo.main()
 
 *edo* takes the same command line arguments and *main* function arguments
 as *ed.py*.
+
+If you start the Python session with the *-i* option, control returns to the
+Python prompt when *edo* exits for any reason.  Then you can resume your
+*edo* session just where you left off, with all buffers intact, just by
+calling *main()* (or *edo.main()*) at the Python prompt.
 
 ## Shell ##
 
@@ -55,8 +62,10 @@ When you type a bare *!* without a command, the command interpreter switches
 to the Python REPL, so you can type a series of Python statements without
 prefixing each with *!*.
 
-The *wyshka* shell works like this in Python mode:
-[Uwmcinfoline] Construction Bulletin for Thursday, May 2nd
+The *wyshka* shell works like this in Python mode 
+(the *wyshka* Python prompt is two brackets *>>* to distinguish
+it from the standard Python prompt with three brackets *>>>*):
+
     >> <statement>   push Python <statement> to pysh
     .. <statment>    push Python continuation line <statement> to pysh
     >>:<command>     execute ed <command>, return to pysh interpreter

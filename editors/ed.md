@@ -24,7 +24,9 @@ The recommended way to run **ed.py** as a standalone program is:
 
     python3 -i -m ed
 
-Here the *-i* option runs Python in interactive mode so you can use
+Here *python3* runs Python version 3 on my system (where the default
+*python* command still runs Python version 2).
+The *-i* option runs Python in interactive mode so you can use
 *readline*-style editing in commands and input text.  The *-i* option
 also makes it possible to resume an *ed.py* session
 after exiting, or to recover from a program crash, without losing buffer
