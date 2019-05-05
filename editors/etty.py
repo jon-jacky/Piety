@@ -3,6 +3,7 @@ etty.py - Run ed line editor session, but use console module instead
  of Python input to collect and edit command line and inserted text.
  Add new methods and keymaps to provide retro printing-terminal-style
  editing and history.
+To use the ed API from the Python prompt, use prefix as in etty.ed.p()
 """
 
 import util, terminal, keyboard, ed, console
@@ -90,6 +91,9 @@ etty.keymap = (lambda: (etty.tty_command_keymap
                         if ed.command_mode
                         else etty.tty_input_keymap))
 
+def main(*filename, **options):
+    etty.run(*filename, **options)
+
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    etty.run(*filename, **options)
+    main(*filename, **options)

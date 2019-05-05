@@ -2,33 +2,37 @@
 session.py
 ==========
 
-**session.py** creates a *Session* instance with four *Console*
-jobs: the *pysh* Python shell, the [ed](../editors/ed.md) line editor,
+**[session.py](session.py)** creates a Piety *Session* instance with four *Console*
+jobs: the [pysh](../shells/pysh.py) Python shell, the [ed](../editors/ed.md) line editor,
 the [edsel](../editors/edsel.md) display editor, and the
 [eden](../editors/eden.md) display editor.
 
+### Running and pausing jobs ###
+
 Here is a typical session, that shows how to invoke each job.  The
-*pysh* job (a Python interpreter) runs at startup.  Invoke the other
-jobs from the Python prompt by name using function call syntax: *ed()* etc.,
-(which invokes
-each job's *__call__* method).  Exit from each job to return to the
-Python interpreter.
+*pysh* job (a Python interpreter) runs at startup
+(the *pysh* Python prompt is two brackets *>>* to distinguish
+it from the standard Python prompt with three brackets *>>>*).
+Invoke the other
+jobs from the Python prompt by calling their *main* methods, with the
+same syntax you use for a standalone program:
+*ed.main()* etc.  Exit from each job to return to the Python interpreter.
 
     ... $ python3 -im session
     >> dir()
-    ...
-    >> ed('README.md')
+    ... ed ... eden ... edm ... edsel ... pysh ...
+    ... fg ... frame ... jobs ... main ...
+    >> ed.main('README.md')
     ... edit in README.md ...
     :q
     >> import datetime
-    ...
-    >> edsel(c=12)
+    >> edsel.main(c=12)
     ... display editor appears with 12 lines in command region,  shows README.md
     ... continue editing README.md
     :q
     >> datetime.datetime.now()
     ... datetime module is still imported
-    >> eden()
+    >> eden.main()
     ... continue editing README.md
     :q
     >> exit()
@@ -37,11 +41,16 @@ Python interpreter.
     ... exit from Python
     ...$
 
+You never actually exit from a job, you just suspend it.
 Each job (including the Python interpreter)
-preserves its state between invocations, so work in progress can be
-resumed.  The line editor *ed* and the display editors *edsel*
+preserves its state between invocations, so work in progress can be resumed.
+The line editor *ed* and the display editors *edsel*
 and *eden* share the same state including editor buffers and insertion points.
 Also, *edsel* and *eden* share window state.
+
+If *session* exits for any reason,
+control returns to the standard Python intepreter (with the *>>>* prompt).
+You can resume the session by typing *main()*, the state of every job will be intact.
 
 ## Job control ##
 
@@ -62,7 +71,7 @@ suspended job:
 
     # Running ed brings it to the foreground and puts pysh in the background
 
-    >> ed()
+    >> ed.main()
     :!jobs()
     <console.Console object at 0x10307fac8>   ed       State.foreground
     <console.Console object at 0x10302cbe0>   pysh     State.background
@@ -80,7 +89,7 @@ suspended job:
 
     # Running edsel brings it to the foreground
 
-    >> edsel()
+    >> edsel.main()
     :!jobs()
     <console.Console object at 0x10307ff98>   edsel    State.foreground
     <console.Console object at 0x10302cbe0>   pysh     State.background
@@ -115,7 +124,18 @@ suspended job:
     <console.Console object at 0x10307fac8>   ed       State.suspended
     <eden.Console object at 0x1030d3908>   eden     State.loaded
 
-**session.py** can also demonstrate the enhanced shell and scripting
-provided by [edo.py](../editors/edo.md).
+### API and data structures ###
 
-Revised Apr 2019
+You can access the editor API and data structures from the Python prompt
+by prefixing them with *edm.* ("*ed* module"): *edm.n()*, *edm.buffers* etc.
+We have to use this module name to distinguish it from the *ed* job.
+
+You can access the display API and data structures by prefixing them
+with *frame.*: *frame.windows* etc.
+
+The three editor jobs have the *[wyshka](../shells/wyshka.py)* shell built-in,
+so you can use the Python command line without exiting the editor, by prefixing
+each Python command with an exclamation point, or by using just an
+exclamation point to switch the editor command line to Python.
+
+Revised May 2019

@@ -19,7 +19,7 @@ to start over on a new line.
 Here is a sample session started from the command line:
 
     ...$ python3 -m etty
-    :a 
+    :a
     Here is  \ a line of tet\txt
     Her \ e is another ^L
     Here is another \ ^L
@@ -33,10 +33,10 @@ Here is a sample session started from the command line:
 
 Here is a sample session started in Python.
 
-    ...$ python3
+    ...$ python3 -i
     ...
-    >>> from etty import *
-    >>> etty('lines20.txt',p='')
+    >>> import etty
+    >>> etty.main('lines20.txt',p='')
     lines20.txt, 20 lines
     a
     Her is a ^U
@@ -47,4 +47,4 @@ Here is a sample session started in Python.
     q
     ...$
 
-Revised March 2018
+Revised May 2019

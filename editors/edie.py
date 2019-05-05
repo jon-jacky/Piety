@@ -1,5 +1,5 @@
 """
-edie.py - ed + wyshka, ed with command interpreter that also provides python 
+edie.py - ed + wyshka, ed with command interpreter that also provides python
             but *not* samysh script facility
 """
 
@@ -14,7 +14,7 @@ def startup(*filename, **options):
     ed.startup(*filename, **options)
     wyshka.prompt = ed.prompt
 
-def edie(*filename, **options):
+def main(*filename, **options):
     'Top level edo command to invoke from Python REPL or __main__'
     startup(*filename, **options) # defined above, based on ed.startup
     while not ed.quit:
@@ -23,4 +23,4 @@ def edie(*filename, **options):
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    edie(*filename, **options)
+    main(*filename, **options)

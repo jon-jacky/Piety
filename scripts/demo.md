@@ -2,18 +2,20 @@
 demo.py
 =======
 
-**demo.py** demonstrates many features of the Piety system,
+**[demo.py](demo.py)** demonstrates many features of the Piety system,
 including concurrent tasks, job control, editors, a windowing system,
 and an enhanced shell.
 
 **demo.py** uses the Piety scheduler to run the four jobs created by
-*session.py*, concurrently with two timestamp tasks.  Each timestamp
-task uses the *print* function to update an editor buffer.  You can
-see these buffers update in their windows as you edit in another window
-or in the command line.
+*[session.py](session.py)*, concurrently with two timestamp tasks.  Each timestamp
+task updates an editor buffer.
+You can see these buffers update in their windows as you edit in another window
+or on the command line.
 
-Here is a sample session that demonstrates this.  Here *>>* is the
-Python prompt and *:* is the editor command
+Here is a sample session that demonstrates this.  Here *>>* is
+Piety's Python prompt (with two brackets, to distinguish it from
+the standard Python prompt with three brackets *>>>*).
+Here *:* is the editor command
 prompt, you type the commands that follow.  First, start the script and
 run the [eden](../editors/eden.md) display editor.
 The *eden* screen with one window appears:
@@ -22,12 +24,14 @@ The *eden* screen with one window appears:
     .   ts1                  0  ts1
     .   ts2                  0  ts2
     . * main                 1  None
-    >> eden(c=12)
+    >> eden.main(c=12)
     ... eden screen with 12-line scrolling region appears ...
 
 Next, type commands at the *eden* command prompt to create
 two new windows that show timestamps updating, then traverse to
-the original *main* window:
+the original *main* window and edit.  The *o2* command splits the window,
+*b ts1* makes *ts1* the current buffer (and displays it in the focus window),
+and *o* moves the focus to the next window:
 
     :o2
     :b ts1
@@ -55,15 +59,15 @@ To exit display editing mode and return to the command prompt, type *^Z*.
 Some interesting commands to type at the *eden* command prompt:
 
  - *b ts1* - in the focus window, display the buffer that contains the
- timeout messages from ts1task.  This window updates each time the
+ timeout messages from *ts1task*.  This window updates each time the
  task generates a new message, even when another window gets focus
  and updates as its text is edited.
 
-Some interesting Python commands to type at the *eden* command prompt
-(prefix each command with an exclamation point, *!*).
-Or, switch to the Python interpreter by typing an exclamation point
-by itself at the *eden* command prompt (then you can return to the *eden*
-command line by typing a colon *:* by itself at the Python prompt).
+Some interesting Python commands to type at the *Python* command prompt.
+(The three editor jobs have the *[wyshka](../shells/wyshka.py)* shell built-in,
+so you can use the Python command line without exiting the editor, by prefixing
+each Python command with an exclamation point, or by typing just an
+exclamation point on the command line by itself to switch to Python.)
 
  - *jobs()* - show information about jobs
 
@@ -81,9 +85,14 @@ command line by typing a colon *:* by itself at the Python prompt).
 
  - *edm.a('append line after dot')* - or any other call from the *ed* API.
 
-**demo.py** can also demonstrate the jobs and job control
-provided by [session.py](session.md) and the enhanced shell and
-scripting provided by [edo.py](../editors/edo.md).
+### API and data structures ###
+
+You can access the editor API and data structures from the Python prompt
+by prefixing them with *edm.* ("*ed* module"): *edm.n()*, *edm.buffers* etc.
+We have to use this module name to distinguish it from the *ed* job.
+
+You can access the display API and data structures by prefixing them
+with *frame.*: *frame.windows* etc.
 
 ### Bugs ###
 
@@ -94,4 +103,4 @@ on each timer tick.   A partial explanation appears in the
 comments in [demo.py](demo.py).   At this time we have not decided
 on the best solution for this.
 
-Revised Apr 2019
+Revised May 2019

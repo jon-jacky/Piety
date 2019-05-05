@@ -113,12 +113,12 @@ def tasks():
             #return 'timer  ? s' # placeholder if we can't use period
         else:
             return oname(e)
-        
+
     print("""  i     name  enabled              n  input            handler
   -     ----  -------              -  -----            -------""")
     for t in tasks_list:
         print('%3d %8s  %-15s  %5d  %-15s  %-15s' % \
-            (t.taskno, t.name, oname(t.enabled), 
+            (t.taskno, t.name, oname(t.enabled),
              ievent[t.input], # ievent imported from eventloop
              # '  ???', # placeholder if we can't use ievent
              ename(t.input), oname(t.handler)))
@@ -183,7 +183,7 @@ class Session(Task):
     def fg(self):
         'Resume running most recently suspended job'
         if self.suspended:
-            self.suspended[-1]()
+            self.suspended[-1].main()
             
             
 # Test

@@ -7,7 +7,7 @@ import traceback, os, sys
 import edo, frame, view, wyshka, samysh
 from updates import Op
 
-ed = edo.ed  # so we can call ed API without edo. prefix
+ed = edo.ed  # so we can use ed API without prefix
 
 # edsel API functions
 

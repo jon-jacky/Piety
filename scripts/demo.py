@@ -9,9 +9,9 @@ demo.py - Demonstrates many features of the Piety system.
 
 import terminal, display, piety, timestamp
 
-import ed as edm # ed module, distinguish from ed Console job
 from session import pysh, ed, edsel, eden # Console jobs
 from session import jobs, fg # functions to type at Python command line
+from session import edm, frame # modules that contain data structures
 
 # This assigment needed so view.update() can restore Console cursor
 #  after updates from background task
@@ -58,7 +58,7 @@ ts1task = piety.Task(handler=ts1handler, input=piety.timer, enabled=piety.true)
 ts2task = piety.Task(handler=ts2handler, input=piety.timer, enabled=alternate)
 
 def main():
-    pysh()
+    pysh.main()
     piety.run()
 
 if __name__ == '__main__':

@@ -94,7 +94,9 @@ class Console(object):
         self.startup(*args, **kwargs)
         self.restart()
 
-    def __call__(self, *args, **kwargs):
+    # So we can start/resume Console instance with objname.main()
+    # just like start/resume wstandalone program with progname.main()
+    def main(self, *args, **kwargs):
         self.start()
         self.resume(*args, **kwargs)
 
@@ -108,7 +110,7 @@ class Console(object):
         Console event loop - run a single Console instance as an application.
         For testing only; handler() blocks, can only run one Console at a time.
         """
-        self.__call__(*args, **kwargs)
+        self.main(*args, **kwargs)
         while not self.stopped():
             self.handler() # blocks in self.reader at each character
 
