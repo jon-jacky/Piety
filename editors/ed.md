@@ -118,16 +118,6 @@ lost and it is no longer possible to resume the session.
 
  *b B D n*
 
-In the *b* command, the buffer name parameter can be abbreviated by
-providing a prefix followed by a hyphen -- a sort of "poor person's
-auto completion".  For example, the command *b key-* or even *b k-*
-might switch to the buffer *keyboard.py*.  If more than one buffer
-name begins with the same prefix, *ed.py* just chooses one.
-
-In the *b* command, if the buffer name parameter is omitted,
-the previous buffer is selected.  This makes it easy to switch
-back and forth between two buffers.
-
 **ed.py** supports these line address forms from classic *ed*:
 
  *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
@@ -155,7 +145,7 @@ interactive Python session and run some commands:
     :e test.txt
     test.txt, 0 lines
     :a
-    main() enters ed command mode.  By default, the command prompt is :
+    ed.main() enters ed command mode.  By default, the command prompt is :
     'e <name>' loads the named file into the current buffer.
     'a' enters ed input mode and appends the text after the current line.
     'w' writes the buffer contents back to the file.
@@ -172,13 +162,20 @@ remain, so the editing session can be resumed at any time by calling
 *main()* again.  Or, any of the other API functions can be called
 at the Python prompt.
 
+### Working with files and buffers ###
+
+**ed.py** can work on several (or many) files in the same session.
+The contents of each file are stored in a separate named *buffer*.
+There is always one *current buffer* where editing commands take effect.
+When *ed.py* starts up, there is one buffer named *main*.
+
 The *n* command prints information about all the buffers,
 for example:
 
     CRM Buffer            Lines  Mode     File
         ed.py               514  Text     ed.py
       * notes.txt        104528  Text     /users/jon/notes/piety/notes/notes.txt
-        main                  1  Text     None
+        main                  1  Text     (no file)
     .   ed.md               335  Text     ed.md
 
 The dot in the *C* (current) column indicates the current buffer.
@@ -188,7 +185,78 @@ indicates the buffer contains unsaved changes.  The buffer size
 is given in lines (not characters). At this time
 the only mode we provide is *Text*.
 
-## Limitations and differences from classic ed and sam ##
+A buffer can have a file name, the file where buffer contents
+are written by a *w* (write) command with no parameter.
+The *w* or *f* (file name) commands with a file name
+parameter assign or reassign the buffer's file name.
+
+It is possible to create a *scratch buffer* that has
+no file name, so a *w* command with no parameter
+writes out nothing (it just prints an error message).
+Scratch buffer contents can be written out by a *w* command
+with a file name parameter, or after assigning a file name with
+the *f* command.
+
+The *B* command creates a new buffer and reads a file into it.
+The name of the file is the *B* command parameter, which might
+be in the current default directory, or might include a prefix
+that names a directory path.  This becomes the new buffer's file name.
+If the file does not already exist, *ed.py* creates it when
+it writes out the buffer.  The name of the new buffer itself
+is the file's basename (without any path prefix).
+
+If one or more  buffers contain files with the same basename (for
+example, several *README.md* from different directories),
+the *B* command makes the buffer names unique by adding suffixes:
+*README.md<1>*, *README.md<2>* etc.
+
+The *b* command takes a buffer name parameter and makes that
+the current buffer.
+
+In the *b* command, if the buffer name parameter is omitted,
+the previous buffer is made current.  This makes it easy to switch
+between buffers.
+
+In the *b* command, the buffer name parameter can be abbreviated by
+providing a prefix followed by a hyphen -- a sort of "poor person's
+auto completion".  For example, the command *b key-* or even *b k-*
+might switch to the buffer *keyboard.py*.  If more than one buffer
+name begins with the same prefix, *ed.py* just chooses one.
+
+In the *b* command, if the buffer name parameter is given but
+there is no buffer with that name, an empty scratch buffer
+with that name is created.
+
+The *e* and *E* commands load a different file into an
+existing buffer, overwriting the previous contents
+and re-assigning the file name (the E command skips
+the 'unsaved changes' warning).
+They are provided for compatibility with classic *ed*,
+but in *ed.py* they only work in the *main* buffer.
+
+To help prevent losing work by accidentally writing over
+a file with the wrong buffer contents,
+*ed.py* ensures that a file can be stored in
+only one buffer at a time.  If the *B* command is given with
+the name of a file that is already stored in a buffer, no new
+buffer is created, instead the existing buffer becomes current.
+The *f*, *w*, *e*, and *E* commands do not accept
+names for files that are already stored in another buffer.
+
+Be aware that *ed.py* only knows about files that are
+loaded into buffers.  It is possible to create a scratch
+file with any almost name with the *b* command, and it is
+possible to write over almost
+any file in the file system from any buffer with the *w* command
+or the *f* command.
+
+We recommend avoiding the *e*, *E*, and *f* commands,
+and using the *main* buffer only as a scratch buffer.
+It is less confusing to use the *B* command instead.
+Then you can always save the buffer contents in the
+intended file by using the *w* command without arguments.
+
+## Differences from classic ed and sam ##
 
 **ed.py** does not support these classic *ed* commands:
 *H h n P u wq W*.
@@ -254,7 +322,7 @@ function call with *ed.*
     >>> import ed
     >>> ed.e('test.txt')
     test.txt, 0 lines
-    >>> ed.a("""main() enters ed command mode.  By default, the command prompt is :
+    >>> ed.a("""ed.main() enters ed command mode.  By default, the command prompt is :
     ... 'e <name>' loads the named file into the current buffer.
     ... 'a' enters ed input mode and appends the text after the current line.
     ... 'w' writes the buffer contents back to the file
@@ -294,7 +362,7 @@ is the preceding example expressed once more using *process_line*:
     >>> ed.process_line('e test.txt')
     test.txt, 0 lines
     >>> ed.process_line('a')
-    >>> ed.process_line('main() enters ed command mode.  By default, the command prompt is :')
+    >>> ed.process_line('ed.main() enters ed command mode.  By default, the command prompt is :')
     >>> ed.process_line("'e <name>' loads the named file into the current buffer.")
     >>> ed.process_line("'a' enters ed input mode and appends the text after the current line.")
     >>> ed.process_line("'w' writes the buffer contents back to the file")
@@ -433,5 +501,5 @@ to be entered at the terminal.
 **[edsel](edsel.md)** and **[eden](eden.md)** are display editors that
 use *ed.py* commands.
 
-Revised Apr 2019
+Revised May 2019
 

@@ -1,0 +1,53 @@
+# files.ed - test loading files - run from Piety/editors
+# B adds suffix to make each buffer name unique
+B README.md
+B ../scripts/README.md
+B ../README.md
+# n lists buffers
+n
+# B does not reload files, it just switches to buffer
+B README.md
+n
+# e only works in main buffer
+e lines20.txt
+n
+b main
+# e does not accept file name already in use
+e README.md
+# e does accept new file name
+e lines20.txt
+n
+# b without arg makes previous buffer current again
+b
+n
+# abbreviate b arg with - suffix
+b m-
+n
+# b arg with new buffer name creates scratch buffer
+b scratch
+a
+This a scratch file.
+.
+n
+# w and f do not accept file name already in use
+f README.md
+w README.md
+n
+# w and f do accept new file names
+w scratch.txt
+$a
+Here is another line.
+.
+f scratch2.txt
+n
+# w without argument uses buffer file name
+w
+# w with argument matching current filename does work
+f scratch3.txt
+a
+Here is a third line
+.
+n
+w scratch3.txt
+# test finished
+

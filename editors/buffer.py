@@ -42,7 +42,8 @@ class Buffer(object):
         return (('%' if self.readonly else ' ') +
                 ('*' if self.modified else ' ') +
                 ' %-15s' % self.name + ' %7d' % self.nlines() +
-                '  %-8s' % self.mode + ' %s' % self.filename)
+                '  %-8s' % self.mode + 
+                ' %s' % (self.filename if self.filename else '(no file)'))
 
     # write method for other programs (besides editors) to write into buffers
     # The call print(s, file=buffer), invokes this method to write s to buffer

@@ -56,6 +56,18 @@ def match_prefix(prefix, names):
                 return n
     return prefix
 
+def bufs_for_file(filename):
+    'Return list of names of buffers editing filename, empty list if none'
+    return [ buffers[b].name for b in buffers
+             if buffers[b].filename == filename ]
+
+def fname_in_use(filename):
+    'Return list of names of buffers editing filename, print warning if not empty'
+    fbufnames = bufs_for_file(filename)
+    if fbufnames:
+        print('? buffer %s is already editing file %s' % (fbufnames[0], filename))
+    return fbufnames
+
 def current_filename(filename):
     """
     Return filename arg if present, if not return current filename.
@@ -92,9 +104,9 @@ def select_buf(bufname):
 
 def b(*args):
     """
-    Set current buffer to name.  If no buffer with that name, create one.
+    Set current buffer to name.
+    If no buffer with given name, create scratch buffer with no file.
     If no name given, set current buffer to previous current buffer.
-    Then print current buffer name.
     """
     global previous, current, buf
     _, _, bufname, _ = parse.arguments(args)
@@ -103,15 +115,20 @@ def b(*args):
         select_buf(bufname)
     elif bufname:
         create_buf(bufname)
-        buf.filename = bufname
+        # buf.filename = bufname # NOT, make scratch buffer with no file
     else:
         select_buf(previous)
-    print('.' + buf.info()) # even if no bufname given
+    print('.' + buf.info())
 
 def f(*args):
-    'set default filename, if filename not specified print current filename'
+    """
+    Set default filename, if filename not given print current filename.
+    If filename is already in use, just print warning.
+    """
     _, _, filename, _ = parse.arguments(args)
     if filename:
+        if fname_in_use(filename):
+            return
         buf.f(filename)
     elif buf.filename:
         print(buf.filename)
@@ -130,8 +147,9 @@ def r(*args):
 
 def E(*args):
     """
-    Read in named file, replace buffer contents.
-    File arg not optional, replaces current file.
+    Read named file into main buffer, replace main buffer contents.
+    File name arg is not optional. It replaces the current file.
+    If another buffer is already editing named file, print warning and exit.
     """
     _, _, filename, _ = parse.arguments(args)
     if not current == 'main':
@@ -139,6 +157,8 @@ def E(*args):
         return
     if not filename:
         print('? no filename')
+        return
+    if fname_in_use(filename):
         return
     buf.filename = filename
     buf.d(1, buf.nlines())
@@ -151,15 +171,25 @@ def e(*args):
     BUT exit with warning if buffer has unsaved changes.
     """
     if buf.modified:
-        print('? warning: file modified')
+        print('? unsaved changes, use E to reload')
         return
     E(*args)
 
 def B(*args):
-    'Create new Buffer and load the named file. Buffer name is file basename'
+    """
+    Create new Buffer and load the named file. Buffer name is file basename.
+    If needed, make unique buffer name by adding suffix <1>, <2>, ...
+    If another buffer is already editing file, just switch to that buffer.
+    """
     _, _, filename, _ = parse.arguments(args)
     if not filename:
         print('? file name')
+        return
+    fbufnames = bufs_for_file(filename)
+    if fbufnames:
+        bufname = fbufnames[0]
+        select_buf(bufname) # Do NOT reload file over buffer contents!
+        print('.' + buf.info())
         return
     basename = os.path.basename(filename)
     bufname = basename
@@ -174,8 +204,18 @@ def B(*args):
     buf.modified = False # insert in r sets modified = True, this is exception
 
 def w(*args):
-    'write current buffer contents to file name'
+    """
+    Write current buffer contents to given file name,
+    but not if file name is already used by another buffer.
+    If no file name given, use buffer's current file name.
+    If file name given and no current file name, assign given.
+    """
     _, _, fname, _ = parse.arguments(args)
+    if fname:
+        fbufnames = bufs_for_file(fname)
+    if fname and fbufnames and current not in fbufnames:
+        print('? buffer %s is already editing file %s' % (fbufnames[0], fname))
+        return
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
