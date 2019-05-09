@@ -2,12 +2,14 @@
 branches
 ========
 
-This is the **eden** branch.  Add full screen editing to the *eden*
+
+This is the **master** branch.  Branches recently merged into **master**:
+
+- **eden**, merged 9 May 2019.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*
 commands.  Make *eden*, including its built-in Python shell, into a
-minimal but self-contained Python programming environment. Begun 1 Apr 2018.
-
-Branches recently merged into **master**:
+minimal but self-contained Python programming environment. 
+Begun 1 Apr 2018.
 
 - **noframe**, merged 1 Apr 2018.  Reorganize and simplify
 communication between applications and display.  Break dependence of

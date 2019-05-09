@@ -94,4 +94,4 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Mar 2019
+Revised May 2019
