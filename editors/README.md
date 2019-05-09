@@ -9,8 +9,9 @@ and culminating in *eden*.  We expect to use *eden* most of the time, but are
 keeping the intermediate experiments as well.
 
 The main steps in the sequence of increasing functionality are:
-*ed.py* (line editor), *edo* (adds built-in Python interpreter and
-scripting), *edsel* (adds display, but still provides only ed commands for
+*ed.py* (line editor), *edie* (adds built-in Python interpreter),
+*edo* (adds Python interpreter and
+scripting), *edsel* (adds display, but still provides only *ed* commands for
 line editing), and *eden* (adds display editing at any character position).
 
 Another dimension arises from wrapping these programs in a
@@ -44,18 +45,21 @@ Files in this directory:
 
 - **edda.py**: defines the *ed* *Console* job that wraps *edo.py* (the *ed.py*
   line editor, along with the *wyshka* enhanced Python shell and
-  *samysh* script execution).  Contrast to the *edo.py* *main* function.
+  *samysh* script execution).  Contrast to the *edo.py*.
 
 - **eden.md**: description of *eden.py*.
 
 - **eden.py**: display editor based on *edsel* and *ed.py*.
 
+- **edie.py**: run *ed.py* line editor along with *wyshka* enhanced shell.
+  contrast to *ed.py* and *edo.py*.
+
 - **edo.md**: description of *edo.py*.
 
 - **edo.py**: run *ed.py* line editor along with *wyshka* enhanced
   shell and *samysh* script execution.  Use Python builtin *input()*
-  to collect and edit input lines with blocking.  Contrast to *ed.py*
-  *main* function and *etty.py*.
+  to collect and edit input lines with blocking.  Contrast to *ed.py*,
+  *edie.py*, and *edda.py*.
 
 - **edsel.md**: description of *edsel.py*.
 
