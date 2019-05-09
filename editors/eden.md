@@ -2,8 +2,9 @@
 eden
 ====
 
-**[eden](eden.py)** is a display editor in pure Python.  
-It provides all of the commands of the line editor [ed.py](ed.md) and
+**[eden](eden.py)** is a display editor in pure Python.
+
+**eden** provides all of the commands of the line editor [ed.py](ed.md) and
 the simpler display editor [edsel](edsel.md).
 It also provides the built-in Python shell and scripting provided
 by [edo.py](../editors/edo.md).
@@ -145,9 +146,9 @@ during *^X* commmands.
 
 The most effective way to use some *eden* commands is not always obvious.
 For working with files and buffers, see the instructions for [ed.py](ed.md)
-(also [here](ed.txt)).  For working with windows, see [edsel](edsel.md) 
+(also [here](ed.txt)).  For working with windows, see [edsel](edsel.md)
 (also [here](edsel.txt)).  For working with the built-in Python shell
-and scripting, see [edo.py](../editors/edo.md).  
+and scripting, see [edo](../editors/edo.md).
 
 Here are some hints for using *eden* display commands.
 
@@ -164,6 +165,8 @@ Therefore, *^X* can act as a search command: type *^X* then
 *^S* (or *^R*) to search forward (or backward) for that same *string*.
 The same search string remains in effect in all buffers until you
 re-assign it in another */.../* or *?...?* command.
+
+In *eden*, search is always case sensitive.
 
 #### Cut and Paste ####
 
