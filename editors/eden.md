@@ -2,23 +2,19 @@
 eden
 ====
 
-**[eden](eden.py)** is a display editor in pure Python.
-
-**eden** provides all the functionality of *edsel*, and also adds a
-display editing mode that inserts or deletes printing characters
-anywhere, and uses control characters to move the cursor and to
-select, cut, and paste text.
-
-**eden** is  based on the line editor [ed.py](ed.md) and
+**[eden](eden.py)** is a display editor in pure Python.  
+It provides all of the commands of the line editor [ed.py](ed.md) and
 the simpler display editor [edsel](edsel.md).
 It also provides the built-in Python shell and scripting provided
-by [edo.py](../editors/edo.md).  Those three pages
-provide much of what you need to know to use *eden*.
+by [edo.py](../editors/edo.md).
+*eden* adds a display editing mode that inserts or deletes printing characters
+anywhere, and uses display commands bound to control characters to move the cursor and to
+select, cut, and paste text.
 
-The shell turns *eden* into a minimal but self-contained
+The built-in Python shell turns *eden* into a minimal but self-contained
 Python programming environment.  *eden* divides the screen
 to show one or more editor windows at the top, and a
-command interpreter for Python or editor commands at the
+command interpreter for editor commands or Python at the
 bottom.  You can edit modules and write them out, then use the
 Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.
@@ -148,7 +144,12 @@ during *^X* commmands.
 ## Using eden commands ##
 
 The most effective way to use some *eden* commands is not always obvious.
-Here are some hints.
+For working with files and buffers, see the instructions for [ed.py](ed.md)
+(also [here](ed.txt)).  For working with windows, see [edsel](edsel.md) 
+(also [here](edsel.txt)).  For working with the built-in Python shell
+and scripting, see [edo.py](../editors/edo.md).  
+
+Here are some hints for using *eden* display commands.
 
 #### Search ####
 
@@ -179,9 +180,18 @@ single line, and a subsequent *^Y* command pastes that
 same segment right at the cursor, anywhere within the same
 line or a different line.
 
-So the
-*^K* and *^U* commands have the effect of toggling subsequent *^Y*
+So the *^K* and *^U* commands have the effect of toggling subsequent *^Y*
 commands to inline mode, while *^W* toggles *^Y* to multiline mode.
+
+#### Indented text ####
+
+To enter an indented line, type *tab* (or *^I*) at the beginning of the line.
+*eden* inserts blanks (space characters) to match the indentation of the preceding line.
+The type the text of the new indented line.
+
+To edit an indented line, type *^J* (jump to next word) at the beginning of the line.
+*eden* places the cursor on the first non-blank character in the line.  Then edit
+the text of the indented line.
 
 ## API and data structures ##
 

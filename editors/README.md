@@ -62,6 +62,8 @@ Files in this directory:
 - **edsel.py**: simple display editor based on the line editor *ed.py*
   with the *edo* enhancements.
 
+- **edsel.txt**: command summary for *edsel.py*.
+
 - **etty.md**: description of *etty.py*.
 
 - **etty.py**: wraps *ed.py* in a *Console* object
