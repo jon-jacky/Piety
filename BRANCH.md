@@ -8,7 +8,11 @@ This is the **master** branch.  Branches recently merged into **master**:
 - **eden**, merged 9 May 2019.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*
 commands.  Make *eden*, including its built-in Python shell, into a
-minimal but self-contained Python programming environment. 
+minimal but self-contained Python programming environment.  Also, 
+improvements to usability, organization, style and documentation.
+Rename each module's main function back to *main*, also rename the
+*Console* *call* function to *main* so standalone programs and console
+jobs can be started in Python with the same syntax: *ed.main()* etc.
 Begun 1 Apr 2018.
 
 - **noframe**, merged 1 Apr 2018.  Reorganize and simplify
