@@ -8,7 +8,8 @@ import util, terminal
 import keyboard, display, console, check, edsel, frame, wyshka, samysh
 from updates import Op
 
-ed = edsel.edo.ed  # so we can use it without prefix
+ed = edsel.edo.ed    # use ed and frame APIs without prefix
+frame = edsel.frame
 
 next_text = re.compile(r'\s\S') # White space char then non-white space char
 
@@ -21,7 +22,7 @@ class Console(console.Console):
         self.collecting_command = False # used by execute, accept methods
 
     # The following methods override methods in console.Console
-    
+
     def restart(self):
         'Prepare to collect a command string in self.line'
         if self.clear_line: # default case, usually True
@@ -379,6 +380,9 @@ eden.keymap = (lambda: (eden.eden_command_keymap
                         if frame.mode == frame.Mode.input
                         else eden.command_keymap)) # frame.Mode.command
 
+def main(*filename, **options):
+    eden.run(*filename, **options)
+
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    eden.run(*filename, **options)
+    main(*filename, **options)

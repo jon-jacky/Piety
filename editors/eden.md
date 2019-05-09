@@ -2,7 +2,7 @@
 eden
 ====
 
-**eden** is a display editor in pure Python.
+**[eden](eden.py)** is a display editor in pure Python.
 
 **eden** provides all the functionality of *edsel*, and also adds a
 display editing mode that inserts or deletes printing characters
@@ -15,26 +15,37 @@ It also provides the built-in Python shell and scripting provided
 by [edo.py](../editors/edo.md).  Those three pages
 provide much of what you need to know to use *eden*.
 
-**eden** has no dependencies.
+The shell turns *eden* into a minimal but self-contained
+Python programming environment.  *eden* divides the screen
+to show one or more editor windows at the top, and a
+command interpreter for Python or editor commands at the
+bottom.  You can edit modules and write them out, then use the
+Python interpreter to import or reload modules, call their functions,
+and inspect and update their data structures.
 
 ## Running eden ##
 
 **eden** uses the same command line options and arguments as *edsel*,
 for example:
 
-    python3 -i -m eden lines20.txt -c 12
+    python3 -im eden lines20.txt -c 12
     ...
 
-To start *eden* in a python session, call the method *eden.run*, which
+To start *eden* in a python session, call the method *eden.main*, which
 takes the same optional arguments as can appear on the command line:
 
     python3 -i
     ...
-    >>> from eden import *
-    >>> eden.run('lines20.txt', c=12)
+    >>> import eden
+    >>> eden.main('lines20.txt', c=12)
     ...
 
-After *eden* stops, you can resume at the Python prompt with *eden.run()*.
+If you use the Python *-i* option, control transfers to an interactive
+Python prompt when *eden* stops for any reason.  The data for all buffers and
+windows remains intact, so you can resume by typing *eden.main()*.
+No function arguments
+are needed here, because the data assigned at startup is still present.
+
 
 ## Using eden ##
 
@@ -172,6 +183,19 @@ So the
 *^K* and *^U* commands have the effect of toggling subsequent *^Y*
 commands to inline mode, while *^W* toggles *^Y* to multiline mode.
 
+## API and data structures ##
+
+In *eden*, calls to the *edsel* API require a prefix:
+*edsel.o(2)*, *edsel.h(12)* etc.
+
+In *eden*, the window data structures must be prefixed by the *frame* module name:
+*frame.win* is the current window, *frame.windows* is the list
+of windows, etc.
+
+In *eden*, *ed* data structures and calls to the *ed* API must be prefixed by
+the module name *ed.*  For example: *ed.current*, *ed.a('append line after dot')*,
+etc.
+
 ## Limitations ##
 
 **eden** is *ed.py* underneath.  In display editing mode, you can place
@@ -200,5 +224,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *eden*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Mar 2019
+Revised May 2019
 

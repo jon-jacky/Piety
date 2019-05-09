@@ -6,7 +6,8 @@ desoto.py - Defines the edsel Console job that wraps the edsel.py
 
 import edsel as editor, wyshka, console
 
-ed = editor.edo.ed # so we can use ed API without prefix
+ed = editor.edo.ed   # use ed and frame APIs without prefix
+frame = editor.frame 
 
 edsel = console.Console(prompt=(lambda: wyshka.prompt),
                         process_line=editor.process_line,

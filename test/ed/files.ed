@@ -49,5 +49,10 @@ Here is a third line
 .
 n
 w scratch3.txt
+# confirm B does not reload file used in main or scratch buffers
+B lines20.txt
+n
+B scratch3.txt
+n
 # test finished
 

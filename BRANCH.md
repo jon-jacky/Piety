@@ -4,7 +4,8 @@ branches
 
 This is the **eden** branch.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*
-commands.  Begun 1 Apr 2018.
+commands.  Make *eden*, including its built-in Python shell, into a
+minimal but self-contained Python programming environment. Begun 1 Apr 2018.
 
 Branches recently merged into **master**:
 
@@ -69,4 +70,4 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised 25 Mar 2018
+Revised May 2019

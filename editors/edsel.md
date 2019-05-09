@@ -2,7 +2,7 @@
 edsel
 =====
 
-**edsel** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edsel_advertisement)
+**[edsel](edsel.py)** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edsel_advertisement)
 
 **edsel** is a simple display editor in pure Python.
 It is still line- and command-oriented like *ed.py*,
@@ -15,7 +15,14 @@ It also provides the built-in Python shell and scripting provided
 by [edo.py](../editors/edo.md).  Those two pages
 provide much of what you need to know to use *edsel*.
 
-**edsel** has no dependencies.
+The shell turns *edsel* into a minimal but self-contained
+Python programming environment.  It divides the screen
+to show one or more editor windows at the top, and a
+command interpreter for Python or editor commands at the
+bottom.  You can edit modules and
+write them out using *ed* cmmands, then use the
+Python interpreter to import or reload modules, call their functions,
+and inspect and update their data structures.
 
 ## Running edsel ##
 
@@ -25,7 +32,7 @@ provide much of what you need to know to use *edsel*.
 [ed.py](ed.md).  It adds one more option, *c*, the number of lines in
 the scrolling command region (see below), for example:
 
-    python3 -i -m edsel lines20.txt -c 12
+    python3 -im edsel lines20.txt -c 12
     ... main window appears ...
 
     lines20.txt, 20 lines
@@ -35,18 +42,16 @@ or
 
     python3 -i
     ...
-    >>> from edsel import *
-    >>> edsel('lines20.txt', c=12)
+    >>> import edsel
+    >>> edsel.main('lines20.txt', c=12)
     .... main window appears ...
 
     lines20.txt, 20 lines
     :
 
-Use the command *python3 -m edsel -h* to print help.
-
 If you use the Python *-i* option, control transfers to an interactive
 Python prompt when *edsel* stops for any reason.  The data for all buffers and
-windows remains intact, so you can resume by typing *edsel()*.
+windows remains intact, so you can resume by typing *edsel.main()*.
 No function arguments
 are needed here, because the data assigned at startup is still present.
 
@@ -62,16 +67,24 @@ shows where the next insertion or deletion will take place.
 
 The command region behaves like a terminal running *ed*: you type a
 command, *edsel* prints the response, and any preceding commands and
-responses scroll up until they disappear off the top.  There is a
-command to adjust the size of the command region (along with the
-frame) to retain more (or fewer) lines.
-
+responses scroll up until they disappear off the top.
 As you type in text, or type commands in the scrolling region, windows
 update to show the current text in the buffers.
 
+**edsel** imports *[edo](edo.md)*, so it includes the *wyshka* shell
+that provides both the *ed* command line and a Python interpreter.
+From the Python interpreter, you can
+import or reload modules, call their functions,
+and inspect and update their data structures.
+
+There is a command to adjust the size of the command region (along with the
+frame) to retain more (or fewer) lines.  When using the Python
+interpreter, it can be useful to expand the command region to
+nearly half the display.
+
 Each window has a status line at its bottom.  Near the left edge of
 the status line, a dot indicates this is the current window, a percent sign
-indicates that the buffer in the window is read-only, and an asterisk 
+indicates that the buffer in the window is read-only, and an asterisk
 indicates that the buffer in the window has unsaved changes.   Then the
 status line shows the buffer name, the location and line
 number of the current line in the buffer, the total number of
@@ -100,10 +113,6 @@ where subsequent commands will take effect.
 
 Conventional full-screen display editing is provided by *[eden](eden.md)*,
 a more capable editor that is based on *edsel*.
-
-**edsel** imports *[edo](edo.md)*, so it includes the *wyshka* shell
-that provides both the *ed* command line and a Python interpreter.
-
 
 ## Window commands ##
 
@@ -167,7 +176,7 @@ echo (boolean) and delay (float), which default to *True* and *0.2*
 seconds.  So *X sample.ed 0 0* suppresses both echo and delay,
 *X sample.ed 1 1* echoes with a 1 second delay, etc.
 
-## API ##
+## API and data structures ##
 
 The *edsel* commands are also available as an API.  The single-letter
 command name is the function name and any optional command suffix or
@@ -175,6 +184,12 @@ parameter is the command argument.  So the refresh command *L*
 becomes the API call *L()*.  The window commands *o* *o1* *o2*
 become the API calls *o()* *o(1)* *o(2)*.  The frame balance/resize commands
 *h* *h 12* (etc.) become *h()* *h(12)* (etc.).
+
+In *edsel*, calls to the *edsel* API require no prefix.
+
+In *edsel*, the window data structures are in the *frame* module:
+*frame.win* is the current window, *frame.windows* is the list
+of windows, etc.
 
 In *edsel*, calls to the *ed* API must be prefixed by
 the module name *ed.*  For example: *ed.a('append line after dot')*.
@@ -190,4 +205,4 @@ so *desoto* can run in the cooperative multitasking system,
 
 **edsel** is the core of a more capable display editor, [eden](eden.md).
 
-Revised Mar 2019
+Revised May 2019

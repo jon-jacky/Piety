@@ -3,70 +3,84 @@
 :../README.md, 73 lines
 ::CRM Buffer            Lines  Mode     File
     main                  0  Text     (no file)
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
 .   README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::.   README.md            91  Text     README.md
 :CRM Buffer            Lines  Mode     File
     main                  0  Text     (no file)
-.   README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+.   README.md            91  Text     README.md
 ::? e and E only work in main buffer
 :CRM Buffer            Lines  Mode     File
     main                  0  Text     (no file)
-.   README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+.   README.md            91  Text     README.md
 :.   main                  0  Text     (no file)
 ::? buffer README.md is already editing file README.md
 ::lines20.txt, 20 lines
 :CRM Buffer            Lines  Mode     File
 .   main                 20  Text     lines20.txt
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::.   README.md            91  Text     README.md
 :CRM Buffer            Lines  Mode     File
     main                 20  Text     lines20.txt
-.   README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+.   README.md            91  Text     README.md
 ::.   main                 20  Text     lines20.txt
 :CRM Buffer            Lines  Mode     File
 .   main                 20  Text     lines20.txt
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::.   scratch               0  Text     (no file)
 ::CRM Buffer            Lines  Mode     File
-    main                 20  Text     lines20.txt
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
 . * scratch               1  Text     (no file)
+    main                 20  Text     lines20.txt
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::? buffer README.md is already editing file README.md
 :? buffer README.md is already editing file README.md
 :CRM Buffer            Lines  Mode     File
-    main                 20  Text     lines20.txt
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
 . * scratch               1  Text     (no file)
+    main                 20  Text     lines20.txt
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::scratch.txt, 1 lines
 :::CRM Buffer            Lines  Mode     File
-    main                 20  Text     lines20.txt
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
 . * scratch               2  Text     scratch2.txt
+    main                 20  Text     lines20.txt
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::scratch2.txt, 2 lines
 ::::CRM Buffer            Lines  Mode     File
-    main                 20  Text     lines20.txt
-    README.md            91  Text     README.md
-    README.md<2>         58  Text     ../scripts/README.md
 . * scratch               3  Text     scratch3.txt
+    main                 20  Text     lines20.txt
     README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 :scratch3.txt, 3 lines
+::.   main                 20  Text     lines20.txt
+:CRM Buffer            Lines  Mode     File
+    scratch               3  Text     scratch3.txt
+.   main                 20  Text     lines20.txt
+    README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
+:.   scratch               3  Text     scratch3.txt
+:CRM Buffer            Lines  Mode     File
+.   scratch               3  Text     scratch3.txt
+    main                 20  Text     lines20.txt
+    README.md<3>         73  Text     ../README.md
+    README.md<2>         58  Text     ../scripts/README.md
+    README.md            91  Text     README.md
 ::? invalid address
 :

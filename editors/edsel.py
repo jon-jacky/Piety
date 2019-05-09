@@ -113,7 +113,7 @@ def cleanup():
     view.update = view.noupdate
     view.lz_print_dest = sys.stdout
 
-def edsel(*filename, **options):
+def main(*filename, **options):
     'Top level edsel command to invoke from python prompt or command line.'
     startup(*filename, **options)
     while not ed.quit:
@@ -127,4 +127,4 @@ frame.init(ed.buf) # import ed above initializes ed.buf
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
-    edsel(*filename, **options)
+    main(*filename, **options)
