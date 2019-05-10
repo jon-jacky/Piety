@@ -2,8 +2,11 @@
 branches
 ========
 
+This is the **edsel** branch.  Rename these editors: *edda* to *edna*, *edsel* to *edda*,
+*eden* to *edsel*.   Reserve the name *eden* for a program we may add in the future.
+Begun 10 May 2019.
 
-This is the **master** branch.  Branches recently merged into **master**:
+Branches recently merged into **master**:
 
 - **eden**, merged 9 May 2019.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*
