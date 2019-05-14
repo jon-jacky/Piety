@@ -55,7 +55,6 @@ def add_command(command, do_command):
     The command name can be more than one character, unlike in classic ed.
     """
     def _do_command(line):
-        line = line.lstrip()
         if line.startswith(command.__name__):
             _, _, paramstring = line.partition(command.__name__)
             command(paramstring.lstrip())

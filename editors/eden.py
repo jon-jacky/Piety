@@ -85,7 +85,7 @@ class Console(console.Console):
         self.point = 0
         self.start_col = 1
         frame.put_display_cursor()
-        
+
         # buf.a() update moved cursor so we have to put it back.FIXME?Redundant?
         win = frame.win
         wdot = win.wline(win.buf.dot)
@@ -259,9 +259,13 @@ class Console(console.Console):
 
     def status(self):
         '^T handler, override base class, for now print items used by del_or_join_next'
-        util.putstr('%s.%s point %s len %s dot %s nlines %s' %
-                    (self.line[:self.point], self.line[self.point:],
-                     self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
+        # Now ^T is bound to runcode
+        if ed.command_mode:
+            super().status()
+        else:
+            util.putstr('%s.%s point %s len %s dot %s nlines %s' %
+                        (self.line[:self.point], self.line[self.point:],
+                         self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
 
     def execute(self):
         """
@@ -302,6 +306,14 @@ class Console(console.Console):
         'For now, just crash' # FIXME - not used, ^K is now console kill line
         return 1/0  # raise exception on demand (crash), for testing
 
+    def runcode(self):
+        'Run Python statements in current selection (point up to dot)'
+        terminal.set_line_mode()
+        frame.put_command_cursor()
+        edsel.edo.P()
+        terminal.set_char_mode()
+        frame.put_display_cursor()
+
     def init_eden_keymaps(self):
         self.display_keys = {
             keyboard.C_c: self.page_up,
@@ -315,6 +327,7 @@ class Console(console.Console):
             keyboard.C_q: self.exchange,
             keyboard.C_r: self.rsearch,
             keyboard.C_s: self.search,
+            keyboard.C_t: self.runcode, # overrides base class ^T status
             keyboard.C_u: self.discard,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,
@@ -345,7 +358,7 @@ def base_do_command(line):
     line = line.lstrip()
 
     # Begin full-screen display editing
-    if line == 'C':
+    if line.startswith('C'):
         eden.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
     else:
         edsel.base_do_command(line)

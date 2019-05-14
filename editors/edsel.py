@@ -71,7 +71,7 @@ def base_do_command(line):
         elif line.startswith('o'):
             do_window_command(paramstring)
         else:
-            ed.do_command(line)
+            edo.do_command(line)
     except BaseException as e:
         cleanup() # so we can see entire traceback
         traceback.print_exc() # looks just like unhandled exception

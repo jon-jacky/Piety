@@ -511,7 +511,6 @@ def do_command(line):
 def add_line(line):
     'Process one line without blocking in ed input mode'
     global command_mode, prompt
-    line = line.lstrip()
     if line == '.':
         command_mode = True
         prompt = command_prompt
