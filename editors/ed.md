@@ -273,6 +273,14 @@ not the classic *ed* command *n* (print line numbers).
 There is no way to suppress printing the error messages as in classic
 *ed*.
 
+The *@* character
+can be used to mark a line with the *k@* command,
+which can then be located by the *'@* address.
+In *ed*, only the lower-case alphabetic characters *a-z* can be used
+for this (*ed.py* supports *a-z* also).
+Other programs (not *ed.py*) can operate on the region or *selection*
+from the *@* mark to the current line.
+
 The *e* and *E* commands only work in the *main* buffer.
 In *sam*, the *e* command works in any buffer.
 

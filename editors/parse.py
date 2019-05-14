@@ -19,17 +19,17 @@ caratnumber = re.compile(r'(\^+)')
 fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
-mark = re.compile(r"'([a-z])")  # 'c, ed mark with single lc char label
+mark = re.compile(r"'([a-z@])")  # 'c, ed mark with single lc char label or @ 
 
 def line_address(buf, cmd_string):
     """
-    Return line number for address at start of cmd_string (None of not found), 
+    Return line number for address at start of cmd_string (None of not found),
      also return rest of cmd_string.
     This is where we convert the various line address forms to line numbers.
     All other code in ed.py and related modules uses line numbers only.
     """
     if cmd_string == '':
-        return None, '' 
+        return None, ''
     if cmd_string[0] == '.': # current line
         return buf.dot, cmd_string[1:]
     if cmd_string[0] == '$': # last line
@@ -60,16 +60,16 @@ def line_address(buf, cmd_string):
     if m:
         return buf.dot - len(m.group(0)), cmd_string[m.end():]
     m = fwdsearch.match(cmd_string)  # /text/ or // - forward search
-    if m: 
+    if m:
         return buf.F(m.group(1)), cmd_string[m.end():]
     m = bkdsearch.match(cmd_string)  # ?text? or ?? - backward search
-    if m: 
+    if m:
         return buf.R(m.group(1)), cmd_string[m.end():]
     m = mark.match(cmd_string) # 'c mark with single lc char label
-    if m: 
+    if m:
         c = m.group(1)
         i = buf.mark[c] if c in buf.mark else -9999 # invalid address
-        return i, cmd_string[m.end():] 
+        return i, cmd_string[m.end():]
     return None, cmd_string
 
 def command(buf, cmd_string):

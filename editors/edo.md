@@ -4,16 +4,22 @@ edo.py
 
 **[edo.py](edo.py)** provides the *[ed.py](ed.md)* line editor with an enhanced
 command line shell, including a Python interpreter
-provided by the *[wyshka](../shells/wyshka.py)* module.
+provided by the *[wyshka](../shells/wyshka.py)* module.  *edo* also
+provides new editor commands for running Python scripts from 
+editor buffers or any selected text.
 
-This shell turns *ed.py* into a minimal but self-contained
+This shell and these new commands
+turn *ed.py* into a minimal but self-contained
 Python programming environment.  In *edo*, you can edit modules and
 write them out using *ed* commands, then use the built-in
 Python interpreter to import or reload modules, call their functions,
-and inspect and update their data structures.
+and inspect and update their data structures.  Or, you can run
+Python scripts directly from editor buffers, or execute Python
+statements from selected text in any buffer.
 
 **edo.py** also provides a new command *X*
-for executing scripts from an editor buffer with optional echo and delay,
+for executing scripts of editor commands
+from an editor buffer with optional echo and delay,
 supported by the *[samysh](../shells/samysh.py)* module.
 
 This command is provided for testing *ed.py* itself, as well as the
@@ -172,6 +178,21 @@ as *ed.py*, and the *edo* *main* function accepts the same optional arguments
 as the *ed* *main* function.
 
 ## Scripting ##
+
+**edo.py** adds a new *R* command that runs a Python script from
+an editor buffer.  The command takes on optional parameter, a buffer name
+(which does not have to end in *.py*).
+If this parameter is omitted, *R* uses the current buffer.
+
+The *R* command executes the entire buffer contents, from
+the first line through the last.  However, the *R* command does not
+import the buffer; the buffer contents execute in the current
+*__main__* module.  Any output from the script (including error
+messages or tracebacks) is printed on the terminal, just like
+other editor output (from *p* commands etc.).
+
+**edo.py** adds a new *P* command that runs Python statements from
+lines in the current buffer.  ...
 
 **edo.py** also adds a new *X* command that executes *ed* commands or
 Python statements from an editor buffer, to support scripting and
