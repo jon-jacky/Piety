@@ -19,6 +19,9 @@ command interpreter for editor commands or Python at the
 bottom.  You can edit modules and write them out, then use the
 Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.
+Or, you can bypass the file system and run
+Python scripts directly from editor buffers, or execute Python
+statements from selected text in any buffer.
 
 ## Running eden ##
 
@@ -87,7 +90,7 @@ bound to them:
     ^I  tab, insert spaces
     ^J  (j)ump cursor forward to beginning of next word
     ^K  delete (kill) from cursor to end of line, save in paste buffer
-    ^L  refresh entire screen (useful after screen is garbled by ^T output etc.)
+    ^L  refresh entire screen
     ^M  return, open new line below, or break line at cursor
     ^N  move cursor down to (n)ext line
     ^O  move cursor to (o)ther window, next in sequence
@@ -95,7 +98,7 @@ bound to them:
     ^Q  exchange mark and dot (move cursor to show where they are)
     ^R  search backwards (reverse) for previously entered search string
     ^S  search forwards for previously entered search string
-    ^T  print task or application status information
+    ^T  run Python statements from mark (included) to dot (excluded).
     ^U  discard from start of line to cursor, save in paste buffer
     ^V  move cursor forward one page (page down)
     ^W  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer

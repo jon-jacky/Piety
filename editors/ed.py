@@ -463,15 +463,11 @@ command_mode = True
 def do_command(line):
     'Process one line without blocking in ed command mode or input mode'
     global command_mode, prompt, D_count, q_count
-    line = line.lstrip()
-    if line and line[0] == '#': # comment, do nothing
-        return
-    items = parse.command(buf, line)
-    if items[0] == 'ERROR':
-        return # parse.command already printed error message
+    results = parse.command(buf, line)
+    if results:
+        cmd_name, args = results
     else:
-        tokens = tuple([ t for t in items if t != None ])
-    cmd_name, args = tokens[0], tokens[1:]
+        return # parse already printed error message
     if cmd_name in parse.complete_cmds:
         globals()[cmd_name](*args) # dict from name (str) to object (fcn)
     elif cmd_name in parse.input_cmds:

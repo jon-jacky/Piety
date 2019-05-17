@@ -5,7 +5,7 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
           P command to run Python statements in current selection
 """
 
-import ed, pysh, samysh, wyshka
+import ed, parse, check, pysh, samysh, wyshka
 
 # Define x command so it can also be imported by edsel, eden etc.
 # to use with their own do_commands, by calling samysh.add_command.
@@ -44,40 +44,38 @@ def X_command(do_command):
                 print('? buffer name')
     return X
 
-def R(bufname, start, end):
-    '(R)un Python script from buffer, lines start through end'
-    source = ''.join(ed.buffers[bufname].lines[start:end+1])
-    pysh.pysh.runsource(source, filename=bufname)
+def R(*args):
+    'Run Python script from named buffer'
+    _, _, bufname, _ = parse.arguments(args)
+    bufname = bufname if bufname else ed.current
+    bufname = ed.match_prefix(bufname, ed.buffers)
+    if not bufname in ed.buffers:
+        print('? buffer name')
+        return
+    pysh.runlines(ed.buffers[bufname].lines[1:])
 
-def P():
-        'Run (P)ython code in current selection (point up to dot)'
-        # based on eden cut method
-        if '@' in ed.buf.mark:
-            start = ed.buf.mark['@']
-            end = ed.buf.dot
-            if start > end:
-                start, end = end, start
-            end -= 1 # exclude last line, dot (usually) or mark
-            if ed.check.range_ok(ed.buf, start, end):
-                R(ed.current, start, end)
-        else:
-            print('? no mark, no region')
+def P(*args):
+    'Run Python statements in addressed lines in current buffer'
+    valid, start, end, _, _ = check.irange(ed.buf, args)
+    if valid: # includes start <= end, maybe not so for mark and dot
+        pysh.runlines(ed.buffers[ed.current].lines[start:end+1])
+
+parse.ed_cmds += 'PR' # so parse.command() recognizes new commands
 
 def do_command(line):
         """
         Add R command to (R)un Python script from buffer,
-        P command to run Python statements in current selection.
+        P command to run Python statements in addressed lines.
         """
-        line = line.lstrip()
-        paramstring = line[1:].lstrip()
-        if line.startswith('R'):
-            bufname = paramstring if paramstring else ed.current
-            if not bufname in ed.buffers:
-                print('? buffer name')
-                return
-            R(bufname, 1, ed.S()) # always the whole buffer
-        elif line.startswith('P'):
-            P()
+        results = parse.command(ed.buf, line)
+        if results:
+            cmd_name, args = results
+        else:
+            return # parse already printed error message
+        if cmd_name == 'R':
+            R(*args)
+        elif cmd_name == 'P':
+            P(*args)
         else:
             ed.do_command(line)
 

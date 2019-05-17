@@ -19,7 +19,7 @@ caratnumber = re.compile(r'(\^+)')
 fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
 text = re.compile(r'(.*)') # nonblank
-mark = re.compile(r"'([a-z@])")  # 'c, ed mark with single lc char label or @ 
+mark = re.compile(r"'([a-z@])")  # 'c, ed mark with single lc char label or @
 
 def line_address(buf, cmd_string):
     """
@@ -72,11 +72,11 @@ def line_address(buf, cmd_string):
         return i, cmd_string[m.end():]
     return None, cmd_string
 
-def command(buf, cmd_string):
+def command_tokens(buf, cmd_string):
     """
     Parse ed.py command string, return multiple values in this order:
      cmd_name - single-character command name
-     start, end - integer line numbers 
+     start, end - integer line numbers
      params - string containing other command parameters
     All are optional except cmd_name, assign None if an item is not present
     """
@@ -110,10 +110,23 @@ def command(buf, cmd_string):
         # return each space-separated parameter as separate arg in sequence
         return (cmd_name,start,end) + (tuple(params.split() if params else ()))
 
+def command(buf, line):
+    'Wrap command_tokens, provide necessary but banal pre/post-processing'
+    cmd_string = line.lstrip()
+    if cmd_string and cmd_string[0] == '#': # comment, do nothing
+        return None
+    items = command_tokens(buf, cmd_string)
+    if items[0] == 'ERROR':
+        return None # parse.command_tokens already printed error message
+    else:
+        tokens = tuple([ t for t in items if t != None ])
+    cmd_name, args = tokens[0], tokens[1:]
+    return cmd_name, args
+
 def arguments(args):
-    """ 
+    """
     Parse variable-length argument list for ed.py Python API, all args optional
-    Return fixed length tuple: start, end, text, params 
+    Return fixed length tuple: start, end, text, params
     start, end are line numbers, for example the first and last line of region.
     When present, start and end are int, both might be absent, indicated None.
     text is the first token in the parameter list, str or None if absent

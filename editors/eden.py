@@ -259,7 +259,7 @@ class Console(console.Console):
 
     def status(self):
         '^T handler, override base class, for now print items used by del_or_join_next'
-        # Now ^T is bound to runcode
+        # Now ^T is bound to runlines
         if ed.command_mode:
             super().status()
         else:
@@ -306,13 +306,25 @@ class Console(console.Console):
         'For now, just crash' # FIXME - not used, ^K is now console kill line
         return 1/0  # raise exception on demand (crash), for testing
 
-    def runcode(self):
-        'Run Python statements in current selection (point up to dot)'
-        terminal.set_line_mode()
-        frame.put_command_cursor()
-        edsel.edo.P()
-        terminal.set_char_mode()
-        frame.put_display_cursor()
+    def runlines(self):
+        """
+        Run Python statements in current selection, mark up to dot
+        If there is no current selection, just run the current line.
+        """
+        if '@' in ed.buf.mark:
+            start = ed.buf.mark['@']
+            end = ed.buf.dot
+            if start > end:
+                start, end = end, start
+            end -= 1 # exclude last line, dot (usually) or mark
+        else:
+            start = end = ed.buf.dot
+        if check.range_ok(ed.buf, start, end):
+            terminal.set_line_mode()
+            frame.put_command_cursor()
+            edsel.edo.P(start, end)
+            terminal.set_char_mode()
+            frame.put_display_cursor()
 
     def init_eden_keymaps(self):
         self.display_keys = {
@@ -327,7 +339,7 @@ class Console(console.Console):
             keyboard.C_q: self.exchange,
             keyboard.C_r: self.rsearch,
             keyboard.C_s: self.search,
-            keyboard.C_t: self.runcode, # overrides base class ^T status
+            keyboard.C_t: self.runlines, # overrides base class ^T status
             keyboard.C_u: self.discard,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,

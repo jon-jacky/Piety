@@ -5,7 +5,7 @@ edo.py
 **[edo.py](edo.py)** provides the *[ed.py](ed.md)* line editor with an enhanced
 command line shell, including a Python interpreter
 provided by the *[wyshka](../shells/wyshka.py)* module.  *edo* also
-provides new editor commands for running Python scripts from 
+provides new editor commands for running Python scripts from
 editor buffers or any selected text.
 
 This shell and these new commands
@@ -13,7 +13,8 @@ turn *ed.py* into a minimal but self-contained
 Python programming environment.  In *edo*, you can edit modules and
 write them out using *ed* commands, then use the built-in
 Python interpreter to import or reload modules, call their functions,
-and inspect and update their data structures.  Or, you can run
+and inspect and update their data structures.  
+Or, you can bypass the file system and run
 Python scripts directly from editor buffers, or execute Python
 statements from selected text in any buffer.
 
@@ -179,41 +180,46 @@ as the *ed* *main* function.
 
 ## Scripting ##
 
+**edo.py** provides new editor commands for running Python scripts from
+editor buffers or any selected text, and for running scripts of editor
+commands from editor buffers.
+
 **edo.py** adds a new *R* command that runs a Python script from
-an editor buffer.  The command takes on optional parameter, a buffer name
+an editor buffer.  The command takes an optional parameter, a buffer name
 (which does not have to end in *.py*).
 If this parameter is omitted, *R* uses the current buffer.
 
 The *R* command executes the entire buffer contents, from
-the first line through the last.  However, the *R* command does not
+the first line through the last.  The *R* command does not
 import the buffer; the buffer contents execute in the current
-*__main__* module.  Any output from the script (including error
+__main__ module.  Any output from the script (including error
 messages or tracebacks) is printed on the terminal, just like
 other editor output (from *p* commands etc.).
 
 **edo.py** adds a new *P* command that runs Python statements from
-lines in the current buffer.  ...
+lines in the current buffer.  Like many *ed* commands,
+it takes one or two optional prefix line address arguments to specify
+the line or range of lines to run.  The default is the current line.
+Any output from the Python statements are printed on the terminal.
 
-**edo.py** also adds a new *X* command that executes *ed* commands or
+**edo.py** adds a new *X* command that executes *ed* commands or
 Python statements from an editor buffer, to support scripting and
 testing.  (That is an uppercase *X*.  The *ed.py* lower case *x*
 command is different.  It pastes recently copied or deleted lines into
 the current text buffer).
+This command is provided for testing *ed.py* itself , as well as the
+several other programs built on it.
 
 The *X* command requires the buffer name parameter (it does not make
 sense to execute *ed* commands in the same buffer that holds the
-script).  The buffer name can be abbreviated by providing a prefix
-followed by a hyphen -- a sort of "poor person's tab completion".  For
-example, the command *X samp-* or even *X s-* might run the test script in
-*sample.ed*.  If more than one buffer name begins with the same
-prefix, the *X* command just chooses one.
+script).
 The *X* command ignores any line address arguments; it always
 executes the entire buffer.
 
 The *X* command takes optional parameters *echo*
 (boolean) and *delay* (float), which are helpful for seeing the
 effects of each command in the script; they are especially useful
-for testing display editors.
+for testing the display editors based on *edo*.
 The defaults are *echo* *True* and *delay* 0.2 sec.
 
 Here is a sample that uses the *X* command to execute the *sample.ed*
@@ -243,6 +249,18 @@ in the *test/ed* directory:
 
 After the script finishes, you can type *q* at the prompt to exit the editor,
 then exit from Python.
+
+It is also possible to use the *X* command to execute a Python script,
+but you must put *!* in the first line of the buffer to switch *wyshka* to Python
+mode, then put *:* in the last line to switch back to *ed* command mode.
+The *R* command is a better way to execute Python scripts; it requires no
+modifications to the buffer.
+
+In the R and X commands, the buffer name can be abbreviated by providing a prefix
+followed by a hyphen -- a sort of "poor person's tab completion".  For
+example, the command *X samp-* or even *X s-* might run the test script in
+*sample.ed*.  If more than one buffer name begins with the same
+prefix, the command just chooses one.
 
 ## Modules ##
 

@@ -15,7 +15,7 @@ It also provides the built-in Python shell and scripting provided
 by [edo.py](../editors/edo.md).  Those two pages
 provide much of what you need to know to use *edsel*.
 
-The shell turns *edsel* into a minimal but self-contained
+The shell and scripting turn *edsel* into a minimal but self-contained
 Python programming environment.  It divides the screen
 to show one or more editor windows at the top, and a
 command interpreter for Python or editor commands at the
@@ -23,6 +23,9 @@ bottom.  You can edit modules and
 write them out using *ed* cmmands, then use the
 Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.
+Or, you can bypass the file system and run
+Python scripts directly from editor buffers, or execute Python
+statements from selected text in any buffer.
 
 ## Running edsel ##
 
