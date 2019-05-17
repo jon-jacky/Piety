@@ -51,7 +51,7 @@ class Console(console.Console):
         win.clear_marker(win.buf.dot)
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot,1)
-        
+
     def command_mode(self):
         'Replace current line in buffer and resume command mode.'
         # Based on ed.py append and '.' handling, Console accept_line method.
@@ -308,7 +308,7 @@ class Console(console.Console):
 
     def runlines(self):
         """
-        Run Python statements in current selection, mark up to dot
+        Run Python statements in current selection (mark to dot).
         If there is no current selection, just run the current line.
         """
         if '@' in ed.buf.mark:
@@ -322,7 +322,9 @@ class Console(console.Console):
         if check.range_ok(ed.buf, start, end):
             terminal.set_line_mode()
             frame.put_command_cursor()
-            edsel.edo.P(start, end)
+            # edsel.edo.P(start, end) # gets weird error msgs
+            edsel.edo.pysh.runlines(ed.buf.lines[start:end+1]) # alternative to P()
+            print('%s, ran lines %d..%d' % (ed.current, start, end))
             terminal.set_char_mode()
             frame.put_display_cursor()
 

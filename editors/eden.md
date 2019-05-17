@@ -240,5 +240,13 @@ bound a command to every control character, so no more display editing
 commands can be added to *eden*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
+## Bugs ##
+
+The *^T* display editing command to run Python statements in the
+current selection (from mark to dot) does not always work.  In the
+meantime, the *edo* *R* and *P* commands do work.  The *R* command
+runs an entire buffer, and the *P* command runs statements in
+the addressed range of lines.
+
 Revised May 2019
 

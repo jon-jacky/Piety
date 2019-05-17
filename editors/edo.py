@@ -53,12 +53,14 @@ def R(*args):
         print('? buffer name')
         return
     pysh.runlines(ed.buffers[bufname].lines[1:])
+    print('%s, ran lines %d..%d' % (bufname, 1, ed.S()))
 
 def P(*args):
     'Run Python statements in addressed lines in current buffer'
     valid, start, end, _, _ = check.irange(ed.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
-        pysh.runlines(ed.buffers[ed.current].lines[start:end+1])
+        pysh.runlines(ed.buf.lines[start:end+1])
+        print('%s, ran lines %d..%d' % (ed.current, start, end))
 
 parse.ed_cmds += 'PR' # so parse.command() recognizes new commands
 
