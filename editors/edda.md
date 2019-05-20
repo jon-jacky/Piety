@@ -2,9 +2,7 @@
 edda
 =====
 
-**[edda](edda.py)** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edda_advertisement)
-
-**edda** is a simple display editor in pure Python.
+**[edda](edda.py)** is a simple display editor in pure Python.
 It is still line- and command-oriented like *ed.py*,
 but it also shows buffers update in display windows as
 you edit with *ed* commands. *edda* adds a few new commands
