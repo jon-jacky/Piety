@@ -2,15 +2,15 @@
 branches
 ========
 
-This is the **edsel** branch.  Rename these editors: *edda* to *edna*, *edsel* to *edda*,
+This is the **master** branch.  Branches recently merged into **master**:
+
+- **edsel**, merged 20 May 2019.  Rename these editors: *edda* to *edna*, *edsel* to *edda*,
 *eden* to *edsel*.   Reserve the name *eden* for a program we may add in the future.
 We rename these files and replace these pervasive names in the many files
 where they appear by running Python scripts, without resorting to
 the shell, *sed*, or any other utilities outside Piety.  To make this self-contained,
 we add editor commands to run Python scripts from editor buffers and selections.
 Begun 10 May 2019.
-
-Branches recently merged into **master**:
 
 - **eden**, merged 9 May 2019.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*

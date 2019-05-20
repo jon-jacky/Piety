@@ -3,7 +3,8 @@ edda
 =====
 
 **[edda](edda.py)** is a simple display editor in pure Python.
-It is still line- and command-oriented like *ed.py*,
+
+**edda** is still line- and command-oriented like *ed.py*,
 but it also shows buffers update in display windows as
 you edit with *ed* commands. *edda* adds a few new commands
 for managing display windows.
