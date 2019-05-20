@@ -9,7 +9,7 @@ demo.py - Demonstrates many features of the Piety system.
 
 import terminal, display, piety, timestamp
 
-from session import pysh, ed, edsel, eden # Console jobs
+from session import pysh, ed, edda, edsel # Console jobs
 from session import jobs, fg # functions to type at Python command line
 from session import edm, frame # modules that contain data structures
 
@@ -17,10 +17,10 @@ from session import edm, frame # modules that contain data structures
 #  after updates from background task
 # FIXME - This is not sufficiently general.
 #  This  is needed for each Console job when it reaches foreground.
-#  Here we have just hard-coded it for the eden Consoledm.
-#  On each timestamp tick, eden cursor will be restored
-#  but edsel cursor will reset to start of linedm.
-edm.buffer.console = eden # Console instance
+#  Here we have just hard-coded it for the edsel Console.
+#  On each timestamp tick, edsel cursor will be restored
+#  but edda cursor will reset to start of line.
+edm.buffer.console = edsel # Console instance
 
 # Put some content in main buffer
 edm.i('This is the main buffer')

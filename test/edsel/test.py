@@ -1,7 +1,7 @@
 """
 test.py - This module contains scripts for several tests.  
 
-Run the tests from the eden command line.  Type eden commands to load
+Run the tests from the edsel command line.  Type edsel commands to load
 a file of sample text and position the cursor, then type Python
 commands to import this module and run one of its scripts.  Prefix the
 Python commands with !  For example:
@@ -11,7 +11,7 @@ Python commands with !  For example:
     :!import test
     :!test.run(test.dnupdn)
 
-The test.run function switches from eden command mode to display mode,
+The test.run function switches from edsel command mode to display mode,
 runs the named test script, and then returns to command mode and
 prints a prompt. Then you can type the ed command ,d to empty the
 buffer and clear the window, and type a Python command to run another
@@ -27,7 +27,7 @@ Some tests do not require any preliminaries, and can be run in a new empty buffe
 See comments before each test case.
 """
 
-import eden, samysh
+import edsel, samysh
 from keyboard import * # ^A ^B ... keycodes
 
 # This script is just a string, all keycodes are single chars ^N ^P
@@ -52,7 +52,7 @@ inline_arrows = (tuple('Here is a line of text',) + (C_a,) + 10*(right,) +
                  (C_k,) + tuple('word') + (C_l,) + tuple(' and stuff') + (C_u,) +
                  tuple('Start over'))
 
-# Page down, page up in eden.Console: ^V, ^R
+# Page down, page up in edsel.Console: ^V, ^R
 # First load several pages of text, for example  :E lines120.txt
 #  then position cursor at top for example :1
 pgdnup = 8*C_v + 8*C_r
@@ -110,31 +110,31 @@ del_join_down = ('line 1' + cr +
 # mark lines 1, move to line 5, cut, yank, move down 5 lines, yank again,
 # move down five more lines, yank again.
 yank = (C_at + 4*C_n +
-        C_x + C_x + 
+        C_x + C_x +
         C_w +
         C_y +
-        C_x + C_x + 
-        5*C_n + 
+        C_x + C_x +
+        5*C_n +
         C_y +
         C_x + C_x +
-        5*C_n + 
+        5*C_n +
         C_y +
         C_x + C_x)
 
-# Test exiting display mode with ^Z, restoring display with C 
-# then exit display mode with ^Q three times, eden restores display after each
+# Test exiting display mode with ^Z, restoring display with C
+# then exit display mode with ^Q three times, edsel restores display after each
 # then exit display mode with ^Z again.  Confirm we get proper prompt each time
 # Not self-contained, first do E lines20.txt then 1
-commands = (C_z + 
-            '3' + cr + '5' + cr + '7' + cr + 
-            'C' + cr + 
-            C_q + '3' + cr + C_q + '5' + cr + C_q + '7' + cr + 
-            C_z + 
-            '3' + cr + '5' + cr + '7' + cr + 
+commands = (C_z +
+            '3' + cr + '5' + cr + '7' + cr +
+            'C' + cr +
+            C_q + '3' + cr + C_q + '5' + cr + C_q + '7' + cr +
+            C_z +
+            '3' + cr + '5' + cr + '7' + cr +
             'C' + cr)
 
 def run(script, delay=0.2): # seconds
-    eden.base_do_command('C')
-    samysh.run_script(eden.eden.handle_key, script, echo=(lambda: False), 
+    edsel.base_do_command('C')
+    samysh.run_script(edsel.edsel.handle_key, script, echo=(lambda: False),
                       delay=delay)
-    eden.eden.command_mode()
+    edsel.edsel.command_mode()

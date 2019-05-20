@@ -1,7 +1,7 @@
 """
 session.py - Creates a Session instance with four console jobs:
              the pysh shell, the ed line editor, and the 
-             edsel and eden display editors.
+             edda and edsel display editors.
 
 Each job is a Console instance that wraps its application.
 
@@ -11,21 +11,21 @@ without the Piety scheduler.
 
 import sys
 import piety
-import salysh, edda, desoto
-import eden as edenm # so eden job name does not hide eden module
+import salysh, edna, desoto
+import edsel as edselm # so edsel job name does not hide edsel module
 
 # Console jobs
 pysh = salysh.pysh
-ed = edda.ed
-edsel = desoto.edsel
-eden = edenm.eden
+ed = edna.ed
+edda = desoto.edda
+edsel = edselm.edsel
 
-session = piety.Session(name='session', input=sys.stdin, jobs=[pysh,ed,edsel,eden])
+session = piety.Session(name='session', input=sys.stdin, jobs=[pysh,ed,edda,edsel])
 
 # convenient abbreviations for the command line
 jobs = session.jobs # list jobs and their states
 fg = session.fg # resume most recently suspended job
-edm = edda.edo.ed # ed module, needs different name from ed console job
+edm = edna.edo.ed # ed module, needs different name from ed console job
 frame = desoto.editor.frame
 
 pysh.name = 'pysh'
@@ -35,13 +35,13 @@ pysh.cleanup = piety.stop # sets piety.cycle.running = False
 ed.name = 'ed'
 ed.start = (lambda: session.start(ed))
 
+edda.name = 'edda'
+edda.start = (lambda: session.start(edda))
+
 edsel.name = 'edsel'
 edsel.start = (lambda: session.start(edsel))
 
-eden.name = 'eden'
-eden.start = (lambda: session.start(eden))
-
-pysh.exit = ed.exit = edsel.exit = eden.exit = session.switch
+pysh.exit = ed.exit = edda.exit = edsel.exit = session.switch
 
 # can start or resume with session.main()
 def main():

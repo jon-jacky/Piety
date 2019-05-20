@@ -409,12 +409,12 @@ command arguments and supplying default arguments.
 
 **ed.py** imports the *view.py* module, which contains configuration
 variables that are read and written by both *ed* and the display
-editor *edsel*, in order to configure code used by both programs to
+editor *edda*, in order to configure code used by both programs to
 run with or without a display.
 
 **ed.py** imports the *Op* display operations enumeration from the
 *updates.py* module, which appears in code in *ed* that is also used
-by the *edsel* display editor.
+by the *edda* display editor.
 
 The *buffer*, *parse*, *check*, *view*, and *updates* modules are
 included in this directory.  **ed.py** also uses the Python standard
@@ -495,9 +495,9 @@ It provides the command line and text buffers for them all.
 Python interpreter and scripting.  This turns *ed.py* into a
 minimal but self-contained Python programming environment.
 
-**[edda](edda.py)** wraps *ed.py* (via *edo*) in a [Console](../console/README.md)
+**[edna](edna.py)** wraps *ed.py* (via *edo*) in a [Console](../console/README.md)
 object that collects each line without blocking,
-so *edda* can run in the cooperative multitasking system,
+so *edna* can run in the cooperative multitasking system,
 [Piety](../piety/README.md).  This is necessary for Piety because
 *ed.py* runs an event loop that blocks waiting for a complete line
 to be entered at the terminal.
@@ -506,7 +506,7 @@ to be entered at the terminal.
 *Console* object that makes it behave like an old-fashioned teletype
 (a printing terminal with limited cursor control).
 
-**[edsel](edsel.md)** and **[eden](eden.md)** are display editors that
+**[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
 Revised May 2019

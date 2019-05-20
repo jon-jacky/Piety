@@ -7,7 +7,7 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 
 import ed, parse, check, pysh, samysh, wyshka
 
-# Define x command so it can also be imported by edsel, eden etc.
+# Define x command so it can also be imported by edda, edsel etc.
 # to use with their own do_commands, by calling samysh.add_command.
 
 def X_command(do_command):

@@ -1,7 +1,7 @@
 """
 background.py - Demonstrate printing to editor buffers from
 the "background".  That is, adding to editor buffers from
-Python code but without using using ed/edsel commands or API.
+Python code but without using using ed/edda commands or API.
 
 This script uses blocking while loop, not piety event loop.
 
@@ -39,11 +39,11 @@ Alternatively:
 """
 
 import timestamp
-import edsel
+import edda
 
 # We haven't started display editor yet, window not initialized,
 #  so use ed commands.
-ed = edsel.ed
+ed = edda.ed
 
 # Put some content in main buffer
 ed.i('This is the main buffer')
@@ -61,7 +61,7 @@ print(next(ts1), file=ts1buf)
 print(next(ts2), file=ts2buf)
 
 def main():
-    edsel.edsel(c=12)
+    edda.main(c=12)
 
 if __name__ == '__main__':
     main()

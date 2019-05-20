@@ -23,9 +23,9 @@ class Op(Enum):
     input = 8    # ed a i c  enter input (insert) mode, from command mode.
     command = 9  # ed .  exit input (insert) mode, return to command mode
     # update operations in frame, refer to windows
-    next = 10    # edsel o, switch to next window
-    single = 11  # edsel o1, return to single window
-    hsplit = 12  # edsel o2, split window, horizontal
+    next = 10    # edda o, switch to next window
+    single = 11  # edda o1, return to single window
+    hsplit = 12  # edda o2, split window, horizontal
     refresh = 13 # clear screen and redraw all windows
     rescale = 14 # rescale frame and window sizes, then refresh
     # update operations on terminal where frame lives

@@ -1,26 +1,24 @@
 
 edsel
-=====
+====
 
-**[edsel](edsel.py)** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edsel_advertisement)
+**[edsel](edsel.py)** -- [*it has the new ideas next year's software is copying!*](http://all-classic-ads.com/ford-vintage-ads-1950.html#1958_ford_edda_advertisement)
 
-**edsel** is a simple display editor in pure Python.
-It is still line- and command-oriented like *ed.py*,
-but it also shows buffers update in display windows as
-you edit with *ed* commands. *edsel* adds a few new commands
-for managing display windows.
+**edsel** is a display editor in pure Python.
 
-**edsel** is  based on the line editor [ed.py](ed.md).
+**edsel** provides all of the commands of the line editor [ed.py](ed.md) and
+the simpler display editor [edda](edda.md).
 It also provides the built-in Python shell and scripting provided
-by [edo.py](../editors/edo.md).  Those two pages
-provide much of what you need to know to use *edsel*.
+by [edo.py](../editors/edo.md).
+*edsel* adds a display editing mode that inserts or deletes printing characters
+anywhere, and uses display commands bound to control characters to move the cursor and to
+select, cut, and paste text.
 
-The shell and scripting turn *edsel* into a minimal but self-contained
-Python programming environment.  It divides the screen
+The built-in Python shell turns *edsel* into a minimal but self-contained
+Python programming environment.  *edsel* divides the screen
 to show one or more editor windows at the top, and a
-command interpreter for Python or editor commands at the
-bottom.  You can edit modules and
-write them out using *ed* cmmands, then use the
+command interpreter for editor commands or Python at the
+bottom.  You can edit modules and write them out, then use the
 Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.
 Or, you can bypass the file system and run
@@ -29,28 +27,20 @@ statements from selected text in any buffer.
 
 ## Running edsel ##
 
-**edsel** can run as a standalone program or in an interactive Python session.
-
-**edsel** is invoked using a similar command line or function call as
-[ed.py](ed.md).  It adds one more option, *c*, the number of lines in
-the scrolling command region (see below), for example:
+**edsel** uses the same command line options and arguments as *edda*,
+for example:
 
     python3 -im edsel lines20.txt -c 12
-    ... main window appears ...
+    ...
 
-    lines20.txt, 20 lines
-    :
-
-or
+To start *edsel* in a python session, call the method *edsel.main*, which
+takes the same optional arguments as can appear on the command line:
 
     python3 -i
     ...
     >>> import edsel
     >>> edsel.main('lines20.txt', c=12)
-    .... main window appears ...
-
-    lines20.txt, 20 lines
-    :
+    ...
 
 If you use the Python *-i* option, control transfers to an interactive
 Python prompt when *edsel* stops for any reason.  The data for all buffers and
@@ -58,154 +48,207 @@ windows remains intact, so you can resume by typing *edsel.main()*.
 No function arguments
 are needed here, because the data assigned at startup is still present.
 
-## Display ##
 
-**edsel** looks similar to other multiwindow display editors such as
-*emacs*.  It divides its display into two main regions: a scrolling
-command region at the bottom, and above it a *frame* that holds one
-or more windows that show the contents of editor buffers.
-One of the windows is the *current window* that shows where commands
-take effect.  The current window always shows a *cursor* or *marker* that
-shows where the next insertion or deletion will take place.
+## Using edsel ##
 
-The command region behaves like a terminal running *ed*: you type a
-command, *edsel* prints the response, and any preceding commands and
-responses scroll up until they disappear off the top.
-As you type in text, or type commands in the scrolling region, windows
-update to show the current text in the buffers.
+When *edsel* starts up, it resembles *edda*, with a command prompt in
+the scrolling region at the bottom of the terminal window.  You must
+use [ed commands](ed.txt) to read and write files, and to manage
+buffers. You may also use *ed* commands to edit the text.  You must
+used [edda commands](edda.txt) to manage windows.
 
-**edsel** imports *[edo](edo.md)*, so it includes the *wyshka* shell
-that provides both the *ed* command line and a Python interpreter.
-From the Python interpreter, you can
-import or reload modules, call their functions,
-and inspect and update their data structures.
+**edsel** adds a command *C* to switch from command mode to display
+editing mode (that's capital *C*, case is significant).  In display
+editing mode you can insert or delete printing characters anywhere and
+use control characters to move the cursor and to select, cut, and
+paste text.
 
-There is a command to adjust the size of the command region (along with the
-frame) to retain more (or fewer) lines.  When using the Python
-interpreter, it can be useful to expand the command region to
-nearly half the display.
+Display editing mode provides a command *^Z* (hold down the control
+key while typing the Z key) that returns to command mode.  There is
+also a command *^X* that enables you to type and execute any single
+*ed* or *edda* command and then return immediately to display editing
+mode.  This makes it easy to alternate display editing with commands.
 
-Each window has a status line at its bottom.  Near the left edge of
-the status line, a dot indicates this is the current window, a percent sign
-indicates that the buffer in the window is read-only, and an asterisk
-indicates that the buffer in the window has unsaved changes.   Then the
-status line shows the buffer name, the location and line
-number of the current line in the buffer, the total number of
-lines in the buffer, and perhaps some other information.
+## Display Editing Commands ##
 
-## Commands ##
+Display editing commands are bound to single control characters: hold
+down the control key while typing the named key.  Control characters
+are case insensitive; *^A* is the same as *^a*.  A few display editing
+commands are also bound to dedicated function keys on the keyboard.
 
-## ed commands ##
+These are the control characters, and the display editing commands
+bound to them:
 
-**edsel** provides all of the [commands](ed.txt) of *ed*.  Most
-updates in *edsel* windows are side effects of *ed* commands as they
-move the current line around in the buffer, change buffer contents, or
-select a different current buffer.
+    ^@  set mark, mark (included) to dot (excluded) defines region cut by ^W
+    ^space  set mark, like ^@
+    ^A  move cursor to start of line
+    ^B  move cursor (b)ack one character
+    ^C  move cursor back one page (page up)
+    ^D  (d)elete character under cursor
+    ^E  move cursor to (e)nd of line
+    ^F  move cursor (f)orward one character
+    ^G  cancel ^X command in progress
+    ^H  backspace, delete character before cursor
+    ^I  tab, insert spaces
+    ^J  (j)ump cursor forward to beginning of next word
+    ^K  delete (kill) from cursor to end of line, save in paste buffer
+    ^L  refresh entire screen
+    ^M  return, open new line below, or break line at cursor
+    ^N  move cursor down to (n)ext line
+    ^O  move cursor to (o)ther window, next in sequence
+    ^P  move cursor up to to (p)revious line
+    ^Q  exchange mark and dot (move cursor to show where they are)
+    ^R  search backwards (reverse) for previously entered search string
+    ^S  search forwards for previously entered search string
+    ^T  run Python statements from mark (included) to dot (excluded).
+    ^U  discard from start of line to cursor, save in paste buffer
+    ^V  move cursor forward one page (page down)
+    ^W  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer
+    ^X  enter and execute ed or edda command, then return to display mode
+    ^Y  insert (paste or (y)ank) contents last deleted by ^K kill, ^U discard, or ^W cut
+    ^Z  exit display editing and return to command mode
 
-When you type a command *a*, *i*, or *c* that enters *input mode*,
-*edsel* opens a line in the window at the insertion point and puts the
-cursor there.  You then type lines of text (as many as you want)
-directly into the window (not the command region).  You can edit
-within your current line in any way provided by your Python's
-*input* (or your local substitute), but you can't edit other lines
-(that you have already finished by typing RETURN).  When you are done,
-type a period at the start of a line to exit input mode.  Then *edsel*
-puts the cursor back in the command region for you to type another
-command.  A marker remains in the window where the cursor was, to show
-where subsequent commands will take effect.
+These are the dedicated function keys and their commands
 
-Conventional full-screen display editing is provided by *[eden](eden.md)*,
-a more capable editor that is based on *edsel*.
+    return  open new line below, or break line at cursor (same as ^M)
+    delete  delete character before cursor (same as ^H)
+    backspace  delete character before cursor (same as ^H)
+    tab insert spaces (same as ^I)
+    left (arrow key) move cursor back one character (same as ^B)
+    right (arrow key) move cursor forward one character (same as ^F)
+    up   (arrow key) move cursor up to previous line (same as ^P)
+    down (arrow key) move cursor down to next line (same as ^N)
 
-## Window commands ##
+## Editing Commmand Lines ##
 
-When *edsel* starts, the frame is filled by one window that shows the
-contents of the *main* buffer.  This is the *current window* - the
-window that has the keyboard focus.  When an *ed* command changes the
-current buffer, the current window updates to display the new current
-buffer.  *edsel* updates the current window to ensure that it always
-shows the *current line* (also called *dot*) in the current buffer,
-where text is inserted and changed.
+It is also possible to edit command lines in the scrolling command
+region.  These control characters behave the same when editing the
+command line: *^A ^B ^D ^E ^F ^H ^I ^J ^K ^T ^U ^Y*.  These function
+keys also behave the same on the command line: *bs del left right* and
+*tab*.
 
-There are commands to add windows, delete windows, change the
-current window, and change window sizes:
+These control characters behave differently when editing the command line:
 
-- **o2** creates a new window by spliting the current window.  Initially
-   both windows show the same contents.  The upper window is the current
-   window, where commands can change the current line, dot.  The lower
-   window saves the current location of dot and its cursor disappears.
+    ^C  interrupt application, write traceback
+    ^D  if line is empty, exit application.  Otherwise (d)elete character under cursor.
+    ^L  refresh command line only (useful if line has become garbled)
+    ^M  execute command (like ret)
+    ^N  retrieve (n)ext line from history
+    ^P  retrieve (p)revious line from history
+    ^Z  if line is empty, exit application
 
-- **o** moves the focus to the next window, which becomes the new
-    current window.  The previous window saves its cursor location and
-    its cursor disappears.  The buffer displayed in the new current
-    window becomes the new current buffer.  The new current window
-    restores its saved cursor location.  This becomes the new current
-    line, dot.
+These function keys behave differently on the command line:
 
-- **o1** deletes all windows except the current window.
+    ret  execute command line
+    up   (arrow key) retrieve previous line from history
+    down (arrow key) retrieve next line from history
 
-- **h** if there are multiple windows, "balance" them (make them all
-    about the same size)
+Commands retrieved from the history can be edited and submitted.
+Command line history including previous search strings can be accessed
+during *^X* commmands.
 
-## Frame commands ##
+## Using edsel commands ##
 
-By default, the frame is made large enough so the *edsel* command region 
-displays just two lines.  This
-is usually not enough to show all of the output from some commands,
-for example *n* (list buffers).  Use the *-c* option to set more lines
-when you invoke *edsel* (see examples above).  Or, to change the
-number command lines at any time during an editing session, use the *h*
-command:
+The most effective way to use some *edsel* commands is not always obvious.
+For working with files and buffers, see the instructions for [ed.py](ed.md)
+(also [here](ed.txt)).  For working with windows, see [edda](edda.md)
+(also [here](edda.txt)).  For working with the built-in Python shell
+and scripting, see [edo](../editors/edo.md).
 
-- **h** assign number of lines in scrolling command region, in the parameter,
-  for example *h 12* to assign 12 lines.  Also, multiple windows (if any)
-  are balanced.  If there is no parameter, the *h* command merely balances
-  windows.
+Here are some hints for using *edsel* display commands.
 
-The *L* command refreshes the entire frame including all windows, and
-also the command line in the scrolling region.  This command can be
-used to recover if display contents get corrupted or out of synch with
-buffer contents.
+#### Search ####
 
-## Script commands ##
+After typing *^X* you can type any *ed* line address: a line number, a
+search string, or any other address form (like *$* for the last line).
+Then *edsel* will move the cursor to that line and resume display
+editing.
 
-When you use the *X* command to execute *ed* commands from a buffer,
-you can see window contents update as the commands run.  Each command
-echoes in the scrolling command region, followed by a short delay before
-processing the next command so
-you have time to observe its effect.  The echo and delay can be adjusted or
-suppressed by two optional *X* parameters that follow the buffer name:
-echo (boolean) and delay (float), which default to *True* and *0.2*
-seconds.  So *X sample.ed 0 0* suppresses both echo and delay,
-*X sample.ed 1 1* echoes with a 1 second delay, etc.
+Therefore, *^X* can act as a search command: type *^X* then
+*/string/* (or *?string?*) to search forward (or backward) for
+*string*.  After that, when display editing, you can type the commands
+*^S* (or *^R*) to search forward (or backward) for that same *string*.
+The same search string remains in effect in all buffers until you
+re-assign it in another */.../* or *?...?* command.
+
+In *edsel*, search is always case sensitive.
+
+#### Cut and Paste ####
+
+The command to set the mark, *^@* (or *^-space*), only marks the line
+(not the character within the line), so the region defined by the mark
+and the current line (called dot) is always a sequence of complete
+lines (that includes mark but excludes dot).  Therefore, the cut (delete)
+command *^W* followed by the paste (yank) command *^Y* always act on a
+sequence of complete lines, inserting the lines before the current line.
+
+In contrast to *^W*, the kill *^K* and discard *^U* commands
+each cut a segment delimited by the cursor from a
+single line, and a subsequent *^Y* command pastes that
+same segment right at the cursor, anywhere within the same
+line or a different line.
+
+So the *^K* and *^U* commands have the effect of toggling subsequent *^Y*
+commands to inline mode, while *^W* toggles *^Y* to multiline mode.
+
+#### Indented text ####
+
+To enter an indented line, type *tab* (or *^I*) at the beginning of the line.
+*edsel* inserts blanks (space characters) to match the indentation of the preceding line.
+The type the text of the new indented line.
+
+To edit an indented line, type *^J* (jump to next word) at the beginning of the line.
+*edsel* places the cursor on the first non-blank character in the line.  Then edit
+the text of the indented line.
 
 ## API and data structures ##
 
-The *edsel* commands are also available as an API.  The single-letter
-command name is the function name and any optional command suffix or
-parameter is the command argument.  So the refresh command *L*
-becomes the API call *L()*.  The window commands *o* *o1* *o2*
-become the API calls *o()* *o(1)* *o(2)*.  The frame balance/resize commands
-*h* *h 12* (etc.) become *h()* *h(12)* (etc.).
+In *edsel*, calls to the *edda* API require a prefix:
+*edda.o(2)*, *edda.h(12)* etc.
 
-In *edsel*, calls to the *edsel* API require no prefix.
-
-In *edsel*, the window data structures are in the *frame* module:
+In *edsel*, the window data structures must be prefixed by the *frame* module name:
 *frame.win* is the current window, *frame.windows* is the list
 of windows, etc.
 
-In *edsel*, calls to the *ed* API must be prefixed by
-the module name *ed.*  For example: *ed.a('append line after dot')*.
+In *edsel*, *ed* data structures and calls to the *ed* API must be prefixed by
+the module name *ed.*  For example: *ed.current*, *ed.a('append line after dot')*,
+etc.
 
-## Related programs ##
+## Limitations ##
 
-**edsel** runs an event loop that blocks waiting for a complete line
-to be entered at the terminal.
-[desoto](desoto.py) wraps *edsel* in a [Console](../console/README.md)
-object that collects the line without blocking,
-so *desoto* can run in the cooperative multitasking system,
-[Piety](../piety/README.md).
+**edsel** is *ed.py* underneath.  In display editing mode, you can place
+the cursor and insert or delete characters anywhere, but some commands
+are still line-oriented.
 
-**edsel** is the core of a more capable display editor, [eden](eden.md).
+All *ed* commands leave the cursor at the beginning of the line.
+
+Search commands only find the line containing the search string.  They
+leave the cursor at the beginning of that line, not at the search
+string within the line.
+
+Some display editing commands also leave the cursor at the beginning of the
+line.  For example, the *C* command that enters (or re-enters) display
+editing mode, the *^X* command that enters and executes a single
+command line, and the *^O* command that moves the cursor to the next
+window.
+
+These limitations might be mitigated somewhat by using the *^J*
+command that quickly moves the cursor to the beginning of the next word.
+
+All display editing commands are bound to single control characters.
+*edsel* does not support sequences of multiple control characters, or
+*meta* characters formed by typing the *esc* or *alt* keys.  We have
+bound a command to every control character, so no more display editing
+commands can be added to *edsel*.  Any additional functionality must
+be provided at the command line, reached through *^X* or *^Z*.
+
+## Bugs ##
+
+The *^T* display editing command to run Python statements in the
+current selection (from mark to dot) does not always work.  In the
+meantime, the *edo* *R* and *P* commands do work.  The *R* command
+runs an entire buffer, and the *P* command runs statements in
+the addressed range of lines.
 
 Revised May 2019
+

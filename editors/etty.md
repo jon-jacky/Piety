@@ -6,7 +6,7 @@ etty
   and edit input lines.  It demonstrates how to use non-default
   keymaps in a *Console* job to provide retro style editing and
   history, as would be provided by a printing terminal.  Contrast to
-  the *ed.py* *main* function and *edda.py*.
+  the *ed.py* *main* function and *edna.py*.
 
 A printing terminal has no cursor addressing --- the printing element
 can only move forward from the end of the text.  So you can only

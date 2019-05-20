@@ -219,7 +219,7 @@ class Buffer(object):
 
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
-        # ed (and also edsel) call d(elete) when command is 'c'
+        # ed (and also edda) call d(elete) when command is 'c'
         # then handle new lines as later a(ppend) commands ...
         self.d(start,end)
         # ...but API c method does handle string argument.  

@@ -1,0 +1,4 @@
+for bufname in ed.buffers:
+    ed.b(bufname)
+    ed.w()
+

@@ -1,0 +1,7 @@
+for bufname in ed.buffers:
+    if bufname.endswith('.py') or bufname.endswith('.md'):
+        ed.b(bufname)
+        ed.s(1,ed.S(),'edda','edna',True)
+        ed.s(1,ed.S(),'edsel','edda',True)
+        ed.s(1,ed.S(),'eden','edsel',True)
+

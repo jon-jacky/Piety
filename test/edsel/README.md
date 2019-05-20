@@ -1,49 +1,12 @@
 
 edsel tests
-===========
+==========
 
-Tests for *edsel.py*.  The directions and explanations in
-*test/ed/README.md* also apply here.  Comments in each file explain
-its test.
+Tests for *edsel.py*.  The test scripts can include sequences of keycodes
+so full screen editing can be tested, by simulating the keystrokes that a
+user might type.
 
-The *edsel.py* display editor imports the *ed.py* line editor and
-supports all of its commands and API calls.  However, the *.py* and
-*.sh* test scripts for *ed* in *test/ed/* do not work with *edsel*; it
-is necessary to make slighty revised versions that import or invoke
-*edsel* instead of *ed*.  The *sample.py* and *sample3.sh* scripts in
-this directory are examples.   
+Directions for each module appear in their comment headers.
 
-All of the *.ed* scripts in *test/ed/* work with *edsel* without any
-changes, because they do not mention the *ed* module name.
+Revised May 2019
 
-The *.edsel* scripts here in *test/edsel/* are files of *ed* and
-*edsel* commands that test *edsel* features that are not present in
-*ed*: display functions and window management commands.  
-
-When you execute an *.ed* or *.edsel* script, you can see the window contents
-update as the test runs.  Each command echoes in the scrolling command
-region, followed by a short delay so you can observe its effect.  The
-echo and delay can be adjusted or suppressed by two optional *X*
-parameters that follow the buffer name: echo (boolean) and delay
-(float), which default to *True* and *0.2* seconds.  So *X sample.ed 0
-0* suppresses both echo and delay.
-
-The names of some scripts are made from the sequence of commands
-they contain, for example *lio2o1xn.edsel*.
-
-
-Revised Nov 2018
-
-D-10-72-58-222:editors jon$ git commit edo.py edsel.py edo.md ../test/ed/README.md ../test/edsel/README.md -m 'Rename x command to X, eXecute script'
-[eden f8ffbd3] Rename x command to X, eXecute script
- 5 files changed, 40 insertions(+), 34 deletions(-)
-
-D-10-72-58-222:editors jon$ git push
-Counting objects: 11, done.
-Delta compression using up to 4 threads.
-Compressing objects: 100% (11/11), done.
-Writing objects: 100% (11/11), 1.44 KiB | 0 bytes/s, done.
-Total 11 (delta 9), reused 0 (delta 0)
-remote: Resolving deltas: 100% (9/9), completed with 9 local objects.
-
-Now add x and y commands to ed.py.  Begin 

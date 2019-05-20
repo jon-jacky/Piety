@@ -6,7 +6,7 @@ frame.py
 *window* instances, with a scrolling command region below the windows
 at the bottom of the display.
 
-**frame.py** provides the display for the *edsel* and *eden* display
+**frame.py** provides the display for the *edda* and *edsel* display
 editors.
 
 **frame.py** provides *update*, the only function that applications
@@ -17,7 +17,7 @@ editors.
   that provide the parameters of the update.
 
 **frame.py** does not require any particular application program to be
-present (it does not import *ed*, *edsel*, or any others), so it can
+present (it does not import *ed*, *edda*, or any others), so it can
 act as a display server to any application (or several).  In fact,
 different programs can simultaneously use different windows on the
 same display.  So *frame* can act as a text-only tiling window

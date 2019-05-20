@@ -26,7 +26,7 @@ windows = list() # list of windows, windows[ifocus] has input focus
 class Mode(Enum):
     command = 1 # ed command mode
     input = 2   # ed input mode for a,i,c commmands
-    display = 3 # eden display mode
+    display = 3 # edsel display mode
 
 mode = Mode.command
 window.show_marker = True
@@ -41,7 +41,7 @@ def scale(nlines, cmd_h):
 def init(buffer):
     'Initialize frame with one window into buffer'
     global win, ifocus
-    # must assign frame size before create first window 
+    # must assign frame size before create first window
     scale(nlines, cmd_h) # default cmd_h, may reassign before first update
     win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
     win.focus = True
@@ -145,7 +145,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         win.update_from(win.buf.dot + 1)
         win.set_marker(win.buf.dot)
 
-    # Switch to eden display mode
+    # Switch to edsel display mode
     elif op == Op.display:
         mode = Mode.display
         window.show_marker = False
@@ -202,7 +202,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
                 if w.intersects(start, destination):
                     w.mutate_lines(start, destination)
 
-    # Switch to next window, edsel o command
+    # Switch to next window, edda o command
     elif op == Op.next:
         w0 = win
         w0.release_focus()
@@ -212,14 +212,14 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         win.set_focus()
         win.update_status()
 
-    # Delete all but current window, edsel o1 cmd
+    # Delete all but current window, edda o1 cmd
     elif op == Op.single: 
         windows[:] = [win]
         ifocus = 0
         win.resize(frame_top, windows_h-1, ncols) # one window, -1 excl status
         win.reupdate()
 
-    # Split window, new window above becomes current window, edsel o2 command
+    # Split window, new window above becomes current window, edda o2 command
     elif op == Op.hsplit:
         win_top = win.top
         win_nlines = win.nlines // 2

@@ -49,10 +49,10 @@ each module for directions and explanations.
 - **session.md**: Description of *session.py*.
 
 - **session.py**: Creates a *Session* instance with four *Console*
-    jobs: the *pysh* shell, the *ed* line editor, and the *edsel*
-    and *eden* display editors.  Used by *demo* and *run_writers*.
+    jobs: the *pysh* shell, the *ed* line editor, and the *edda*
+    and *edsel* display editors.  Used by *demo* and *run_writers*.
 
 - **writers.py**: Creates writer tasks used by *embedded* and
     *run_writers*.
 
-Revised Apr 2019
+Revised May 2019

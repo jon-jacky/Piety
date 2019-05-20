@@ -288,15 +288,15 @@ It provides the Python interpreter and scripting for them all.
 And, via its imported *ed.py*, it also provides their command lines
 and text buffers.
 
-**[edda](edda.py)** wraps *edo.py* in a [Console](../console/README.md)
+**[edna](edna.py)** wraps *edo.py* in a [Console](../console/README.md)
 object that collects each line without blocking,
-so *edda* can run in the cooperative multitasking system,
+so *edna* can run in the cooperative multitasking system,
 [Piety](../piety/README.md).  This is necessary for Piety because
 *edo.py* runs an event loop that blocks waiting for a complete line
 to be entered at the terminal.
 
-The **[edsel](edsel.md)** display editor imports *edo.py*.
+The **[edda](edda.md)** display editor imports *edo.py*.
 
-The **[eden](eden.md)** display editor imports *edsel* which imports *edo*.
+The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
 Revised May 2019
