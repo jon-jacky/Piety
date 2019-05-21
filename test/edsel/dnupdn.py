@@ -24,7 +24,7 @@ def main():
     ed.E('lines20.txt')
     ed.l(10)
     edsel.base_do_command('C')
-    samysh.run_script(edsel.edsel.handle_key, keycodes, echo=(lambda: False))
+    samysh.run_script(edsel.edsel.handle_key, keycodes, echo=False)
     edsel.edsel.command_mode()
 
 # so we don't have to call main after initial import

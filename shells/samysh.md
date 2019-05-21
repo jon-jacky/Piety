@@ -6,7 +6,10 @@ samysh.py
   It was created to run test scripts in the *[edo](../editors/edo.md)* line editor
   and the *[edsel](../editors/edsel.md)* and *[eden](../editors/eden.md)* display editors.
 
-**samysh.py** provides three functions:
+**samysh.py** provides four functions:
+
+- *params* gets *echo* and *delay* parameters used by *show_command* and *run_script*
+  (below).  Also gets buffer name used by *edo* *X_command* which uses *run_script*.
 
 - *show_command* executes a single command with an optional echo and delay.
   This is helpful for seeing the command's effects, especially in

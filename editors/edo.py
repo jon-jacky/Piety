@@ -12,30 +12,19 @@ import ed, parse, check, pysh, samysh, wyshka
 
 def X_command(do_command):
     """
-    Return function to run script from buffer using do_command,
+    Return function named X to run script from buffer using do_command,
     with optional echo and delay.
     """
     def X(paramstring):
         """
         Run script from buffer with optional echo and delay, coded in line arg.
-        Named x for eXecute, a single letter like other ed command functions.
+        Named X for eXecute, a single letter like other ed command functions.
         paramstring has buffer name, echo, delay, for example 'modes.ed 0 1'
         Buffer name can be abberviated with - , for example 'modes- 0 1'
         Buffer name is required, default echo is True, default delay is 1 sec.
         """
         if ed.command_mode:
-            echo, delay = (lambda: True), 1
-            params = paramstring.split()
-            if len(params) > 1:
-                echo = ((lambda: not ed.command_mode)
-                        if params[1] in ('0','f','false','F','False')
-                        else (lambda: True))
-            if len(params) > 2:
-                try:
-                    delay = float(params[2])
-                except ValueError:
-                    pass # use default
-            bufname = params[0] if len(params) > 0 else ''
+            bufname, echo, delay = samysh.params(paramstring)
             bufname = ed.match_prefix(bufname, ed.buffers)
             if bufname in ed.buffers and bufname != ed.current:
                 lines = ed.buffers[bufname].lines[1:] # lines[0] always empty

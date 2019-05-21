@@ -135,6 +135,6 @@ commands = (C_z +
 
 def run(script, delay=0.2): # seconds
     edsel.base_do_command('C')
-    samysh.run_script(edsel.edsel.handle_key, script, echo=(lambda: False),
+    samysh.run_script(edsel.edsel.handle_key, script, echo=False,
                       delay=delay)
     edsel.edsel.command_mode()
