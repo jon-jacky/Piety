@@ -4,6 +4,10 @@ branches
 
 This is the **master** branch.  Branches recently merged into **master**:
 
+- **xcommand*, merged 21 May 2019.  Extract *params* function from *edo* *X_command*,
+move to *samysh* module.   Change *echo* parameter in *samysh* *show_command* and *run_script*
+from lambda to simple boolean.  Begun 21 May 2019.
+
 - **edsel**, merged 20 May 2019.  Rename these editors: *edda* to *edna*, *edsel* to *edda*,
 *eden* to *edsel*.   Reserve the name *eden* for a program we may add in the future.
 We rename these files and replace these pervasive names in the many files

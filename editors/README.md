@@ -50,6 +50,8 @@ Files in this directory:
 
 - **edda.txt**: command summary for *edda.py*.
 
+- **eden.py**: placeholder for a program we may write in the future.
+
 - **edie.py**: run *ed.py* line editor along with *wyshka* enhanced shell.
   contrast to *ed.py* and *edo.py*.
 
