@@ -104,6 +104,7 @@ Here are some examples.
 | [rustboot](https://github.com/charliesome/rustboot), also [here](http://jvns.ca/blog/categories/kernel/) | P | 2013 | Rust | Bare machine | QEMU | "A tiny 32 bit kernel written in Rust" |
 | [Four Rust OS](https://github.com/flosse/rust-os-comparison): redox, reenix, rustboot, Tifflin | P | 2015 | Rust | Bare machine | QEMU | "A comparison of operating systems written in Rust" |
 | [OSv](http://osv.io/), also [here](http://mailman.cs.huji.ac.il/pipermail/linux-il/2013-September/010649.html) and [here](https://github.com/cloudius-systems/osv) and [here](https://docs.google.com/presentation/d/11mxUl8PBDQ3C4QyeHBT8BcMPGzqk-C8bV1Fw8xLgwSI/preview#slide=id.p) | R | 2013 | C++ | Virtual Machine | KVM, Xen, Amazon EC2, also VMware planned | "run a single application on a virtual machine", "tiny compared to Linux", "less than one second to boot"  |
+| [SerenityOS](https://github.com/SerenityOS/serenity), also [HN](https://news.ycombinator.com/item?id=19986126) with author's comments | P | 2019 | C++ | Virtual Machine | "This entire project is about implementing already-existing functionality in its own way, with minimal dependencies, for fun." |
 | [Urbit](http://www.urbit.org/), also [code](https://github.com/urbit/urbit) and [docs](http://doc.urbit.org/) and [video](http://www.youtube.com/watch?v=6S8JFoT6BEM) and [startup](https://angel.co/tlon) and [blog](http://alexkrupp.typepad.com/sensemaking/2013/12/a-brief-introduction-to-urbit.html) and [HN](https://news.ycombinator.com/item?id=6440884) and [more HN](https://news.ycombinator.com/item?id=5110868) and [still more HN](https://news.ycombinator.com/item?id=8578151) | P | 2013 -- | Nock  "a combinator automaton", Hoon "FP made stupid" | Native OS | Linux, OS X | "not much sign of a connection to ordinary Earth computing" |
 | [Rump Kernel](https://github.com/rumpkernel/wiki/wiki), also [paper](http://rumpkernel.org/misc/usenix-login-2014/login_1410_03_kantee.pdf) | R | 2009 -- | C | Bare machine, Virtual Machine | "... userspace, the Xen hypervisor, bare metal, ..." | OS components: "componentized, kernel quality drivers ... file systems, POSIX system call handlers, PCI device drivers, a SCSI protocol stack and the TCP/IP stack" |
 | [rumpuser-baremetal](http://blog.netbsd.org/tnf/entry/an_internet_ready_os_from), also [GitHub](https://github.com/rumpkernel/rumpuser-baremetal) | R | 2014 | C | OS Components | [Rump Kernel](https://github.com/rumpkernel/wiki/wiki), x86-32 | "run an off-the-shelf httpd ... just bolting a lot of working components together ... some hundreds of lines of code" |
@@ -141,7 +142,7 @@ course or graduates.
 
 Key to **Substrate** column:
 
-* **Bare machine** 
+* **Bare machine**
 The system includes an operating system kernel written mostly
 In the favored language, with only a minimal amount of C or assembler.
 The "bare machine" might actually be virtual machine or emulator
@@ -197,4 +198,4 @@ systems:
 Here are more links on operating system 
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
-
+This entire project is about implementing already-existing functionality in its own way, with minimal dependencies, for fun.
