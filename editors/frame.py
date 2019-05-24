@@ -175,9 +175,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         for w in windows:
             if w.buf == buffer:
                 w.saved_dot = w.buf.dot
-                terminal.set_line_mode()
                 w.insert(origin, start, end)
-                terminal.set_char_mode()
         if mode == Mode.input: # can't put input cursor til other windows done
             win.put_cursor_for_input(column=column)
         elif mode == Mode.display:
@@ -192,7 +190,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         for w in windows:
             if w.samebuf(win):
                 w.adjust_delete(start, end, destination)
- 
+
     # Change text: ed s command
     # Update all lines in start..destination, don't know which lines changed
     elif op == Op.mutate:
@@ -213,7 +211,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         win.update_status()
 
     # Delete all but current window, edda o1 cmd
-    elif op == Op.single: 
+    elif op == Op.single:
         windows[:] = [win]
         ifocus = 0
         win.resize(frame_top, windows_h-1, ncols) # one window, -1 excl status

@@ -2,7 +2,7 @@
 display - Update the terminal display using ANSI control sequences.
 """
 
-from util import putstr # write without newline, flush for immediate output
+import util # util.putstr writes w/o newline, flushes for immediate output
 
 esc = '\x1B'     # \e does not work 'invalid \x escape'
 csi = esc+'['    # ANSI control sequence introducer
@@ -43,59 +43,64 @@ def render(text, *attributes):
     Print text with one or more attributes, each given by separate int arg,
     then clear attributes, but do not print newline.
     """
-    putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+    util.putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 # used by line
 
 def insert_char(key):
     'Insert character in front of cursor'
-    putstr((ich % 1) + key) # open space to insert char
+    util.putstr((ich % 1) + key) # open space to insert char
 
 def insert_string(string):
-    putstr((ich % len(string)) + string)
+    util.putstr((ich % len(string)) + string)
 
 def delete_char():
     'Delete character under the cursor'
-    putstr(dch % 1)
+    util.putstr(dch % 1)
 
 def backward_delete_char():
     'Delete character before cursor'
-    putstr(cub + dch % 1)
+    util.putstr(cub + dch % 1)
 
 def forward_char():
-    putstr(cuf) # move just one char
+    util.putstr(cuf) # move just one char
 
 def backward_char():
-    putstr(cub)
+    util.putstr(cub)
 
 def move_to_column(column):
-    putstr(cha % column)
+    util.putstr(cha % column)
 
 # line also uses kill_line, defined below
 
 # used by edsel and window, they also use render (above)
 
 def erase(): # erase_display in gnu readline
-    putstr(ed)
+    util.putstr(ed)
 
 def put_cursor(line, column):      # not in emacs or gnu readline
-    putstr(cup % (line, column))
+    util.putstr(cup % (line, column))
 
 def kill_line():
     'Erase from cursor to end of line'
-    putstr(el_end)
+    util.putstr(el_end)
 
 def kill_whole_line():
     'Erase entire line'
-    putstr(el_all)
+    util.putstr(el_all)
 
-def set_scroll(ltop, lbottom): 
+def set_scroll(ltop, lbottom):
     'Set scrolling region to lines ltop through lbottom (line numbers)'
-    putstr(decstbm % (ltop, lbottom))
+    util.putstr(decstbm % (ltop, lbottom))
 
 def set_scroll_all():
     'Set scrolling region to entire display'
-    putstr(decstbmn)
+    util.putstr(decstbmn)
+
+# provide util.putstr here so clients don't also have to import util
+def putstr(string):
+    'Print string on console with no formatting (unlike plain Python print)'
+    util.putstr(string)
 
 def put_render(line, column, text, *attributes):
     """
@@ -103,8 +108,8 @@ def put_render(line, column, text, *attributes):
     but without newline, then clear attributes.
     """
     put_cursor(line, column)
-    putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+    util.putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 def next_line():
     'replacement for print() in terminal char mode, explicitly sends \n\r'
-    putstr('\n\r')
+    util.putstr('\n\r')

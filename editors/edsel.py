@@ -30,7 +30,7 @@ class Console(console.Console):
         else:
             # display_mode sets clear_line = False - but does not call restart
             self.clear_line = True # restore default,leave self.line,no prompt
-            terminal.set_char_mode()
+            terminal.set_char_mode() # enter inline editing
 
     # The following  methods and keymaps all have new names, so they are added
     #  to the ones in the Console base class, they do not replace any.
@@ -285,21 +285,18 @@ class Console(console.Console):
     def accept_edsel_command(self):
         'After execute() above, execute the line, then return to display mode.'
         self.collecting_command = False
-        self.process_command()
+        self.process_command() # exits inline editing with term.set_char_mode
         if self.stopped() and not self.quit: # if .quit, stop() already called
             self.stop()
         else:
-            terminal.set_char_mode()
+            terminal.set_char_mode() # resume inline editing
             self.display_mode(ed.buf.lines[ed.buf.dot].rstrip())
 
     def cancel_edsel_command(self):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
-        # self.process_command()
-        # next two lines from discard method
         self.move_beginning()
         display.kill_line()
-        terminal.set_char_mode()
         self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
     def crash(self):
@@ -320,12 +317,12 @@ class Console(console.Console):
         else:
             start = end = ed.buf.dot
         if check.range_ok(ed.buf, start, end):
-            terminal.set_line_mode()
+            terminal.set_line_mode() # exit inline editing, prepare for P(...)
             frame.put_command_cursor()
             # edda.edo.P(start, end) # gets weird error msgs
             edda.edo.pysh.runlines(ed.buf.lines[start:end+1]) # alternative to P()
             print('%s, ran lines %d..%d' % (ed.current, start, end))
-            terminal.set_char_mode()
+            terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()
 
     def init_edsel_keymaps(self):

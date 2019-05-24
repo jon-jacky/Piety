@@ -101,7 +101,7 @@ class Console(object):
         self.resume(*args, **kwargs)
 
     def stop(self):
-        self.restore() # calls print() for newline
+        self.restore() # exit char mode inline editing, call print() for newline
         self.cleanup()
         self.exit()
 
@@ -152,20 +152,17 @@ class Console(object):
     def ctrl_z(self):
         if self.line == '':
             self.quit = True
-            print('^Z')
-            util.putstr('\rStopped') # still in raw mode, print didn't RET
+            util.putstr('^Z\rStopped') # still in raw mode
             self.stop()
-        else: 
+        else:
             util.putstr(keyboard.bel) # sound indicates no handler
 
     # ^C exit is more drastic than job control, exits to top-level Python
 
     def interrupt(self):
         'Handle ^C, exit from Python sesson'
-        # raw mode terminal doesn't respond to ^C, must handle here
-        util.putstr('^C') 
-        terminal.set_line_mode() # on new line...
-        print()              # ... otherwise traceback is a mess
+        terminal.set_line_mode() # exit from inline editing, entered at restart()
+        print('^C')
         raise KeyboardInterrupt
 
     # The following methods, restore through restart, are invoked by
@@ -174,13 +171,13 @@ class Console(object):
     # The user typically indicates this by typing RET, but the actual keycodes
     # (for each mode) are set by keymaps in self.keymap.
     # Complications arise from commands that might exit or suspend application
-    # (so control must be transferred elsewhere) and commands that might 
-    # initialize the command (or text) line, overriding defaults 
+    # (so control must be transferred elsewhere) and commands that might
+    # initialize the command (or text) line, overriding defaults
     # (which must be restored later).
 
     def restore(self):
         'Restore terminal line mode, prepare to print on new line'
-        terminal.set_line_mode()
+        terminal.set_line_mode() # exit from inline editing, entered at restart()
         print()
 
     # accept_line and accept_command invoke the other methods in this section.
@@ -188,24 +185,24 @@ class Console(object):
     # accept_line is used in insert modes, accept_command in command modes.
     def accept_line(self):
         'For insert modes: handle line, but no history, exit, or job control'
-        self.restore()      # advance line and put terminal in line mode 
-        self.process_line() # might reassign self.line
-        self.restart()      # print prompt and put term in character mode
+        self.restore()      # advance line, exit char mode inline editing
+        self.process_line() # might print in line mode, might reassign self.line
+        self.restart()      # print prompt, resume char mode inline editing
 
     def process_command(self):
         'add command to history then execute it'
         self.history.append(self.line)
         self.hindex = len(self.history) - 1
-        self.restore()
+        self.restore() # exit char mode inline editing, process_line might print
         self.process_line() # might stop or preempt this job, assign self.state
 
     def accept_command(self):
         'For command modes: handle line, with history, exit, and job control'
-        self.process_command()
+        self.process_command() # might print in line mode
         if self.stopped():
-            self.stop()
+            self.stop()    # exit char mode inline editing
         elif self.state != State.background: #assigned by job control elsewhere
-            self.restart()
+            self.restart() # resume char mode inline editing
         else:
             return # a different job continues
 
@@ -217,7 +214,7 @@ class Console(object):
         self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
         util.putstr(self.prompt() + self.line) # line might be empty
         self.move_to_point() # might not be end of line
-        terminal.set_char_mode()
+        terminal.set_char_mode() # enter inline editing, exit at restore()
 
     # Command history
 
@@ -427,8 +424,7 @@ class Console(object):
         
 def main():
     # Test: echo input lines, use job control commands ^D ^Z to exit.
-    echo = Console(prompt=(lambda: '> '), 
-                   process_line=(lambda line: print(line)))
+    echo = Console(prompt=(lambda: '> '), process_line=print)
     echo.run()
 
 if __name__ == '__main__':

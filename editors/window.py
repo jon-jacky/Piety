@@ -176,7 +176,6 @@ class Window(object):
         """
         for i in range(first,last+1): # unempty if reached end of buffer
             display.kill_whole_line()
-            #print()
             display.next_line()
 
     def render_lines(self, first, last):
@@ -186,9 +185,8 @@ class Window(object):
         """
         i = -1
         for i, line in enumerate(self.buf.lines[first:last+1]):
-            print(line.rstrip()[:self.ncols], end='') # remove \n, truncate
+            display.putstr(line.rstrip()[:self.ncols]) # remove \n, truncate
             display.kill_line()
-            #print()
             display.next_line()
         return i+1 # fewer than first:last+1 when at end of buffer
 
