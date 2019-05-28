@@ -327,7 +327,7 @@ def z(*args):
             iline += npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= buf.nlines() else buf.nlines()
-        p_lines(iline, end, view.lz_print_dest)
+        p_lines(iline, end, view.lz_print_dest) # assigns buf.dot = iline
         if npage < 0:
             buf.dot = iline
 

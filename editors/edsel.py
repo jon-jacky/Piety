@@ -28,41 +28,34 @@ class Console(console.Console):
         if self.clear_line: # default case, usually True
             super().restart() # clear self.line=''; show prompt; set_char_mode
         else:
-            # display_mode sets clear_line = False - but does not call restart
+            # set_display_mode sets clear_line = False - but does not call restart
             self.clear_line = True # restore default,leave self.line,no prompt
             terminal.set_char_mode() # enter inline editing
 
     # The following  methods and keymaps all have new names, so they are added
     #  to the ones in the Console base class, they do not replace any.
 
-    def display_mode(self, line):
+    def set_display_mode(self, line):
         'Enter display editing mode.'
         # Based on ed.py do_command 'c' case
         ed.command_mode = False
-        frame.update(Op.display)
         ed.prompt = ed.input_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         edsel.line = line # not including final \n at eol
         edsel.point = 0 # 0-based
         edsel.start_col = 1 # 1-based
         edsel.clear_line = False
-        # following lines based on frame Op.input and Op.command
-        win = frame.win
-        win.clear_marker(win.buf.dot)
-        wdot = win.wline(win.buf.dot)
-        display.put_cursor(wdot,1)
+        frame.update(Op.display)
+        frame.put_display_cursor()
 
-    def command_mode(self):
+    def set_command_mode(self):
         'Replace current line in buffer and resume command mode.'
         # Based on ed.py append and '.' handling, Console accept_line method.
-        self.restore() # advance line and put terminal in line mode
         ed.buf.replace(ed.buf.dot, self.line + '\n')
         ed.command_mode = True
-        frame.update(Op.command)
         ed.prompt = ed.command_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
-        win = frame.win
-        win.set_marker(win.buf.dot)
+        frame.update(Op.command)
         frame.put_command_cursor()
         super().restart() # not self.restart.  print prompt and enter char mode
 
@@ -251,7 +244,7 @@ class Console(console.Console):
         ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
         edda.do_window_command('') # reassign win, ed.buf, call update(Op.next)
         self.line = ed.buf.lines[ed.buf.dot].rstrip() # from several methods
-        # From display_mode
+        # From set_display_mode
         self.point = 0
         self.start_col = 1
         wdot = frame.win.wline(frame.win.buf.dot)
@@ -276,7 +269,7 @@ class Console(console.Console):
         So this command acts as go-to-line or search command also.
         """
         self.collecting_command = True
-        self.command_mode() # like edsel ^Z command
+        self.set_command_mode() # like edsel ^Z command
         # Now console will collect command line
         # BUT collecting_command tells console not to call accept_command
         # but (via keymap lambda with if...) to call accept_edsel_command
@@ -290,14 +283,14 @@ class Console(console.Console):
             self.stop()
         else:
             terminal.set_char_mode() # resume inline editing
-            self.display_mode(ed.buf.lines[ed.buf.dot].rstrip())
+            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip())
 
     def cancel_edsel_command(self):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         self.move_beginning()
         display.kill_line()
-        self.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+        self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
     def crash(self):
         'For now, just crash' # FIXME - not used, ^K is now console kill line
@@ -344,7 +337,7 @@ class Console(console.Console):
             keyboard.C_w: self.cut,
             keyboard.C_x: self.execute,
             keyboard.C_y: self.yank,
-            keyboard.C_z: self.command_mode,
+            keyboard.C_z: self.set_command_mode,
             # ^space also works as ^@ on many terminals
             keyboard.C_at: self.set_mark,
             keyboard.cr: self.open_line,
@@ -370,7 +363,7 @@ def base_do_command(line):
 
     # Begin full-screen display editing
     if line.startswith('C'):
-        edsel.display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+        edsel.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
     else:
         edda.base_do_command(line)
 

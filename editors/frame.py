@@ -29,7 +29,8 @@ class Mode(Enum):
     display = 3 # edsel display mode
 
 mode = Mode.command
-window.show_marker = True
+# window.command_mode() tracks mode
+window.command_mode = (lambda: mode == Mode.command)
 
 def scale(nlines, cmd_h):
     'Calculate dimensions and location of windows and scrolling command region'
@@ -52,8 +53,6 @@ def update_windows():
     'Redraw all windows, called by refresh, for example after resize.'
     for w in windows:
         w.update()
-        if w.focus and mode == Mode.command:
-            w.set_marker(w.buf.dot)
 
 def put_command_cursor(column=1):
     'Put cursor at input line in scrolling command region, at given column'
@@ -132,7 +131,6 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to ed input mode, for ed a i c commands
     elif op == Op.input:
         mode = Mode.input
-        window.show_marker = False
         win.update_for_input()
         wdot = win.wline(win.buf.dot)
         display.put_cursor(wdot+1,1)
@@ -140,7 +138,6 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to ed command mode, ed . while in input mode
     elif op == Op.command:
         mode = Mode.command
-        window.show_marker = True
         # Overwrite '.' line on display, and lines below.
         win.update_from(win.buf.dot + 1)
         win.set_marker(win.buf.dot)
@@ -148,8 +145,9 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to edsel display mode
     elif op == Op.display:
         mode = Mode.display
-        window.show_marker = False
-        put_display_cursor(column=column)
+        # following lines based on frame Op.input and Op.command
+        win.clear_marker(win.buf.dot)
+        wdot = win.wline(win.buf.dot)
 
     # Dot moved, ed l command
     elif op == Op.locate:

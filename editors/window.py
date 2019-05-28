@@ -1,6 +1,14 @@
 """
-window.py - Window class for line-oriented display editors. 
-            Each window displays a range of lines (a segment) of a text buffer.
+window.py - Window class for line-oriented display editors.
+
+Each window displays a range of lines (a segment) of a text buffer.
+All updates here involve a whole line or group of lines from a buffer.
+
+Updates within a line are handled by the console or edsel modules,
+which use the display module to write and update that line
+directly on the display, without using this window module.
+The line being edited by console or edsel is not yet part of a buffer
+so it cannot be handled by this module.
 """
 
 import display
@@ -9,16 +17,38 @@ def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
     return min(max(first, iline), last)
 
-# show_marker is just a proxy for frame.mode variable
-# True when mode == Mode.command, false when Mode.input and Mode.display
-show_marker = True
+# command_mode is True when entering/editing/executing commands
+# on the command line and printing output in the scrolling region,
+# command_mode is False when entering/editing text in a display window.
+# It is possible to edit buffers and manage windows from
+# the command line, so display window contents can change a lot
+# in command_mode.
+
+# When command_mode is True, the terminal cursor where the user
+# types input is in the command region,
+# so we display a marker in a display window to show where
+# commands will take effect.   The marker appears in the focus window
+# at the first character of the current line, dot.
+# When command_mode is False (in display editing modes),
+# the marker is not displayed, because instead the terminal cursor
+# where the user types input appears in the focus window
+# at point (the character position where insertions and deletions
+# take effect).
+
+# command_mode here is assigned in the frame module once at startup:
+#  window.command_mode = (lambda: mode == Mode.command)
+# after this assignment, window.command_mode() follows frame.mode
+# even though the window module does not import the frame module.
+
+command_mode = (lambda: True) # will be reassigned in frame module
+
 show_diagnostics = False # on status line - for now, don't show
 
 class Window(object):
     """
     Window class for line-oriented display editors.
     Displays a range of lines (the segment) from a text buffer.
-    May display a marker to indicate text insertion point (called dot).
+    May display a marker to indicate dot, the line where commands take effect.
     May be followed by a status line with information about the buffer.
     """
 
@@ -34,7 +64,7 @@ class Window(object):
         """
         self.focus = False # True when this window has the input focus
         self.buf = buf
-        self.saved_dot = self.buf.dot  # line
+        self.saved_dot = self.buf.dot  # to restore dot when window selected
         self.btop = 1 # index in buffer of first line displayed in window
         self.resize(top, nlines, ncols) # assigns self.top .nlines .ncols
         self.blast = self.blastline() # buffer can get out of synch
@@ -109,10 +139,8 @@ class Window(object):
         return (self.contains(start) or self.contains(end)
                 or (start < self.btop and end > self.bbottom()))
 
-    # Marker is only displayed during command modes when cursor is not in window.
-    # Then marker shows where text will be inserted, where cursor will appear
-    # in display editing modes.  Marker is not shown in display editing modes
-    # because then the terminal's cursor is in the window, that is sufficient.
+    # ch0 etc. used for marker, see explanation in comment near top of file.
+    # The marker, when displayed, appears in the first column of dot.
 
     def ch0(self, iline):
         'First character in line iline in buffer, or space if line empty'
@@ -126,8 +154,7 @@ class Window(object):
         
     def set_marker(self, iline):
         'Set marker on buffer line iline, or top line if buffer empty'
-        if show_marker:
-            self.put_marker(iline)
+        self.put_marker(iline)
 
     def clear_marker(self, iline):
         'Clear marker from buffer line iline, or top line if buffer empty'
@@ -204,10 +231,13 @@ class Window(object):
         icursor = first + nprinted
         self.nprinted += nprinted
         self.clear_lines(icursor, last)
-        
+
     def update_from(self, iline):
         'Write lines in window starting at line number iline in buffer'
         self.update_lines(self.wline(iline), iline)
+        if self.focus and command_mode():
+            # self has focus, mark self.buf.dot not self.saved_dot
+            self.set_marker(self.buf.dot)
         self.update_status()
 
     def update(self):
@@ -218,18 +248,15 @@ class Window(object):
         'Move window to show buffer line iline then update window'
         self.locate_segment(iline)
         self.update()
-        if self.focus:
-            if show_marker:
-                self.set_marker(iline)
 
     def reupdate(self):
         'Move window to show its buf.dot then update window'
         self.move_update(self.buf.dot)
 
     def locate(self, origin, destination):
-        'Update window after cursor moves from origin to destination'
+        'Update window after dot moves from origin to destination'
         if self.contains(destination):
-            if self.focus and show_marker:
+            if self.focus and command_mode():
                 self.clear_marker(origin)
                 self.set_marker(destination)
             self.update_status()
@@ -242,8 +269,6 @@ class Window(object):
             if origin > 0:
                 self.clear_marker(origin)
             self.update_from(start)
-            if self.focus and show_marker:
-                self.set_marker(end)
         else:
             self.reupdate()
 
@@ -251,7 +276,6 @@ class Window(object):
         'Update window after delete lines above destination'
         if self.contains(destination): # window already contains new dot
             self.update_from(destination)
-            self.set_marker(destination)
         else:
             self.reupdate() 
 

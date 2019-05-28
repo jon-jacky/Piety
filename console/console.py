@@ -198,9 +198,9 @@ class Console(object):
 
     def accept_command(self):
         'For command modes: handle line, with history, exit, and job control'
-        self.process_command() # might print in line mode
+        self.process_command() # exits char mode inline editing, might print
         if self.stopped():
-            self.stop()    # exit char mode inline editing
+            self.stop()    # exits char mode inline editing, hook to job ctrl
         elif self.state != State.background: #assigned by job control elsewhere
             self.restart() # resume char mode inline editing
         else:
