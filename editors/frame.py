@@ -55,10 +55,11 @@ def update_windows():
         w.update()
 
 def put_command_cursor(column=1):
-    'Put cursor at input line in scrolling command region, at given column'
+    'Put cursor at command line in scroll region, at given col (default 1)'
     display.put_cursor(cmd_n, column) # last line on display
 
 def put_display_cursor(column=1):
+    'Put cursor at dot in current window, at given column (default 1)'
     wdot = win.wline(win.buf.dot)
     display.put_cursor(wdot,column)
 
@@ -107,7 +108,8 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         cmd_h = start if start else cmd_h
         rescale()
 
-    # Create new buffer, ed B, Op.insert case will display its contents.
+    # Create new buffer in current window, ed B
+    # Op.insert case will display its contents.
     elif op == Op.create:
         win.focus = True
         win.buf = buffer

@@ -291,12 +291,16 @@ class Console(object):
             self.point = m.start()+1
             self.move_to_point()
 
+    def kill_line(self):
+        'Wrap display.kill_line so clients do not have to import display'
+        display.kill_line()
+
     def redraw(self):
         'Refresh line'
         display.move_to_column(self.start_col)
         self.point = len(self.line)
         util.putstr(self.line)
-        display.kill_line() # remove any leftover text past self.line
+        self.kill_line() # remove any leftover text past self.line
 
     def kill(self):
         'Delete line from point to end-of-line'
@@ -304,7 +308,7 @@ class Console(object):
         if killed_segment: # Do not overwrite yank buffer with empty segment
             self.yank_buffer = killed_segment
         self.line = self.line[:self.point] # point does not change
-        display.kill_line()
+        self.kill_line()
 
     def discard(self): # name like gnu readline unix-line-discard
         'Delete line from start-of-line to point'
@@ -314,7 +318,7 @@ class Console(object):
         self.line = self.line[self.point:]
         self.move_beginning() # accounts for prompt, assigns point
         util.putstr(self.line)
-        display.kill_line() # remove any leftover text past self.line
+        self.kill_line() # remove any leftover text past self.line
         self.move_beginning() # replace cursor again
  
     def yank(self):

@@ -5,7 +5,7 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import keyboard, display, console, check, edda, frame, wyshka, samysh
+import keyboard, console, check, edda, frame, wyshka, samysh
 from updates import Op
 
 ed = edda.edo.ed    # use ed and frame APIs without prefix
@@ -72,17 +72,12 @@ class Console(console.Console):
         prefix = self.line[:self.point]
         suffix = self.line[self.point:].rstrip()
         ed.buf.replace(ed.buf.dot, prefix + '\n')
-        display.kill_line() # from cursor to end of line
+        self.kill_line() # from cursor to end of line
         ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
         self.line = suffix
         self.point = 0
         self.start_col = 1
         frame.put_display_cursor()
-
-        # buf.a() update moved cursor so we have to put it back.FIXME?Redundant?
-        win = frame.win
-        wdot = win.wline(win.buf.dot)
-        display.put_cursor(wdot,1)
 
     def del_or_join_prev(self):
         """
@@ -247,8 +242,7 @@ class Console(console.Console):
         # From set_display_mode
         self.point = 0
         self.start_col = 1
-        wdot = frame.win.wline(frame.win.buf.dot)
-        display.put_cursor(wdot, 1)
+        frame.put_display_cursor()
 
     def status(self):
         '^T handler, override base class, for now print items used by del_or_join_next'
@@ -289,7 +283,7 @@ class Console(console.Console):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         self.move_beginning()
-        display.kill_line()
+        self.kill_line()
         self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
 
     def crash(self):
