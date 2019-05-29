@@ -312,14 +312,18 @@ class Window(object):
         statustext = (current + readonly + modified + bufname + position +
                       linenums + mode)
         nstatus = len(statustext)
-        Window.nupdates += 1 # ensure at least this changes in diagnostics
-        diagnostics = '  N%6d f%3d n%3d' % \
-            (Window.nupdates, self.first, self.nprinted)
-        nsuffix = len(diagnostics)
-        suffix = diagnostics if show_diagnostics else '-'*nsuffix
-        nstrut = self.ncols - (nstatus + nsuffix)
-        statustext += '-'*nstrut + suffix
-        return statustext
+        if show_diagnostics:
+            Window.nupdates += 1 # ensure at least this changes in diagnostics
+            diagnostics = '  N%6d f%3d n%3d' % \
+                (Window.nupdates, self.first, self.nprinted)
+            nsuffix = len(diagnostics)
+            npad = self.ncols - (nstatus + nsuffix)
+            statustext += '-'*npad + diagnostics
+        else: # show + at column 80
+            npad79 = 79 - nstatus
+            npad81 = self.ncols - 81
+            statustext += '-'*npad79 + '+' + '-'*npad81
+        return statustext[:self.ncols+1]
 
     def update_status_line(self, text):
         'display text on status line with white_bg'

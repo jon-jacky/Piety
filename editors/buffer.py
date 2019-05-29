@@ -227,7 +227,7 @@ class Buffer(object):
 
     def j(self, start, end):
         'Delete lines from start to end, replace with single line joined text'
-        lines = [ line.rstrip() for line in self.lines[start:end+1] ]
+        lines = [ line.rstrip('\n') for line in self.lines[start:end+1] ]
         joined = ''.join(lines)+'\n'
         self.d(start, end, yank=False) # do not save joined lines in cut buffer
         self.i(start, joined)
