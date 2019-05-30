@@ -5,7 +5,7 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import keyboard, console, check, edda, frame, wyshka, samysh
+import keyboard, console, check, edda, frame, pysh, wyshka, samysh
 from updates import Op
 
 ed = edda.edo.ed    # use ed and frame APIs without prefix
@@ -306,8 +306,7 @@ class Console(console.Console):
         if check.range_ok(ed.buf, start, end):
             terminal.set_line_mode() # exit inline editing, prepare for P(...)
             frame.put_command_cursor()
-            # edda.edo.P(start, end) # gets weird error msgs
-            edda.edo.pysh.runlines(ed.buf.lines[start:end+1]) # alternative to P()
+            pysh.execlines(ed.buf.lines[start:end+1])
             print('%s, ran lines %d..%d' % (ed.current, start, end))
             terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()

@@ -4,9 +4,10 @@ branches
 
 This is the **master** branch.  Branches recently merged into **master**:
 
-- **edsel_cleanup**, merged 29 May 2019.  Tweaks to naming and style in 
+- **edsel_cleanup**, merged 29 May 2019.  Tweak naming and style in
 *ed*, *buffer*, *console*, *edsel*, *frame*, *window*, and *display*.
-Begun 23 May 2019.
+Break dependence of *edsel* (formerly *eden*) on *display*, now only depends
+on *frame*. Begun 23 May 2019.
 
 - **xcommand**, merged 21 May 2019.  Extract *params* function from *edo* *X_command*,
 move to *samysh* module.   Change *echo* parameter in *samysh* *show_command* and *run_script*

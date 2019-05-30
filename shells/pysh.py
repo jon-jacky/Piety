@@ -40,9 +40,23 @@ def push(line):
 # SyntaxError: multiple statements found while compiling a single statement
 
 def runlines(lines):
-    'Run a sequence of lines in the Python interpreter'
+    'Run a sequence of lines in the Python interpreter using push'
     for line in lines:
         push(line.rstrip('\n')) # remove any terminal \n from line
+
+# execlines because sometimes runlines doesn't work either.
+# runlines works in edo P and R but not always in edsel runlines
+# It complains about indentation etc. and then after it returns,
+# command lines you type elicit Python errors - so interpreter is confused.
+
+# However execlines does not behave the same as runlines; it is not
+# an interactive shell.  Values of expressions are not printed by default.
+
+# execlines second argument is needed to update variables seen by pysh
+
+def execlines(lines):
+    'Run a sequence of lines in the Python interpreter using exec'
+    exec(''.join(lines), main_globals)
 
 def main():
     'Python REPL using home-made pysh shell'
