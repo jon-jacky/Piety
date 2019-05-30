@@ -4,7 +4,11 @@ branches
 
 This is the **master** branch.  Branches recently merged into **master**:
 
-- **xcommand*, merged 21 May 2019.  Extract *params* function from *edo* *X_command*,
+- **edsel_cleanup**, merged 29 May 2019.  Tweaks to naming and style in 
+*ed*, *buffer*, *console*, *edsel*, *frame*, *window*, and *display*.
+Begun 23 May 2019.
+
+- **xcommand**, merged 21 May 2019.  Extract *params* function from *edo* *X_command*,
 move to *samysh* module.   Change *echo* parameter in *samysh* *show_command* and *run_script*
 from lambda to simple boolean.  Begun 21 May 2019.
 
@@ -19,7 +23,7 @@ Begun 10 May 2019.
 - **eden**, merged 9 May 2019.  Add full screen editing to the *eden*
 display editor, in addition to the classic *ed* *insert* and *append*
 commands.  Make *eden*, including its built-in Python shell, into a
-minimal but self-contained Python programming environment.  Also, 
+minimal but self-contained Python programming environment.  Also,
 improvements to usability, organization, style and documentation.
 Rename each module's main function back to *main*, also rename the
 *Console* *call* function to *main* so standalone programs and console
