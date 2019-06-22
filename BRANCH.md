@@ -2,7 +2,13 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into **master**:
+This is the **runlines** branch.  Execute the current selection
+(from mark to dot) with the Python interpreter, in display editing mode with
+a keystroke.  For some reason, the code for executing Python lines from a
+buffer, added in the *edsel* branch (below), does not work for this.
+Begun 30 May 2019.
+
+Branches recently merged into **master**:
 
 - **edsel_cleanup**, merged 29 May 2019.  Tweak naming and style in
 *ed*, *buffer*, *console*, *edsel*, *frame*, *window*, and *display*.
@@ -92,4 +98,4 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised May 2019
+Revised Jun 2019
