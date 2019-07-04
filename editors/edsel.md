@@ -43,7 +43,8 @@ takes the same optional arguments as can appear on the command line:
     ...
 
 If you use the Python *-i* option, control transfers to an interactive
-Python prompt when *edsel* stops for any reason.  The data for all buffers and
+Python prompt when *edsel* exits or stops for any reason, including 
+program crashes or ^C interrupts.  The data for all buffers and
 windows remains intact, so you can resume by typing *edsel.main()*.
 No function arguments
 are needed here, because the data assigned at startup is still present.
@@ -195,7 +196,7 @@ commands to inline mode, while *^W* toggles *^Y* to multiline mode.
 
 To enter an indented line, type *tab* (or *^I*) at the beginning of the line.
 *edsel* inserts blanks (space characters) to match the indentation of the preceding line.
-The type the text of the new indented line.
+Then type the text of the new indented line.
 
 To edit an indented line, type *^J* (jump to next word) at the beginning of the line.
 *edsel* places the cursor on the first non-blank character in the line.  Then edit

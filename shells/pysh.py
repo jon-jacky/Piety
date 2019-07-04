@@ -38,20 +38,18 @@ def push(line):
 # runlines because we couldn't get stdlib code module runsource working.
 # runsource often works, but sometimes it complains, for no apparent reason:
 # SyntaxError: multiple statements found while compiling a single statement
+# We found by experiment that in runlines we must append extra blank line,
+#  otherwise push doesn't always execute line properly.
+# We got the idea to append a blank line after reading source in standard
+# library codeop.py, the comment that begins 'Compile three times: ...'
 
 def runlines(lines):
     'Run a sequence of lines in the Python interpreter using push'
-    for line in lines:
+    for line in lines + ['\n']:
         push(line.rstrip('\n')) # remove any terminal \n from line
 
-# execlines because sometimes runlines doesn't work either.
-# runlines works in edo P and R but not always in edsel runlines
-# It complains about indentation etc. and then after it returns,
-# command lines you type elicit Python errors - so interpreter is confused.
-
-# However execlines does not behave the same as runlines; it is not
+# execlines does not behave the same as runlines; it is not
 # an interactive shell.  Values of expressions are not printed by default.
-
 # execlines second argument is needed to update variables seen by pysh
 
 def execlines(lines):

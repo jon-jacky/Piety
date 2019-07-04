@@ -368,7 +368,8 @@ class Window(object):
         'Set input focus to this window'
         self.focus = True
         self.buf.dot = self.saved_dot
-        self.set_marker(self.buf.dot)
+        if command_mode():
+            self.set_marker(self.buf.dot)
 
     def release_focus(self):
         'Release input focus from this window'

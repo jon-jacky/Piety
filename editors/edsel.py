@@ -306,8 +306,9 @@ class Console(console.Console):
         if check.range_ok(ed.buf, start, end):
             terminal.set_line_mode() # exit inline editing, prepare for P(...)
             frame.put_command_cursor()
-            pysh.execlines(ed.buf.lines[start:end+1])
-            print('%s, ran lines %d..%d' % (ed.current, start, end))
+            pysh.runlines(ed.buf.lines[start:end+1])
+            # Sometimes buf.lines prints nothing - did anything happen?
+            # print('%s, ran lines %d..%d' % (ed.current, start, end))
             terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()
 

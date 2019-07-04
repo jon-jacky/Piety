@@ -135,7 +135,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
         mode = Mode.input
         win.update_for_input()
         wdot = win.wline(win.buf.dot)
-        display.put_cursor(wdot+1,1)
+        display.put_cursor(wdot+1,1) # +1 so we can't use put_display_cursor
 
     # Switch to ed command mode, ed . while in input mode
     elif op == Op.command:
@@ -147,9 +147,7 @@ def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
     # Switch to edsel display mode
     elif op == Op.display:
         mode = Mode.display
-        # following lines based on frame Op.input and Op.command
         win.clear_marker(win.buf.dot)
-        wdot = win.wline(win.buf.dot)
 
     # Dot moved, ed l command
     elif op == Op.locate:
