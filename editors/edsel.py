@@ -5,7 +5,7 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import keyboard, console, check, edda, frame, pysh, wyshka, samysh
+import keyboard, console, check, edda, pysh, wyshka, samysh
 from updates import Op
 
 ed = edda.edo.ed    # use ed and frame APIs without prefix
