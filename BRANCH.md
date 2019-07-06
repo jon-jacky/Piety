@@ -2,7 +2,10 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into **master**:
+This is the **redirect** branch.  Experiment with redirecting output from *stdout*
+to an editor text buffer.  Begun 6 Jul 2019.
+
+Branches recently merged into **master**:
 
 - **runlines**, merged 4 Jul 2019.  Execute the current selection
 (from mark to dot) with the Python interpreter, in display editing mode with
