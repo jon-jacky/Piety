@@ -96,4 +96,15 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
+Some of the files:
+
+- *empty.py*: empty file
+
+- *empty1.py*: file containing only one *\n*
+
+- *empty2.py*: file containing only two *\n*
+
+- *comment1.py*: file containing one comment line followed by one *\n*
+
+- *dtimport.py*:
 Revised May 2019
