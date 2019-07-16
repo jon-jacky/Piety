@@ -3,7 +3,8 @@ branches
 ========
 
 This is the **redirect** branch.  Experiment with redirecting output from *stdout*
-to an editor text buffer.  Begun 6 Jul 2019.
+to an editor text buffer.  Also, fix bugs in executing code from text
+buffers, code begun in *edsel* and *runlines* branches.  Begun 6 Jul 2019.
 
 Branches recently merged into **master**:
 
