@@ -18,19 +18,7 @@ class Console(console.Console):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.keymap = self.init_edsel_keymaps()
-        self.clear_line = True # used by restart method
-        self.collecting_command = False # used by execute, accept methods
-
-    # The following methods override methods in console.Console
-
-    def restart(self):
-        'Prepare to collect a command string in self.line'
-        if self.clear_line: # default case, usually True
-            super().restart() # clear self.line=''; show prompt; set_char_mode
-        else:
-            # set_display_mode sets clear_line = False - but does not call restart
-            self.clear_line = True # restore default,leave self.line,no prompt
-            terminal.set_char_mode() # enter inline editing
+        self.collecting_command = False # used by execute, accept_edsel methods
 
     # The following  methods and keymaps all have new names, so they are added
     #  to the ones in the Console base class, they do not replace any.
@@ -44,7 +32,6 @@ class Console(console.Console):
         edsel.line = line # not including final \n at eol
         edsel.point = 0 # 0-based
         edsel.start_col = 1 # 1-based
-        edsel.clear_line = False
         frame.update(Op.display)
         frame.put_display_cursor()
 
@@ -57,7 +44,7 @@ class Console(console.Console):
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
         frame.update(Op.command)
         frame.put_command_cursor()
-        super().restart() # not self.restart.  print prompt and enter char mode
+        self.restart() # print prompt and enter char mode
 
     def refresh(self):
         'Refresh entire display including whole frame and scrolling command region.'
@@ -95,7 +82,7 @@ class Console(console.Console):
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
-            
+
     def join_next(self):
         'Helper - join next line to this one. At last line do nothing.'
         if ed.buf.dot < ed.buf.nlines():

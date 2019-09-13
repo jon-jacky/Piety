@@ -425,7 +425,7 @@ class Console(object):
         self.command_keymap.update(self.job_control_keys)
 
         return (lambda: self.command_keymap) # default keymap
-        
+
 def main():
     # Test: echo input lines, use job control commands ^D ^Z to exit.
     echo = Console(prompt=(lambda: '> '), process_line=print)
