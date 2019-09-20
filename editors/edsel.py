@@ -295,7 +295,7 @@ class Console(console.Console):
             frame.put_command_cursor()
             pysh.runlines(ed.buf.lines[start:end+1])
             # Sometimes buf.lines prints nothing - did anything happen?
-            # print('%s, ran lines %d..%d' % (ed.current, start, end))
+            print('%s, ran lines %d..%d' % (ed.current, start, end))
             terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()
 
