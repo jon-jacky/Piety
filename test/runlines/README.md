@@ -102,5 +102,9 @@ Since the behavior of *edsel* *R* *P* and *^T* in this situation is the same
 as the stardard interactive Python interpreter, we do not consider this
 behavior to be a bug and we will not attempt to fix it.
 
+(We discovered this problem when we got a syntax error running
+*redirect_noblank.py* with the *edsel* *R* command.  We found we could work 
+around the problem by adding a blank line before the outdent in *redirect.py*.)
+
 Revised Sep 2019
 
