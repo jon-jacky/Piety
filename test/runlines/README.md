@@ -69,13 +69,13 @@ line, then a *print* statement
 indented *if* body and the *print* statement
 
 Both *defs_noblank.py* and *if_block_noblank.py* are correct Python code;
-each runs without errors when it is *import*'ed.
+each runs without errors when it is *import*ed.
 Each of these modules has an *outdent* where an indented block of code is
 followed by an unindented statement, with no blank line between.  When
 the contents of these modules are executed by *edsel* using the
 *R*, *P*, or *^T* commands, *edsel* reports a synax error at the outdented
 statement.  The modules *defs.py* and *if_block.py* are the same, except there
-is ablank line between the indented block antd the following outdented
+is a blank line between the indented block antd the following outdented
 statement.   The *R*, *P*, or *^T* commands run these modules without errors.
 
 This same quirk exhibited by the standard interactive Python interpreter.
@@ -99,7 +99,7 @@ This is what happens if you tupe the lines in *if_block_noblank*:
     SyntaxError: invalid syntax
 
 Since the behavior of *edsel* *R* *P* and *^T* in this situation is the same
-as the stardard interactive Python interpreter, we do not consider this 
+as the stardard interactive Python interpreter, we do not consider this
 behavior to be a bug and we will not attempt to fix it.
 
 Revised Sep 2019
