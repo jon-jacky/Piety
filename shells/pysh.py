@@ -23,7 +23,7 @@ def stop():
 
 main_globals = sys.modules['__main__'].__dict__
 
-pysh = code.InteractiveConsole(locals=main_globals)
+interpreter = code.InteractiveConsole(locals=main_globals)
 
 def push(line):
     'Push one line to Python interpreter'
@@ -32,14 +32,10 @@ def push(line):
         stop() # ... instead assign running variable, can be used by caller
         continuation = False
     else:
-        continuation = pysh.push(line) # True if continuation line expected
+        continuation = interpreter.push(line) # True if continuation line expected
     prompt = ps2 if continuation else ps1
 
-# runlines because we couldn't get stdlib code module runsource working.
-# runsource often works, but sometimes it complains, for no apparent reason:
-# SyntaxError: multiple statements found while compiling a single statement
-# We found by experiment that in runlines we must append extra blank line,
-#  otherwise push doesn't always execute line properly.
+# Append extra empty line, otherwise push doesn't always execute line properly.
 # We got the idea to append a blank line after reading source in standard
 # library codeop.py, the comment that begins 'Compile three times: ...'
 

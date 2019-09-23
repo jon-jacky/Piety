@@ -1,0 +1,6 @@
+
+def sqr(x):
+    return x+x
+def dbl(x): return x+x
+
+

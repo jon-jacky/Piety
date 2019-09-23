@@ -46,5 +46,61 @@ the comment in the standard library module *codeop.py*, that begins
 - *dtimport_blank2.py*: *dtimport.py* contents, but with a blank line between
 the first and second lines of code
 
-Revised July 2019
+- *exprs.py*: several expressions and assignment statements, with no blank
+lines
+
+- *exprs_blank1234.py*: same as *exprs.py*, but with one or more blank lines
+separating groups of statements
+
+- *exprs_errs.py*: similar to *exprs.py*, but some statements contain undefined
+variable or syntax errors
+
+- *defs.py*: define two functions, separated by a blank line
+
+- *defs_noblank.py*: like *defs.py*, but no blank line between the definitions
+
+- *defs_errs.py*: like *defs.py*, but each definition is preceded by a similar
+definition containing a syntax error
+
+- *if_block.py*: an *if* statement with an indented body followed by a blank
+line, then a *print* statement
+
+- *if_block_noblank.py*: like *if_block.py*, but no blank line between the
+indented *if* body and the *print* statement
+
+Both *defs_noblank.py* and *if_block_noblank.py* are correct Python code;
+each runs without errors when it is *import*'ed.
+Each of these modules has an *outdent* where an indented block of code is
+followed by an unindented statement, with no blank line between.  When
+the contents of these modules are executed by *edsel* using the
+*R*, *P*, or *^T* commands, *edsel* reports a synax error at the outdented
+statement.  The modules *defs.py* and *if_block.py* are the same, except there
+is ablank line between the indented block antd the following outdented
+statement.   The *R*, *P*, or *^T* commands run these modules without errors.
+
+This same quirk exhibited by the standard interactive Python interpreter.
+This is what happens if you type the lines in *if_block.py* at the interpreter:
+
+    >>> if True:
+    ...     1 + 1
+    ...
+    2
+    >>> print('It worked')
+    It worked
+
+This is what happens if you tupe the lines in *if_block_noblank*:
+
+    >>> if True:
+    ...     1 + 1
+    ... print('It worked')
+      File "<stdin>", line 3
+        print('It worked')
+        ^
+    SyntaxError: invalid syntax
+
+Since the behavior of *edsel* *R* *P* and *^T* in this situation is the same
+as the stardard interactive Python interpreter, we do not consider this 
+behavior to be a bug and we will not attempt to fix it.
+
+Revised Sep 2019
 
