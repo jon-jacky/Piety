@@ -266,10 +266,25 @@ def A(*args):
         print('? invalid address')
 
 def n(*args):
-    'Print information about all buffers'
-    print('CRM Buffer            Lines  Mode     File') #Current Readonly Modified
+    """
+    Print information about all buffers.
+    Print on console or in buffer named in optional parameter.
+    """
+    _, _, bufname, _ = parse.arguments(args)
+    if bufname:
+        match_prefix(bufname, buffers)
+        if bufname in buffers:
+            destination = buffers[bufname]
+        else:
+            print('? buffer name')
+            return
+    else:
+        destination = sys.stdout
+    print('CRM Buffer            Lines  Mode     File',  # Current Readonly Modified
+            file=destination)
     for name in buffers:
-        print (('.' if name == current else ' ') + buffers[name].info())
+        print(('.' if name == current else ' ') + buffers[name].info(),
+                file=destination)
 
 # command functions: displaying and navigating text
 
