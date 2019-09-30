@@ -1,8 +1,31 @@
-edsel.py command summary:
+edsel.py display editing commands summary:
 
- o2  split window, horizontal
- o   move to next window
- o1  return to single window
+    ^@  set mark, mark (included) to dot (excluded) defines region cut by ^W
+    ^space  set mark, like ^@
+    ^A  move cursor to start of line
+    ^B  move cursor (b)ack one character
+    ^C  move cursor back one page (page up)
+    ^D  (d)elete character under cursor
+    ^E  move cursor to (e)nd of line
+    ^F  move cursor (f)orward one character
+    ^G  cancel ^X command in progress
+    ^H  backspace, delete character before cursor
+    ^I  tab, insert spaces
+    ^J  (j)ump cursor forward to beginning of next word
+    ^K  delete (kill) from cursor to end of line, save in paste buffer
+    ^L  refresh entire screen
+    ^M  return, open new line below, or break line at cursor
+    ^N  move cursor down to (n)ext line
+    ^O  move cursor to (o)ther window, next in sequence
+    ^P  move cursor up to to (p)revious line
+    ^Q  exchange mark and dot (move cursor to show where they are)
+    ^R  search backwards (reverse) for previously entered search string
+    ^S  search forwards for previously entered search string
+    ^T  run Python statements from mark (included) to dot (excluded).
+    ^U  discard from start of line to cursor, save in paste buffer
+    ^V  move cursor forward one page (page down)
+    ^W  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer
+    ^X  enter and execute ed or edda command, then return to display mode
+    ^Y  insert (paste or (y)ank) contents last deleted by ^K kill, ^U discard, or ^W cut
+    ^Z  exit display editing and return to command mode
 
- h    balance windows (make all about the same size)
- h N  set scrolling command region to N lines (h 2, h 12 etc.)
