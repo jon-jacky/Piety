@@ -20,6 +20,19 @@ class Console(console.Console):
         self.keymap = self.init_edsel_keymaps()
         self.collecting_command = False # used by execute, accept_edsel methods
 
+    # This method overrides the one in the Console base class
+    # Special case handling for C command - change to display mode
+    # setting collecting_command = True ensures that C command will be
+    # handled by accept_edsel_command (below) via edsel_command_keymap
+    # Do not process C command by Console accept_command
+    # because that calls Console restart() which assigns self.line = ''
+    # after set_display_mode assigns self.line = ed.buf.dot 
+    # That's a bug where C command deletes contents of line at ed.buf.dot
+    def insert_char(self, keycode):
+        super().insert_char(keycode)
+        if ed.command_mode and self.line.startswith('C'):
+            self.collecting_command = True
+
     # The following  methods and keymaps all have new names, so they are added
     #  to the ones in the Console base class, they do not replace any.
 
@@ -344,7 +357,10 @@ def base_do_command(line):
 
     # Begin full-screen display editing
     if line.startswith('C'):
-        edsel.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+        # All the work here is done by 'C' special case in insert_char
+        # (above) which sets collecting_command = True, and then by
+        #  accept_edsel_command which calls set_display_mode.
+        pass
     else:
         edda.base_do_command(line)
 
