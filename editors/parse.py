@@ -4,7 +4,7 @@ parse.py - command line parsing for ed.py
 
 import re
 
-complete_cmds = 'AbBdDeEfjkKlmnpqQrstwxyz' # commands that do not use input mode
+complete_cmds = 'AbBdDeEfjJkKlmnpqQrstwxyz' # commands that do not use input mode
 input_cmds = 'aci' # commands that use input mode to collect text
 ed_cmds = complete_cmds + input_cmds
 
@@ -38,6 +38,10 @@ def line_address(buf, cmd_string):
         return buf.dot, ',$'+ cmd_string[1:]
     if cmd_string[0] in ',%': # equivalent to 1,$ - whole buffer
         return 1, ',$'+ cmd_string[1:]
+
+    if cmd_string[0] in '[': # equivalent to '@,- -selection from mark to dot
+        cmd_string = "'@,-" + cmd_string[1:]
+
     m = number.match(cmd_string) # digits, the line number
     if m:
         return int(m.group(1)), cmd_string[m.end():]

@@ -3,7 +3,7 @@ buffer.py - Buffer class for line-oriented text editors.
             The text in each buffer is a list of strings.
 """
 
-import os.path
+import os.path, re
 from enum import Enum
 import view
 from updates import Op, background_task
@@ -32,6 +32,7 @@ class Buffer(object):
         self.modified = False # True if buffer contains unsaved changes
         self.mark = dict() # dict from mark char to line num, for 'c addresses
         self.end_phase = False # control variable used by write method
+        self.fill_column = 80 # default, can be reassigned by J parameter
 
     def empty(self):
         'True when buffer is empty (not couting empty line at index 0)'
@@ -232,11 +233,45 @@ class Buffer(object):
         self.d(start, end, yank=False) # do not save joined lines in cut buffer
         self.i(start, joined)
 
+    def J(self, start, end, fill_column):
+        """
+        Replace lines from start to end with filled lines.
+        Left margin is first nonblank column in start line.
+        Right margin is buf.fill_column, can be assigned by optional parameter.
+        """
+        if fill_column:
+            self.fill_column = fill_column
+        # set left margin, search region for first nonblank line
+        margin = ''
+        nonblank = False
+        for line in self.lines[start:end+1]:
+            for i, c in enumerate(line):
+                if c != ' ':
+                    margin = line[:i]
+                    nonblank = True
+                    break # break out of line
+            if nonblank:
+                break # break out of start..end
+        # obvious greedy algorithm that can leave very ragged right margin
+        # alternatives:  http://xxyxyz.org/line-breaking/
+        words = ''.join(self.lines[start:end+1]).split() # list of all words
+        filled = '' # string of filled lines, \n at each line break
+        line = margin
+        for word in words:
+            if len(line) + len(word) + 1 <= self.fill_column:
+                line += word + ' '
+            else:
+                filled += line + ' ' + '\n' # wrap long line, put space at eol
+                line = margin + word + ' '  # ... so j (join) can undo J (fill)
+        filled += line + '\n' # last short line
+        self.d(start, end, yank=False) # do not save unfilled lines in cut buffer
+        self.i(start, filled)
+
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,
         otherwise substitute only the first occurrence in each line."""
-        origin = self.dot 
+        origin = self.dot
         for i in range(start,end+1): # ed range is inclusive, unlike Python
             if old in self.lines[i]: # test to see if we should advance dot
                 self.y(i,i) # Cut buf only holds last line where subst, like GNU ed

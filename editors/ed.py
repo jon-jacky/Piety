@@ -375,16 +375,30 @@ def j(*args):
     if valid:
         buf.j(start, end)
 
+def J(*args):
+    'Replace lines from start to end with filled lines'
+    valid, start, end, param, _ = check.irange(buf, args)
+    if valid:
+        if param:
+            try:
+                fill_column = int(param)
+            except:
+                print('? integer expected at %s' % param)
+                return
+        else:
+            fill_column = 0
+        buf.J(start, end, fill_column)
+
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
     valid, start, end, lines, _ = check.irange(buf, args)
     if valid:
         buf.c(start,end,lines)
-        
+
 def s(*args):
     """
     Substitute new for old in lines from start up to end.
-    When glbl is False (the default), substitute only the first occurrence 
+    When glbl is False (the default), substitute only the first occurrence
     in each line.  Otherwise substitute all occurrences in each line
     """
     valid, start, end, old, params = check.irange(buf, args)
