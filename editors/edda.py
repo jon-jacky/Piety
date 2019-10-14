@@ -57,7 +57,7 @@ def do_window_command(paramstring):
         print('? integer 1 or 2 expected at %s' % paramstring)
 
 
-def base_do_command(line):
+def do_command(line):
     'Process one command line without blocking.'
     line = line.lstrip()
     paramstring = line[1:].lstrip()
@@ -81,7 +81,7 @@ def base_do_command(line):
 def base_process_line(line):
     'process one line without blocking, according to mode'
     if ed.command_mode:
-        base_do_command(line)
+        do_command(line)
     else:
         ed.add_line(line)
 

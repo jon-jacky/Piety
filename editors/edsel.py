@@ -20,18 +20,15 @@ class Console(console.Console):
         self.keymap = self.init_edsel_keymaps()
         self.collecting_command = False # used by execute, accept_edsel methods
 
-    # This method overrides the one in the Console base class
-    # Special case handling for C command - change to display mode
-    # setting collecting_command = True ensures that C command will be
-    # handled by accept_edsel_command (below) via edsel_command_keymap
-    # Do not process C command by Console accept_command
-    # because that calls Console restart() which assigns self.line = ''
-    # after set_display_mode assigns self.line = ed.buf.dot 
-    # That's a bug where C command deletes contents of line at ed.buf.dot
-    def insert_char(self, keycode):
-        super().insert_char(keycode)
-        if ed.command_mode and self.line.startswith('C'):
-            self.collecting_command = True
+    # This method overrides the one in the Console base class.
+    # Special case handling for C command that changes to display mode.
+    # Handle here instead of in do_command.
+    def accept_command(self):
+        if self.line == 'C': # C command, change to display mode
+            print() # advance line in command region
+            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip())
+        else:
+            super().accept_command()
 
     # The following  methods and keymaps all have new names, so they are added
     #  to the ones in the Console base class, they do not replace any.
@@ -351,38 +348,8 @@ class Console(console.Console):
         self.edsel_command_keymap.update(self.edsel_command_keys)
         return (lambda: self.edsel_display_keymap)
 
-def base_do_command(line):
-    'Process one command line without blocking.'
-    line = line.lstrip()
-
-    # Begin full-screen display editing
-    if line.startswith('C'):
-        # All the work here is done by 'C' special case in insert_char
-        # (above) which sets collecting_command = True, and then by
-        #  accept_edsel_command which calls set_display_mode.
-        pass
-    else:
-        edda.base_do_command(line)
-
-# We redefined do_command so we have to redefine process_line
-def base_process_line(line):
-    'process one line without blocking, according to mode'
-    if ed.command_mode:
-        base_do_command(line)
-    else:
-        ed.add_line(line)
-
-# Add embedded python interpreter.
-_process_line = wyshka.shell(process_line=base_process_line,
-                             command_mode=(lambda: ed.command_mode),
-                             command_prompt=(lambda: ed.prompt))
-
-# Add command to run script from buffer with optional echo and delay.
-process_line = samysh.add_command(edda.edo.X_command(_process_line),
-                                  _process_line)
-
 edsel = Console(prompt=(lambda: wyshka.prompt),
-               process_line=process_line,
+               process_line=edda.process_line,
                stopped=(lambda command: ed.quit),
                startup=edda.startup, cleanup=edda.cleanup)
 
