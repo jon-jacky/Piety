@@ -26,7 +26,7 @@ main_globals = sys.modules['__main__'].__dict__
 interpreter = code.InteractiveConsole(locals=main_globals)
 
 def push(line):
-    'Push one line to Python interpreter'
+    'Push one line to Python code.InteractiveConsole interpreter'
     global continuation, prompt
     if line == 'exit()': # DON'T exit from underlying Python session ...
         stop() # ... instead assign running variable, can be used by caller
@@ -39,17 +39,17 @@ def push(line):
 # We got the idea to append a blank line after reading source in standard
 # library codeop.py, the comment that begins 'Compile three times: ...'
 
-def runlines(lines):
-    'Run a sequence of lines in the Python interpreter using push'
+def pushlines(lines):
+    'Run a sequence of lines in the Python InteractiveConsole using push'
     for line in lines + ['\n']:
         push(line.rstrip('\n')) # remove any terminal \n from line
 
-# execlines does not behave the same as runlines; it is not
-# an interactive shell.  Values of expressions are not printed by default.
-# execlines second argument is needed to update variables seen by pysh
+# execlines does not behave the same as pushlines; it uses builtin exec
+# not InteractiveConsole.  Values of expressions are not printed by default.
+# execlines second argument is needed to update variables seen by pysh.
 
 def execlines(lines):
-    'Run a sequence of lines in the Python interpreter using exec'
+    'Run a sequence of lines in the Python interpreter using builtin exec'
     exec(''.join(lines), main_globals)
 
 def main():

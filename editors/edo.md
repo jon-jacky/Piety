@@ -49,6 +49,27 @@ Python prompt when *edo* exits for any reason.  Then you can resume your
 *edo* session just where you left off, with all buffers intact, just by
 calling *main()* (or *edo.main()*) at the Python prompt.
 
+## Python ##
+
+**edo.py** provides new editor commands for running Python out of
+text buffers.
+
+- *linesP*: Execute selected lines using the *push* method from Python *code*
+module *InteractiveConsole* class. Here *lines* is a single line or range of
+lines indentified by one or two *ed* line addresses. Default is *dot*, the
+current line.
+
+- *linesR*: Execute selected lines using the builtin *exec* function.
+
+We provide both *P* and *R* commands because the behavior of *push* and *exec*
+are different. *P* treats the lines of code the same as the interactive Python
+interpreter.  It prints the values of expressions even without any explicit
+*print* calls, but it requires that the code be formatted with a blank line
+preceding every *outdent* (a line with less indentation than its predecessor).
+An outdent that is not preceded with a blank line is reported as a syntax error,
+and the code is not executed.
+*R* uses builtin *exec* which runs the code instead of reporting an error.
+
 ## Shell ##
 
 The *wyshka* command line shell used by *edo* provides both the *ed*
@@ -180,30 +201,8 @@ as the *ed* *main* function.
 
 ## Scripting ##
 
-**edo.py** provides new editor commands for running Python scripts from
-editor buffers or any selected text, and for running scripts of editor
-commands from editor buffers.
-
-**edo.py** adds a new *R* command that runs a Python script from
-an editor buffer.  The command takes an optional parameter, a buffer name
-(which does not have to end in *.py*).
-If this parameter is omitted, *R* uses the current buffer.
-
-The *R* command executes the entire buffer contents, from
-the first line through the last.  The *R* command does not
-import the buffer; the buffer contents execute in the current
-__main__ module.  Any output from the script (including error
-messages or tracebacks) is printed on the terminal, just like
-other editor output (from *p* commands etc.).
-
-**edo.py** adds a new *P* command that runs Python statements from
-lines in the current buffer.  Like many *ed* commands,
-it takes one or two optional prefix line address arguments to specify
-the line or range of lines to run.  The default is the current line.
-Any output from the Python statements are printed on the terminal.
-
-**edo.py** adds a new *X* command that executes *ed* commands or
-Python statements from an editor buffer, to support scripting and
+**edo.py** adds a new *X* command that executes *ed* commands
+from an editor buffer, to support scripting and
 testing.  (That is an uppercase *X*.  The *ed.py* lower case *x*
 command is different.  It pastes recently copied or deleted lines into
 the current text buffer).
@@ -250,13 +249,7 @@ in the *test/ed* directory:
 After the script finishes, you can type *q* at the prompt to exit the editor,
 then exit from Python.
 
-It is also possible to use the *X* command to execute a Python script,
-but you must put *!* in the first line of the buffer to switch *wyshka* to Python
-mode, then put *:* in the last line to switch back to *ed* command mode.
-The *R* command is a better way to execute Python scripts; it requires no
-modifications to the buffer.
-
-In the R and X commands, the buffer name can be abbreviated by providing a prefix
+In the X command, the buffer name can be abbreviated by providing a prefix
 followed by a hyphen -- a sort of "poor person's tab completion".  For
 example, the command *X samp-* or even *X s-* might run the test script in
 *sample.ed*.  If more than one buffer name begins with the same

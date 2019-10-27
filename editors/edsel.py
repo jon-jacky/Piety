@@ -102,7 +102,7 @@ class Console(console.Console):
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
-            
+
     def del_or_join_next(self):
         """
         If point is not at end of line, delete character under cursor.
@@ -269,7 +269,10 @@ class Console(console.Console):
     def accept_edsel_command(self):
         'After execute() above, execute the line, then return to display mode.'
         self.collecting_command = False
-        self.process_command() # exits inline editing with term.set_char_mode
+        if self.line == 'C': # no handler for 'C', avoid bogus 'command expected'
+            print() # advance line in command region
+        else:
+            self.process_command() # exits inline editing with term.set_char_mode
         if self.stopped() and not self.quit: # if .quit, stop() already called
             self.stop()
         else:
@@ -303,7 +306,8 @@ class Console(console.Console):
         if check.range_ok(ed.buf, start, end):
             terminal.set_line_mode() # exit inline editing, prepare for P(...)
             frame.put_command_cursor()
-            pysh.runlines(ed.buf.lines[start:end+1])
+            # Use pushlines, uses code.InteractiveConsole not builtin exec
+            pysh.pushlines(ed.buf.lines[start:end+1])
             # Sometimes buf.lines prints nothing - did anything happen?
             print('%s, ran lines %d..%d' % (ed.current, start, end))
             terminal.set_char_mode() # resume inline editing

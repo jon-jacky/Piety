@@ -9,18 +9,65 @@ Pertinent commands:
 
 - *B filename*: Load file named *filename* into a new buffer with that name.
 
-- *R bufname*: Execute the entire buffer named *bufname*.
-Default is the current buffer.
+- *linesP*: Execute selected lines using the *push* method from Python *code*
+module *InteractiveConsole* class. Here *lines* is a single line or range of
+lines indentified by one or two *ed* line addresses. Default is *dot*, the
+current line.
 
-- *linesP*: Execute selected lines in the current buffer in
-command mode.  *lines* is a single line or range of lines indentified by
-one or two *ed* line addresses.  Default is *dot*, the current line.
+- *linesR*: Execute selected lines using the builtin *exec* function.
 
-- *^T*: Execute the current selection from *mark* (inclusive) to
-*dot* (exclusive) in display mode.   Default if there is no *mark* is *dot*.
+- *^T*: In display mode, execute the current selection using *push*
+The *selection* is the lines from *mark* (inclusive) to
+*dot* (exclusive). The default selection is *dot* if there is no *mark*.
 
-Some of the test files.  Several are designed to check handling of newlines 
-and empty lines in code.  We suspect this might be an issue.  See
+We provide both *P* and *R* commands because the behavior of *push* and *exec*
+are different. *P* treats the lines of code the same as the interactive Python
+interpreter.  It prints the values of expressions even without any explicit
+*print* calls, but it requires that the code be formatted with a blank line
+preceding every *outdent* (a line with less indentation than its predecessor).
+
+For example,
+both *defs_noblank.py* and *if_block_noblank.py* in this directory
+are correct Python code;
+each runs without errors when it is *import*ed.
+Each of these modules has an *outdent* with no preceding blank line.
+When the contents of these modules are executed by the
+*P* or *^T* commands, *edsel* reports a synax error at the outdented
+statement.  The modules *defs.py* and *if_block.py* are the same, except there
+is a blank line between the indented block antd the following outdented
+statement.   *P* and *^T* run these modules without errors.
+
+This same quirk exhibited by the standard interactive Python interpreter.
+This is what happens if you type the lines in *if_block.py* at the interpreter:
+
+    >>> if True:
+    ...     1 + 1
+    ...
+    2
+    >>> print('It worked')
+    It worked
+
+This is what happens if you type the lines in *if_block_noblank*:
+
+    >>> if True:
+    ...     1 + 1
+    ... print('It worked')
+      File "<stdin>", line 3
+        print('It worked')
+        ^
+    SyntaxError: invalid syntax
+
+Since the behavior of *P* and *^T* in this situation is the same
+as the stardard interactive Python interpreter, we do not consider this
+behavior to be a bug.  Instead, we also provide an *R* command that
+uses builtin *exec* which runs the code instead of reporting an error.
+
+We discovered this behavior when we got a syntax error running
+*redirect_noblank.py* with the *P* command. We found we could work around the
+problem by adding a blank line before the outdent in *redirect.py*.
+
+Some of the test files.  Several are designed to check handling of newlines
+and empty lines in code.  We suspected this might be an issue.  See
 the comment in the standard library module *codeop.py*, that begins
 'Compile three times: ...'
 
@@ -68,43 +115,5 @@ line, then a *print* statement
 - *if_block_noblank.py*: like *if_block.py*, but no blank line between the
 indented *if* body and the *print* statement
 
-Both *defs_noblank.py* and *if_block_noblank.py* are correct Python code;
-each runs without errors when it is *import*ed.
-Each of these modules has an *outdent* where an indented block of code is
-followed by an unindented statement, with no blank line between.  When
-the contents of these modules are executed by *edsel* using the
-*R*, *P*, or *^T* commands, *edsel* reports a synax error at the outdented
-statement.  The modules *defs.py* and *if_block.py* are the same, except there
-is a blank line between the indented block antd the following outdented
-statement.   The *R*, *P*, or *^T* commands run these modules without errors.
-
-This same quirk exhibited by the standard interactive Python interpreter.
-This is what happens if you type the lines in *if_block.py* at the interpreter:
-
-    >>> if True:
-    ...     1 + 1
-    ...
-    2
-    >>> print('It worked')
-    It worked
-
-This is what happens if you tupe the lines in *if_block_noblank*:
-
-    >>> if True:
-    ...     1 + 1
-    ... print('It worked')
-      File "<stdin>", line 3
-        print('It worked')
-        ^
-    SyntaxError: invalid syntax
-
-Since the behavior of *edsel* *R* *P* and *^T* in this situation is the same
-as the stardard interactive Python interpreter, we do not consider this
-behavior to be a bug and we will not attempt to fix it.
-
-(We discovered this problem when we got a syntax error running
-*redirect_noblank.py* with the *edsel* *R* command.  We found we could work 
-around the problem by adding a blank line before the outdent in *redirect.py*.)
-
-Revised Sep 2019
+Revised Oct 2019
 

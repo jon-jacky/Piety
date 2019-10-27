@@ -33,31 +33,24 @@ def X_command(do_command):
                 print('? buffer name')
     return X
 
-def R(*args):
-    'Run Python script from named buffer'
-    _, _, bufname, _ = parse.arguments(args)
-    bufname = bufname if bufname else ed.current
-    bufname = ed.match_prefix(bufname, ed.buffers)
-    if not bufname in ed.buffers:
-        print('? buffer name')
-        return
-    pysh.runlines(ed.buffers[bufname].lines[1:])
-    print('%s, ran lines %d..%d' % (bufname, 1, ed.S()))
-
 def P(*args):
-    'Run Python statements in addressed lines in current buffer'
+    'Run Python statements in addressed lines using push'
     valid, start, end, _, _ = check.irange(ed.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
-        pysh.runlines(ed.buf.lines[start:end+1])
-        print('%s, ran lines %d..%d' % (ed.current, start, end))
+        pysh.pushlines(ed.buf.lines[start:end+1])
+        print('%s, ran lines %d..%d using push' % (ed.current, start, end))
+
+def R(*args):
+    'Run Python statements in addressed lines using exec'
+    valid, start, end, _, _ = check.irange(ed.buf, args)
+    if valid: # includes start <= end, maybe not so for mark and dot
+        pysh.execlines(ed.buf.lines[start:end+1])
+        print('%s, ran lines %d..%d using exec' % (ed.current, start, end))
 
 parse.ed_cmds += 'PR' # so parse.command() recognizes new commands
 
 def do_command(line):
-        """
-        Add R command to (R)un Python script from buffer,
-        P command to run Python statements in addressed lines.
-        """
+        'Add P and R commands to run Python statements'
         results = parse.command(ed.buf, line)
         if results:
             cmd_name, args = results
