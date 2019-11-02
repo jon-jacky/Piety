@@ -49,27 +49,6 @@ Python prompt when *edo* exits for any reason.  Then you can resume your
 *edo* session just where you left off, with all buffers intact, just by
 calling *main()* (or *edo.main()*) at the Python prompt.
 
-## Python ##
-
-**edo.py** provides new editor commands for running Python out of
-text buffers.
-
-- *linesP*: Execute selected lines using the *push* method from Python *code*
-module *InteractiveConsole* class. Here *lines* is a single line or range of
-lines indentified by one or two *ed* line addresses. Default is *dot*, the
-current line.
-
-- *linesR*: Execute selected lines using the builtin *exec* function.
-
-We provide both *P* and *R* commands because the behavior of *push* and *exec*
-are different. *P* treats the lines of code the same as the interactive Python
-interpreter.  It prints the values of expressions even without any explicit
-*print* calls, but it requires that the code be formatted with a blank line
-preceding every *outdent* (a line with less indentation than its predecessor).
-An outdent that is not preceded with a blank line is reported as a syntax error,
-and the code is not executed.
-*R* uses builtin *exec* which runs the code instead of reporting an error.
-
 ## Shell ##
 
 The *wyshka* command line shell used by *edo* provides both the *ed*
@@ -199,6 +178,31 @@ The *edo.py* program accepts the same optional command line arguments
 as *ed.py*, and the *edo* *main* function accepts the same optional arguments
 as the *ed* *main* function.
 
+
+## Running Python code ##
+
+In addition to providing a Python shell, **edo.py** also provides new editor
+commands for running Python out of text buffers. These commands execute the code
+at top level (in the *main* module), they do not import the buffer as a module.
+
+- *P*: Execute selected lines using the *push* method from Python *code* module
+*InteractiveConsole* class. The selected lines can be a single line or range of
+lines indentified by one or two *ed* line addresses. Default is *dot*, the
+current line.
+
+- *R*: Execute selected lines using the builtin *exec* function.
+
+We provide both *P* and *R* commands because the behavior of *push* and *exec*
+are different. *P* treats the lines of code the same as the interactive Python
+interpreter. It prints the values of expressions even without any explicit
+*print* calls, but it requires that the code be formatted with a blank line
+preceding every *outdent* (a line with less indentation than its predecessor).
+An outdent that is not preceded with a blank line is reported as a syntax
+error, and the code is not executed. *R* uses builtin *exec* which runs the
+code instead of reporting an error. It runs any valid Python code, but does not
+print the values of expressions it evaluates unless there is an explicity
+*print* call.
+
 ## Scripting ##
 
 **edo.py** adds a new *X* command that executes *ed* commands
@@ -292,4 +296,4 @@ The **[edda](edda.md)** display editor imports *edo.py*.
 
 The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
-Revised May 2019
+Revised October 2019

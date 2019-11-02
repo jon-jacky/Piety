@@ -32,7 +32,7 @@ class Buffer(object):
         self.modified = False # True if buffer contains unsaved changes
         self.mark = dict() # dict from mark char to line num, for 'c addresses
         self.end_phase = False # control variable used by write method
-        self.fill_column = 80 # default, can be reassigned by J parameter
+        self.fill_column = 75 # default, can be reassigned by J parameter
 
     def empty(self):
         'True when buffer is empty (not couting empty line at index 0)'
@@ -235,9 +235,11 @@ class Buffer(object):
 
     def J(self, start, end, fill_column):
         """
-        Replace lines from start to end with filled lines.
+        Replace lines from start to end with wrapped (filled) lines.
         Left margin is first nonblank column in start line.
         Right margin is buf.fill_column, can be assigned by optional parameter.
+        After coding this we found we could have used
+        https://docs.python.org/3/library/textwrap.html
         """
         if fill_column:
             self.fill_column = fill_column

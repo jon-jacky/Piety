@@ -202,6 +202,33 @@ To edit an indented line, type *^J* (jump to next word) at the beginning of the 
 *edsel* places the cursor on the first non-blank character in the line.  Then edit
 the text of the indented line.
 
+### Wrapped text ###
+
+Use the *ed.py* *J* command in command mode to wrap text. The selected lines
+are wrapped so their length does not exceed *fill_column*, which defaults to 75
+characters, but can be reassigned by including a parameter to the *J* command,
+which then remains in effect in that buffer only until it is reassigned again.
+
+The left margin of all the wrapped lines is the made the same as the left
+margin of the first line in the selection.
+
+The default selection for the *J* command is *dot*, the current line.
+
+A convenient way to select the lines to wrap is to set the mark at the
+beginning of the region, then move the cursor to the line after the region.
+Then type *^X* to get the command prompt, then type the commmand *[J*
+which applies the wrap command *J* to the region *[* from mark to dot.
+
+### Long lines ###
+
+Lines which are wider than the frame disappear off the right edge of the
+frame (they are *clipped*, not wrapped).  To edit one of these extra-long
+lines, type *^X* to get the command prompt, then type the command *J* to
+wrap that line to the width defined by the default fill column.  Two or
+more wrapped lines will appear.  You can edit those lines. When uoyou are done
+editing, select all the wrapped lines and type the *j* command to join them
+all into one long line again.
+
 ## API and data structures ##
 
 In *edsel*, calls to the *edda* API require a prefix:
@@ -243,13 +270,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-## Bugs ##
-
-The *^T* display editing command to run Python statements in the
-current selection (from mark to dot) does not always work.  In the
-meantime, the *edo* *R* and *P* commands do work.  The *R* command
-runs an entire buffer, and the *P* command runs statements in
-the addressed range of lines.
-
-Revised May 2019
+Revised Nov 2019
 

@@ -9,12 +9,12 @@ Pertinent commands:
 
 - *B filename*: Load file named *filename* into a new buffer with that name.
 
-- *linesP*: Execute selected lines using the *push* method from Python *code*
+- *P*: Execute selected lines using the *push* method from Python *code*
 module *InteractiveConsole* class. Here *lines* is a single line or range of
 lines indentified by one or two *ed* line addresses. Default is *dot*, the
 current line.
 
-- *linesR*: Execute selected lines using the builtin *exec* function.
+- *R*: Execute selected lines using the builtin *exec* function.
 
 - *^T*: In display mode, execute the current selection using *push*
 The *selection* is the lines from *mark* (inclusive) to

@@ -118,9 +118,18 @@ lost and it is no longer possible to resume the session.
 
  *b B D n*
 
+**ed.py** adds a new *wrap* command:
+
+ *J*
+
 **ed.py** supports these line address forms from classic *ed*:
 
  *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
+
+**ed.py** adds a new line address form to indicate the region from *mark* to
+*dot*:
+
+ *[*
 
 Here is a [command summary](ed.txt).
 
@@ -269,17 +278,28 @@ printing the current line after any command).
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
 
+**ed.py** provides the new *J* command to wrap text in the selected
+lines.  The default is dot, the current line.  The selected lines
+are wrapped so their length does not exceed *fill_column*, which
+defaults to 75 characters, but can be reassigned by including
+a parameter to the *J* command, which then remains in effect in that
+buffer only until it is reassigned again. The left margin of all the
+wrapped lines is the made the same as the left margin of the first line in
+the selection.
+
 **ed.py** always prints the error message following the *?* character.
 There is no way to suppress printing the error messages as in classic
 *ed*.
 
-The *@* character
-can be used to mark a line with the *k@* command,
-which can then be located by the *'@* address.
-In *ed*, only the lower-case alphabetic characters *a-z* can be used
-for this (*ed.py* supports *a-z* also).
-Other programs (not *ed.py*) can operate on the region or *selection*
-from the *@* mark to the current line.
+The *@* character can be used to mark a line with the *k@* command, which  
+can then be located by the *'@* address. In *ed*, only the lower-case  
+alphabetic characters *a-z* can be used for this (*ed.py* supports *a-z*  
+also). Other programs (besides *ed.py*) can operate on the *region* or  
+selection from the *@* mark (inclusive) to dot, the current line  
+(exclusive).
+
+Our *ed.py* provides the new *[* address range to indicate the region from
+mark to dot.
 
 The *e* and *E* commands only work in the *main* buffer.
 In *sam*, the *e* command works in any buffer.
@@ -509,5 +529,5 @@ to be entered at the terminal.
 **[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
-Revised May 2019
+Revised November 2019
 

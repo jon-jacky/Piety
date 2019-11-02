@@ -376,7 +376,7 @@ def j(*args):
         buf.j(start, end)
 
 def J(*args):
-    'Replace lines from start to end with filled lines'
+    'Replace lines from start to end with wrapped (filled) lines'
     valid, start, end, param, _ = check.irange(buf, args)
     if valid:
         if param:

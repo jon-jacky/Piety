@@ -12,6 +12,7 @@ ed.py summary.  Commands from classic ed:
  E read named file into current buffer, despite unsaved changes
  f change file name for current buffer
  i insert lines (enter input mode)
+ j join lines
  k mark addressed line with single character label
  l go to addressed line and print (default next line)
  m move lines to after destination line
@@ -38,7 +39,11 @@ Commands from sam:
  D delete buffer
  n list buffers
 
-Line addresses:
+New commands in ed.py only:
+
+ J wrap lines
+
+Line addresses from ed:
 
  . current line, called dot (default for most commands)
  $ last line
@@ -58,6 +63,10 @@ Line addresses:
  % entire buffer (same as ,)
  ; current line to end of buffer (same as .,$)
 
+New line addresses in ed.py only:
+
+ [ region from line marked with @ (inclusive) to dot (exclusive)
+
 Command format:
 
  start,endC parameters
@@ -65,8 +74,8 @@ Command format:
  All fields are optional, with helpful defaults.
  Here C is command name.  All names are one character, case senstive, default is l.
  start, end are line addresses.
- If both are present, command applies to all lines in range.  
- If only start is present, command applies to that line.  
+ If both are present, command applies to all lines in range.
+ If only start is present, command applies to that line.
  If both are absent, most commands apply to the current line.
  Most commands move the current line to the last affected line.
  Parameters may be separated from command name C by zero or more spaces
@@ -77,5 +86,5 @@ Command format:
 
 For more information, type man ed on any Unix-like system.
 
-Revised Nov 2018
+Revised Nov 2019
 
