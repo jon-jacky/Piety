@@ -126,10 +126,8 @@ lost and it is no longer possible to resume the session.
 
  *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
 
-**ed.py** adds a new line address form to indicate the region from *mark* to
-*dot*:
-
- *[*
+**ed.py** adds a new line address form *[* to indicate the region from  
+the *mark* to *dot*.
 
 Here is a [command summary](ed.txt).
 
@@ -254,7 +252,7 @@ names for files that are already stored in another buffer.
 
 Be aware that *ed.py* only knows about files that are
 loaded into buffers.  It is possible to create a scratch
-file with any almost name with the *b* command, and it is
+file with almost any name with the *b* command, and it is
 possible to write over almost
 any file in the file system from any buffer with the *w* command
 or the *f* command.
@@ -294,9 +292,10 @@ There is no way to suppress printing the error messages as in classic
 The *@* character can be used to mark a line with the *k@* command, which  
 can then be located by the *'@* address. In *ed*, only the lower-case  
 alphabetic characters *a-z* can be used for this (*ed.py* supports *a-z*  
-also). Other programs (besides *ed.py*) can operate on the *region* or  
-selection from the *@* mark (inclusive) to dot, the current line  
-(exclusive).
+also). The *@* mark and the current line, dot, define a *region* or  
+selection that other commands can use. This region begins with the line
+with the *@* mark and includes all the lines up to (but not including) the
+current line, dot.
 
 Our *ed.py* provides the new *[* address range to indicate the region from
 mark to dot.

@@ -202,7 +202,7 @@ To edit an indented line, type *^J* (jump to next word) at the beginning of the 
 *edsel* places the cursor on the first non-blank character in the line.  Then edit
 the text of the indented line.
 
-### Wrapped text ###
+#### Wrapped text ####
 
 Use the *ed.py* *J* command in command mode to wrap text. The selected lines
 are wrapped so their length does not exceed *fill_column*, which defaults to 75
@@ -219,13 +219,13 @@ beginning of the region, then move the cursor to the line after the region.
 Then type *^X* to get the command prompt, then type the commmand *[J*
 which applies the wrap command *J* to the region *[* from mark to dot.
 
-### Long lines ###
+#### Long lines ####
 
 Lines which are wider than the frame disappear off the right edge of the
 frame (they are *clipped*, not wrapped).  To edit one of these extra-long
 lines, type *^X* to get the command prompt, then type the command *J* to
 wrap that line to the width defined by the default fill column.  Two or
-more wrapped lines will appear.  You can edit those lines. When uoyou are done
+more wrapped lines will appear.  You can edit those lines. When you are done
 editing, select all the wrapped lines and type the *j* command to join them
 all into one long line again.
 
