@@ -289,10 +289,10 @@ the selection.
 There is no way to suppress printing the error messages as in classic
 *ed*.
 
-The *@* character can be used to mark a line with the *k@* command, which  
-can then be located by the *'@* address. In *ed*, only the lower-case  
-alphabetic characters *a-z* can be used for this (*ed.py* supports *a-z*  
-also). The *@* mark and the current line, dot, define a *region* or  
+The *@* character can be used to mark a line with the *k@* command, which
+can then be located by the *'@* address. In *ed*, only the lower-case
+alphabetic characters *a-z* can be used for this (*ed.py* supports *a-z*
+also). The *@* mark and the current line, dot, define a *region* or
 selection that other commands can use. This region begins with the line
 with the *@* mark and includes all the lines up to (but not including) the
 current line, dot.
@@ -335,12 +335,11 @@ unlike classic *ed*.
 **ed.py** has a Python API so you can edit from the Python prompt or
 write editing scripts in Python.
 
-A convenient way to use the API is to start *ed.py* with the Python *-i* option
-as described above, edit some text using *ed* commands, then exit using the *q* 
-or *Q* command
-to return to the Python prompt.
-Then all the buffer contents that you entered in *ed* are still in memory for you to work on
-with the API.
+A convenient way to use the API is to start *ed.py* with the Python *-i*  
+option as described above, edit some text using *ed* commands, then exit  
+using the *q* or *Q* command to return to the Python prompt. Then all the  
+buffer contents that you entered in *ed* are still in memory for you to  
+work on with the API.
 
 Here is the preceding example expressed using the API.
 We import the *ed* module at the Python command, so we have to prefix each
