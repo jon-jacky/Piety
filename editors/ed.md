@@ -297,7 +297,7 @@ selection that other commands can use. This region begins with the line
 with the *@* mark and includes all the lines up to (but not including) the
 current line, dot.
 
-Our *ed.py* provides the new *[* address range to indicate the region from
+**ed.py** provides the new *[* address range to indicate the region from
 mark to dot.
 
 The *e* and *E* commands only work in the *main* buffer.
@@ -335,10 +335,10 @@ unlike classic *ed*.
 **ed.py** has a Python API so you can edit from the Python prompt or
 write editing scripts in Python.
 
-A convenient way to use the API is to start *ed.py* with the Python *-i*  
-option as described above, edit some text using *ed* commands, then exit  
-using the *q* or *Q* command to return to the Python prompt. Then all the  
-buffer contents that you entered in *ed* are still in memory for you to  
+A convenient way to use the API is to start *ed.py* with the Python *-i*
+option as described above, edit some text using *ed* commands, then exit
+using the *q* or *Q* command to return to the Python prompt. Then all the
+buffer contents that you entered in *ed* are still in memory for you to
 work on with the API.
 
 Here is the preceding example expressed using the API.
