@@ -190,7 +190,7 @@ A percent sign *%* in the *R* (readonly) column indicates that
 buffer is read-only.  An asterisk * in the *M* (modified) column
 indicates the buffer contains unsaved changes.  The buffer size
 is given in lines (not characters). At this time
-the only mode we provide is *Text*.
+the only mode we provide is *Text* and there are no read-only buffers.
 
 A buffer can have a file name, the file where buffer contents
 are written by a *w* (write) command with no parameter.
@@ -299,6 +299,9 @@ current line, dot.
 
 **ed.py** provides the new *[* address range to indicate the region from
 mark to dot.
+
+(The *edsel* display editor, which is based on *ed.py*, provides commands  
+that set the mark and use the region defined by mark and dot.)
 
 The *e* and *E* commands only work in the *main* buffer.
 In *sam*, the *e* command works in any buffer.
