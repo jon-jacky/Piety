@@ -212,7 +212,7 @@ class Window(object):
         """
         i = -1
         for i, line in enumerate(self.buf.lines[first:last+1]):
-            display.putstr(line.rstrip()[:self.ncols]) # remove \n, truncate
+            display.putstr(line.rstrip('\n')[:self.ncols]) # truncate
             display.kill_line()
             display.next_line()
         return i+1 # fewer than first:last+1 when at end of buffer

@@ -173,7 +173,7 @@ class Buffer(object):
         prev_dot = self.dot
         self.dot = iline
         view.update(Op.locate, buffer=self,origin=prev_dot,destination=iline)
-        return (self.lines[iline]).rstrip() # strip trailing \n
+        return (self.lines[iline]).rstrip('\n')
 
     # adding, changing, and deleting text
 

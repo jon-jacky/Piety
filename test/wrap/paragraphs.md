@@ -8,25 +8,23 @@ Here is a paragraph typed into edsel, typing RETURN at about
 more more more more more more more more more more even more
 more more more more more more more moer more more yet more.
 
-In the source text, the preceding paragraph has lines that end with
-... about
-... still more
-... even more
-... yet more
+In the source text, the preceding paragraph has lines that end with the words:
+... about  
+... still more  
+... even more  
+... yet more  
 
-In the source text, every line in the preceding paragraph ends with two spaces
+In the source text, every line in the preceding paragraph ends with two spaces.
 in order to force line breaks.
+This is a little-known (to me) feature provided by github markdown.
 
-But the edsel cursor, when sent to the end of the line, does not show the two spaces.
-and !ed.buf.lines[10:15] shows each has no trailing blanks - edsel code
-must trim them off!
-
-This paragraph was typed with lines exceeding 80 characters, then used the
-edsel [J command to wrap the text to the old default width, 80 characters. More
-more more more more more more more more more more more more more more more more
-more more more more more more more more more more more still more more more
-more more more more more more more more more more more more more more more more
-even more
+This paragraph was typed with lines exceeding 80 characters, 1 
+then used the edsel [J command with a parameter to wrap the text 2
+to 65 characters, then marked the end of each line with digits 3
+1..7 More more more more more more more more more more more more 4  
+more more more more more more more more more more more more more 5
+more more more still more more more more more more more more 6
+more more more more more more more more more more more even more 7
 
 This paragraph was typed with lines exceeding 80 characters, and was left with the extra long lines.
 More more more more more more more more more more more more more more more more more more more still more

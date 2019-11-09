@@ -26,7 +26,7 @@ class Console(console.Console):
     def accept_command(self):
         if self.line == 'C': # C command, change to display mode
             print() # advance line in command region
-            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip())
+            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip('\n'))
         else:
             super().accept_command()
 
@@ -67,7 +67,7 @@ class Console(console.Console):
         with its prefix, append suffix after line at dot.
         """
         prefix = self.line[:self.point]
-        suffix = self.line[self.point:].rstrip()
+        suffix = self.line[self.point:].rstrip('\n')
         ed.buf.replace(ed.buf.dot, prefix + '\n')
         self.kill_line() # from cursor to end of line
         ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
@@ -87,7 +87,7 @@ class Console(console.Console):
             new_point = len(ed.buf.lines[ed.buf.dot-1])-1 # don't count \n
             ed.buf.replace(ed.buf.dot, self.line)
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
-            self.line = ed.buf.lines[ed.buf.dot].rstrip()
+            self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
             self.point = new_point
             frame.put_display_cursor(self.start_col + self.point)
         else:
@@ -98,7 +98,7 @@ class Console(console.Console):
         if ed.buf.dot < ed.buf.nlines():
             ed.buf.replace(ed.buf.dot, self.line)
             ed.buf.j(ed.buf.dot, ed.buf.dot+1)
-            self.line = ed.buf.lines[ed.buf.dot].rstrip()
+            self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
             frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
@@ -117,7 +117,7 @@ class Console(console.Console):
         if check.iline_ok(ed.buf, iline):
             ed.buf.replace(ed.buf.dot, self.line + '\n')
             ed.buf.l(iline)
-            line = ed.buf.lines[ed.buf.dot].rstrip()  # FIXME? [iline] - ?
+            line = ed.buf.lines[ed.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(self.start_col + self.point)
@@ -235,7 +235,7 @@ class Console(console.Console):
         'Move cursor to other window, next in sequence.'
         ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
         edda.do_window_command('') # reassign win, ed.buf, call update(Op.next)
-        self.line = ed.buf.lines[ed.buf.dot].rstrip() # from several methods
+        self.line = ed.buf.lines[ed.buf.dot].rstrip('\n') # from several methods
         # From set_display_mode
         self.point = 0
         self.start_col = 1
@@ -277,14 +277,14 @@ class Console(console.Console):
             self.stop()
         else:
             terminal.set_char_mode() # resume inline editing
-            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip())
+            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip('\n'))
 
     def cancel_edsel_command(self):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         self.move_beginning()
         self.kill_line()
-        self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip()) # strip \n at eol
+        self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip('\n'))
 
     def crash(self):
         'For now, just crash' # FIXME - not used, ^K is now console kill line
