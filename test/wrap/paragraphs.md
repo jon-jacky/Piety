@@ -84,6 +84,25 @@ but wrapped:
 Notice how the two blank lines at the end of each line were preserved
 in the wrapped text.
 
+This next paragraph is filled by the new code that puts *one* trailing
+blank at the end of each line (so some lines might exceed fill_column)
 
+This paragraph was typed with lines exceeding 80 characters, and 
+was left with the extra long lines. More more more more more more 
+more more more more more more more more more more more more more 
+still more More more more more more more more more more more more 
+more more more more more more more more even more mire more more 
+more more more more more more more more more more more more more 
+more more more still more
 
+Here is a very very long line, then the line wrapped with J, then 
+joined again with [j
+
+more more more more more more more more even more mire more more more more more more more more more more more more more more more more more more still more
+
+more more more more more more more more even more mire more more 
+more more more more more more more more more more more more more 
+more more more still more
+
+more more more more more more more more even more mire more more more more more more more more more more more more more more more more more more still more
 
