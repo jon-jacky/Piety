@@ -44,7 +44,46 @@ more more more more more more more more more more even more mire
 more more more more more more more more more more more more more  
 more more more more more still more 
 
-Oh, our [J wrap left two blank lines at the end of each line above!
+Oh, our homemade [J wrap left two blank lines at the end of each line above!
+
+The following paragraph is a cut-pasted copy of the preceding one, 
+but with initial indent 6 lines, then wrapped using [J with fill_column = 75,
+and using Python textwrap.fill() 
+
+      This paragraph was typed with lines exceeding 80 characters, and
+      was left with the extra long lines. More more more more more   more
+      more more more more more more more more more more more more   more
+      still more More more more more more more more more more   more more
+      more more more more more more more more even more mire   more more
+      more more more more more more more more more more more   more more
+      more more more still more
+
+This paragraph is similar but with no initial indent and fill_column 69,
+to get the line breaks in the same places.
+
+This paragraph was typed with lines exceeding 80 characters, and
+was left with the extra long lines. More more more more more   more
+more more more more more more more more more more more more   more
+still more More more more more more more more more more   more more
+more more more more more more more more even more mire   more more
+more more more more more more more more more more more   more more
+more more more still more
+
+This paragraph is inside an item so it should be indented, 
+but wrapped:
+
+- This is the header, the rest has 2 char indent and fill_column 71
+  This paragraph was typed with lines exceeding 80 characters, and
+  was left with the extra long lines. More more more more more   more
+  more more more more more more more more more more more more   more
+  still more More more more more more more more more more   more more
+  more more more more more more more more even more mire   more more
+  more more more more more more more more more more more   more more
+  more more more still more
+
+Notice how the two blank lines at the end of each line were preserved
+in the wrapped text.
+
 
 
 

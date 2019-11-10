@@ -3,7 +3,7 @@ buffer.py - Buffer class for line-oriented text editors.
             The text in each buffer is a list of strings.
 """
 
-import os.path, re
+import os.path, re, textwrap
 from enum import Enum
 import view
 from updates import Op, background_task
@@ -235,38 +235,18 @@ class Buffer(object):
 
     def J(self, start, end, fill_column):
         """
-        Replace lines from start to end with wrapped (filled) lines.
+        Replace lines from start through end with wrapped (filled) lines.
         Left margin is first nonblank column in start line.
         Right margin is buf.fill_column, can be assigned by optional parameter.
-        After coding this we found we could have used
-        https://docs.python.org/3/library/textwrap.html
+        alternative algorithms to text.wrap:  http://xxyxyz.org/line-breaking/
         """
         if fill_column:
             self.fill_column = fill_column
-        # set left margin, search region for first nonblank line
-        margin = ''
-        nonblank = False
-        for line in self.lines[start:end+1]:
-            for i, c in enumerate(line):
-                if c != ' ':
-                    margin = line[:i]
-                    nonblank = True
-                    break # break out of line
-            if nonblank:
-                break # break out of start..end
-        # obvious greedy algorithm that can leave very ragged right margin
-        # alternatives:  http://xxyxyz.org/line-breaking/
-        words = ''.join(self.lines[start:end+1]).split() # list of all words
-        filled = '' # string of filled lines, \n at each line break
-        line = margin
-        for word in words:
-            if len(line) + len(word) + 1 <= self.fill_column:
-                line += word + ' '
-            else:
-                filled += line + ' ' + '\n' # wrap long line, put space at eol
-                line = margin + word + ' '  # ... so j (join) can undo J (fill)
-        filled += line + '\n' # last short line
-        self.d(start, end, yank=False) # do not save unfilled lines in cut buffer
+        lines = self.lines[start:end+1]
+        margin = ' ' * (len(lines[0]) - len(lines[0].lstrip()))
+        filled = textwrap.fill(''.join(lines), width=self.fill_column,
+                                initial_indent='', subsequent_indent=margin)
+        self.d(start, end, yank=False)
         self.i(start, filled)
 
     def s(self, start, end, old, new, glbl):
