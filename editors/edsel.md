@@ -124,7 +124,7 @@ These are the dedicated function keys and their commands
 
 It is also possible to edit command lines in the scrolling command
 region.  These control characters behave the same when editing the
-command line: *^A ^B ^D ^E ^F ^H ^I ^J ^K ^T ^U ^Y*.  These function
+command line: *^A ^B ^D ^E ^F ^H ^I ^J ^K ^U ^Y*.  These function
 keys also behave the same on the command line: *bs del left right* and
 *tab*.
 
