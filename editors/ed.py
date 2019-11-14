@@ -454,9 +454,12 @@ def k(*args):
     """
     valid, iline, marker = check.iline_valid(buf, args)
     if valid:
-        c = marker[0]
-        buf.mark[c] = iline
-        print("Mark %s set at line %d in buffer %s" % (c, iline, current))
+        if marker:
+            c = marker[0]
+            buf.mark[c] = iline
+            print("Mark %s set at line %d in buffer %s" % (c, iline, current))
+        else:
+            print("No mark")
 
 # command functions: control, debugging, etc.
 
