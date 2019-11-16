@@ -2,7 +2,23 @@
 display - Update the terminal display using ANSI control sequences.
 """
 
-import util # util.putstr writes w/o newline, flushes for immediate output
+
+# This putstr always writes to display even when stdout is redirected
+
+import os
+
+ttyname = os.ctermid() # usually returns '/dev/tty'
+tty = open(ttyname, 'w')
+
+# Differs from util.putstr which writes to stdout and might be redirected
+def putstr(s):
+    """
+    Print string (can be just one character) on display with no
+    formatting (unlike plain Python print).  Flush to force output immediately.
+    If you want newline, you must explicitly include it in s.
+    Always print to tty (terminal) device even when stdout is redirected.
+    """
+    print(s, end='', flush=True, file=tty)
 
 esc = '\x1B'     # \e does not work 'invalid \x escape'
 csi = esc+'['    # ANSI control sequence introducer
@@ -43,64 +59,59 @@ def render(text, *attributes):
     Print text with one or more attributes, each given by separate int arg,
     then clear attributes, but do not print newline.
     """
-    util.putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+    putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 # used by line
 
 def insert_char(key):
     'Insert character in front of cursor'
-    util.putstr((ich % 1) + key) # open space to insert char
+    putstr((ich % 1) + key) # open space to insert char
 
 def insert_string(string):
-    util.putstr((ich % len(string)) + string)
+    putstr((ich % len(string)) + string)
 
 def delete_char():
     'Delete character under the cursor'
-    util.putstr(dch % 1)
+    putstr(dch % 1)
 
 def backward_delete_char():
     'Delete character before cursor'
-    util.putstr(cub + dch % 1)
+    putstr(cub + dch % 1)
 
 def forward_char():
-    util.putstr(cuf) # move just one char
+    putstr(cuf) # move just one char
 
 def backward_char():
-    util.putstr(cub)
+    putstr(cub)
 
 def move_to_column(column):
-    util.putstr(cha % column)
+    putstr(cha % column)
 
 # line also uses kill_line, defined below
 
 # used by edsel and window, they also use render (above)
 
 def erase(): # erase_display in gnu readline
-    util.putstr(ed)
+    putstr(ed)
 
 def put_cursor(line, column):      # not in emacs or gnu readline
-    util.putstr(cup % (line, column))
+    putstr(cup % (line, column))
 
 def kill_line():
     'Erase from cursor to end of line'
-    util.putstr(el_end)
+    putstr(el_end)
 
 def kill_whole_line():
     'Erase entire line'
-    util.putstr(el_all)
+    putstr(el_all)
 
 def set_scroll(ltop, lbottom):
     'Set scrolling region to lines ltop through lbottom (line numbers)'
-    util.putstr(decstbm % (ltop, lbottom))
+    putstr(decstbm % (ltop, lbottom))
 
 def set_scroll_all():
     'Set scrolling region to entire display'
-    util.putstr(decstbmn)
-
-# provide util.putstr here so clients don't also have to import util
-def putstr(string):
-    'Print string on console with no formatting (unlike plain Python print)'
-    util.putstr(string)
+    putstr(decstbmn)
 
 def put_render(line, column, text, *attributes):
     """
@@ -108,8 +119,8 @@ def put_render(line, column, text, *attributes):
     but without newline, then clear attributes.
     """
     put_cursor(line, column)
-    util.putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
+    putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
 
 def next_line():
     'replacement for print() in terminal char mode, explicitly sends \n\r'
-    util.putstr('\n\r')
+    putstr('\n\r')
