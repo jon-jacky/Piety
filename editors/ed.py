@@ -280,10 +280,9 @@ def n(*args):
     print_buffers()
 
 def N(*args):
-    """
-    Print information about all buffers in new *Buffers* buffer
-    """
-    create_buf('*Buffers*')
+    'Print information about all buffers in *Buffers* buffer'
+    b('*Buffers*')
+    d(1,S())
     with redirect_stdout(buf):
         print_buffers()
 
