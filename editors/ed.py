@@ -4,6 +4,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 
 import re, os, sys
 from enum import Enum
+from contextlib import redirect_stdout
 import parse, check, buffer, view
 from updates import Op
 
@@ -265,26 +266,26 @@ def A(*args):
     else:
         print('? invalid address')
 
-def n(*args):
+def print_buffers():
     """
-    Print information about all buffers.
-    Print on console or in buffer named in optional parameter.
+    Print information about all buffers on stdout.
+    Called by n to print on stdout, called by N with redirection
     """
-    _, _, bufname, _ = parse.arguments(args)
-    if bufname:
-        match_prefix(bufname, buffers)
-        if bufname in buffers:
-            destination = buffers[bufname]
-        else:
-            print('? buffer name')
-            return
-    else:
-        destination = sys.stdout
-    print('CRM Buffer            Lines  Mode     File',  # Current Readonly Modified
-            file=destination)
+    print('CRM Buffer            Lines  Mode     File')  # Current Readonly Modified
     for name in buffers:
-        print(('.' if name == current else ' ') + buffers[name].info(),
-                file=destination)
+        print(('.' if name == current else ' ') + buffers[name].info())
+
+def n(*args):
+    'print information about all buffers on stdout'
+    print_buffers()
+
+def N(*args):
+    """
+    Print information about all buffers in new *Buffers* buffer
+    """
+    create_buf('*Buffers*')
+    with redirect_stdout(buf):
+        print_buffers()
 
 # command functions: displaying and navigating text
 
