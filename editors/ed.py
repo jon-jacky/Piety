@@ -327,12 +327,8 @@ def z(*args):
     global npage
     valid, iline, npage_string = check.iline_valid(buf, args)
     if valid:
-        if npage_string:
-            try:
-                npage = int(npage_string)
-            except:
-                print('? integer expected at %s' % npage_string)
-                return
+      valid, npage = check.iparam(npage_string, npage)
+      if valid:
         if npage >= 0:
             if not args or isinstance(args[0],str): # args[0] might be npage
                 iline = buf.dot + 1
@@ -379,15 +375,34 @@ def J(*args):
     'Replace lines from start to end with wrapped (filled) lines'
     valid, start, end, param, _ = check.irange(buf, args)
     if valid:
-        if param:
-            try:
-                fill_column = int(param)
-            except:
-                print('? integer expected at %s' % param)
-                return
-        else:
-            fill_column = 0
-        buf.J(start, end, fill_column)
+        valid, fill_column = check.iparam(param, 0)
+        if valid:
+            buf.J(start, end, fill_column)
+
+# used for both indent and outdent
+indent = 4
+
+def I(*args):
+    'Indent lines, optional parameter assigns N of indent/outdent spaces'
+    global indent
+    valid, start, end, param, _ = check.irange(buf, args)
+    if valid:
+        valid, indent = check.iparam(param, indent)
+        if valid:
+            buf.I(start, end, indent)
+            view.update(Op.mutate, buffer=buf, origin=start,
+                        start=start, end=end, destination=end)
+    
+def M(*args):
+    'Outdent lines, optional parameter assigns N of indent/outdent spaces'
+    global indent
+    valid, start, end, param, _ = check.irange(buf, args)
+    if valid:
+        valid, indent = check.iparam(param, indent)
+        if valid:
+            buf.M(start, end, indent)
+            view.update(Op.mutate, buffer=buf, origin=start,
+                        start=start, end=end, destination=end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'

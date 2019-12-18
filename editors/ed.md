@@ -118,9 +118,9 @@ lost and it is no longer possible to resume the session.
 
  *b B D n*
 
-**ed.py** adds a new *wrap* command:
+**ed.py** add new *wrap*, *indent*, and *outdent* commands:
 
- *J*
+ *J I M*
 
 **ed.py** supports these line address forms from classic *ed*:
 
@@ -284,6 +284,12 @@ a parameter to the *J* command, which then remains in effect in that
 buffer only until it is reassigned again. The left margin of all the
 wrapped lines is the made the same as the left margin of the first line in
 the selection.
+
+**ed.py** provides the new *I* and *M* commands to ident and outdent the 
+selected lines.  The default is dot, the current line.   The default 
+indent and outdent are four spaces, but can be changed by an optional 
+integer parameter to either command, which then applies to all subsequent 
+indents and outdents until it is reassigned again.
 
 **ed.py** always prints the error message following the *?* character.
 There is no way to suppress printing the error messages as in classic

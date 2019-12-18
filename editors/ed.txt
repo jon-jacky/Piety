@@ -42,12 +42,14 @@ Commands from sam:
 New commands in ed.py only:
 
  J wrap lines
+ I indent lines
+ M outdent lines
 
 Line addresses from ed:
 
  . current line, called dot (default for most commands)
  $ last line
- 'c line marked with label c by k command
+ 'c line marked with label c by k command, c can be @
  <n> (number) line number (starting at 1 not 0)
  +<n> n lines after dot
  -<n> n lines before dot

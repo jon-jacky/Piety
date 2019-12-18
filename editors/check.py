@@ -38,6 +38,21 @@ def range_ok(buf, start, end):
 # The following functions check arguments, replace missing args with defaults, 
 # and print error messages.
 
+def iparam(s, default):
+    """
+    Return string s converted to int, if s is empty return default
+    First returned value is False if nonempy s does not convert to int
+    """
+    if s:
+        try:
+            i = int(s)
+            return True, i
+        except:
+            print('? integer expected at %s' % s)
+            return False, default
+    else:
+        return True, default
+
 def line_valid(buf, ok0, args):
     'check if iline in args is valid, if so return it along with any param'
     iline, _, param, _ = parse.arguments(args)

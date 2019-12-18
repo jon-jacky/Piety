@@ -250,6 +250,14 @@ class Buffer(object):
         self.d(start, end, yank=False)
         self.i(start, filled)
 
+    def I(self, start, end, indent):
+        'Indent lines, add indent leading spaces'
+        self.lines[start:end+1] = [ ' '*indent + l for l in self.lines[start:end+1]]
+
+    def M(self, start, end, outdent):
+        'Outdent lines, remove leading outdent chars'
+        self.lines[start:end+1] = [ l[outdent:] for l in self.lines[start:end+1]]
+
     def s(self, start, end, old, new, glbl):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,
