@@ -2,7 +2,6 @@
 display - Update the terminal display using ANSI control sequences.
 """
 
-
 # This putstr always writes to display even when stdout is redirected
 
 import os

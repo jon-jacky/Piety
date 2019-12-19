@@ -4,7 +4,8 @@ wyshka.py - Shell that can alternate between pysh (Python)
             such as ed.  You can use Python without leaving the application.
 """
 
-import pysh
+import pysh, ed, buffer, display
+from contextlib import redirect_stdout
 
 # globals reassigned by shell _process_line below
 python_mode = False
@@ -34,28 +35,61 @@ def shell(process_line=(lambda line: None), command_mode=(lambda: True),
     def _process_line(line):
         global python_mode, prompt
         if command_mode():
+
+            # set up redirect
+            prefix = ''
+            if line and line[0] in '!:':
+                prefix = line[0]
+                line = line[1:]
+            tokens = line.split()            
+            if tokens and tokens[0] in '>>':
+                rewrite = True if tokens[0] == '>' else False
+                if len(tokens) > 2:
+                    bufname = tokens[1]
+                    if bufname in ed.buffers:
+                        buf = ed.buffers[bufname]
+                        if rewrite:
+                            buf.d(1, buf.nlines()) 
+                        else: # append
+                            buf.dot = buf.nlines()
+                    else:
+                        ed.buffers[bufname] = buffer.Buffer(bufname)
+                    dest = ed.buffers[bufname] 
+                    ed.b(bufname)
+                    line = prefix + ' '.join(tokens[2:])
+                else:
+                    print('? > <buffer name> <command>')
+            else:
+                dest = display.tty
+                line = prefix + line
+
+            # process line with redirect            
             if python_mode:
                 if len(line) > 1 and line[0] == ':':
-                    process_line(line[1:])
+                    with redirect_stdout(dest):
+                        process_line(line[1:])
                 elif line == ':':
                     python_mode = False
                 else:
-                    pysh.push(line)
+                    with redirect_stdout(dest):
+                        pysh.push(line)
             else: # not python_mode
                 if len(line) > 1 and line[0] == '!':
-                    pysh.push(line[1:])
+                    with redirect_stdout(dest):
+                        pysh.push(line[1:])
                 elif line == '!':
                     python_mode = True
                 elif pysh.continuation:
-                    pysh.push(line)
+                    with redirect_stdout(dest):
+                        pysh.push(line)
                 else: 
-                    process_line(line)        
+                    with redirect_stdout(dest):
+                        process_line(line)
         else: # not command_mode()
             process_line(line)
         prompt = pysh.prompt if python_mode else command_prompt()
         return 
     return _process_line
-
 
 if __name__ == '__main__':
 
