@@ -188,19 +188,23 @@ discusses many of the same OS that we show in this table, and others as well.
 
 Many sites provide instructions and examples for building operating
 systems: 
-[CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford),
-[6.828](http://pdos.csail.mit.edu/6.828/2012/xv6.html) (MIT),
+[6.828](http://pdos.csail.mit.edu/6.828/2018/xv6.html) (MIT, Xv6, 2018),
+[CS140e](http://web.stanford.edu/class/cs140e/) (Stanford, RPi+C, 2019),
+[CS140e](https://downey.io/blog/cs140e-writing-an-operating-system-in-rust) (Stanford, RPi+Rust, 2018,
+more on [HN](https://news.ycombinator.com/item?id=16134618),
+[Andre](https://github.com/rust-embedded/rust-raspi3-OS-tutorials) (RPi+Rust, 2019),
+[CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford, 2012),
 [CS194-24](http://www.cs.berkeley.edu/~kubitron/courses/cs194-24-S13/index_lectures.html) (Berkeley),
 [Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
-(Cambridge), 
+(Cambridge, RPi+asm, 2012), 
 [OS from Scratch](http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) (Birmingham, more in [HN](https://news.ycombinator.com/item?id=8380822)),
 [OS Development](http://littleosbook.github.io/), (RIT Stockholm, more on [HN](https://news.ycombinator.com/item?id=13258063)),
  [these](http://news.ycombinator.com/item?id=4834008)
 (CMU, UMD, MIT, Stanford, Harvard),
 [BrokenThorn](http://www.brokenthorn.com/Resources/OSDevIndex.html),
 [bkerndev](http://www.osdever.net/bkerndev/index.php),
-[JamesM](http://www.jamesmolloy.co.uk/tutorial_html/),
-[OSDev.org](http://wiki.osdev.org/), ...
+[JamesM](http://www.jamesmolloy.co.uk/tutorial_html/) ...
+[OSDev.org](http://wiki.osdev.org/) is recommended in many sources.
 
 Here are more links on operating system 
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
