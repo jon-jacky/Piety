@@ -2,6 +2,7 @@
 wyshka.py - Shell that can alternate between pysh (Python)
             and the command line interface to another application program,
             such as ed.  You can use Python without leaving the application.
+            Can also redirect output to text buffer, rewrite or append
 """
 
 import pysh, ed, buffer, display
@@ -36,60 +37,70 @@ def shell(process_line=(lambda line: None), command_mode=(lambda: True),
         global python_mode, prompt
         if command_mode():
 
-            # set up redirect
-            prefix = ''
-            if line and line[0] in '!:':
-                prefix = line[0]
-                line = line[1:]
-            tokens = line.split()            
-            if tokens and tokens[0] in '>>':
-                rewrite = True if tokens[0] == '>' else False
-                if len(tokens) > 2:
-                    bufname = tokens[1]
-                    if bufname in ed.buffers:
-                        buf = ed.buffers[bufname]
-                        if rewrite:
-                            buf.d(1, buf.nlines()) 
-                        else: # append
-                            buf.dot = buf.nlines()
-                    else:
-                        ed.buffers[bufname] = buffer.Buffer(bufname)
-                    dest = ed.buffers[bufname] 
-                    ed.b(bufname)
-                    line = prefix + ' '.join(tokens[2:])
+            # check command line for redirect, prepare destination
+            # allow any amount of whitespace around > and >> 
+            if line.lstrip().startswith('>>'):
+                redirect, rewrite = True, False
+                _, _, line = line.lstrip().partition('>>')
+            elif line.lstrip().startswith('>'):
+                redirect, rewrite = True, True
+                _, _, line = line.lstrip().partition('>')              
+            else:
+                redirect = False
+            if redirect:
+                bufname, _, line = line.lstrip().partition(' ')                
+                # if bufname and/or line are missing now line is ''
+                if not line:
+                    print('? bufname command')
+                    return 
+                if bufname in ed.buffers:
+                    buf = ed.buffers[bufname]
+                    if rewrite:
+                        buf.d(1, buf.nlines()) 
+                    else: # append
+                        buf.dot = buf.nlines()
                 else:
-                    print('? > <buffer name> <command>')
+                    ed.buffers[bufname] = buffer.Buffer(bufname)
+                dest = ed.buffers[bufname] 
+                # do not switch current buffer to dest until after command
             else:
                 dest = display.tty
-                line = prefix + line
 
-            # process line with redirect            
+            # process command line, with possible redirect
+            # allow whitespace before but not after ! and :
             if python_mode:
-                if len(line) > 1 and line[0] == ':':
-                    with redirect_stdout(dest):
-                        process_line(line[1:])
-                elif line == ':':
+                if line.lstrip() == ':':
                     python_mode = False
+                elif line.lstrip().startswith(':'):
+                    with redirect_stdout(dest):
+                        process_line(line.lstrip()[1:])
                 else:
                     with redirect_stdout(dest):
                         pysh.push(line)
             else: # not python_mode
-                if len(line) > 1 and line[0] == '!':
-                    with redirect_stdout(dest):
-                        pysh.push(line[1:])
-                elif line == '!':
+                if line.lstrip() == '!':
                     python_mode = True
+                elif line.lstrip().startswith('!'):
+                    with redirect_stdout(dest):
+                        pysh.push(line.lstrip()[1:])
                 elif pysh.continuation:
                     with redirect_stdout(dest):
                         pysh.push(line)
                 else: 
                     with redirect_stdout(dest):
                         process_line(line)
+            # now switch current buffer 
+            if redirect:
+                ed.b(bufname)
+
         else: # not command_mode()
             process_line(line)
+
         prompt = pysh.prompt if python_mode else command_prompt()
         return 
     return _process_line
+
+# Test
 
 if __name__ == '__main__':
 

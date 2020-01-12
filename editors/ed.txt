@@ -43,7 +43,7 @@ New commands in ed.py only:
 
  J wrap lines
  I indent lines
- M outdent lines
+ O outdent lines
 
 Line addresses from ed:
 

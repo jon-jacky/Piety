@@ -383,7 +383,7 @@ def J(*args):
 indent = 4
 
 def I(*args):
-    'Indent lines, optional parameter assigns N of indent/outdent spaces'
+    'Indent lines, optional parameter assigns n of indent/outdent spaces'
     global indent
     valid, start, end, param, _ = check.irange(buf, args)
     if valid:
@@ -393,8 +393,8 @@ def I(*args):
             view.update(Op.mutate, buffer=buf, origin=start,
                         start=start, end=end, destination=end)
     
-def M(*args):
-    'Outdent lines, optional parameter assigns N of indent/outdent spaces'
+def O(*args):
+    'Outdent lines, optional parameter assigns n of indent/outdent spaces'
     global indent
     valid, start, end, param, _ = check.irange(buf, args)
     if valid:
