@@ -5,8 +5,8 @@ edo.py
 **[edo.py](edo.py)** provides the *[ed.py](ed.md)* line editor with an enhanced
 command line shell, including a Python interpreter
 provided by the *[wyshka](../shells/wyshka.py)* module.  *edo* also
-provides new editor commands for running Python scripts from
-editor buffers or any selected text.
+provides new editor commands for running Python code from
+selected text in any buffer.
 
 This shell and these new commands
 turn *ed.py* into a minimal but self-contained
@@ -14,8 +14,7 @@ Python programming environment.  In *edo*, you can edit modules and
 write them out using *ed* commands, then use the built-in
 Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.  
-Or, you can bypass the file system and run
-Python scripts directly from editor buffers, or execute Python
+Or, you can bypass the file system and run Python
 statements from selected text in any buffer.
 
 **edo.py** also provides a new command *X*
@@ -54,130 +53,13 @@ calling *main()* (or *edo.main()*) at the Python prompt.
 The *wyshka* command line shell used by *edo* provides both the *ed*
 command line and the *pysh* callable Python interpreter.  This makes
 it possible to use the *ed.py* Python API (or any other Python
-statements) without exiting the editor.
+statements) without exiting the editor.  
 
-The shell works like this in *ed* command line mode:
+The *wyshka* shell also provides output redirection.  The output of any
+*ed* or Python command can be sent to a text buffer instead of
+the scrolling command region.
 
-    :<command>       execute ed <command>
-    :!<statement>    push Python <statement> to pysh, return to ed command mode
-    .. <statement>   push Python continuation line <statement> to pysh
-    :!               switch to Python mode
-
-With *edo*, in *!command*, the *command* is passed to the Python
-interpreter, not to the system command shell as in classic *ed*.
-When you type a bare *!* without a command, the command interpreter switches
-to the Python REPL, so you can type a series of Python statements without
-prefixing each with *!*.
-
-The *wyshka* shell works like this in Python mode 
-(the *wyshka* Python prompt is two brackets *>>* to distinguish
-it from the standard Python prompt with three brackets *>>>*):
-
-    >> <statement>   push Python <statement> to pysh
-    .. <statment>    push Python continuation line <statement> to pysh
-    >>:<command>     execute ed <command>, return to pysh interpreter
-    >>:              switch to ed command mode
-
-So you can use *:command* to execute an *ed* *command* without exiting
-Python.  Type a bare *:*  without a command to switch back to the *ed*
-command interpreter.
-
-Here is a sample session that uses *wyshka* to demonstrate both
-the classic *ed* command line and the new *ed.py* Python API:
-
-    Start edo and use ed editing commands.
-
-    Jonathans-MacBook-Pro:editors jon$ python3 -im edo
-    :a
-    line 1
-    line 2
-    .
-    :p
-    line 2
-    :1,$p
-    line 1
-    line 2
-
-    Use the ed Python API at the ed command prompt by prefixing each command with !
-
-    :!ed.a('line A')
-    :!ed.p()
-    line A
-    :!ed.p(1,ed.S())
-    line 1
-    line 2
-    line A
-
-    Switch to the pysh Python prompt by typing ! alone.  Continue using the ed API.
-
-    :!
-    >> ed.a("""line B
-    .. line C
-    .. line D""")
-    >> ed.p()
-    line D
-    >> ed.p(1,ed.S())
-    line 1
-    line 2
-    line A
-    line B
-    line C
-    line D
-
-    Use any other Python statements at the Python prompt.
-
-    >> import datetime
-    >> datetime.datetime.now()
-    datetime.datetime(2018, 1, 31, 20, 51, 50, 275079)
-
-    Use Python to compute arguments to the ed API.
-
-    >> _.__str__()
-    '2018-01-31 20:51:50.275079'
-    >> ed.a(_)
-    >> ed.p()
-    2018-01-31 20:51:50.275079
-    >> ed.a(datetime.datetime.now().__str__())
-    >> ed.p()
-    2018-01-31 20:52:45.504836
-
-    To return to the ed command line, type : alone.
-
-    >> :
-    :p
-    2018-01-31 20:52:45.504836
-    :1,$p
-    line 1
-    line 2
-    line A
-    line B
-    line C
-    line D
-    2018-01-31 20:51:50.275079
-    2018-01-31 20:52:45.504836
-
-    Exit from edo and return to the standard Python prompt.
-
-    :q
-    >>> ^D
-    ...$
-
-You can also run *edo* from an interactive Python session.  Just
-import *edo* and call its *main* function:
-
-    python3 -i
-    ...
-    >>> import edo
-    >>> edo.main()
-    :a
-    ... etc. ...
-    :!ed.a('line A')
-    ... etc. ...
-
-The *edo.py* program accepts the same optional command line arguments
-as *ed.py*, and the *edo* *main* function accepts the same optional arguments
-as the *ed* *main* function.
-
+For more explanation of the shell, see *wyshka.md*.
 
 ## Running Python code ##
 
@@ -296,4 +178,4 @@ The **[edda](edda.md)** display editor imports *edo.py*.
 
 The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
-Revised October 2019
+Revised Jan 2020

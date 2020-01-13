@@ -118,9 +118,9 @@ lost and it is no longer possible to resume the session.
 
  *b B D n*
 
-**ed.py** add new *wrap*, *indent*, and *outdent* commands:
+**ed.py** add new *wrap*, *indent*, *buffers*, and *outdent* commands:
 
- *J I O*
+ *J I N O*
 
 **ed.py** supports these line address forms from classic *ed*:
 
@@ -184,6 +184,8 @@ for example:
       * notes.txt        104528  Text     /users/jon/notes/piety/notes/notes.txt
         main                  1  Text     (no file)
     .   ed.md               335  Text     ed.md
+
+The *N* command writes the same information into a buffer name *Buffers*.
 
 The dot in the *C* (current) column indicates the current buffer.
 A percent sign *%* in the *R* (readonly) column indicates that
@@ -275,6 +277,7 @@ printing the current line after any command).
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
+The new *N* command writes the same information into a buffer named *Buffers*.
 
 **ed.py** provides the new *J* command to wrap text in the selected
 lines.  The default is dot, the current line.  The selected lines
@@ -536,5 +539,5 @@ to be entered at the terminal.
 **[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
-Revised November 2019
+Revised Jan 2020
 
