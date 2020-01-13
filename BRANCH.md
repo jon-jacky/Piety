@@ -2,15 +2,16 @@
 branches
 ========
 
-This is the **redirect** branch.  Provide redirection of command output  
+This is the **redirect** branch.  Provide redirection of command output
 *stdout* to text buffers (instead of the scrolling command region).
-Revise commands in *edo* (and *edsel* etc) for running code from text
+Revise commands in *edo* (and *edsel* etc.) for running code from text
 buffers, begun in *runlines* branch: *R* runs code using *eval*,
 *P* runs code using interactive interpreter *push*.
 Add commands to *ed* (and *edsel* etc.): indent *I* and outdent *O*, 
-wrap lines *J*, and list buffers to the buffer named *Buffer* *B*.
-Add new *ed* address abbreviation *[*, the lines in the
-region from the mark to dot.
+wrap lines *J*, and list buffers to the buffer named *Buffer* *N*.
+Add new *ed* address range abbreviation *[*, the lines in the
+region from the mark to dot (which is usually selected in *edsel*).
+Begun 6 Jul 2019.
 
 Branches recently merged into **master**:
 
@@ -109,4 +110,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Jul 2019
+Revised Jan 2020
+
