@@ -2,9 +2,15 @@
 branches
 ========
 
-This is the **redirect** branch.  Experiment with redirecting output from *stdout*
-to an editor text buffer.  Also, fix bugs in executing code from text
-buffers, code begun in *edsel* and *runlines* branches.  Begun 6 Jul 2019.
+This is the **redirect** branch.  Provide redirection of command output  
+*stdout* to text buffers (instead of the scrolling command region).
+Revise commands in *edo* (and *edsel* etc) for running code from text
+buffers, begun in *runlines* branch: *R* runs code using *eval*,
+*P* runs code using interactive interpreter *push*.
+Add commands to *ed* (and *edsel* etc.): indent *I* and outdent *O*, 
+wrap lines *J*, and list buffers to the buffer named *Buffer* *B*.
+Add new *ed* address abbreviation *[*, the lines in the
+region from the mark to dot.
 
 Branches recently merged into **master**:
 
