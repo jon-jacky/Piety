@@ -2,7 +2,9 @@
 branches
 ========
 
-This is the **redirect** branch.  Provide redirection of command output
+This is the **master** branch.  Branches recently merged into *master*:
+
+-- **redirect**, merged 13 Jan 2020.  Provide redirection of command output
 *stdout* to text buffers (instead of the scrolling command region).
 Revise commands in *edo* (and *edsel* etc.) for running code from text
 buffers, begun in *runlines* branch: *R* runs code using *eval*,
@@ -12,8 +14,6 @@ wrap lines *J*, and list buffers to the buffer named *Buffer* *N*.
 Add new *ed* address range abbreviation *[*, the lines in the
 region from the mark to dot (which is usually selected in *edsel*).
 Begun 6 Jul 2019.
-
-Branches recently merged into **master**:
 
 - **runlines**, merged 4 Jul 2019.  Execute the current selection
 (from mark to dot) with the Python interpreter, in display editing mode with
