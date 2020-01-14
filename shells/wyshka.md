@@ -155,6 +155,12 @@ to the end, use the *>>* redirection symbol instead:
  
     >> bufname command
 
+Redirection works in both application command mode (after the *:* prompt) and 
+Python mode (after the *>>* prompt).
+The *command* can begin with *!* to use (and redirect) a Python command
+while in application mode, or *:* to use (and redirect) an application
+command while in Python mode.
+
 ## Related programs ##
 
 The *wyshka* shell is provided by the *edo* and *edna* line editors,
