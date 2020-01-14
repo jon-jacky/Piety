@@ -18,6 +18,9 @@ Callable Python shells
 
 - **wyshka.py**: Shell that can alternate between *pysh* (Python) and
   the command line interface to another application program, such as
-  *ed*.  You can use Python without leaving the application.
+  *ed*.  You can use Python without leaving the application.  This shell
+  can also redirect command output from the application or from Python
+  to a text buffer instead of the terminal.
 
-Revised Jan 2018
+Revised Jan 2020
+
