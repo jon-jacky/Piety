@@ -4,7 +4,7 @@ branches
 
 This is the **master** branch.  Branches recently merged into *master*:
 
--- **redirect**, merged 13 Jan 2020.  Provide redirection of command output
+- **redirect**, merged 13 Jan 2020.  Provide redirection of command output
 *stdout* to text buffers (instead of the scrolling command region).
 Revise commands in *edo* (and *edsel* etc.) for running code from text
 buffers, begun in *runlines* branch: *R* runs code using *eval*,
