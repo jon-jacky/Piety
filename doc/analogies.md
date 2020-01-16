@@ -31,7 +31,7 @@ This is how some traditional operating system contructs are realized in Piety:
 
 - **task**: In Piety, a collection of functions (or methods or
 any other callables) that can be invoked by a single kind of event
-(keyboard input, or timer expires, etc.).  In Piety, functions that
+(keyboard input, periodic timer, etc.).  In Piety, functions that
 are invoked by events are called *handlers*.  Piety runs an *event
 loop* that detects events and invokes their handlers.  Each handler
 should be *non-blocking*; it should exit promptly before the next
@@ -89,7 +89,7 @@ input.  A terminal session can include several console jobs.
     terminal.
 
 - **background job**: the job that will resume when the foreground job
-    exits or is suspended.  In a terminal session, the shell is
+    exits or is suspended.  In a terminal session, a shell is
     usually the background job when another application is running.
 
 - **shell**: In Piety, a console job that provides a Python REPL
@@ -97,9 +97,12 @@ input.  A terminal session can include several console jobs.
 command language.  However, the standard Python interpreter cannot
 serve as the Piety shell because it blocks while waiting for the
 next statement, which would prevent other tasks from running.  Piety
-provides a callable Python shell named *pysh*
+provides a simple callable Python shell named *pysh*
 (rhymes with *fish*), along with [modules](../shells/README.md)
-that adapt it to run in Piety sessions.
+that adapt it to run in Piety sessions.  Piety also provides a more
+elaborate shell named *wyshka* that makes it easy to alternate between Python
+and an application command language, and provides redirection the output of
+any Python or application command.
 
 - **memory management**: including allocation and reclamation (that is,
 garbage collection).  Provided by Python language runtime.
@@ -125,14 +128,10 @@ directly from these buffers so they don't need to be saved in the host
 file system. (Not yet implemented)
 
 - **i/o redirection**: In Piety, redirecting the output of
-a task to some text buffer.  We will do this by reassigning the
-*print* function or the *sys.stdout* variable.  This should work
-because we use cooperative multitasking, and we do not have true
-parallelism.  Therefore we can always explicitly reassign *print* and
-*stdout* when we start each handler.  (Not yet implemented)
+a task to some text buffer.  Redirection is provided by the *wyshka* shell.
 
-- **desktop, window manager**: Our display editor *edsel* and its
-derivatives *desoto* and *eden* provide multiple tiled windows in a
+- **desktop, window manager**: Our display editors *edda* and *edsel*
+provide multiple tiled windows in a
 single terminal, where each window displays (part of) the contents of
 a text buffer.  The display module *frame* used by these editors does
 not depend on *edsel* or any other application so it is in effect a
