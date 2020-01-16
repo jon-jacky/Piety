@@ -101,7 +101,7 @@ provides a simple callable Python shell named *pysh*
 (rhymes with *fish*), along with [modules](../shells/README.md)
 that adapt it to run in Piety sessions.  Piety also provides a more
 elaborate shell named *wyshka* that makes it easy to alternate between Python
-and an application command language, and provides redirection the output of
+and an application command language, and provides redirection of the output of
 any Python or application command.
 
 - **memory management**: including allocation and reclamation (that is,
