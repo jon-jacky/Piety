@@ -163,5 +163,5 @@ The operating system that Piety resembles the most is
 multitasking, uses a text buffer class as a building block, and uses a
 multiwindow text editor as its desktop and system shell.
 
-Revised Mar 2019
+Revised Jan 2020
 
