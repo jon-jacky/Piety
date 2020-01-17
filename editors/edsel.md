@@ -6,16 +6,17 @@ edsel
 
 **edsel** is a display editor in pure Python.
 
-**edsel** provides all of the commands of the line editor [ed.py](ed.md) and
-the simpler display editor [edda](edda.md).
-It also provides the built-in Python shell and scripting provided
-by [edo.py](../editors/edo.md).
-*edsel* adds a display editing mode that inserts or deletes printing characters
-anywhere, and uses display commands bound to control characters to move the cursor and to
-select, cut, and paste text.
+**edsel** provides all of the commands of the line editor [ed.py](ed.md) 
+and the simpler display editor [edda](edda.md).  *edsel* adds a display 
+editing mode that inserts or deletes printing characters anywhere, and 
+uses display commands bound to control characters to move the cursor and 
+to select, cut, and paste text.
 
-The built-in Python shell turns *edsel* into a minimal but self-contained
-Python programming environment.  *edsel* divides the screen
+**edsel** provides the [wyshka](../shells/wyshka.md) shell, which provides 
+easy access to both  Python and the editor command language, as well as 
+redirection and scripting.
+
+**edsel** divides the screen
 to show one or more editor windows at the top, and a
 command interpreter for editor commands or Python at the
 bottom.  You can edit modules and write them out, then use the
@@ -24,6 +25,11 @@ and inspect and update their data structures.
 Or, you can bypass the file system and run
 Python scripts directly from editor buffers, or execute Python
 statements from selected text in any buffer.
+
+**edsel** serves as the programmers' user interface to the 
+Piety system.   By providing text editing, a shell and a 
+window manager, it comprises a minimal but self-contained Python 
+programming environment.
 
 ## Running edsel ##
 
@@ -270,5 +276,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Nov 2019
+Revised Jan 2020
 

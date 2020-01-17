@@ -4,6 +4,11 @@ editors
 
 Text editors, including a line editor *ed.py* and a display editor *edsel*.
 
+The display editor *edsel* serves as the programmers' user interface to the 
+Piety system.   In addition to text editing, it also provides a shell and 
+window manager.   It comprises a minimal but self-contained Python 
+programming environment.
+
 There are several editors here, a series of experiments beginning with *ed.py*
 and culminating in *edsel*.  We expect to use *edsel* most of the time, but are
 keeping the intermediate experiments as well.
@@ -96,4 +101,4 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised May 2019
+Revised Jan 2020
