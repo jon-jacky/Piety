@@ -2,7 +2,20 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into *master*:
+This is the **flatten** branch:
+
+- **flatten**.  Simplify display updates in *frame* and its clients. 
+Replace its large  *update*  function with each of its many nested cases 
+turned into a  separate small function, whose name is the same as the *Op* 
+*Enum* value that was used to select that case.  Each function has just 
+the  minimum of positional arguments it needs,  instead of many optional 
+keyword  arguments.  Remove the *updates* module with its *Op* enum; they 
+are no longer needed to select cases.  Remove the *view* module with its 
+no-op *update* function that suppresses output when no display, instead just 
+have a  boolean variable and explicitly guard *import frame* and each call 
+to a  *frame* display function.  Begun 17 Jan 2020.
+
+Branches recently merged into *master*:
 
 - **redirect**, merged 13 Jan 2020.  In the *wyshka* shell, 
 provide redirection of command output
