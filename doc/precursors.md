@@ -122,7 +122,10 @@ Here are some examples.
 | [Python OS Project (POP)](http://python-os.info/en/) | P | 2009  | Python | Native OS | Linux | "Fun ... easy to modify OS" "Dominate desktop OS market!" |
 | [raspi+python+ipython](http://www.pythononwheels.org/post/blog) | P | 2013 | Python | Native OS | Linux (Raspian) on Raspberry Pi | "using [IPython as a shell](http://transneptune.net/2009/06/16/ipython-as-your-default-shell/) ... works on any Linux" |
 | [Micro Python](http://micropython.org/), also [github](https://github.com/micropython/micropython) and [wiki](https://github.com/micropython/micropython/wiki) and [differences](https://github.com/micropython/micropython/wiki/Differences) and [library](https://github.com/micropython/micropython-lib) and [kickstarter](http://www.kickstarter.com/projects/214379695/micro-python-python-for-microcontrollers) and [interview](http://hackaday.com/2013/11/27/interview-with-damien-george-creator-of-the-micro-python-project/) and [linux](https://mail.python.org/pipermail/python-list/2014-June/673020.html) and [video](http://www.youtube.com/watch?v=hmGISrwPtyA) and [slides](http://micropython.org/static/resources/pyconuk14-mpinternals.pdf) and [caveats](https://news.ycombinator.com/item?id=7841983) | P | 2013 -- | Python 3 | Bare machine, native OS  | "32-bit ARM with the Thumb v2 instruction set, such as Cortex M. ... tested on an STM32F405 chip", Linux | "complete rewrite, from scratch, of Python. ...  includes a complete parser, compiler, virtual machine, runtime system, garbage collector and support libraries to run on a microcontroller." |
-| [PylotOS](https://www.sra.uni-hannover.de/People/naumann/2018_master_naumann.pdf), also [here](https://www.stefannaumann.de/static/resources/2017-12-mpy.pdf), [via](https://www.stefannaumann.de/)  | S | 2018 | Python | Bare machine | Raspberry Pi Zero, with Micro Python | "In PylotOS the domain concept is the equivalent to processes ... Domains cannot share any state or information with other domains." -- How !? |
+| [pyv6](https://github.com/jtauber/pyv6/tree/master/pyv6) | P | 2013 | Python | Native OS | any with Python? | "a wild attempt to port xv6 to Python" | 
+| [PylotOS](https://www.sra.uni-hannover.de/People/naumann/2018_master_naumann.pdf), also [here](https://www.stefannaumann.de/static/resources/2017-12-mpy.pdf), [via](https://www.stefannaumann.de/)  | S  | 2018 | Micro Python | Bare machine | Raspberry Pi Zero | "In PylotOS the domain concept is the equivalent to processes ... Domains cannot share any state or information with other domains." -- How !? |
+| [Kernel module](https://medium.com/@yon.goldschmidt/running-python-in-the-linux-kernel-7cbcbd44503c) also 
+[github](https://github.com/Jongy/micropython/tree/linux-kernel/ports/linux-kernel) | P | 2019 | Micro Python | Native OS | Linux | "port of MicroPython that runs as a Linux kernel module."  |
 
 Key to **T** (project **Type**) column, perhaps an indicator of
 project size and longevity:
@@ -188,15 +191,16 @@ discusses many of the same OS that we show in this table, and others as well.
 
 Many sites provide instructions and examples for building operating
 systems: 
-[6.828](http://pdos.csail.mit.edu/6.828/2018/xv6.html) (MIT, Xv6, 2018),
-[CS140e](http://web.stanford.edu/class/cs140e/) (Stanford, RPi+C, 2019),
-[CS140e](https://downey.io/blog/cs140e-writing-an-operating-system-in-rust) (Stanford, RPi+Rust, 2018,
+[6.S081](https://pdos.csail.mit.edu/6.828/2019/index.html) (MIT, xv6 RISC-V, 2019),
+[6.828](http://pdos.csail.mit.edu/6.828/2018/xv6.html) (MIT, xv6 x86, 2018),
+[CS140e](http://web.stanford.edu/class/cs140e/) (Stanford, RPi C, 2019),
+[CS140e](https://downey.io/blog/cs140e-writing-an-operating-system-in-rust) (Stanford, RPi Rust, 2018,
 more on [HN](https://news.ycombinator.com/item?id=16134618),
-[Andre](https://github.com/rust-embedded/rust-raspi3-OS-tutorials) (RPi+Rust, 2019),
+[Andre](https://github.com/rust-embedded/rust-raspi3-OS-tutorials) (RPi Rust, 2019),
 [CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford, 2012),
 [CS194-24](http://www.cs.berkeley.edu/~kubitron/courses/cs194-24-S13/index_lectures.html) (Berkeley),
 [Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
-(Cambridge, RPi+asm, 2012), 
+(Cambridge, RPi asm, 2012), 
 [OS from Scratch](http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) (Birmingham, more in [HN](https://news.ycombinator.com/item?id=8380822)),
 [OS Development](http://littleosbook.github.io/), (RIT Stockholm, more on [HN](https://news.ycombinator.com/item?id=13258063)),
  [these](http://news.ycombinator.com/item?id=4834008)
@@ -205,8 +209,11 @@ more on [HN](https://news.ycombinator.com/item?id=16134618),
 [bkerndev](http://www.osdever.net/bkerndev/index.php),
 [JamesM](http://www.jamesmolloy.co.uk/tutorial_html/) ...
 [OSDev.org](http://wiki.osdev.org/) is recommended in many sources.
+Here is a recent roundup on [HN](https://news.ycombinator.com/item?id=22087701) (Jan 2020).
+This [textbook](http://csapp.cs.cmu.edu/) provides a recent overview of Unix + C OS.
 
 Here are more links on operating system 
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
+
 
