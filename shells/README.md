@@ -22,5 +22,9 @@ Callable Python shells
   can also redirect command output from the application or from Python
   to a text buffer instead of the terminal.
 
+I recently learned of an abandoned project named 
+[pysh](http://pysh.sourceforge.net/) via this page on
+[alternative shells](https://github.com/oilshell/oil/wiki/ExternalResources).
+
 Revised Jan 2020
 

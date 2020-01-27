@@ -208,7 +208,8 @@ more on [HN](https://news.ycombinator.com/item?id=16134618),
 [bkerndev](http://www.osdever.net/bkerndev/index.php),
 [JamesM](http://www.jamesmolloy.co.uk/tutorial_html/) ...
 [OSDev.org](http://wiki.osdev.org/) is recommended in many sources.
-Here is a recent roundup on [HN](https://news.ycombinator.com/item?id=22087701) (Jan 2020).
+Here is a recent roundup on [HN](https://news.ycombinator.com/item?id=22087701),
+and [another](https://news.ycombinator.com/item?id=22149866) (both Jan 2020).
 This [textbook](http://csapp.cs.cmu.edu/) provides a recent overview of Unix + C OS.
 
 Here are more links on operating system 
