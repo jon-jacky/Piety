@@ -8,29 +8,30 @@ import edo, frame, view, wyshka, samysh
 from updates import Op
 
 ed = edo.ed  # so we can use ed API without prefix
+buffer = ed.buffer
 
 # edda API functions
 
 def L():
     'Refresh'
-    frame.update(Op.refresh)
+    frame.refresh(1) # start at column 1
 
 def o(*args):
     'Window commands: o(2) horiz. split, o(1) one window, o() next window'
     if not args:
-        win = frame.update(Op.next)
+        win = frame.next()
         ed.buf = win.buf
         ed.current = ed.buf.name
     elif args[0] == 1:
-        frame.update(Op.single)
+        frame.single()
     elif args[0] == 2:
-        frame.update(Op.hsplit)
+        frame.hsplit()
 
 def h(*args):
     'Resize/balance frame: h(n) set scrolling region to n lines, h() balance only'
     if args:
         frame.cmd_h = args[0]
-    frame.update(Op.rescale)
+    frame.rescale(None) # use frame.cmd_h
 
 # Wrappers for API functions
 
@@ -98,7 +99,9 @@ def startup(*filename, **options):
     global cmd_h
     if 'c' in options:
         cmd_h = options['c']
-    frame.update(Op.rescale, start=cmd_h) # before edo.startup calls e()
+    frame.rescale(cmd_h) # before edo.startup calls e()
+    ed.displaying = buffer.displaying = True # defaults are False, no display
+    ed.frame = buffer.frame = frame # defaults are None
     edo.startup(*filename, **options)
     view.lz_print_dest = view.null # Reassign configs made in edo.startup,
     view.update = frame.update  #  so it can be used by ed and buffer.
@@ -109,7 +112,7 @@ def startup(*filename, **options):
 
 def cleanup():
     'Restore display screen then turn off display updates etc.'
-    frame.update(Op.restore)
+    frame.restore()
     view.update = view.noupdate
     view.lz_print_dest = sys.stdout
 

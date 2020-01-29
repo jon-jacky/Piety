@@ -42,8 +42,8 @@ class Console(console.Console):
         edsel.line = line # not including final \n at eol
         edsel.point = 0 # 0-based
         edsel.start_col = 1 # 1-based
-        frame.update(Op.display)
-        frame.put_display_cursor()
+        frame.display_mode()
+        frame.put_display_cursor() # FIXME?  couldn't this be in frame.display_mode?
 
     def set_command_mode(self):
         'Replace current line in buffer and resume command mode.'
@@ -52,14 +52,13 @@ class Console(console.Console):
         ed.command_mode = True
         ed.prompt = ed.command_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
-        frame.update(Op.command)
-        frame.put_command_cursor()
+        frame.command_mode()
         self.restart() # print prompt and enter char mode
 
     def refresh(self):
         'Refresh entire display including whole frame and scrolling command region.'
         ed.buf.replace(ed.buf.dot, self.line + '\n') # so refresh renders it
-        frame.update(Op.refresh, column=(self.start_col + self.point))
+        frame.refresh(self.start_col + self.point)
 
     def open_line(self):
         """

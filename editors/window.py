@@ -263,11 +263,9 @@ class Window(object):
         else:
             self.reupdate()
 
-    def insert(self, origin, start, end):
+    def insert(self, start, end):
         'Update window after insert lines from origin to start..end'
         if self.contains(end):
-            if origin > 0:
-                self.clear_marker(origin)
             self.update_from(start)
         else:
             self.reupdate()
@@ -377,14 +375,13 @@ class Window(object):
         self.saved_dot = self.buf.dot
         self.clear_marker(self.saved_dot)
 
-    def adjust_insert(self, start, end, destination):
+    def adjust_insert(self, start, end):
         """
         After insert, adjust segment visible in a window without input focus,
         to keep lines shown in that window the same so no update is needed.
         """
         # start, end are line numbers *after* insert is executed in buffer.
         # ed i() inserts text *before* dot, so start == buf.dot before execute.
-        # destination == end, last inserted line *after* insert executed in buf
         nlines = end - start + 1
         if self.saved_dot == 0:  # buffer was empty
             self.saved_dot = self.buf.dot

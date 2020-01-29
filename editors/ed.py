@@ -8,6 +8,11 @@ from contextlib import redirect_stdout
 import parse, check, buffer, view
 from updates import Op
 
+# ed default is no display.  
+# edda startup assigns ed.displaying = True and ed.frame = frame
+displaying = False
+frame = None
+
 # Each ed command is implemented here by a command function with the same
 # one-letter name, whose arguments are the same as the ed command args.
 # The current buffer is used by many of these functions, but to
@@ -91,7 +96,8 @@ def create_buf(bufname):
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
     previous = current
     current = bufname
-    view.update(Op.create, buffer=buf)
+    if displaying:
+        frame.create(buf)
 
 def select_buf(bufname):
     'Make buffer with given name the current buffer'
@@ -99,7 +105,8 @@ def select_buf(bufname):
     previous = current
     current = bufname
     buf = buffers[current]
-    view.update(Op.select, buffer=buf)
+    if displaying:
+        frame.select(buf)
 
 # command functions: buffers and files
 
@@ -220,7 +227,8 @@ def w(*args):
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         buf.w(filename)
-        view.update(Op.status, buffer=buf)
+        if displaying:
+            frame.status(buf)
         print('%s, %d lines' % (filename, buf.nlines()))
 
 def DD(*args):
@@ -239,7 +247,8 @@ def DD(*args):
             keys = list(buffers.keys()) # always nonempty due to main
             select_buf(keys[0]) # reassigns current
             previous = current
-        view.update(Op.remove, sourcebuf=delbuf, buffer=buf)
+        if displaying:
+            frame.remove(delbuf, buf)
         print('%s, buffer deleted' % name)
 
 D_count = 0 # number of consecutive times D command has been invoked
@@ -390,8 +399,8 @@ def I(*args):
         valid, indent = check.iparam(param, indent)
         if valid:
             buf.I(start, end, indent)
-            view.update(Op.mutate, buffer=buf, origin=start,
-                        start=start, end=end, destination=end)
+            if displaying:
+                frame.mutate(start, end)
     
 def O(*args):
     'Outdent lines, optional parameter assigns n of indent/outdent spaces'
@@ -401,8 +410,8 @@ def O(*args):
         valid, indent = check.iparam(param, indent)
         if valid:
             buf.M(start, end, indent)
-            view.update(Op.mutate, buffer=buf, origin=start,
-                        start=start, end=end, destination=end)
+            if displaying:
+                frame.mutate(start, end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
@@ -533,15 +542,18 @@ def do_command(line):
         # assign dot to prepare for input mode, where we a(ppend) each line
         elif cmd_name == 'a':
             buf.dot = start
-            view.update(Op.input) # depends on buf.dot so can't be moved up
+            if displaying:
+                frame.input_mode() # depends on buf.dot so can't be moved up
         elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
             buf.dot = start - 1 if start > 0 else 0
             # so we can a(ppend) instead of i(nsert)
-            view.update(Op.input) # depends on buf.dot so can't be moved up
+            if displaying:
+                frame.input_mode() # depends on buf.dot so can't be moved up
         elif cmd_name == 'c': #c(hange) command deletes changed lines first
             buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
             buf.dot = start - 1 # supercede dot assigned in preceding
-            view.update(Op.input) # queues Op.input after buf.d Op.delete
+            if displaying:
+                frame.input_mode() # after buf.d(...) calls frame.delete(...)
         else:
             print('? command not supported in input mode: %s' % cmd_name)
     else:
@@ -557,7 +569,8 @@ def add_line(line):
     if line == '.':
         command_mode = True
         prompt = command_prompt
-        view.update(Op.command)
+        if displaying:
+            frame.command_mode()
     else:
         # Recall input() returns each line with final \n stripped off,
         # BUT buf.a requires \n at end of each line.

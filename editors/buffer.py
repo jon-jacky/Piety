@@ -8,6 +8,11 @@ from enum import Enum
 import view
 from updates import Op, background_task
 
+# buffer default is no display.  
+# edda startup assigns buffer.displaying = True and buffer.frame = frame
+displaying = False
+frame = None
+
 # Hook for display updates from background tasks to restore cursor etc.
 console = None  # default: no updates from background tasks,no restore needed
 
@@ -126,10 +131,8 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-        # start and end of inserted text, end == destination == dot
-        view.update(Op.insert, buffer=self, origin=origin,
-                      destination=self.dot, start=iline, end=self.dot,
-                      column=column)
+        if displaying:
+            frame.insert(iline, self.dot)
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'
@@ -172,7 +175,8 @@ class Buffer(object):
         'Advance dot to iline and return it (so caller can print it)'
         prev_dot = self.dot
         self.dot = iline
-        view.update(Op.locate, buffer=self,origin=prev_dot,destination=iline)
+        if displaying:
+            frame.locate(prev_dot, iline)
         return (self.lines[iline]).rstrip('\n')
 
     # adding, changing, and deleting text
@@ -213,11 +217,11 @@ class Buffer(object):
                 nlines = (end-start) + 1
                 new_mark[c] = markc - nlines if markc >= end else markc
         self.mark = new_mark
-        # origin, start, end are before deletion
-        # destination == dot after deletion, first line following deleted lines
-        view.update(Op.delete, buffer=self,
-                      origin=start, destination=self.dot, start=start, end=end)
-
+        # start, end lines in buffer are before deletion
+        # after deletion, win.buf.dot is first line following deleted lines
+        if displaying:
+            frame.delete(start, end)
+                      
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
         # ed (and also edda) call d(elete) when command is 'c'
@@ -262,7 +266,6 @@ class Buffer(object):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,
         otherwise substitute only the first occurrence in each line."""
-        origin = self.dot
         for i in range(start,end+1): # ed range is inclusive, unlike Python
             if old in self.lines[i]: # test to see if we should advance dot
                 self.y(i,i) # Cut buf only holds last line where subst, like GNU ed
@@ -270,9 +273,9 @@ class Buffer(object):
                                                       else 1)
                 self.dot = i
                 self.modified = True
-        # Update.end and .destination are last line actually changed
-        view.update(Op.mutate, buffer=self, origin=origin,
-                      start=start, end=self.dot, destination=self.dot)
+        # now self.dot is destination, last line actually changed
+        if displaying:
+            frame.mutate(start, self.dot)
 
     def y(self, start, end):
         'Yank (copy, do not remove) lines to cut buffer'
