@@ -13,7 +13,7 @@ from session import pysh, ed, edda, edsel # Console jobs
 from session import jobs, fg # functions to type at Python command line
 from session import edm, frame # modules that contain data structures
 
-# This assigment needed so view.update() can restore Console cursor
+# This assigment needed so code in frame can restore Console cursor
 #  after updates from background task
 # FIXME - This is not sufficiently general.
 #  This  is needed for each Console job when it reaches foreground.

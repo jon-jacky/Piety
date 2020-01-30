@@ -5,8 +5,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 import re, os, sys
 from enum import Enum
 from contextlib import redirect_stdout
-import parse, check, buffer, view
-from updates import Op
+import parse, check, buffer
 
 # ed default is no display.  
 # edda startup assigns ed.displaying = True and ed.frame = frame
@@ -298,7 +297,7 @@ def N(*args):
 # command functions: displaying and navigating text
 
 def l(*args):
-    'Advance dot to iline and print it'
+    'Advance dot to iline, return line there, conditionally print it'
     iline, _, _, _ = parse.arguments(args)
     if not buf.lines:
         print('? empty buffer')
@@ -309,18 +308,23 @@ def l(*args):
     if not check.iline_ok(buf, iline):
         print('? invalid address')
         return
-    print(buf.l(iline), file=view.lz_print_dest)
-
-def p_lines(start, end, destination): # arg here shadows global destination
-    'Print lines start through end, inclusive, at destination'
-    for iline in range(start, end+1): # +1 because start,end is inclusive
-        print(buf.l(iline), file=destination) # file can be null or stdout or..
+    line = buf.l(iline)
+    if not displaying:
+        print(line)
 
 def p(*args):
-    'Print lines from start through end, leave dot at last line printed'
+    'Unconditionally print lines from start through end, inclusive'
     valid, start, end, _, _ = check.irange(buf, args)
     if valid:
-        p_lines(start, end, sys.stdout) # print unconditionally
+        for iline in range(start, end+1): # +1 because start,end is inclusive
+            print(buf.l(iline))
+
+def p_lines(start, end): # arg here shadows global destination
+    'Conditionnally print lines start through end, inclusive, if not displaying'
+    for iline in range(start, end+1): # +1 because start,end is inclusive
+        line = buf.l(iline)
+        if not displaying:
+            print(line)
 
 npage = 22 # n of lines printed by z command, can be changed by optional param
 
@@ -347,7 +351,7 @@ def z(*args):
             iline += npage # npage negative, go backward
             iline = iline if iline > 0 else 1
         end = end if end <= buf.nlines() else buf.nlines()
-        p_lines(iline, end, view.lz_print_dest) # assigns buf.dot = iline
+        p_lines(iline, end)
         if npage < 0:
             buf.dot = iline
 
@@ -550,7 +554,7 @@ def do_command(line):
             if displaying:
                 frame.input_mode() # depends on buf.dot so can't be moved up
         elif cmd_name == 'c': #c(hange) command deletes changed lines first
-            buf.d(start, end) # d updates buf.dot, calls update(Op.delete).
+            buf.d(start, end) # d updates buf.dot, calls frame.delete()
             buf.dot = start - 1 # supercede dot assigned in preceding
             if displaying:
                 frame.input_mode() # after buf.d(...) calls frame.delete(...)

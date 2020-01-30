@@ -4,8 +4,7 @@ edda - Display editor based on the line editor ed.py
 """
 
 import traceback, os, sys
-import edo, frame, view, wyshka, samysh
-from updates import Op
+import edo, frame, wyshka, samysh
 
 ed = edo.ed  # so we can use ed API without prefix
 buffer = ed.buffer
@@ -103,18 +102,15 @@ def startup(*filename, **options):
     ed.displaying = buffer.displaying = True # defaults are False, no display
     ed.frame = buffer.frame = frame # defaults are None
     edo.startup(*filename, **options)
-    view.lz_print_dest = view.null # Reassign configs made in edo.startup,
-    view.update = frame.update  #  so it can be used by ed and buffer.
-    if filename: # update only works now, call based on buf.insert(...)
-        frame.update(Op.insert, sourcebuf=frame.win.buf,
-                     destination=frame.win.buf.dot, start=1,
-                     end=frame.win.buf.dot)
+    if filename:
+        frame.insert(1, frame.win.buf.dot)
 
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    view.update = view.noupdate
-    view.lz_print_dest = sys.stdout
+    ed.displaying = buffer.displaying = False
+    ed.frame = buffer.frame = None
+    ed.lz_print_dest = sys.stdout
 
 def main(*filename, **options):
     'Top level edda command to invoke from python prompt or command line.'

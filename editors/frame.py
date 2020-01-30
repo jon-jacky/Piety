@@ -5,7 +5,6 @@ frame.py - Multiwindow display implemented by a list of window instances,
 
 from enum import Enum
 import terminal, terminal_util, display, window
-from updates import Op, background_task
 
 # Data structures
 
@@ -58,36 +57,23 @@ def update_windows():
     for w in windows:
         w.update()
 
-# old put cursor fcns called by update
-
-def put_command_cursor(column=1):
-    'Put cursor at command line in scroll region, at given column (default 1).'
-    display.put_cursor(cmd_n, column) # last line on display
-
-def put_display_cursor(column=1):
-    'Put cursor at dot in current window, at given column (default 1).'
-    wdot = win.wline(win.buf.dot)
-    display.put_cursor(wdot, column)
-
-# new put cursor fcns callded by functions extracted from update
+def put_command_cursor():
+    'Put cursor at command line in scroll region, at column 1.'
+    display.put_cursor(cmd_n, 1) # last line on display
 
 def put_command_cursor_col(column):
     'Put cursor at command line in scroll region, at given column.'
     display.put_cursor(cmd_n, column) # last line on display
 
-def put_command_cursor_c1():
-    'Put cursor at command line in scroll region, at column 1.'
-    display.put_cursor(cmd_n, 1) # last line on display
+def put_display_cursor():
+    'Put cursor at dot in current window, at column 1.'
+    wdot = win.wline(win.buf.dot)
+    display.put_cursor(wdot, 1)
 
 def put_display_cursor_col(column):
     'Put cursor at dot in current window, at given column.'
     wdot = win.wline(win.buf.dot)
     display.put_cursor(wdot, column)
-
-def put_display_cursor_c1():
-    'Put cursor at dot in current window, at column 1.'
-    wdot = win.wline(win.buf.dot)
-    display.put_cursor(wdot, 1)
 
 # Display update functions called by clients
 #    global mode, win, ifocus, cmd_h
@@ -144,7 +130,7 @@ def select(buf):
     win.buf = buf
     win.reupdate()
     if mode == Mode.command:
-        put_command_cursor_c1()
+        put_command_cursor()
 
 def remove(delbuf, buf):
     """
@@ -171,20 +157,20 @@ def command_mode():
     # Overwrite '.' line on display, and lines below.
     win.update_from(win.buf.dot + 1)
     win.set_marker(win.buf.dot)
-    put_command_cursor_c1()
+    put_command_cursor()
 
 def display_mode():
     'Switch to edsel display mode'
     global mode
     mode = Mode.display
     win.clear_marker(win.buf.dot)
-    put_display_cursor_c1()
+    put_display_cursor()
 
 def locate(origin, destination):
     'Dot moved, ed l command'
     win.locate(origin, destination)
     if mode == Mode.command:
-        put_command_cursor_c1()
+        put_command_cursor()
 
 def next():
     'Switch to next window, edda o command'
@@ -197,7 +183,7 @@ def next():
     win.set_focus()
     win.update_status()
     if mode == Mode.command:
-        put_command_cursor_c1()
+        put_command_cursor()
     return win
 
 def single():
@@ -207,7 +193,7 @@ def single():
     ifocus = 0
     win.resize(frame_top, windows_h-1, ncols) # one window, -1 excl status
     win.reupdate()
-    put_command_cursor_c1()
+    put_command_cursor()
 
 def hsplit():
     'Split window, new window above becomes current window, edda o2 command'
@@ -222,17 +208,21 @@ def hsplit():
     win.focus = True
     windows.insert(ifocus, win)
     win.reupdate()
-    put_command_cursor_c1()
+    put_command_cursor()
 
 def status(buf):
     'Update status line for given buffer in all of its windows'
     for w in windows:
         if w.buf == buf:
             w.update_status()
+    if mode == Mode.command:
+        put_command_cursor()
 
 def insert(start, end):
-    # Insert text: ed a i c m r t y commands
-    # start, end are after insert, start == destination, end == win.buf.dot
+    """
+    Insert text: ed a i c m r t y commands
+    start, end are after insert, start == destination, end == win.buf.dot
+    """
     if mode != Mode.input: # ed commands m r t y
         win.insert(start, end)
     elif mode == Mode.input: # input mode after ed commands a i c
@@ -244,54 +234,47 @@ def insert(start, end):
     if mode == Mode.input: # can't put input cursor til other windows done
         win.put_cursor_for_input()
     if mode == Mode.command:
-        put_command_cursor_c1()
+        put_command_cursor()
 
 def delete(start, end):
-    # Delete text: ed d m command
-    # deleted lines were above win.buf.dot
-    # we need start, end to adjust the other windows
+    """
+    Delete text: ed d m command
+    deleted lines were above win.buf.dot
+    we need start, end to adjust the other windows
+    """
     win.delete(win.buf.dot)
     for w in windows:
         if w.samebuf(win):
             w.adjust_delete(start, end, win.buf.dot)
     if mode == Mode.command:
-        put_command_cursor_c1()
+        put_command_cursor()
 
 def mutate(start, destination):
-    # Change text: ed s command
-    # destination is last line where substitution actually made
-    # Update all lines in start..destination, don't know which lines changed
-    win.mutate(origin, start, destination)
+    """
+    Change text: ed s command
+    destination is last line where substitution actually made
+    Update all lines in start..destination, don't know which lines changed
+    """
+    win.mutate(start, start, destination) # was origin, start, destination
     for w in windows:
         if w.samebuf(win):
             if w.intersects(start, destination):
                 w.mutate_lines(start, destination)
 
-def update(op, sourcebuf=None, buffer=None, origin=0, destination=0,
-           start=0, end=0, column=1): # display column numbers are 1-based
-    'Update the display: one window, several, or the entire frame.'
+def insert_other(buffer, start, end, column):
+    """
+    Insert text into buffer which is not the current buffer.
+    Search for windows (if any) which displays that buffer.
+    """
+    for w in windows:
+        if w.buf == buffer:
+            w.saved_dot = w.buf.dot
+            w.insert(start, end)  # FIXME
+    # Now put the cursor back in current window, or at command line
+    if mode == Mode.input: # can't put input cursor til other windows done
+        win.put_cursor_for_input(column=column)
+    elif mode == Mode.display:
+        put_display_cursor_col(column)
+    elif mode == Mode.command:
+        put_command_cursor_col(column)
 
-    global mode, win, ifocus, cmd_h
-
-    # Background task inserts text by calling buffer write() method.
-    # Search for windows (if any) which displays that buffer.
-    if op == Op.insert and origin == background_task:
-        for w in windows:
-            if w.buf == buffer:
-                w.saved_dot = w.buf.dot
-                w.insert(origin, start, end)
-        if mode == Mode.input: # can't put input cursor til other windows done
-            win.put_cursor_for_input(column=column)
-        elif mode == Mode.display:
-            put_display_cursor(column=column)
-        else:
-            pass # Mode.commmand handled at the end of this fcn
-
-    # In command mode put ed command cursor back in scrolling command region.
-    # Then we can call standard Python input() or Piety Console restart().
-    if mode == Mode.command:
-        put_command_cursor(column=column) # background task can set column
-    # Each Op... case handles other modes, see refresh() and Op.refresh
-    # Is that necessary? I recall it's because some cases use default column=1
-
-    return win # caller might need to know which window was selected

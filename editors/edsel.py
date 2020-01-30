@@ -6,7 +6,6 @@ edsel - Full screen display editing, with screen editing keys defined
 import re
 import util, terminal
 import keyboard, console, check, edda, pysh, wyshka, samysh
-from updates import Op
 
 ed = edda.edo.ed    # use ed and frame APIs without prefix
 frame = edda.frame
@@ -69,7 +68,7 @@ class Console(console.Console):
         suffix = self.line[self.point:].rstrip('\n')
         ed.buf.replace(ed.buf.dot, prefix + '\n')
         self.kill_line() # from cursor to end of line
-        ed.buf.a(ed.buf.dot, suffix + '\n') # calls update(Op.insert ...)
+        ed.buf.a(ed.buf.dot, suffix + '\n') # calls frame.insert()
         self.line = suffix
         self.point = 0
         self.start_col = 1
@@ -88,7 +87,7 @@ class Console(console.Console):
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
             self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
             self.point = new_point
-            frame.put_display_cursor(self.start_col + self.point)
+            frame.put_display_cursor_col(self.start_col + self.point)
         else:
             pass
 
@@ -98,7 +97,7 @@ class Console(console.Console):
             ed.buf.replace(ed.buf.dot, self.line)
             ed.buf.j(ed.buf.dot, ed.buf.dot+1)
             self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
-            frame.put_display_cursor(self.start_col + self.point)
+            frame.put_display_cursor_col(self.start_col + self.point)
         else:
             pass
 
@@ -119,7 +118,7 @@ class Console(console.Console):
             line = ed.buf.lines[ed.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
             self.line = line
             self.point = min(jcol, len(line))
-            frame.put_display_cursor(self.start_col + self.point)
+            frame.put_display_cursor_col(self.start_col + self.point)
         # FIXME? else: ... bad line address ...
 
     def prev_line(self):
@@ -233,7 +232,7 @@ class Console(console.Console):
     def other_window(self):
         'Move cursor to other window, next in sequence.'
         ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
-        edda.do_window_command('') # reassign win, ed.buf, call update(Op.next)
+        edda.do_window_command('') # reassign win, ed.buf, call frame.next()
         self.line = ed.buf.lines[ed.buf.dot].rstrip('\n') # from several methods
         # From set_display_mode
         self.point = 0

@@ -5,8 +5,6 @@ buffer.py - Buffer class for line-oriented text editors.
 
 import os.path, re, textwrap
 from enum import Enum
-import view
-from updates import Op, background_task
 
 # buffer default is no display.  
 # edda startup assigns buffer.displaying = True and buffer.frame = frame
@@ -65,10 +63,9 @@ class Buffer(object):
             # ignore the end string, buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
             # self.a(self.dot, self.contents) # append command, advances dot
-            self.insert(self.nlines()+1, self.contents.splitlines(True),
-                        origin=background_task,
-                        column=(console.start_col + console.point
-                                if console else 0))
+            self.insert_other(self.nlines()+1, self.contents.splitlines(True),
+                              console.start_col + console.point 
+                              if console else 0)
         else:
             # store contents string until we get end string
             self.contents = s
@@ -120,7 +117,7 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert(self, iline, lines, origin=0, column=1):
+    def insert_lines(self, iline, lines):
         """Insert lines (list of strings) before iline,
         update dot to last inserted line"""
         self.lines[iline:iline] = lines # sic, insert lines at this position
@@ -131,8 +128,18 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
+
+    def insert(self, iline, lines):
+        'Insert lines, then conditionally update display'
+        self.insert_lines(iline, lines)
         if displaying:
             frame.insert(iline, self.dot)
+
+    def insert_other(self, iline, lines, column):
+        'Insert lines when this buffer is not the current buffer'
+        self.insert_lines(iline, lines)
+        if displaying:
+            frame.insert_other(self, iline, self.dot, column)
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'
@@ -160,7 +167,8 @@ class Buffer(object):
                 strings = fd.readlines() # each string in lines ends with \n
             self.insert(iline+1, strings) # like append, below
         else:
-            view.update(Op.select, buffer=self) # new buffer for new file
+            if displaying:
+                frame.select(self) # new buffer for new file
 
     def w(self, name):
         'Write current buffer contents to file name'
@@ -186,13 +194,12 @@ class Buffer(object):
         # string is one big str with linebreaks indicated by embedded \n
         # splitlines(True) breaks at \n to make list of strings
         # keepends True arg keeps each trailing \n, same as with fd.readlines()
-        self.insert(iline+1, string.splitlines(True), origin=iline)
+        self.insert(iline+1, string.splitlines(True))
 
     def i(self, iline, string):
         'Insert lines from string before iline, new dot is last inserted line'
         # iline at initial empty line w/ index 0 is a special case, must append
-        self.insert(iline if iline else iline+1, string.splitlines(True),
-                    origin=iline)
+        self.insert(iline if iline else iline+1, string.splitlines(True))
 
     def d(self, start, end, yank=True):
         'Delete text from start up through end'
@@ -291,7 +298,7 @@ class Buffer(object):
 
     def t(self, start, end, dest):
         'Transfer (copy) lines to after destination line.'
-        self.insert(dest+1, self.lines[start:end+1], origin=start) 
+        self.insert(dest+1, self.lines[start:end+1]) # origin=start) 
 
     def m(self, start, end, dest):
         'Move lines to after destination line.'
