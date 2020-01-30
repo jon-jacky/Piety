@@ -82,7 +82,7 @@ Files in this directory:
   like an old-fashioned teletype. Contrast to *ed.py*
   *main* function and *edna*.
 
-- **frame.md**: description of *frame.py* and *updates.py*
+- **frame.md**: description of *frame.py*.
 
 - **frame.py**: multiwindow display implemented by list of *window*
    instances, with a scrolling command region at the bottom of the
@@ -92,12 +92,6 @@ Files in this directory:
     files for experimenting with the editor.
 
 - **parse.py**: command line parsing for *ed.py*.
-
-- **updates.py**: define display operations enumeration *Op*.
-
-- **view.py**: defines variables that are used by *ed*, *edda*,
-   *desoto* and *edsel*, to
-   configure code in *ed* to run with or without a display.
 
 - **window.py**: defines Window class used by *frame*.
 
