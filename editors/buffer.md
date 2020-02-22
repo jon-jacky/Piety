@@ -30,10 +30,9 @@ text buffers without using the *ed.py* user interface or API, simply
 calling the standard Python *print* function, with the *file=...* optional
 argument pointing to the buffer.
 
-The *buffer* module defines an *update* function which can optionally
-be reassigned to a callable that may be used to update a display
-whenever buffer contents change.  The default definition of this
-function does nothing (has an empty body), so the *buffer* module can
-be used by programs like *ed.py* that do not use a display.
+*Buffer* objects can optionally show their contents on the display, by
+calling functions in the *frame* module.  By default, this is not
+enabled, so these buffers can be used by programs like *ed.py* that do
+not use a display.
 
-Revised Aug 2017
+Revised Feb 2020

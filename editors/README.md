@@ -93,6 +93,8 @@ Files in this directory:
 
 - **parse.py**: command line parsing for *ed.py*.
 
+- **window.md**: description of *window.py*.
+
 - **window.py**: defines Window class used by *frame*.
 
-Revised Jan 2020
+Revised Feb 2020

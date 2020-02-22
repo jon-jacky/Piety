@@ -319,7 +319,7 @@ def p(*args):
         for iline in range(start, end+1): # +1 because start,end is inclusive
             print(buf.l(iline))
 
-def p_lines(start, end): # arg here shadows global destination
+def p_lines(start, end):
     'Conditionnally print lines start through end, inclusive, if not displaying'
     for iline in range(start, end+1): # +1 because start,end is inclusive
         line = buf.l(iline)

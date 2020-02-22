@@ -87,7 +87,7 @@ class Console(console.Console):
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
             self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
             self.point = new_point
-            frame.put_display_cursor_col(self.start_col + self.point)
+            frame.put_display_cursor(self.start_col + self.point)
         else:
             pass
 
@@ -118,7 +118,7 @@ class Console(console.Console):
             line = ed.buf.lines[ed.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
             self.line = line
             self.point = min(jcol, len(line))
-            frame.put_display_cursor_col(self.start_col + self.point)
+            frame.put_display_cursor(self.start_col + self.point)
         # FIXME? else: ... bad line address ...
 
     def prev_line(self):

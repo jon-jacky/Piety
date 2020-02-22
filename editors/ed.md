@@ -427,7 +427,7 @@ console, but does not directly update buffers or access files.
 **ed.py** imports the *buffer.py* module, which provides the
 *Buffer* class, which defines the core data structure and the internal
 API for updating it.  Many *Buffer* methods correspond to functions in
-the API, but here each method has a fixed argument list, provides no
+the API, but in *Buffer* each method has a fixed argument list, provides no
 error checking, and no error messages or progress messages.  The
 *Buffer* class does not access the console, but updates text buffers
 and reads and writes files.
@@ -437,19 +437,16 @@ functions for parsing *ed* commands, and the
 *check.py* module that provides functions for checking
 command arguments and supplying default arguments.
 
-**ed.py** imports the *view.py* module, which contains configuration
-variables that are read and written by both *ed* and the display
-editor *edda*, in order to configure code used by both programs to
-run with or without a display.
+When **ed.py** is imported by the display editors *edda* and *esdsel*,
+it can update the display by calling functions in the *frame* module.
+By default, this is not enabled, because when **ed.py** is running standalone
+it does not use a display.
 
-**ed.py** imports the *Op* display operations enumeration from the
-*updates.py* module, which appears in code in *ed* that is also used
-by the *edda* display editor.
-
-The *buffer*, *parse*, *check*, *view*, and *updates* modules are
+The *buffer*, *parse*, and *check* modules are
 included in this directory.  **ed.py** also uses the Python standard
-library modules *re*, *os*, and *sys*.  Other than that, **ed.py** has
-no dependencies.
+library modules *re*, *os*, *sys*, *enum*, and *contextlib*.
+Other than that, **ed.py** has no dependencies.
+
 
 ## Data structures ##
 
@@ -539,5 +536,5 @@ to be entered at the terminal.
 **[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
-Revised Jan 2020
+Revised Feb 2020
 

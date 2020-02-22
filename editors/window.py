@@ -1,14 +1,8 @@
 """
 window.py - Window class for line-oriented display editors.
 
-Each window displays a range of lines (a segment) of a text buffer.
-All updates here involve a whole line or group of lines from a buffer.
-
-Updates within a line are handled by the console or edsel modules,
-which use the display module to write and update that line
-directly on the display, without using this window module.
-The line being edited by console or edsel is not yet part of a buffer
-so it cannot be handled by this module.
+Each window displays a range of lines (a segment) of a text buffer, and
+also includes a final status line with information about its contents.
 """
 
 import display
@@ -17,39 +11,14 @@ def clip(iline, first, last):
     'return iline limited to range first .. last inclusive'
     return min(max(first, iline), last)
 
-# command_mode is True when entering/editing/executing commands
-# on the command line and printing output in the scrolling region,
-# command_mode is False when entering/editing text in a display window.
-# It is possible to edit buffers and manage windows from
-# the command line, so display window contents can change a lot
-# in command_mode.
-
-# When command_mode is True, the terminal cursor where the user
-# types input is in the command region,
-# so we display a marker in a display window to show where
-# commands will take effect.   The marker appears in the focus window
-# at the first character of the current line, dot.
-# When command_mode is False (in display editing modes),
-# the marker is not displayed, because instead the terminal cursor
-# where the user types input appears in the focus window
-# at point (the character position where insertions and deletions
-# take effect).
-
-# command_mode here is assigned in the frame module once at startup:
-#  window.command_mode = (lambda: mode == Mode.command)
-# after this assignment, window.command_mode() follows frame.mode
-# even though the window module does not import the frame module.
-
-command_mode = (lambda: True) # will be reassigned in frame module
-
 show_diagnostics = False # on status line - for now, don't show
 
 class Window(object):
     """
     Window class for line-oriented display editors.
     Displays a range of lines (the segment) from a text buffer.
+    After the segment, displays a status line with information about contents.
     May display a marker to indicate dot, the line where commands take effect.
-    May be followed by a status line with information about the buffer.
     """
 
     nupdates = 0 # diagnostic, optionally show on status line
@@ -62,7 +31,7 @@ class Window(object):
          nlines - number of lines in this window, excluding status line
          ncols - maximum number of characters in a line
         """
-        self.focus = False # True when this window has the input focus
+        self.focus = False # input focus, only used in self.status_text()  
         self.buf = buf
         self.saved_dot = self.buf.dot  # to restore dot when window selected
         self.btop = 1 # index in buffer of first line displayed in window
@@ -162,32 +131,32 @@ class Window(object):
 
     def scroll(self, nlines):
         """
-        Move segment of buffer displayed in window by nlines (pos or neg)
-        but leave dot unchanged so window contents appear to scroll.
+        Shift segment of buffer displayed in window by nlines (pos or neg)
+        but leave dot unchanged so window contents will appear to scroll.
         """
         self.btop = clip(self.btop + nlines, 1, self.buf.nlines())
         self.blast = self.blastline()
 
     def shift(self, nlines):
         """
-        Move segment of buffer displayed in window by nlines (pos or neg)
-        and shift saved_dot also so window contents appear the same.
+        Shift segment of buffer displayed in window by nlines (pos or neg)
+        and shift saved_dot also ... (so same lines appear in window?)
         This is only meaningful for the windows without input focus.
         """
         self.scroll(nlines)
         self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.nlines())
 
-    def locate_segment(self, iline):
+    def locate(self, destination):
         """
-        Given line number in buffer iline, prepare to position window by
+        Given line number in buffer destination, locate window by
         assigning self.btop, index in buffer of top line in window.
         """
-        if self.near_top(iline):
+        if self.near_top(destination):
             self.btop = 1  
-        elif self.near_bottom(iline):
+        elif self.near_bottom(destination):
             self.btop = self.buf.nlines() - (self.nlines - 1) # last page
         else: 
-            self.btop = iline - self.nlines//2 # center iline in window
+            self.btop = destination - self.nlines//2 # center dest. in window
         self.blast = self.blastline()
 
     def open_line(self, wiline):
@@ -232,66 +201,57 @@ class Window(object):
         self.nprinted += nprinted
         self.clear_lines(icursor, last)
 
-    def update_from(self, iline):
-        'Write lines in window starting at line number iline in buffer'
-        self.update_lines(self.wline(iline), iline)
-        if self.focus and command_mode():
-            # self has focus, mark self.buf.dot not self.saved_dot
-            self.set_marker(self.buf.dot)
+    def render(self, start):
+        """
+        Write lines in window, starting at line number start in buffer.
+        Update window status line
+        """
+        self.update_lines(self.wline(start), start)
         self.update_status()
 
-    def update(self):
-        'Write all lines in window'
-        self.update_from(self.btop)
+    def refresh(self):
+        'Render all the lines in the window, update status line'
+        self.render(self.btop)
 
-    def move_update(self, iline):
-        'Move window to show buffer line iline then update window'
-        self.locate_segment(iline)
-        self.update()
-
-    def reupdate(self):
-        'Move window to show its buf.dot then update window'
-        self.move_update(self.buf.dot)
-
-    def locate(self, origin, destination):
-        'Update window after dot moves from origin to destination'
-        if self.contains(destination):
-            if self.focus and command_mode():
-                self.clear_marker(origin)
-                self.set_marker(destination)
-            self.update_status()
-        else:
-            self.reupdate()
+    def update(self, destination=None):
+        """
+        Locate window at destination (line in buffer) then update window.
+        Default destination is dot.
+        """
+        if destination is None:
+            destination=self.buf.dot
+        self.locate(destination)
+        self.refresh()
 
     def insert(self, start, end):
-        'Update window after insert lines from origin to start..end'
+        'Update window after insert lines to start..end'
         if self.contains(end):
-            self.update_from(start)
+            self.render(start)
         else:
-            self.reupdate()
+            self.update()
 
-    def delete(self, destination):
-        'Update window after delete lines above destination'
-        if self.contains(destination): # window already contains new dot
-            self.update_from(destination)
+    def delete(self, iline):
+        'Update window after delete lines above iline'
+        if self.contains(iline): # window already contains new dot
+            self.render(iline)
         else:
-            self.reupdate() 
+            self.update() 
 
-    def mutate_lines(self, start, destination):
-        'Update window after some lines in range start..destination changed'
+    def mutate_lines(self, start, end):
+        'Update window after some lines in range start..end changed'
         top = max(start, self.btop)
         self.update_lines(self.wline(top), top, 
-                       last=self.wline(destination))
+                       last=self.wline(end))
         self.update_status()
 
-    def mutate(self, origin, start, destination):
+    def mutate(self, start, end):
         'Update window and move marker after some lines in range changed'
-        if self.contains(destination):
-            self.clear_marker(origin)
-            self.mutate_lines(start, destination)
-            self.set_marker(destination)
+        if self.contains(end):
+            self.clear_marker(start)
+            self.mutate_lines(start, end)
+            self.set_marker(end)
         else:
-            self.reupdate()
+            self.update()
 
     def status_text(self):
         'Return string about window and its buffer for its status line.'
@@ -333,7 +293,7 @@ class Window(object):
         self.first = 0    # diagnostics, reset after each update
         self.nprinted = 0
        
-# The following methods are only used with input mode
+    # The following methods are only used with ed input mode: a i c commands
 
     def update_for_input(self):
         """
@@ -356,24 +316,11 @@ class Window(object):
         wdot = self.wline(self.buf.dot)
         display.put_cursor(wdot+1, column)
 
-# The following methods are only used with multiple windows
+    # The following methods are only used with multiple windows
 
     def samebuf(self, win):
         'True when this window differs from win but uses the same buffer'
         return (self != win and self.buf == win.buf)
-
-    def set_focus(self):
-        'Set input focus to this window'
-        self.focus = True
-        self.buf.dot = self.saved_dot
-        if command_mode():
-            self.set_marker(self.buf.dot)
-
-    def release_focus(self):
-        'Release input focus from this window'
-        self.focus = False
-        self.saved_dot = self.buf.dot
-        self.clear_marker(self.saved_dot)
 
     def adjust_insert(self, start, end):
         """
@@ -385,18 +332,18 @@ class Window(object):
         nlines = end - start + 1
         if self.saved_dot == 0:  # buffer was empty
             self.saved_dot = self.buf.dot
-            self.move_update(self.saved_dot)
+            self.update()
             self.update_status()
         elif self.covers(start):
             if self.saved_dot >= start:
                 self.saved_dot = self.saved_dot + nlines
-            self.move_update(self.saved_dot)
+            self.update(destination=self.saved_dot)
             self.update_status()
         elif self.btop >= start:
             self.shift(nlines)
             self.update_status()
         elif self.blast < start:
-            self.update_status() # xx% nn/mm in status line changes
+            self.update_status()
         else:
             pass # should be unreachable! status line doesn't update
 
@@ -404,9 +351,11 @@ class Window(object):
         """
         After delete, adjust segment visible in a window without input focus,
         to keep lines shown in that window the same so no update is needed.
+        start, end - line numbers *before* delete is executed in buffer.
+        destination - first unchanged line *after* delete executed in buf.
+        destination may differ from start if we delete end of buffer,
+        see buffer d() method.
         """
-        # start, end are line numbers *before* delete is executed in buffer.
-        # destination is first unchanged line *after* delete executed in buf.
         nlines = -(end - start + 1)
         if self.intersects(start, end):
             if self.saved_dot < start:
@@ -415,7 +364,7 @@ class Window(object):
                 self.saved_dot = self.saved_dot + nlines
             else:
                 self.saved_dot = destination
-            self.move_update(self.saved_dot)
+            self.update(destination=self.saved_dot)
             self.update_status()
         elif self.btop > end:
             self.shift(nlines)
