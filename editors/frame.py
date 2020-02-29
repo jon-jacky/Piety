@@ -1,8 +1,6 @@
 """
 frame.py - Multiwindow display implemented by a list of window instances,
             with a scrolling command region at the bottom of the display.
-           Applications that use multiple windows should call functions in this
-            module (not the window or display modules) to update the display.
 """
 
 from enum import Enum
@@ -10,21 +8,8 @@ import terminal, terminal_util, display, window
 
 class Mode(Enum):
     """
-    mode is Mode.command when executing commands on 
-    the command line and printing output in the scrolling region. 
-    mode is Mode.display or Mode.input when entering/editing text in a 
-    display window. It is possible to edit buffers and manage windows 
-    from the command line, so display window contents can change a lot 
-    in Mode.command.
-
-    In Mode.command, the terminal cursor where the user types input is in 
-    the  command region, so we display a marker in a display window to 
-    show where  commands will take effect.   The marker appears in the 
-    focus window at the  first character of the current line, dot.
-    In Mode.display and Mode.input,  the marker is not displayed, because 
-    instead the terminal cursor where the  user types input appears in 
-    the focus window at point, the character  position where insertions 
-    and deletions take effect.
+    Mode.command when executing commands typed on the command line.
+    Mode.input or Mode.display when entering/editing text in a display window.
     """
     command = 1 # ed command mode
     input = 2   # ed input mode for a,i,c commmands
@@ -75,10 +60,9 @@ def put_command_cursor(column=1):
     display.put_cursor(cmd_n, column) # last line on display
 
 def put_display_cursor(column=1):
-    'Put cursor at dot in current window, at given column, default 1'
+    'Put cursor at dot in focus window, at given column, default 1'
     wdot = win.wline(win.buf.dot)
     display.put_cursor(wdot, column)
-
 
 # Display update functions intended to be called by clients
 
@@ -107,7 +91,7 @@ def command_mode():
     global mode
     mode = Mode.command
     # Overwrite '.' line on display, and lines below.
-    win.render(win.buf.dot + 1)
+    win.render_from(win.buf.dot + 1)
     win.set_marker(win.buf.dot)
     put_command_cursor()
 
@@ -126,7 +110,7 @@ def refresh(column):
     column - where to put cursor, might not be column 1.
     """
     if mode == Mode.command:
-        display.put_cursor(1,1) # upper left corner
+        display.put_cursor(1,1)
         display.erase()
     refresh_windows()
     if mode == Mode.command:
@@ -154,7 +138,10 @@ def rescale(new_cmd_h):
     refresh(1)
 
 def restore():
-    'Exit all windows, restore full screen scrolling, put cursor at bottom.'
+    """
+    Exit from the whole frame and all its windows.
+    Restore normal terminal behavior: full screen scrolling, cursor at bottom.
+    """
     display.set_scroll_all()
     display.put_cursor(nlines,1)
 
@@ -180,43 +167,46 @@ def next():
     return win
 
 def single():
-    'Delete all but current window, edda o1 cmd'
+    'Delete all but focus window, edda o1 cmd'
     global ifocus
     windows[:] = [win]
     ifocus = 0
     win.resize(frame_top, windows_h-1, ncols) # one window, -1 excl status
     win.update()
-    win.set_marker(win.buf.dot) # single is only available in command mode
-    put_command_cursor()
+    if mode == Mode.command:
+        win.set_marker(win.buf.dot) # single is only available in command mode
+        put_command_cursor()
 
 def hsplit():
-    'Split window, new window above becomes current window, edda o2 command'
+    'Split window, new window above becomes focus window, edda o2 command'
     global win
     win_top = win.top
     win_nlines = win.nlines // 2
     w0 = win
     w0.focus = False
     w0.saved_dot = w0.buf.dot
-    w0.clear_marker(w0.saved_dot) # hsplit is only available in command mode
+    if mode == Mode.command:
+        w0.clear_marker(w0.saved_dot)
     w0.resize(win_top + win_nlines, w0.nlines - win_nlines, ncols)
     w0.update()
     win = window.Window(win.buf,win_top,win_nlines-1,ncols) #-1 excl status
     win.focus = True
     windows.insert(ifocus, win)
     win.update()
-    win.set_marker(win.buf.dot) # hsplit is only available in command mode
-    put_command_cursor()
+    if mode == Mode.command:
+        win.set_marker(win.buf.dot) # hsplit is only available in command mode
+        put_command_cursor()
 
-# Select the buffer displayed in the current window, that has input focus
+# Select the buffer displayed in the focus window, that has input focus
 
 def create(buf):
-    'Create new buffer in current window, ed B.'
+    'Create new buffer in focus window, ed B.'
     win.buf = buf
     win.saved_dot = win.buf.dot
     win.update()
 
 def select(buf):
-    'Change buffer in current window, ed b E D.'
+    'Change buffer in focus window, ed b E D.'
     win.buf = buf
     win.update()
     if mode == Mode.command:
@@ -234,7 +224,7 @@ def remove(delbuf, buf):
             w.update()
 
 # Update one or more windows with buffer contents, where the buffer 
-# is implicit: it is the buffer displayed in the current window.
+# is implicit: it is the buffer displayed in the focus window.
 
 def locate(origin, destination):
     """
@@ -256,28 +246,29 @@ def insert(start, end):
     start, end - line numbers of inserted text after insertion
     """
     if mode != Mode.input: # ed commands m r t y
-        win.insert(start, end)
+        win.modify(start, end)
     elif mode == Mode.input: # input mode after ed commands a i c
-        # Text at dot is already up-to-date on display, open next line.
         win.update_for_input()
     for w in windows:
         if w.samebuf(win):
             w.adjust_insert(start, end)
     if mode == Mode.input:
         win.put_cursor_for_input()
-    if mode == Mode.command:
+    elif mode == Mode.command:
         win.set_marker(win.buf.dot)
         put_command_cursor()
+    elif mode == Mode.display:
+        put_display_cursor()
 
 def delete(start, end):
     """
     Delete text: ed d m command
     start, end - line numbers of deleted text before deletion
+    Deleted lines were above win.buf.dot
+    win.buf.dot may differ from start if we delete end of buffer
+    See buffer d() method
     """
-    # deleted lines were above win.buf.dot
-    # win.buf.dot may differ from start if we delete end of buffer
-    # see buffer d() method
-    win.delete(win.buf.dot)
+    win.modify(win.buf.dot, win.buf.dot)
     for w in windows:
         if w.samebuf(win):
             w.adjust_delete(start, end, win.buf.dot)
@@ -292,7 +283,11 @@ def mutate(start, end):
     end - last line where substitution actually made
     Update all lines in start..end, don't know which lines changed
     """
+    if mode == Mode.command and win.contains(start):
+        self.clear_marker(start)
     win.mutate(start, end)
+    if mode == Mode.command and win.contains(end):
+        self.set_marker(end)
     for w in windows:
         if w.samebuf(win):
             if w.intersects(start, end):
@@ -323,7 +318,7 @@ def insert_other(buffer, start, end, column):
         if w.buf == buffer:
             w.saved_dot = w.buf.dot
             w.insert(start, end)
-    # Now put the cursor back in current window, or at command line
+    # Now put the cursor back in focus window, or at command line
     if mode == Mode.input: # can't put input cursor til other windows done
         win.put_cursor_for_input(column=column)
     elif mode == Mode.display:

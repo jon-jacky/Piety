@@ -31,7 +31,7 @@ their own *.md* and *.txt* files (*ed.md* and *ed.txt* for *ed.py*, etc.)
 
 Files in this directory:
 
-- **buffer.md**: description of *buffer.py*.
+- **buffer.md**: explanation of *buffer.py*.
 
 - **buffer.py**: defines *Buffer* class used by *ed.py*.
 
@@ -42,13 +42,13 @@ Files in this directory:
   display editor, along with the *wyshka* enhanced Python shell and
   *samysh* script execution.  Contrast to the *edda.py* *main* function.
 
-- **ed.md**: description of *ed.py*.
+- **ed.md**: explanation of *ed.py*.
 
 - **ed.py**: line editor inspired by the classic Unix editor *ed*.
 
 - **ed.txt**: command summary for *ed.py*
 
-- **edda.md**: description of *edda.py*.
+- **edda.md**: explanation of *edda.py*.
 
 - **edda.py**: simple display editor based on the line editor *ed.py*
   with the *edo* enhancements.
@@ -64,25 +64,25 @@ Files in this directory:
   line editor, along with the *wyshka* enhanced Python shell and
   *samysh* script execution).  Contrast to the *edo.py*.
 
-- **edo.md**: description of *edo.py*.
+- **edo.md**: explanation of *edo.py*.
 
 - **edo.py**: run *ed.py* line editor along with *wyshka* enhanced
   shell and *samysh* script execution.  Use Python builtin *input()*
   to collect and edit input lines with blocking.  Contrast to *ed.py*,
   *edie.py*, and *edna.py*.
 
-- **edsel.md**: description of *edsel.py*.
+- **edsel.md**: explanation of *edsel.py*.
 
 - **edsel.py**: display editor based on *edda* and *ed.py*.
 
-- **etty.md**: description of *etty.py*.
+- **etty.md**: explanation of *etty.py*.
 
 - **etty.py**: wraps *ed.py* in a *Console* object
   that uses non-default keymaps to make the terminal behave
   like an old-fashioned teletype. Contrast to *ed.py*
   *main* function and *edna*.
 
-- **frame.md**: description of *frame.py*.
+- **frame.md**: explanation of *frame.py*.
 
 - **frame.py**: multiwindow display implemented by list of *window*
    instances, with a scrolling command region at the bottom of the
@@ -93,7 +93,7 @@ Files in this directory:
 
 - **parse.py**: command line parsing for *ed.py*.
 
-- **window.md**: description of *window.py*.
+- **window.md**: explanation of *window.py*.
 
 - **window.py**: defines Window class used by *frame*.
 

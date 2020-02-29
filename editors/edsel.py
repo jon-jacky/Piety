@@ -42,7 +42,6 @@ class Console(console.Console):
         edsel.point = 0 # 0-based
         edsel.start_col = 1 # 1-based
         frame.display_mode()
-        frame.put_display_cursor() # FIXME?  couldn't this be in frame.display_mode?
 
     def set_command_mode(self):
         'Replace current line in buffer and resume command mode.'
@@ -72,7 +71,6 @@ class Console(console.Console):
         self.line = suffix
         self.point = 0
         self.start_col = 1
-        frame.put_display_cursor()
 
     def del_or_join_prev(self):
         """
@@ -87,7 +85,7 @@ class Console(console.Console):
             ed.buf.j(ed.buf.dot-1, ed.buf.dot)
             self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
             self.point = new_point
-            frame.put_display_cursor(self.start_col + self.point)
+            frame.put_display_cursor(column=(self.start_col + self.point))
         else:
             pass
 
@@ -97,7 +95,7 @@ class Console(console.Console):
             ed.buf.replace(ed.buf.dot, self.line)
             ed.buf.j(ed.buf.dot, ed.buf.dot+1)
             self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
-            frame.put_display_cursor_col(self.start_col + self.point)
+            frame.put_display_cursor(column=(self.start_col + self.point))
         else:
             pass
 
@@ -118,7 +116,7 @@ class Console(console.Console):
             line = ed.buf.lines[ed.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
             self.line = line
             self.point = min(jcol, len(line))
-            frame.put_display_cursor(self.start_col + self.point)
+            frame.put_display_cursor(column=(self.start_col + self.point))
         # FIXME? else: ... bad line address ...
 
     def prev_line(self):
