@@ -230,7 +230,7 @@ class Console(console.Console):
     def other_window(self):
         'Move cursor to other window, next in sequence.'
         ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
-        edda.do_window_command('') # reassign win, ed.buf, call frame.next()
+        edda.o() # call frame.next() then reassign win, ed.buf, ed.current
         self.line = ed.buf.lines[ed.buf.dot].rstrip('\n') # from several methods
         # From set_display_mode
         self.point = 0

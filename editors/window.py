@@ -42,20 +42,9 @@ class Window(object):
         self.first = 0    # first line printed on window in this update
         self.nprinted = 0 # n of lines printed on window in this update
 
-    def resize(self, top, nlines, ncols):
-        """
-        Assign, recalculate window dimensions
-         top - line number on display of first line of window
-         nlines - n of lines in window, excludling status line
-         ncols - maximum number of characters in a line
-        """
-        self.top = top
-        self.nlines = nlines
-        self.ncols = ncols
+    # Helper methods, not called by clients
 
-    def wline(self, iline):
-        'Line number on display of iline in buffer.'
-        return self.top + (iline - self.btop)
+    # window geometry calculations
 
     def bottom(self):
         'Line num. on display of bottom line in window (not status line)'
@@ -95,18 +84,11 @@ class Window(object):
         'Line number iline in buffer is empty, or is just \n'
         return self.buf.lines[iline] in ('','\n')
 
-    def contains(self, iline):
-        'Line number iline in buffer is one of the lines present in the window'
-        return (self.btop <= iline <= self.blast)
-
     def covers(self, iline):
         'Line number iline in buffer is in range of lines covered by window.'
         return (self.btop <= iline <= self.bbottom())
 
-    def intersects(self, start, end):
-        'Window intersects range defined by start..end'
-        return (self.contains(start) or self.contains(end)
-                or (start < self.btop and end > self.bbottom()))
+    # markers
 
     def ch0(self, iline):
         'First character in line iline in buffer, or space if line empty'
@@ -117,15 +99,9 @@ class Window(object):
         display.put_render(self.top if self.buf.empty() else self.wline(iline),
                            1, self.ch0(iline), 
                            display.clear if clear else display.white_bg)
-        
-    def set_marker(self, iline):
-        'Set marker on buffer line iline, or top line if buffer empty'
-        self.put_marker(iline)
 
-    def clear_marker(self, iline):
-        'Clear marker from buffer line iline, or top line if buffer empty'
-        self.put_marker(iline, clear=True)
-
+    # adjust window positions
+                           
     def shift(self, nlines):
         """
         Shift segment of buffer displayed in window by nlines (pos or neg)
@@ -145,18 +121,7 @@ class Window(object):
         self.shift(nlines)
         self.saved_dot = clip(self.saved_dot + nlines, 1, self.buf.nlines())
 
-    def locate(self, destination):
-        """
-        Shift segment of buffer displayed in window to center on destination, 
-        a line number in buffer.
-        """
-        if self.near_top(destination):
-            self.btop = 1  
-        elif self.near_bottom(destination):
-            self.btop = self.buf.nlines() - (self.nlines - 1) # last page
-        else: 
-            self.btop = destination - self.nlines//2 # center dest. in window
-        self.blast = self.blastline()
+    # update windows
 
     def open_line(self, wiline):
         'Make line empty at line number wiline on display'
@@ -199,6 +164,97 @@ class Window(object):
         icursor = first + nprinted
         self.nprinted += nprinted
         self.clear_lines(icursor, last)
+
+    # status line
+       
+    def status_text(self):
+        'Return string about window and its buffer for its status line.'
+        current = '----.' if self.focus else '-----'
+        readonly = '%' if self.buf.readonly else '-'
+        modified = '*-     ' if self.buf.modified else '--     '
+        bufname = '%-13s' % self.buf.name
+        dot = self.buf.dot if self.focus else self.saved_dot
+        position = (' All ' if self.buf.nlines() <= self.nlines else
+                    ' Top ' if self.btop == 1 else
+                    ' Bot ' if self.blast == self.buf.nlines() else
+                    ' %2.0f%% ' % (100*dot/self.buf.nlines()))
+        linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
+        bufmodetext = '(%s)' % (self.buf.mode,) # 'Text' or 'Python' or ...
+        bufmode = bufmodetext + '-'*(10 - len(bufmodetext))
+        statustext = (current + readonly + modified + bufname + position +
+                      linenums + bufmode)
+        nstatus = len(statustext)
+        if show_diagnostics:
+            Window.nupdates += 1 # ensure at least this changes in diagnostics
+            diagnostics = '  N%6d f%3d n%3d' % \
+                (Window.nupdates, self.first, self.nprinted)
+            nsuffix = len(diagnostics)
+            npad = self.ncols - (nstatus + nsuffix)
+            statustext += '-'*npad + diagnostics
+        else: # show + at column 80
+            npad79 = 79 - nstatus
+            npad81 = self.ncols - 81
+            statustext += '-'*npad79 + '+' + '-'*npad81
+        return statustext[:self.ncols+1]
+
+    def update_status_line(self, text):
+        'display text on status line with white_bg'
+        display.put_render(self.statusline(), 1, text, display.white_bg)
+
+    # Methods called by clients
+
+    # window geometry calculations
+
+    def resize(self, top, nlines, ncols):
+        """
+        Assign, recalculate window dimensions
+         top - line number on display of first line of window
+         nlines - n of lines in window, excludling status line
+         ncols - maximum number of characters in a line
+        """
+        self.top = top
+        self.nlines = nlines
+        self.ncols = ncols
+
+    def wline(self, iline):
+        'Line number on display of iline in buffer.'
+        return self.top + (iline - self.btop)
+
+    def contains(self, iline):
+        'Line number iline in buffer is one of the lines present in the window'
+        return (self.btop <= iline <= self.blast)
+
+    def intersects(self, start, end):
+        'Window intersects range defined by start..end'
+        return (self.contains(start) or self.contains(end)
+                or (start < self.btop and end > self.bbottom()))
+
+    # markers
+
+    def set_marker(self, iline):
+        'Set marker on buffer line iline, or top line if buffer empty'
+        self.put_marker(iline)
+
+    def clear_marker(self, iline):
+        'Clear marker from buffer line iline, or top line if buffer empty'
+        self.put_marker(iline, clear=True)
+
+    # adjust window positions
+
+    def locate(self, destination):
+        """
+        Shift segment of buffer displayed in window to center on destination, 
+        a line number in buffer.
+        """
+        if self.near_top(destination):
+            self.btop = 1  
+        elif self.near_bottom(destination):
+            self.btop = self.buf.nlines() - (self.nlines - 1) # last page
+        else: 
+            self.btop = destination - self.nlines//2 # center dest. in window
+        self.blast = self.blastline()
+
+    # update windows
 
     def render_from(self, start):
         """
@@ -254,7 +310,7 @@ class Window(object):
             self.mutate_lines(start, end)
         else:
             self.update()
-       
+
     def update_for_input(self):
         """
         For use with ed input mode: a i c.  Text at dot is already up-to-date.
@@ -335,42 +391,10 @@ class Window(object):
             self.update(destination=self.saved_dot)
         # window followed deleted lines
         elif self.btop > end:
-            self.shift(nlines)
+            self.translate(nlines)
         self.update_status()
 
-    def status_text(self):
-        'Return string about window and its buffer for its status line.'
-        current = '----.' if self.focus else '-----'
-        readonly = '%' if self.buf.readonly else '-'
-        modified = '*-     ' if self.buf.modified else '--     '
-        bufname = '%-13s' % self.buf.name
-        dot = self.buf.dot if self.focus else self.saved_dot
-        position = (' All ' if self.buf.nlines() <= self.nlines else
-                    ' Top ' if self.btop == 1 else
-                    ' Bot ' if self.blast == self.buf.nlines() else
-                    ' %2.0f%% ' % (100*dot/self.buf.nlines()))
-        linenums = '%-14s' % ('L%d/%d ' % (dot, self.buf.nlines()))
-        bufmodetext = '(%s)' % (self.buf.mode,) # 'Text' or 'Python' or ...
-        bufmode = bufmodetext + '-'*(10 - len(bufmodetext))
-        statustext = (current + readonly + modified + bufname + position +
-                      linenums + bufmode)
-        nstatus = len(statustext)
-        if show_diagnostics:
-            Window.nupdates += 1 # ensure at least this changes in diagnostics
-            diagnostics = '  N%6d f%3d n%3d' % \
-                (Window.nupdates, self.first, self.nprinted)
-            nsuffix = len(diagnostics)
-            npad = self.ncols - (nstatus + nsuffix)
-            statustext += '-'*npad + diagnostics
-        else: # show + at column 80
-            npad79 = 79 - nstatus
-            npad81 = self.ncols - 81
-            statustext += '-'*npad79 + '+' + '-'*npad81
-        return statustext[:self.ncols+1]
-
-    def update_status_line(self, text):
-        'display text on status line with white_bg'
-        display.put_render(self.statusline(), 1, text, display.white_bg)
+    # status line
 
     def update_status(self):
         'display status text on status line'

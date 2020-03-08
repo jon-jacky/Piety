@@ -317,7 +317,7 @@ def insert_other(buffer, start, end, column):
     for w in windows:
         if w.buf == buffer:
             w.saved_dot = w.buf.dot
-            w.insert(start, end)
+            w.modify(start, end)
     # Now put the cursor back in focus window, or at command line
     if mode == Mode.input: # can't put input cursor til other windows done
         win.put_cursor_for_input(column=column)

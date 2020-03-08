@@ -437,14 +437,14 @@ functions for parsing *ed* commands, and the
 *check.py* module that provides functions for checking
 command arguments and supplying default arguments.
 
-When **ed.py** is imported by the display editors *edda* and *esdsel*,
+When **ed.py** is imported by the display editors *edda* and *edsel*,
 it can update the display by calling functions in the *frame* module.
 By default, this is not enabled, because when **ed.py** is running standalone
 it does not use a display.
 
 The *buffer*, *parse*, and *check* modules are
 included in this directory.  **ed.py** also uses the Python standard
-library modules *re*, *os*, *sys*, *enum*, and *contextlib*.
+library modules *re*, *os*, *sys*, and *contextlib*.
 Other than that, **ed.py** has no dependencies.
 
 

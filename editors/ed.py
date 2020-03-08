@@ -3,7 +3,6 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 """
 
 import re, os, sys
-from enum import Enum
 from contextlib import redirect_stdout
 import parse, check, buffer
 
