@@ -4,16 +4,21 @@ branches
 
 This is the **flatten** branch:
 
-- **flatten**.  Simplify display updates in *frame* and its clients. 
-Replace its large  *update*  function with each of its many nested cases 
-turned into a  separate small function, whose name is the same as the *Op* 
-*Enum* value that was used to select that case.  Each function has just 
-the  minimum of positional arguments it needs,  instead of many optional 
-keyword  arguments.  Remove the *updates* module with its *Op* enum; they 
-are no longer needed to select cases.  Remove the *view* module with its 
-no-op *update* function that suppresses output when no display, instead just 
-have a  boolean variable and explicitly guard *import frame* and each call 
-to a  *frame* display function.  Begun 17 Jan 2020.
+- **flatten**.  Improvements to organization and style in *frame* and 
+*window*, and correpsonding revisions in their clients *buffer*, *ed*, 
+*edda*, and *edsel*.  In *frame*,  replace its large  *update* function 
+with each of its many nested cases  turned into a  separate small 
+function, whose name is the same as the *Op*  *Enum* value that was used 
+to select that case.  Each function has just  the  minimum of positional 
+arguments it needs,  instead of many optional  keyword  arguments.  Remove 
+the *updates* module with its *Op* enum; they  are no longer needed to 
+select cases.  Remove the *view* module with its  no-op *update* function 
+that suppresses output when no display.  Instead, in *ed* and *buffer* 
+have a boolean variable *displaying* that explicitly guards *import frame* 
+and each call to a *frame* display function.  In *window*, simplify code 
+and  remove redundancies, rename several methods, reorder methods in the 
+file.  Revise  explanations in *frame.md* and *window.md*, minor revisions 
+to other *md* files. Begun 17 Jan 2020.
 
 Branches recently merged into *master*:
 
@@ -124,5 +129,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Jan 2020
+Revised Mar  2020
 

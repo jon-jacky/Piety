@@ -42,7 +42,7 @@ class Window(object):
         self.first = 0    # first line printed on window in this update
         self.nprinted = 0 # n of lines printed on window in this update
 
-    # Helper methods, not called by clients
+    # Helper methods, used within this class but not called by clients
 
     # window geometry calculations
 
@@ -229,6 +229,10 @@ class Window(object):
         return (self.contains(start) or self.contains(end)
                 or (start < self.btop and end > self.bbottom()))
 
+    def samebuf(self, win):
+        'True when this window differs from win but uses the same buffer'
+        return (self != win and self.buf == win.buf)
+
     # markers
 
     def set_marker(self, iline):
@@ -335,10 +339,6 @@ class Window(object):
         """
         wdot = self.wline(self.buf.dot)
         display.put_cursor(wdot+1, column)
-
-    def samebuf(self, win):
-        'True when this window differs from win but uses the same buffer'
-        return (self != win and self.buf == win.buf)
 
     def adjust_insert(self, start, end):
         """

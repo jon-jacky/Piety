@@ -35,7 +35,7 @@ ifocus = None # index of window with input focus
 win = None # window with input focus
 windows = list() # list of windows, windows[ifocus] has input focus
 
-# Helper functions, not intended to be called by clients
+# Helper functions, used within this module but not called by clients
 
 def scale(nlines, cmd_h):
     """
@@ -64,7 +64,7 @@ def put_display_cursor(column=1):
     wdot = win.wline(win.buf.dot)
     display.put_cursor(wdot, column)
 
-# Display update functions intended to be called by clients
+# Functions called by clients
 
 def init(buffer):
     'Initialize frame with one window into buffer.'
