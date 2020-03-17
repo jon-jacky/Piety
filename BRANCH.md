@@ -4,8 +4,9 @@ branches
 
 This is the **flatten** branch:
 
-- **flatten**.  Improvements to organization and style in *frame* and 
-*window*, and correpsonding revisions in their clients *buffer*, *ed*, 
+- **flatten**.  Simplify the display update modules *frame* and *window*, 
+improve their organization
+and style, and make corresponding revisions in their clients *buffer*, *ed*, 
 *edda*, and *edsel*.  In *frame*,  replace its large  *update* function 
 with each of its many nested cases  turned into a  separate small 
 function, whose name is the same as the *Op*  *Enum* value that was used 

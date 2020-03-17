@@ -76,6 +76,11 @@ also a command *^X* that enables you to type and execute any single
 *ed* or *edda* command and then return immediately to display editing
 mode.  This makes it easy to alternate display editing with commands.
 
+You will probably use *^Z* and *^X* frequently while display editing, because
+many useful operations are only available in commmand mode.  For example,
+you must use one of these commands before you can enter a Python command 
+or enter the Python shell.
+
 ## Display Editing Commands ##
 
 Display editing commands are bound to single control characters: hold
@@ -154,13 +159,26 @@ Commands retrieved from the history can be edited and submitted.
 Command line history including previous search strings can be accessed
 during *^X* commmands.
 
+## API and data structures ##
+
+In *edsel*, calls to the *edda* API require a prefix:
+*edda.o(2)*, *edda.h(12)* etc.
+
+In *edsel*, the window data structures must be prefixed by the *frame* module name:
+*frame.win* is the current window, *frame.windows* is the list
+of windows, etc.
+
+In *edsel*, *ed* data structures and calls to the *ed* API must be prefixed by
+the module name *ed.*  For example: *ed.current*, *ed.a('append line after dot')*,
+etc.
+
 ## Using edsel commands ##
 
 The most effective way to use some *edsel* commands is not always obvious.
 For working with files and buffers, see the instructions for [ed.py](ed.md)
 (also [here](ed.txt)).  For working with windows, see [edda](edda.md)
-(also [here](edda.txt)).  For working with the built-in Python shell
-and scripting, see [edo](../editors/edo.md).
+(also [here](edda.txt)).  For working with the built-in Python shell,
+see [wyshka](../shells/wyshka), and for scripting, see [edo](../editors/edo.md).
 
 Here are some hints for using *edsel* display commands.
 
@@ -180,20 +198,51 @@ re-assign it in another */.../* or *?...?* command.
 
 In *edsel*, search is always case sensitive.
 
+#### Selecting and using the text region ####
+
+The text *region* is the target for the *^W* cut command and
+can be used as the selection for any *ed.py* command (that is,
+the range of lines affected by the command).
+
+The text *region* is defined by the line called the *mark*  and the 
+current line *dot*.  The region is the sequence of complete lines 
+beginning with (and including) mark, up to (but *not* including) dot.  To 
+select a region, put the cursor on the first line of the region and type 
+the command to set the mark:  *^@* (or *^-space*). The message *Mark set* 
+appears in the scrolling region at the bottom of the display. Then move 
+the cursor (which indicates dot) 
+down to the first line after the end of the region. As you move 
+the cursor, the end of the region moves also, always following one
+line behind dot.
+
+To see where the region begins, type *^Q*, which places the cursor at 
+mark, then type *^Q* again to return the cursor to dot, after the end of 
+the region.
+
+In command mode, the text region is indicated by the *[* character
+and can prefix any command.  For example, *[p* prints all the
+lines in the region.   You can select the region in display editing
+mode, then apply any *ed.py* command to that region by typing *^X*, then
+at the prompt type *[* then the command.  Some useful examples appear 
+below.
+
+You might well ask, what if dot *precedes* mark?  ...
+
+You might also ask, how do we get rid of the mark, or cancel the region
+so we can start a new one somewhere else?  The *^G* command deletes the mark
+and cancels the region.
+
 #### Cut and Paste ####
 
-The command to set the mark, *^@* (or *^-space*), only marks the line
-(not the character within the line), so the region defined by the mark
-and the current line (called dot) is always a sequence of complete
-lines (that includes mark but excludes dot).  Therefore, the cut (delete)
-command *^W* followed by the paste (yank) command *^Y* always act on a
-sequence of complete lines, inserting the lines before the current line.
+The text region is always a sequence of complete lines. Therefore, the cut 
+(delete) command *^W* followed by the paste (yank) command *^Y* always act 
+on a sequence of complete lines, inserting the lines before the current 
+line.
 
-In contrast to *^W*, the kill *^K* and discard *^U* commands
-each cut a segment delimited by the cursor from a
-single line, and a subsequent *^Y* command pastes that
-same segment right at the cursor, anywhere within the same
-line or a different line.
+In contrast to *^W*, the kill command *^K* cuts from the cursor to the end 
+of the line, and *^U* cuts from the beginning of the line to the  cursor. 
+A subsequent *^Y* command pastes that cut  segment right at the cursor, 
+anywhere within the same line or a different line.
 
 So the *^K* and *^U* commands have the effect of toggling subsequent *^Y*
 commands to inline mode, while *^W* toggles *^Y* to multiline mode.
@@ -202,11 +251,29 @@ commands to inline mode, while *^W* toggles *^Y* to multiline mode.
 
 To enter an indented line, type *tab* (or *^I*) at the beginning of the line.
 *edsel* inserts blanks (space characters) to match the indentation of the preceding line.
-Then type the text of the new indented line.
+You can type additional tabs or spaces, or alternatively you may delete some 
+preceding spaces, to adjust the indentation differently than the preceding line.
+Then type the text of the new indented line.  To enter a sequence of lines with
+the same indentation, just type *tab* or *^I* at the beginning of each line
+to match the indentation of the preceding line, then type your text.
 
 To edit an indented line, type *^J* (jump to next word) at the beginning of the line.
 *edsel* places the cursor on the first non-blank character in the line.  Then edit
 the text of the indented line.
+
+To indent an existing block of text, use *^X* to select command mode,
+then type *I*, the *ed.py* indent command (capital *I*, the lowercase *i*
+is the insert command).  By default *I* just indents the current line, dot,
+but you can prefix *I* by any range of line numbers, or any selection
+abbreviation.  Type *[I* to indent the text region previously
+selected in display mode by a mark command.
+
+To outdent a block of text, use the *O* command.
+
+The indent and outdent commands *I* and *O* both take an optional parameter,
+the number of spaces to indent (or outdent).   This initially defaults to 
+4 spaces, after you type a number, it becomes the default for subsequent
+*I* and *O* commands.
 
 #### Wrapped text ####
 
@@ -235,23 +302,10 @@ more wrapped lines will appear.  You can edit those lines. When you are done
 editing, select all the wrapped lines and type the *j* command to join them
 all into one long line again.
 
-## API and data structures ##
-
-In *edsel*, calls to the *edda* API require a prefix:
-*edda.o(2)*, *edda.h(12)* etc.
-
-In *edsel*, the window data structures must be prefixed by the *frame* module name:
-*frame.win* is the current window, *frame.windows* is the list
-of windows, etc.
-
-In *edsel*, *ed* data structures and calls to the *ed* API must be prefixed by
-the module name *ed.*  For example: *ed.current*, *ed.a('append line after dot')*,
-etc.
-
 ## Limitations ##
 
 **edsel** is *ed.py* underneath.  In display editing mode, you can place
-the cursor and insert or delete characters anywhere, but some commands
+the cursor and insert or delete characters anywhere, but most commands
 are still line-oriented.
 
 All *ed* commands leave the cursor at the beginning of the line.
@@ -266,8 +320,20 @@ editing mode, the *^X* command that enters and executes a single
 command line, and the *^O* command that moves the cursor to the next
 window.
 
-These limitations might be mitigated somewhat by using the *^J*
-command that quickly moves the cursor to the beginning of the next word.
+When *edsel* puts the cursor at the start of a line, you can 
+jump to the position you want by repeating the *^J*
+command that moves the cursor to the beginning of the next word.
+
+As you type and edit characters within a line, *edsel* renders them 
+directly to the focus window on the display, but does not yet store them 
+in the focus window's text buffer.   When you type *Return* at the 
+end of the line, or move to a different line, then *edsel* stores the completed 
+line in the text buffer.   If you have another window displaying the  same 
+text buffer, the line you are typing or editing in the focus window does 
+not appear in the other window until you finish editing the line by typing 
+*Return*, or move to a different line and then do some command that updates
+the display.  Just moving to a different line does not update the display,
+in order to avoid too many updates.
 
 All display editing commands are bound to single control characters.
 *edsel* does not support sequences of multiple control characters, or
@@ -276,5 +342,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Jan 2020
+Revised Mar 2020
 

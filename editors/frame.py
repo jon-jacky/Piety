@@ -284,10 +284,10 @@ def mutate(start, end):
     Update all lines in start..end, don't know which lines changed
     """
     if mode == Mode.command and win.contains(start):
-        self.clear_marker(start)
+        win.clear_marker(start)
     win.mutate(start, end)
     if mode == Mode.command and win.contains(end):
-        self.set_marker(end)
+        win.set_marker(end)
     for w in windows:
         if w.samebuf(win):
             if w.intersects(start, end):
