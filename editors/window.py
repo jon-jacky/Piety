@@ -362,7 +362,7 @@ class Window(object):
             self.update(destination=self.saved_dot)
         # window follows inserted lines
         elif self.btop >= start:
-            self.shift(nlines)
+            self.translate(nlines)
         self.update_status()
 
     def adjust_delete(self, start, end, destination):
