@@ -11,6 +11,7 @@ import parse, check, buffer
 displaying = False
 frame = None
 
+
 # Each ed command is implemented here by a command function with the same
 # one-letter name, whose arguments are the same as the ed command args.
 # The current buffer is used by many of these functions, but to
@@ -164,7 +165,9 @@ def E(*args):
     if not filename:
         print('? no filename')
         return
-    if fname_in_use(filename):
+    fbufnames = bufs_for_file(filename)
+    if fbufnames and 'main' not in fbufnames:
+        print('? buffer %s is already editing file %s' % (fbufnames[0], filename))
         return
     buf.filename = filename
     buf.d(1, buf.nlines())

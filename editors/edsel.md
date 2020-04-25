@@ -196,6 +196,10 @@ Therefore, *^X* can act as a search command: type *^X* then
 The same search string remains in effect in all buffers until you
 re-assign it in another */.../* or *?...?* command.
 
+Search commands only find the line containing the search string.  They
+leave the cursor at the beginning of that line, not at the search
+string within the line.
+
 In *edsel*, search is always case sensitive.
 
 #### Selecting and using the text region ####
@@ -219,7 +223,7 @@ To see where the region begins, type *^Q*, which places the cursor at
 mark, then type *^Q* again to return the cursor to dot, after the end of 
 the region.
 
-In command mode, the text region is indicated by the *[* character
+In command mode, the text region is selected by the *[* character
 and can prefix any command.  For example, *[p* prints all the
 lines in the region.   You can select the region in display editing
 mode, then apply any *ed.py* command to that region by typing *^X*, then

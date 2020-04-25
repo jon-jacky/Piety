@@ -19,7 +19,8 @@ have a boolean variable *displaying* that explicitly guards *import frame*
 and each call to a *frame* display function.  In *window*, simplify code 
 and  remove redundancies, rename several methods, reorder methods in the 
 file.  Revise  explanations in *frame.md* and *window.md*, minor revisions 
-to other *md* files. Begun 17 Jan 2020.
+to other *md* files.  Bug fixes in *ed.py* and a few other modules.  Bring some
+tests in *test/edda* up to date.  Begun 17 Jan 2020.
 
 Branches recently merged into *master*:
 

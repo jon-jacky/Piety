@@ -288,7 +288,7 @@ buffer only until it is reassigned again. The left margin of all the
 wrapped lines is the made the same as the left margin of the first line in
 the selection.
 
-**ed.py** provides the new *I* and *O* commands to ident and outdent the 
+**ed.py** provides the new *I* and *O* commands to indent and outdent the 
 selected lines.  The default is dot, the current line.   The default 
 indent and outdent are four spaces, but can be changed by an optional 
 integer parameter to either command, which then applies to all subsequent 

@@ -98,7 +98,7 @@ def command_tokens(buf, cmd_string):
     if tail and tail[0] in ed_cmds:
         cmd_name, params = tail[0], tail[1:].strip()
     # special case command names
-    elif tail == '':
+    elif tail == '' or tail.isspace():
         cmd_name = 'l' # default for empty cmd_string
     elif tail[0] == '=':
         cmd_name = 'A'

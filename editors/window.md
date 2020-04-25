@@ -12,8 +12,12 @@ in the buffer, and other information.
 
 Window contents are not stored in *Window* objects, only in text buffers.
 *Window* methods render buffer contents directly to the display.
-Window objects only store the location of the window on the display,
+*Window* objects only store the location of the window on the display,
 and the location of the window's segment (displayed lines) in the buffer.
+
+In the present version, *Window* objects only store the vertical location 
+of the window. All windows are aligned on the left edge of the display.
+The display shows a vertical stack of windows (or one window).
 
 All updates from the *window* module involve a whole line or sequence of 
 lines from a buffer. Updates within a line are handled by the *console* or 

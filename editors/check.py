@@ -83,6 +83,7 @@ def irange(buf, args):
 def range_dest(buf, args):
     'check range and destination in args, for cmds with a destination: m t'
     valid, start, end, params, _ = irange(buf, args)
+    dest_valid, dest = None, None # placeholders needed for not valid case
     if valid:
         dest, _ = parse.line_address(buf, params)
         # dest can be 0 because lines are moved to *after* dest
