@@ -2,10 +2,10 @@
 branches
 ========
 
-This is the **flatten** branch:
+This is the **master** branch.  Branches recently merged into *master*:
 
-- **flatten**.  Simplify the display update modules *frame* and *window*, 
-improve their organization
+- **flatten**, merged 25 Apr 2020.  Simplify the display update modules 
+*frame* and *window*, improve their organization
 and style, and make corresponding revisions in their clients *buffer*, *ed*, 
 *edda*, and *edsel*.  In *frame*,  replace its large  *update* function 
 with each of its many nested cases  turned into a  separate small 
@@ -21,8 +21,6 @@ and  remove redundancies, rename several methods, reorder methods in the
 file.  Revise  explanations in *frame.md* and *window.md*, minor revisions 
 to other *md* files.  Bug fixes in *ed.py* and a few other modules.  Bring some
 tests in *test/edda* up to date.  Begun 17 Jan 2020.
-
-Branches recently merged into *master*:
 
 - **redirect**, merged 13 Jan 2020.  In the *wyshka* shell, 
 provide redirection of command output
