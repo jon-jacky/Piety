@@ -5,8 +5,9 @@ branches
 This is the **paragraph** branch.  
 
 - **paragraph**.  Add new paragraph address range ] to *ed.py*, for 
-convenience using wrap command *J* and executue Python commands *P* and *R*. 
+convenience using wrap command *J* and execute Python commands *P* and *R*. 
 Revise *J* command to properly re-wrap already-indented text.
+Begun 26 Apr 2020.
 
 Branches recently merged into *master*:
 
