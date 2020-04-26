@@ -2,7 +2,13 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into *master*:
+This is the **paragraph** branch.  
+
+- **paragraph**.  Add new paragraph address range ] to *ed.py*, for 
+convenience using wrap command *J* and executue Python commands *P* and *R*. 
+Revise *J* command to properly re-wrap already-indented text.
+
+Branches recently merged into *master*:
 
 - **flatten**, merged 25 Apr 2020.  Simplify the display update modules 
 *frame* and *window*, improve their organization
@@ -129,5 +135,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Mar  2020
+Revised Apr 2020
 
