@@ -255,9 +255,9 @@ class Buffer(object):
             self.fill_column = fill_column
         lines = self.lines[start:end+1]
         margin = ' ' * (len(lines[0]) - len(lines[0].lstrip()))
-        wrapped = textwrap.wrap(''.join(lines), width=self.fill_column-1,
-                               initial_indent='', subsequent_indent=margin)
-        filled = ' \n'.join(wrapped) # trailing space so J then [j restores line
+        filled = textwrap.fill(textwrap.dedent(''.join(lines)), 
+                                width=self.fill_column-1,
+                                initial_indent=margin, subsequent_indent=margin)
         self.d(start, end, yank=False)
         self.i(start, filled)
 
