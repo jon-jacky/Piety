@@ -39,8 +39,14 @@ def line_address(buf, cmd_string):
     if cmd_string[0] in ',%': # equivalent to 1,$ - whole buffer
         return 1, ',$'+ cmd_string[1:]
 
+    # These next two cases don't return, instead they proceed to next section
+
     if cmd_string[0] in '[': # equivalent to '@,- -selection from mark to dot
         cmd_string = "'@,-" + cmd_string[1:]
+
+    # This is a special case, we find two line numbers at once.
+    if cmd_string[0] in ']': # paragraph
+        cmd_string = "%d,%d" % (buf.para_first(), buf.para_last()) + cmd_string[1:]
 
     m = number.match(cmd_string) # digits, the line number
     if m:

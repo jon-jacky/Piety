@@ -298,13 +298,15 @@ which applies the wrap command *J* to the region *[* from mark to dot.
 
 #### Long lines ####
 
-Lines which are wider than the frame disappear off the right edge of the
-frame (they are *clipped*, not wrapped).  To edit one of these extra-long
-lines, type *^X* to get the command prompt, then type the command *J* to
-wrap that line to the width defined by the default fill column.  Two or
-more wrapped lines will appear.  You can edit those lines. When you are done
-editing, select all the wrapped lines and type the *j* command to join them
-all into one long line again.
+Lines which are wider than the frame disappear off the right edge of the 
+frame (they are *clipped*, not wrapped).  To edit one of these extra-long 
+lines, type *^X* to get the command prompt, then type the command *J* to 
+wrap that line to the width defined by the default fill column.  Two or 
+more wrapped lines will appear.  You can edit those lines. When you are 
+done editing, type a space at the end of each wrapped line, select all the 
+wrapped lines and type the *[j* command to join them all into one long line 
+again. (If you do not type the extra space at the end of each line, words
+will run together where the lines are joined.)
 
 ## Limitations ##
 

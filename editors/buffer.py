@@ -14,10 +14,12 @@ frame = None
 # Hook for display updates from background tasks to restore cursor etc.
 console = None  # default: no updates from background tasks,no restore needed
 
+# used by paragraph methods par_start, par_end 
+re_emptyline = re.compile('^\s*$')
+
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
-
-    pattern = '' # search string - default '' matches any line
+    pattern = re.compile('') # search string - default '' matches any line
     # assigned by y(ank), that is copy, or d(elete) in current buffer,
     # may be used by x (put, paste) in same or any other buffer
     cut_buffer = list() # most recently deleted (or "yanked") lines from any buffer
@@ -84,12 +86,12 @@ class Buffer(object):
         (or if forward is False, search backward from .-1 to start of buffer)
         If found, return line number.  If not found, return None.
         This version stops at end (or start) of buffer, does not wrap around.
-        This version searches for exact match, not regex match."""
+        This version searches for regex match, not exact match"""
         found = False
         slines = self.lines[self.dot+1:] if forward \
             else reversed(self.lines[:self.dot-1])
         for imatch, line in enumerate(slines):
-            if Buffer.pattern in line:
+            if Buffer.pattern.search(line):
                 found = True
                 break
         if not found:
@@ -101,7 +103,7 @@ class Buffer(object):
         Search for Buffer.pattern, return line number where found, dot if not found
         Search forward if forward is True, backward otherwise."""
         if pattern:
-            Buffer.pattern = pattern
+            Buffer.pattern = re.compile(pattern)
         imatch = self.search_buf(forward)
         return imatch if imatch else self.dot
 
@@ -114,6 +116,38 @@ class Buffer(object):
         """Backward search for pattern,
         return line number where found, self.dot if not found"""
         return self.search(pattern, False)
+
+    def emptyline(self, iline):
+        'Return match object if line number iline is empty, None otherwise'
+        return re_emptyline.match(self.lines[iline])
+
+    def para_first(self):
+        'Return number of first line in paragraph that contains dot'
+        iline = self.dot
+        # If dot is empty line following paragraph, search back.
+        # iline 0 is invisible empty line before visible line 1.
+        while self.emptyline(iline) and iline >= 0: 
+            iline -= 1
+        if iline == 0: # all lines in buffer are empty
+            return 0   # invokes '? Invalid address'
+        # Dot is non-empty line in paragraph, search back for empty.
+        while not self.emptyline(iline) and iline >= 0:
+            iline -= 1
+        return iline + 1
+
+    def para_last(self):
+        'Return number of last line in paragraph that contains dot'
+        iline = self.dot
+        # If dot is empty line following paragraph, search back for nonempty.
+        # iline 0 is invisible empty line before visible line 1.
+        while self.emptyline(iline) and iline >= 0: 
+            iline -= 1
+        if iline == 0: # all lines in buffer are empty
+            return 0   # invokes '? Invalid address'
+        # Dot is non-empty line in paragraph, search forward for empty.
+        while not self.emptyline(iline) and iline <= self.nlines():
+            iline += 1
+        return iline - 1 if iline < self.nlines() else iline
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
