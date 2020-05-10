@@ -14,8 +14,8 @@ frame = None
 # Hook for display updates from background tasks to restore cursor etc.
 console = None  # default: no updates from background tasks,no restore needed
 
-# used by paragraph methods par_start, par_end 
-re_emptyline = re.compile('^\s*$')
+# used by search methods
+emptyline = re.compile('^\s*$')
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) and state variables.'
@@ -81,73 +81,75 @@ class Buffer(object):
 
     # search
 
-    def search_buf(self, forward):
-        """Search for Buffer.pattern.  Search forward from .+1 to end of buffer
-        (or if forward is False, search backward from .-1 to start of buffer)
-        If found, return line number.  If not found, return None.
-        This version stops at end (or start) of buffer, does not wrap around.
-        This version searches for regex match, not exact match"""
-        found = False
-        slines = self.lines[self.dot+1:] if forward \
-            else reversed(self.lines[:self.dot-1])
-        for imatch, line in enumerate(slines):
-            if Buffer.pattern.search(line):
-                found = True
-                break
-        if not found:
-            return None
-        return self.dot+1 + imatch if forward else self.dot-2 - imatch
+    def match(self, pattern, iline):
+        """
+        pattern is a compiled regexp, iline is a line number in the buffer.
+        Return match object if pattern found in line, None otherwise.
+        Named match, but uses re search not match to match anywhere in line.
+        """
+        return pattern.search(self.lines[iline])
 
-    def search(self, pattern, forward):
-        """Update Buffer.pattern if pattern is nonempty, otherwise retain old pattern
-        Search for Buffer.pattern, return line number where found, dot if not found
-        Search forward if forward is True, backward otherwise."""
+    def lines_precede(self, iline):
+        'returns True when more lines precede iline in buffer, False otherwise'
+        return iline > 0    
+
+    def lines_follow(self, iline):
+        'returns True when more lines follow iline in buffer, False otherwise'
+        return iline < self.nlines()   
+    
+    def search(self, pattern, direction, more_lines):
+        """
+        Search forward (backward) for pattern to end (start) of buffer.
+        Return line number where pattern first found, return dot if not found.  
+        If pattern arg is nonempty use it, otherwise use previous Buffer.pattern.
+        pattern: literal string or regexp string (not compiled)
+        direction: 1 forward toward end, -1 back toward start
+        more_lines: True when more lines follow (precede) iline in buffer.
+        """
         if pattern:
             Buffer.pattern = re.compile(pattern)
-        imatch = self.search_buf(forward)
-        return imatch if imatch else self.dot
-
+        iline = self.dot + direction
+        while not self.match(Buffer.pattern, iline) and more_lines(iline):
+            iline += direction
+        return iline if self.match(Buffer.pattern, iline) else self.dot
+                     
     def F(self, pattern):
-        """Forward Search for pattern,
-        return line number where found, dot if not found"""
-        return self.search(pattern, True)
+        'Search forward for pattern by calling search method'
+        return self.search(pattern, 1, self.lines_follow)
 
     def R(self, pattern):
-        """Backward search for pattern,
-        return line number where found, self.dot if not found"""
-        return self.search(pattern, False)
+        'Search backward for pattern by calling search method'
+        return self.search(pattern, -1, self.lines_precede)
 
-    def emptyline(self, iline):
-        'Return match object if line number iline is empty, None otherwise'
-        return re_emptyline.match(self.lines[iline])
-
-    def para_first(self):
-        'Return number of first line in paragraph that contains dot'
+    def para_edge(self, direction, more_lines):
+        """
+        A paragraph is a sequence of non-empty lines.
+        Return number of first (last) line in paragraph that contains dot.
+        If dot is on an empty line, return line nums from preceding paragraph.
+        If no preceding paragraph, return 0.
+        direction -1 to search back to first line, +1 search fwd to last line.
+        more_lines: True when more lines precede (follow) iline in buffer.
+        """
         iline = self.dot
         # If dot is empty line following paragraph, search back.
         # iline 0 is invisible empty line before visible line 1.
-        while self.emptyline(iline) and iline >= 0: 
+        while self.match(emptyline, iline) and iline > 0: 
             iline -= 1
         if iline == 0: # all lines in buffer are empty
             return 0   # invokes '? Invalid address'
-        # Dot is non-empty line in paragraph, search back for empty.
-        while not self.emptyline(iline) and iline >= 0:
-            iline -= 1
-        return iline + 1
+        # Dot is non-empty line in paragraph, search back (forward) for empty.
+        while not self.match(emptyline, iline) and more_lines(iline):
+            iline += direction 
+        return iline - direction # edge is line that follows (precedes) empty
+        # FIXME? When direction = 1, can't return last line
+
+    def para_first(self):
+        'Return number of first line in paragraph that contains/precedes dot'
+        return self.para_edge(-1, self.lines_precede)
 
     def para_last(self):
-        'Return number of last line in paragraph that contains dot'
-        iline = self.dot
-        # If dot is empty line following paragraph, search back for nonempty.
-        # iline 0 is invisible empty line before visible line 1.
-        while self.emptyline(iline) and iline >= 0: 
-            iline -= 1
-        if iline == 0: # all lines in buffer are empty
-            return 0   # invokes '? Invalid address'
-        # Dot is non-empty line in paragraph, search forward for empty.
-        while not self.emptyline(iline) and iline <= self.nlines():
-            iline += 1
-        return iline - 1 if iline < self.nlines() else iline
+        'Return number of last line in paragraph that contains/precedes dot'
+        return self.para_edge(1, self.lines_follow)
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
