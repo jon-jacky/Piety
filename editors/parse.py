@@ -16,8 +16,12 @@ bkdcnumber = re.compile(r'\^(\d+)')
 plusnumber = re.compile(r'(\++)')
 minusnumber = re.compile(r'(\-+)')
 caratnumber = re.compile(r'(\^+)')
+# string search, regexp meta chrs match themselves
 fwdsearch = re.compile(r'/(.*?)/') # non-greedy *? for /text1/,/text2/
 bkdsearch = re.compile(r'\?(.*?)\?')
+# regular expression search, unescaped regexp meta chrs are interpreted
+refwdsearch = re.compile(r'\|(.*?)\|')
+rebkdsearch = re.compile(r'&(.*?)&')
 text = re.compile(r'(.*)') # nonblank
 mark = re.compile(r"'([a-z@])")  # 'c, ed mark with single lc char label or @
 
@@ -69,10 +73,18 @@ def line_address(buf, cmd_string):
     m = caratnumber.match(cmd_string) # digits, the line number
     if m:
         return buf.dot - len(m.group(0)), cmd_string[m.end():]
+    # string search, regexp meta chrs match themselves
     m = fwdsearch.match(cmd_string)  # /text/ or // - forward search
     if m:
-        return buf.F(m.group(1)), cmd_string[m.end():]
+        return buf.F(re.escape(m.group(1))), cmd_string[m.end():]
     m = bkdsearch.match(cmd_string)  # ?text? or ?? - backward search
+    if m:
+        return buf.R(re.escape(m.group(1))), cmd_string[m.end():]
+    # regular expression search, unescaped regexp meta chrs are interpreted
+    m = refwdsearch.match(cmd_string)  # |text| or || - forward regexp search
+    if m:
+        return buf.F(m.group(1)), cmd_string[m.end():]
+    m = rebkdsearch.match(cmd_string)  # &text& or && - backward regexp search
     if m:
         return buf.R(m.group(1)), cmd_string[m.end():]
     m = mark.match(cmd_string) # 'c mark with single lc char label

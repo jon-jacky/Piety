@@ -4,7 +4,6 @@ buffer.py - Buffer class for line-oriented text editors.
 """
 
 import os.path, re, textwrap
-from enum import Enum
 
 # buffer default is no display.  
 # edda startup assigns buffer.displaying = True and buffer.frame = frame
@@ -18,7 +17,7 @@ console = None  # default: no updates from background tasks,no restore needed
 emptyline = re.compile('^\s*$')
 
 class Buffer(object):
-    'Text buffer for editors, a list of lines (strings) and state variables.'
+    'Text buffer for editors, a list of lines (strings) with state variables.'
     pattern = re.compile('') # search string - default '' matches any line
     # assigned by y(ank), that is copy, or d(elete) in current buffer,
     # may be used by x (put, paste) in same or any other buffer
@@ -99,26 +98,32 @@ class Buffer(object):
     
     def search(self, pattern, direction, more_lines):
         """
-        Search forward (backward) for pattern to end (start) of buffer.
+        Regexp. search forward (backward) for pattern to end (start) of buffer.
         Return line number where pattern first found, return dot if not found.  
         If pattern arg is nonempty use it, otherwise use previous Buffer.pattern.
-        pattern: literal string or regexp string (not compiled)
+        pattern: regexp string (not compiled), unescaped meta chrs interpreted.
         direction: 1 forward toward end, -1 back toward start
         more_lines: True when more lines follow (precede) iline in buffer.
         """
         if pattern:
             Buffer.pattern = re.compile(pattern)
-        iline = self.dot + direction
+        iline = self.dot + direction if more_lines(self.dot) else self.dot
         while not self.match(Buffer.pattern, iline) and more_lines(iline):
             iline += direction
         return iline if self.match(Buffer.pattern, iline) else self.dot
                      
     def F(self, pattern):
-        'Search forward for pattern by calling search method'
+        """
+        Regular expression search forward for string pattern.
+        pattern: regexp string (not compiled), unescaped meta chrs interpreted.
+        """
         return self.search(pattern, 1, self.lines_follow)
 
     def R(self, pattern):
-        'Search backward for pattern by calling search method'
+        """
+        Regular expression search backward for string pattern.
+        pattern: regexp string (not compiled), unescaped meta chrs interpreted.
+        """
         return self.search(pattern, -1, self.lines_precede)
 
     def para_edge(self, direction, more_lines):

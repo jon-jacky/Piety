@@ -144,11 +144,11 @@ class Console(console.Console):
 
     def search(self):
         'Search forward for previous search string.'
-        self.goto_line(ed.F(''), self.point)
+        self.goto_line(ed.buf.F(''), self.point)
 
     def rsearch(self):
         'Search backward for previous search string.'
-        self.goto_line(ed.R(''), self.point)
+        self.goto_line(ed.buf.R(''), self.point)
 
     def set_mark(self):
         'Define region from mark (inclusive) to dot (exclusive) that is deleted by cut'

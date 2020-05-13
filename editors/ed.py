@@ -36,18 +36,6 @@ def S(): # looks like ed $
     'Return index of the last line, 0 if the buffer is empty'
     return buf.nlines()
 
-# helper functions: search
-
-def F(pattern):
-    """Forward Search for pattern,
-    return line number where found, dot if not found"""
-    return buf.F(pattern)
-
-def R(pattern):
-    """Backward search for pattern,
-    return line number where found, dot if not found"""
-    return buf.R(pattern)
-
 # helper functions: buffers and files
 
 def match_prefix(prefix, names):
