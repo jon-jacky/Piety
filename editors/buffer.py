@@ -310,15 +310,21 @@ class Buffer(object):
         'Outdent lines, remove leading outdent chars'
         self.lines[start:end+1] = [ l[outdent:] for l in self.lines[start:end+1]]
 
-    def s(self, start, end, old, new, glbl):
+    def s(self, start, end, old, new, glbl, use_regex):
         """Substitute new for old in lines from start up to end.
         When glbl is True, substitute all occurrences in each line,
         otherwise substitute only the first occurrence in each line."""
+        if use_regex:
+            re_old = re.compile(old)
         for i in range(start,end+1): # ed range is inclusive, unlike Python
-            if old in self.lines[i]: # test to see if we should advance dot
+            if ((not use_regex and old in self.lines[i])
+                    or (use_regex and self.match(re_old, i))):
                 self.y(i,i) # Cut buf only holds last line where subst, like GNU ed
-                self.lines[i] = self.lines[i].replace(old,new, -1 if glbl 
-                                                      else 1)
+                if not use_regex:
+                    self.lines[i] = self.lines[i].replace(old,new, -1 if glbl 
+                                                          else 1)
+                else: # use_regex
+                    self.lines[i] = re.sub(old, new, self.lines[i])
                 self.dot = i
                 self.modified = True
         # now self.dot is destination, last line actually changed

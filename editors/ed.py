@@ -427,11 +427,9 @@ def s(*args):
         else:
             print('? /old/new/')
             return
-        if len(params) > 1:
-            glbl = bool(params[1])
-        else:
-            glbl = False # default
-        buf.s(start, end, old, new, glbl)
+        glbl = bool(params[1])
+        use_regex = bool(params[2])
+        buf.s(start, end, old, new, glbl, use_regex)
 
 def m(*args):
     'move lines to after destination line'

@@ -124,9 +124,16 @@ def command_tokens(buf, cmd_string):
         print('? command expected at %s' % tail)
         return 'ERROR', start, end, params
     # command-specific parameter parsing
-    if cmd_name == 's' and len(params.split('/')) == 4: #s/old/new/g,g optional
+    # literal string replace with s/old/new/g, g optional
+    if cmd_name == 's' and len(params.split('/')) == 4:
+        use_regex = False
         empty, old, new, glbl = params.split('/') # glbl == '' when g absent
-        return cmd_name, start, end, old, new, glbl
+        return cmd_name, start, end, old, new, glbl, use_regex
+    # regular expression string replace with s|old|new|g, g optional
+    elif cmd_name == 's' and len(params.split('|')) == 4:
+        use_regex = True
+        empty, old, new, glbl = params.split('|') # glbl == '' when g absent
+        return cmd_name, start, end, old, new, glbl, use_regex
     # all other commands, no special parameter parsing
     else:
         # return each space-separated parameter as separate arg in sequence
