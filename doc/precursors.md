@@ -125,6 +125,7 @@ Here are some examples.
 | [pyv6](https://github.com/jtauber/pyv6) | P | 2013 | Python | Native OS | any with Python | "a wild attempt to port xv6 to Python" | 
 | [PylotOS](https://www.sra.uni-hannover.de/People/naumann/2018_master_naumann.pdf), also [here](https://www.stefannaumann.de/static/resources/2017-12-mpy.pdf), [via](https://www.stefannaumann.de/)  | S  | 2018 | Micro Python | Bare machine | Raspberry Pi Zero | "In PylotOS the domain concept is the equivalent to processes ... Domains cannot share any state or information with other domains." -- How !? |
 | [Kernel module](https://medium.com/@yon.goldschmidt/running-python-in-the-linux-kernel-7cbcbd44503c), also [github](https://github.com/Jongy/micropython/tree/linux-kernel/ports/linux-kernel) | P | 2019 | Micro Python | Native OS | Linux | "port of MicroPython that runs as a Linux kernel module."  |
+| [snakeware](https://github.com/joshiemoore/snakeware), also [HN](https://news.ycombinator.com/item?id=23391380)| P | 2020 | Python | Native OS | Linux (with pygame)  | "Linux distro with a Python userspace inspired by the Commodore 64" |
 
 Key to **T** (project **Type**) column, perhaps an indicator of
 project size and longevity:

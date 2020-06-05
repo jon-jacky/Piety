@@ -421,7 +421,7 @@ def s(*args):
     """
     valid, start, end, old, params = check.irange(buf, args)
     if valid:
-        # params might be [ new, glbl ]
+        # params might be [ new, glbl, use_regex ]
         if old and len(params) > 0 and isinstance(params[0],str):
             new = params[0]
         else:
@@ -429,7 +429,9 @@ def s(*args):
             return
         glbl = bool(params[1])
         use_regex = bool(params[2])
-        buf.s(start, end, old, new, glbl, use_regex)
+        match = buf.s(start, end, old, new, glbl, use_regex)
+        if not match:
+            print('? no match')
 
 def m(*args):
     'move lines to after destination line'

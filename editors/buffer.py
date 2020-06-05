@@ -14,11 +14,12 @@ frame = None
 console = None  # default: no updates from background tasks,no restore needed
 
 # used by search methods
-emptyline = re.compile('^\s*$')
+emptyline = '^\s*$'
+no_match = -99  # must be same as no_match in check.py
 
 class Buffer(object):
     'Text buffer for editors, a list of lines (strings) with state variables.'
-    pattern = re.compile('') # search string - default '' matches any line
+    pattern = '' # search string - default '' matches any line
     # assigned by y(ank), that is copy, or d(elete) in current buffer,
     # may be used by x (put, paste) in same or any other buffer
     cut_buffer = list() # most recently deleted (or "yanked") lines from any buffer
@@ -37,6 +38,7 @@ class Buffer(object):
         self.mark = dict() # dict from mark char to line num, for 'c addresses
         self.end_phase = False # control variable used by write method
         self.fill_column = 75 # default, can be reassigned by J parameter
+        self.found = False # True when search for Buffer.pattern succeeds
 
     def empty(self):
         'True when buffer is empty (not couting empty line at index 0)'
@@ -82,11 +84,11 @@ class Buffer(object):
 
     def match(self, pattern, iline):
         """
-        pattern is a compiled regexp, iline is a line number in the buffer.
+        pattern is regexp string (not compiled), iline is line number in buf.
         Return match object if pattern found in line, None otherwise.
         Named match, but uses re search not match to match anywhere in line.
         """
-        return pattern.search(self.lines[iline])
+        return re.search(pattern, self.lines[iline])
 
     def lines_precede(self, iline):
         'returns True when more lines precede iline in buffer, False otherwise'
@@ -106,11 +108,17 @@ class Buffer(object):
         more_lines: True when more lines follow (precede) iline in buffer.
         """
         if pattern:
-            Buffer.pattern = re.compile(pattern)
+            Buffer.pattern = pattern
+            self.found = False
         iline = self.dot + direction if more_lines(self.dot) else self.dot
         while not self.match(Buffer.pattern, iline) and more_lines(iline):
             iline += direction
-        return iline if self.match(Buffer.pattern, iline) else self.dot
+        if self.match(Buffer.pattern, iline):
+            self.found = True
+            return iline
+        else: 
+            self.found = False
+            return no_match
                      
     def F(self, pattern):
         """
@@ -311,25 +319,27 @@ class Buffer(object):
         self.lines[start:end+1] = [ l[outdent:] for l in self.lines[start:end+1]]
 
     def s(self, start, end, old, new, glbl, use_regex):
-        """Substitute new for old in lines from start up to end.
-        When glbl is True, substitute all occurrences in each line,
-        otherwise substitute only the first occurrence in each line."""
-        if use_regex:
-            re_old = re.compile(old)
+        """
+        Substitute new for old in lines from start up to end.
+        old, new treated as literal strings when use_regex is False,
+        treated as regexp (string, not compiled) when use_regex  is True.
+        When not regex and glbl True substitute all occurrences in each line,
+        otherwise substitute only the first occurrence in each line.
+        Return True if old found and substitution done, otherwise False
+        """
+        if not use_regex:
+            old = re.escape(old)
+        match = False
         for i in range(start,end+1): # ed range is inclusive, unlike Python
-            if ((not use_regex and old in self.lines[i])
-                    or (use_regex and self.match(re_old, i))):
+            if self.match(old, i):
+                match = True
                 self.y(i,i) # Cut buf only holds last line where subst, like GNU ed
-                if not use_regex:
-                    self.lines[i] = self.lines[i].replace(old,new, -1 if glbl 
-                                                          else 1)
-                else: # use_regex
-                    self.lines[i] = re.sub(old, new, self.lines[i])
+                self.lines[i] = re.sub(old, new, self.lines[i])
                 self.dot = i
                 self.modified = True
-        # now self.dot is destination, last line actually changed
         if displaying:
-            frame.mutate(start, self.dot)
+            frame.mutate(start, self.dot) # self.dot is last line changed
+        return match
 
     def y(self, start, end):
         'Yank (copy, do not remove) lines to cut buffer'

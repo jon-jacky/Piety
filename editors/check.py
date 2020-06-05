@@ -11,6 +11,8 @@ not empty).
 
 import parse
 
+no_match = -99 # must be same as no_match in buffer.py
+
 # Defaults and range checking, use the indexing and range conventions above.
 # mk_ functions replace None missing arguments with default line numbers
 
@@ -59,7 +61,7 @@ def line_valid(buf, ok0, args):
     iline = mk_iline(buf, iline)
     valid = iline_ok0(buf, iline) if ok0 else iline_ok(buf, iline)
     if not valid:
-        print('? invalid address')
+        print('? no match' if iline == no_match else '? invalid address')
     return valid, iline, param
 
 def iline_valid(buf, args):
@@ -76,7 +78,8 @@ def irange(buf, args):
     start, end = mk_range(buf, start, end)
     valid = range_ok(buf, start, end)
     if not valid:
-        print('? invalid address')
+        print('? no match' if (start == no_match or end == no_match)
+                else '? invalid address')
     param = param if param is not None else ''
     return valid, start, end, param, param_list
 
@@ -89,5 +92,5 @@ def range_dest(buf, args):
         # dest can be 0 because lines are moved to *after* dest
         dest_valid = iline_ok0(buf, dest)
         if not dest_valid:
-            print('? invalid destination')
+            print('? no match for destination' if dest == no_match else '? invalid destination')
     return (valid and dest_valid), start, end, dest
