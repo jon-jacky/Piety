@@ -51,11 +51,13 @@ parse.ed_cmds += 'PR' # so parse.command() recognizes new commands
 
 def do_command(line):
         'Add P and R commands to run Python statements'
-        results = parse.command(ed.buf, line)
-        if results:
+        status, results = parse.command(ed.buf, line)
+        if status:
             cmd_name, args = results
         else:
-            return # parse already printed error message
+            errfmt, errdata = results
+            print(errfmt % errdata)
+            return
         if cmd_name == 'R':
             R(*args)
         elif cmd_name == 'P':

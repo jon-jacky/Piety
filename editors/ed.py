@@ -11,7 +11,6 @@ import parse, check, buffer
 displaying = False
 frame = None
 
-
 # Each ed command is implemented here by a command function with the same
 # one-letter name, whose arguments are the same as the ed command args.
 # The current buffer is used by many of these functions, but to
@@ -35,6 +34,26 @@ def o(): # looks like ed .
 def S(): # looks like ed $
     'Return index of the last line, 0 if the buffer is empty'
     return buf.nlines()
+
+# helper functions: messages
+
+def loc_invalid(iline):
+    'Return string indicating iline is not found or is out of range.'
+    return ('? no match' if iline == buffer.no_match else '? invalid address')
+
+def range_invalid(start, end):
+    'Return string indicating start or end is not found or is out of range.'
+    return ('? no match' if (start == buffer.no_match or end == buffer.no_match)
+                         else '? invalid address')
+
+def dest_invalid(destination):
+    'Return string indicating destination is not found or is out of range.'
+    return ('? no match for destination' if destination == buffer.no_match 
+                                         else '? invalid destination')
+
+def strint_invalid(s):
+    'Return string indicating string s does not convert to an integer'
+    return ('? integer expected at %s' % s)
 
 # helper functions: buffers and files
 
@@ -139,6 +158,8 @@ def r(*args):
             nlines0 = buf.nlines()
             buf.r(iline, filename)
             print('%s, %d lines' % (filename, buf.nlines() - nlines0))
+    else:
+        print(loc_invalid(iline))
 
 def E(*args):
     """
@@ -262,7 +283,7 @@ def A(*args):
     if check.iline_ok0(buf, iline): # don't print error message when file is empty
         print(iline)
     else:
-        print('? invalid address')
+        print(loc_invalid(iline))
 
 def print_buffers():
     """
@@ -296,7 +317,7 @@ def l(*args):
     if iline == None:
         iline = buf.dot + 1
     if not check.iline_ok(buf, iline):
-        print('? invalid address')
+        print(loc_invalid(iline))
         return
     line = buf.l(iline)
     if not displaying:
@@ -308,6 +329,8 @@ def p(*args):
     if valid:
         for iline in range(start, end+1): # +1 because start,end is inclusive
             print(buf.l(iline))
+    else:
+        print(range_invalid(start, end))
 
 def p_lines(start, end):
     'Conditionnally print lines start through end, inclusive, if not displaying'
@@ -344,6 +367,10 @@ def z(*args):
         p_lines(iline, end)
         if npage < 0:
             buf.dot = iline
+      else:
+          print(strint_invalid(npage_string))
+    else:
+        print(loc_invalid(iline))
 
 # command functions: adding, changing, and deleting text
 
@@ -352,18 +379,24 @@ def a(*args):
     valid, iline, lines = check.iline0_valid(buf, args)
     if valid and lines:
         buf.a(iline, lines)
+    elif not valid:
+        print(loc_invalid(iline))
 
 def i(*args):
     'Insert lines from string before iline, update dot to last inserted line'
     valid, iline, lines = check.iline0_valid(buf, args)
     if valid and lines:
         buf.i(iline, lines)
+    elif not valid:
+        print(loc_invalid(iline))
 
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes'
     valid, start, end, _, _ = check.irange(buf, args)
     if valid:
         buf.d(start, end)
+    else:
+        print(range_invalid(start, end))
 
 def j(*args):
     'Delete lines from start to end, replace with single line of joined text'
@@ -373,6 +406,8 @@ def j(*args):
            else end)
     if valid:
         buf.j(start, end)
+    else:
+        print(range_invalid(start, end))
 
 def J(*args):
     'Replace lines from start to end with wrapped (filled) lines'
@@ -381,6 +416,10 @@ def J(*args):
         valid, fill_column = check.iparam(param, 0)
         if valid:
             buf.J(start, end, fill_column)
+        else:
+            print(strint_invalid(param))
+    else:
+        print(range_invalid(start, end))
 
 # used for both indent and outdent
 indent = 4
@@ -395,7 +434,11 @@ def I(*args):
             buf.I(start, end, indent)
             if displaying:
                 frame.mutate(start, end)
-    
+        else:
+            print(strint_invalid(param))
+    else:
+        print(range_invalid(start, end))
+
 def O(*args):
     'Outdent lines, optional parameter assigns n of indent/outdent spaces'
     global indent
@@ -406,12 +449,18 @@ def O(*args):
             buf.M(start, end, indent)
             if displaying:
                 frame.mutate(start, end)
+        else:
+            print(str_invalid(param))
+    else:
+        print(range_invalid(start, end))
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
     valid, start, end, lines, _ = check.irange(buf, args)
     if valid:
         buf.c(start,end,lines)
+    else:
+        print(range_invalid(start, end))
 
 def s(*args):
     """
@@ -432,34 +481,46 @@ def s(*args):
         match = buf.s(start, end, old, new, glbl, use_regex)
         if not match:
             print('? no match')
+    else:
+        print(range_invalid(start, end))
 
 def m(*args):
     'move lines to after destination line'
-    valid, start, end, dest = check.range_dest(buf, args)
-    if valid:
+    range_valid, dest_valid, start, end, dest = check.range_dest(buf, args)
+    if range_valid and dest_valid:
         if (start <= dest <= end):
-            print('? invalid destination')
+            print(dest_invalid(dest))
             return
         buf.m(start, end, dest)
+    elif not range_valid:
+        print(range_invalid(start,end))
+    elif not dest_valid:
+        print(dest_invalid(dest))
 
 def t(*args):
     'transfer (copy) lines to after destination line'
-    valid, start, end, dest = check.range_dest(buf, args)
-    if valid:
+    range_valid, dest_valid, start, end, dest = check.range_dest(buf, args)
+    if range_valid and dest_valid:
         buf.t(start, end, dest)
+    elif not range_valid:
+        print(range_invalid(start,end))
+    elif not dest_valid:
+        print(dest_invalid(dest))
 
 def y(*args):
     'Yank (copy, do not remove) lines to cut buffer'
     valid, start, end, _, _ = check.irange(buf, args)
     if valid:
         buf.y(start, end)
+    else:
+        print(range_invalid(start, end))
 
 def x(*args):
     'Append (put, paste) cut buffer contents after dest. line address'
     iline, _, _, _ = parse.arguments(args)
     iline = check.mk_iline(buf, iline)
     if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer
-        print('? invalid address')
+        print(loc_invalid(iline))
         return
     buf.x(iline)
 
@@ -478,6 +539,8 @@ def k(*args):
             print("Mark %s set at line %d in buffer %s" % (c, iline, current))
         else:
             print("No mark")
+    else:
+        print(loc_invalid(iline))
 
 # command functions: control, debugging, etc.
 
@@ -510,14 +573,16 @@ prompt = command_prompt
 
 command_mode = True
 
-def do_command(line):
-    'Process one line without blocking in ed command mode or input mode'
+def do_command(cmd_line):
+    'Process one command line without blocking in ed command mode or input mode'
     global command_mode, prompt, D_count, q_count
-    results = parse.command(buf, line)
-    if results:
+    status, results = parse.command(buf, cmd_line)
+    if status:
         cmd_name, args = results
     else:
-        return # parse already printed error message
+        errfmt, errdata = results
+        print(errfmt % errdata)
+        return
     if cmd_name in parse.complete_cmds:
         globals()[cmd_name](*args) # dict from name (str) to object (fcn)
     elif cmd_name in parse.input_cmds:
@@ -530,7 +595,7 @@ def do_command(line):
         start, end = check.mk_range(buf, start, end) # int only
         if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
                 else check.range_ok(buf, start, end)):
-            print('? invalid address')
+            print(range_invalid(start, end))
             command_mode = True
             prompt = command_prompt
         # assign dot to prepare for input mode, where we a(ppend) each line

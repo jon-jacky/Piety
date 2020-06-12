@@ -1,5 +1,8 @@
 """
 parse.py - command line parsing for ed.py
+
+This module does not print any messages (for invalid commands etc).
+It returns status values so the caller can print messages if appropriate.
 """
 
 import re
@@ -110,8 +113,7 @@ def command_tokens(buf, cmd_string):
         if tail and tail[0] == ',': # ',' means next addr is NOT optional
             end, tail = line_address(buf, tail[1:]) # reassign tail
             if end == None:
-                print('? end address expected at %s' % tail)
-                return 'ERROR', start, end, params
+                return 'ERROR', '? end address expected at %s', tail
     # look for cmd_string, NOT optional
     if tail and tail[0] in ed_cmds:
         cmd_name, params = tail[0], tail[1:].strip()
@@ -121,8 +123,7 @@ def command_tokens(buf, cmd_string):
     elif tail[0] == '=':
         cmd_name = 'A'
     else:
-        print('? command expected at %s' % tail)
-        return 'ERROR', start, end, params
+        return 'ERROR', '? command expected at %s', tail
 
     # command-specific parameter parsing
 
@@ -143,18 +144,18 @@ def command_tokens(buf, cmd_string):
         # return each space-separated parameter as separate arg in sequence
         return (cmd_name,start,end) + (tuple(params.split() if params else ()))
 
-def command(buf, line):
+def command(buf, cmd_line):
     'Wrap command_tokens, provide necessary but banal pre/post-processing'
-    cmd_string = line.lstrip()
+    cmd_string = cmd_line.lstrip()
     if cmd_string and cmd_string[0] == '#': # comment, do nothing
         return None
     items = command_tokens(buf, cmd_string)
     if items[0] == 'ERROR':
-        return None # parse.command_tokens already printed error message
+        return 0, items[1:] # error status, error message
     else:
         tokens = tuple([ t for t in items if t != None ])
     cmd_name, args = tokens[0], tokens[1:]
-    return cmd_name, args
+    return 1, (cmd_name, args) # success status, data
 
 def arguments(args):
     """
