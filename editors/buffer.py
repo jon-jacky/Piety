@@ -345,6 +345,12 @@ class Buffer(object):
         'Yank (copy, do not remove) lines to cut buffer'
         Buffer.cut_buffer = self.lines[start:end+1]
 
+    def u(self, iline):
+        'Undo last substitution: replace line at iline from cut buffer'
+        self.replace(iline, Buffer.cut_buffer[0])
+        if displaying:
+            frame.mutate(iline, iline)
+        
     def x(self, iline):
         'Append (put, paste) cut buffer contents after iline.'
         self.insert(iline+1, Buffer.cut_buffer) # append

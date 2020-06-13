@@ -117,9 +117,9 @@ class Console(console.Console):
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(column=(self.start_col + self.point))
-        else:
+        if iline == ed.buffer.no_match:
             frame.put_command_cursor()
-            print(ed.loc_invalid(iline)) # '? no match' when search fails
+            print('? no match')
             frame.put_display_cursor()
 
     def prev_line(self):
