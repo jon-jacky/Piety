@@ -262,7 +262,7 @@ def A(*args):
     if check.iline_ok0(buf, iline): # don't print error message when file is empty
         print(iline)
     else:
-        print('? invalid address')
+        print('? no match' if iline == buffer.no_match else '? invalid address')        
 
 def print_buffers():
     """
@@ -296,7 +296,7 @@ def l(*args):
     if iline == None:
         iline = buf.dot + 1
     if not check.iline_ok(buf, iline):
-        print('? invalid address')
+        print('? no match' if iline == buffer.no_match else '? invalid address')
         return
     line = buf.l(iline)
     if not displaying:
@@ -468,7 +468,7 @@ def x(*args):
     iline, _, _, _ = parse.arguments(args)
     iline = check.mk_iline(buf, iline)
     if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer
-        print('? invalid address')
+        print('? no match' if iline == buffer.no_match else '? invalid address')
         return
     buf.x(iline)
 
@@ -539,7 +539,7 @@ def do_command(line):
         start, end = check.mk_range(buf, start, end) # int only
         if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
                 else check.range_ok(buf, start, end)):
-            print('? invalid address')
+            print('? no match' if iline == buffer.no_match else '? invalid address')            
             command_mode = True
             prompt = command_prompt
         # assign dot to prepare for input mode, where we a(ppend) each line
