@@ -1,13 +1,6 @@
 """
 check.py - check command line args and provide default args for ed.py
 
-This module only works on integer line numbers.  It requires
-that line addresses expressed as symbols like . or $ or as search strings 
-like /pattern/ have already been converted to line numbers.
-
-This module does not print any messages (for invalid line numbers etc).
-It returns status values so the caller can print messages if appropriate.
-
 The commands and API for ed.py use the classic Unix ed conventions for
 indexing and range (which are unlike Python): The index of the first
 line is 1, the index of the last line is the same as the number of
@@ -16,7 +9,7 @@ last line with index j (so the range i,i is just the line i, but it is
 not empty).
 """
 
-import parse
+import parse, buffer
 
 # Defaults and range checking, use the indexing and range conventions above.
 # mk_ functions replace None missing arguments with default line numbers
@@ -55,18 +48,18 @@ def iparam(s, default):
             i = int(s)
             return True, i
         except:
+            print('? integer expected at %s' % s)
             return False, default
     else:
         return True, default
 
 def line_valid(buf, ok0, args):
-    """
-    Check if iline in args is valid, if so return it along with any param.
-    Pass ok0 True if line 0 (before first line, or empty buffer) is valid.
-    """
+    'check if iline in args is valid, if so return it along with any param'
     iline, _, param, _ = parse.arguments(args)
     iline = mk_iline(buf, iline)
     valid = iline_ok0(buf, iline) if ok0 else iline_ok(buf, iline)
+    if not valid:
+        print('? no match' if iline == buffer.no_match else '? invalid address')
     return valid, iline, param
 
 def iline_valid(buf, args):
@@ -82,15 +75,22 @@ def irange(buf, args):
     start, end, param, param_list = parse.arguments(args)
     start, end = mk_range(buf, start, end)
     valid = range_ok(buf, start, end)
+    if not valid:
+        print('? no match' 
+                if (start == buffer.no_match or end == buffer.no_match)
+                else '? invalid address')
     param = param if param is not None else ''
     return valid, start, end, param, param_list
 
 def range_dest(buf, args):
     'check range and destination in args, for cmds with a destination: m t'
-    range_valid, start, end, params, _ = irange(buf, args)
+    valid, start, end, params, _ = irange(buf, args)
     dest_valid, dest = None, None # placeholders needed for not valid case
-    if range_valid:
+    if valid:
         dest, _ = parse.line_address(buf, params)
         # dest can be 0 because lines are moved to *after* dest
         dest_valid = iline_ok0(buf, dest)
-    return range_valid, dest_valid, start, end, dest
+        if not dest_valid:
+            print('? no match for destination' 
+                    if dest == buffer.no_match else '? invalid destination')
+    return (valid and dest_valid), start, end, dest
