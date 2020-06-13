@@ -117,7 +117,10 @@ class Console(console.Console):
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(column=(self.start_col + self.point))
-        # FIXME? else: ... bad line address ...
+        else:
+            frame.put_command_cursor()
+            print(ed.loc_invalid(iline)) # '? no match' when search fails
+            frame.put_display_cursor()
 
     def prev_line(self):
         """
@@ -155,7 +158,7 @@ class Console(console.Console):
         ed.buf.mark['@'] = ed.buf.dot
         frame.put_command_cursor()
         util.putstr('Mark set\n')
-        frame.put_display_cursor() # Or display.put_cursor(wdot,1) ?
+        frame.put_display_cursor()
 
     def exchange(self):
         'Exchange point and mark (to make mark visible by putting cursor there).'

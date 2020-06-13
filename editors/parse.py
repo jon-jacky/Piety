@@ -148,14 +148,14 @@ def command(buf, cmd_line):
     'Wrap command_tokens, provide necessary but banal pre/post-processing'
     cmd_string = cmd_line.lstrip()
     if cmd_string and cmd_string[0] == '#': # comment, do nothing
-        return None
+        return 0, '' # invalid, no message
     items = command_tokens(buf, cmd_string)
     if items[0] == 'ERROR':
-        return 0, items[1:] # error status, error message
+        return 0, items[1:] # invalid, error message
     else:
         tokens = tuple([ t for t in items if t != None ])
     cmd_name, args = tokens[0], tokens[1:]
-    return 1, (cmd_name, args) # success status, data
+    return 1, (cmd_name, args) # valid, data
 
 def arguments(args):
     """

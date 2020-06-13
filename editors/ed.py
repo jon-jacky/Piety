@@ -576,13 +576,15 @@ command_mode = True
 def do_command(cmd_line):
     'Process one command line without blocking in ed command mode or input mode'
     global command_mode, prompt, D_count, q_count
-    status, results = parse.command(buf, cmd_line)
-    if status:
+    valid, results = parse.command(buf, cmd_line)
+    if valid:
         cmd_name, args = results
-    else:
-        errfmt, errdata = results
-        print(errfmt % errdata)
+    elif results:
+        cmd_invalid, tail = results
+        print(cmd_invalid % tail)
         return
+    else:
+        return # comment command
     if cmd_name in parse.complete_cmds:
         globals()[cmd_name](*args) # dict from name (str) to object (fcn)
     elif cmd_name in parse.input_cmds:
