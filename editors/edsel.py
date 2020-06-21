@@ -118,9 +118,7 @@ class Console(console.Console):
             self.point = min(jcol, len(line))
             frame.put_display_cursor(column=(self.start_col + self.point))
         if iline == ed.buffer.no_match:
-            frame.put_command_cursor()
-            print('? no match')
-            frame.put_display_cursor()
+            frame.put_message('? no match')
 
     def prev_line(self):
         """
@@ -156,9 +154,7 @@ class Console(console.Console):
     def set_mark(self):
         'Define region from mark (inclusive) to dot (exclusive) that is deleted by cut'
         ed.buf.mark['@'] = ed.buf.dot
-        frame.put_command_cursor()
-        util.putstr('Mark set\n')
-        frame.put_display_cursor()
+        frame.put_message('Mark set')
 
     def exchange(self):
         'Exchange point and mark (to make mark visible by putting cursor there).'
@@ -166,6 +162,8 @@ class Console(console.Console):
             saved_dot = ed.buf.dot
             self.goto_line(ed.buf.mark['@'], 1) # updates ed.buf.dot
             ed.buf.mark['@'] = saved_dot
+        else:
+            frame.put_message('? No mark')
 
     def cut(self):
         """
@@ -183,7 +181,8 @@ class Console(console.Console):
                 ed.buf.d(start, end)
                 frame.put_display_cursor()
                 self.inline_yank = False
-        # FIXME? else: "The mark is not set now, so there is no region"
+        else:
+            frame.put_message('? No mark')
 
     def kill(self):
         super().kill()

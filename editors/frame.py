@@ -4,7 +4,7 @@ frame.py - Multiwindow display implemented by a list of window instances,
 """
 
 from enum import Enum
-import terminal, terminal_util, display, window
+import util, terminal, terminal_util, display, window
 
 class Mode(Enum):
     """
@@ -55,6 +55,8 @@ def refresh_windows():
     for w in windows:
         w.refresh()
 
+# Functions called by clients
+
 def put_command_cursor(column=1):
     'Put cursor at command line in scroll region, at given column, default 1'
     display.put_cursor(cmd_n, column) # last line on display
@@ -64,7 +66,11 @@ def put_display_cursor(column=1):
     wdot = win.wline(win.buf.dot)
     display.put_cursor(wdot, column)
 
-# Functions called by clients
+def put_message(msg):
+    'While in display mode, write a message in scrolling command region'
+    put_command_cursor()
+    util.putstr(msg + '\n')
+    put_display_cursor()
 
 def init(buffer):
     'Initialize frame with one window into buffer.'

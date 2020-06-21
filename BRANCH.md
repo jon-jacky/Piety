@@ -4,9 +4,13 @@ branches
 
 This is the **paragraph** branch.  
 
-- **paragraph**.  Add new paragraph address range ] to *ed.py*, for 
-convenience using wrap command *J* and execute Python commands *P* and *R*. 
+- **paragraph**.  Add new paragraph address range *]* to *ed.py*, sometimes
+more convenient than selectng a region with mark.
 Revise *J* command to properly re-wrap already-indented text.
+Support regular expressions in line address patterns and the *s* substitute 
+command.  Print *? no match* when the requested pattern is not found in 
+the buffer or in a line.  Add *u* command, undo previous substitution.  
+
 Begun 26 Apr 2020.
 
 Branches recently merged into *master*:
