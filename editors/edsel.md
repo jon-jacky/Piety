@@ -202,6 +202,16 @@ string within the line.
 
 In *edsel*, search is always case sensitive.
 
+When you use the */.../* and *?...?* forms, the search string is treated
+as ordinary text, not a regular expression. You can use these forms to
+search for strings that include  regular expression characters such as .
+(dot) and * (star) etc. without  escapes, and strings that include invalid
+regular expressions such as unmatched parentheses etc.
+
+You can also search for regular expressions.  *edsel* provides the
+*|pattern|* and *&pattern&* address forms, where *pattern* is a regular
+expression.
+
 #### Selecting and using the text region ####
 
 The text *region* is the target for the *^W* cut command and
@@ -219,22 +229,52 @@ down to the first line after the end of the region. As you move
 the cursor, the end of the region moves also, always following one
 line behind dot.
 
-To see where the region begins, type *^Q*, which places the cursor at 
-mark, then type *^Q* again to return the cursor to dot, after the end of 
-the region.
+To see where the region begins, type *^Q*, which exchanges dot and mark,
+so the cursor (which is always at dot) goes to the line at the beginning
+of the region.  Then type *^Q* to exchange them again, so dot and the
+cursor return to the line after the end of the region.
 
-In command mode, the text region is selected by the *[* character
-and can prefix any command.  For example, *[p* prints all the
-lines in the region.   You can select the region in display editing
-mode, then apply any *ed.py* command to that region by typing *^X*, then
-at the prompt type *[* then the command.  Some useful examples appear 
-below.
+It is possible for dot to *precede* mark.  This can occur after you type
+*^Q* to exchange them.  In this situation, the region comprises exactly
+the same lines - but now it begins at dot and extends to the line before
+mark.  In display mode, commands that use the region, *^W* and *^Q*, work
+as well when dot precedes mark.
 
-You might well ask, what if dot *precedes* mark?  ...
+In command mode, the text region defined by mark and dot is selected by
+the *[* character and can prefix any command.  For example, *[p* prints
+all the lines in the region.   You can select the region in display
+editing mode, then apply any *ed.py* command to that region by typing
+*^X*, then at the prompt type *[* then the command.  For example, the
+*ed.py* command *[y* copies the region into the cut buffer without
+deleting it.  The command *[d* works like *^W*: it copies the 
+region into the cut buffer and deletes it.  After *[d*, *^Y^* has the 
+same effect as it does after *^W*: it pastes the deleted region
+back into the buffer.   The *[y* command is similar to *[d*, except
+it copies the region into the cut buffer without deleting it.
 
-You might also ask, how do we get rid of the mark, or cancel the region
-so we can start a new one somewhere else?  The *^G* command deletes the mark
-and cancels the region.
+In command mode, the region address range *[* only  works when mark
+precedes dot, otherwise *edsel* prints *? address invalid*.
+
+When the region is moved, the mark (as well as marks set with the 
+*ed* *k* command) move with it.   So after cut and paste with
+*^W* and *^Y*, another *^W* cuts the region that was just pasted.
+
+There is no command to delete the mark.  The mark remains until the line
+that it indicates is deleted.
+
+#### Selecting and using paragraphs ####
+
+Sometimes you want to perform an operation on the entire paragraph that
+contains dot: all the lines up to the nearest preceding empty line, and
+down to the nearest following empty line.  Or, if the current line is
+empty, you want to opeerate on the preceding paragraph.
+
+It is not necessary to set the mark to operate on the current paragraph.
+The  *]* address range indicates the current paragraph, even when there is
+no mark.
+
+The paragraph range *]* is especially useful with the
+wrap, indent, and outdent commands *J*, *I*, and *O*. 
 
 #### Cut and Paste ####
 
@@ -250,6 +290,16 @@ anywhere within the same line or a different line.
 
 So the *^K* and *^U* commands have the effect of toggling subsequent *^Y*
 commands to inline mode, while *^W* toggles *^Y* to multiline mode.
+
+The command mode *x* command is similar to the display mode *yank* *^Y*
+command. It also restores the recently cut lines back into the buffer.
+But *x* appends the restored lines after dot, then places dot at the last
+restored line, while *^Y* restores the lines before dot, and leaves dot
+there at the first line after the restored  lines.
+
+The *ed* *yank* (actually *copy*) *y*, *delete* *d*, *substitute* *s*,
+and *change* *c* commands all copy text into the cut buffer, from where it
+can be pasted by *ed* *x* or edsel *^Y*.
 
 #### Indented text ####
 
@@ -308,6 +358,26 @@ wrapped lines and type the *[j* command to join them all into one long line
 again. (If you do not type the extra space at the end of each line, words
 will run together where the lines are joined.)
 
+#### Undo ####
+
+**edsel** has no *undo* command.  But it is usually possible to recover
+the most recently deleted or altered text.  The command to restore the text
+depends on the command that deleted or altered it.
+
+After command mode *delete* *d* or *change* *c*, or display mode *cut*
+*^W*, the deleted lines can be pasted back into the buffer after dot with
+command mode *x* or  before dot with display mode *yank* *^Y*.
+
+After *kill* *^K* or *discard* *^U*, the deleted characters can be pasted
+back into a line (the original line or another line) at point by *^Y*.
+
+After *substitute* *s* the original line as it was before the substitution
+can be restored at dot, replacing whatever line is there, by *undo* *u*.
+Only the last substituted line can be restored.
+
+Only the most recently deleted or altered text can be restored.  *edsel* does
+not maintain any history of deletions or alterations before that.
+
 ## Limitations ##
 
 **edsel** is *ed.py* underneath.  In display editing mode, you can place
@@ -348,5 +418,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Mar 2020
+Revised Jun 2020
 

@@ -4,13 +4,18 @@ branches
 
 This is the **paragraph** branch.  
 
-- **paragraph**.  Add new paragraph address range *]* to *ed.py*, sometimes
-more convenient than selectng a region with mark.
-Revise *J* command to properly re-wrap already-indented text.
-Support regular expressions in line address patterns and the *s* substitute 
-command.  Print *? no match* when the requested pattern is not found in 
-the buffer or in a line.  Add *u* command, undo previous substitution.  
-
+- **paragraph**.  Add functionality and reorganize code in editors.
+Add new paragraph address range *]* to *ed.py*,
+sometimes more convenient than selectng a region with mark. Revise *J*
+*wrap* command to properly re-wrap already-indented text. Support regular
+expressions in line address patterns and the *s* substitute command. Print
+*? no match* when the search pattern is not found in the buffer, or the
+replacement pattern is not found in the line.   Support classic *ed* default
+replacement pattern in *s* command: *s//new*.   Add classic ed *u* command, undo
+previous substitution. Reorganize search and line address code in
+*buffer.py* *ed.py* *buffer.py* *check.py*. Print *? no mark* from *edsel*
+*^Q* and *^W* commands.  Ensure that text deleted, altered, or copied by 
+*ed* *y* *d* *c* *s* commands can be restored by *edsel* *^Y as well as *ed* *x*.
 Begun 26 Apr 2020.
 
 Branches recently merged into *master*:
@@ -33,17 +38,15 @@ file.  Revise  explanations in *frame.md* and *window.md*, minor revisions
 to other *md* files.  Bug fixes in *ed.py* and a few other modules.  Bring some
 tests in *test/edda* up to date.  Begun 17 Jan 2020.
 
-- **redirect**, merged 13 Jan 2020.  In the *wyshka* shell, 
-provide redirection of command output
-*stdout* to text buffers (instead of the scrolling command region).
-Revise commands in *edo* (and *edsel* etc.) for running code from text
-buffers, begun in *runlines* branch: *R* runs code using *eval*,
-*P* runs code using interactive interpreter *push*.
-Add commands to *ed* (and *edsel* etc.): indent *I* and outdent *O*, 
-wrap lines *J*, and list buffers to the buffer named *Buffer* *N*.
-Add new *ed* address range abbreviation *[*, the lines in the
-region from the mark to dot (which is usually selected in *edsel*).
-Begun 6 Jul 2019.
+- **redirect**, merged 13 Jan 2020.  Provide redirection of command output
+*stdout* to text buffers (instead of the scrolling command region) in the
+*wyshka* shell. Revise commands in *edo* (and *edsel* etc.) for running
+code from text buffers, begun in *runlines* branch: *R* runs code using
+*eval*, *P* runs code using interactive interpreter *push*. Add commands
+to *ed* (and *edsel* etc.): indent *I* and outdent *O*,  wrap lines *J*,
+and list buffers to the buffer named *Buffer* *N*. Add new *ed* address
+range abbreviation *[*, the lines in the region from the mark to dot
+(which is usually selected in *edsel*). Begun 6 Jul 2019.
 
 - **runlines**, merged 4 Jul 2019.  Execute the current selection
 (from mark to dot) with the Python interpreter, in display editing mode with
@@ -140,5 +143,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Apr 2020
+Revised Jun 2020
 

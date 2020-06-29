@@ -180,23 +180,24 @@ class Console(console.Console):
             if check.range_ok(ed.buf, start, end):
                 ed.buf.d(start, end)
                 frame.put_display_cursor()
-                self.inline_yank = False
         else:
             frame.put_message('? No mark')
 
     def kill(self):
         super().kill()
-        ed.buf.modified = True
-        self.inline_yank = True
+        if not ed.command_mode:
+            ed.buffer.Buffer.yank_lines = False
+            ed.buf.modified = True
 
     def discard(self):
         super().discard()
-        ed.buf.modified = True
-        self.inline_yank = True
+        if not ed.command_mode:
+            ed.buffer.Buffer.yank_lines = False
+            ed.buf.modified = True
 
     def yank(self):
-        if ed.command_mode or self.inline_yank == True:
-            # Insert string from self.yank_buffer at point.
+        if ed.command_mode or not ed.buffer.Buffer.yank_lines:
+            # Insert string from self.yank_buffer inline at point.
             super().yank()
         else:
             # Insert lines from Buffer class cut_buffer before dot.

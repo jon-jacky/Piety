@@ -10,17 +10,20 @@ is a response to this impulse:
 > small, easy to understand, and fun to program.  And, let's build it
 > all in our favorite language!*
 
-We draw inspiration from the single-user, single-language,
-special-hardware systems of the 1970s and 80s: Smalltalk, Lisp
-machines, Oberon (see [doc/precursors.md](doc/precursors.md)).  Piety
-is an experiment to see if we can achieve something similar today with
-Python, but running on ordinary hardware.  (For other projects in a 
-similar spirit, again see [doc/precursors.md](doc/precursors.md).)
-We aim to produce, in Python, a simple but self-contained personal
-computer operating system.
-We aim to see how far we can get with just Python.  There is already a
-lot of work by others that we might be able to use or adapt (see
-[doc/utilities.md](doc/utilities.md)).
+We draw inspiration from the single-user, single-language, special-
+hardware systems of the 1970s and 80s: Smalltalk, Lisp machines, Oberon
+(see [doc/precursors.md](doc/precursors.md)).   Those systems used a
+single programming language for both the applications and the operating
+system.  Changes to application and system code were effective
+immediately, without having to stop and restart the system.
+
+Piety is an experiment to see if we can achieve something similar today
+with Python, but running on ordinary hardware.  (For other projects in a
+similar spirit, again see [doc/precursors.md](doc/precursors.md).) We aim
+to produce, in Python, a simple but self-contained personal computer
+operating system. We aim to see how far we can get with just Python.
+There is already a lot of work by others that we might be able to use or
+adapt (see [doc/utilities.md](doc/utilities.md)).
 
 For now, Piety runs in an ordinary Python interpreter session on a
 host operating system.  An overview of its design appears

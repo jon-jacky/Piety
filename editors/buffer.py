@@ -24,6 +24,9 @@ class Buffer(object):
     # may be used by x (put, paste) in same or any other buffer
     cut_buffer = list() # most recently deleted (or "yanked") lines from any buffer
     cut_buffer_mark = dict() # markers for deleted lines, for yank command
+    # When yank_lines True, ^Y invokes edsel yank (paste lines)
+    # when yank_lines False, ^Y invokes console yank (paste words inline) 
+    yank_lines = True
 
     def __init__(self, name):
         'New text buffer'
@@ -344,6 +347,7 @@ class Buffer(object):
     def y(self, start, end):
         'Yank (copy, do not remove) lines to cut buffer'
         Buffer.cut_buffer = self.lines[start:end+1]
+        Buffer.yank_lines = True
 
     def u(self, iline):
         'Undo last substitution: replace line at iline from cut buffer'

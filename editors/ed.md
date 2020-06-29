@@ -5,10 +5,10 @@ ed.py
 **[ed.py](ed.py)** is a text editor in pure Python inspired by the
 classic Unix editor *ed*.
 
-**ed.py** provides most of the commands from
-classic *ed* and *GNU ed*, augmented with a few commands for handling
-multiple buffers and files from the later Unix (and Plan 9) editor
-*sam*.
+**ed.py** provides most of the commands from classic *ed* and *GNU ed*,
+augmented with a few commands for handling multiple buffers and files from
+the later Unix (and Plan 9) editor *sam*.  *ed.py* adds a few new commands
+for selecting and formatting blocks of text.
 
 **ed.py** runs in a command mode that emulates classic
 *ed*.  It also provides an API so you can edit from the Python prompt
@@ -108,7 +108,7 @@ lost and it is no longer possible to resume the session.
 
 **ed.py** supports these commands from classic *ed*:
 
- *= a c d e E f i j k l m p q Q r s t w z*
+ *= a c d e E f i j k l m p q Q r s t u w z*
 
 **ed.py** supports these commands from *GNU ed*:
 
@@ -126,8 +126,10 @@ lost and it is no longer possible to resume the session.
 
  *number . , ; % $ 'c /text/ // ?text? ?? +number -number ^number* also *+ ++*  etc. *- --* etc. *^ ^^* etc.
 
-**ed.py** adds a new line address form *[* to indicate the region from  
-the *mark* to *dot*.
+**ed.py** adds the new line address form *[* to indicate the region from
+the *mark* to *dot*, and the new line addess form *]* to indicate the
+current paragraph (between empty lines, or preceding the current line if
+it is empty).
 
 Here is a [command summary](ed.txt).
 
@@ -268,7 +270,7 @@ intended file by using the *w* command without arguments.
 ## Differences from classic ed and sam ##
 
 **ed.py** does not support these classic *ed* commands:
-*H h n P u wq W*.
+*H h n P wq W*.
 
 **ed.py** does not support the classic *ed* iteration commands *g G v V*.
 
@@ -278,6 +280,59 @@ printing the current line after any command).
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
 The new *N* command writes the same information into a buffer named *Buffers*.
+
+The *e* and *E* commands only work in the *main* buffer.
+In *sam*, the *e* command works in any buffer.
+
+The *e* and *E* commands require a filename parameter.
+In classic *ed* (and *sam*), *e* with no filename
+reloads the current file into the current buffer, which
+erases any modifications made since the file was last loaded.
+
+The *B* (and *D*) commands accept only one file (or buffer) name argument,
+not multiple names as in *sam*.
+
+The *j* (join) command does not save the lines that were joined
+in the cut buffer, unlike *GNU ed*.
+
+The *z* command accepts a negative parameter to scroll backward,
+unlike classic *ed*.
+
+**ed.py** always prints the error message following the *?* character.
+There is no way to suppress printing the error messages as in classic
+*ed*.
+
+The default prompt is the colon *:*, not the empty string.  If no
+prompt is desired, the empty string must be requested with *-p ''*
+on the command line or *p=''* in the *ed* function call.
+
+In the *s* (substitute) command and in the */pattern/* and *?pattern?* address
+forms, the text pattern is ordinary text, not a regular expression.
+You can search for strings that include  regular expression
+characters such as . (dot) and * (star) etc. without  escapes, and strings
+that include invalid regular expressions such as unmatched parentheses
+etc.
+
+**ed.py** does provide regular expressions in address patterns and search
+and replace.  It uses vertical bars as in *|pattern|* for regular
+expression  foward search, ampersands as in *&pattern&* for backward
+search.  *ed.py* also uses vertical bars for regular expression
+substitions as in *s|old|new|*. *ed.py* uses Python regular expression
+syntax, which differs slightly from the regular expression syntax of
+classic *ed*.
+
+In the */text/* and *?text?* address forms for forward (and backward)
+search, *ed.py* only searches forward to the end of the buffer (or
+backward to the beginning). It does not wrap around and continue searching
+from the beginning (or end).
+
+## New commands and address forms in *ed.py* ##
+
+**ed.py** provides several new commmands and address forms not present in
+any version of *ed*, nor in *sam*.   These commands were introduced for
+the new display editors *edda* and *edsel*, which are based on *ed.py*.
+However they only use data structures already provided by *ed.py*, so they
+are added here.
 
 **ed.py** provides the new *J* command to wrap text in the selected
 lines.  The default is dot, the current line.  The selected lines
@@ -294,53 +349,39 @@ indent and outdent are four spaces, but can be changed by an optional
 integer parameter to either command, which then applies to all subsequent 
 indents and outdents until it is reassigned again.
 
-**ed.py** always prints the error message following the *?* character.
-There is no way to suppress printing the error messages as in classic
-*ed*.
+**ed.py** provides the new *N* command that lists buffers and their
+properties like the *n* command, but saves the list in a buffer named
+*Buffers*.  This makes it possible to view a long list of buffers 
+that might otherwise scroll away out of sight.
 
 The *@* character can be used to mark a line with the *k@* command, which
 can then be located by the *'@* address. In *ed*, only the lower-case
 alphabetic characters *a-z* can be used for this (*ed.py* supports *a-z*
-also). The *@* mark and the current line, dot, define a *region* or
+also). The *@* mark and the current line, *dot*, define a *region* or
 selection that other commands can use. This region begins with the line
 with the *@* mark and includes all the lines up to (but not including) the
-current line, dot.
+current line, dot.  This was provided for the *edsel* *cut* command, *^W*.
 
 **ed.py** provides the new *[* address range to indicate the region from
-mark to dot.
+mark up to dot, that is *'@,-*.   The *ed.py* *delete* command with this
+range *[d* has the same effect as the *edsel* *cut* command *^W*: it
+deletes the region from the buffer, and saves in the *cut buffer*,
+where it can be pasted later by the *ed.py* *x* command or the  edsel *^Y*
+command. To use the *[* region, mark must be present and must precede dot,
+otherwise *ed.py* prints  *? address invalid*.
 
-(The *edsel* display editor, which is based on *ed.py*, provides commands  
-that set the mark and use the region defined by mark and dot.)
+**ed.py** provides the new *]* address range to indicate the current
+paragraph: all the lines up to the nearest preceding empty line, and down
+to the nearest following empty line.  If the current line is empty, *]*
+indicates the  preceding paragraph.  The paragraph range *]* is useful
+with the new wrap, indent, and outdent commands *J*, *I*, and *O*.
 
-The *e* and *E* commands only work in the *main* buffer.
-In *sam*, the *e* command works in any buffer.
+**ed.py** provides the new *|pattern|* and *&pattern&* address forms
+for searching forward and backward for regular expressions (see preceding
+section).
 
-The *e* and *E* commands require a filename parameter.
-In classic *ed* (and *sam*), *e* with no filename
-reloads the current file into the current buffer, which
-erases any modifications made since the file was last loaded.
-
-The *B* (and *D*) commands accept only one file (or buffer) name argument,
-not multiple names as in *sam*.
-
-In the *s* (substitute) command and in the */text/* and *?text?*
-address forms, the text pattern is ordinary text, not a regular
-expression.
-
-The *j* (join) command does not save the lines that were joined
-in the cut buffer, unlike *GNU ed*.
-
-In the */text/* and *?text?* address forms, **ed.py** only searches
-forward to the end of the buffer (or backward to the beginning). It
-does not wrap around and continue searching from the beginning (or
-end).
-
-The default prompt is the colon *:*, not the empty string.  If no
-prompt is desired, the empty string must be requested with *-p ''*
-on the command line or *p=''* in the *ed* function call.
-
-The *z* command accepts a negative parameter to scroll backward,
-unlike classic *ed*.
+**ed.py** provides the new *s|old|new|* form for regular expression
+substitution (see preceding section).
 
 ## API ##
 
@@ -536,5 +577,5 @@ to be entered at the terminal.
 **[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
-Revised Feb 2020
+Revised Jun 2020
 
