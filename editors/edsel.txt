@@ -1,4 +1,8 @@
-edsel.py display editing commands summary:
+edsel.py command summary:
+
+    C   change to display editing mode
+
+edsel.py display editing commands summary in text buffer window:
 
     ^@  set mark, mark (included) to dot (excluded) defines region cut by ^W
     ^space  set mark, like ^@
@@ -28,4 +32,31 @@ edsel.py display editing commands summary:
     ^X  enter and execute ed or edda command, then return to display mode
     ^Y  insert (paste or (y)ank) contents last deleted by ^K kill, ^U discard, or ^W cut
     ^Z  exit display editing and return to command mode
+
+edsel.py command line editing: ^A ^B ^D ^E ^F ^H ^I ^J ^K ^U ^Y as above, but:
+
+    ^C  interrupt application, write traceback
+    ^D  if line is empty, exit application.  Otherwise (d)elete character under cursor.
+    ^L  refresh command line only (useful if line has become garbled)
+    ^M  execute command (like ret)
+    ^N  retrieve (n)ext line from history
+    ^P  retrieve (p)revious line from history
+    ^Z  if line is empty, exit application
+
+also, special keys while display editing in buffer window:
+
+    return  open new line below, or break line at cursor (same as ^M)
+    delete  delete character before cursor (same as ^H)
+    backspace  delete character before cursor (same as ^H)
+    tab insert spaces (same as ^I)
+    left (arrow key) move cursor back one character (same as ^B)
+    right (arrow key) move cursor forward one character (same as ^F)
+    up   (arrow key) move cursor up to previous line (same as ^P)
+    down (arrow key) move cursor down to next line (same as ^N)
+
+and differences while editing the command line:
+
+    ret  execute command line
+    up   (arrow key) retrieve previous line from history
+    down (arrow key) retrieve next line from history
 

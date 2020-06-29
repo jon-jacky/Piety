@@ -46,7 +46,7 @@ Files in this directory:
 
 - **ed.py**: line editor inspired by the classic Unix editor *ed*.
 
-- **ed.txt**: command summary for *ed.py*
+- **ed.txt**: command summary for *ed.py*.
 
 - **edda.md**: explanation of *edda.py*.
 
@@ -71,9 +71,13 @@ Files in this directory:
   to collect and edit input lines with blocking.  Contrast to *ed.py*,
   *edie.py*, and *edna.py*.
 
+- **edo.txt**: command summary for *edo.py*.
+
 - **edsel.md**: explanation of *edsel.py*.
 
 - **edsel.py**: display editor based on *edda* and *ed.py*.
+
+- **edsel.txt**: command summary for *edsel.py*.
 
 - **etty.md**: explanation of *etty.py*.
 
@@ -97,4 +101,4 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Feb 2020
+Revised Jun 2020

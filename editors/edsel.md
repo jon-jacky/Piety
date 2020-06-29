@@ -6,11 +6,12 @@ edsel
 
 **edsel** is a display editor in pure Python.
 
-**edsel** provides all of the commands of the line editor [ed.py](ed.md) 
-and the simpler display editor [edda](edda.md).  *edsel* adds a display 
-editing mode that inserts or deletes printing characters anywhere, and 
-uses display commands bound to control characters to move the cursor and 
-to select, cut, and paste text.
+**edsel** provides all of the commands of the line editors [ed.py](ed.md)
+(also [here](ed.txt)) and [edo.py](edo.md) (also [here](edo.txt))  and the
+simpler display editor [edda](edda.md) (also [here](edda.txt)).   *edsel*
+adds a display  editing mode that inserts or deletes printing characters
+anywhere, and  uses display commands bound to control characters to move
+the cursor and  to select, cut, and paste text.
 
 **edsel** provides the [wyshka](../shells/wyshka.md) shell, which provides 
 easy access to both  Python and the editor command language, as well as 
@@ -158,6 +159,8 @@ These function keys behave differently on the command line:
 Commands retrieved from the history can be edited and submitted.
 Command line history including previous search strings can be accessed
 during *^X* commmands.
+
+Here is a [command summary](edsel.txt).
 
 ## API and data structures ##
 

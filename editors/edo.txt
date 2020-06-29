@@ -1,0 +1,7 @@
+edo.py command summary:
+
+ P  execute selected lines using Python InteractiveConsole class
+ R  execute selected lines using Python exec function
+
+ X buffer echo delay - execute editor or Python script in named buffer 
+    with command echo (Boolean), delay seconds between commands
