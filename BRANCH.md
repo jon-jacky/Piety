@@ -16,7 +16,7 @@ previous substitution. Reorganize search and line address code in
 *buffer.py* *ed.py* *buffer.py* *check.py*. Print *? no mark* from *edsel*
 *^Q* and *^W* commands.  Ensure that text deleted, altered, or copied by 
 *ed* *y* *d* *c* *s* commands can be restored by *edsel* *^Y as well as *ed* *x*.
-Begun 26 Apr 2020.
+Revise documentation in several *.md* and *.txt* files. Begun 26 Apr 2020.
 
 Branches recently merged into *master*:
 
