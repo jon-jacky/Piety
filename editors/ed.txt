@@ -31,7 +31,7 @@ Commands from GNU ed:
  # comment, useful in command scripts
  x append (paste) from cut buffer after current line
  y copy (yank) addressed lines into cut buffer (without deleting them)
-   cut buffer is also overwritten by addressed lines in c d j s commands.
+   cut buffer is also overwritten by addressed lines in c d s commands.
 
 Commands from sam:
 
@@ -47,7 +47,7 @@ New commands in ed.py only:
  N list buffers, write list into buffer named *Buffers*
  O outdent lines
 
-Line addresses from ed:
+Line addresses and abbreviations from ed:
 
  . current line, called dot (default for most commands)
  $ last line
@@ -67,10 +67,10 @@ Line addresses from ed:
  % entire buffer (same as ,)
  ; current line to end of buffer (same as .,$)
 
-New line addresses in ed.py only:
+New line address abbreviations in ed.py only:
 
  [  region from line from mark @ (inclusive) to dot (exclusive) (same as @,-)
- ]  paragraph, region between empty lines, or preceding dot if dot is empty
+ ]  paragraph, region between empty lines, or preceding paragraph if dot is empty
 
 Command format:
 

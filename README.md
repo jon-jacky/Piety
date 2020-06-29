@@ -10,7 +10,7 @@ is a response to this impulse:
 > small, easy to understand, and fun to program.  And, let's build it
 > all in our favorite language!*
 
-We draw inspiration from the single-user, single-language, special-
+We draw inspiration from the single user, single language, special
 hardware systems of the 1970s and 80s: Smalltalk, Lisp machines, Oberon
 (see [doc/precursors.md](doc/precursors.md)).   Those systems used a
 single programming language for both the applications and the operating
@@ -73,4 +73,4 @@ Piety is written in Python 3 since June 2015.  Earlier work is saved
 in this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).
 
-Revised Mar 2019
+Revised Jun 2020

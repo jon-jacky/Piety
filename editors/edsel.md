@@ -320,7 +320,9 @@ then type *I*, the *ed.py* indent command (capital *I*, the lowercase *i*
 is the insert command).  By default *I* just indents the current line, dot,
 but you can prefix *I* by any range of line numbers, or any selection
 abbreviation.  Type *[I* to indent the text region previously
-selected in display mode by a mark command.
+selected in display mode by a mark command, or *]I* to indent the current
+paragraph, any sequence of lines separated from surrounding text by one
+or more empty lines preceding and following.  
 
 To outdent a block of text, use the *O* command.
 
@@ -334,7 +336,7 @@ the number of spaces to indent (or outdent).   This initially defaults to
 Use the *ed.py* *J* command in command mode to wrap text. The selected lines
 are wrapped so their length does not exceed *fill_column*, which defaults to 75
 characters, but can be reassigned by including a parameter to the *J* command,
-which then remains in effect in that buffer only until it is reassigned again.
+which then remains in effect in that buffer until it is reassigned again.
 
 The left margin of all the wrapped lines is the made the same as the left
 margin of the first line in the selection.
@@ -345,6 +347,9 @@ A convenient way to select the lines to wrap is to set the mark at the
 beginning of the region, then move the cursor to the line after the region.
 Then type *^X* to get the command prompt, then type the commmand *[J*
 which applies the wrap command *J* to the region *[* from mark to dot.
+Another convenient way is to simply wrap the current paragraph 
+with *]J*, which wraps all the lines up to the nearest
+preceding empty line and down the the nearest following empty line.
 
 #### Long lines ####
 

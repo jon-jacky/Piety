@@ -6,12 +6,12 @@ This is the **paragraph** branch.
 
 - **paragraph**.  Add functionality and reorganize code in editors.
 Add new paragraph address range *]* to *ed.py*,
-sometimes more convenient than selectng a region with mark. Revise *J*
+sometimes more convenient than selecting a region with mark. Revise *J*
 *wrap* command to properly re-wrap already-indented text. Support regular
 expressions in line address patterns and the *s* substitute command. Print
 *? no match* when the search pattern is not found in the buffer, or the
 replacement pattern is not found in the line.   Support classic *ed* default
-replacement pattern in *s* command: *s//new*.   Add classic ed *u* command, undo
+empty pattern in *s* command: *s//new*.   Add classic ed *u* command, undo
 previous substitution. Reorganize search and line address code in
 *buffer.py* *ed.py* *buffer.py* *check.py*. Print *? no mark* from *edsel*
 *^Q* and *^W* commands.  Ensure that text deleted, altered, or copied by 
