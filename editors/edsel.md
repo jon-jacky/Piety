@@ -132,6 +132,8 @@ These are the dedicated function keys and their commands
     up   (arrow key) move cursor up to previous line (same as ^P)
     down (arrow key) move cursor down to next line (same as ^N)
 
+Here is a [command summary](edsel.txt).
+
 ## Editing Commmand Lines ##
 
 It is also possible to edit command lines in the scrolling command
@@ -159,8 +161,6 @@ These function keys behave differently on the command line:
 Commands retrieved from the history can be edited and submitted.
 Command line history including previous search strings can be accessed
 during *^X* commmands.
-
-Here is a [command summary](edsel.txt).
 
 ## API and data structures ##
 
