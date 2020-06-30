@@ -22,9 +22,11 @@ Callable Python shells
   can also redirect command output from the application or from Python
   to a text buffer instead of the terminal.
 
+- **wyshka.txt**: Summary of *whyska.py*.
+
 Our *pysh.py* is not related to the abandoned project also named 
 [pysh](http://pysh.sourceforge.net/) mentioned on this page on
 [alternative shells](https://github.com/oilshell/oil/wiki/ExternalResources).
 
-Revised Jan 2020
+Revised Jun 2020
 
