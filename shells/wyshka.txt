@@ -1,0 +1,30 @@
+wyshka.py summary
+
+Switching between shells.  In application shell (usually edsel):
+
+    :<command>       execute application <command>
+    :!<statement>    push Python <statement> to pysh, return to application command mode
+    .. <statement>   push Python continuation line <statement> to pysh
+    :!               switch to Python mode
+
+In Python:
+
+    >> <statement>   push Python <statement> to pysh
+    .. <statment>    push Python continuation line <statement> to pysh
+    >>:<command>     execute application <command>, return to pysh interpreter
+    >>:              switch to application command mode
+
+Redirect output of command to named buffer, works in both application and
+Python modes. To rewrite buffer contents, so any previous contents are lost:
+
+    > bufname command
+
+To append command output to the buffer, preserving previous contents:
+
+    >> bufname command
+
+Revised Jun 2020
+
+
+
+

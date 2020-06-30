@@ -6,6 +6,15 @@ samysh.py
   It was created to run test scripts in the *[edo](../editors/edo.md)* line editor
   and the *[edsel](../editors/edsel.md)* and *[eden](../editors/eden.md)* display editors.
 
+For example, the *[edo](../editors/edo.md)* editor (also
+[here](../editors/edo.txt)) provides *samysh* scripting in its *X* command, 
+which is used this way:
+
+    X bufname echo delay
+
+This command executes the editor or Python script in the named buffer 
+with optional command echo (Boolean), delay seconds between script commands.
+
 **samysh.py** provides four functions:
 
 - *params* gets *echo* and *delay* parameters used by *show_command* and *run_script*
@@ -22,8 +31,5 @@ samysh.py
 - *add_command* adds one new command to a command line program. Use this to
   add the command the runs a script.
 
-The *[edo](../editors/edo.py)* editor (explained
-[here](../editors/edo.md)) demonstrates how to use *samysh*.
-
-Revised May 2019
+Revised June 3020
 

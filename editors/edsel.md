@@ -13,7 +13,8 @@ adds a display  editing mode that inserts or deletes printing characters
 anywhere, and  uses display commands bound to control characters to move
 the cursor and  to select, cut, and paste text.
 
-**edsel** provides the [wyshka](../shells/wyshka.md) shell, which provides 
+**edsel** provides the [wyshka](../shells/wyshka.md) shell 
+(also [here](../shells/wyshka.txt)), which provides 
 easy access to both  Python and the editor command language, as well as 
 redirection and scripting.
 
