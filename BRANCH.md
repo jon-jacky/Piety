@@ -2,7 +2,14 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into *master*:
+This is the **storage** branch:
+
+- **storage**.  Separate buffer data structures out of *ed.py* into  the
+new *storage* module.  Add *noed* ("no ed"), an editor with storage and
+display but no commands or any user interface except the interactive
+Python interpreter.  Begun Jul 1 2020.
+
+Branches recently merged into *master*:
 
 - **paragraph**, merged Jun 30 2020.   Add functionality and reorganize
 code in editors. Add new paragraph address range *]* to *ed.py*, sometimes
