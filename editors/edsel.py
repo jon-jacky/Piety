@@ -5,7 +5,8 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import keyboard, console, check, edda, pysh, wyshka, samysh
+import keyboard, console, check, edda, pysh, wyshka, samysh, buffer
+import storage as st
 
 ed = edda.edo.ed    # use ed and frame APIs without prefix
 frame = edda.frame
@@ -25,7 +26,7 @@ class Console(console.Console):
     def accept_command(self):
         if self.line == 'C': # C command, change to display mode
             print() # advance line in command region
-            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip('\n'))
+            self.set_display_mode(st.buf.lines[st.buf.dot].rstrip('\n'))
         else:
             super().accept_command()
 
@@ -46,7 +47,7 @@ class Console(console.Console):
     def set_command_mode(self):
         'Replace current line in buffer and resume command mode.'
         # Based on ed.py append and '.' handling, Console accept_line method.
-        ed.buf.replace(ed.buf.dot, self.line + '\n')
+        st.buf.replace(st.buf.dot, self.line + '\n')
         ed.command_mode = True
         ed.prompt = ed.command_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
@@ -55,7 +56,7 @@ class Console(console.Console):
 
     def refresh(self):
         'Refresh entire display including whole frame and scrolling command region.'
-        ed.buf.replace(ed.buf.dot, self.line + '\n') # so refresh renders it
+        st.buf.replace(st.buf.dot, self.line + '\n') # so refresh renders it
         frame.refresh(self.start_col + self.point)
 
     def open_line(self):
@@ -65,9 +66,9 @@ class Console(console.Console):
         """
         prefix = self.line[:self.point]
         suffix = self.line[self.point:].rstrip('\n')
-        ed.buf.replace(ed.buf.dot, prefix + '\n')
+        st.buf.replace(st.buf.dot, prefix + '\n')
         self.kill_line() # from cursor to end of line
-        ed.buf.a(ed.buf.dot, suffix + '\n') # calls frame.insert()
+        st.buf.a(st.buf.dot, suffix + '\n') # calls frame.insert()
         self.line = suffix
         self.point = 0
         self.start_col = 1
@@ -79,11 +80,11 @@ class Console(console.Console):
         """
         if self.point > 0:
             self.backward_delete_char()
-        elif ed.buf.dot > 1:
-            new_point = len(ed.buf.lines[ed.buf.dot-1])-1 # don't count \n
-            ed.buf.replace(ed.buf.dot, self.line)
-            ed.buf.j(ed.buf.dot-1, ed.buf.dot)
-            self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
+        elif st.buf.dot > 1:
+            new_point = len(st.buf.lines[st.buf.dot-1])-1 # don't count \n
+            st.buf.replace(st.buf.dot, self.line)
+            st.buf.j(st.buf.dot-1, st.buf.dot)
+            self.line = st.buf.lines[st.buf.dot].rstrip('\n')
             self.point = new_point
             frame.put_display_cursor(column=(self.start_col + self.point))
         else:
@@ -91,10 +92,10 @@ class Console(console.Console):
 
     def join_next(self):
         'Helper - join next line to this one. At last line do nothing.'
-        if ed.buf.dot < ed.buf.nlines():
-            ed.buf.replace(ed.buf.dot, self.line)
-            ed.buf.j(ed.buf.dot, ed.buf.dot+1)
-            self.line = ed.buf.lines[ed.buf.dot].rstrip('\n')
+        if st.buf.dot < st.buf.nlines():
+            st.buf.replace(st.buf.dot, self.line)
+            st.buf.j(st.buf.dot, st.buf.dot+1)
+            self.line = st.buf.lines[st.buf.dot].rstrip('\n')
             frame.put_display_cursor(column=(self.start_col + self.point))
         else:
             pass
@@ -110,14 +111,14 @@ class Console(console.Console):
             self.join_next()
 
     def goto_line(self, iline, jcol):
-        if check.iline_ok(ed.buf, iline):
-            ed.buf.replace(ed.buf.dot, self.line + '\n')
-            ed.buf.l(iline)
-            line = ed.buf.lines[ed.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
+        if check.iline_ok(st.buf, iline):
+            st.buf.replace(st.buf.dot, self.line + '\n')
+            st.buf.l(iline)
+            line = st.buf.lines[st.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(column=(self.start_col + self.point))
-        if iline == ed.buffer.no_match:
+        if iline == buffer.no_match:
             frame.put_message('? no match')
 
     def prev_line(self):
@@ -127,41 +128,41 @@ class Console(console.Console):
         When cursor would leave top, redraw window with current line in middle
         Replace current line in buffer and copy preceding buffer line into line
         """
-        self.goto_line(ed.buf.dot-1, self.point)
+        self.goto_line(st.buf.dot-1, self.point)
 
     def next_line(self):
         'Like prev_line, but line below/bottom.'
-        self.goto_line(ed.buf.dot+1, self.point)
+        self.goto_line(st.buf.dot+1, self.point)
 
     def page_down(self):
         'Move cursor forward several/many lines.'
-        dest = min(ed.buf.dot + frame.win.nlines - 1, ed.buf.nlines())
+        dest = min(st.buf.dot + frame.win.nlines - 1, st.buf.nlines())
         self.goto_line(dest, self.point)
 
     def page_up(self):
         'Move cursor backward several/many lines.'
-        dest = max(ed.buf.dot - frame.win.nlines + 1, 1)
+        dest = max(st.buf.dot - frame.win.nlines + 1, 1)
         self.goto_line(dest, self.point)
 
     def search(self):
         'Search forward for previous search string.'
-        self.goto_line(ed.buf.F(''), self.point)
+        self.goto_line(st.buf.F(''), self.point)
 
     def rsearch(self):
         'Search backward for previous search string.'
-        self.goto_line(ed.buf.R(''), self.point)
+        self.goto_line(st.buf.R(''), self.point)
 
     def set_mark(self):
         'Define region from mark (inclusive) to dot (exclusive) that is deleted by cut'
-        ed.buf.mark['@'] = ed.buf.dot
+        st.buf.mark['@'] = st.buf.dot
         frame.put_message('Mark set')
 
     def exchange(self):
         'Exchange point and mark (to make mark visible by putting cursor there).'
-        if '@' in ed.buf.mark:
-            saved_dot = ed.buf.dot
-            self.goto_line(ed.buf.mark['@'], 1) # updates ed.buf.dot
-            ed.buf.mark['@'] = saved_dot
+        if '@' in st.buf.mark:
+            saved_dot = st.buf.dot
+            self.goto_line(st.buf.mark['@'], 1) # updates st.buf.dot
+            st.buf.mark['@'] = saved_dot
         else:
             frame.put_message('? No mark')
 
@@ -171,14 +172,14 @@ class Console(console.Console):
         If no mark, do nothing.
         If mark follows dot, delete from dot to one before mark, reassign dot/
         """
-        if '@' in ed.buf.mark:
-            start = ed.buf.mark['@']
-            end = ed.buf.dot
+        if '@' in st.buf.mark:
+            start = st.buf.mark['@']
+            end = st.buf.dot
             if start > end:
                 start, end = end, start
             end -= 1 # exclude last line, dot (usually) or mark
-            if check.range_ok(ed.buf, start, end):
-                ed.buf.d(start, end)
+            if check.range_ok(st.buf, start, end):
+                st.buf.d(start, end)
                 frame.put_display_cursor()
         else:
             frame.put_message('? No mark')
@@ -186,23 +187,23 @@ class Console(console.Console):
     def kill(self):
         super().kill()
         if not ed.command_mode:
-            ed.buffer.Buffer.yank_lines = False
-            ed.buf.modified = True
+            buffer.Buffer.yank_lines = False
+            st.buf.modified = True
 
     def discard(self):
         super().discard()
         if not ed.command_mode:
-            ed.buffer.Buffer.yank_lines = False
-            ed.buf.modified = True
+            buffer.Buffer.yank_lines = False
+            st.buf.modified = True
 
     def yank(self):
-        if ed.command_mode or not ed.buffer.Buffer.yank_lines:
+        if ed.command_mode or not buffer.Buffer.yank_lines:
             # Insert string from self.yank_buffer inline at point.
             super().yank()
         else:
             # Insert lines from Buffer class cut_buffer before dot.
-            ed.buf.x(ed.buf.dot-1) # ed x appends, edsel ^Y inserts
-            ed.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
+            st.buf.x(st.buf.dot-1) # ed x appends, edsel ^Y inserts
+            st.buf.dot += 1  # x puts dot at last line in region, ^Y at first after
             frame.put_display_cursor()
 
     def prev_indent(self, prev_line):
@@ -214,7 +215,7 @@ class Console(console.Console):
         indent = self.n_tab_spaces # default
         match = None
         while not match and prev_line > 0:
-            match = next_text.search(ed.buf.lines[prev_line], 0)
+            match = next_text.search(st.buf.lines[prev_line], 0)
             if match:
                 indent = match.start()+1
             else:
@@ -224,17 +225,17 @@ class Console(console.Console):
     def tab(self):
         'For first tab stop, try to match indentation of preceding line'
         if self.point == 0:
-            indent, _ = self.prev_indent(ed.buf.dot - 1)
+            indent, _ = self.prev_indent(st.buf.dot - 1)
         else:
             indent = self.n_tab_spaces
         self.tab_n(indent)
-        ed.buf.modified = True
+        st.buf.modified = True
 
     def other_window(self):
         'Move cursor to other window, next in sequence.'
-        ed.buf.replace(ed.buf.dot, self.line + '\n') # from goto_line
-        edda.o() # call frame.next() then reassign win, ed.buf, ed.current
-        self.line = ed.buf.lines[ed.buf.dot].rstrip('\n') # from several methods
+        st.buf.replace(st.buf.dot, self.line + '\n') # from goto_line
+        edda.o() # call frame.next() then reassign win, st.buf, st.current
+        self.line = st.buf.lines[st.buf.dot].rstrip('\n') # from several methods
         # From set_display_mode
         self.point = 0
         self.start_col = 1
@@ -248,7 +249,7 @@ class Console(console.Console):
         else:
             util.putstr('%s.%s point %s len %s dot %s nlines %s' %
                         (self.line[:self.point], self.line[self.point:],
-                         self.point, len(self.line), ed.buf.dot, ed.buf.nlines()))
+                         self.point, len(self.line), st.buf.dot, st.buf.nlines()))
 
     def execute(self):
         """
@@ -276,14 +277,14 @@ class Console(console.Console):
             self.stop()
         else:
             terminal.set_char_mode() # resume inline editing
-            self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip('\n'))
+            self.set_display_mode(st.buf.lines[st.buf.dot].rstrip('\n'))
 
     def cancel_edsel_command(self):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         self.move_beginning()
         self.kill_line()
-        self.set_display_mode(ed.buf.lines[ed.buf.dot].rstrip('\n'))
+        self.set_display_mode(st.buf.lines[st.buf.dot].rstrip('\n'))
 
     def crash(self):
         'For now, just crash' # FIXME - not used, ^K is now console kill line
@@ -294,21 +295,21 @@ class Console(console.Console):
         Run Python statements in current selection (mark to dot).
         If there is no current selection, just run the current line.
         """
-        if '@' in ed.buf.mark:
-            start = ed.buf.mark['@']
-            end = ed.buf.dot
+        if '@' in st.buf.mark:
+            start = st.buf.mark['@']
+            end = st.buf.dot
             if start > end:
                 start, end = end, start
             end -= 1 # exclude last line, dot (usually) or mark
         else:
-            start = end = ed.buf.dot
-        if check.range_ok(ed.buf, start, end):
+            start = end = st.buf.dot
+        if check.range_ok(st.buf, start, end):
             terminal.set_line_mode() # exit inline editing, prepare for P(...)
             frame.put_command_cursor()
             # Use pushlines, uses code.InteractiveConsole not builtin exec
-            pysh.pushlines(ed.buf.lines[start:end+1])
+            pysh.pushlines(st.buf.lines[start:end+1])
             # Sometimes buf.lines prints nothing - did anything happen?
-            print('%s, ran lines %d..%d' % (ed.current, start, end))
+            print('%s, ran lines %d..%d' % (st.current, start, end))
             terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()
 

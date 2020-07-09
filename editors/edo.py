@@ -6,6 +6,7 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 """
 
 import ed, parse, check, pysh, samysh, wyshka
+import storage as st
 
 # Define x command so it can also be imported by edda, edsel etc.
 # to use with their own do_commands, by calling samysh.add_command.
@@ -25,33 +26,33 @@ def X_command(do_command):
         """
         if ed.command_mode:
             bufname, echo, delay = samysh.params(paramstring)
-            bufname = ed.match_prefix(bufname, ed.buffers)
-            if bufname in ed.buffers and bufname != ed.current:
-                lines = ed.buffers[bufname].lines[1:] # lines[0] always empty
+            bufname = ed.match_prefix(bufname, st.buffers)
+            if bufname in st.buffers and bufname != st.current:
+                lines = st.buffers[bufname].lines[1:] # lines[0] always empty
                 samysh.run_script(do_command, lines, echo=echo, delay=delay)
-            else:
+            else:                
                 print('? buffer name')
     return X
 
 def P(*args):
     'Run Python statements in addressed lines using push'
-    valid, start, end, _, _ = check.irange(ed.buf, args)
+    valid, start, end, _, _ = check.irange(st.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
-        pysh.pushlines(ed.buf.lines[start:end+1])
-        print('%s, ran lines %d..%d using push' % (ed.current, start, end))
+        pysh.pushlines(st.buf.lines[start:end+1])
+        print('%s, ran lines %d..%d using push' % (st.current, start, end))
 
 def R(*args):
     'Run Python statements in addressed lines using exec'
-    valid, start, end, _, _ = check.irange(ed.buf, args)
+    valid, start, end, _, _ = check.irange(st.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
-        pysh.execlines(ed.buf.lines[start:end+1])
-        print('%s, ran lines %d..%d using exec' % (ed.current, start, end))
+        pysh.execlines(st.buf.lines[start:end+1])
+        print('%s, ran lines %d..%d using exec' % (st.current, start, end))
 
 parse.ed_cmds += 'PR' # so parse.command() recognizes new commands
 
 def do_command(line):
         'Add P and R commands to run Python statements'
-        results = parse.command(ed.buf, line)
+        results = parse.command(st.buf, line)
         if results:
             cmd_name, args = results
         else:

@@ -4,13 +4,17 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 
 import re, os, sys
 from contextlib import redirect_stdout
-import parse, check, buffer
+import parse, check
+
+# Data structures, variables, fcns in storage module: 
+# previous current buf buffers create_buf select_buf
+# Initialize data with call to st.create_buf (below, near main)
+import storage as st
 
 # ed default is no display.  
 # edda startup assigns ed.displaying = True and ed.frame = frame
 displaying = False
 frame = None
-
 
 # Each ed command is implemented here by a command function with the same
 # one-letter name, whose arguments are the same as the ed command args.
@@ -20,21 +24,15 @@ frame = None
 # must form an API that can be used without running the ed command line, 
 # so each command function must gather and check its own arguments.
 
-# Data structures and variables. Initialize these with create_buf (below)
-buf = None       # current buffer
-previous = str() # name of previous buffer
-current = str()  # name of current buffer
-buffers = dict() # dict from buffer names (strings) to Buffer instances
-
 # helper functions: line addresses
 
 def o(): # looks like ed .
     'Return index of the current line (called dot), 0 if the buffer is empty'
-    return buf.dot
+    return st.buf.dot
 
 def S(): # looks like ed $
     'Return index of the last line, 0 if the buffer is empty'
-    return buf.nlines()
+    return st.buf.nlines()
 
 # helper functions: buffers and files
 
@@ -51,8 +49,8 @@ def match_prefix(prefix, names):
 
 def bufs_for_file(filename):
     'Return list of names of buffers editing filename, empty list if none'
-    return [ buffers[b].name for b in buffers
-             if buffers[b].filename == filename ]
+    return [ st.buffers[b].name for b in st.buffers
+             if st.buffers[b].filename == filename ]
 
 def fname_in_use(filename):
     'Return list of names of buffers editing filename, print warning if not empty'
@@ -68,32 +66,15 @@ def current_filename(filename):
     SIDE EFFECT! Assign current filename only if it was previously absent.
     """
     if filename:
-        if not buf.filename:
-            buf.filename = filename # side effect!
+        if not st.buf.filename:
+            st.buf.filename = filename # side effect!
         return filename
-    if buf.filename:
-        return buf.filename
+    if st.buf.filename:
+        return st.buf.filename
     print('? no current filename')
     return None
 
-def create_buf(bufname):
-    'Create buffer with given name. Replace any existing buffer with same name'
-    global previous, current, buf
-    buf = buffer.Buffer(bufname)
-    buffers[bufname] = buf # replace buffers[bufname] if it already exists
-    previous = current
-    current = bufname
-    if displaying:
-        frame.create(buf)
-
-def select_buf(bufname):
-    'Make buffer with given name the current buffer'
-    global previous, current, buf
-    previous = current
-    current = bufname
-    buf = buffers[current]
-    if displaying:
-        frame.select(buf)
+# st.create_buf and st.select_buf are in storage module
 
 # command functions: buffers and files
 
@@ -103,17 +84,16 @@ def b(*args):
     If no buffer with given name, create scratch buffer with no file.
     If no name given, set current buffer to previous current buffer.
     """
-    global previous, current, buf
     _, _, bufname, _ = parse.arguments(args)
-    bufname = match_prefix(bufname, buffers)
-    if bufname in buffers:
-        select_buf(bufname)
+    bufname = match_prefix(bufname, st.buffers)
+    if bufname in st.buffers:
+        st.select_buf(bufname)
     elif bufname:
-        create_buf(bufname)
-        # buf.filename = bufname # NOT, make scratch buffer with no file
+        st.create_buf(bufname)
+        # st.buf.filename = bufname # NOT, make scratch buffer with no file
     else:
-        select_buf(previous)
-    print('.' + buf.info())
+        st.select_buf(st.previous)
+    print('.' + st.buf.info())
 
 def f(*args):
     """
@@ -124,21 +104,21 @@ def f(*args):
     if filename:
         if fname_in_use(filename):
             return
-        buf.f(filename)
-    elif buf.filename:
-        print(buf.filename)
+        st.buf.f(filename)
+    elif st.buf.filename:
+        print(st.buf.filename)
     else:
         print('? no current filename')
 
 def r(*args):
     'Read file contents into buffer after iline'
-    valid, iline, fname = check.iline0_valid(buf, args)
+    valid, iline, fname = check.iline0_valid(st.buf, args)
     if valid:
         filename = current_filename(fname)
         if filename:
-            nlines0 = buf.nlines()
-            buf.r(iline, filename)
-            print('%s, %d lines' % (filename, buf.nlines() - nlines0))
+            nlines0 = st.buf.nlines()
+            st.buf.r(iline, filename)
+            print('%s, %d lines' % (filename, st.buf.nlines() - nlines0))
 
 def E(*args):
     """
@@ -147,7 +127,7 @@ def E(*args):
     If another buffer is already editing named file, print warning and exit.
     """
     _, _, filename, _ = parse.arguments(args)
-    if not current == 'main':
+    if not st.current == 'main':
         print('? e and E only work in main buffer')
         return
     if not filename:
@@ -157,17 +137,17 @@ def E(*args):
     if fbufnames and 'main' not in fbufnames:
         print('? buffer %s is already editing file %s' % (fbufnames[0], filename))
         return
-    buf.filename = filename
-    buf.d(1, buf.nlines())
+    st.buf.filename = filename
+    st.buf.d(1, st.buf.nlines())
     r(0, filename)
-    buf.modified = False # insert in r sets modified = True, this is exception
+    st.buf.modified = False # insert in r sets modified = True, this is exception
 
 def e(*args):
     """
     Read in named file, replace buffer contents.
     BUT exit with warning if buffer has unsaved changes.
     """
-    if buf.modified:
+    if st.buf.modified:
         print('? unsaved changes, use E to reload')
         return
     E(*args)
@@ -185,20 +165,20 @@ def B(*args):
     fbufnames = bufs_for_file(filename)
     if fbufnames:
         bufname = fbufnames[0]
-        select_buf(bufname) # Do NOT reload file over buffer contents!
-        print('.' + buf.info())
+        st.select_buf(bufname) # Do NOT reload file over buffer contents!
+        print('.' + st.buf.info())
         return
     basename = os.path.basename(filename)
     bufname = basename
     suffix = 1
     # assign unique names: README.md README.md<2> ...
-    while bufname in buffers:
+    while bufname in st.buffers:
         suffix += 1
         bufname = basename + '<%d>' % suffix
-    create_buf(bufname)
-    buf.filename = filename
+    st.create_buf(bufname)
+    st.buf.filename = filename
     r(0, filename)
-    buf.modified = False # insert in r sets modified = True, this is exception
+    st.buf.modified = False # insert in r sets modified = True, this is exception
 
 def w(*args):
     """
@@ -210,34 +190,33 @@ def w(*args):
     _, _, fname, _ = parse.arguments(args)
     if fname:
         fbufnames = bufs_for_file(fname)
-    if fname and fbufnames and current not in fbufnames:
+    if fname and fbufnames and st.current not in fbufnames:
         print('? buffer %s is already editing file %s' % (fbufnames[0], fname))
         return
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
-        buf.w(filename)
+        st.buf.w(filename)
         if displaying:
-            frame.status(buf)
-        print('%s, %d lines' % (filename, buf.nlines()))
+            frame.status(st.buf)
+        print('%s, %d lines' % (filename, st.buf.nlines()))
 
 def DD(*args):
     'Delete the named buffer, even if it has unsaved changes'
-    global previous, current, buf
     _, _, bufname, _ = parse.arguments(args)
-    name = bufname if bufname else current
-    if not name in buffers:
+    name = bufname if bufname else st.current
+    if not name in st.buffers:
         print('? buffer name')
     elif name == 'main':
         print("? Can't delete main buffer")
     else:
-        delbuf = buffers[name]
-        del buffers[name]
-        if name == current: # pick a new current buffer
-            keys = list(buffers.keys()) # always nonempty due to main
-            select_buf(keys[0]) # reassigns current
-            previous = current
+        delbuf = st.buffers[name]
+        del st.buffers[name]
+        if name == st.current: # pick a new current buffer
+            keys = list(st.buffers.keys()) # always nonempty due to main
+            st.select_buf(keys[0]) # reassigns current
+            st.previous = st.current
         if displaying:
-            frame.remove(delbuf, buf)
+            frame.remove(delbuf, st.buf)
         print('%s, buffer deleted' % name)
 
 D_count = 0 # number of consecutive times D command has been invoked
@@ -246,8 +225,8 @@ def D(*args):
     'Delete the named buffer, but if unsaved changes print message and exit'
     global D_count
     _, _, bufname, _ = parse.arguments(args)
-    name = bufname if bufname else current
-    if name in buffers and buffers[name].modified and not D_count:
+    name = bufname if bufname else st.current
+    if name in st.buffers and st.buffers[name].modified and not D_count:
         print('? unsaved changes, repeat D to delete')
         D_count += 1 # must invoke D twice to confirm, see message below
         return
@@ -258,30 +237,27 @@ def D(*args):
 def A(*args):
     ' = in command mode, print the line number of the addressed line'
     iline, _, _, _ = parse.arguments(args)
-    iline = iline if iline != None else buf.nlines() # default $ not .
-    if check.iline_ok0(buf, iline): # don't print error message when file is empty
+    iline = iline if iline != None else st.buf.nlines() # default $ not .
+    if check.iline_ok0(st.buf, iline): # don't print error message when file is empty
         print(iline)
     else:
         print('? no match' if iline == buffer.no_match else '? invalid address')        
 
 def print_buffers():
-    """
-    Print information about all buffers on stdout.
-    Called by n to print on stdout, called by N with redirection
-    """
+    'Print information about all buffers on stdout.'
     print('CRM Buffer            Lines  Mode     File')  # Current Readonly Modified
-    for name in buffers:
-        print(('.' if name == current else ' ') + buffers[name].info())
+    for name in st.buffers:
+        print(('.' if name == st.current else ' ') + st.buffers[name].info())
 
 def n(*args):
-    'print information about all buffers on stdout'
+    'Print information about all buffers on stdout'
     print_buffers()
 
 def N(*args):
     'Print information about all buffers in *Buffers* buffer'
     b('*Buffers*')
     d(1,S())
-    with redirect_stdout(buf):
+    with redirect_stdout(st.buf):
         print_buffers()
 
 # command functions: displaying and navigating text
@@ -289,30 +265,30 @@ def N(*args):
 def l(*args):
     'Advance dot to iline, return line there, conditionally print it'
     iline, _, _, _ = parse.arguments(args)
-    if not buf.lines:
+    if not st.buf.lines:
         print('? empty buffer')
         return
     # don't use usual default dot here, instead advance dot
     if iline == None:
-        iline = buf.dot + 1
-    if not check.iline_ok(buf, iline):
+        iline = st.buf.dot + 1
+    if not check.iline_ok(st.buf, iline):
         print('? no match' if iline == buffer.no_match else '? invalid address')
         return
-    line = buf.l(iline)
+    line = st.buf.l(iline)
     if not displaying:
         print(line)
 
 def p(*args):
     'Unconditionally print lines from start through end, inclusive'
-    valid, start, end, _, _ = check.irange(buf, args)
+    valid, start, end, _, _ = check.irange(st.buf, args)
     if valid:
         for iline in range(start, end+1): # +1 because start,end is inclusive
-            print(buf.l(iline))
+            print(st.buf.l(iline))
 
 def p_lines(start, end):
     'Conditionnally print lines start through end, inclusive, if not displaying'
     for iline in range(start, end+1): # +1 because start,end is inclusive
-        line = buf.l(iline)
+        line = st.buf.l(iline)
         if not displaying:
             print(line)
 
@@ -328,59 +304,59 @@ def z(*args):
      start at iline+npage (preceding iline), leave dot at first line printed.
     """
     global npage
-    valid, iline, npage_string = check.iline_valid(buf, args)
+    valid, iline, npage_string = check.iline_valid(st.buf, args)
     if valid:
       valid, npage = check.iparam(npage_string, npage)
       if valid:
         if npage >= 0:
             if not args or isinstance(args[0],str): # args[0] might be npage
-                iline = buf.dot + 1
+                iline = st.buf.dot + 1
             end = iline + npage - 1
         else:
             end = iline - 1
             iline += npage # npage negative, go backward
             iline = iline if iline > 0 else 1
-        end = end if end <= buf.nlines() else buf.nlines()
+        end = end if end <= st.buf.nlines() else st.buf.nlines()
         p_lines(iline, end)
         if npage < 0:
-            buf.dot = iline
+            st.buf.dot = iline
 
 # command functions: adding, changing, and deleting text
 
 def a(*args):
     'Append lines from string after  iline, update dot to last appended line'
-    valid, iline, lines = check.iline0_valid(buf, args)
+    valid, iline, lines = check.iline0_valid(st.buf, args)
     if valid and lines:
-        buf.a(iline, lines)
+        st.buf.a(iline, lines)
 
 def i(*args):
     'Insert lines from string before iline, update dot to last inserted line'
-    valid, iline, lines = check.iline0_valid(buf, args)
+    valid, iline, lines = check.iline0_valid(st.buf, args)
     if valid and lines:
-        buf.i(iline, lines)
+        st.buf.i(iline, lines)
 
 def d(*args):
     'Delete text from start up to end, set dot to first line after deletes'
-    valid, start, end, _, _ = check.irange(buf, args)
+    valid, start, end, _, _ = check.irange(st.buf, args)
     if valid:
-        buf.d(start, end)
+        st.buf.d(start, end)
 
 def j(*args):
     'Delete lines from start to end, replace with single line of joined text'
-    valid, start, end, _, _ = check.irange(buf, args)
+    valid, start, end, _, _ = check.irange(st.buf, args)
     # For j command only, default end is start+1
-    end = (start + 1 if end == start and check.iline_ok(buf, start+1)
+    end = (start + 1 if end == start and check.iline_ok(st.buf, start+1)
            else end)
     if valid:
-        buf.j(start, end)
+        st.buf.j(start, end)
 
 def J(*args):
     'Replace lines from start to end with wrapped (filled) lines'
-    valid, start, end, param, _ = check.irange(buf, args)
+    valid, start, end, param, _ = check.irange(st.buf, args)
     if valid:
         valid, fill_column = check.iparam(param, 0)
         if valid:
-            buf.J(start, end, fill_column)
+            st.buf.J(start, end, fill_column)
 
 # used for both indent and outdent
 indent = 4
@@ -388,30 +364,30 @@ indent = 4
 def I(*args):
     'Indent lines, optional parameter assigns n of indent/outdent spaces'
     global indent
-    valid, start, end, param, _ = check.irange(buf, args)
+    valid, start, end, param, _ = check.irange(st.buf, args)
     if valid:
         valid, indent = check.iparam(param, indent)
         if valid:
-            buf.I(start, end, indent)
+            st.buf.I(start, end, indent)
             if displaying:
                 frame.mutate(start, end)
     
 def O(*args):
     'Outdent lines, optional parameter assigns n of indent/outdent spaces'
     global indent
-    valid, start, end, param, _ = check.irange(buf, args)
+    valid, start, end, param, _ = check.irange(st.buf, args)
     if valid:
         valid, indent = check.iparam(param, indent)
         if valid:
-            buf.M(start, end, indent)
+            st.buf.M(start, end, indent)
             if displaying:
                 frame.mutate(start, end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
-    valid, start, end, lines, _ = check.irange(buf, args)
+    valid, start, end, lines, _ = check.irange(st.buf, args)
     if valid:
-        buf.c(start,end,lines)
+        st.buf.c(start,end,lines)
 
 def s(*args):
     """
@@ -420,9 +396,9 @@ def s(*args):
     in each line.  Otherwise substitute all occurrences in each line.
     If old is absent, use pattern from most recent search if successsful.
     """
-    valid, start, end, old, params = check.irange(buf, args)
+    valid, start, end, old, params = check.irange(st.buf, args)
     if valid:
-        if not old and buf.found:
+        if not old and st.buf.found:
             old = buffer.Buffer.pattern # most recent successful search
         # params might be [ new, glbl, use_regex ]
         if old and len(params) > 0 and isinstance(params[0],str):
@@ -432,45 +408,45 @@ def s(*args):
             return
         glbl = bool(params[1])
         use_regex = bool(params[2])
-        match = buf.s(start, end, old, new, glbl, use_regex)
+        match = st.buf.s(start, end, old, new, glbl, use_regex)
         if not match:
             print('? no match')
 
 def u(*args):
     'Undo last substitution: replace line at iline from cut buffer'
-    valid, iline, _ = check.iline0_valid(buf, args)
+    valid, iline, _ = check.iline0_valid(st.buf, args)
     if valid:
-        buf.u(iline)
+        st.buf.u(iline)
 
 def m(*args):
     'move lines to after destination line'
-    valid, start, end, dest = check.range_dest(buf, args)
+    valid, start, end, dest = check.range_dest(st.buf, args)
     if valid:
         if (start <= dest <= end):
             print('? invalid destination')
             return
-        buf.m(start, end, dest)
+        st.buf.m(start, end, dest)
 
 def t(*args):
     'transfer (copy) lines to after destination line'
-    valid, start, end, dest = check.range_dest(buf, args)
+    valid, start, end, dest = check.range_dest(st.buf, args)
     if valid:
-        buf.t(start, end, dest)
+        st.buf.t(start, end, dest)
 
 def y(*args):
     'Yank (copy, do not remove) lines to cut buffer'
-    valid, start, end, _, _ = check.irange(buf, args)
+    valid, start, end, _, _ = check.irange(st.buf, args)
     if valid:
-        buf.y(start, end)
+        st.buf.y(start, end)
 
 def x(*args):
     'Append (put, paste) cut buffer contents after dest. line address'
     iline, _, _, _ = parse.arguments(args)
-    iline = check.mk_iline(buf, iline)
-    if not (0 <= iline <= buf.nlines()+1): # allow +y at $ to append to buffer
+    iline = check.mk_iline(st.buf, iline)
+    if not (0 <= iline <= st.buf.nlines()+1): # allow +y at $ to append to buffer
         print('? no match' if iline == buffer.no_match else '? invalid address')
         return
-    buf.x(iline)
+    st.buf.x(iline)
 
 # command functions: markers
 
@@ -479,12 +455,12 @@ def k(*args):
     Mark addressed line in this buffer with character c (command parameter),
     to use with 'c address form.  'c address identifies both buffer and line.
     """
-    valid, iline, marker = check.iline_valid(buf, args)
+    valid, iline, marker = check.iline_valid(st.buf, args)
     if valid:
         if marker:
             c = marker[0]
-            buf.mark[c] = iline
-            print("Mark %s set at line %d in buffer %s" % (c, iline, current))
+            st.buf.mark[c] = iline
+            print("Mark %s set at line %d in buffer %s" % (c, iline, st.current))
         else:
             print("No mark")
 
@@ -506,7 +482,7 @@ q_count = 0
 def q(*args):
     'Quit ed, unless unsaved changes'
     global q_count
-    if any([buffers[b].modified for b in buffers]) and not q_count:
+    if any([st.buffers[b].modified for b in st.buffers]) and not q_count:
         print('? unsaved changes, repeat q to quit')
         q_count += 1 # must invoke q twice to confirm
         return
@@ -522,7 +498,7 @@ command_mode = True
 def do_command(line):
     'Process one line without blocking in ed command mode or input mode'
     global command_mode, prompt, D_count, q_count
-    results = parse.command(buf, line)
+    results = parse.command(st.buf, line)
     if results:
         cmd_name, args = results
     else:
@@ -532,31 +508,31 @@ def do_command(line):
     elif cmd_name in parse.input_cmds:
         command_mode = False
         prompt = input_prompt
-        # Instead of using buf.a i c fcns we handle input mode cmds inline here
+        # Instead of using st.buf.a i c fcns we handle input mode cmds inline here
         # We add each line to buffer when user types RET at end-of-line,
         # *unlike* in Python API where we pass multiple input lines at once
         start, end, params, _ = parse.arguments(args) # can be int or None
-        start, end = check.mk_range(buf, start, end) # int only
-        if not (check.iline_ok0(buf, start) if cmd_name in 'ai'
-                else check.range_ok(buf, start, end)):
+        start, end = check.mk_range(st.buf, start, end) # int only
+        if not (check.iline_ok0(st.buf, start) if cmd_name in 'ai'
+                else check.range_ok(st.buf, start, end)):
             print('? no match' if iline == buffer.no_match else '? invalid address')            
             command_mode = True
             prompt = command_prompt
         # assign dot to prepare for input mode, where we a(ppend) each line
         elif cmd_name == 'a':
-            buf.dot = start
+            st.buf.dot = start
             if displaying:
-                frame.input_mode() # depends on buf.dot so can't be moved up
+                frame.input_mode() # depends on st.buf.dot so can't be moved up
         elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
-            buf.dot = start - 1 if start > 0 else 0
+            st.buf.dot = start - 1 if start > 0 else 0
             # so we can a(ppend) instead of i(nsert)
             if displaying:
-                frame.input_mode() # depends on buf.dot so can't be moved up
+                frame.input_mode() # depends on st.buf.dot so can't be moved up
         elif cmd_name == 'c': #c(hange) command deletes changed lines first
-            buf.d(start, end) # d updates buf.dot, calls frame.delete()
-            buf.dot = start - 1 # supercede dot assigned in preceding
+            st.buf.d(start, end) # d updates st.buf.dot, calls frame.delete()
+            st.buf.dot = start - 1 # supercede dot assigned in preceding
             if displaying:
-                frame.input_mode() # after buf.d(...) calls frame.delete(...)
+                frame.input_mode() # after st.buf.d(...) calls frame.delete(...)
         else:
             print('? command not supported in input mode: %s' % cmd_name)
     else:
@@ -576,8 +552,8 @@ def add_line(line):
             frame.command_mode()
     else:
         # Recall input() returns each line with final \n stripped off,
-        # BUT buf.a requires \n at end of each line.
-        buf.a(buf.dot, line + '\n') # Append new line after dot, advance dot.
+        # BUT st.buf.a requires \n at end of each line.
+        st.buf.a(st.buf.dot, line + '\n') # Append new line after dot, advance dot.
     return
 
 def process_line(line):
@@ -605,8 +581,9 @@ def cmd_options():
     options.update({'c': args.cmd_h })
     return filename, options
 
-create_buf('main')  # initialize main buffer only once on import
-previous = 'main'
+# Initialize data structures in storage module
+st.create_buf('main')  # initialize main buffer only once on import
+st.previous = 'main'
 
 def startup(*filename, **options):
     global command_prompt, prompt, quit

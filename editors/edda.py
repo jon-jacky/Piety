@@ -4,10 +4,10 @@ edda - Display editor based on the line editor ed.py
 """
 
 import traceback, os, sys
-import edo, frame, wyshka, samysh
+import edo, frame, wyshka, samysh, buffer
+import storage as st
 
 ed = edo.ed  # so we can use ed API without prefix
-buffer = ed.buffer
 
 # edda API functions
 
@@ -19,8 +19,8 @@ def o(*args):
     'Window commands: o(2) horiz. split, o(1) one window, o() next window'
     if not args:
         win = frame.next()
-        ed.buf = win.buf
-        ed.current = ed.buf.name
+        st.buf = win.buf
+        st.current = st.buf.name
     elif args[0] == 1:
         frame.single()
     elif args[0] == 2:
@@ -99,8 +99,9 @@ def startup(*filename, **options):
     if 'c' in options:
         cmd_h = options['c']
     frame.rescale(cmd_h) # before edo.startup calls e()
-    ed.displaying = buffer.displaying = True # defaults are False, no display
-    ed.frame = buffer.frame = frame # defaults are None
+    # Enable display in ed, buffer, storage modules. Defaults is no display.
+    ed.displaying = buffer.displaying = st.displaying = True
+    ed.frame = buffer.frame = st.frame = frame
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
@@ -108,8 +109,8 @@ def startup(*filename, **options):
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    ed.displaying = buffer.displaying = False
-    ed.frame = buffer.frame = None
+    ed.displaying = buffer.displaying = st.displaying = False
+    ed.frame = buffer.frame = st.frame = None
     ed.lz_print_dest = sys.stdout
 
 def main(*filename, **options):
@@ -122,7 +123,7 @@ def main(*filename, **options):
 
 # initialize scrolling region and first window only once on import
 cmd_h = 2
-frame.init(ed.buf) # import ed above initializes ed.buf
+frame.init(st.buf) # import ed above initializes st.buf
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()
