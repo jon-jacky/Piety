@@ -28,7 +28,7 @@ def X_command(do_command):
             bufname, echo, delay = samysh.params(paramstring)
             bufname = ed.match_prefix(bufname, st.buffers)
             if bufname in st.buffers and bufname != st.current:
-                lines = st.buffers[bufname].lines[1:] # lines[0] always empty
+                lines = st.lines(bufname)
                 samysh.run_script(do_command, lines, echo=echo, delay=delay)
             else:                
                 print('? buffer name')

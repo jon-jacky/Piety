@@ -4,11 +4,11 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 
 import re, os, sys
 from contextlib import redirect_stdout
-import parse, check
+import parse, check, buffer
 
 # Data structures, variables, fcns in storage module: 
-# previous current buf buffers create_buf select_buf
-# Initialize data with call to st.create_buf (below, near main)
+# previous current buf buffers create select
+# Initialize data with call to st.create (below, near main)
 import storage as st
 
 # ed default is no display.  
@@ -47,14 +47,9 @@ def match_prefix(prefix, names):
                 return n
     return prefix
 
-def bufs_for_file(filename):
-    'Return list of names of buffers editing filename, empty list if none'
-    return [ st.buffers[b].name for b in st.buffers
-             if st.buffers[b].filename == filename ]
-
 def fname_in_use(filename):
     'Return list of names of buffers editing filename, print warning if not empty'
-    fbufnames = bufs_for_file(filename)
+    fbufnames = st.bufs_for_file(filename)
     if fbufnames:
         print('? buffer %s is already editing file %s' % (fbufnames[0], filename))
     return fbufnames
@@ -74,7 +69,7 @@ def current_filename(filename):
     print('? no current filename')
     return None
 
-# st.create_buf and st.select_buf are in storage module
+# st.create and st.select are in storage module
 
 # command functions: buffers and files
 
@@ -87,12 +82,12 @@ def b(*args):
     _, _, bufname, _ = parse.arguments(args)
     bufname = match_prefix(bufname, st.buffers)
     if bufname in st.buffers:
-        st.select_buf(bufname)
+        st.select(bufname)
     elif bufname:
-        st.create_buf(bufname)
+        st.create(bufname)
         # st.buf.filename = bufname # NOT, make scratch buffer with no file
     else:
-        st.select_buf(st.previous)
+        st.select(st.previous)
     print('.' + st.buf.info())
 
 def f(*args):
@@ -133,7 +128,7 @@ def E(*args):
     if not filename:
         print('? no filename')
         return
-    fbufnames = bufs_for_file(filename)
+    fbufnames = st.bufs_for_file(filename)
     if fbufnames and 'main' not in fbufnames:
         print('? buffer %s is already editing file %s' % (fbufnames[0], filename))
         return
@@ -162,10 +157,10 @@ def B(*args):
     if not filename:
         print('? file name')
         return
-    fbufnames = bufs_for_file(filename)
+    fbufnames = st.bufs_for_file(filename)
     if fbufnames:
         bufname = fbufnames[0]
-        st.select_buf(bufname) # Do NOT reload file over buffer contents!
+        st.select(bufname) # Do NOT reload file over buffer contents!
         print('.' + st.buf.info())
         return
     basename = os.path.basename(filename)
@@ -175,7 +170,7 @@ def B(*args):
     while bufname in st.buffers:
         suffix += 1
         bufname = basename + '<%d>' % suffix
-    st.create_buf(bufname)
+    st.create(bufname)
     st.buf.filename = filename
     r(0, filename)
     st.buf.modified = False # insert in r sets modified = True, this is exception
@@ -189,7 +184,7 @@ def w(*args):
     """
     _, _, fname, _ = parse.arguments(args)
     if fname:
-        fbufnames = bufs_for_file(fname)
+        fbufnames = st.bufs_for_file(fname)
     if fname and fbufnames and st.current not in fbufnames:
         print('? buffer %s is already editing file %s' % (fbufnames[0], fname))
         return
@@ -209,14 +204,7 @@ def DD(*args):
     elif name == 'main':
         print("? Can't delete main buffer")
     else:
-        delbuf = st.buffers[name]
-        del st.buffers[name]
-        if name == st.current: # pick a new current buffer
-            keys = list(st.buffers.keys()) # always nonempty due to main
-            st.select_buf(keys[0]) # reassigns current
-            st.previous = st.current
-        if displaying:
-            frame.remove(delbuf, st.buf)
+        st.delete(name)
         print('%s, buffer deleted' % name)
 
 D_count = 0 # number of consecutive times D command has been invoked
@@ -226,7 +214,7 @@ def D(*args):
     global D_count
     _, _, bufname, _ = parse.arguments(args)
     name = bufname if bufname else st.current
-    if name in st.buffers and st.buffers[name].modified and not D_count:
+    if st.modified(name) and not D_count:
         print('? unsaved changes, repeat D to delete')
         D_count += 1 # must invoke D twice to confirm, see message below
         return
@@ -243,22 +231,18 @@ def A(*args):
     else:
         print('? no match' if iline == buffer.no_match else '? invalid address')        
 
-def print_buffers():
+def n(*args):
     'Print information about all buffers on stdout.'
     print('CRM Buffer            Lines  Mode     File')  # Current Readonly Modified
     for name in st.buffers:
-        print(('.' if name == st.current else ' ') + st.buffers[name].info())
-
-def n(*args):
-    'Print information about all buffers on stdout'
-    print_buffers()
+        print(('.' if name == st.current else ' ') + st.info(name))
 
 def N(*args):
-    'Print information about all buffers in *Buffers* buffer'
+    'Print information about all buffers in *Buffers* buffer.'
     b('*Buffers*')
     d(1,S())
     with redirect_stdout(st.buf):
-        print_buffers()
+        n(*args)
 
 # command functions: displaying and navigating text
 
@@ -482,7 +466,7 @@ q_count = 0
 def q(*args):
     'Quit ed, unless unsaved changes'
     global q_count
-    if any([st.buffers[b].modified for b in st.buffers]) and not q_count:
+    if st.any_modified() and not q_count:
         print('? unsaved changes, repeat q to quit')
         q_count += 1 # must invoke q twice to confirm
         return
@@ -582,7 +566,7 @@ def cmd_options():
     return filename, options
 
 # Initialize data structures in storage module
-st.create_buf('main')  # initialize main buffer only once on import
+st.create('main')  # initialize main buffer only once on import
 st.previous = 'main'
 
 def startup(*filename, **options):
