@@ -172,6 +172,10 @@ In *edsel*, the window data structures must be prefixed by the *frame* module na
 *frame.win* is the current window, *frame.windows* is the list
 of windows, etc.
 
+In *edsel*, the storage data structures must be prefixed by the *st*
+module name: *st.buf* is the current buffer, *st.buffers* is the
+collection of buffers, etc.
+
 In *edsel*, *ed* data structures and calls to the *ed* API must be prefixed by
 the module name *ed.*  For example: *ed.current*, *ed.a('append line after dot')*,
 etc.
@@ -427,5 +431,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Jun 2020
+Revised Jul 2020
 

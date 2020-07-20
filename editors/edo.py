@@ -6,7 +6,7 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 """
 
 import ed, parse, check, pysh, samysh, wyshka
-import storage as st
+st = ed.st # so we can use it without ed prefix
 
 # Define x command so it can also be imported by edda, edsel etc.
 # to use with their own do_commands, by calling samysh.add_command.

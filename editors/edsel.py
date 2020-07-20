@@ -5,10 +5,10 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import keyboard, console, check, edda, pysh, wyshka, samysh, buffer
-import storage as st
+import keyboard, console, check, edda, pysh, wyshka, samysh
 
-ed = edda.edo.ed    # use ed and frame APIs without prefix
+ed = edda.edo.ed    # use ed, frame, st APIs without prefix
+st = ed.st
 frame = edda.frame
 
 next_text = re.compile(r'\s\S') # White space char then non-white space char
@@ -118,7 +118,7 @@ class Console(console.Console):
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(column=(self.start_col + self.point))
-        if iline == buffer.no_match:
+        if iline == st.buffer.no_match:
             frame.put_message('? no match')
 
     def prev_line(self):
@@ -187,17 +187,17 @@ class Console(console.Console):
     def kill(self):
         super().kill()
         if not ed.command_mode:
-            buffer.Buffer.yank_lines = False
+            st.buffer.Buffer.yank_lines = False
             st.buf.modified = True
 
     def discard(self):
         super().discard()
         if not ed.command_mode:
-            buffer.Buffer.yank_lines = False
+            st.buffer.Buffer.yank_lines = False
             st.buf.modified = True
 
     def yank(self):
-        if ed.command_mode or not buffer.Buffer.yank_lines:
+        if ed.command_mode or not st.buffer.Buffer.yank_lines:
             # Insert string from self.yank_buffer inline at point.
             super().yank()
         else:

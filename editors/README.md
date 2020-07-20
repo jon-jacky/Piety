@@ -95,10 +95,13 @@ Files in this directory:
 - **lines5.txt, lines20.txt, lines40.txt, lines120.txt**: sample text
     files for experimenting with the editor.
 
+- **noed.py**: editor with no user interface other than the Python interpreter,
+       shows that storage and display modules do not depend on any application.
+
 - **parse.py**: command line parsing for *ed.py*.
 
 - **window.md**: explanation of *window.py*.
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Jun 2020
+Revised Jul 2020

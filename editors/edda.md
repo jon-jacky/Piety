@@ -193,6 +193,10 @@ In *edda*, the window data structures are in the *frame* module:
 *frame.win* is the current window, *frame.windows* is the list
 of windows, etc.
 
+In *edda*, the storage data structures are in the *st* module:
+*st.current* is the name of the current buffer, *st.buf* is the current
+buffer, *st.buffers* is the collection of buffers keyed by name.
+
 In *edda*, calls to the *ed* API must be prefixed by
 the module name *ed.*  For example: *ed.a('append line after dot')*.
 
@@ -207,4 +211,5 @@ so *desoto* can run in the cooperative multitasking system,
 
 **edda** is the core of a more capable display editor, [edsel](edsel.md).
 
-Revised May 2019
+Revised Jul 2020
+

@@ -4,7 +4,7 @@ ed.py - line-oriented text editor in pure Python based on classic Unix ed
 
 import re, os, sys
 from contextlib import redirect_stdout
-import parse, check, buffer
+import parse, check
 
 # Data structures, variables, fcns in storage module: 
 # previous current buf buffers create select
@@ -229,7 +229,7 @@ def A(*args):
     if check.iline_ok0(st.buf, iline): # don't print error message when file is empty
         print(iline)
     else:
-        print('? no match' if iline == buffer.no_match else '? invalid address')        
+        print('? no match' if iline == st.buffer.no_match else '? invalid address')        
 
 def n(*args):
     'Print information about all buffers on stdout.'
@@ -256,7 +256,7 @@ def l(*args):
     if iline == None:
         iline = st.buf.dot + 1
     if not check.iline_ok(st.buf, iline):
-        print('? no match' if iline == buffer.no_match else '? invalid address')
+        print('? no match' if iline == st.buffer.no_match else '? invalid address')
         return
     line = st.buf.l(iline)
     if not displaying:
@@ -383,7 +383,7 @@ def s(*args):
     valid, start, end, old, params = check.irange(st.buf, args)
     if valid:
         if not old and st.buf.found:
-            old = buffer.Buffer.pattern # most recent successful search
+            old = st.buffer.Buffer.pattern # most recent successful search
         # params might be [ new, glbl, use_regex ]
         if old and len(params) > 0 and isinstance(params[0],str):
             new = params[0]
@@ -428,7 +428,7 @@ def x(*args):
     iline, _, _, _ = parse.arguments(args)
     iline = check.mk_iline(st.buf, iline)
     if not (0 <= iline <= st.buf.nlines()+1): # allow +y at $ to append to buffer
-        print('? no match' if iline == buffer.no_match else '? invalid address')
+        print('? no match' if iline == st.buffer.no_match else '? invalid address')
         return
     st.buf.x(iline)
 
@@ -499,7 +499,7 @@ def do_command(line):
         start, end = check.mk_range(st.buf, start, end) # int only
         if not (check.iline_ok0(st.buf, start) if cmd_name in 'ai'
                 else check.range_ok(st.buf, start, end)):
-            print('? no match' if iline == buffer.no_match else '? invalid address')            
+            print('? no match' if iline == st.buffer.no_match else '? invalid address')            
             command_mode = True
             prompt = command_prompt
         # assign dot to prepare for input mode, where we a(ppend) each line

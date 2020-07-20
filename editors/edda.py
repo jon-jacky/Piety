@@ -4,10 +4,10 @@ edda - Display editor based on the line editor ed.py
 """
 
 import traceback, os, sys
-import edo, frame, wyshka, samysh, buffer
-import storage as st
+import edo, frame, wyshka, samysh
 
 ed = edo.ed  # so we can use ed API without prefix
+st = ed.st   # so we can use st without prefix
 
 # edda API functions
 
@@ -100,8 +100,8 @@ def startup(*filename, **options):
         cmd_h = options['c']
     frame.rescale(cmd_h) # before edo.startup calls e()
     # Enable display in ed, buffer, storage modules. Defaults is no display.
-    ed.displaying = buffer.displaying = st.displaying = True
-    ed.frame = buffer.frame = st.frame = frame
+    ed.displaying = st.buffer.displaying = st.displaying = True
+    ed.frame = st.buffer.frame = st.frame = frame
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
@@ -109,8 +109,8 @@ def startup(*filename, **options):
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    ed.displaying = buffer.displaying = st.displaying = False
-    ed.frame = buffer.frame = st.frame = None
+    ed.displaying = st.buffer.displaying = st.displaying = False
+    ed.frame = st.buffer.frame = st.frame = None
     ed.lz_print_dest = sys.stdout
 
 def main(*filename, **options):
