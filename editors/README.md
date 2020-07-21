@@ -95,8 +95,8 @@ Files in this directory:
 - **lines5.txt, lines20.txt, lines40.txt, lines120.txt**: sample text
     files for experimenting with the editor.
 
-- **noed.py**: editor with no user interface other than the Python interpreter,
-       shows that storage and display modules do not depend on any application.
+- **noed.py**: multi-buffer display editor with no command language or input 
+  other than the Python interpreter. 
 
 - **parse.py**: command line parsing for *ed.py*.
 
