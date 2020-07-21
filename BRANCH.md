@@ -2,14 +2,12 @@
 branches
 ========
 
-This is the **storage** branch:
+This is the **master** branch.  Branches recently merged into *master*:
 
-- **storage**.  Separate buffer data structures out of *ed.py* into  the
-new *storage* module.  Add *noed* ("no ed"), an editor with storage and
-display but no commands or any user interface except the interactive
-Python interpreter.  Begun Jul 1 2020.
-
-Branches recently merged into *master*:
+- **storage**, merged Jul 21 2020.  Separate buffer data structures out of
+*ed.py* into  the new *storage* module.  Add *noed* ("no ed"), an editor
+with storage and display but no commands or any user interface except the
+interactive Python interpreter.  Begun Jul 1 2020.
 
 - **paragraph**, merged Jun 30 2020.   Add functionality and reorganize
 code in editors. Add new paragraph address range *]* to *ed.py*, sometimes
@@ -149,5 +147,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Jun 2020
+Revised Jul 2020
 
