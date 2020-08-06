@@ -119,14 +119,17 @@ Python session.
 are possible within a single Python session, so Piety does not support
 these.  Piety is a single-user system.
 
-- **files**: We try to avoid using the host file system.  Instead, we
-use in-memory data structures that can persist through the
-long-running Python session.  In particular, we use text buffers,
-instances of the *Buffer* class used in *ed.py*
-and other editors.  They provide a *write* method so Python *print*
-statements can write into them.  We will configure Python *import* to import
+- **files**: We try to avoid using the host file system.  Instead, we use
+in-memory data structures that can persist through the long-running Python
+session.  These are provided by the *storage* module, which manages a
+collection of text buffers, instances of the *Buffer* class.  Text buffers
+are used by the *ed.py* and *edsel* editors and other applications, but
+the *storage* and *buffer* modules do not depend on any application and
+can by used by any.  Applications can create and delete buffers by calling
+functions in *storage*, but the collection of buffers is not affected when
+applications start or exit.  We will configure Python *import* to import
 directly from these buffers so they don't need to be saved in the host
-file system. (Not yet implemented)
+file system. (Import from buffers is not yet implemented.)
 
 - **i/o redirection**: In Piety, redirecting the output of
 a task to some text buffer.  Redirection is provided by the *wyshka* shell.
@@ -164,5 +167,5 @@ The operating system that Piety resembles the most is
 multitasking, uses a text buffer class as a building block, and uses a
 multiwindow text editor as its desktop and system shell.
 
-Revised Jan 2020
+Revised Aug 2020
 

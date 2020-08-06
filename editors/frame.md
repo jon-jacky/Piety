@@ -3,7 +3,7 @@ frame.py
 ========
 
 **frame.py** manages a multiwindow display implemented by list of
-*window* instances, with a scrolling command region below the windows
+**Wndow* instances, with a scrolling command region below the windows
 at the bottom of the display.
 
 **frame.py** provides the display for the *edda* and *edsel* display

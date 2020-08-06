@@ -472,7 +472,7 @@ internal API for updating it.  Many *Buffer* methods correspond to
 functions in the API, but in *Buffer* each method has a fixed argument
 list, provides no error checking, and no error messages or progress
 messages.  The *storage* module and *Buffer* class do not access the
-console, but updates text buffers and reads and writes files.
+console, but update text buffers and read and write files.
 
 **ed.py** imports the *parse.py* module that provides
 functions for parsing *ed* commands, and the
@@ -484,7 +484,7 @@ it can update the display by calling functions in the *frame* module.
 By default, this is not enabled, because when **ed.py** is running standalone
 it does not use a display.
 
-The *buffer*, *parse*, and *check* modules are
+The *storage*, *buffer*, *parse*, and *check* modules are
 included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, *sys*, and *contextlib*.
 Other than that, **ed.py** has no dependencies.

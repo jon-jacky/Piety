@@ -33,7 +33,7 @@ Files in this directory:
 
 - **buffer.md**: explanation of *buffer.py*.
 
-- **buffer.py**: defines *Buffer* class used by *ed.py*.
+- **buffer.py**: defines *Buffer* class used by *ed.py* etc.
 
 - **check.py**: check command line arguments and provide default
     argumentss for *ed.py*.
@@ -100,8 +100,12 @@ Files in this directory:
 
 - **parse.py**: command line parsing for *ed.py*.
 
+- **storage.md**: explanatino of *storage.py*.
+
+- **storage.py**: text buffer data structures used by *ed.py* etc.
+
 - **window.md**: explanation of *window.py*.
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Jul 2020
+Revised Aug 2020
