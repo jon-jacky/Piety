@@ -100,7 +100,7 @@ Files in this directory:
 
 - **parse.py**: command line parsing for *ed.py*.
 
-- **storage.md**: explanatino of *storage.py*.
+- **storage.md**: explanation of *storage.py*.
 
 - **storage.py**: text buffer data structures used by *ed.py* etc.
 
