@@ -2,7 +2,29 @@
 branches
 ========
 
-This is the **master** branch.  Branches recently merged into *master*:
+This is the **ed_frame** branch.  
+
+- **ed_frame**.  Remove display code from the *ed*, *storage*, and *buffer*
+modules -- finally!  None of these modules imports the display module
+*frame* anymore, and they no longer contain all those *if displaying: ...*
+statements.  This simplifies those modules, and also makes it possible to
+use them with a different display system. We provide  new modules
+*ed_frame*, *storage_frame*, and *buffer_frame* in addition to *ed* etc.
+The new *ed_frame* imports *ed* and *frame* and wraps each *ed* function
+that should cause a display update.  For example, it defines its own
+*set_command_mode* function which simply calls *ed.set_command_mode* then
+calls *frame.command_mode*    We revise the display editor
+*edda*, which is imported by display editor *edsel*.  The revised *edda*
+imports both *ed* and *ed_frame*  and reassigns *ed.set_command_mode  =
+ed_frame.set_command_mode* etc. The *ed* functions that do not cause
+display updates are not reassigned. Likewise for functions in the
+*storage* module.  The *buffer* module defines the *Buffer* class.  Then
+new *buffer_frame* module defines the new  *BufferFrame* class, which
+inherits *Buffer* and overrides only the methods that should cause display
+updates by adding calls to functions in *frame*. Then *edda* reassigns
+*buffer.Buffer = buffer_frame.BufferFrame*.  Begun Aug 7 2020.
+
+Branches recently merged into *master*:
 
 - **storage**, merged Jul 21 2020.  Separate buffer data structures out of
 *ed.py* into  the new *storage* module.  Add *noed* ("no ed"), an editor
