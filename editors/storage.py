@@ -3,7 +3,7 @@ storage.py - Dictionary of text buffers indexed by string buffer names
              for use by ed.py and other text editors.
 """
 
-import buffer, frame
+import buffer
 
 # Data structures and variables. Initialize these with create_buf (below)
 
@@ -11,11 +11,6 @@ buf = None       # current buffer
 previous = str() # name of previous buffer
 current = str()  # name of current buffer
 buffers = dict() # dict from buffer names (strings) to Buffer instances
-
-# Display, default is no display.  
-# edda startup assigns displaying = True and frame = frame
-displaying = False
-frame = None
 
 # Basic functions that update data structures: create, select, delete
 
@@ -26,8 +21,6 @@ def create(bufname):
     buffers[bufname] = buf # replace buffers[bufname] if it already exists
     previous = current
     current = bufname
-    if displaying:
-        frame.create(buf)
 
 def select(bufname):
     'Make buffer with given name the current buffer'
@@ -35,11 +28,12 @@ def select(bufname):
     previous = current
     current = bufname
     buf = buffers[current]
-    if displaying:
-        frame.select(buf)
+
+delbuf = None # must be global so other modules can find it
 
 def delete(bufname):
     'Delete buffer with given name, might be the current buffer'
+    global delbuf
     delbuf = buffers[bufname]
     del buffers[bufname]
     if bufname == current: # pick a new current buffer

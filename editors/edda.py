@@ -9,6 +9,13 @@ import edo, frame, wyshka, samysh
 ed = edo.ed  # so we can use ed API without prefix
 st = ed.st   # so we can use st without prefix
 
+# storage_frame wraps storage modules to update display
+import storage_frame as stframe
+
+st.create = stframe.create
+st.select = stframe.select
+st.delete = stframe.delete
+
 # edda API functions
 
 def L():
