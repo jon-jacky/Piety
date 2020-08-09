@@ -40,8 +40,6 @@ def delete(bufname):
         keys = list(buffers.keys()) # always nonempty due to main
         select(keys[0]) # reassigns current
         previous = current
-    if displaying:
-        frame.remove(delbuf, buf)
 
 # Queries and predicates
 

@@ -106,9 +106,9 @@ def startup(*filename, **options):
     if 'c' in options:
         cmd_h = options['c']
     frame.rescale(cmd_h) # before edo.startup calls e()
-    # Enable display in ed, buffer, storage modules. Defaults is no display.
-    ed.displaying = st.buffer.displaying = st.displaying = True
-    ed.frame = st.buffer.frame = st.frame = frame
+    # Enable display in ed, buffer. Defaults is no display.
+    ed.displaying = st.buffer.displaying = True
+    ed.frame = st.buffer.frame = frame
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
