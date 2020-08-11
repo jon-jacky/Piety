@@ -228,6 +228,8 @@ class Buffer(object):
             for line in self.lines[1:]: # don't print empty line 0
                 fd.write(line)
         self.modified = False
+        if displaying:
+            frame.status(self)
 
     # displaying and navigating text
 
@@ -316,10 +318,14 @@ class Buffer(object):
     def I(self, start, end, indent):
         'Indent lines, add indent leading spaces'
         self.lines[start:end+1] = [ ' '*indent + l for l in self.lines[start:end+1]]
+        if displaying:
+            frame.mutate(start, end)
 
     def M(self, start, end, outdent):
         'Outdent lines, remove leading outdent chars'
         self.lines[start:end+1] = [ l[outdent:] for l in self.lines[start:end+1]]
+        if displaying:
+            frame.mutate(start, end)
 
     def s(self, start, end, old, new, glbl, use_regex):
         """

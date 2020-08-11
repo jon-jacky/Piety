@@ -11,11 +11,6 @@ import parse, check
 # Initialize data with call to st.create (below, near main)
 import storage as st
 
-# ed default is no display.  
-# edda startup assigns ed.displaying = True and ed.frame = frame
-displaying = False
-frame = None
-
 # Each ed command is implemented here by a command function with the same
 # one-letter name, whose arguments are the same as the ed command args.
 # The current buffer is used by many of these functions, but to
@@ -191,8 +186,6 @@ def w(*args):
     filename = current_filename(fname)
     if filename: # if not, current_filename printed error msg
         st.buf.w(filename)
-        if displaying:
-            frame.status(st.buf)
         print('%s, %d lines' % (filename, st.buf.nlines()))
 
 def DD(*args):
@@ -246,8 +239,9 @@ def N(*args):
 
 # command functions: displaying and navigating text
 
-def l(*args):
-    'Advance dot to iline, return line there, conditionally print it'
+# called by l (below), might be called by display code elsewhere
+def l_noprint(*args):
+    'Advance dot to iline, return that line'
     iline, _, _, _ = parse.arguments(args)
     if not st.buf.lines:
         print('? empty buffer')
@@ -259,8 +253,12 @@ def l(*args):
         print('? no match' if iline == st.buffer.no_match else '? invalid address')
         return
     line = st.buf.l(iline)
-    if not displaying:
-        print(line)
+    return line
+
+def l(*args):
+    'Advance dot to iline, print it'
+    line = l_noprint(*args)
+    print(line)
 
 def p(*args):
     'Unconditionally print lines from start through end, inclusive'
@@ -269,12 +267,16 @@ def p(*args):
         for iline in range(start, end+1): # +1 because start,end is inclusive
             print(st.buf.l(iline))
 
+# Alternative to p_lines (below), might be called by display code elsewhere
+def p_lines_noprint(start, end):
+    'Advance dot to end, but do not print lines'
+    line = st.buf.l(end)
+    
 def p_lines(start, end):
-    'Conditionnally print lines start through end, inclusive, if not displaying'
+    'Print lines start through end, inclusive'
     for iline in range(start, end+1): # +1 because start,end is inclusive
         line = st.buf.l(iline)
-        if not displaying:
-            print(line)
+        print(line)
 
 npage = 22 # n of lines printed by z command, can be changed by optional param
 
@@ -353,8 +355,6 @@ def I(*args):
         valid, indent = check.iparam(param, indent)
         if valid:
             st.buf.I(start, end, indent)
-            if displaying:
-                frame.mutate(start, end)
     
 def O(*args):
     'Outdent lines, optional parameter assigns n of indent/outdent spaces'
@@ -364,8 +364,6 @@ def O(*args):
         valid, indent = check.iparam(param, indent)
         if valid:
             st.buf.M(start, end, indent)
-            if displaying:
-                frame.mutate(start, end)
 
 def c(*args):
     'Change (replace) lines from start up to end with lines from string'
@@ -479,6 +477,20 @@ prompt = command_prompt
 
 command_mode = True
 
+# Called by do_command (below), might be wrapped with display code elsewhere
+def prepare_input_mode(cmd_name, start, end):
+    'assign dot to prepare for input mode, where we a(ppend) each line'
+    if cmd_name == 'a':
+        st.buf.dot = start
+    elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
+        st.buf.dot = start - 1 if start > 0 else 0
+        # so we can a(ppend) instead of i(nsert)
+    elif cmd_name == 'c': #c(hange) command deletes changed lines first
+        st.buf.d(start, end) # d updates st.buf.dot, calls frame.delete()
+        st.buf.dot = start - 1 # supercede dot assigned in preceding
+    else:
+        pass
+
 def do_command(line):
     'Process one line without blocking in ed command mode or input mode'
     global command_mode, prompt, D_count, q_count
@@ -502,21 +514,8 @@ def do_command(line):
             print('? no match' if iline == st.buffer.no_match else '? invalid address')            
             command_mode = True
             prompt = command_prompt
-        # assign dot to prepare for input mode, where we a(ppend) each line
-        elif cmd_name == 'a':
-            st.buf.dot = start
-            if displaying:
-                frame.input_mode() # depends on st.buf.dot so can't be moved up
-        elif cmd_name == 'i': #and start >0: NOT! can insert in empty file
-            st.buf.dot = start - 1 if start > 0 else 0
-            # so we can a(ppend) instead of i(nsert)
-            if displaying:
-                frame.input_mode() # depends on st.buf.dot so can't be moved up
-        elif cmd_name == 'c': #c(hange) command deletes changed lines first
-            st.buf.d(start, end) # d updates st.buf.dot, calls frame.delete()
-            st.buf.dot = start - 1 # supercede dot assigned in preceding
-            if displaying:
-                frame.input_mode() # after st.buf.d(...) calls frame.delete(...)
+        elif cmd_name in 'aic':
+            prepare_input_mode(cmd_name, start, end)
         else:
             print('? command not supported in input mode: %s' % cmd_name)
     else:
@@ -526,14 +525,17 @@ def do_command(line):
     q_count = 0 if cmd_name != 'q' else q_count
     return
 
+# Called by add_line (below), might be wrapped with display code elsewhere
+def set_command_mode():
+    'set mode and prompt for command mode'
+    global command_mode, prompt
+    command_mode = True
+    prompt = command_prompt
+    
 def add_line(line):
     'Process one line without blocking in ed input mode'
-    global command_mode, prompt
     if line == '.':
-        command_mode = True
-        prompt = command_prompt
-        if displaying:
-            frame.command_mode()
+        set_command_mode()
     else:
         # Recall input() returns each line with final \n stripped off,
         # BUT st.buf.a requires \n at end of each line.

@@ -16,6 +16,15 @@ st.create = stframe.create
 st.select = stframe.select
 st.delete = stframe.delete
 
+# ed_frame wraps ed modules to update display, 
+# or replaces them to *not* print on console
+import ed_frame
+
+ed.l = ed.l_noprint
+ed.p_lines = ed.p_lines_noprint
+ed.prepare_input_mode = ed_frame.prepare_input_mode
+ed.set_command_mode = ed_frame.set_command_mode
+
 # edda API functions
 
 def L():
@@ -107,8 +116,8 @@ def startup(*filename, **options):
         cmd_h = options['c']
     frame.rescale(cmd_h) # before edo.startup calls e()
     # Enable display in ed, buffer. Defaults is no display.
-    ed.displaying = st.buffer.displaying = True
-    ed.frame = st.buffer.frame = frame
+    st.buffer.displaying = True
+    st.buffer.frame = frame
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
@@ -116,9 +125,8 @@ def startup(*filename, **options):
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    ed.displaying = st.buffer.displaying = st.displaying = False
-    ed.frame = st.buffer.frame = st.frame = None
-    ed.lz_print_dest = sys.stdout
+    st.buffer.displaying = False
+    st.buffer.frame = None
 
 def main(*filename, **options):
     'Top level edda command to invoke from python prompt or command line.'
