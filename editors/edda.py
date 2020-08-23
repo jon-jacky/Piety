@@ -6,15 +6,17 @@ edda - Display editor based on the line editor ed.py
 import traceback, os, sys
 import edo, frame, wyshka, samysh
 
-ed = edo.ed  # so we can use ed API without prefix
-st = ed.st   # so we can use st without prefix
+# So we can use these modules without prefix
+ed = edo.ed
+st = ed.st
+buffer = st.buffer
 
 # storage_frame wraps storage modules to update display
-import storage_frame as stframe
+import storage_frame as st_frame
 
-st.create = stframe.create
-st.select = stframe.select
-st.delete = stframe.delete
+st.create = st_frame.create
+st.select = st_frame.select
+st.delete = st_frame.delete
 
 # ed_frame wraps ed modules to update display, 
 # or replaces them to *not* print on console
@@ -24,6 +26,10 @@ ed.l = ed.l_noprint
 ed.p_lines = ed.p_lines_noprint
 ed.prepare_input_mode = ed_frame.prepare_input_mode
 ed.set_command_mode = ed_frame.set_command_mode
+
+# buffer_frame defines BufferFrame, wraps Buffer methods that update display
+import buffer_frame
+buffer.Buffer = buffer_frame.BufferFrame
 
 # edda API functions
 
@@ -115,9 +121,6 @@ def startup(*filename, **options):
     if 'c' in options:
         cmd_h = options['c']
     frame.rescale(cmd_h) # before edo.startup calls e()
-    # Enable display in ed, buffer. Defaults is no display.
-    st.buffer.displaying = True
-    st.buffer.frame = frame
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
@@ -125,8 +128,7 @@ def startup(*filename, **options):
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    st.buffer.displaying = False
-    st.buffer.frame = None
+    # FIXME: turn off display updates
 
 def main(*filename, **options):
     'Top level edda command to invoke from python prompt or command line.'

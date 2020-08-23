@@ -113,8 +113,7 @@ class Console(console.Console):
     def goto_line(self, iline, jcol):
         if check.iline_ok(st.buf, iline):
             st.buf.replace(st.buf.dot, self.line + '\n')
-            st.buf.l(iline)
-            line = st.buf.lines[st.buf.dot].rstrip('\n')  # FIXME? [iline] - ?
+            line, _  = st.buf.l(iline)
             self.line = line
             self.point = min(jcol, len(line))
             frame.put_display_cursor(column=(self.start_col + self.point))

@@ -1,0 +1,39 @@
+# frame_test.ed - test ed commands that are wrapped in _frame modules
+#   should work without frame (display) in ed edo, with frame in edda edsel
+# p prints unconditionally, l and z do not print when frame is enabled.
+# rm new3.txt before running this script to start a new file each time.
+B new3.txt
+B redirect.txt
+b new3.txt
+r line20.txt
+5l 
+a
+Here is a line
+here is another
+here is a third
+.
+1,10p
+8d
+1,10p
+z
+w
+5,10I8
+1,10p
+5,10O4
+1,10p
+3
+s/line/number/
+p
+u
+p
+$p
+?line10?
+p
+
+
+
+p
+D
+D
+p
+

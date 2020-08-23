@@ -5,11 +5,6 @@ buffer.py - Buffer class for line-oriented text editors.
 
 import os.path, re, textwrap
 
-# buffer default is no display.  
-# edda startup assigns buffer.displaying = True and buffer.frame = frame
-displaying = False
-frame = None
-
 # Hook for display updates from background tasks to restore cursor etc.
 console = None  # default: no updates from background tasks,no restore needed
 
@@ -169,9 +164,11 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert_lines(self, iline, lines):
-        """Insert lines (list of strings) before iline,
-        update dot to last inserted line"""
+    def insert(self, iline, lines):
+        """
+        Insert lines (list of strings) before iline,
+        update dot to last inserted line
+        """
         self.lines[iline:iline] = lines # sic, insert lines at this position
         nlines = len(lines)
         self.dot = iline + nlines - 1
@@ -180,18 +177,6 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-
-    def insert(self, iline, lines):
-        'Insert lines, then conditionally update display'
-        self.insert_lines(iline, lines)
-        if displaying:
-            frame.insert(iline, self.dot)
-
-    def insert_other(self, iline, lines, column):
-        'Insert lines when this buffer is not the current buffer'
-        self.insert_lines(iline, lines)
-        if displaying:
-            frame.insert_other(self, iline, self.dot, column)
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'
@@ -211,35 +196,39 @@ class Buffer(object):
         self.filename = filename
 
     def r(self, iline, filename):
-        'Read file contents into buffer after iline'
+        """
+        Read file contents into buffer after iline.
+        Return file_found, False if not found, creating new file.
+        """
         if os.path.isfile(filename):
             strings = [] # in case readlines fails
             with open(filename, mode='r') as fd:
                 # fd.readlines reads file into a list of strings, one per line
                 strings = fd.readlines() # each string in lines ends with \n
             self.insert(iline+1, strings) # like append, below
+            file_found = True
         else:
-            if displaying:
-                frame.select(self) # new buffer for new file
+            file_found = False
+        return file_found
 
     def w(self, name):
-        'Write current buffer contents to file name'
+        'Write current buffer contents to file name.'
         with open(name, 'w') as fd:
             for line in self.lines[1:]: # don't print empty line 0
                 fd.write(line)
         self.modified = False
-        if displaying:
-            frame.status(self)
 
     # displaying and navigating text
 
     def l(self, iline):
-        'Advance dot to iline and return it (so caller can print it)'
+        """
+        Advance to iline and return that line (so caller can print it).
+        Also return prev_dot, might be needed by display.
+        """
         prev_dot = self.dot
         self.dot = iline
-        if displaying:
-            frame.locate(prev_dot, iline)
-        return (self.lines[iline]).rstrip('\n')
+        line = (self.lines[iline]).rstrip('\n')
+        return line, prev_dot
 
     # adding, changing, and deleting text
 
@@ -280,8 +269,6 @@ class Buffer(object):
         self.mark = new_mark
         # start, end lines in buffer are before deletion
         # after deletion, win.buf.dot is first line following deleted lines
-        if displaying:
-            frame.delete(start, end)
                       
     def c(self, start, end, string):
         'Change (replace) lines from start up to end with lines from string.'
@@ -318,14 +305,10 @@ class Buffer(object):
     def I(self, start, end, indent):
         'Indent lines, add indent leading spaces'
         self.lines[start:end+1] = [ ' '*indent + l for l in self.lines[start:end+1]]
-        if displaying:
-            frame.mutate(start, end)
 
     def M(self, start, end, outdent):
         'Outdent lines, remove leading outdent chars'
         self.lines[start:end+1] = [ l[outdent:] for l in self.lines[start:end+1]]
-        if displaying:
-            frame.mutate(start, end)
 
     def s(self, start, end, old, new, glbl, use_regex):
         """
@@ -346,8 +329,6 @@ class Buffer(object):
                 self.lines[i] = re.sub(old, new, self.lines[i])
                 self.dot = i
                 self.modified = True
-        if displaying:
-            frame.mutate(start, self.dot) # self.dot is last line changed
         return match
 
     def y(self, start, end):
@@ -358,8 +339,6 @@ class Buffer(object):
     def u(self, iline):
         'Undo last substitution: replace line at iline from cut buffer'
         self.replace(iline, Buffer.cut_buffer[0])
-        if displaying:
-            frame.mutate(iline, iline)
         
     def x(self, iline):
         'Append (put, paste) cut buffer contents after iline.'

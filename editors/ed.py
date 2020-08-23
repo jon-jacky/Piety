@@ -252,7 +252,7 @@ def l_noprint(*args):
     if not check.iline_ok(st.buf, iline):
         print('? no match' if iline == st.buffer.no_match else '? invalid address')
         return
-    line = st.buf.l(iline)
+    line, _ = st.buf.l(iline)
     return line
 
 def l(*args):
@@ -265,17 +265,18 @@ def p(*args):
     valid, start, end, _, _ = check.irange(st.buf, args)
     if valid:
         for iline in range(start, end+1): # +1 because start,end is inclusive
-            print(st.buf.l(iline))
+            line, _ = st.buf.l(iline)
+            print(line)
 
 # Alternative to p_lines (below), might be called by display code elsewhere
 def p_lines_noprint(start, end):
     'Advance dot to end, but do not print lines'
-    line = st.buf.l(end)
+    _, _ = st.buf.l(end)
     
 def p_lines(start, end):
     'Print lines start through end, inclusive'
     for iline in range(start, end+1): # +1 because start,end is inclusive
-        line = st.buf.l(iline)
+        line, _ = st.buf.l(iline)
         print(line)
 
 npage = 22 # n of lines printed by z command, can be changed by optional param
