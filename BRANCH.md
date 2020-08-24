@@ -9,20 +9,10 @@ modules -- finally!  None of these modules imports the display module
 *frame* anymore, and they no longer contain all those *if displaying: ...*
 statements.  This simplifies those modules, and also makes it possible to
 use them with a different display system. We provide  new modules
-*ed_frame*, *storage_frame*, and *buffer_frame* in addition to *ed* etc.
-The new *ed_frame* imports *ed* and *frame* and wraps each *ed* function
-that should cause a display update.  For example, it defines its own
-*set_command_mode* function which simply calls *ed.set_command_mode* then
-calls *frame.command_mode*    We revise the display editor
-*edda*, which is imported by display editor *edsel*.  The revised *edda*
-imports both *ed* and *ed_frame*  and reassigns *ed.set_command_mode  =
-ed_frame.set_command_mode* etc. The *ed* functions that do not cause
-display updates are not reassigned. Likewise for functions in the
-*storage* module.  The *buffer* module defines the *Buffer* class.  Then
-new *buffer_frame* module defines the new  *BufferFrame* class, which
-inherits *Buffer* and overrides only the methods that should cause display
-updates by adding calls to functions in *frame*. Then *edda* reassigns
-*buffer.Buffer = buffer_frame.BufferFrame*.  Begun Aug 7 2020.
+*ed_frame*, *storage_frame*, and *buffer_frame* that wrap functions
+in *ed* and *storage* and methods in *buffer* to call display code
+in *frame*.  We revise the display editor *edda* (which is imported by 
+*edsel*) to import and use these new *_frame* modules. Begun Aug 7 2020.
 
 Branches recently merged into *master*:
 
@@ -169,5 +159,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Jul 2020
+Revised Aug 2020
 
