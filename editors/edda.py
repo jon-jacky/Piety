@@ -11,25 +11,22 @@ ed = edo.ed
 st = ed.st
 buffer = st.buffer
 
-# storage_frame wraps storage modules to update display
-import storage_frame as st_frame
+# enable/disable frame, the display module
 
-st.create = st_frame.create
-st.select = st_frame.select
-st.delete = st_frame.delete
+# storage_frame, ed_frame, buffer_frame wrap code in storeage, ed, buffer
+import ed_frame, buffer_frame, storage_frame as st_frame
 
-# ed_frame wraps ed modules to update display, 
-# or replaces them to *not* print on console
-import ed_frame
+def enable_frame():
+    'Enable display by assigning wrapped fcns/methods in storage, ed, buffer'
+    st_frame.enable()
+    ed_frame.enable()
+    buffer_frame.enable()
 
-ed.l = ed.l_noprint
-ed.p_lines = ed.p_lines_noprint
-ed.prepare_input_mode = ed_frame.prepare_input_mode
-ed.set_command_mode = ed_frame.set_command_mode
-
-# buffer_frame defines BufferFrame, wraps Buffer methods that update display
-import buffer_frame
-buffer.Buffer = buffer_frame.BufferFrame
+def disable_frame():
+    'Disable display by restoring unwrapped fcns/methods in storage, ed, buffer'
+    st_frame.disable()
+    ed_frame.disable()
+    buffer_frame.disable()
 
 # edda API functions
 
@@ -124,11 +121,12 @@ def startup(*filename, **options):
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
+    enable_frame() # turn on display updates
 
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    # FIXME: turn off display updates
+    disable_frame() # turn off display updates
 
 def main(*filename, **options):
     'Top level edda command to invoke from python prompt or command line.'

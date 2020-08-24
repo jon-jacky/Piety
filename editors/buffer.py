@@ -178,6 +178,13 @@ class Buffer(object):
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
 
+    def insert_other(self, iline, lines, column):
+        """
+        Insert lines when this buffer is not the current buffer.
+        Must distinguish from insert because it might be displayed differently.
+        """
+        self.insert(iline, lines)
+
     def replace(self, iline, line):
         'replace the line at iline with another single line'
         if self.empty(): # previously empty buffer, must create line

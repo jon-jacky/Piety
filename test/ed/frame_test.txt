@@ -21,7 +21,7 @@ buffer.py
 r a i x t  > insert
 add line in input mode > insert
 
-timestamp demo, probably simpler ones > insert_other 
+N > insert_other, via 'with redirect_stdout(st.buf): n(*args)'
 
 r w l d I M s u   are themselves ed commands, except O (outdent) > M
                   l is default command, invoked by any line address or RET
