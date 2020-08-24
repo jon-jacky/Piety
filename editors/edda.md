@@ -200,6 +200,15 @@ buffer, *st.buffers* is the collection of buffers keyed by name.
 In *edda*, calls to the *ed* API must be prefixed by
 the module name *ed.*  For example: *ed.a('append line after dot')*.
 
+## Modules ##
+
+**edda** imports *ed.py* which provides all of the line editing commands,
+and in turn imports the *storage* module that provides all the text buffers.
+*edda* also imports the *frame* module which provides the display.  *edda*
+also imports *ed_frame*, *storage_frame*, and *buffer_frame* which wrap 
+functions in *ed* and *storage* and methods in *buffer* with calls to display
+code in *frame*.
+
 ## Related programs ##
 
 **edda** runs an event loop that blocks waiting for a complete line
@@ -211,5 +220,5 @@ so *desoto* can run in the cooperative multitasking system,
 
 **edda** is the core of a more capable display editor, [edsel](edsel.md).
 
-Revised Jul 2020
+Revised Aug 2020
 

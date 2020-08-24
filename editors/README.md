@@ -35,6 +35,9 @@ Files in this directory:
 
 - **buffer.py**: defines *Buffer* class used by *ed.py* etc.
 
+- **buffer_frame.py**: wraps methods in *buffer* with calls to display code in 
+  *frame*, imported by *edda*.
+
 - **check.py**: check command line arguments and provide default
     argumentss for *ed.py*.
 
@@ -47,6 +50,9 @@ Files in this directory:
 - **ed.py**: line editor inspired by the classic Unix editor *ed*.
 
 - **ed.txt**: command summary for *ed.py*.
+
+- **ed_frame.py**: wraps functions in *ed.py* with calls to display code in 
+  *frame*, imported by *edda*.
 
 - **edda.md**: explanation of *edda.py*.
 
@@ -103,6 +109,9 @@ Files in this directory:
 - **storage.md**: explanation of *storage.py*.
 
 - **storage.py**: text buffer data structures used by *ed.py* etc.
+
+- **storage_frame.py**: wraps functions in *storage* with calls to display code in 
+  *frame*, imported by *edda*.
 
 - **window.md**: explanation of *window.py*.
 
