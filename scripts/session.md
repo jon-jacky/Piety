@@ -127,8 +127,11 @@ suspended job:
 ### API and data structures ###
 
 You can access the editor API and data structures from the Python prompt
-by prefixing them with *edm.* ("*ed* module"): *edm.n()*, *edm.buffers* etc.
+by prefixing them with *edm.* ("*ed* module"): *edm.n()* etc.
 We have to use this module name to distinguish it from the *ed* job.
+
+You can access the storage API and data structures by prefixing them
+with *st.*: *st.buffers* etc.
 
 You can access the display API and data structures by prefixing them
 with *frame.*: *frame.windows* etc.
@@ -138,4 +141,4 @@ so you can use the Python command line without exiting the editor, by prefixing
 each Python command with an exclamation point, or by using just an
 exclamation point to switch the editor command line to Python.
 
-Revised May 2019
+Revised Aug 2020
