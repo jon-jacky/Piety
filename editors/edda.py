@@ -4,29 +4,12 @@ edda - Display editor based on the line editor ed.py
 """
 
 import traceback, os, sys
-import edo, frame, wyshka, samysh
+import edo, frame, wyshka, samysh, frame_wrapper
 
 # So we can use these modules without prefix
 ed = edo.ed
 st = ed.st
 buffer = st.buffer
-
-# enable/disable frame, the display module
-
-# storage_frame, ed_frame, buffer_frame wrap code in storeage, ed, buffer
-import ed_frame, buffer_frame, storage_frame as st_frame
-
-def enable_frame():
-    'Enable display by assigning wrapped fcns/methods in storage, ed, buffer'
-    st_frame.enable()
-    ed_frame.enable()
-    buffer_frame.enable()
-
-def disable_frame():
-    'Disable display by restoring unwrapped fcns/methods in storage, ed, buffer'
-    st_frame.disable()
-    ed_frame.disable()
-    buffer_frame.disable()
 
 # edda API functions
 
@@ -121,12 +104,12 @@ def startup(*filename, **options):
     edo.startup(*filename, **options)
     if filename:
         frame.insert(1, frame.win.buf.dot)
-    enable_frame() # turn on display updates
+    frame_wrapper.enable() # turn on display updates
 
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    disable_frame() # turn off display updates
+    frame_wrapper.disable() # turn off display updates
 
 def main(*filename, **options):
     'Top level edda command to invoke from python prompt or command line.'

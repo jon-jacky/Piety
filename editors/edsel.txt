@@ -29,7 +29,7 @@ edsel.py display editing commands summary in text buffer window:
     ^U  discard from start of line to cursor, save in paste buffer
     ^V  move cursor forward one page (page down)
     ^W  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer
-    ^X  enter and execute ed or edda command, then return to display mode
+    ^X  enter and execute one command, then return to display mode
     ^Y  insert (paste or (y)ank) contents last deleted by ^K kill, ^U discard, or ^W cut
     ^Z  exit display editing and return to command mode
 

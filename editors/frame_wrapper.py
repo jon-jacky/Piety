@@ -1,9 +1,52 @@
 """
-buffer_frame.py - BufferFrame class derived from Buffer.
-                  wrap Buffer methods that cause display updates.
+frame_wrapper.py - wrap functions in ed.py and storage.py, methods in buffer.py
+                   with calls to frame.py to update display
 """
 
-import buffer, frame
+import frame, ed, buffer, storage as st
+
+# wrap functions in ed.py
+
+# Save a reference to each of these before we reassign them.
+# This is necessary to restore unwrapped fcns, also to break infinite recursion.
+ed_l = ed.l
+ed_p_lines = ed.p_lines
+ed_prepare_input_mode = ed.prepare_input_mode
+ed_set_command_mode = ed.set_command_mode
+
+# define wrapped functions
+    
+def prepare_input_mode(cmd_name, start, end):
+    ed_prepare_input_mode(cmd_name, start, end) # not ed.prepare_input_mode
+    frame.input_mode()
+
+def set_command_mode():
+    ed_set_command_mode()
+    frame.command_mode()
+
+# wrap functions in storage
+
+# Save a reference to each of these before we reassign them.
+# This is necessary to restore unwrapped fcns, also to break infinite recursion.
+st_create = st.create
+st_select = st.select
+st_delete = st.delete
+
+# define the wrapped functions
+
+def create(bufname):
+    st_create(bufname)  # not st.create - that creates infinite recursion
+    frame.create(st.buf)
+
+def select(bufname):
+    st_select(bufname)
+    frame.select(st.buf)
+
+def delete(bufname):
+    st_delete(bufname)
+    frame.remove(st.delbuf, st.buf)
+
+# wrap methods in buffer
 
 # Save a reference to the unwrapped base class before we reassign it.
 # This is necessary to restore base class, also to break infinite recursion.
@@ -38,6 +81,7 @@ class BufferFrame(buffer_Buffer):
         file_found = super().r(iline, filename)
         if not file_found:
             frame.select(self) # if file_found display already updated
+        return file_found
 
     def w(self, name):
         'Write current buffer contents to file name.'
@@ -67,21 +111,36 @@ class BufferFrame(buffer_Buffer):
 
     def s(self, start, end, old, new, glbl, use_regex):
         'Substitute new for old in lines from start up to end.'
-        super().s(start, end, old, new, glbl, use_regex)
+        match = super().s(start, end, old, new, glbl, use_regex)
         frame.mutate(start, self.dot) # self.dot is last line changed
+        return match
 
     def u(self, iline):
         'Undo last substitution: replace line at iline from cut buffer'
         super().u(iline)
         frame.mutate(iline, iline)
 
-# Enable/disable display by assigning/restoring wrapped/uwrapped buffer class 
+# Enable/disable display by assigning/restoring wrapped/uwrapped fcns, methods
 
 def enable():
-    'Enable display by assigning class with wrapped methods'
+    'Enable display by assigning wrapped functions and methods'
+    ed.l = ed.l_noprint
+    ed.p_lines = ed.p_lines_noprint
+    ed.prepare_input_mode = prepare_input_mode
+    ed.set_command_mode = set_command_mode
+    st.create = create
+    st.select = select
+    st.delete = delete
     buffer.Buffer = BufferFrame
 
 def disable():
-    'Disable display by reassigning base class'
+    'Disable display by restoring unwrapped functions and methods'
+    ed.l = ed_l
+    ed.p_lines = ed_p_lines
+    ed.prepare_input_mode = ed_prepare_input_mode
+    ed.set_command_mode = ed_set_command_mode
+    st.create = st_create
+    st.select = st_select
+    st.delete = st_delete
     buffer.Buffer = buffer_Buffer
 
