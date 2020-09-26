@@ -97,14 +97,20 @@ process_line = samysh.add_command(edo.X_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
-    global cmd_h
+    # Must be careful to intialize frame, enable buffers to update frame
+    #  before initializing buffers in edo.startup
+    cmd_h = 2
     if 'c' in options:
         cmd_h = options['c']
-    frame.rescale(cmd_h) # before edo.startup calls e()
-    edo.startup(*filename, **options)
+    frame_wrapper.enable() # turn on display updates - call before edo.startup
+    if not frame.win: # create initial window only first time edda runs in session
+        blank = buffer.Buffer('blank') # placeholder only needed by frame.init()
+        frame.init(blank)
+    frame.rescale(cmd_h) # assign frame.cmd_h then refresh display
+    edo.startup(*filename, **options) # initialize buffers etc.
+    frame.put_command_cursor() # edo.startup leaves cursor on window status line
     if filename:
         frame.insert(1, frame.win.buf.dot)
-    frame_wrapper.enable() # turn on display updates
 
 def cleanup():
     'Restore display screen then turn off display updates etc.'
@@ -118,10 +124,6 @@ def main(*filename, **options):
         line = input(wyshka.prompt)
         process_line(line)
     cleanup()
-
-# initialize scrolling region and first window only once on import
-cmd_h = 2
-frame.init(st.buf) # import ed above initializes st.buf
 
 if __name__ == '__main__':
     filename, options = ed.cmd_options()

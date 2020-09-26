@@ -568,12 +568,11 @@ def cmd_options():
     options.update({'c': args.cmd_h })
     return filename, options
 
-# Initialize data structures in storage module
-st.create('main')  # initialize main buffer only once on import
-st.previous = 'main'
-
 def startup(*filename, **options):
     global command_prompt, prompt, quit
+    if not st.buf: # create main buffer only first time ed is run in session
+        st.create('main')
+        st.previous = 'main'
     if filename:
         e(filename[0])
     if 'p' in options:
