@@ -4,15 +4,15 @@ branches
 
 This is the **ed_frame** branch.  
 
-- **ed_frame**.  Remove display code from the *ed*, *storage*, and *buffer*
-modules -- finally!  None of these modules imports the display module
-*frame* anymore, and they no longer contain all those *if displaying: ...*
-statements.  This simplifies those modules, and also makes it possible to
-use them with a different display system. We provide  new modules
-*ed_frame*, *storage_frame*, and *buffer_frame* that wrap functions
-in *ed* and *storage* and methods in *buffer* to call display code
-in *frame*.  We revise the display editor *edda* (which is imported by 
-*edsel*) to import and use these new *_frame* modules. Begun Aug 7 2020.
+- **ed_frame**.  Remove display code from the *ed*, *storage*, and
+*buffer* modules -- finally!  None of these modules imports the display
+module *frame* anymore, and they no longer contain all those *if
+displaying: ...* statements.  This simplifies those modules, and also
+makes it possible to use them with a different display system. We provide
+a new module *frame_wrapper* that wraps functions in *ed* and *storage* and
+methods in *buffer* to call display code in *frame*.  We revise the
+display editor *edda* (which is imported by  *edsel*) to import and use
+this new *frame_wrapper* module. Begun Aug 7 2020.
 
 Branches recently merged into *master*:
 
@@ -159,5 +159,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Aug 2020
+Revised Sep 2020
 

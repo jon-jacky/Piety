@@ -133,6 +133,13 @@ def enable():
     st.delete = delete
     buffer.Buffer = BufferFrame
 
+# disable does NOT really work, because Buffer instances that were
+# created while the display was enabled continue to update the display
+# even after disable is called.  That's how objects work in Python:
+# existing objects' methods are not replaced when their code is updated.
+# Fixing this would require turning the Buffer methods into ordinary
+# functions at top level, like the functions in storage and ed.
+
 def disable():
     'Disable display by restoring unwrapped functions and methods'
     ed.l = ed_l
