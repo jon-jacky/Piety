@@ -41,12 +41,6 @@ same syntax you use for a standalone program:
     ... exit from Python
     ...$
 
-NOTE: In the current version, when you run *ed* first, then *edda* and
-*edsel* (as in the preceding example), some edits in the *main* buffer do
-not update the display.  Buffer instances that were created before the
-display was enabled, like *main* here, do not always update even after the
-display is enabled.  We have not yet decided on the best way to fix this.
-
 You never actually exit from a job, you just suspend it.
 Each job (including the Python interpreter)
 preserves its state between invocations, so work in progress can be resumed.
@@ -58,6 +52,15 @@ If *session* exits for any reason,
 control returns to the standard Python intepreter (with the *>>>* prompt).
 You can resume the session by typing *main()*, the state of every job will be intact.
 
+- **NOTE**: In the current version, when you run *ed* first, then when you
+  run *edda* and *edsel* (as in the preceding example), some edits in the
+  *main* buffer do not update the display.  Buffer instances that were
+  created before the display was enabled, like *main* here, do not always
+  update even after the display is enabled. We have not yet decided on
+  the best way to fix this. In the meantime, you can update the display by
+  using the refresh command *L* in *edda* and *edsel* or the *^L*
+  keystroke  while display editing in *edsel*.
+  
 ## Job control ##
 
 The *session* module also demonstrates job control, including the
