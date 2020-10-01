@@ -2,9 +2,10 @@
 branches
 ========
 
-This is the **ed_frame** branch.  
+This is the *master* branch.  Branches recently merged into *master*:
 
-- **ed_frame**.  Remove display code from the *ed*, *storage*, and
+- **ed_frame**.  Merged Sep 30, 2020.
+Remove display code from the *ed*, *storage*, and
 *buffer* modules -- finally!  None of these modules imports the display
 module *frame* anymore, and they no longer contain all those *if
 displaying: ...* statements.  This simplifies those modules, and also
@@ -13,8 +14,6 @@ a new module *frame_wrapper* that wraps functions in *ed* and *storage* and
 methods in *buffer* to call display code in *frame*.  We revise the
 display editor *edda* (which is imported by  *edsel*) to import and use
 this new *frame_wrapper* module. Begun Aug 7 2020.
-
-Branches recently merged into *master*:
 
 - **storage**, merged Jul 21 2020.  Separate buffer data structures out of
 *ed.py* into  the new *storage* module.  Add *noed* ("no ed"), an editor
