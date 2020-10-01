@@ -2,9 +2,17 @@
 branches
 ========
 
-This is the *master* branch.  Branches recently merged into *master*:
+This is the *textframe* branch.  
 
-- **ed_frame**.  Merged Sep 30, 2020.
+- **textfame** - Rename the *storage* module to *text*.  This name
+is analogous to *frame* for the display module -- it is not a generic
+display, but a particular kind.  Also rename *frame_wrapper* to *textframe*,
+to indicate it is where the *text* storage module and *frame* display module
+are put together.  Begun Sep 30 2020.
+
+Branches recently merged into *master*:
+
+- **ed_frame**.  Merged Sep 30 2020.
 Remove display code from the *ed*, *storage*, and
 *buffer* modules -- finally!  None of these modules imports the display
 module *frame* anymore, and they no longer contain all those *if
