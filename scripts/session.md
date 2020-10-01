@@ -41,6 +41,12 @@ same syntax you use for a standalone program:
     ... exit from Python
     ...$
 
+NOTE: In the current version, when you run *ed* first, then *edda* and
+*edsel* (as in the preceding example), some edits in the *main* buffer do
+not update the display.  Buffer instances that were created before the
+display was enabled, like *main* here, do not always update even after the
+display is enabled.  We have not yet decided on the best way to fix this.
+
 You never actually exit from a job, you just suspend it.
 Each job (including the Python interpreter)
 preserves its state between invocations, so work in progress can be resumed.
@@ -141,4 +147,4 @@ so you can use the Python command line without exiting the editor, by prefixing
 each Python command with an exclamation point, or by using just an
 exclamation point to switch the editor command line to Python.
 
-Revised Aug 2020
+Revised Sep 2020

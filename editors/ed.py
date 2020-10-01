@@ -8,7 +8,6 @@ import parse, check
 
 # Data structures, variables, fcns in storage module: 
 # previous current buf buffers create select
-# Initialize data with call to st.create (below, near main)
 import storage as st
 
 # Each ed command is implemented here by a command function with the same
@@ -570,9 +569,7 @@ def cmd_options():
 
 def startup(*filename, **options):
     global command_prompt, prompt, quit
-    if not st.buf: # create main buffer only first time ed is run in session
-        st.create('main')
-        st.previous = 'main'
+    st.startup('main')
     if filename:
         e(filename[0])
     if 'p' in options:

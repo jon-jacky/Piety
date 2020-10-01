@@ -41,6 +41,16 @@ def delete(bufname):
         select(keys[0]) # reassigns current
         previous = current
 
+# Called at application startup to ensure the named buffer is created only once.
+# The same application may be started, exited, started again several times
+# during a single interactive Python session.
+
+def startup(bufname):
+    'Create initial buffer named bufname at application startup.'
+    if not bufname in buffers:
+        create(bufname)
+        previous = bufname
+
 # Queries and predicates
 
 def bufs_for_file(filename):

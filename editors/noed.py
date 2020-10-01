@@ -21,21 +21,16 @@ Here is a sample session:
 """
 
 import storage as st
-import frame
+import frame, frame_wrapper
 
 def startup():
-    # copied from ed.py top level
-    st.create('main')  # initialize main buffer only once on import
-    st.previous = 'main'
-
-    # copied from edda.py top level
-    frame.init(st.buf) 
-
-    # copied from edda.py startup()
-    frame.rescale(frame.cmd_h) # calls refresh, which calls set_scroll
-    # Enable display in ed, buffer, storage modules. Defaults is no display.
-    st.buffer.displaying = st.displaying = True
-    st.buffer.frame = st.frame = frame
+    # based on edda startup and ed startup
+    # Must be careful to intialize frame, enable buffers to update frame
+    #  before initializing buffers
+    cmd_h = 2
+    frame_wrapper.startup(cmd_h) # enable display, must call before st.startup
+    st.startup('main')
+    frame.put_command_cursor() # st.startup leaves cursor on window status line
 
 if __name__ == '__main__':
    startup()

@@ -72,11 +72,11 @@ def put_message(msg):
     util.putstr(msg + '\n')
     put_display_cursor()
 
-def init(buffer):
+def init(cmd_h, buffer):
     'Initialize frame with one window into buffer.'
     global win, ifocus
     # must assign frame size before create first window
-    scale(nlines, cmd_h) # default cmd_h, may reassign before first update
+    scale(nlines, cmd_h)
     win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
     win.focus = True
     windows.append(win)

@@ -102,11 +102,7 @@ def startup(*filename, **options):
     cmd_h = 2
     if 'c' in options:
         cmd_h = options['c']
-    frame_wrapper.enable() # turn on display updates - call before edo.startup
-    if not frame.win: # create initial window only first time edda runs in session
-        blank = buffer.Buffer('blank') # placeholder only needed by frame.init()
-        frame.init(blank)
-    frame.rescale(cmd_h) # assign frame.cmd_h then refresh display
+    frame_wrapper.startup(cmd_h) # enable display, must call before edo.startup
     edo.startup(*filename, **options) # initialize buffers etc.
     frame.put_command_cursor() # edo.startup leaves cursor on window status line
     if filename:

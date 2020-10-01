@@ -151,3 +151,20 @@ def disable():
     st.delete = st_delete
     buffer.Buffer = buffer_Buffer
 
+# Called at application startup to ensure the frame is initialized only once.
+# The same application may be started, exited, started again several times
+# during a single interactive Python session.
+# Also solves a chicken-and-egg problem: When display is enabled, 
+# frame must be initialized before the first application buffer is created
+# BUT frame.init requires a buffer for initial window, so create a placeholder.
+
+def startup(cmd_h):
+    'Initialize frame at application startup.'
+    enable() # turn on display updates
+    if not frame.win: # create initial window only once in session
+        if st.buf: # some application has already created a buffer
+            frame.init(cmd_h, st.buf)
+        else: # create initial window with placeholder buffer
+            frame.init(cmd_h, buffer.Buffer('placeholder'))
+    frame.rescale(cmd_h) # assign frame.cmd_h then refresh display
+
