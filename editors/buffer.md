@@ -30,9 +30,9 @@ text buffers without using the *ed.py* user interface or API, simply
 calling the standard Python *print* function, with the *file=...* optional
 argument pointing to the buffer.
 
-The [storage](storage.md) module maintains a collection of 
+The [text](text.md) module maintains a collection of 
 *Buffer* instances, to support multi-buffer editors and other
-Bapplications.
+applications.
 
 *Buffer* objects can optionally show their contents on the display, by
 calling functions in the *frame* module.  By default, this is not

@@ -106,15 +106,15 @@ Files in this directory:
 
 - **parse.py**: command line parsing for *ed.py*.
 
-- **storage.md**: explanation of *storage.py*.
+- **text.md**: explanation of *text.py*.
 
-- **storage.py**: text buffer data structures used by *ed.py* etc.
+- **text.py**: text buffer data structures used by *ed.py* etc.
 
-- **storage_frame.py**: wraps functions in *storage* with calls to display code in 
-  *frame*, imported by *edda*.
+- **textframe.py**: wraps functions in *text* and methods in *buffer*
+  with calls to display code in *frame*, imported by *edda*.
 
 - **window.md**: explanation of *window.py*.
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Aug 2020
+Revised Oct 2020

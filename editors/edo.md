@@ -144,8 +144,8 @@ prefix, the command just chooses one.
 ## Modules ##
 
 **[edo.py](edo.py)** imports *ed.py*, so it uses all the modules *ed.py*
-imports.  It defines the abbreviation *st* for *ed.st*, the *storage* module,
-so *st* can be used without the *ed* prefix.
+imports.  It defines the abbreviation *text* for *ed.text*, the *text* module,
+so *text* can be used without the *ed* prefix.
 
 **edo.py** also imports *wyshka.py* and *samysh.py* from the *shells* directory.
 
@@ -155,12 +155,12 @@ You can access the editor API and data structures from the Python prompt
 via the imported *ed* module.
 
 If you start *edo* at the system command line, *ed.a* is the append function,
-*st.current* is the name of the current buffer, *st.buf* is the
-current buffer object, and *st.buffers* is the dictionary of buffers
+*text.current* is the name of the current buffer, *text.buf* is the
+current buffer object, and *text.buffers* is the dictionary of buffers
 indexed by name.
 
-If you import *edo* into a Python session, then
-you use *edo.ed.a*, *edo.st.current* etc.
+If you import *edo* into a Python session, then you use *edo.ed.a*,
+*edo.text.current* etc.
 
 ## Related programs ##
 

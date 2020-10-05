@@ -465,13 +465,13 @@ Finally, the API provides the *main* function that runs the application.
 Python API described above.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
 
-**ed.py** imports the *storage.py* module, which provides the collection
+**ed.py** imports the *text.py* module, which provides the collection
 of buffers.  The *storge.py* module imports the *buffer.py* module, which
 provides the *Buffer* class, which defines the core data structure and the
 internal API for updating it.  Many *Buffer* methods correspond to
 functions in the API, but in *Buffer* each method has a fixed argument
 list, provides no error checking, and no error messages or progress
-messages.  The *storage* module and *Buffer* class do not access the
+messages.  The *text* module and *Buffer* class do not access the
 console, but update text buffers and read and write files.
 
 **ed.py** imports the *parse.py* module that provides
@@ -479,7 +479,7 @@ functions for parsing *ed* commands, and the
 *check.py* module that provides functions for checking
 command arguments and supplying default arguments.
 
-The *storage*, *buffer*, *parse*, and *check* modules are
+The *text*, *buffer*, *parse*, and *check* modules are
 included in this directory.  **ed.py** also uses the Python standard
 library modules *re*, *os*, *sys*, and *contextlib*.
 Other than that, **ed.py** has no dependencies.
@@ -487,20 +487,19 @@ Other than that, **ed.py** has no dependencies.
 
 ## Data structures ##
 
-The editor data structures are in the *storage* module, which is 
-abbreviated *st*, 
+The editor data structures are in the *text* module,
 so you can easily inspect them at the Python prompt.  The most
 important are:
 
-- *st.current* is the name of the current buffer, a string.
+- *text.current* is the name of the current buffer, a string.
 
-- *st.buf* is the current buffer, an instance of the *Buffer* class.
-  *st.buf.lines* is the text in the buffer, a list of strings.
-  *st.buf.dot* is the index of the current line in *buf.lines*.
+- *text.buf* is the current buffer, an instance of the *Buffer* class.
+  *text.buf.lines* is the text in the buffer, a list of strings.
+  *text.buf.dot* is the index of the current line in *buf.lines*.
 
-- *st.buffers* is the collection of all buffers, a dictionary whose keys
+- *text.buffers* is the collection of all buffers, a dictionary whose keys
   are the buffer names (strings) and whose values are the buffer
-  instances.  So *st.buffers['main'].lines* is the text in the *main* buffer.
+  instances.  So *text.buffers['main'].lines* is the text in the *main* buffer.
 
 In this example we start an *ed.py* session, type a few *ed* commands, then
 quit to the Python prompt and type a few statements to inspect the data:
@@ -528,19 +527,19 @@ quit to the Python prompt and type a few statements to inspect the data:
     then inspect current, buf, and buffers.
 
     :Q
-    >>> st.current
+    >>> text.current
     'ed.md'
-    >>> st.buf
+    >>> text.buf
     <buffer.Buffer object at 0x10144ee48>
-    >>> st.buffers
+    >>> text.buffers
     {'main': <buffer.Buffer object at 0x10144eeb8>, 'ed.md': <buffer.Buffer object at 0x10144ee48>}
-    >>> st.buf.lines[:5]
+    >>> text.buf.lines[:5]
     ['', '\n', 'ed.py\n', '=====\n', '\n']
 
     You could even update the data structures from the Python prompt, 
     completely bypassing the API.
 
-    >>> st.buf.lines[3] = '+++++\n'
+    >>> text.buf.lines[3] = '+++++\n'
 
 We started this example by starting *ed.py* from the system command line.
 Or, we could start *ed.py* in the Python session with *import ed*
@@ -574,5 +573,5 @@ to be entered at the terminal.
 **[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
-Revised Aug 2020
+Revised Oct 2020
 

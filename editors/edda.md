@@ -193,9 +193,9 @@ In *edda*, the window data structures are in the *frame* module:
 *frame.win* is the current window, *frame.windows* is the list
 of windows, etc.
 
-In *edda*, the storage data structures are in the *st* module:
-*st.current* is the name of the current buffer, *st.buf* is the current
-buffer, *st.buffers* is the collection of buffers keyed by name.
+In *edda*, the text data structures are in the *text* module:
+*text.current* is the name of the current buffer, *text.buf* is the current
+buffer, *text.buffers* is the collection of buffers keyed by name.
 
 In *edda*, calls to the *ed* API must be prefixed by
 the module name *ed.*  For example: *ed.a('append line after dot')*.
@@ -203,10 +203,10 @@ the module name *ed.*  For example: *ed.a('append line after dot')*.
 ## Modules ##
 
 **edda** imports *ed.py* which provides all of the line editing commands,
-and in turn imports the *storage* module that provides all the text buffers.
+and in turn imports the *text* module that provides all the text buffers.
 *edda* also imports the *frame* module which provides the display.  *edda*
-also imports *ed_frame*, *storage_frame*, and *buffer_frame* which wrap 
-functions in *ed* and *storage* and methods in *buffer* with calls to display
+also imports *ed_frame*, *text_frame*, and *buffer_frame* which wrap 
+functions in *ed* and *text* and methods in *buffer* with calls to display
 code in *frame*.
 
 ## Related programs ##
