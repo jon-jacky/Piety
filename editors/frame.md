@@ -19,7 +19,17 @@ present (it does not import *edda*, *edsel*, or any others), so it can
 act as a display server to any client application (or several).
 Different programs can simultaneously use different windows on the
 same display.  So *frame* can act as a text-only tiling window
-manager.
+manager.   
+
+The collection of windows is initialized from *frame*, not by any
+application.  Applications can create, update, and delete windows by using
+functions and data in *frame*, but the collection of windows persists
+unchanged when applications start or exit.  
+
+An application can clear and update the display using its own code,
+different from *frame*, but when it exits, the *frame* window data
+structures are still there, and can be displayed by another application or
+by the user's command.
 
 More than one window might be visible at the same time, showing different 
 buffers or different locations in  the same buffer.   When a buffer's 
@@ -71,4 +81,4 @@ The present version of *frame* always shows a vertical stack of
 windows (or one window).  It is only possible to split a window
 horizontally, not vertically.
 
-Revised Feb 2020
+Revised Oct 2020

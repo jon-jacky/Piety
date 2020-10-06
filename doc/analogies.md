@@ -121,12 +121,12 @@ these.  Piety is a single-user system.
 
 - **files**: We try to avoid using the host file system.  Instead, we use
 in-memory data structures that can persist through the long-running Python
-session.  These are provided by the *storage* module, which manages a
+session.  These are provided by the *text* module, which manages a
 collection of text buffers, instances of the *Buffer* class.  Text buffers
 are used by the *ed.py* and *edsel* editors and other applications, but
-the *storage* and *buffer* modules do not depend on any application and
+the *text* and *buffer* modules do not depend on any application and
 can by used by any.  Applications can create and delete buffers by calling
-functions in *storage*, but the collection of buffers is not affected when
+functions in *text*, but the collection of buffers is not affected when
 applications start or exit.  We will configure Python *import* to import
 directly from these buffers so they don't need to be saved in the host
 file system. (Import from buffers is not yet implemented.)
@@ -135,12 +135,17 @@ file system. (Import from buffers is not yet implemented.)
 a task to some text buffer.  Redirection is provided by the *wyshka* shell.
 
 - **desktop, window manager**: Our display editors *edda* and *edsel*
-provide multiple tiled windows in a
-single terminal, where each window displays (part of) the contents of
-a text buffer.  The display module *frame* used by these editors does
-not depend on *edsel* or any other application so it is in effect a
-separate window manager; it can display windows that are updated by
-different applications.
+provide multiple tiled windows in a single terminal, where each window
+displays (part of) the contents of a text buffer.  The display module
+*frame* used by these editors does not depend on *edsel* or any other
+application so it is in effect a separate window manager; it can display
+windows that are updated by different applications. Applications can
+create, update, and delete windows by using *frame*, but the collection of
+windows persists unchanged when applications start or exit.   An
+application can clear and update the display using its own code, different
+from *frame*, but when it exits, the *frame* window data structures are
+still there, and can be displayed by another application or by the user's
+command.
 
 - **boot**: start the standard blocking Python interpreter, import
 Piety operating system and application modules, start Piety event
@@ -167,5 +172,5 @@ The operating system that Piety resembles the most is
 multitasking, uses a text buffer class as a building block, and uses a
 multiwindow text editor as its desktop and system shell.
 
-Revised Aug 2020
+Revised Oct 2020
 
