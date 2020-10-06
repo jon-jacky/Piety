@@ -70,7 +70,9 @@ run as a non-blocking task or job in a Piety session.
 A typical Piety session has a shell and editor loaded, and perhaps some
 other applications.   There are no barriers between applications
 in a Piety session -- the functions and data in each
-are accessible to all the others.
+are accessible to all the others.  Once loaded, an application is never
+deleted.  An application can be suspended, but it can always be resumed 
+or restarted.
 
 - **job**: a single application within a task.  A task can contain
 multiple jobs.  The jobs within a task do not interleave with each
@@ -93,17 +95,16 @@ input.  A terminal session can include several console jobs.
     exits or is suspended.  In a terminal session, a shell is
     usually the background job when another application is running.
 
-- **shell**: In Piety, a console job that provides a Python REPL
-(Read-Evaluate-Print Loop).  In Piety, Python itself is the shell
-command language.  However, the standard Python interpreter cannot
-serve as the Piety shell because it blocks while waiting for the
-next statement, which would prevent other tasks from running.  Piety
-provides a simple callable Python shell named *pysh*
-(rhymes with *fish*), along with [modules](../shells/README.md)
-that adapt it to run in Piety sessions.  Piety also provides a more
-elaborate shell named *wyshka* that makes it easy to alternate between Python
-and an application command language, and provides redirection of the output of
-any Python or application command.
+- **shell**: In Piety, a console job that provides a Python REPL (Read-
+Evaluate-Print Loop).  In Piety, Python itself is the shell command
+language.  However, the standard Python interpreter cannot serve as the
+Piety shell because it blocks while waiting for the next statement, which
+would prevent other tasks from running.  Piety provides a simple callable
+Python shell named *pysh* (rhymes with *fish*), along with
+[modules](../shells/README.md) that adapt it to run in Piety sessions.
+Piety also provides a more elaborate shell named *wyshka* that makes it
+easy to alternate between Python and an application command language, and
+provides redirection of the output of any Python or application command.
 
 - **memory management**: including allocation and reclamation (that is,
 garbage collection).  Provided by Python language runtime.
