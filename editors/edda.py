@@ -6,6 +6,8 @@ edda - Display editor based on the line editor ed.py
 import traceback, os, sys
 import edo, frame, wyshka, samysh, textframe
 
+textframe.enable() # enable display updates
+
 # So we can use these modules without prefix
 ed = edo.ed
 text = ed.text
@@ -97,21 +99,19 @@ process_line = samysh.add_command(edo.X_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
-    # Must be careful to intialize frame, enable buffers to update frame
-    #  before initializing buffers in edo.startup
     cmd_h = 2
     if 'c' in options:
         cmd_h = options['c']
-    textframe.startup(cmd_h) # enable display, must call before edo.startup
-    edo.startup(*filename, **options) # initialize buffers etc.
-    frame.put_command_cursor() # edo.startup leaves cursor on window status line
+    edo.startup(*filename, **options) # initialize text.buf etc.
+    textframe.displaying = True # turn on display updates
+    frame.startup(cmd_h, text.buf) # create initial window into buf, refresh display
     if filename:
         frame.insert(1, frame.win.buf.dot)
 
 def cleanup():
     'Restore display screen then turn off display updates etc.'
     frame.restore()
-    textframe.disable() # turn off display updates
+    textframe.displaying = False
 
 def main(*filename, **options):
     'Top level edda command to invoke from python prompt or command line.'

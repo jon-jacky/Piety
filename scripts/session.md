@@ -51,15 +51,6 @@ Also, *edda* and *edsel* share window state.
 If *session* exits for any reason,
 control returns to the standard Python intepreter (with the *>>>* prompt).
 You can resume the session by typing *main()*, the state of every job will be intact.
-
-- **NOTE**: In the current version, when you run *ed* first, then when you
-  run *edda* and *edsel* (as in the preceding example), some edits in the
-  *main* buffer do not update the display.  Buffer instances that were
-  created before the display was enabled, like *main* here, do not always
-  update even after the display is enabled. We have not yet decided on
-  the best way to fix this. In the meantime, you can update the display by
-  using the refresh command *L* in *edda* and *edsel* or the *^L*
-  keystroke  while display editing in *edsel*.
   
 ## Job control ##
 
@@ -150,4 +141,4 @@ so you can use the Python command line without exiting the editor, by prefixing
 each Python command with an exclamation point, or by using just an
 exclamation point to switch the editor command line to Python.
 
-Revised Sep 2020
+Revised Oct 2020

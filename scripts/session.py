@@ -27,7 +27,7 @@ jobs = session.jobs # list jobs and their states
 fg = session.fg # resume most recently suspended job
 edm = edna.edo.ed # ed module, needs different name from ed console job
 frame = desoto.editor.frame
-st = edm.st
+text = edm.text
 
 pysh.name = 'pysh'
 pysh.start = (lambda: session.start(pysh))

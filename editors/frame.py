@@ -1,5 +1,5 @@
 """
-frame.py - Multiwindow display implemented by a list of window instances,
+py - Multiwindow display implemented by a list of window instances,
             with a scrolling command region at the bottom of the display.
 """
 
@@ -331,3 +331,14 @@ def insert_other(buffer, start, end, column):
         put_display_cursor(column=column)
     elif mode == Mode.command:
         put_command_cursor(column=column)
+
+# Called at application startup to ensure the frame is initialized only once.
+# The same application may be started, exited, started again several times
+# during a single interactive Python session.
+# text.buf must already exist when this is called.
+
+def startup(cmd_h, buf):
+    'Initialize frame at application startup with window into buf'
+    if not win: # create initial window only once in session
+        init(cmd_h, buf)
+    rescale(cmd_h) # assign cmd_h then refresh display

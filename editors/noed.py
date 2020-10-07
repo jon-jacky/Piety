@@ -22,14 +22,14 @@ Here is a sample session:
 
 import text, frame, textframe
 
+textframe.enable() # enable display updates
+
 def startup():
     # based on edda startup and ed startup
-    # Must be careful to intialize frame, enable buffers to update frame
-    #  before initializing buffers
     cmd_h = 2
-    textframe.startup(cmd_h) # enable display, must call before st.startup
-    st.startup('main')
-    frame.put_command_cursor() # st.startup leaves cursor on window status line
+    text.startup('main') # initialize text.buf with main buffer
+    textframe.displaying = True # turn on display updates
+    frame.startup(cmd_h, text.buf) # create initial window into buf, refresh
 
 if __name__ == '__main__':
    startup()
