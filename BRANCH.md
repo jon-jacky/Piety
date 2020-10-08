@@ -2,7 +2,12 @@
 branches
 ========
 
-This is the *master* branch.  Branches recently merged into *master*:
+This is the *bimport* branch:
+
+- **bimport**. Provide a way to import or reload a module directly from
+a text buffer, without having to write it out to a file.  Begun Oct 8 2020.
+
+Branches recently merged into *master*:
 
 - **textframe**.  Merged Oct 8 2020.
 Rename the *storage* module to *text*.  This name
@@ -10,7 +15,8 @@ is analogous to *frame* for the display module -- it is not a generic
 display, but a particular kind.  Also rename *frame_wrapper* to *textframe*,
 to indicate it is where the *text* storage module and *frame* display module
 are put together.  Also, fix bug from the previous *ed_frame* branch:
-now display updates can be turned on and off. Begun Sep 30 2020.
+now display updates can be turned on and off during a Python session.
+Begun Sep 30 2020.
 
 - **ed_frame**.  Merged Sep 30 2020.
 Remove display code from the *ed*, *storage*, and
