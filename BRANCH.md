@@ -4,7 +4,7 @@ branches
 
 This is the *master* branch.  Branches recently merged into *master*:
 
-- **textfame**.  Merged Oct 8 2020.
+- **textframe**.  Merged Oct 8 2020.
 Rename the *storage* module to *text*.  This name
 is analogous to *frame* for the display module -- it is not a generic
 display, but a particular kind.  Also rename *frame_wrapper* to *textframe*,
