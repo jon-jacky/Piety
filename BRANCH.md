@@ -166,5 +166,5 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Sep 2020
+Revised Oct 2020
 
