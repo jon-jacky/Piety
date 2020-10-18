@@ -206,10 +206,12 @@ def hsplit():
 # Select the buffer displayed in the focus window, that has input focus
 
 def create(buf):
-    'Create new buffer in focus window, ed B.'
+    'Create new buffer in focus window, ed b B.'
     win.buf = buf
     win.saved_dot = win.buf.dot
     win.update()
+    if mode == Mode.command:
+        put_command_cursor()
 
 def select(buf):
     'Change buffer in focus window, ed b E D.'
