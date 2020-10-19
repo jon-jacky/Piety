@@ -4,7 +4,7 @@ branches
 
 This is the *bimport* branch:
 
-- **bimport**. Provide a way to import or reload a module directly from
+- **bimport**. Provide functions to import or reload a module directly from
 a text buffer, without having to write it out to a file.  Begun Oct 8 2020.
 
 Branches recently merged into *master*:

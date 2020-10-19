@@ -1,6 +1,6 @@
 """
-bimport.py -  import or reload a module directly from a text buffer, 
-               without having to write it out to a file.
+bufimport.py -  provide functions to import or reload a module directly from 
+                a text buffer, without having to write it out to a file.
 """
 
 import importlib, sys

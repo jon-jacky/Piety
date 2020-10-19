@@ -125,12 +125,12 @@ in-memory data structures that can persist through the long-running Python
 session.  These are provided by the *text* module, which manages a
 collection of text buffers, instances of the *Buffer* class.  Text buffers
 are used by the *ed.py* and *edsel* editors and other applications, but
-the *text* and *buffer* modules do not depend on any application and
-can by used by any.  Applications can create and delete buffers by calling
+the *text* and *buffer* modules do not depend on any application and can
+by used by any.  Applications can create and delete buffers by calling
 functions in *text*, but the collection of buffers is not affected when
-applications start or exit.  We will configure Python *import* to import
-directly from these buffers so they don't need to be saved in the host
-file system. (Import from buffers is not yet implemented.)
+applications start or exit.   We provide functions to import or reload a
+module directly from a text buffer, without having to write it out to a
+file.
 
 - **i/o redirection**: In Piety, redirecting the output of
 a task to some text buffer.  Redirection is provided by the *wyshka* shell.

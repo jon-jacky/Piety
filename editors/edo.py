@@ -3,10 +3,12 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
             + samysh, run script from buffer with optional echo and delay
           Also add R command to run Python script from buffer,
           P command to run Python statements in current selection
+          bimport() and breload() functions to import, reload from buffers
 """
 
-import ed, parse, check, pysh, samysh, wyshka
+import ed, parse, check, pysh, samysh, wyshka, bufimport
 text = ed.text # so we can use it without ed prefix
+bimport, breload = bufimport.bimport, bufimport.breload # use without prefix
 
 # Define x command so it can also be imported by edda, edsel etc.
 # to use with their own do_commands, by calling samysh.add_command.

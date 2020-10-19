@@ -26,7 +26,8 @@ Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.
 Or, you can bypass the file system and run
 Python scripts directly from editor buffers, or execute Python
-statements from selected text in any buffer.
+statements from selected text in any buffer, or import or reload
+and entire module from a buffer.
 
 **edsel** serves as the programmers' user interface to the 
 Piety system.   By providing text editing, a shell and a 
@@ -431,5 +432,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Jul 2020
+Revised Oct 2020
 

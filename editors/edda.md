@@ -24,7 +24,8 @@ Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.
 Or, you can bypass the file system and run
 Python scripts directly from editor buffers, or execute Python
-statements from selected text in any buffer.
+statements from selected text in any buffer, or import or reload
+an entire module from a buffer.
 
 ## Running edda ##
 
@@ -220,5 +221,5 @@ so *desoto* can run in the cooperative multitasking system,
 
 **edda** is the core of a more capable display editor, [edsel](edsel.md).
 
-Revised Aug 2020
+Revised Oct 2020
 

@@ -6,7 +6,8 @@ edo.py
 command line shell, including a Python interpreter
 provided by the *[wyshka](../shells/wyshka.py)* module.  *edo* also
 provides new editor commands for running Python code from
-selected text in any buffer.
+selected text in any buffer, and new functions for importing or reloading
+a module directly from a buffer.
 
 This shell and these new commands
 turn *ed.py* into a minimal but self-contained
@@ -15,14 +16,15 @@ write them out using *ed* commands, then use the built-in
 Python interpreter to import or reload modules, call their functions,
 and inspect and update their data structures.  
 Or, you can bypass the file system and run Python
-statements from selected text in any buffer.
+statements from selected text in a buffer, or import or reload an entire
+module from a buffer.
 
 **edo.py** also provides a new command *X*
 for executing scripts of editor commands
 from an editor buffer with optional echo and delay,
 supported by the *[samysh](../shells/samysh.py)* module.
 
-This command is provided for testing *ed.py* itself, as well as the
+The *X* command is provided for testing *ed.py* itself, as well as the
 several other programs built on it (see below).  The echo and delay make
 it easy to see the effect of each command in the script.  This is
 especially useful for testing the display editors based on *ed.py*.
@@ -84,6 +86,14 @@ error, and the code is not executed. *R* uses builtin *exec* which runs the
 code instead of reporting an error. It runs any valid Python code, but does not
 print the values of expressions it evaluates unless there is an explicity
 *print* call.
+
+## Importing and reloading Python modules ##
+
+**edo.py** provides Python functions to import or reload a module directly
+from  a text buffer, so it is not necessary to save the buffer contents to
+a file first.  The function call *bimport()* imports the current buffer,
+and  *breload()* reloads it.  These function calls can be typed at the
+*wyshka* shell, like any other Python statements.
 
 ## Scripting ##
 
@@ -180,4 +190,4 @@ The **[edda](edda.md)** display editor imports *edo.py*.
 
 The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
-Revised Jul 2020
+Revised Oct 2020

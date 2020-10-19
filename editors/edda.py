@@ -8,10 +8,11 @@ import edo, frame, wyshka, samysh, textframe
 
 textframe.enable() # enable display updates
 
-# So we can use these modules without prefix
+# So we can use these modules and functions without prefix
 ed = edo.ed
 text = ed.text
 buffer = text.buffer
+bimport, breload = edo.bimport, edo.breload
 
 # edda API functions
 
