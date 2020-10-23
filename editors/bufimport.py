@@ -64,6 +64,6 @@ def breload():
             breload_m(bufname, m)
             print('Module %s reloaded from buffer %s' % (modname, bufname))
         else:
-            print('? %s mot in sys.modules, use bimport() instead' 
+            print('? %s not in sys.modules, use bimport() instead' 
                     % modname)
 

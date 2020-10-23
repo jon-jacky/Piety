@@ -5,7 +5,7 @@ wyshka.py - Shell that can alternate between pysh (Python)
             Can also redirect output to text buffer, rewrite or append
 """
 
-import pysh, ed, buffer, display
+import pysh, text, buffer, display
 from contextlib import redirect_stdout
 
 # globals reassigned by shell _process_line below
@@ -53,16 +53,15 @@ def shell(process_line=(lambda line: None), command_mode=(lambda: True),
                 if not line:
                     print('? bufname command')
                     return 
-                if bufname in ed.buffers:
-                    buf = ed.buffers[bufname]
+                if bufname in text.buffers:
+                    text.select(bufname)
                     if rewrite:
-                        buf.d(1, buf.nlines()) 
+                        text.buf.d(1, text.buf.nlines()) 
                     else: # append
-                        buf.dot = buf.nlines()
+                        text.buf.dot = text.buf.nlines()
                 else:
-                    ed.buffers[bufname] = buffer.Buffer(bufname)
-                dest = ed.buffers[bufname] 
-                # do not switch current buffer to dest until after command
+                    text.create(bufname)
+                dest = text.buffers[bufname] 
             else:
                 dest = display.tty
 
@@ -89,9 +88,6 @@ def shell(process_line=(lambda line: None), command_mode=(lambda: True),
                 else: 
                     with redirect_stdout(dest):
                         process_line(line)
-            # now switch current buffer 
-            if redirect:
-                ed.b(bufname)
 
         else: # not command_mode()
             process_line(line)
