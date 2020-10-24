@@ -10,5 +10,9 @@ def sh(command):
     # Capture command output and print it in the calling process, 
     #  so redirection works.
     cp = subprocess.run(command, shell=True, text=True, capture_output=True)
-    print(cp.stdout)
+    if cp.stdout:
+        print(cp.stdout)
+    else:
+        print(cp.stderr)
+
 
