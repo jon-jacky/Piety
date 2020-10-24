@@ -14,6 +14,8 @@ Callable Python shells
 - **samysh.py**: Execute a command with optional echo and delay.
   Useful for observing the execution of test scripts.
 
+- **shellcmd.py**: provide a function to invoke a shell command.
+
 - **wyshka.md**: Description of *wyshka.py*.
 
 - **wyshka.py**: Shell that can alternate between *pysh* (Python) and
@@ -28,5 +30,5 @@ Our *pysh.py* is not related to the abandoned project also named
 [pysh](http://pysh.sourceforge.net/) mentioned on this page on
 [alternative shells](https://github.com/oilshell/oil/wiki/ExternalResources).
 
-Revised Jun 2020
+Revised Oct 2020
 
