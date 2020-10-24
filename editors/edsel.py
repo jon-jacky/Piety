@@ -10,7 +10,7 @@ import keyboard, console, check, edda, pysh, wyshka, samysh
 ed = edda.edo.ed    # use ed, frame, st APIs without prefix
 text = ed.text
 frame = edda.frame
-bimport, breload = edda.bimport, edda.breload
+bimport, breload, sh = edda.bimport, edda.breload, edda.sh
 
 next_text = re.compile(r'\s\S') # White space char then non-white space char
 

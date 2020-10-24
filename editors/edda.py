@@ -12,7 +12,7 @@ textframe.enable() # enable display updates
 ed = edo.ed
 text = ed.text
 buffer = text.buffer
-bimport, breload = edo.bimport, edo.breload
+bimport, breload, sh = edo.bimport, edo.breload, edo.sh
 
 # edda API functions
 

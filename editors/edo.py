@@ -6,9 +6,9 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
           bimport() and breload() functions to import, reload from buffers
 """
 
-import ed, parse, check, pysh, samysh, wyshka, bufimport
+import ed, parse, check, pysh, samysh, wyshka, bufimport, shellcmd
 text = ed.text # so we can use it without ed prefix
-bimport, breload = bufimport.bimport, bufimport.breload # use without prefix
+bimport, breload, sh = bufimport.bimport, bufimport.breload, shellcmd.sh
 
 # Define x command so it can also be imported by edda, edsel etc.
 # to use with their own do_commands, by calling samysh.add_command.
