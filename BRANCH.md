@@ -4,8 +4,12 @@ branches
 
 This is the *bimport* branch:
 
-- **bimport**. Provide functions to import or reload a module directly from
-a text buffer, without having to write it out to a file.  Begun Oct 8 2020.
+- **bimport**. Add the the *bufimport* module with functions to import or
+reload a module directly from a text buffer, without having to write it
+out to a file.  Add the *shellcmd* module with a function to run
+a system shell command.  Revise the *wyshka* module to use the  new *text*
+module instead of *ed*, completing the work of the previous two branches.
+Begun Oct 8 2020.
 
 Branches recently merged into *master*:
 
