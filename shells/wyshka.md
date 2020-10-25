@@ -131,7 +131,9 @@ added at the Python prompt by using the *ed* API are still in buffer:
 
 The *wyshka* shell also provides output redirection.  The output of any
 application command or Python command can be sent to a text buffer instead of
-the scrolling command region.
+the scrolling command region.  This is useful when a command prints more
+output than can fit in the command region, or when you want to save command 
+output to read or use later.
 
 To redirect the output of *command*, use this prefix syntax, where the 
 redirection symbol *>* and the  destination buffer name *bufname* precede 
@@ -161,10 +163,31 @@ The *command* can begin with *!* to use (and redirect) a Python command
 while in application mode, or *:* to use (and redirect) an application
 command while in Python mode.
 
+Here is an example.  To redirect the buffer list printed by the 
+*n* command to the buffer named *n.log*, type
+
+  > n.log n
+
+(The built-in *N* command achieves the same effect without redirection
+on the command line.)
+
+Redirection is often useful with the Python *sh* function that executes
+a system shell command.   For example to save the output
+from *ls -l* in the buffer *ls.log*, use this command: 
+
+  > ls.log !sh('ls -l')
+
+Here the *!* preceding *sh* indicates that *sh* and what follows is a
+*Python* function call, not an editor command (this is only necessary if
+*wyshka* is not  already in Python mode).    Then to append another
+directory listing to the same buffer, type this command:
+
+  >> ls.log !sh('ls -l *.py')
+
 ## Related programs ##
 
 The *wyshka* shell is provided by the *edo* and *edna* line editors,
 and the *edda* and *edsel* display editors.
 
-Revised Jan 2020
+Revised Oct 2020
 

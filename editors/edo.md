@@ -5,11 +5,12 @@ edo.py
 **[edo.py](edo.py)** provides the *[ed.py](ed.md)* line editor with an enhanced
 command line shell, including a Python interpreter
 provided by the *[wyshka](../shells/wyshka.py)* module.  *edo* also
-provides new editor commands for running Python code from
-selected text in any buffer, and new functions for importing or reloading
-a module directly from a buffer.
+provides editor commands for running Python code from
+selected text in any buffer, functions for importing or reloading
+a Python module directly from a buffer, and a function to execute 
+system shell commands (with *bash*, for example).
 
-This shell and these new commands
+This shell and these commands
 turn *ed.py* into a minimal but self-contained
 Python programming environment.  In *edo*, you can edit modules and
 write them out using *ed* commands, then use the built-in
@@ -94,6 +95,20 @@ from  a text buffer, so it is not necessary to save the buffer contents to
 a file first.  The function call *bimport()* imports the current buffer,
 and  *breload()* reloads it.  These function calls can be typed at the
 *wyshka* shell, like any other Python statements.
+
+## Using the system shell ##
+
+**edo.py** provides the Python function *sh()* which executes its argument
+(a string) with the system shell (*bash*, for example). So it is possible
+to run system commands without leaving *edo*, for  example *sh('ls -l')*
+
+Like any other command, shell command output usually appears in the
+scrolling command region, but you can use the output redirection
+capability of the  *wyshka* shell to save output in a buffer,  for example
+to save the output from *ls -l* in the buffer *ls.log*, use this command:
+*> ls.log !sh('ls -l')* Here the *!* preceding *sh* indicates that *sh*
+and what follows is a *Python* function call, not an editor command
+(this is only necessary if *wyshka* is not already in Python mode).
 
 ## Scripting ##
 
@@ -191,3 +206,4 @@ The **[edda](edda.md)** display editor imports *edo.py*.
 The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
 Revised Oct 2020
+
