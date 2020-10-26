@@ -164,7 +164,9 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    def insert(self, iline, lines):
+    # This method is called by both insert and insert_other, below
+    # It separated out so we can display insert and insert_other differently.
+    def insert_lines(self, iline, lines):
         """
         Insert lines (list of strings) before iline,
         update dot to last inserted line
@@ -178,12 +180,19 @@ class Buffer(object):
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
 
+    def insert(self, iline, lines):
+        """
+        Insert lines when this buffer is the current buffer.
+        If displaying, update the focus window via a wrapper in textframe or...
+        """
+        self.insert_lines(iline, lines)
+
     def insert_other(self, iline, lines, column):
         """
-        Insert lines when this buffer is not the current buffer.
-        Must distinguish from insert because it might be displayed differently.
+        Insert lines when this buffer is *not* the current buffer.
+        If displaying, update other windows via wrapper but *not* focus window.
         """
-        self.insert(iline, lines)
+        self.insert_lines(iline, lines)
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'

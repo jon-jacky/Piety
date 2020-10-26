@@ -79,11 +79,14 @@ exclamation point on the command line by itself to switch to Python.)
 
  - *ts1task.enabled=alternate* - run *ts1task* handler on alternate timeout events
 
- - *piety.cycle.period=0.1* - cause *ts1* buffer to update ten times a second
+ - *piety.cycle.period=0.1* - cause *ts1* buffer to update ten times a second.  We have 
+     We have found that with *period=0.0001* -- 10,000 events/sec -- we can
+     still type comfortably in the *main* buffer, with no lost characters.
 
  - *piety.cycle.period=1.0* - cause *ts1* buffer to resume updating once a second
 
  - *edm.a('append line after dot')* - or any other call from the *ed* API.
+
 
 ### API and data structures ###
 
