@@ -160,10 +160,11 @@ Python REPL console job and return to standard blocking Python
 interpreter, stop Piety event loop, exit Python.
 
 - **virtual machine**: On a conventional operating system, it is possible
-to use a *virtual machine monitor (VMM)* (or *hypervisor*)
-such as QEMU or VirtualBox to run another operating system in a *virtual machine*.
-Piety only uses Python, so a Python interpreter is the only
-VMM needed to run Piety.  The Python session is the entire virtual machine.
+to use a *virtual machine monitor (VMM)* (or *hypervisor*) such as QEMU or
+VirtualBox to run another operating system in a *virtual machine*. Piety
+only uses Python, so a Python interpreter is the only VMM needed to run
+Piety.  The Python session (including the Python language runtime support)
+is the entire virtual machine.
 
 - **kernel mode**: Piety does not distinguish kernel and user modes.
 All code, including applications, runs with the same privileges.

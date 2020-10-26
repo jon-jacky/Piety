@@ -25,16 +25,20 @@ operating system. We aim to see how far we can get with just Python.
 There is already a lot of work by others that we might be able to use or
 adapt (see [doc/utilities.md](doc/utilities.md)).
 
-For now, Piety runs in an ordinary Python interpreter session on a
-host operating system.  An overview of its design appears
-[here](doc/analogies.md).  We have a [script](scripts/demo.py) that
-demonstrates many Piety features, described
-[here](scripts/demo.md).  We plan to run Piety on a bare
-machine (or bare VM) with no other operating system, but only a Python
-interpreter with minimal support.
-There are only a few platform-dependent modules.  Most modules
-developed for Piety on a host operating system should also work on a
-bare machine.
+For now, Piety runs in an ordinary Python interpreter session on a host
+operating system.  The programmer's user interface to Piety is 
+[edsel](editors/edsel.md), a combined  display editor, shell, and window
+manager, which together provide a minimal but self-contained Python
+programming environment.  
+
+We plan to run Piety on a bare machine (or bare VM) with no other operating
+system, but only a Python interpreter with minimal support. There are only
+a few platform-dependent modules.  Most modules developed for Piety on a
+host operating system should also work on a bare machine.
+
+An overview of the Piety design appears [here](doc/analogies.md).  We have
+a [script](scripts/demo.py) that demonstrates many Piety features,
+described [here](scripts/demo.md).
 
 Piety might be used for ---
 
@@ -69,8 +73,8 @@ Alternatively, it might be possible to assemble similar functionality
 from [other projects](doc/utilities.md), but we expect the resulting
 system would be larger and harder to understand than Piety.
 
-Piety is written in Python 3 since June 2015.  Earlier work is saved
-in this repository in the *python2* tag.  The conversion is described
-[here](doc/python3.md).
+Piety is written in Python 3 since June 2015.   Earlier work is saved in
+this repository in the *python2* tag.  The conversion is described
+[here](doc/python3.md).   Piety now requires Python 3.5.
 
 Revised Jun 2020

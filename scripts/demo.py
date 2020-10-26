@@ -13,6 +13,8 @@ from session import pysh, ed, edda, edsel # Console jobs
 from session import jobs, fg # functions to type at Python command line
 from session import edm, frame # modules that contain data structures
 
+text = edm.text # abbreviation so we can use text without prefix
+
 # This assigment needed so code in frame can restore Console cursor
 #  after updates from background task
 # FIXME - This is not sufficiently general.
@@ -20,9 +22,10 @@ from session import edm, frame # modules that contain data structures
 #  Here we have just hard-coded it for the edsel Console.
 #  On each timestamp tick, edsel cursor will be restored
 #  but edda cursor will reset to start of line.
-edm.buffer.console = edsel # Console instance
+text.buffer.console = edsel # Console instance
 
-# Put some content in main buffer
+# Create the main buffer and add some content
+text.startup('main')
 edm.i('This is the main buffer')
 
 # create timestamp generators
@@ -37,8 +40,8 @@ edm.b('ts2')
 edm.b('main')
 
 # aliases for timestamp buffers
-ts1buf = edm.buffers['ts1']
-ts2buf = edm.buffers['ts2']
+ts1buf = text.buffers['ts1']
+ts2buf = text.buffers['ts2']
 
 # add content to timestamp buffers
 print(next(ts1), file=ts1buf)
