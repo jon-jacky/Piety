@@ -77,4 +77,4 @@ Piety is written in Python 3 since June 2015.   Earlier work is saved in
 this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).   Piety now requires Python 3.5.
 
-Revised Jun 2020
+Revised Oct 2020
