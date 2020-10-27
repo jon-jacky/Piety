@@ -26,7 +26,7 @@ nlines, ncols = terminal_util.dimensions()
 
 # Default frame dimensions, might be updated while running, especially cmd_h:
 frame_top = 1 # line number on display of first line of frame
-cmd_h = 2  # default height (lines) of scrolling command region at the bottom
+cmd_h = None  # assign from application's startup only if not already assigned
 
 # Assigned by scale()
 windows_h = None # total number of lines of all windows, including status lines
