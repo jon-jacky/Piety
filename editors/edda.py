@@ -100,7 +100,7 @@ process_line = samysh.add_command(edo.X_command(_process_line), _process_line)
 
 def startup(*filename, **options):
     'Configure ed for display editing, other startup chores'
-    cmd_h = 2
+    cmd_h = 2 if not frame.cmd_h else frame.cmd_h
     if 'c' in options:
         cmd_h = options['c']
     edo.startup(*filename, **options) # initialize text.buf etc.

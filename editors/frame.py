@@ -6,6 +6,9 @@ py - Multiwindow display implemented by a list of window instances,
 from enum import Enum
 import util, terminal, terminal_util, display, window
 
+# Hook for display updates from background tasks to restore cursor etc.
+console = None  # default: no updates from background tasks,no restore needed
+
 class Mode(Enum):
     """
     Mode.command when executing commands typed on the command line.
@@ -315,7 +318,7 @@ def status(buffer):
     if mode == Mode.command:
         put_command_cursor()
 
-def insert_other(buffer, start, end, column):
+def insert_other(buffer, start, end):
     """
     Insert text into buffer which might not be the current buffer.
     Search for windows (if any) which display that buffer.
@@ -327,6 +330,7 @@ def insert_other(buffer, start, end, column):
             w.saved_dot = w.buf.dot
             w.modify(start, end)
     # Now put the cursor back in focus window, or at command line
+    column = console.start_col + console.point if console else 0
     if mode == Mode.input: # can't put input cursor til other windows done
         win.put_cursor_for_input(column=column)
     elif mode == Mode.display:

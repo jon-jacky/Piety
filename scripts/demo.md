@@ -79,31 +79,35 @@ exclamation point on the command line by itself to switch to Python.)
 
  - *ts1task.enabled=alternate* - run *ts1task* handler on alternate timeout events
 
- - *piety.cycle.period=0.1* - cause *ts1* buffer to update ten times a second.  We have 
-     We have found that with *period=0.0001* -- 10,000 events/sec -- we can
-     still type comfortably in the *main* buffer, with no lost characters.
+ - *piety.cycle.period=0.1* - cause *ts1* buffer to update ten times a second.  We hav
 
  - *piety.cycle.period=1.0* - cause *ts1* buffer to resume updating once a second
 
  - *edm.a('append line after dot')* - or any other call from the *ed* API.
 
+With *piety.cycle.period=0.0001* -- 10,000 events/second -- we can type
+comfortably in the *main* buffer, with no lost characters -- although 
+cursor blinks furiously.   This is on an
+early 2011 MacBook Pro, 2.3 GHz Intel Core i5, 4 GB, OS X 10.11.6 El
+Capitan, with CPython 3.9.  Even with period 0.000001 we can type with
+no lost characters, display is updating at a blur (but probably not
+a million times a second).
 
 ### API and data structures ###
 
-You can access the editor API and data structures from the Python prompt
-by prefixing them with *edm.* ("*ed* module"): *edm.n()*, *edm.buffers* etc.
+You can access the editor API from the Python prompt
+by prefixing them with *edm.* ("*ed* module"): *edm.n()*, etc.
 We have to use this module name to distinguish it from the *ed* job.
+
+You can access the storage API and data structures by prefixing them 
+with *text.*: *text.buffers* etc.
 
 You can access the display API and data structures by prefixing them
 with *frame.*: *frame.windows* etc.
 
 ### Bugs ###
 
-The demonstration works as intended when you run the display editor
-*edsel*.  It does not work when you run the display editor *edda*.
-With *edda*, the cursor jumps to the beginning of the line
-on each timer tick.   A partial explanation appears in the
-comments in [demo.py](demo.py).   At this time we have not decided
-on the best solution for this.
+This demonstration works as described here when you run the display editor
+*edsel*, but not *edda*.  For now, *edsel* is hard-coded into the demo.
 
-Revised May 2019
+Revised Oct 2020

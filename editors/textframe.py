@@ -71,13 +71,13 @@ class BufferFrame(buffer_Buffer):
         super().insert(iline, lines)
         if displaying: frame.insert(iline, self.dot)          
 
-    def insert_other(self, iline, lines, column):
+    def insert_other(self, iline, lines):
         """
         Insert lines when this buffer is not the current buffer,
         for example when this buffer is updated by a background task.
         """
-        super().insert_other(iline, lines, column)
-        if displaying: frame.insert_other(self, iline, self.dot, column)          
+        super().insert_other(iline, lines)
+        if displaying: frame.insert_other(self, iline, self.dot)
 
     def r(self, iline, filename):
         'Read file contents into buffer after iline.'

@@ -5,9 +5,6 @@ buffer.py - Buffer class for line-oriented text editors.
 
 import os.path, re, textwrap
 
-# Hook for display updates from background tasks to restore cursor etc.
-console = None  # default: no updates from background tasks,no restore needed
-
 # used by search methods
 emptyline = '^\s*$'
 no_match = -99  # must be same as no_match in check.py
@@ -64,9 +61,7 @@ class Buffer(object):
             # ignore the end string, buffer lines must end with \n
             # self.lines.append(self.contents) # already  includes final'\n'
             # self.a(self.dot, self.contents) # append command, advances dot
-            self.insert_other(self.nlines()+1, self.contents.splitlines(True),
-                              console.start_col + console.point 
-                              if console else 0)
+            self.insert_other(self.nlines()+1, self.contents.splitlines(True))
         else:
             # store contents string until we get end string
             self.contents = s
@@ -187,7 +182,7 @@ class Buffer(object):
         """
         self.insert_lines(iline, lines)
 
-    def insert_other(self, iline, lines, column):
+    def insert_other(self, iline, lines):
         """
         Insert lines when this buffer is *not* the current buffer.
         If displaying, update other windows via wrapper but *not* focus window.

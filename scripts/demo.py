@@ -20,9 +20,9 @@ text = edm.text # abbreviation so we can use text without prefix
 # FIXME - This is not sufficiently general.
 #  This  is needed for each Console job when it reaches foreground.
 #  Here we have just hard-coded it for the edsel Console.
-#  On each timestamp tick, edsel cursor will be restored
+#  On each timestamp tick, edsel cursor will be restored to correct location,
 #  but edda cursor will reset to start of line.
-text.buffer.console = edsel # Console instance
+frame.console = edsel # Console instance
 
 # Create the main buffer and add some content
 text.startup('main')
