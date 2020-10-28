@@ -6,15 +6,12 @@ This is the *master* branch.
 
 When the *bimport* branch was merged recently, we finished the first stage
 of the Piety project.  We have provided all the features described in the
-[design document](doc/analogies.md).
-
-In the next phase, we will try to create, test, and run a nontrivial
-application, working only in [edsel](editors/edsel.md).  We will see if
-*edsel* really is usable as a standalone development environent.   We will
-make changes in *edsel* as needed  to support this.
-
-The application will be a text-only web browser that displays
-web pages in *edsel* windows.
+[design document](doc/analogies.md).  In the next phase, we will try to
+create, test, and run a nontrivial application, working only in
+[edsel](editors/edsel.md).  We will see if *edsel* really is usable as a
+standalone development environent.  We will make changes in *edsel* as
+needed  to support this.  The application will be a text-only web browser
+that displays web pages in *edsel* windows.
 
 Branches recently merged into *master*:
 
