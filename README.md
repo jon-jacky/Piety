@@ -38,7 +38,8 @@ host operating system should also work on a bare machine.
 
 An overview of the Piety design appears [here](doc/analogies.md).  We have
 a [script](scripts/demo.py) that demonstrates many Piety features,
-described [here](scripts/demo.md).
+described [here](scripts/demo.md).  Ongoing and recent work on Piety is
+described [here](BRANCH.md).
 
 Piety might be used for ---
 
@@ -58,13 +59,6 @@ Piety might be used for ---
 
 Another page describes the Piety [directories](DIRECTORIES.md) and
 their contents.
-
-An overview of the Piety design appears [here](doc/analogies.md).
-
-A [script](scripts/demo.py) that demonstrates many Piety
-features is described [here](scripts/demo.md).
-
-Ongoing and recent work on Piety is described [here](BRANCH.md).
 
 The Piety system has no dependencies, other than Python itself
 (including a few standard library modules).  This makes Piety a

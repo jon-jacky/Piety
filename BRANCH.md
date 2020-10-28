@@ -10,7 +10,7 @@ of the Piety project.  We have provided all the features described in the
 create, test, and run a nontrivial application, working only in
 [edsel](editors/edsel.md).  We will see if *edsel* really is usable as a
 standalone development environent.  We will make changes in *edsel* as
-needed  to support this.  The application will be a text-only web browser
+needed  to support this.  The application might be a text-only web browser
 that displays web pages in *edsel* windows.
 
 Branches recently merged into *master*:
