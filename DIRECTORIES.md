@@ -4,8 +4,6 @@ Piety directories
 
 The Piety repository is organized into these directories:
 
-- **applications**: small applications for demonstrating *piety.run*.
-
 - **asyncio**: Non-blocking event loop using Python 3 *asyncio*, used
    by *piety.run*.  An alternative to *select* (below).
 
@@ -23,6 +21,8 @@ The Piety repository is organized into these directories:
 - **piety**: defines *Task*, *Job*, *Session*, and imports *eventloop*, 
   which defines *schedule* and *run*, the non-blocking event loop.
   This is the core of the Piety operating system.
+
+- **samples**: small samples for demonstrating *piety.run*.
 
 - **scripts**: Python modules that test and demonstrate Piety,
     running applications as tasks or jobs with *piety.run*,
@@ -57,4 +57,5 @@ The Piety repository is organized into these directories:
 Each directory contains a *README* file with more information.
 Another page explains the [rationale](doc/modules.md) for this organization.
 
-Revised Jan 2018
+Revised Oct 2020
+

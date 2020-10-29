@@ -8,7 +8,7 @@ The shell command: tail -f w0.txt shows the t0 task in action.
 """
 
 import piety # for Piety Task class, schedule data structure etc.
-from writer import Writer # applications
+from writer import Writer # samples
 
 w0,w1 = Writer(fname='w0.txt'),Writer(fname='w1.txt')
 

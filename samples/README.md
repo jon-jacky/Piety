@@ -1,8 +1,8 @@
 
-applications
-============
+samples
+=======
 
-Small applications for demonstrating *piety.run*:
+Small samples for demonstrating *piety.run*:
 
 - **printer.py**: print to stdout or text buffers to demonstrate interleaving concurrency.
 
@@ -12,4 +12,4 @@ Small applications for demonstrating *piety.run*:
 
 - **writer.py**: write to files to demonstrate interleaving concurrency.
 
-Revised June 2016
+Revised Oct 2020

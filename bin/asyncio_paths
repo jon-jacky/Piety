@@ -12,5 +12,5 @@ export PATH=$PIETY/bin:$PIETY/scripts:$PATH
 # Python path for Piety on a Unix-like host with a VT100-compatible terminal
 #  and asyncio-based event loop.
 # For other platforms, replace unix, vt_terminal and/or select in this path.
-# Recall that scripts import from applications and editors
-export PYTHONPATH=$PIETY/scripts:$PIETY/applications:$PIETY/util:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shells:$PIETY/unix:$PIETY/vt_terminal:$PIETY/asyncio:$PIETY/wrappers:/users/jon/tao:$PYTHONPATH
+# Recall that scripts import from samples and editors
+export PYTHONPATH=$PIETY/scripts:$PIETY/samples:$PIETY/util:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shells:$PIETY/unix:$PIETY/vt_terminal:$PIETY/asyncio:$PIETY/wrappers:/users/jon/tao:$PYTHONPATH
