@@ -7,6 +7,8 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 """
 
 import ed, parse, check, pysh, samysh, wyshka, bufimport, shellcmd
+from contextlib import redirect_stdout
+
 text = ed.text # so we can use it without ed prefix
 bimport, breload, sh = bufimport.bimport, bufimport.breload, shellcmd.sh
 
@@ -50,7 +52,17 @@ def R(*args):
         pysh.execlines(text.buf.lines[start:end+1])
         print('%s, ran lines %d..%d using exec' % (text.current, start, end))
 
-parse.ed_cmds += 'PR' # so parse.command() recognizes new commands
+def T(*args):
+    """
+    Run Python statements in addressed lines using push,
+    redirect output to end of current buffer
+    """
+    valid, start, end, _, _ = check.irange(text.buf, args)
+    if valid: # includes start <= end, maybe not so for mark and dot
+        with redirect_stdout(text.buf):
+            pysh.pushlines(text.buf.lines[start:end+1])
+
+parse.ed_cmds += 'PRT' # so parse.command() recognizes new commands
 
 def do_command(line):
         'Add P and R commands to run Python statements'
@@ -63,6 +75,8 @@ def do_command(line):
             R(*args)
         elif cmd_name == 'P':
             P(*args)
+        elif cmd_name == 'T':
+            T(*args)
         else:
             ed.do_command(line)
 

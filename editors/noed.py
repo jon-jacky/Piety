@@ -3,7 +3,8 @@ noed.py - Pronounced "no ed".  Multi-buffer display editor with no
   command language or input other than the Python interpreter.
 
 Demonstrates that the text and display modules do not depend on any
-application.
+application.  All the functions and methods in the text, frame, textframe,
+buffer and window modules are available.  You can print directly to text buffers.
 
 Here is a sample session:
 
@@ -13,6 +14,7 @@ Here is a sample session:
 
 >>> text.buf.a(0, 'Here is a line of text') # append after line 0, at the top
 >>> text.buf.a(1, 'and another')            # append after line 1
+>>> print('Here is a third line', file=text.buf) # you can just print to a buffer
 >>> frame.restore()                       # restore full-screen scrolling
 >>> ^D
 

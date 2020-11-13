@@ -9,7 +9,7 @@ of the Piety project.  We have provided all the features described in the
 [design document](doc/analogies.md).  In the next phase, we will try to
 create, test, and run a nontrivial application, working only in
 [edsel](editors/edsel.md).  We will see if *edsel* really is usable as a
-standalone development environent.  We will make changes in *edsel* as
+standalone development environment.  We will make changes in *edsel* as
 needed  to support this.  A good application to try might be a text-only
 web browser that displays web pages in *edsel* windows.
 
