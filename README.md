@@ -31,10 +31,10 @@ operating system.  The programmer's user interface to Piety is
 manager, which together provide a minimal but self-contained Python
 programming environment.  
 
-We plan to run Piety on a bare machine (or bare VM) with no other operating
-system, but only a Python interpreter with minimal support. There are only
-a few platform-dependent modules.  Most modules developed for Piety on a
-host operating system should also work on a bare machine.
+We hope someday to run Piety on a bare machine (or bare VM) with no other
+operating system, but only a Python interpreter with minimal support.
+There are only a few platform-dependent modules.  Most modules developed
+for Piety on a host operating system should also work on a bare machine.
 
 An overview of the Piety design appears [here](doc/analogies.md).  We have
 a [script](scripts/demo.py) that demonstrates many Piety features,
@@ -71,4 +71,5 @@ Piety is written in Python 3 since June 2015.   Earlier work is saved in
 this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).   Piety now requires Python 3.5.
 
-Revised Oct 2020
+Revised Nov 2020
+

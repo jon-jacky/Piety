@@ -34,6 +34,10 @@ Piety system.   By providing text editing, a shell and a
 window manager, it comprises a minimal but self-contained Python 
 programming environment.
 
+*edsel** is most strongly influenced by *emacs*, and also by
+[Acme](http://acme.cat-v.org/) and [Oberon](http://www.projectoberon.com).
+All three combine a shell, editor, and tiling window manager.
+
 ## Running edsel ##
 
 **edsel** uses the same command line options and arguments as *edda*,
@@ -432,5 +436,5 @@ bound a command to every control character, so no more display editing
 commands can be added to *edsel*.  Any additional functionality must
 be provided at the command line, reached through *^X* or *^Z*.
 
-Revised Oct 2020
+Revised Nov 2020
 
