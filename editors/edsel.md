@@ -18,16 +18,14 @@ the cursor and  to select, cut, and paste text.
 easy access to both  Python and the editor command language, as well as 
 redirection and scripting.
 
-**edsel** divides the screen
-to show one or more editor windows at the top, and a
-command interpreter for editor commands or Python at the
-bottom.  You can edit modules and write them out, then use the
-Python interpreter to import or reload modules, call their functions,
-and inspect and update their data structures.
-Or, you can bypass the file system and run
-Python scripts directly from editor buffers, or execute Python
-statements from selected text in any buffer, or import or reload
-an entire module from a buffer.
+**edsel** divides the screen to show one or more editor windows at the
+top, and a command interpreter for editor commands or Python at the
+bottom.  You can edit modules and write them out, then use the Python
+interpreter to import or reload modules, call their functions, and inspect
+and update their data structures. Or, you can bypass the file system and
+run Python scripts directly from editor buffers, or execute Python
+statements from selected text in any buffer, or import or reload an entire
+module from a buffer.
 
 **edsel** serves as the programmers' user interface to the 
 Piety system.   By providing text editing, a shell and a 
@@ -177,12 +175,12 @@ In *edsel*, the window data structures must be prefixed by the *frame* module na
 *frame.win* is the current window, *frame.windows* is the list
 of windows, etc.
 
-In *edsel*, the text data structures must be prefixed by the *st*
+In *edsel*, the text data structures must be prefixed by the *text*
 module name: *text.buf* is the current buffer, *text.buffers* is the
 collection of buffers, etc.
 
 In *edsel*, *ed* data structures and calls to the *ed* API must be prefixed by
-the module name *ed.*  For example: *ed.current*, *ed.a('append line after dot')*,
+the module name *ed.*  For example: *ed.prompt*, *ed.a('append line after dot')*,
 etc.
 
 ## Using edsel commands ##
@@ -233,25 +231,25 @@ the range of lines affected by the command).
 
 The text *region* is defined by the line called the *mark*  and the 
 current line *dot*.  The region is the sequence of complete lines 
-beginning with (and including) mark, up to (but *not* including) dot.  To 
-select a region, put the cursor on the first line of the region and type 
-the command to set the mark:  *^@* (or *^-space*). The message *Mark set* 
-appears in the scrolling region at the bottom of the display. Then move 
-the cursor (which indicates dot) 
-down to the first line after the end of the region. As you move 
-the cursor, the end of the region moves also, always following one
-line behind dot.
+beginning with (and including) mark, up to (but *not* including) dot.  
 
-To see where the region begins, type *^Q*, which exchanges dot and mark,
-so the cursor (which is always at dot) goes to the line at the beginning
-of the region.  Then type *^Q* to exchange them again, so dot and the
-cursor return to the line after the end of the region.
+To select a region in display editing mode, put the cursor on the first
+line of the region and type  the command to set the mark:  *^@* (or
+*^-space*). The message *Mark set*  appears in the scrolling region at the
+bottom of the display. Then move  the cursor (which indicates dot)  down
+to the first line after the end of the region. As you move  the cursor,
+the end of the region moves also, always following one line behind dot.
 
-It is possible for dot to *precede* mark.  This can occur after you type
-*^Q* to exchange them.  In this situation, the region comprises exactly
-the same lines - but now it begins at dot and extends to the line before
-mark.  In display mode, commands that use the region, *^W* and *^Q*, work
-as well when dot precedes mark.
+To see where the region begins in display editing mode, type *^Q*, which
+exchanges dot and mark, so the cursor (which is always at dot) goes to the
+line at the beginning of the region.  Then type *^Q* to exchange them
+again, so dot and the cursor return to the line after the end of the
+region.
+
+You can also select a region in command mode.  Set the mark by using the
+*ed k* command  with the *@* label: *k@*.   This is how *ed* (and *edsel*)
+represent the mark internally: it has the line address *'@*.  The numerous
+*ed* commands that set dot define the other end of the region.
 
 In command mode, the text region defined by mark and dot is selected by
 the *[* character and can prefix any command.  For example, *[p* prints
@@ -265,12 +263,18 @@ same effect as it does after *^W*: it pastes the deleted region
 back into the buffer.   The *[y* command is similar to *[d*, except
 it copies the region into the cut buffer without deleting it.
 
-In command mode, the region address range *[* only  works when mark
-precedes dot, otherwise *edsel* prints *? address invalid*.
-
 When the region is moved, the mark (as well as marks set with the 
 *ed* *k* command) move with it.   So after cut and paste with
 *^W* and *^Y*, another *^W* cuts the region that was just pasted.
+
+It is possible for dot to *precede* mark.  This can occur after you type
+*^Q* to exchange them.  In this situation, the region comprises exactly
+the same lines - but now it begins at dot and extends to the line before
+mark.  In display mode, commands that use the region, *^W* and *^Q*, work
+as well when dot precedes mark.
+
+In command mode, the region address range *[* only  works when mark
+precedes dot, otherwise *edsel* prints *? address invalid*.
 
 There is no command to delete the mark.  The mark remains until the line
 that it indicates is deleted.
@@ -288,6 +292,12 @@ no mark.
 
 The paragraph range *]* is especially useful with the
 wrap, indent, and outdent commands *J*, *I*, and *O*. 
+
+Short Python function definitions are often written in a single paragraph.
+A new (or revised) function that is defined in a paragraph can be added
+(or updated) to the Python session by placing dot in that paragraph  (or
+in a blank line following it) and using the *]* address range with one of
+the commands to execute Python code: *]P* *]R* or *]T*.
 
 #### Cut and Paste ####
 
@@ -324,9 +334,9 @@ Then type the text of the new indented line.  To enter a sequence of lines with
 the same indentation, just type *tab* or *^I* at the beginning of each line
 to match the indentation of the preceding line, then type your text.
 
-To edit an indented line, type *^J* (jump to next word) at the beginning of the line.
-*edsel* places the cursor on the first non-blank character in the line.  Then edit
-the text of the indented line.
+To edit an indented line, type *^J* (jump to next word) at the beginning
+of the line. *edsel* places the cursor on the first non-blank character in
+the line.  Then edit the text of the indented line.
 
 To indent an existing block of text, use *^X* to select command mode,
 then type *I*, the *ed.py* indent command (capital *I*, the lowercase *i*
@@ -355,6 +365,7 @@ The left margin of all the wrapped lines is the made the same as the left
 margin of the first line in the selection.
 
 The default selection for the *J* command is *dot*, the current line.
+This is handy for wrapping lines that are too long.
 
 A convenient way to select the lines to wrap is to set the mark at the
 beginning of the region, then move the cursor to the line after the region.
