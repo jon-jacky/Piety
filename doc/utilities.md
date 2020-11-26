@@ -24,6 +24,7 @@ Python, or programmable in Python.
 | [PyPXE](https://github.com/psychomario/PyPXE) | Network | Source, API | "Pure Python2 PXE (DHCP/TFTP/HTTP) server", used for [network booting](http://networkboot.org/fundamentals/) |
 | [Pcapy](http://oss.coresecurity.com/projects/pcapy.html) | Network | Wrapper, API | "Pcapy is a Python extension module that interfaces with the [libpcap](http://www.tcpdump.org/) packet capture library. Pcapy enables python scripts to capture packets on the network."  Used by VNS [HTTPServer](https://github.com/dound/vns/blob/master/HTTPServer.py) (above). |
 | [Scapy](http://www.secdev.org/projects/scapy/), also [here](http://www.secdev.org/projects/scapy/doc/) and [here](http://www.secdev.org/projects/scapy/doc/usage.html#simple-one-liners) | Network | Wrapper, API | "Scapy is a powerful interactive packet manipulation program. It is able to forge or decode packets of a wide number of protocols, send them on the wire, capture them, match requests and replies, and much more." Uses [libpcap, libdnet, and their Python wrappers](http://www.secdev.org/projects/scapy/portability.html).  |
+| [Packet-Sniffer](https://github.com/EONRaider/Packet-Sniffer/ | Network | Source, API | "A simple pure-Python network packet sniffer" |
 | [pypacker](https://gitlab.com/mike01/pypacker) | Network | Source, API | " The fastest and simplest packet manipulation lib for Python", supports "sending/receiving packets on different layers and intercepting packets ... Easily create new protocols ..." "Pypacker is based on code of [dpkt](https://github.com/kbandla/dpkt) ..." |
 | [paramiko](http://www.lag.net/paramiko/), also [here](https://github.com/paramiko/paramiko) and [here](http://docs.paramiko.org/) | Network | Source, API | "paramiko is a module for python 2.2 (or higher) that implements the SSH2 protocol for secure (encrypted and authenticated) connections to remote machines." "It is written entirely in python (no C or platform-dependent code) ..." |
 | [x84](https://github.com/jquast/x84/), also [docs](http://x84.readthedocs.org/en/latest/index.html) | Telnet/ssh server | Source, API | "supplies a scripting engine for developing character-at a time telnet or ssh server, such as MUD or BBS systems", "communication between sessions is provided through an event queuing framework", uses *miniboa*, *blessed*, *sqlitedict*, *paramiko*, and *web.py* |
@@ -109,3 +110,6 @@ The component is a database whose query language is provided as a Python API.
 * **Client**
 The component is a server that communicates using a protocol that has
 a Python API.
+
+Revised Nov 2020
+
