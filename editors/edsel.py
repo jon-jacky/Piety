@@ -7,10 +7,11 @@ import re
 import util, terminal
 import keyboard, console, check, edda, pysh, wyshka, samysh
 
-ed = edda.edo.ed    # use ed, frame, st APIs without prefix
+edo = edda.edo # use edo, ed, text, frame etc. APIs without prefix
+ed = edo.ed    
 text = ed.text
 frame = edda.frame
-bimport, breload, sh = edda.bimport, edda.breload, edda.sh
+bimport, breload, sh = edo.bimport, edo.breload, edo.sh
 
 next_text = re.compile(r'\s\S') # White space char then non-white space char
 
@@ -294,6 +295,7 @@ class Console(console.Console):
         """
         Run Python statements in current selection (mark to dot).
         If there is no current selection, just run the current line.
+        Writes output to stdout, usually the scrolling command region
         """
         if '@' in text.buf.mark:
             start = text.buf.mark['@']
@@ -313,6 +315,22 @@ class Console(console.Console):
             terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()
 
+    def runlines_buf(self):
+        """
+        Run Python statements in current selection (mark to dot).
+        If there is no current selection, just run the current line.
+        Redirects output to end of current buffer.
+        """
+        if '@' in text.buf.mark:
+            start = text.buf.mark['@']
+            end = text.buf.dot
+            if start > end:
+                start, end = end, start
+            end -= 1 # exclude last line, dot (usually) or mark
+        else:
+            start = end = text.buf.dot
+        edo.T(start, end) # FIXME - args correct?
+         
     def init_edsel_keymaps(self):
         self.display_keys = {
             keyboard.C_c: self.page_up,
@@ -326,7 +344,7 @@ class Console(console.Console):
             keyboard.C_q: self.exchange,
             keyboard.C_r: self.rsearch,
             keyboard.C_s: self.search,
-            keyboard.C_t: self.runlines, # overrides base class ^T status
+            keyboard.C_t: self.runlines_buf, # overrides base class ^T status
             keyboard.C_u: self.discard,
             keyboard.C_v: self.page_down,
             keyboard.C_w: self.cut,

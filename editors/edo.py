@@ -7,7 +7,7 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 """
 
 import ed, parse, check, pysh, samysh, wyshka, bufimport, shellcmd
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, redirect_stderr
 
 text = ed.text # so we can use it without ed prefix
 bimport, breload, sh = bufimport.bimport, bufimport.breload, shellcmd.sh
@@ -55,13 +55,19 @@ def R(*args):
 def T(*args):
     """
     Run Python statements in addressed lines using push,
-    redirect output to end of current buffer
+    redirect output to end of current buffer, advance to next line
     """
     valid, start, end, _, _ = check.irange(text.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
         with redirect_stdout(text.buf):
-            pysh.pushlines(text.buf.lines[start:end+1])
-
+            # with redirect_stderr(text.buf): # FIXME - doesn't work
+                pysh.pushlines(text.buf.lines[start:end+1])
+    # Append new empty line and put dot there to make it easy to add new text.
+    text.buf.a(text.buf.dot, '\n')
+    # Also put mark there to make it easy to select the new text.
+    # Everything you type after the last batch of output is selected.
+    text.buf.mark['@'] = text.buf.dot
+        
 parse.ed_cmds += 'PRT' # so parse.command() recognizes new commands
 
 def do_command(line):
