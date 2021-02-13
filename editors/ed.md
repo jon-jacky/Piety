@@ -466,7 +466,7 @@ Python API described above.  **ed.py** reads and writes at the
 console, but does not directly update buffers or access files.
 
 **ed.py** imports the *text.py* module, which provides the collection
-of buffers.  The *storge.py* module imports the *buffer.py* module, which
+of buffers.  The *text.py* module imports the *buffer.py* module, which
 provides the *Buffer* class, which defines the core data structure and the
 internal API for updating it.  Many *Buffer* methods correspond to
 functions in the API, but in *Buffer* each method has a fixed argument

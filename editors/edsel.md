@@ -284,7 +284,7 @@ that it indicates is deleted.
 Sometimes you want to perform an operation on the entire paragraph that
 contains dot: all the lines up to the nearest preceding empty line, and
 down to the nearest following empty line.  Or, if the current line is
-empty, you want to opeerate on the preceding paragraph.
+empty, you want to operate on the preceding paragraph.
 
 It is not necessary to set the mark to operate on the current paragraph.
 The  *]* address range indicates the current paragraph, even when there is

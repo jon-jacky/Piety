@@ -77,6 +77,9 @@ current line.
 
 - *R*: Execute selected lines using the builtin *exec* function.
 
+- *T*: Execute selected lines using the *push* method, append output 
+to the end of buffer.  
+
 We provide both *P* and *R* commands because the behavior of *push* and *exec*
 are different. *P* treats the lines of code the same as the interactive Python
 interpreter. It prints the values of expressions even without any explicit
@@ -88,13 +91,34 @@ code instead of reporting an error. It runs any valid Python code, but does not
 print the values of expressions it evaluates unless there is an explicity
 *print* call.
 
+The *P* and *R* commands print any output from the Python code in the
+scrolling command region.   The *T* command prints the output at the end
+of the buffer (the same buffer containing the code) even if the selected
+code is not at the end of the buffer.  
+
+If the Python code crashes, the *P* and *T* commands print any traceback
+etc. in the scrolling command region; the *R* command causes the whole
+session  to crash.
+
+The *T* command, after it prints the output from the selected Python code
+at the end of the buffer, also adds a new empty line to end of buffer
+and sets mark and dot there.  Then new lines typed at the end of the buffer
+advance dot but leave the mark, so the new lines form a region from mark
+to dot.  After typing RET at the end of the last new line, the command [T
+will execute all the lines entered since the previous T command output.
+
 ## Importing and reloading Python modules ##
 
 **edo.py** provides Python functions to import or reload a module directly
 from  a text buffer, so it is not necessary to save the buffer contents to
-a file first.  The function call *bimport()* imports the current buffer,
-and  *breload()* reloads it.  These function calls can be typed at the
-*wyshka* shell, like any other Python statements.
+a file first:
+
+- *bimport()* imports the current buffer
+
+- *breload()* reloads the current buffer
+
+These function calls can be typed at the *wyshka* shell, like any other
+Python statements.
 
 ## Using the system shell ##
 
@@ -205,5 +229,5 @@ The **[edda](edda.md)** display editor imports *edo.py*.
 
 The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
-Revised Oct 2020
+Revised Feb 2021
 
