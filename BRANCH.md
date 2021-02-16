@@ -2,16 +2,11 @@
 branches
 ========
 
-This is the *master* branch.  
+This is the *metakey* branch.  
 
-When the *bimport* branch was merged recently, we finished the first stage
-of the Piety project.  We have provided all the features described in the
-[design document](doc/analogies.md).  In the next phase, we will try to
-create, test, and run a nontrivial application, working only in
-[edsel](editors/edsel.md).  We will see if *edsel* really is usable as a
-standalone development environment.  We will make changes in *edsel* as
-needed  to support this.  A good application to try might be a text-only
-web browser that displays web pages in *edsel* windows.
+-- **metakey**.  Support the *Meta* key modifier, often
+provided by the *Alt* key on the keyboard.  Add Meta key commands 
+similar to those in Emacs.  Begun 15 Feb 2021.
 
 Branches recently merged into *master*:
 
@@ -22,6 +17,10 @@ out to a file.  Add the *shellcmd* module with a function to run
 a system shell command.  Revise the *wyshka* module to use the  new *text*
 module instead of *ed*, completing the work of the previous two branches.
 Begun Oct 8 2020.
+
+When the *bimport* branch was merged, we finished the first stage
+of the Piety project.  We have provided all the features described in the
+[design document](doc/analogies.md).  
 
 - **textframe**.  Merged Oct 8 2020.
 Rename the *storage* module to *text*.  This name
@@ -186,5 +185,6 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Oct 2020
+Revised Feb 2021
+
 
