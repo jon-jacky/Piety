@@ -4,9 +4,9 @@ branches
 
 This is the *metakey* branch.  
 
-- **metakey**.  Support the *Meta* key modifier, often
-provided by the *Alt* key on the keyboard.  Add Meta key commands 
-similar to those in Emacs.  Begun 15 Feb 2021.
+- **metakey**.  Support the *Meta* key modifier, often provided by the
+*Alt* key on the keyboard.  Add Meta key editing commands  similar to
+those in *readline* and *Emacs*.  Begun 15 Feb 2021.
 
 Branches recently merged into *master*:
 
