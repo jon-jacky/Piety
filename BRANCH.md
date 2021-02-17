@@ -8,16 +8,28 @@ This is the *metakey* branch.
 *Alt* key on the keyboard.  Add Meta key editing commands  similar to
 those in *readline* and *Emacs*.  Begun 15 Feb 2021.
 
+Recent work in the *master* branch:
+
+- Feb 2021.  Add the *T* command to *edo*.   It executes the selected
+  lines with with the Python interpreter, appends the output to the buffer,
+  adds a new line after that and places *mark* and *dot* there. Subsequent
+  typing advances dot but leaves mark, so all text typed after the last 
+  Python output is in the selection region, ready to be executed by *]T*
+  The *edsel* *^T* command invokes *edo* *T*.  These turn any buffer into 
+  a Python REPL.
+
+  There are some inconveniences with *T*.  Error output still appears in the
+  scrolling region, not the buffer.  Some Python output appears in very long
+  lines that are not automatically wrapped.
+
 Branches recently merged into *master*:
 
-- **bimport**.  Merged 26 Oct 2020.
-
-  Add the the *bufimport* module with functions to import or reload a
-  module directly from a text buffer, without having to write it out to a
-  file.  Add the *shellcmd* module with a function to run a system shell
-  command.  Revise the *wyshka* module to use the  new *text* module
-  instead of *ed*, completing the work of the previous two branches.
-  Begun Oct 8 2020.
+- **bimport**.  Merged 26 Oct 2020. Add the the *bufimport* module 
+  with functions to import or reload a module directly from a text buffer,
+  without having to write it out to a file.  Add the *shellcmd* module
+  with a function to run a system shell command.  Revise the *wyshka*
+  module to use the  new *text* module instead of *ed*, completing the
+  work of the previous two branches. Begun Oct 8 2020.
 
   When the *bimport* branch was merged, we finished the first stage of
   the Piety project.  We have provided all the features described in the

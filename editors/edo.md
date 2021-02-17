@@ -103,9 +103,13 @@ session  to crash.
 The *T* command, after it prints the output from the selected Python code
 at the end of the buffer, also adds a new empty line to end of buffer
 and sets mark and dot there.  Then new lines typed at the end of the buffer
-advance dot but leave the mark, so the new lines form a region from mark
-to dot.  After typing RET at the end of the last new line, the command [T
-will execute all the lines entered since the previous T command output.
+advance dot but leave the mark, so all text typed after the last Python output
+is in the selection region, ready to be executed by *]T*.   The *edsel* *^T*
+command invokes *edo* *T*.  These turn any buffer into a Python REPL.
+
+There are some inconveniences with *T*.  Error output still appears in the
+scrolling region, not the buffer.  Some Python output appears in very long
+lines that are not automatically wrapped.
 
 ## Importing and reloading Python modules ##
 
