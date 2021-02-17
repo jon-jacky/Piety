@@ -15,12 +15,14 @@ Recent work in the *master* branch:
   adds a new line after that and places *mark* and *dot* there. Subsequent
   typing advances dot but leaves mark, so all text typed after the last 
   Python output is in the selection region, ready to be executed by *]T*.
-  The *edsel* *^T* command invokes *edo* *T*.  These turn any buffer into 
-  a Python REPL.
+  The *edsel* *^T* command invokes *edo* *T* on the selected lines.
+  These commands turn any buffer into a Python REPL.
 
   There are some inconveniences with *T*.  Error output still appears in the
   scrolling region, not the buffer.  Some Python output appears in very long
   lines that are not automatically wrapped.
+
+  Oct 2020.  Rename *Piety/applications* directory to *samples*.
 
 Branches recently merged into *master*:
 
