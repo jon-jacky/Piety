@@ -14,7 +14,7 @@ Recent work in the *master* branch:
   lines with with the Python interpreter, appends the output to the buffer,
   adds a new line after that and places *mark* and *dot* there. Subsequent
   typing advances dot but leaves mark, so all text typed after the last 
-  Python output is in the selection region, ready to be executed by *]T*
+  Python output is in the selection region, ready to be executed by *]T*.
   The *edsel* *^T* command invokes *edo* *T*.  These turn any buffer into 
   a Python REPL.
 
