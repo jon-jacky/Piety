@@ -6,7 +6,7 @@ etty.py - Run ed line editor session, but use console module instead
 To use the ed API from the Python prompt, use prefix as in etty.ed.p()
 """
 
-import util, terminal, keyboard, ed, console
+import util, terminal, key, ed, console
 
 class Console(console.Console):
     'Console subclass that adds methods and keymaps for printing terminals'
@@ -55,22 +55,22 @@ class Console(console.Console):
         # This keymap works on a printing terminal.
         self.tty_input_keymap = {
             console.printable: self.append_char, 
-            keyboard.cr: self.accept_line,
-            keyboard.C_c: self.interrupt,
+            key.cr: self.accept_line,
+            key.C_c: self.interrupt,
             # Rudimentary in-line editing, just delete last char in line
-            keyboard.bs: self.backward_delete_last_char,
-            keyboard.delete: self.backward_delete_last_char,
+            key.bs: self.backward_delete_last_char,
+            key.delete: self.backward_delete_last_char,
             # Show the line, useful after several edits
-            keyboard.C_l: self.redraw_tty,
-            keyboard.C_u: self.discard_tty,
+            key.C_l: self.redraw_tty,
+            key.C_u: self.discard_tty,
         }
 
         # This keymap works on a printing terminal with no arrow keys.
         self.tty_command_keys = {
             # Any keycode that maps to accept_command is a command terminator.
-            keyboard.cr: self.accept_command, # add to history, possibly exit
-            keyboard.C_n: self.next_history_tty,
-            keyboard.C_p: self.previous_history_tty,
+            key.cr: self.accept_command, # add to history, possibly exit
+            key.C_n: self.next_history_tty,
+            key.C_p: self.previous_history_tty,
             }
 
         # This combined keymap works on a printing terminal.

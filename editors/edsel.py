@@ -5,7 +5,7 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import keyboard, console, check, edda, pysh, wyshka, samysh
+import key, console, check, edda, pysh, wyshka, samysh
 
 edo = edda.edo # use edo, ed, text, frame etc. APIs without prefix
 ed = edo.ed    
@@ -69,7 +69,7 @@ class Console(console.Console):
         prefix = self.line[:self.point]
         suffix = self.line[self.point:].rstrip('\n')
         text.buf.replace(text.buf.dot, prefix + '\n')
-        self.kill_line() # from cursor to end of line
+        self.display_kill_line() # from cursor to end of line
         text.buf.a(text.buf.dot, suffix + '\n') # calls frame.insert()
         self.line = suffix
         self.point = 0
@@ -284,7 +284,7 @@ class Console(console.Console):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         self.move_beginning()
-        self.kill_line()
+        self.display_kill_line()
         self.set_display_mode(text.buf.lines[text.buf.dot].rstrip('\n'))
 
     def crash(self):
@@ -333,37 +333,37 @@ class Console(console.Console):
          
     def init_edsel_keymaps(self):
         self.display_keys = {
-            keyboard.C_c: self.page_up,
-            keyboard.C_d: self.del_or_join_next,
-            # keyboard.C_k: self.crash, # FIXME? Now ^K is kill
-            keyboard.C_k: self.kill,
-            keyboard.C_l: self.refresh,
-            keyboard.C_n: self.next_line,
-            keyboard.C_o: self.other_window,
-            keyboard.C_p: self.prev_line,
-            keyboard.C_q: self.exchange,
-            keyboard.C_r: self.rsearch,
-            keyboard.C_s: self.search,
-            keyboard.C_t: self.runlines_buf, # overrides base class ^T status
-            keyboard.C_u: self.discard,
-            keyboard.C_v: self.page_down,
-            keyboard.C_w: self.cut,
-            keyboard.C_x: self.execute,
-            keyboard.C_y: self.yank,
-            keyboard.C_z: self.set_command_mode,
+            key.C_c: self.page_up,
+            key.C_d: self.del_or_join_next,
+            # key.C_k: self.crash, # FIXME? Now ^K is kill
+            key.C_k: self.kill,
+            key.C_l: self.refresh,
+            key.C_n: self.next_line,
+            key.C_o: self.other_window,
+            key.C_p: self.prev_line,
+            key.C_q: self.exchange,
+            key.C_r: self.rsearch,
+            key.C_s: self.search,
+            key.C_t: self.runlines_buf, # overrides base class ^T status
+            key.C_u: self.discard,
+            key.C_v: self.page_down,
+            key.C_w: self.cut,
+            key.C_x: self.execute,
+            key.C_y: self.yank,
+            key.C_z: self.set_command_mode,
             # ^space also works as ^@ on many terminals
-            keyboard.C_at: self.set_mark,
-            keyboard.cr: self.open_line,
-            keyboard.up: self.prev_line,
-            keyboard.down: self.next_line,
-            keyboard.bs: self.del_or_join_prev,
-            keyboard.delete: self.del_or_join_prev,
+            key.C_at: self.set_mark,
+            key.cr: self.open_line,
+            key.up: self.prev_line,
+            key.down: self.next_line,
+            key.bs: self.del_or_join_prev,
+            key.delete: self.del_or_join_prev,
             }
         self.display_keymap = self.input_keymap.copy()# FIXME? Why?
         self.display_keymap.update(self.display_keys) # override some keys
         self.edsel_command_keys = {
-            keyboard.C_g: self.cancel_edsel_command,
-            keyboard.cr: self.accept_edsel_command,
+            key.C_g: self.cancel_edsel_command,
+            key.cr: self.accept_edsel_command,
             }
         # Be sure to preserve console command_keymap, we stil use it
         self.edsel_command_keymap = self.command_keymap.copy()

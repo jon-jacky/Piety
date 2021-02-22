@@ -6,18 +6,21 @@ console.py - Console class, a wrapper that adapts console applications
 """
 
 import sys, string, re
-import util, terminal, keyboard, display, key
+import util, terminal, key, getkey, display
 from piety import State
 
 # used by keymaps, below
 printable = 'a' # proxy in keymaps for all printable characters
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
+
+# used by forward word, backward word
 next_word = re.compile(r'\W\w') # Non-word char then word char
+prev_word = re.compile(r'\w\W') # Word char then non-word char
 
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
     def __init__(self, name=__module__,
-                 prompt=(lambda: ''), reader=key.Key(),
+                 prompt=(lambda: ''), reader=getkey.getkey,
                  process_line=(lambda line: None),
                  stopped=(lambda line: False),
                  startup=(lambda: None), cleanup=(lambda: None),
@@ -37,8 +40,11 @@ class Console(object):
         might be a single character or several (an escape sequence,
         for example).  Takes no arguments and returns a keycode, or
         returns empty string '' to indicate char was received but
-        keycode is incomplete.  Default is key.Key(), handles single
-        characters and a few ANSI escape sequences.
+        keycode is incomplete.  Default is getkey.getkey, handles single
+        characters, control characters (typed with control key modifier),
+        meta characters (typed with alt key modifier, or prefixed by escape
+        key) and a few simple ANSI escape sequences (arrow keys and any
+        other sequences with just one character following esc-[).
 
         process_line - callable to process a line, for example to
         execute a command or add text to a buffer.  Takes one
@@ -108,7 +114,7 @@ class Console(object):
     def run(self, *args, **kwargs):
         """
         Console event loop - run a single Console instance as an application.
-        For testing only; handler() blocks, can only run one Console at a time.
+        handler() blocks, so this can only run one Console instance at a time.
         """
         self.main(*args, **kwargs)
         while not self.stopped():
@@ -126,7 +132,7 @@ class Console(object):
             method = self.keymap()[keycode]
             method()
         elif keycode:
-            util.putstr(keyboard.bel) # sound indicates no handler
+            util.putstr(key.bel) # sound indicates no handler
         else:
             pass # incomplete or unrecognized keycode, do nothing
 
@@ -155,7 +161,7 @@ class Console(object):
             util.putstr('^Z\rStopped') # still in raw mode
             self.stop()
         else:
-            util.putstr(keyboard.bel) # sound indicates no handler
+            util.putstr(key.bel) # sound indicates no handler
 
     # ^C exit is more drastic than job control, exits to top-level Python
 
@@ -291,24 +297,47 @@ class Console(object):
             self.point = m.start()+1
             self.move_to_point()
 
-    def kill_line(self):
+    def forward_word(self):
+        'Move to next beginning of word, not next char (space) after word'
+        m = next_word.search(self.line, self.point)
+        if m:
+            self.point = m.start()+1
+            self.move_to_point()
+
+    def backward_word(self):
+        'Move to beginning of previous word, not space preceding word'
+        # reverse line from start to point, search for word/non-word boundary
+        m = prev_word.search(self.line[self.point-1::-1],0)
+        if m:
+            self.point = self.point-1 - m.start()
+            self.move_to_point()
+
+    def display_kill_line(self):
         'Wrap display.kill_line so clients do not have to import display'
         display.kill_line()
+
+    def kill_line(self):
+        'Delete line from point to end-of-line, save in yank buffer'
+        killed_segment = self.line[self.point:]
+        if killed_segment: # Do not overwrite yank buffer with empty segment
+            self.yank_buffer = killed_segment
+        self.line = self.line[:self.point] # point does not change
+        self.display_kill_line()
+
+    def kill_word(self):
+        'Delete word to beginning of next word, save in yank buffer'
+        m = next_word.search(self.line, self.point)
+        if m:
+            self.yank_buffer = self.line[self.point:m.start()+1]
+            self.line = self.line[:self.point] + self.line[m.start():]
+            display.delete_nchars(self.point - (m.start()+1))
 
     def redraw(self):
         'Refresh line'
         display.move_to_column(self.start_col)
         self.point = len(self.line)
         util.putstr(self.line)
-        self.kill_line() # remove any leftover text past self.line
-
-    def kill(self):
-        'Delete line from point to end-of-line'
-        killed_segment = self.line[self.point:]
-        if killed_segment: # Do not overwrite yank buffer with empty segment
-            self.yank_buffer = killed_segment
-        self.line = self.line[:self.point] # point does not change
-        self.kill_line()
+        self.display_kill_line() # remove any leftover text past self.line
 
     def discard(self): # name like gnu readline unix-line-discard
         'Delete line from start-of-line to point'
@@ -318,7 +347,7 @@ class Console(object):
         self.line = self.line[self.point:]
         self.move_beginning() # accounts for prompt, assigns point
         util.putstr(self.line)
-        self.kill_line() # remove any leftover text past self.line
+        self.display_kill_line() # remove any leftover text past self.line
         self.move_beginning() # replace cursor again
  
     def yank(self):
@@ -368,54 +397,62 @@ class Console(object):
             printable: self.insert_char,
 
             # any keycode that maps to accept_line exits from line entry/edit
-            keyboard.cr: self.accept_line, # but don't add to history, C_m
-            keyboard.C_c: self.interrupt,
+            key.cr: self.accept_line, # but don't add to history, C_m
+            key.C_c: self.interrupt,
 
             # line editing
-            keyboard.bs: self.backward_delete_char, # C_h
-            keyboard.delete: self.backward_delete_char,
-            keyboard.htab: self.tab, # C_i
-            keyboard.C_a: self.move_beginning,
-            keyboard.C_b: self.backward_char,
-            keyboard.C_d: self.delete_char,
-            keyboard.C_e: self.move_end,
-            keyboard.C_f: self.forward_char,
-            # keyboard.C_h is keyboard.bs above
-            # keyboard.C_i: self.tab, # C_i is htab above
-            keyboard.C_j: self.forward_word,
-            keyboard.C_k: self.kill,
-            keyboard.C_l: self.redraw,
-            # keyboard.C_m is keyboard.cr above
-            keyboard.C_t: self.status,
-            keyboard.C_u: self.discard,
-            keyboard.C_y: self.yank,
+            # C_a etc. are typed with control key modifier, also called ^a etc.
+            key.bs: self.backward_delete_char, # C_h
+            key.delete: self.backward_delete_char,
+            key.htab: self.tab, # C_i
+            key.C_a: self.move_beginning,
+            key.C_b: self.backward_char,
+            key.C_d: self.delete_char,
+            key.C_e: self.move_end,
+            key.C_f: self.forward_char,
+            # key.C_h is key.bs above
+            # key.C_i: self.tab, # C_i is htab above
+            key.C_k: self.kill_line,
+            key.C_l: self.redraw,
+            # key.C_m is key.cr above
+            key.C_t: self.status,
+            key.C_u: self.discard,
+            key.C_y: self.yank,
+
+            # Meta keys typed with alt key modifer, prefixed with esc character
+            # require keyboard that sends ESC char before alt-modified keys
+            # and keyboard reader that handles two-character keycodes
+            key.M_f: self.forward_word,
+            key.M_b: self.backward_word,
+            key.M_d: self.kill_word,
+
             # These keys are multicharacter control sequences
             # require keyboard that sends ANSI control sequences
             # and keyboard reader that handles multicharacter keycodes
-            keyboard.right: self.forward_char,
-            keyboard.left: self.backward_char,
+            key.right: self.forward_char,
+            key.left: self.backward_char,
             }
 
         # These keys are active in ed (etc.) command mode. 
         # This command mode keymap requires a video terminal with arrow keys.
         self.command_keys = {
             # Any keycode that maps to accept_command is a command terminator.
-            keyboard.cr: self.accept_command, # C_m, add to history, possibly exit
-            keyboard.C_n: self.next_history,
-            keyboard.C_p: self.previous_history,
-            keyboard.up: self.previous_history,
-            keyboard.down: self.next_history,
+            key.cr: self.accept_command, # C_m, add to history, possibly exit
+            key.C_n: self.next_history,
+            key.C_p: self.previous_history,
+            key.up: self.previous_history,
+            key.down: self.next_history,
         }
 
         # These keys have job ctrl function only when alone at start of line
         # in cmd mode. Otherwise they can edit - C_d appears in input_keymap.
         self.job_control_keys = {
-            keyboard.C_d: self.ctrl_d,
-            keyboard.C_z: self.ctrl_z,
+            key.C_d: self.ctrl_d,
+            key.C_z: self.ctrl_z,
             }
 
         # Combine the keymaps - command mode adds several keys to input mode,
-        #  also reassigns method for keyboard.cr (RET key).
+        #  also reassigns method for key.cr (RET key).
         # job_control_keys replaces ^D del in input_keymap with eof
         #  and adds ^Z suspend.
         # This keymap is the default that __init__ assigns to self.keymap.

@@ -1,5 +1,5 @@
 """
-keyboard.py - ASCII and ANSI control codes for the terminal keyboard
+key.py - ASCII and ANSI control codes for the terminal keyboard
 
 ASCII control codes
  http://en.wikipedia.org/wiki/ASCII#ASCII_control_characters
@@ -61,9 +61,39 @@ C_y = '\x19' # ^Y, em
 C_z = '\x1a' # ^Z, sub
 C_space = '\x99' # placeholder for'\x0' # ^space, alias for ^@, nul
 
-# ANSI codes for arrow keys
+# Define Meta keys, prefixed with esc
 
 esc = '\x1B'  # \e does not work 'invalid \x escape'
+
+M_a = esc + 'a'
+M_b = esc + 'b'
+M_c = esc + 'c'
+M_d = esc + 'd'
+M_e = esc + 'e'
+M_f = esc + 'f'
+M_g = esc + 'g'
+M_h = esc + 'h'
+M_i = esc + 'i'
+M_j = esc + 'j'
+M_k = esc + 'k'
+M_l = esc + 'l'
+M_m = esc + 'm'
+M_n = esc + 'n'
+M_o = esc + 'o'
+M_p = esc + 'p'
+M_q = esc + 'q'
+M_r = esc + 'r'
+M_s = esc + 's'
+M_t = esc + 't'
+M_u = esc + 'u'
+M_v = esc + 'v'
+M_w = esc + 'w'
+M_x = esc + 'x'
+M_y = esc + 'y'
+M_z = esc + 'z'
+
+# ANSI codes for arrow keys
+
 csi = esc+'[' # ANSI control sequence introducer
 
 up =    csi+'A'  # cursor up, default 1 char

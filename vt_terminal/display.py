@@ -73,6 +73,10 @@ def delete_char():
     'Delete character under the cursor'
     putstr(dch % 1)
 
+def delete_nchars(n):
+    'Delete n characters under, then after the cursor'
+    putstr(dch % n)    
+
 def backward_delete_char():
     'Delete character before cursor'
     putstr(cub + dch % 1)
