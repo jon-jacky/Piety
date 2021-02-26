@@ -145,6 +145,14 @@ class Console(console.Console):
         dest = max(text.buf.dot - frame.win.nlines + 1, 1)
         self.goto_line(dest, self.point)
 
+    def top(self):
+        'Move cursor to first line (top) of buffer'
+        self.goto_line(1, 1)
+
+    def bottom(self):
+        'Move cursor to last line (bottom) of buffer'
+        self.goto_line(text.buf.nlines(), 1)
+
     def search(self):
         'Search forward for previous search string.'
         self.goto_line(text.buf.F(''), self.point)
@@ -185,8 +193,8 @@ class Console(console.Console):
         else:
             frame.put_message('? No mark')
 
-    def kill(self):
-        super().kill()
+    def kill_line(self):
+        super().kill_line()
         if not ed.command_mode:
             text.buffer.Buffer.yank_lines = False
             text.buf.modified = True
@@ -237,7 +245,7 @@ class Console(console.Console):
         text.buf.replace(text.buf.dot, self.line + '\n') # from goto_line
         edda.o() # call frame.next() then reassign win, text.buf, text.current
         self.line = text.buf.lines[text.buf.dot].rstrip('\n') # from several methods
-        # From set_display_mode
+
         self.point = 0
         self.start_col = 1
         frame.put_display_cursor()
@@ -333,10 +341,9 @@ class Console(console.Console):
          
     def init_edsel_keymaps(self):
         self.display_keys = {
-            key.C_c: self.page_up,
             key.C_d: self.del_or_join_next,
             # key.C_k: self.crash, # FIXME? Now ^K is kill
-            key.C_k: self.kill,
+            key.C_k: self.kill_line,
             key.C_l: self.refresh,
             key.C_n: self.next_line,
             key.C_o: self.other_window,
@@ -348,9 +355,14 @@ class Console(console.Console):
             key.C_u: self.discard,
             key.C_v: self.page_down,
             key.C_w: self.cut,
-            key.C_x: self.execute,
             key.C_y: self.yank,
             key.C_z: self.set_command_mode,
+
+            key.M_v: self.page_up,
+            key.M_x: self.execute,
+            key.M_lt: self.top,    # lt is <
+            key.M_gt: self.bottom, # gt is >
+
             # ^space also works as ^@ on many terminals
             key.C_at: self.set_mark,
             key.cr: self.open_line,

@@ -92,6 +92,9 @@ M_x = esc + 'x'
 M_y = esc + 'y'
 M_z = esc + 'z'
 
+M_lt = esc + '<'
+M_gt = esc + '>'
+
 # ANSI codes for arrow keys
 
 csi = esc+'[' # ANSI control sequence introducer
