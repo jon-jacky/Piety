@@ -153,6 +153,13 @@ class Console(console.Console):
         'Move cursor to last line (bottom) of buffer'
         self.goto_line(text.buf.nlines(), 1)
 
+    def fill(self):
+        'Fill paragraph'
+        text.buf.J(text.buf.para_first(), text.buf.para_last(), 
+                   text.buf.fill_column)
+        # copy new filled line at dot back to edsel/console text line
+        self.line = text.buf.lines[text.buf.dot].rstrip('\n')
+        
     def search(self):
         'Search forward for previous search string.'
         self.goto_line(text.buf.F(''), self.point)
@@ -362,6 +369,7 @@ class Console(console.Console):
             key.M_x: self.execute,
             key.M_lt: self.top,    # lt is <
             key.M_gt: self.bottom, # gt is >
+            key.M_q: self.fill,
 
             # ^space also works as ^@ on many terminals
             key.C_at: self.set_mark,
