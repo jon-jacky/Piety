@@ -5,7 +5,7 @@ edsel - Full screen display editing, with screen editing keys defined
 
 import re
 import util, terminal
-import key, console, check, edda, pysh, wyshka, samysh
+import key, display, console, check, edda, pysh, wyshka, samysh
 
 edo = edda.edo # use edo, ed, text, frame etc. APIs without prefix
 ed = edo.ed    
@@ -32,8 +32,13 @@ class Console(console.Console):
         else:
             super().accept_command()
 
-    # The following  methods and keymaps all have new names, so they are added
-    #  to the ones in the Console base class, they do not replace any.
+    def load_line(self):
+        'load self.line from line in buffer at dot'
+        self.line = text.buf.lines[text.buf.dot].rstrip('\n')
+
+    def store_line(self):
+        'store self.line to line in buffer at dot'
+        text.buf.replace(text.buf.dot, self.line + '\n')
 
     def set_display_mode(self, line):
         'Enter display editing mode.'
@@ -49,7 +54,7 @@ class Console(console.Console):
     def set_command_mode(self):
         'Replace current line in buffer and resume command mode.'
         # Based on ed.py append and '.' handling, Console accept_line method.
-        text.buf.replace(text.buf.dot, self.line + '\n')
+        self.store_line()
         ed.command_mode = True
         ed.prompt = ed.command_prompt
         wyshka.prompt = ed.prompt # self.do_command does this via wyshka shell
@@ -57,8 +62,8 @@ class Console(console.Console):
         self.restart() # print prompt and enter char mode
 
     def refresh(self):
-        'Refresh entire display including whole frame and scrolling command region.'
-        text.buf.replace(text.buf.dot, self.line + '\n') # so refresh renders it
+        'Refresh entire display including whole frame and scrolling region.'
+        self.store_line()
         frame.refresh(self.start_col + self.point)
 
     def open_line(self):
@@ -68,56 +73,61 @@ class Console(console.Console):
         """
         prefix = self.line[:self.point]
         suffix = self.line[self.point:].rstrip('\n')
-        text.buf.replace(text.buf.dot, prefix + '\n')
-        self.display_kill_line() # from cursor to end of line
+        text.buf.replace(text.buf.dot, prefix + '\n') # similar to store_line
+        display.kill_line() # from cursor to end of line
         text.buf.a(text.buf.dot, suffix + '\n') # calls frame.insert()
         self.line = suffix
         self.point = 0
         self.start_col = 1
 
-    def del_or_join_prev(self):
-        """
-        If point is not at start of line, delete preceding character
-        Otherwise join to previous line.  At start of first line do nothing.
-        """
-        if self.point > 0:
-            self.backward_delete_char()
-        elif text.buf.dot > 1:
+    def join_prev(self):
+        'Helper - join this line to previous. At first line do nothing.'
+        if text.buf.dot > 1:
             new_point = len(text.buf.lines[text.buf.dot-1])-1 # don't count \n
-            text.buf.replace(text.buf.dot, self.line)
+            self.store_line()
             text.buf.j(text.buf.dot-1, text.buf.dot)
-            self.line = text.buf.lines[text.buf.dot].rstrip('\n')
+            self.load_line()
             self.point = new_point
             frame.put_display_cursor(column=(self.start_col + self.point))
         else:
             pass
 
+    def delete_backward_char(self):
+        """
+        If point is not at start of line, delete preceding character.
+        Otherwise join to previous line.  At start of first line do nothing.
+        """
+        if self.point > 0:
+            super().delete_backward_char()
+        else: 
+            self.join_prev()
+
     def join_next(self):
         'Helper - join next line to this one. At last line do nothing.'
         if text.buf.dot < text.buf.nlines():
-            text.buf.replace(text.buf.dot, self.line)
+            self.store_line()
             text.buf.j(text.buf.dot, text.buf.dot+1)
-            self.line = text.buf.lines[text.buf.dot].rstrip('\n')
+            self.load_line()
             frame.put_display_cursor(column=(self.start_col + self.point))
         else:
             pass
 
-    def del_or_join_next(self):
+    def delete_char(self):
         """
         If point is not at end of line, delete character under cursor.
         Otherwise join next line to this one.  At end of last line do nothing.
         """
         if self.point < len(self.line):
-            self.delete_char()
+            super().delete_char()
         else:
             self.join_next()
 
     def goto_line(self, iline, jcol):
         if check.iline_ok(text.buf, iline):
-            text.buf.replace(text.buf.dot, self.line + '\n')
-            line, _  = text.buf.l(iline)
-            self.line = line
-            self.point = min(jcol, len(line))
+            self.store_line()
+            text.buf.l(iline)
+            self.load_line()
+            self.point = min(jcol, len(self.line))
             frame.put_display_cursor(column=(self.start_col + self.point))
         if iline == text.buffer.no_match:
             frame.put_message('? no match')
@@ -157,8 +167,7 @@ class Console(console.Console):
         'Fill paragraph'
         text.buf.J(text.buf.para_first(), text.buf.para_last(), 
                    text.buf.fill_column)
-        # copy new filled line at dot back to edsel/console text line
-        self.line = text.buf.lines[text.buf.dot].rstrip('\n')
+        self.load_line() # now there is a new line at dot
         
     def search(self):
         'Search forward for previous search string.'
@@ -249,16 +258,15 @@ class Console(console.Console):
 
     def other_window(self):
         'Move cursor to other window, next in sequence.'
-        text.buf.replace(text.buf.dot, self.line + '\n') # from goto_line
+        self.store_line()
         edda.o() # call frame.next() then reassign win, text.buf, text.current
-        self.line = text.buf.lines[text.buf.dot].rstrip('\n') # from several methods
-
+        self.load_line()
         self.point = 0
         self.start_col = 1
         frame.put_display_cursor()
 
     def status(self):
-        '^T handler, override base class, for now print items used by del_or_join_next'
+        '^T handler, override base class'
         # Now ^T is bound to runlines
         if ed.command_mode:
             super().status()
@@ -299,7 +307,7 @@ class Console(console.Console):
         'After execute() above, just discard the line, then return to display mode.'
         self.collecting_command = False
         self.move_beginning()
-        self.display_kill_line()
+        display.kill_line()
         self.set_display_mode(text.buf.lines[text.buf.dot].rstrip('\n'))
 
     def crash(self):
@@ -348,7 +356,7 @@ class Console(console.Console):
          
     def init_edsel_keymaps(self):
         self.display_keys = {
-            key.C_d: self.del_or_join_next,
+            key.C_d: self.delete_char,
             # key.C_k: self.crash, # FIXME? Now ^K is kill
             key.C_k: self.kill_line,
             key.C_l: self.refresh,
@@ -376,8 +384,8 @@ class Console(console.Console):
             key.cr: self.open_line,
             key.up: self.prev_line,
             key.down: self.next_line,
-            key.bs: self.del_or_join_prev,
-            key.delete: self.del_or_join_prev,
+            key.bs: self.delete_backward_char,
+            key.delete: self.delete_backward_char,
             }
         self.display_keymap = self.input_keymap.copy()# FIXME? Why?
         self.display_keymap.update(self.display_keys) # override some keys

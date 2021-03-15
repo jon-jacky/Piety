@@ -269,12 +269,12 @@ class Console(object):
         self.point += 1
         display.insert_char(keycode)
 
-    def backward_delete_char(self):
+    def delete_backward_char(self):
         if self.point > 0:
             self.line = (self.line[:self.point-1] + 
                             self.line[self.point:])
             self.point -= 1
-            display.backward_delete_char()
+            display.delete_backward_char()
 
     def backward_char(self):
         if self.point > 0:
@@ -312,17 +312,13 @@ class Console(object):
             self.point = self.point-1 - m.start()
             self.move_to_point()
 
-    def display_kill_line(self):
-        'Wrap display.kill_line so clients do not have to import display'
-        display.kill_line()
-
     def kill_line(self):
         'Delete line from point to end-of-line, save in yank buffer'
         killed_segment = self.line[self.point:]
         if killed_segment: # Do not overwrite yank buffer with empty segment
             self.yank_buffer = killed_segment
         self.line = self.line[:self.point] # point does not change
-        self.display_kill_line()
+        display.kill_line()
 
     def kill_word(self):
         'Delete word to beginning of next word, save in yank buffer'
@@ -337,7 +333,7 @@ class Console(object):
         display.move_to_column(self.start_col)
         self.point = len(self.line)
         util.putstr(self.line)
-        self.display_kill_line() # remove any leftover text past self.line
+        display.kill_line() # remove any leftover text past self.line
 
     def discard(self): # name like gnu readline unix-line-discard
         'Delete line from start-of-line to point'
@@ -347,7 +343,7 @@ class Console(object):
         self.line = self.line[self.point:]
         self.move_beginning() # accounts for prompt, assigns point
         util.putstr(self.line)
-        self.display_kill_line() # remove any leftover text past self.line
+        display.kill_line() # remove any leftover text past self.line
         self.move_beginning() # replace cursor again
  
     def yank(self):
@@ -402,8 +398,8 @@ class Console(object):
 
             # line editing
             # C_a etc. are typed with control key modifier, also called ^a etc.
-            key.bs: self.backward_delete_char, # C_h
-            key.delete: self.backward_delete_char,
+            key.bs: self.delete_backward_char, # C_h
+            key.delete: self.delete_backward_char,
             key.htab: self.tab, # C_i
             key.C_a: self.move_beginning,
             key.C_b: self.backward_char,
