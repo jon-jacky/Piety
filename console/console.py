@@ -93,6 +93,7 @@ class Console(object):
         # self.state is reassigned only by job control code in another module
         self.state = State.loaded # remain in this state if no job control
         self.yank_buffer = '' # string previously deleted by kill or discard
+        self.inline_yank = True # yank from inline yank_buffer not multiline
         self.n_tab_spaces = n_tab_spaces
 
     # Piety Session switch method requires job has method named resume
@@ -312,31 +313,27 @@ class Console(object):
             self.point = self.point-1 - m.start()
             self.move_to_point()
 
+    def kill_word(self):
+        'Delete word to beginning of next word, save in yank buffer'
+        m = next_word.search(self.line, self.point)
+        if m:
+            self.inline_yank = True
+            self.yank_buffer = self.line[self.point:m.start()+1]
+            self.line = self.line[:self.point] + self.line[m.start()+1:]
+            display.delete_nchars(self.point - (m.start()+1))
+
     def kill_line(self):
         'Delete line from point to end-of-line, save in yank buffer'
+        self.inline_yank = True
         killed_segment = self.line[self.point:]
         if killed_segment: # Do not overwrite yank buffer with empty segment
             self.yank_buffer = killed_segment
         self.line = self.line[:self.point] # point does not change
         display.kill_line()
 
-    def kill_word(self):
-        'Delete word to beginning of next word, save in yank buffer'
-        m = next_word.search(self.line, self.point)
-        if m:
-            self.yank_buffer = self.line[self.point:m.start()+1]
-            self.line = self.line[:self.point] + self.line[m.start():]
-            display.delete_nchars(self.point - (m.start()+1))
-
-    def redraw(self):
-        'Refresh line'
-        display.move_to_column(self.start_col)
-        self.point = len(self.line)
-        util.putstr(self.line)
-        display.kill_line() # remove any leftover text past self.line
-
     def discard(self): # name like gnu readline unix-line-discard
         'Delete line from start-of-line to point'
+        self.inline_yank = True
         killed_segment = self.line[:self.point]
         if killed_segment: # Do not overwrite yank buffer with empty segment
             self.yank_buffer = killed_segment
@@ -363,6 +360,13 @@ class Console(object):
     def tab(self):
         'Insert standard number of spaces at point'
         self.tab_n(self.n_tab_spaces)
+
+    def refresh(self):
+        'Refresh line'
+        display.move_to_column(self.start_col)
+        util.putstr(self.line)
+        display.kill_line() # remove any leftover text past self.line
+        self.move_to_point()
 
     def status(self):
         '^T handler, can override this method with custom handlers in subclasses'
@@ -409,7 +413,7 @@ class Console(object):
             # key.C_h is key.bs above
             # key.C_i: self.tab, # C_i is htab above
             key.C_k: self.kill_line,
-            key.C_l: self.redraw,
+            key.C_l: self.refresh,
             # key.C_m is key.cr above
             key.C_t: self.status,
             key.C_u: self.discard,

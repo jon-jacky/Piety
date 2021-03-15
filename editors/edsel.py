@@ -204,6 +204,7 @@ class Console(console.Console):
                 start, end = end, start
             end -= 1 # exclude last line, dot (usually) or mark
             if check.range_ok(text.buf, start, end):
+                self.inline_yank = False
                 text.buf.d(start, end)
                 frame.put_display_cursor()
         else:
@@ -222,7 +223,7 @@ class Console(console.Console):
             text.buf.modified = True
 
     def yank(self):
-        if ed.command_mode or not text.buffer.Buffer.yank_lines:
+        if ed.command_mode or self.inline_yank:
             # Insert string from self.yank_buffer inline at point.
             super().yank()
         else:
