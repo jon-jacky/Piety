@@ -63,8 +63,11 @@ class Console(console.Console):
 
     def refresh(self):
         'Refresh entire display including whole frame and scrolling region.'
-        self.store_line()
-        frame.refresh(self.start_col + self.point)
+        if ed.command_mode:
+            super().refresh() # just refresh the command line
+        else:
+            self.store_line()
+            frame.refresh(self.start_col + self.point)
 
     def open_line(self):
         """

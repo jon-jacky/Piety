@@ -244,11 +244,11 @@ class Console(object):
 
     def previous_history(self):
         self.retrieve_previous_history()
-        self.redraw() # tty requires a different method here
+        self.refresh() # tty requires a different method here
 
     def next_history(self):
         self.retrieve_next_history()
-        self.redraw()
+        self.refresh()
 
     # Editing that requires a display terminal with cursor addressing
 

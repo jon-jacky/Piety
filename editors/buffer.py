@@ -147,7 +147,7 @@ class Buffer(object):
         while not self.match(emptyline, iline) and more_lines(iline):
             iline += direction 
         return iline - direction # edge is line that follows (precedes) empty
-        # FIXME? When direction = 1, can't return last line
+        # When direction = 1, can't return last line
 
     def para_first(self):
         'Return number of first line in paragraph that contains/precedes dot'
@@ -155,7 +155,12 @@ class Buffer(object):
 
     def para_last(self):
         'Return number of last line in paragraph that contains/precedes dot'
-        return self.para_edge(1, self.lines_follow)
+        ilast = self.para_edge(1, self.lines_follow)
+        # special case not handled in para_edge
+        if ilast+1 == self.nlines and not self.match(emptyline, self.nlines):
+            return self.nlines 
+        else:
+            return ilast
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
