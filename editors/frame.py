@@ -233,6 +233,9 @@ def remove(delbuf, buf):
         if w.buf == delbuf:
             w.buf = buf
             w.update()
+    if mode == Mode.command:
+        win.set_marker(win.buf.dot)
+        put_command_cursor()
 
 # Update one or more windows with buffer contents, where the buffer 
 # is implicit: it is the buffer displayed in the focus window.

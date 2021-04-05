@@ -46,7 +46,19 @@ def getkey():
         else:
             return keyseq
 
-    # Other prefixes to come? Maybe C-x C-c ... the whole Emacs menagerie
+    # ctrl-X prefix for window commands and buffer commands
+    elif keyseq == key.C_x:
+        keyseq += terminal.getchar() # block waiting, then get next key
+
+        # C_g is the cancel command, stop waiting for more keys and return now
+        if keyseq[-1] == key.C_g:
+            return key.C_g
+
+        # C_x + one more key  
+        else:
+            return keyseq
+
+    # Other prefixes to come? Maybe C-c and the whole Emacs menagerie
 
     # No prefix - just return the single character
     else:

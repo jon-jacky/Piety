@@ -33,13 +33,14 @@ delbuf = None # must be global so other modules can find it
 
 def delete(bufname):
     'Delete buffer with given name, might be the current buffer'
-    global delbuf
+    global delbuf, previous, current, buf
     delbuf = buffers[bufname]
     del buffers[bufname]
-    if bufname == current: # pick a new current buffer
+    if bufname == current: # current has been deleted, pick new current buffer
         keys = list(buffers.keys()) # always nonempty due to main
-        select(keys[0]) # reassigns current
-        previous = current
+        current = keys[0]  
+        buf = buffers[current]
+        previous = current # must reassign previous *after* assign current here
 
 # Called at application startup to ensure the named buffer is created only once.
 # The same application may be started, exited, started again several times

@@ -269,6 +269,16 @@ class Console(console.Console):
         self.start_col = 1
         frame.put_display_cursor()
 
+    def split_window(self):
+        'Split window into two horizontally'
+        edda.o(2)
+        frame.put_display_cursor()
+        
+    def one_window(self):
+        'Current window becomes the only window'
+        edda.o(1)        
+        frame.put_display_cursor()
+
     def status(self):
         '^T handler, override base class'
         # Now ^T is bound to runlines
@@ -365,7 +375,7 @@ class Console(console.Console):
             key.C_k: self.kill_line,
             key.C_l: self.refresh,
             key.C_n: self.next_line,
-            key.C_o: self.other_window,
+            # key.C_o: self.other_window, # now assigned to C_x + 'o'
             key.C_p: self.prev_line,
             key.C_q: self.exchange,
             key.C_r: self.rsearch,
@@ -382,6 +392,11 @@ class Console(console.Console):
             key.M_lt: self.top,    # lt is <
             key.M_gt: self.bottom, # gt is >
             key.M_q: self.fill,
+
+            # C_x prefix
+            key.C_x + 'o' : self.other_window,
+            key.C_x + '2' : self.split_window,
+            key.C_x + '1' : self.one_window,
 
             # ^space also works as ^@ on many terminals
             key.C_at: self.set_mark,
