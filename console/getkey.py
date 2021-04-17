@@ -54,7 +54,13 @@ def getkey():
         if keyseq[-1] == key.C_g:
             return key.C_g
 
-        # C_x + one more key  
+        # C-x M-<char> just returns  M-<char>
+        # FIXME? This code doesn't handle C-g or ANSI escape sequences
+        elif keyseq[-1] == key.esc:
+            keyseq += terminal.getchar() # get <char> after esc
+            return keyseq[-2:] # return M-<char>
+
+        # C_x + one more key
         else:
             return keyseq
 

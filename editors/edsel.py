@@ -168,6 +168,7 @@ class Console(console.Console):
 
     def fill(self):
         'Fill paragraph'
+        self.store_line() # might not have been stored yet
         text.buf.J(text.buf.para_first(), text.buf.para_last(), 
                    text.buf.fill_column)
         self.load_line() # now there is a new line at dot
@@ -279,6 +280,11 @@ class Console(console.Console):
         edda.o(1)        
         frame.put_display_cursor()
 
+    def switch_to_buffer(self):
+        'Switch to another buffer, default is previous buffer'
+        frame.put_message('Switch to buffer (default %s): ' % text.previous)
+        # FIXME How best to collect non-default filename without blocking?
+
     def status(self):
         '^T handler, override base class'
         # Now ^T is bound to runlines
@@ -387,16 +393,22 @@ class Console(console.Console):
             key.C_y: self.yank,
             key.C_z: self.set_command_mode,
 
+            # M prefix - esc key prefix or alt key modifier
             key.M_v: self.page_up,
             key.M_x: self.execute,
             key.M_lt: self.top,    # lt is <
             key.M_gt: self.bottom, # gt is >
             key.M_q: self.fill,
 
-            # C_x prefix
+            # C_x prefix - window commands
             key.C_x + 'o' : self.other_window,
             key.C_x + '2' : self.split_window,
             key.C_x + '1' : self.one_window,
+
+            # C_x prefix - buffer and file commands
+            # FIXME not ready
+            # key.C_x + key.C_b : ed.N, # list buffers in a buffer
+            # key.C_x + 'b': self.switch_to_buffer,
 
             # ^space also works as ^@ on many terminals
             key.C_at: self.set_mark,

@@ -146,8 +146,11 @@ class Buffer(object):
         # Dot is non-empty line in paragraph, search back (forward) for empty.
         while not self.match(emptyline, iline) and more_lines(iline):
             iline += direction 
-        return iline - direction # edge is line that follows (precedes) empty
-        # When direction = 1, can't return last line
+        # When searching forward, last line in buffer can be the edge
+        if direction == 1 and not more_lines(iline):
+            return iline
+        else:
+            return iline - direction # edge is line that follows (precedes) empty
 
     def para_first(self):
         'Return number of first line in paragraph that contains/precedes dot'
@@ -155,12 +158,7 @@ class Buffer(object):
 
     def para_last(self):
         'Return number of last line in paragraph that contains/precedes dot'
-        ilast = self.para_edge(1, self.lines_follow)
-        # special case not handled in para_edge
-        if ilast+1 == self.nlines and not self.match(emptyline, self.nlines):
-            return self.nlines 
-        else:
-            return ilast
+        return self.para_edge(1, self.lines_follow)
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
