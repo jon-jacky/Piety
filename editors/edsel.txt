@@ -1,62 +1,88 @@
 edsel.py command summary:
 
+On the command line, any commands for ed.py, edo, and edda, or any Python
+statements in the wyshka shell.  Also:
+
     C   change to display editing mode
 
-edsel.py display editing commands summary in text buffer window:
+While display editing in a text window:
 
-    ^@  set mark, mark (included) to dot (excluded) defines region cut by ^W
-    ^space  set mark, like ^@
-    ^A  move cursor to start of line
-    ^B  move cursor (b)ack one character
-    ^C  move cursor back one page (page up)
-    ^D  (d)elete character under cursor
-    ^E  move cursor to (e)nd of line
-    ^F  move cursor (f)orward one character
-    ^G  cancel ^X command in progress
-    ^H  backspace, delete character before cursor
-    ^I  tab, insert spaces
-    ^J  (j)ump cursor forward to beginning of next word
-    ^K  delete (kill) from cursor to end of line, save in paste buffer
-    ^L  refresh entire screen
-    ^M  return, open new line below, or break line at cursor
-    ^N  move cursor down to (n)ext line
-    ^O  move cursor to (o)ther window, next in sequence
-    ^P  move cursor up to to (p)revious line
-    ^Q  exchange mark and dot (move cursor to show where they are)
-    ^R  search backwards (reverse) for previously entered search string
-    ^S  search forwards for previously entered search string
-    ^T  run Python statements from mark (included) to dot (excluded).
-    ^U  discard from start of line to cursor, save in paste buffer
-    ^V  move cursor forward one page (page down)
-    ^W  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer
-    ^X  enter and execute one command, then return to display mode
-    ^Y  insert (paste or (y)ank) contents last deleted by ^K kill, ^U discard, or ^W cut
-    ^Z  exit display editing and return to command mode
+    Control keys: C-f means hold down control key while typing f key.  C-f is
+    sometimes written ^F. Control keys are case-insensitive; C-f and C-F are
+    the same.
 
-edsel.py command line editing: ^A ^B ^D ^E ^F ^H ^I ^J ^K ^U ^Y as above, but:
+    C-@  set mark, mark (included) to dot (excluded) defines region cut by C-w
+    C-space  set mark, like C-@
+    C-a  move cursor to start of line
+    C-b  move cursor (b)ack one character
+    C-d  (d)elete character under cursor
+    C-e  move cursor to (e)nd of line
+    C-f  move cursor (f)orward one character
+    C-g  cancel M-x command in progress
+    C-h  backspace, delete character before cursor
+    C-i  tab, insert spaces
+    C-k  delete (kill) from cursor to end of line, save in paste buffer
+    C-l  refresh entire screen
+    C-m  return, open new line below, or break line at cursor
+    C-n  move cursor down to (n)ext line
+    C-p  move cursor up to to (p)revious line
+    C-q  exchange mark and dot (move cursor to show where they are)
+    C-r  search backwards (reverse) for previously entered search string
+    C-s  search forwards for previously entered search string
+    C-t  run Python statements from mark (included) to dot (excluded).
+    C-u  discard from start of line to cursor, save in paste buffer
+    C-v  move cursor forward one-half page (page down)
+    C-w  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer
+    C-y  insert (paste or (y)ank) contents last deleted by C-k kill, C-u discard, or C-w cut
+    C-z  exit display editing and return to command line
 
-    ^C  interrupt application, write traceback
-    ^D  if line is empty, exit application.  Otherwise (d)elete character under cursor.
-    ^L  refresh command line only (useful if line has become garbled)
-    ^M  execute command (like ret)
-    ^N  retrieve (n)ext line from history
-    ^P  retrieve (p)revious line from history
-    ^Z  if line is empty, exit application
+    Meta keys: M-q means hold down alt key while typing q key.  Or, type the
+    esc key, then type q key
 
-also, special keys while display editing in buffer window:
+    M-<  move cursor to beginning of buffer
+    M->  move cursor to end of buffer
+    M-b  move cursor (b)ackward one word
+    M-f  move cursor (f)orward one word
+    M-d  delete word at cursor, save in paste buffer
+    M-q  fill paragraph containing cursor, or immediately preceding cursor
+    M-v  move cursor backward one-half page (page up)
+    M-x  enter a single command at the command line, return to display editing    
+    
+    Control-x prefix keys: First hold down control key while typing x,
+    type the remaining key.
 
-    return  open new line below, or break line at cursor (same as ^M)
-    delete  delete character before cursor (same as ^H)
-    backspace  delete character before cursor (same as ^H)
-    tab insert spaces (same as ^I)
-    left (arrow key) move cursor back one character (same as ^B)
-    right (arrow key) move cursor forward one character (same as ^F)
-    up   (arrow key) move cursor up to previous line (same as ^P)
-    down (arrow key) move cursor down to next line (same as ^N)
+    C-x 2  create a new window by splitting window in two horizontally
+    C-x 1  return to a single window by expanding the current window to fill frame
+    C-x o  move to other window
 
-and differences while editing the command line:
+    Special keys on the keyboard:
+
+    return  open new line below, or break line at cursor (same as C-m)
+    delete  delete character before cursor (same as C-h)
+    backspace  delete character before cursor (same as C-h)
+    tab insert spaces (same as C-i)
+    left (arrow key) move cursor back one character (same as C-b)
+    right (arrow key) move cursor forward one character (same as C-f)
+
+    down (arrow key) move cursor down to next line (same as C-n)
+
+On the command line:
+
+    C-a C-b C-d C-e C-f C-h C-i C-k C-u C-y M-b M-f M-d  as above, but:
+
+    C-c  interrupt application, write traceback
+    C-d  if line is empty, exit application.  Otherwise (d)elete character under cursor.
+    C-l  refresh command line only (useful if line has become garbled)
+    C-m  execute command (like ret)
+    C-n  retrieve (n)ext line from history
+    C-p  retrieve (p)revious line from history
+    C-z  if line is empty, exit application
+
+    delete, backspace, tab, left, right as above, but:
 
     ret  execute command line
     up   (arrow key) retrieve previous line from history
     down (arrow key) retrieve next line from history
+
+Revised Apr 2021
 
