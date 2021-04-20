@@ -150,14 +150,14 @@ Special keys on the keyboard:
     tab insert spaces (same as C-i)
     left (arrow key) move cursor back one character (same as C-b)
     right (arrow key) move cursor forward one character (same as C-f)
-
+    up (arrow key) move cursor upt to previous line (same as C-p)
     down (arrow key) move cursor down to next line (same as C-n)
 
 ### Editing on the command line ###
 
-Some display editing commands also work on the command line, in command mode.
-
-*C-a C-b C-d C-e C-f C-h C-i C-k C-u C-y M-b M-f M-d*  as above, but:
+Some display editing commands also work on the command line, in command
+mode. *C-a C-b C-d C-e C-f C-h C-i C-k C-u C-y M-b M-f M-d*  work the same
+as above, but these keys work differently on the command line:
 
     C-c  interrupt application, write traceback
     C-d  if line is empty, exit application.  Otherwise (d)elete character under cursor.
@@ -167,11 +167,12 @@ Some display editing commands also work on the command line, in command mode.
     C-p  retrieve (p)revious line from history
     C-z  if line is empty, exit application
 
-*delete, backspace, tab, left, right* as above, but:
+*delete, backspace, tab, left, right* work the same as in display editing,
+but these special keys behave differently in command mode:
 
     ret  execute command line
-    up   (arrow key) retrieve previous line from history
-    down (arrow key) retrieve next line from history
+    up   (arrow key) retrieve previous line from history (same as C-p)
+    down (arrow key) retrieve next line from history (same as C-n)
 
 Commands retrieved from the history can be edited and submitted. Command
 line history including previous search strings can be accessed during *M-x*
@@ -179,12 +180,12 @@ commmands.
 
 ## Using edsel commands ##
 
-Most *edsel* sessions involve both display editing and the command line. In
-fact, all operations are available at the command line.  Display editing
+Most edsel sessions involve both display editing and the command line.
+All operations are available at the command line.  Display editing
 is often more convienient, but some operations are not available in
 display editing.
 
-For working with files and buffers at the command line, see the
+Regarding the command line: For working with files and buffers see the
 instructions for [ed.py](ed.md) (also [here](ed.txt)).  For working with
 windows, see [edda](edda.md) (also [here](edda.txt)).  For working with
 the built-in Python shell, see [wyshka](../shells/wyshka), and for
@@ -192,6 +193,15 @@ scripting, see [edo](../editors/edo.md).
 
 The most effective way to use some *edsel* commands is not always obvious.
 Here are some hints.
+
+[Search](#Search)  
+[Selecting and using the text region](#Selecting-and-using-the-text-region)  
+[Selecting and using paragraphs](#Selecting-and-using-paragraphs)  
+[Cut and paste](#Cut-and-paste)  
+[Indented text](#Indented-text)  
+[Wrapped text](#Wrapped-text)
+[Long lines](#Long-lines)
+[Undo](#Undo)
 
 #### Search ####
 
@@ -299,7 +309,7 @@ A new (or revised) function that is defined in a paragraph can be added
 in a blank line following it) and using the *]* address range with one of
 the commands to execute Python code: *]P* *]R* or *]T*.
 
-#### Cut and Paste ####
+#### Cut and paste ####
 
 The text region is always a sequence of complete lines. Therefore, the cut 
 (delete) command *C-w* followed by the paste (yank) command *C-y* always act 
@@ -399,8 +409,9 @@ After command mode *delete* *d* or *change* *c*, or display mode *cut*
 *C-w*, the deleted lines can be pasted back into the buffer after dot with
 command mode *x* or  before dot with display mode *yank* *C-y*.
 
-After *kill* *C-k*, *discard* *C-u*, or the deleted characters can be pasted
-back into a line (the original line or another line) at point by *C-y*.
+After *kill line* *C-k*, *discard* *C-u*, or *kill word* *M-d*, the
+deleted characters can be pasted back into a line (the original line or
+another line) at point by *C-y*.
 
 After *substitute* *s* the original line as it was before the substitution
 can be restored at dot, replacing whatever line is there, by *undo* *u*.
@@ -424,20 +435,24 @@ module from a buffer.  You can redirect Python output to another buffer.
 
 ## API and data structures ##
 
-In *edsel*, calls to the *edda* API require a prefix:
-*edda.o(2)*, *edda.h(12)* etc.
+In *edsel*, the window data structures must be prefixed by the *frame*
+module name: *frame.win* is the current window, *frame.windows* is the
+list of windows, etc.
 
-In *edsel*, the window data structures must be prefixed by the *frame* module name:
-*frame.win* is the current window, *frame.windows* is the list
-of windows, etc.
+If you started *edsel* in an interactive Python session by *import *edsel*,
+then you must also add *edsel* to the prefix: *edsel.frame.win* etc.
+This applies to all the directions here.
 
 In *edsel*, the text data structures must be prefixed by the *text*
 module name: *text.buf* is the current buffer, *text.buffers* is the
-collection of buffers, etc.
+collection of buffers, etc.  (Or *edsel.text.buf* etc.)
 
 In *edsel*, *ed* data structures and calls to the *ed* API must be prefixed by
 the module name *ed.*  For example: *ed.prompt*, *ed.a('append line after dot')*,
-etc.
+etc. (Or *edsel.ed.prompt* etc.)
+
+In *edsel*, calls to the *edda* API require a prefix:
+*edda.o(2)*, *edda.h(12)* etc.  (Or *edsel.edda.o(2)* etc.)
 
 ## Limitations ##
 
