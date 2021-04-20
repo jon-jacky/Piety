@@ -31,9 +31,9 @@ and tiling window manager.
 
 [Running edsel](#Running-edsel)   
 [Using edsel](#Using-edsel)   
-[Display Editing Commands](#Display-Editing-Commands)   
+[Display editing commands](#Display-editing-commands)   
 [Using edsel commands](#Using-edsel-commands)    
-[Writing and running Python from edsel](#Writing-and-running-Python-from-edsel #  )
+[Writing and running Python from edsel](#Writing-and-running-Python-from-edsel)   
 [API and data structures](#API-and-data-structures)   
 [Limitations](#Limitations)   
 
@@ -87,7 +87,7 @@ because many useful operations are only available in commmand mode.  For
 example, you must use [ed commands](ed.txt) to read and write files, and
 to manage buffers.
 
-## Display Editing Commands ##
+## Display editing commands ##
 
 Most of the display editing commands comprise a small subset of the standard
 [Emacs key bindings](https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf).
