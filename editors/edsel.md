@@ -18,15 +18,6 @@ the cursor and  to select, cut, and paste text.
 easy access to both  Python and the editor command language, as well as 
 redirection and scripting.
 
-**edsel** divides the screen to show one or more editor windows at the
-top, and a command interpreter for editor commands or Python at the
-bottom.  You can edit modules and write them out, then use the Python
-interpreter to import or reload modules, call their functions, and inspect
-and update their data structures. Or, you can bypass the file system and
-run Python scripts directly from editor buffers, or execute Python
-statements from selected text in any buffer, or import or reload an entire
-module from a buffer.
-
 **edsel** serves as the programmers' user interface to the 
 Piety system.   By providing text editing, a shell and a 
 window manager, it comprises a minimal but self-contained Python 
@@ -37,6 +28,14 @@ programming environment.
 and also by [Acme](http://acme.cat-v.org/) and
 [Oberon](http://www.projectoberon.com). All three combine a shell, editor,
 and tiling window manager.
+
+[Running edse](*Running-edsel)   
+[Using edsel](*Using-edsel)   
+[Display Editing Commands](*Display-Editing-Commands)   
+[Using edsel commands](*Using edsel commands)    
+[Writing and running Python from edsel](*Writing and running Python from edsel #   
+[API and data structures](*API and data structures)   
+[Limitations](*Limitations)   
 
 ## Running edsel ##
 
@@ -65,9 +64,10 @@ are needed here, because the data assigned at startup is still present.
 
 ## Using edsel ##
 
-When *edsel* starts up, it resembles *edda*, with a command prompt in
-the scrolling region at the bottom of the terminal window.
-Here you can type any *ed*, *edo*, *edda*, or *wyshka* commands.
+When *edsel* starts up, it resembles *edda*, with an editing window at the
+top of the terminal window and a command prompt in the scrolling region at
+the bottom. Here you can type any *ed*, *edo*, *edda*, or *wyshka*
+commands.
 
 **edsel** adds a command *C* to switch from command mode to display
 editing mode (that's capital *C*, case is significant).  In display
@@ -89,7 +89,8 @@ to manage buffers.
 
 ## Display Editing Commands ##
 
-Most display editing commands are the same as in *Emacs*.
+Most of the display editing commands comprise a small subset of the standard
+[Emacs key bindings](https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf).
 
 ### Display editing in a text window ###
 
@@ -407,6 +408,19 @@ Only the last substituted line can be restored.
 
 Only the most recently deleted or altered text can be restored.  *edsel* does
 not maintain any history of deletions or alterations before that.
+
+## Writing and running Python from edsel ##
+
+**edsel** serves as the programmers' user interface to the 
+Piety system.   By providing text editing, a shell and a 
+window manager, it comprises a minimal but self-contained Python 
+programming environment.
+You can edit modules and write them out, then use the Python
+interpreter to import or reload modules, call their functions, and inspect
+and update their data structures. Or, you can bypass the file system and
+run Python scripts directly from editor buffers, or execute Python
+statements from selected text in any buffer, or import or reload an entire
+module from a buffer.  You can redirect Python output to another buffer.
 
 ## API and data structures ##
 
