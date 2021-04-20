@@ -29,13 +29,13 @@ and also by [Acme](http://acme.cat-v.org/) and
 [Oberon](http://www.projectoberon.com). All three combine a shell, editor,
 and tiling window manager.
 
-[Running edse](*Running-edsel)   
-[Using edsel](*Using-edsel)   
-[Display Editing Commands](*Display-Editing-Commands)   
-[Using edsel commands](*Using edsel commands)    
-[Writing and running Python from edsel](*Writing and running Python from edsel #   
-[API and data structures](*API and data structures)   
-[Limitations](*Limitations)   
+[Running edsel](#Running-edsel)   
+[Using edsel](#Using-edsel)   
+[Display Editing Commands](#Display-Editing-Commands)   
+[Using edsel commands](#Using-edsel-commands)    
+[Writing and running Python from edsel](#Writing-and-running-Python-from-edsel #  )
+[API and data structures](#API-and-data-structures)   
+[Limitations](#Limitations)   
 
 ## Running edsel ##
 
@@ -75,7 +75,7 @@ editing mode you can insert or delete printing characters anywhere and
 use control characters to move the cursor and to select, cut, and
 paste text.
 
-Display editing mode provides a command *C-z* (*control *z, hold down the
+Display editing mode provides a command *C-z* (*control z*, hold down the
 control key while typing the *z* key) that returns to command mode.  There
 is also a command *M-x* (*meta x*, hold down the *alt* key while typing
 *x*) that enables you to type and run a single
