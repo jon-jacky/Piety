@@ -34,6 +34,7 @@ and tiling window manager.
 [Display editing commands](#Display-editing-commands)   
 [Using edsel commands](#Using-edsel-commands)    
 [Writing and running Python from edsel](#Writing-and-running-Python-from-edsel)   
+[Using the system shell from edsel](#Using-the-system-shell-from-edsel)  
 [API and data structures](#API-and-data-structures)   
 [Limitations](#Limitations)   
 
@@ -199,9 +200,9 @@ Here are some hints.
 [Selecting and using paragraphs](#Selecting-and-using-paragraphs)  
 [Cut and paste](#Cut-and-paste)  
 [Indented text](#Indented-text)  
-[Wrapped text](#Wrapped-text)
-[Long lines](#Long-lines)
-[Undo](#Undo)
+[Wrapped text](#Wrapped-text)  
+[Long lines](#Long-lines)  
+[Undo](#Undo)  
 
 #### Search ####
 
@@ -423,7 +424,7 @@ not maintain any history of deletions or alterations before that.
 ## Writing and running Python from edsel ##
 
 **edsel** serves as the programmers' user interface to the 
-Piety system.   By providing text editing, a shell and a 
+[Piety](../README.md) system.   By providing text editing, a shell and a 
 window manager, it comprises a minimal but self-contained Python 
 programming environment.
 You can edit modules and write them out, then use the Python
@@ -432,6 +433,10 @@ and update their data structures. Or, you can bypass the file system and
 run Python scripts directly from editor buffers, or execute Python
 statements from selected text in any buffer, or import or reload an entire
 module from a buffer.  You can redirect Python output to another buffer.
+
+## Using the system shell from edsel ##
+
+To come ...
 
 ## API and data structures ##
 
