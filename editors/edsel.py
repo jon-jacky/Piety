@@ -4,6 +4,8 @@ edsel - Full screen display editing, with screen editing keys defined
 """
 
 import re
+from contextlib import redirect_stdout
+
 import util, terminal
 import key, display, console, check, edda, pysh, wyshka, samysh
 
@@ -372,7 +374,23 @@ class Console(console.Console):
             end -= 1 # exclude last line, dot (usually) or mark
         else:
             start = end = text.buf.dot
-        edo.T(start, end) # FIXME - args correct?
+        edo.T(start, end)
+
+    def runshell_buf(self):
+        """
+        Run shell command in line preceding dot.
+        Redirects output to end of current buffer.
+        """
+        iline = text.buf.dot if text.buf.dot > 0 else 1
+        command = text.buf.lines[iline-1].rstrip('\n')
+        with redirect_stdout(text.buf):
+            sh(command)
+        # Following lines copied from edo.T
+        # Append new empty line and put dot there to make it easy to add new text.
+        text.buf.a(text.buf.dot, '\n')
+        # Also put mark there to make it easy to select the new text.
+        # Everything you type after the last batch of output is selected.
+        text.buf.mark['@'] = text.buf.dot
          
     def init_edsel_keymaps(self):
         self.display_keys = {
@@ -386,7 +404,7 @@ class Console(console.Console):
             key.C_q: self.exchange,
             key.C_r: self.rsearch,
             key.C_s: self.search,
-            key.C_t: self.runlines_buf, # overrides base class ^T status
+            key.C_j: self.runlines_buf, # like emacs eval-print-last-sexp
             key.C_u: self.discard,
             key.C_v: self.page_down,
             key.C_w: self.cut,
@@ -394,6 +412,7 @@ class Console(console.Console):
             key.C_z: self.set_command_mode,
 
             # M prefix - esc key prefix or alt key modifier
+            key.M_j: self.runshell_buf,
             key.M_v: self.page_up,
             key.M_x: self.execute,
             key.M_lt: self.top,    # lt is <

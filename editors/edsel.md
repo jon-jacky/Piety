@@ -19,7 +19,7 @@ easy access to both  Python and the editor command language, as well as
 redirection and scripting.
 
 **edsel** serves as the programmers' user interface to the 
-Piety system.   By providing text editing, a shell and a 
+[Piety](../README.md) system.   By providing text editing, a shell and a 
 window manager, it comprises a minimal but self-contained Python 
 programming environment.
 
@@ -33,7 +33,7 @@ and tiling window manager.
 [Using edsel](#Using-edsel)   
 [Display editing commands](#Display-editing-commands)   
 [Using edsel commands](#Using-edsel-commands)    
-[Writing and running Python from edsel](#Writing-and-running-Python-from-edsel)   
+[Writing and running Python in edsel](#Writing-and-running-Python-in-edsel)   
 [Using the system shell from edsel](#Using-the-system-shell-from-edsel)  
 [API and data structures](#API-and-data-structures)   
 [Limitations](#Limitations)   
@@ -86,11 +86,11 @@ it easy to alternate display editing with commands.
 You will probably use *C-z* and *M-x* frequently while display editing,
 because many useful operations are only available in commmand mode.  For
 example, you must use [ed commands](ed.txt) to read and write files, and
-to manage buffers.
+Ato manage buffers.
 
 ## Display editing commands ##
 
-Most of the display editing commands comprise a small subset of the standard
+Most of the display editing commands use the standard
 [Emacs key bindings](https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf).
 
 ### Display editing in a text window ###
@@ -295,7 +295,8 @@ that it indicates is deleted.
 Sometimes you want to perform an operation on the entire paragraph that
 contains dot: all the lines up to the nearest preceding empty line, and
 down to the nearest following empty line.  Or, if the current line is
-empty, you want to operate on the preceding paragraph.
+empty, you want to operate on the preceding paragraph --- this situation
+often arises when you have just finished typing a paragraph.
 
 It is not necessary to set the mark to operate on the current paragraph.
 The  *]* address range indicates the current paragraph, even when there is
@@ -303,12 +304,6 @@ no mark.
 
 The paragraph range *]* is especially useful with the
 wrap, indent, and outdent commands *J*, *I*, and *O*. 
-
-Short Python function definitions are often written in a single paragraph.
-A new (or revised) function that is defined in a paragraph can be added
-(or updated) to the Python session by placing dot in that paragraph  (or
-in a blank line following it) and using the *]* address range with one of
-the commands to execute Python code: *]P* *]R* or *]T*.
 
 #### Cut and paste ####
 
@@ -369,6 +364,10 @@ the number of spaces to indent (or outdent).   This initially defaults to
 
 #### Wrapped text ####
 
+In display editing mode, use the *M-q* command to wrap text in the
+paragraph at the cursor.  The right margin wraps at *text.buf.fill_column*,
+which defaults to 75.
+
 Use the *ed.py* *J* command in command mode to wrap text. The selected lines
 are wrapped so their length does not exceed *fill_column*, which defaults to 75
 characters, but can be reassigned by including a parameter to the *J* command,
@@ -421,22 +420,102 @@ Only the last substituted line can be restored.
 Only the most recently deleted or altered text can be restored.  *edsel* does
 not maintain any history of deletions or alterations before that.
 
-## Writing and running Python from edsel ##
 
-**edsel** serves as the programmers' user interface to the 
-[Piety](../README.md) system.   By providing text editing, a shell and a 
-window manager, it comprises a minimal but self-contained Python 
-programming environment.
-You can edit modules and write them out, then use the Python
-interpreter to import or reload modules, call their functions, and inspect
-and update their data structures. Or, you can bypass the file system and
-run Python scripts directly from editor buffers, or execute Python
-statements from selected text in any buffer, or import or reload an entire
-module from a buffer.  You can redirect Python output to another buffer.
+## Writing and running Python in edsel ##
+
+**edsel** is the programmers' user interface to the [Piety](../README.md)
+system.   An *edsel* editing session is also an interactive Python
+session. You can write and run Python code without exiting *edsel*. 
+
+The *edsel* command line is actually the [wyhska](../shells/wyshka.md)
+shell (also [here](../shells/wyshka.txt)), which provides a full Python
+interpreter in addition to all of the *edsel* editing commands.
+
+When *edsel* starts up, *wyshka* begins in editor mode, with the editor
+command prompt (default *:*).  At this prompt, to use Python, type *!command*.
+The *command* string is passed to the Python interpreter, and its output
+appears in the scrolling command region.   
+
+If you type a bare *!* without a command, *wyshka* switches to Python REPL
+mode, and prints its Python command prompt, *>>* (just two *>* instead of
+the three used by standard Python).  Now you can type a series of Python
+statements without prefixing each with *!*.  To return to editor mode, 
+type *:* at the *>>* prompt.
+
+The *wyshka* shell provides output redirection.  The output of any
+Python command (or editor command) can be sent to a text buffer instead of
+the scrolling command region.  This is useful when there is too much
+output to fit in the command region, or when you want to save the output.
+
+To redirect the output of a Pytjon *command*, use this prefix syntax, where the 
+redirection symbol *>* and the  destination buffer name *bufname* precede 
+the *command*:  *> bufname !command*
+
+If the named buffer does not yet exist, this command creates it. This
+command rewrites the buffer contents, so any contents already in the
+buffer are lost.   To preserve the buffer contents and append command output to the end, use
+the *>>* redirection symbol instead: *>> bufname !command*
+
+You can select text in any buffer and execute it with Python, using the
+*P* command.  For details,  see [edo.md](edo.md).  Any *ed.py* address
+range can be used with *P*. For example, a new (or revised) function that
+is defined in a paragraph  (a sequence of lines preceded and followed by
+blank lines) can be added (or updated) to the Python session.   Place dot
+in that paragraph (or in a blank line following it) and type this command:
+*]P*.  The Python output appears in the scrolling command region.
+
+You can use any buffer to make a transcript of an interactive Python
+session, where all the commands you type and all their output are saved in
+the buffer.  The *T* command is similar to *P*, but the Python output
+appears at the end of the same buffer.
+
+The *T* command also adds a new empty line to the end of the buffer and
+sets mark and dot there.  Then new lines typed at the end of the buffer
+advance dot but leave the mark, so all text typed after the last Python
+output is in the selection region.  So after the output appears, you  can
+type another Python command on the next line -- or a whole block of Python
+code, if you wish.   Then type RETURN, then type *M-x* to get a command
+prompt, then enter the *]T* command to  execute the code you just entered
+and begin the cycle again.
+
+The *edsel* display editing command *C-t* has the same effect as *]T*
+command. Just type *C-t* after you  enter each command or block of Python
+code - there is no need to leave display editing.
+
+All of the techniques described so far execute the Python code in the
+*__main__* module.   It acts as a sort of scratchpad -- any objects you
+create in the *__main__* module disappear when you exit the Python
+session.  For permanent work, you must put your code into a module.
+You can create, revise, and run Python modules in *edsel*.
+
+You can edit a module in a buffer, use the editor *w* command to write the
+buffer contents to a file.  Then use any of the techniques described above to
+run the Python *import* statement or *reload* function to import or reload
+that module into the *edsel* session, and then run the code in the module.
+
+Alternatively, you can bypass the file system and simply type the command
+*bimport()* or *breload()* to import or reload the module directly from
+the current text buffer -- without first writing it out to a file. If you
+started  *edsel* by importing it into a Python session with *import edsel*
+etc. then you have to type *edsel.bimport()* etc.
 
 ## Using the system shell from edsel ##
 
-To come ...
+Our goal is to write and run Python code entirely within an *edsel*
+session. Nevertheless, it is sometimes necessary to resort to the host
+system shell to use version control or navigate the host file system.
+
+The *edsel* *sh* function executes its argument (a string) with the system
+shell (*bash*, for example). So it is possible to run system commands
+without leaving *edsel*, for  example *sh('ls -l')*.  If you started 
+*edsel* by importing it into a Python session with *import edsel* etc.
+then you have to type *edsel.sh('ls -l')*.
+
+Shell command output usually appears in the scrolling command region.  But
+if you invoke the *sh* function using the *T* command or *C-t* display
+editing command, the shell command output appears right below the command
+in the same buffer. Alternatively, you can use the output redirection
+capability of the *wyshka* shell to save command output in another buffer.
 
 ## API and data structures ##
 

@@ -164,25 +164,25 @@ while in application mode, or *:* to use (and redirect) an application
 command while in Python mode.
 
 Here is an example.  To redirect the buffer list printed by the 
-*n* command to the buffer named *n.log*, type
+*n* command to the buffer named *buffers.log*, type
 
-  > n.log n
+    > buffers.log n
 
-(The built-in *N* command achieves the same effect without redirection
-on the command line.)
+(The built-in *N* command (capital *N*) achieves the same effect without
+redirection on the command line.)
 
 Redirection is often useful with the Python *sh* function that executes
 a system shell command.   For example to save the output
-from *ls -l* in the buffer *ls.log*, use this command: 
+from *ls -l* in the buffer *shell.log*, use this command: 
 
-  > ls.log !sh('ls -l')
+    > shell.log !sh('ls -l')
 
 Here the *!* preceding *sh* indicates that *sh* and what follows is a
 *Python* function call, not an editor command (this is only necessary if
 *wyshka* is not  already in Python mode).    Then to append another
 directory listing to the same buffer, type this command:
 
-  >> ls.log !sh('ls -l *.py')
+  >> shell.log !sh('ls -l *.py')
 
 ## Related programs ##
 
