@@ -109,6 +109,7 @@ and *C-F* are the same.
     C-g  cancel M-x command in progress
     C-h  backspace, delete character before cursor
     C-i  tab, insert spaces
+    C-j  run Python statements in region from mark (included) to dot (excluded), append output to current buffer
     C-k  (k)ill line, delete from cursor to end of line, save in paste buffer
     C-l  refresh entire screen
     C-m  return, open new line below, or break line at cursor
@@ -117,7 +118,6 @@ and *C-F* are the same.
     C-q  exchange mark and dot (move cursor to show where they are)
     C-r  search backwards (reverse) for previously entered search string
     C-s  search forwards for previously entered search string
-    C-t  run Python statements from mark (included) to dot (excluded).
     C-u  discard from start of line to cursor, save in paste buffer
     C-v  move cursor forward one-half page (page down)
     C-w  delete (cut) lines from mark (included) to dot (excluded), save in paste buffer
@@ -132,6 +132,7 @@ type the *esc* key, then type the *q* key
     M-b  move cursor (b)ackward one word
     M-f  move cursor (f)orward one word
     M-d  kill word, (d)elete word at cursor, save in paste buffer
+    M-j  run system shell command in line preceding dot, append output to end of current buffer
     M-q  fill paragraph containing cursor, or immediately preceding cursor
     M-v  move cursor backward one-half page (page up)
     M-x  enter a single command at the command line, return to display editing    
