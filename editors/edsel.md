@@ -479,8 +479,8 @@ code, if you wish.   Then type RETURN, then type *M-x* to get a command
 prompt, then enter the *]T* command to  execute the code you just entered
 and begin the cycle again.
 
-The *edsel* display editing command *C-t* has the same effect as *]T*
-command. Just type *C-t* after you  enter each command or block of Python
+The *edsel* display editing command *C-j* has the same effect as *]T*
+command. Just type *C-j* after you  enter each command or block of Python
 code - there is no need to leave display editing.
 
 All of the techniques described so far execute the Python code in the
@@ -513,10 +513,14 @@ without leaving *edsel*, for  example *sh('ls -l')*.  If you started
 then you have to type *edsel.sh('ls -l')*.
 
 Shell command output usually appears in the scrolling command region.  But
-if you invoke the *sh* function using the *T* command or *C-t* display
+if you invoke the *sh* function using the *T* command or *C-j* display
 editing command, the shell command output appears right below the command
 in the same buffer. Alternatively, you can use the output redirection
 capability of the *wyshka* shell to save command output in another buffer.
+
+The *M-j* display editing command executes a shell command in the line
+preceding dot, without having to quote it and pass it to the *sh*
+function.  The shell command output appears at the end of the current buffer.
 
 ## API and data structures ##
 
