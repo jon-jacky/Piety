@@ -10,13 +10,13 @@ edsel
 (also [here](ed.txt)) and [edo.py](edo.md) (also [here](edo.txt))  and the
 simpler display editor [edda](edda.md) (also [here](edda.txt)).   *edsel*
 adds a display  editing mode that inserts or deletes printing characters
-anywhere, and  uses display commands bound to control characters to move
+anywhere, and  uses display commands bound to control keys to move
 the cursor and  to select, cut, and paste text.
 
 **edsel** provides the [wyshka](../shells/wyshka.md) shell 
 (also [here](../shells/wyshka.txt)), which provides 
 easy access to both  Python and the editor command language, as well as 
-redirection and scripting.
+redirection and editor scripting.
 
 **edsel** serves as the programmers' user interface to the 
 [Piety](../README.md) system.   By providing text editing, a shell and a 
@@ -26,7 +26,7 @@ programming environment.
 **edsel** is most strongly influenced by
 [Emacs](https://www.gnu.org/software/emacs/manual/html_node/emacs/index.html),
 and also by [Acme](http://acme.cat-v.org/) and
-[Oberon](http://www.projectoberon.com). All three combine a shell, editor,
+[Oberon](http://www.projectoberon.com). All three combine an editor, shell,
 and tiling window manager.
 
 [Running edsel](#Running-edsel)   
@@ -86,7 +86,7 @@ it easy to alternate display editing with commands.
 You will probably use *C-z* and *M-x* frequently while display editing,
 because many useful operations are only available in commmand mode.  For
 example, you must use [ed commands](ed.txt) to read and write files, and
-Ato manage buffers.
+to manage buffers.
 
 ## Display editing commands ##
 
@@ -191,7 +191,7 @@ Regarding the command line: For working with files and buffers see the
 instructions for [ed.py](ed.md) (also [here](ed.txt)).  For working with
 windows, see [edda](edda.md) (also [here](edda.txt)).  For working with
 the built-in Python shell, see [wyshka](../shells/wyshka), and for
-scripting, see [edo](../editors/edo.md).
+editor scripting, see [edo](../editors/edo.md).
 
 The most effective way to use some *edsel* commands is not always obvious.
 Here are some hints.
@@ -233,7 +233,8 @@ regular expressions such as unmatched parentheses etc.
 
 You can also search for regular expressions.  *edsel* provides the
 *|pattern|* and *&pattern&* address forms, where *pattern* is a regular
-expression.
+expression. (Here *|pattern|* uses the pipe character *|* not the 
+forward slash character */* used for ordinary text searches.)
 
 #### Selecting and using the text region ####
 
@@ -275,7 +276,7 @@ same effect as it does after *C-w*: it pastes the deleted region
 back into the buffer.   The *[y* command is similar to *[d*, except
 it copies the region into the cut buffer without deleting it.
 
-When the region is moved, the mark (as well as marks set with the 
+When the region is moved, the mark (as well as other markers set with the 
 *ed* *k* command) move with it.   So after cut and paste with
 *C-w* and *C-y*, another *C-w* cuts the region that was just pasted.
 
@@ -305,6 +306,9 @@ no mark.
 
 The paragraph range *]* is especially useful with the
 wrap, indent, and outdent commands *J*, *I*, and *O*. 
+
+The *M-q* display editing command wraps the current paragraph, so you 
+do not have to use command mode for this.
 
 #### Cut and paste ####
 
@@ -400,6 +404,12 @@ wrapped lines and type the *[j* command to join them all into one long line
 again. (If you do not type the extra space at the end of each line, words
 will run together where the lines are joined.)
 
+If you type a long line so the end disappears off the right edge, then 
+shorten the line by deleting characters in the middle so the following
+characters move left again, the characters that were beyond the right
+edge do not reappear.  You must use the display editing *refresh* command
+*C-l* to make them reappear.  
+
 #### Undo ####
 
 **edsel** has no *undo* command.  But it is usually possible to recover
@@ -494,17 +504,17 @@ buffer contents to a file.  Then use any of the techniques described above to
 run the Python *import* statement or *reload* function to import or reload
 that module into the *edsel* session, and then run the code in the module.
 
-Alternatively, you can bypass the file system and simply type the command
-*bimport()* or *breload()* to import or reload the module directly from
-the current text buffer -- without first writing it out to a file. If you
-started  *edsel* by importing it into a Python session with *import edsel*
-etc. then you have to type *edsel.bimport()* etc.
+Alternatively, you can bypass the file system and simply type the  Python
+command *bimport()* or *breload()* to import or reload the module directly
+from the current text buffer -- without first writing it out to a file. If
+you started  *edsel* by importing it into a Python session with *import
+edsel* etc. then you have to type *edsel.bimport()* etc.
 
 ## Using the system shell from edsel ##
 
 Our goal is to write and run Python code entirely within an *edsel*
 session. Nevertheless, it is sometimes necessary to resort to the host
-system shell to use version control or navigate the host file system.
+system shell, for example to navigate the host file system.
 
 The *edsel* *sh* function executes its argument (a string) with the system
 shell (*bash*, for example). So it is possible to run system commands
@@ -565,16 +575,15 @@ When *edsel* puts the cursor at the start of a line, you can
 jump to the position you want by repeating the *M-f*
 command that moves the cursor to the beginning of the next word.
 
-As you type and edit characters within a line, *edsel* renders them 
-directly to the focus window on the display, but does not yet store them 
-in the focus window's text buffer.   When you type *Return* at the 
-end of the line, or move to a different line, then *edsel* stores the completed 
-line in the text buffer.   If you have another window displaying the  same 
-text buffer, the line you are typing or editing in the focus window does 
-not appear in the other window until you finish editing the line by typing 
-*Return*, or move to a different line and then do some command that updates
-the display.  Just moving to a different line does not update the display,
-in order to avoid too many updates.
+As you type and edit characters within a line, *edsel* renders them
+directly to the window on the display, but does not yet store them  in the
+window's text buffer.   When you type *Return* at the  end of the line, or
+move to a different line, then *edsel* stores the completed  line in the
+text buffer by calling the *edsel* *store_line* method.   If you have
+another window displaying the  same  text buffer, the line you are typing
+or editing in the focus window does  not appear in the other window until
+you finish editing the line by typing  *Return*, or perform some other
+operation that calls *store_line*.
 
 Revised Apr 2021
 
