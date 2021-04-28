@@ -494,8 +494,8 @@ command. Just type *C-j* after you  enter each command or block of Python
 code - there is no need to leave display editing.
 
 All of the techniques described so far execute the Python code in the
-*__main__* module.   It acts as a sort of scratchpad -- any objects you
-create in the *__main__* module disappear when you exit the Python
+\_\_*main*\_\_ module.   It acts as a sort of scratchpad -- any objects you
+create in the \_\_*main*\_\_ module disappear when you exit the Python
 session.  For permanent work, you must put your code into a module.
 You can create, revise, and run Python modules in *edsel*.
 
