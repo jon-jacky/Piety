@@ -16,16 +16,16 @@ or write editing scripts in Python.
 
 **ed.py** has no dependencies.
 
-[Running ed.py](*Running-ed.py)
-[Stopping and resuming ed.py](*Stopping-and-resuming-ed.py)
-[Commands](*Commands)
-[Working with files and buffers](*Working-with-files-and-buffers)
-[Differences from classic ed and sam](*Differences-from-classic-ed-and-sam)
-[New commands and address forms in ed.y](*New-commands-and-address-forms-in-ed.py)
-[API](*API)
-[Modules](*Modules)
-[Data structures](*Data-structures)
-[Related programs](*Related-programs)
+[Running ed.py](*Running-ed.py)  
+[Stopping and resuming ed.py](*Stopping-and-resuming-ed.py)  
+[Commands](*Commands)  
+[Working with files and buffers](*Working-with-files-and-buffers)  
+[Differences from classic ed and sam](*Differences-from-classic-ed-and-sam)  
+[New commands and address forms in ed.y](*New-commands-and-address-forms-in-ed.py)  
+[API](*API)  
+[Modules](*Modules)  
+[Data structures](*Data-structures)  
+[Related programs](*Related-programs)  
 
 ## Running ed.py ##
 
