@@ -17,11 +17,11 @@ or write editing scripts in Python.
 **ed.py** has no dependencies.
 
 [Running ed.py](#Running-ed.py)  
-[Stopping and resuming ed.py](#Stopping-and-resuming-ed.py)  
+[Stopping and resuming ed\.py](#Stopping-and-resuming-ed\.py)  
 [Commands](#Commands)  
 [Working with files and buffers](#Working-with-files-and-buffers)  
 [Differences from classic ed and sam](#Differences-from-classic-ed-and-sam)  
-[New commands and address forms in ed.y](#New-commands-and-address-forms-in-ed.py)  
+[New commands and address forms in ed.py](#New-commands-and-address-forms-in-ed.py)  
 [API](#API)  
 [Modules](#Modules)  
 [Data structures](#Data-structures)  
@@ -91,7 +91,7 @@ can resemble the *ed* command line:
     lines20.txt, 20 lines
     %
 
-## Stopping and resuming ed.py ##
+## Stopping and resuming ed\.py ##
 
 The usual way to stop *ed.py* is to use its *q* (quit) command
 (the *Q* command quits without warning about any unsaved changes).
