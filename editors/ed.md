@@ -16,6 +16,17 @@ or write editing scripts in Python.
 
 **ed.py** has no dependencies.
 
+[Running ed.py](*Running-ed.py)
+[Stopping and resuming ed.py](*Stopping-and-resuming-ed.py)
+[Commands](*Commands)
+[Working with files and buffers](*Working-with-files-and-buffers)
+[Differences from classic ed and sam](*Differences-from-classic-ed-and-sam)
+[New commands and address forms in ed.y](*New-commands-and-address-forms-in-ed.py)
+[API](*API)
+[Modules](*Modules)
+[Data structures](*Data-structures)
+[Related programs](*Related-programs)
+
 ## Running ed.py ##
 
 **ed.py** can run as a standalone program or in an interactive Python session.
@@ -187,7 +198,8 @@ for example:
         main                  1  Text     (no file)
     .   ed.md               335  Text     ed.md
 
-The *N* command writes the same information into a buffer name *Buffers*.
+The *N* command writes the same information into a buffer named
+\**Buffers*\*.
 
 The dot in the *C* (current) column indicates the current buffer.
 A percent sign *%* in the *R* (readonly) column indicates that
@@ -279,7 +291,8 @@ printing the current line after any command).
 
 **ed.py** supports the *sam* command *n* (print list of buffers),
 not the classic *ed* command *n* (print line numbers).
-The new *N* command writes the same information into a buffer named *Buffers*.
+The new *N* command writes the same information into a buffer 
+named \**Buffers*\*.
 
 The *e* and *E* commands only work in the *main* buffer.
 In *sam*, the *e* command works in any buffer.
@@ -351,7 +364,7 @@ indents and outdents until it is reassigned again.
 
 **ed.py** provides the new *N* command that lists buffers and their
 properties like the *n* command, but saves the list in a buffer named
-*Buffers*.  This makes it possible to view a long list of buffers 
+\**Buffers*\*.  This makes it possible to view a long list of buffers 
 that might otherwise scroll away out of sight.
 
 The *@* character can be used to mark a line with the *k@* command, which
@@ -573,5 +586,5 @@ to be entered at the terminal.
 **[edda](edda.md)** and **[edsel](edsel.md)** are display editors that
 use *ed.py* commands.
 
-Revised Oct 2020
+Revised Apr 2021
 

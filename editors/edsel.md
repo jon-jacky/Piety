@@ -92,6 +92,7 @@ to manage buffers.
 
 Most of the display editing commands use the standard
 [Emacs key bindings](https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf).
+The *edsel* display editing commands are summarized [here](edsel.txt).
 
 ### Display editing in a text window ###
 
@@ -179,6 +180,8 @@ but these special keys behave differently in command mode:
 Commands retrieved from the history can be edited and submitted. Command
 line history including previous search strings can be accessed during *M-x*
 commmands.
+
+The *edsel* display editing commands are summarized [here](edsel.txt).
 
 ## Using edsel commands ##
 
