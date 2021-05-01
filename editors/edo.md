@@ -30,7 +30,7 @@ it easy to see the effect of each command in the script.  This is
 especially useful for testing the display editors based on *ed.py*.
 
 [Running and resuming edo.py](#Running-and-resuming-edo.py)  
-[Wyshka-shell](#Wyshka-hell)  
+[Wyshka shell](#Wyshka-shell)  
 [Running Python code](#Running-Python-code)  
 [Importing and reloading Python modules](#Importing-and-reloading-Python-modules)  
 [Using the system shell](#Using-the-system-shell)  
