@@ -27,6 +27,13 @@ Python scripts directly from editor buffers, or execute Python
 statements from selected text in any buffer, or import or reload
 an entire module from a buffer.
 
+[Running edda](#Running-edda)  
+[Display](#Display)  
+[Commands](#Commands)  
+[API and data structure](#API-and-data-structures)  
+[Modules](#Modules)  
+[Related programs](#Related-programs)
+
 ## Running edda ##
 
 **edda** can run as a standalone program or in an interactive Python session.
@@ -94,6 +101,11 @@ number of the current line in the buffer, the total number of
 lines in the buffer, and perhaps some other information.
 
 ## Commands ##
+
+[ed commands](#ed-commands]  
+[Window commands](#Window-commands)  
+[Frame commands](#Frame-commands)  
+[Editing script commands](#Editing-script-commands)  
 
 ## ed commands ##
 
@@ -167,7 +179,7 @@ also the command line in the scrolling region.  This command can be
 used to recover if display contents get corrupted or out of synch with
 buffer contents.
 
-## Script commands ##
+## Editing script commands ##
 
 When you use the *X* command to execute *ed* commands from a buffer,
 you can see window contents update as the commands run.  Each command
@@ -206,9 +218,8 @@ the module name *ed.*  For example: *ed.a('append line after dot')*.
 **edda** imports *ed.py* which provides all of the line editing commands,
 and in turn imports the *text* module that provides all the text buffers.
 *edda* also imports the *frame* module which provides the display.  *edda*
-also imports *ed_frame*, *text_frame*, and *buffer_frame* which wrap 
-functions in *ed* and *text* and methods in *buffer* with calls to display
-code in *frame*.
+also imports *textframe* which wraps functions in *ed* and *text* and
+methods in *buffer* with calls to display code in *frame*.
 
 ## Related programs ##
 
@@ -221,5 +232,5 @@ so *desoto* can run in the cooperative multitasking system,
 
 **edda** is the core of a more capable display editor, [edsel](edsel.md).
 
-Revised Oct 2020
+Revised Apr 2021
 

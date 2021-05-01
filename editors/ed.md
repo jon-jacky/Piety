@@ -17,11 +17,11 @@ or write editing scripts in Python.
 **ed.py** has no dependencies.
 
 [Running ed.py](#Running-ed.py)  
-[Stopping and resuming ed\.py](#Stopping-and-resuming-ed\.py)  
+[Stopping and resuming](#Stopping-and-resuming)  
 [Commands](#Commands)  
 [Working with files and buffers](#Working-with-files-and-buffers)  
 [Differences from classic ed and sam](#Differences-from-classic-ed-and-sam)  
-[New commands and address forms in ed.py](#New-commands-and-address-forms-in-ed.py)  
+[New commands and address forms](#New-commands-and-address-forms)  
 [API](#API)  
 [Modules](#Modules)  
 [Data structures](#Data-structures)  
@@ -91,7 +91,7 @@ can resemble the *ed* command line:
     lines20.txt, 20 lines
     %
 
-## Stopping and resuming ed\.py ##
+## Stopping and resuming ##
 
 The usual way to stop *ed.py* is to use its *q* (quit) command
 (the *Q* command quits without warning about any unsaved changes).
@@ -339,7 +339,7 @@ search, *ed.py* only searches forward to the end of the buffer (or
 backward to the beginning). It does not wrap around and continue searching
 from the beginning (or end).
 
-## New commands and address forms in *ed.py* ##
+## New commands and address forms ##
 
 **ed.py** provides several new commmands and address forms not present in
 any version of *ed*, nor in *sam*.   These commands were introduced for

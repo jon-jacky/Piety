@@ -4,7 +4,7 @@ edo.py
 
 **[edo.py](edo.py)** provides the *[ed.py](ed.md)* line editor with an enhanced
 command line shell, including a Python interpreter
-provided by the *[wyshka](../shells/wyshka.py)* module.  *edo* also
+provided by the *[wyshka](../shells/wyshka.md)* module.  *edo* also
 provides editor commands for running Python code from
 selected text in any buffer, functions for importing or reloading
 a Python module directly from a buffer, and a function to execute 
@@ -15,7 +15,7 @@ turn *ed.py* into a minimal but self-contained
 Python programming environment.  In *edo*, you can edit modules and
 write them out using *ed* commands, then use the built-in
 Python interpreter to import or reload modules, call their functions,
-and inspect and update their data structures.  
+and inspect and update their data structures.
 Or, you can bypass the file system and run Python
 statements from selected text in a buffer, or import or reload an entire
 module from a buffer.
@@ -24,11 +24,20 @@ module from a buffer.
 for executing scripts of editor commands
 from an editor buffer with optional echo and delay,
 supported by the *[samysh](../shells/samysh.py)* module.
-
 The *X* command is provided for testing *ed.py* itself, as well as the
 several other programs built on it (see below).  The echo and delay make
 it easy to see the effect of each command in the script.  This is
 especially useful for testing the display editors based on *ed.py*.
+
+[Running and resuming edo.py](#Running-and-resuming-edo.py)  
+[Wyshka-shell](#Wyshka-hell)  
+[Running Python code](#Running-Python-code)  
+[Importing and reloading Python modules](#Importing-and-reloading-Python-modules)  
+[Using the system shell](#Using-the-system-shell)  
+[Editor scripting](#Editor-scripting)  
+[Modules](#Modules)  
+[API and Data Structures](#API-and-Data-Structures)  
+[Related programs](#Related-programs)  
 
 ## Running and resuming edo.py ##
 
@@ -51,18 +60,16 @@ Python prompt when *edo* exits for any reason.  Then you can resume your
 *edo* session just where you left off, with all buffers intact, just by
 calling *main()* (or *edo.main()*) at the Python prompt.
 
-## Shell ##
+## Wyshka shell ##
 
-The *wyshka* command line shell used by *edo* provides both the *ed*
-command line and the *pysh* callable Python interpreter.  This makes
-it possible to use the *ed.py* Python API (or any other Python
-statements) without exiting the editor.  
+The [wyshka](../shells/wyshka.md) command line shell used by *edo*
+provides both the *ed* command line and the *pysh* callable Python
+interpreter.  This makes it possible to use the *ed.py* Python API (or any
+other Python statements) without exiting the editor.
 
 The *wyshka* shell also provides output redirection.  The output of any
 *ed* or Python command can be sent to a text buffer instead of
 the scrolling command region.
-
-For more explanation of the shell, see *wyshka.md*.
 
 ## Running Python code ##
 
@@ -138,7 +145,7 @@ to save the output from *ls -l* in the buffer *ls.log*, use this command:
 and what follows is a *Python* function call, not an editor command
 (this is only necessary if *wyshka* is not already in Python mode).
 
-## Scripting ##
+## Editor scripting ##
 
 **edo.py** adds a new *X* command that executes *ed* commands
 from an editor buffer, to support scripting and
@@ -233,5 +240,5 @@ The **[edda](edda.md)** display editor imports *edo.py*.
 
 The **[edsel](edsel.md)** display editor imports *edda* which imports *edo*.
 
-Revised Feb 2021
+Revised Apr 2021
 
