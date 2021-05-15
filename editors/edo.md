@@ -73,9 +73,10 @@ the scrolling command region.
 
 ## Running Python code ##
 
-In addition to providing a Python shell, **edo.py** also provides new editor
-commands for running Python out of text buffers. These commands execute the code
-at top level (in the *main* module), they do not import the buffer as a module.
+In addition to providing a Python shell, **edo.py** also provides new
+editor commands for running Python out of text buffers. These commands
+execute the code at top level (in the \_\_*main*\_\_ module), they do not
+import the buffer as a module.
 
 - *P*: Execute selected lines using the *push* method from Python *code* module
 *InteractiveConsole* class. The selected lines can be a single line or range of
@@ -108,11 +109,12 @@ etc. in the scrolling command region; the *R* command causes the whole
 session  to crash.
 
 The *T* command, after it prints the output from the selected Python code
-at the end of the buffer, also adds a new empty line to end of buffer
-and sets mark and dot there.  Then new lines typed at the end of the buffer
-advance dot but leave the mark, so all text typed after the last Python output
-is in the selection region, ready to be executed by *]T*.   The *edsel* *^T*
-command invokes *edo* *T*.  These turn any buffer into a Python REPL.
+at the end of the buffer, also adds a new empty line to end of buffer and
+sets mark and dot there.  Then new lines typed at the end of the buffer
+advance dot but leave the mark, so all text typed after the last Python
+output is in the selection region, ready to be executed by *]T*.   The
+*edsel* *C-j* display editing command invokes *edo* *]T*.  These turn any
+buffer into a Python REPL.
 
 There are some inconveniences with *T*.  Error output still appears in the
 scrolling region, not the buffer.  Some Python output appears in very long

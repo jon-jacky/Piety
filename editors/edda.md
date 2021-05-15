@@ -30,7 +30,7 @@ an entire module from a buffer.
 [Running edda](#Running-edda)  
 [Display](#Display)  
 [Commands](#Commands)  
-/[API and data structures](#API-and-data-structures)  
+[API and data structures](#API-and-data-structures)  
 [Modules](#Modules)  
 [Related programs](#Related-programs)
 

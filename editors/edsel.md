@@ -91,7 +91,7 @@ to manage buffers.
 ## Display editing commands ##
 
 Most of the display editing commands use the standard
-[Emacs key bindings](https://www.gnu.org/software/emacs/refcards/pdf/refcard.pdf).
+[Emacs key bindings](http://www.math.uh.edu/~bgb/emacs_keys.html).
 The *edsel* display editing commands are summarized [here](edsel.txt).
 
 ### Display editing in a text window ###
