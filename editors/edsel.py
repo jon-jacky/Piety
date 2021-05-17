@@ -1,5 +1,5 @@
 """
-edsel - Full screen display editing, with screen editing keys defined
+ - Full screen display editing, with screen editing keys defined
         in a new Console subclass.
 """
 
@@ -360,6 +360,11 @@ class Console(console.Console):
             terminal.set_char_mode() # resume inline editing
             frame.put_display_cursor()
 
+    def push_print_last_line(self):
+        self.store_line() # Python statement
+        edo.T() # FIXME? args?
+        self.load_line() # empty line after Python output
+
     def runlines_buf(self):
         """
         Run Python statements in current selection (mark to dot).
@@ -375,6 +380,12 @@ class Console(console.Console):
         else:
             start = end = text.buf.dot
         edo.T(start, end)
+        # Following lines moved over from edo.py T() 5/6/21
+        # Append new empty line and put dot there to make it easy to add new text.
+        text.buf.a(text.buf.dot, '\n')
+        # Also put mark there to make it easy to select the new text.
+        # Everything you type after the last batch of output is selected.
+        text.buf.mark['@'] = text.buf.dot
 
     def runshell_buf(self):
         """
@@ -396,6 +407,7 @@ class Console(console.Console):
         self.display_keys = {
             key.C_d: self.delete_char,
             # key.C_k: self.crash, # FIXME? Now ^K is kill
+            key.C_j: self.push_print_last_line, # emacs has eval-print-last-sexp
             key.C_k: self.kill_line,
             key.C_l: self.refresh,
             key.C_n: self.next_line,
@@ -404,7 +416,6 @@ class Console(console.Console):
             key.C_q: self.exchange,
             key.C_r: self.rsearch,
             key.C_s: self.search,
-            key.C_j: self.runlines_buf, # like emacs eval-print-last-sexp
             key.C_u: self.discard,
             key.C_v: self.page_down,
             key.C_w: self.cut,
@@ -429,7 +440,7 @@ class Console(console.Console):
             # key.C_x + key.C_b : ed.N, # list buffers in a buffer
             # key.C_x + 'b': self.switch_to_buffer,
 
-            # ^space also works as ^@ on many terminals
+            # C-space also works as C-@ on many terminals
             key.C_at: self.set_mark,
             key.cr: self.open_line,
             key.up: self.prev_line,

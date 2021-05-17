@@ -55,18 +55,18 @@ def R(*args):
 def T(*args):
     """
     Run Python statements in addressed lines using push,
-    redirect output to end of current buffer, advance to next line
+    redirect output to end of current buffer, advance dot to next line
     """
     valid, start, end, _, _ = check.irange(text.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
         with redirect_stdout(text.buf):
             # with redirect_stderr(text.buf): # FIXME - doesn't work
                 pysh.pushlines(text.buf.lines[start:end+1])
-    # Append new empty line and put dot there to make it easy to add new text.
-    text.buf.a(text.buf.dot, '\n')
+    text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
+    # Following lines commented out, moved over to edsel.py runlines_buf()
     # Also put mark there to make it easy to select the new text.
     # Everything you type after the last batch of output is selected.
-    text.buf.mark['@'] = text.buf.dot
+    #text.buf.mark['@'] = text.buf.dot
         
 parse.ed_cmds += 'PRT' # so parse.command() recognizes new commands
 
