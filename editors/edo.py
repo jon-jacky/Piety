@@ -63,15 +63,21 @@ def T(*args):
             # with redirect_stderr(text.buf): # FIXME - doesn't work
                 pysh.pushlines(text.buf.lines[start:end+1])
     text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
-    # Following lines commented out, moved over to edsel.py runlines_buf()
-    # Also put mark there to make it easy to select the new text.
-    # Everything you type after the last batch of output is selected.
-    #text.buf.mark['@'] = text.buf.dot
-        
-parse.ed_cmds += 'PRT' # so parse.command() recognizes new commands
+
+def Z(*args):
+    'Run shell command on single line at dot'
+    # ignore any arguments for now - only works at dot
+    # sh function must be defined in the top-level module 
+    sh_cmd = 'sh(\'%s\')' % text.buf.lines[text.buf.dot].rstrip()
+    with redirect_stdout(text.buf):
+        # with redirect_stderr(text.buf): # FIXME - doesn't work
+            pysh.pushlines([sh_cmd]) # pushlines takes a list of strings
+    text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
+    
+parse.ed_cmds += 'PRTZ' # so parse.command() recognizes new commands
 
 def do_command(line):
-        'Add P and R commands to run Python statements'
+        'Add P, R, T, Z commands to run Python statements'
         results = parse.command(text.buf, line)
         if results:
             cmd_name, args = results
@@ -83,6 +89,8 @@ def do_command(line):
             P(*args)
         elif cmd_name == 'T':
             T(*args)
+        elif cmd_name == 'Z':
+            Z(*args)
         else:
             ed.do_command(line)
 

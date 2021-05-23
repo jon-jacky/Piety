@@ -361,8 +361,17 @@ class Console(console.Console):
             frame.put_display_cursor()
 
     def push_print_last_line(self):
+        'Run Python statement at dot and print output at end of buffer'
+        # name by analogy with emacs eval-print-last-sexp
         self.store_line() # Python statement
-        edo.T() # FIXME? args?
+        edo.T()
+        self.load_line() # empty line after Python output
+
+    def shell_print_last_line(self):
+        'Run shell commmand at dot and print output at end of buffer'
+        # name by analogy with emacs eval-print-last-sexp
+        self.store_line() # Python statement
+        edo.Z()
         self.load_line() # empty line after Python output
 
     def runlines_buf(self):
@@ -380,10 +389,7 @@ class Console(console.Console):
         else:
             start = end = text.buf.dot
         edo.T(start, end)
-        # Following lines moved over from edo.py T() 5/6/21
-        # Append new empty line and put dot there to make it easy to add new text.
-        text.buf.a(text.buf.dot, '\n')
-        # Also put mark there to make it easy to select the new text.
+        # Put mark at dot to make it easy to select the new text.
         # Everything you type after the last batch of output is selected.
         text.buf.mark['@'] = text.buf.dot
 
@@ -423,7 +429,7 @@ class Console(console.Console):
             key.C_z: self.set_command_mode,
 
             # M prefix - esc key prefix or alt key modifier
-            key.M_j: self.runshell_buf,
+            key.M_j: self.shell_print_last_line,
             key.M_v: self.page_up,
             key.M_x: self.execute,
             key.M_lt: self.top,    # lt is <
