@@ -419,7 +419,6 @@ class Console(console.Console):
             key.C_n: self.next_line,
             # key.C_o: self.other_window, # now assigned to C_x + 'o'
             key.C_p: self.prev_line,
-            key.C_q: self.exchange,
             key.C_r: self.rsearch,
             key.C_s: self.search,
             key.C_u: self.discard,
@@ -440,6 +439,9 @@ class Console(console.Console):
             key.C_x + 'o' : self.other_window,
             key.C_x + '2' : self.split_window,
             key.C_x + '1' : self.one_window,
+
+            # C_x prefix - miscellaneous
+            key.C_x + key.C_x : self.exchange, # exchange point and mark
 
             # C_x prefix - buffer and file commands
             # FIXME not ready
