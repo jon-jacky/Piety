@@ -287,6 +287,93 @@ class Console(console.Console):
         frame.put_message('Switch to buffer (default %s): ' % text.previous)
         # FIXME How best to collect non-default filename without blocking?
 
+    # Run Python code and Shell commands
+
+    def push_print_last_line(self):
+        'Run Python statement at dot and print output at end of buffer'
+        # name by analogy with emacs eval-print-last-sexp
+        self.store_line() # Python statement
+        edo.T()
+        self.load_line() # empty line after Python output
+
+    def shell_print_last_line(self):
+        'Run shell commmand at dot and print output at end of buffer'
+        # name by analogy with emacs eval-print-last-sexp
+        self.store_line() # shell command
+        edo.Z()
+        self.load_line() # empty line after shell output
+
+    # The following methods are not bound to any keycodes.
+    # Instead we use edo commands or other methods above, so we may omit these.
+
+    def runlines(self):
+        # Similar to edo ]P, could be bound to keycode.
+        """
+        Run Python statements in current selection (mark to dot).
+        If there is no current selection, just run the current line.
+        Writes output to stdout, usually the scrolling command region
+        """
+        if '@' in text.buf.mark:
+            start = text.buf.mark['@']
+            end = text.buf.dot
+            if start > end:
+                start, end = end, start
+            end -= 1 # exclude last line, dot (usually) or mark
+        else:
+            start = end = text.buf.dot
+        if check.range_ok(text.buf, start, end):
+            terminal.set_line_mode() # exit inline editing, prepare for P(...)
+            frame.put_command_cursor()
+            # Use pushlines, uses code.InteractiveConsole not builtin exec
+            pysh.pushlines(text.buf.lines[start:end+1])
+            # Sometimes buf.lines prints nothing - did anything happen?
+            print('%s, ran lines %d..%d' % (text.current, start, end))
+            terminal.set_char_mode() # resume inline editing
+            frame.put_display_cursor()
+
+    def runlines_buf(self):
+        # Similar to edo ]T, could be bound to keycode,
+        # BUT instead we bind push_print_last_line (above) to C_j
+        """    
+        Run Python statements in current selection (mark to dot).
+        If there is no current selection, just run the current line.
+        Redirects output to end of current buffer.
+        Advances point to end of buffer so anything typed after is in region.
+        """
+        if '@' in text.buf.mark:
+            start = text.buf.mark['@']
+            end = text.buf.dot
+            if start > end:
+                start, end = end, start
+            end -= 1 # exclude last line, dot (usually) or mark
+        else:
+            start = end = text.buf.dot
+        edo.T(start, end)
+        # Put mark at dot to make it easy to select the new text.
+        # Everything you type after the last batch of output is selected.
+        text.buf.mark['@'] = text.buf.dot
+
+    def runshell_buf(self):
+        # Like edo Z command
+        # Instead of this, we bind push_print_last_line (above) to M_j
+        """
+        Run shell command in line preceding dot.
+        Redirects output to end of current buffer.
+        Advances point to end of buffer so anything typed after is in region.
+        """
+        iline = text.buf.dot if text.buf.dot > 0 else 1
+        command = text.buf.lines[iline-1].rstrip('\n')
+        with redirect_stdout(text.buf):
+            sh(command)
+        # Following lines copied from edo.T
+        # Append new empty line and put dot there to make it easy to add new text.
+        text.buf.a(text.buf.dot, '\n')
+        # Also put mark there to make it easy to select the new text.
+        # Everything you type after the last batch of output is selected.
+        text.buf.mark['@'] = text.buf.dot
+
+    # Miscellaneous commands, not bound to any keycodes
+
     def status(self):
         '^T handler, override base class'
         # Now ^T is bound to runlines
@@ -296,6 +383,12 @@ class Console(console.Console):
             util.putstr('%s.%s point %s len %s dot %s nlines %s' %
                         (self.line[:self.point], self.line[self.point:],
                          self.point, len(self.line), text.buf.dot, text.buf.nlines()))
+
+    def crash(self):
+        'For now, just crash' # FIXME - not used, ^K is now console kill line
+        return 1/0  # raise exception on demand (crash), for testing
+
+    # Using the command line
 
     def execute(self):
         """
@@ -332,82 +425,7 @@ class Console(console.Console):
         display.kill_line()
         self.set_display_mode(text.buf.lines[text.buf.dot].rstrip('\n'))
 
-    def crash(self):
-        'For now, just crash' # FIXME - not used, ^K is now console kill line
-        return 1/0  # raise exception on demand (crash), for testing
-
-    def runlines(self):
-        """
-        Run Python statements in current selection (mark to dot).
-        If there is no current selection, just run the current line.
-        Writes output to stdout, usually the scrolling command region
-        """
-        if '@' in text.buf.mark:
-            start = text.buf.mark['@']
-            end = text.buf.dot
-            if start > end:
-                start, end = end, start
-            end -= 1 # exclude last line, dot (usually) or mark
-        else:
-            start = end = text.buf.dot
-        if check.range_ok(text.buf, start, end):
-            terminal.set_line_mode() # exit inline editing, prepare for P(...)
-            frame.put_command_cursor()
-            # Use pushlines, uses code.InteractiveConsole not builtin exec
-            pysh.pushlines(text.buf.lines[start:end+1])
-            # Sometimes buf.lines prints nothing - did anything happen?
-            print('%s, ran lines %d..%d' % (text.current, start, end))
-            terminal.set_char_mode() # resume inline editing
-            frame.put_display_cursor()
-
-    def push_print_last_line(self):
-        'Run Python statement at dot and print output at end of buffer'
-        # name by analogy with emacs eval-print-last-sexp
-        self.store_line() # Python statement
-        edo.T()
-        self.load_line() # empty line after Python output
-
-    def shell_print_last_line(self):
-        'Run shell commmand at dot and print output at end of buffer'
-        # name by analogy with emacs eval-print-last-sexp
-        self.store_line() # Python statement
-        edo.Z()
-        self.load_line() # empty line after Python output
-
-    def runlines_buf(self):
-        """
-        Run Python statements in current selection (mark to dot).
-        If there is no current selection, just run the current line.
-        Redirects output to end of current buffer.
-        """
-        if '@' in text.buf.mark:
-            start = text.buf.mark['@']
-            end = text.buf.dot
-            if start > end:
-                start, end = end, start
-            end -= 1 # exclude last line, dot (usually) or mark
-        else:
-            start = end = text.buf.dot
-        edo.T(start, end)
-        # Put mark at dot to make it easy to select the new text.
-        # Everything you type after the last batch of output is selected.
-        text.buf.mark['@'] = text.buf.dot
-
-    def runshell_buf(self):
-        """
-        Run shell command in line preceding dot.
-        Redirects output to end of current buffer.
-        """
-        iline = text.buf.dot if text.buf.dot > 0 else 1
-        command = text.buf.lines[iline-1].rstrip('\n')
-        with redirect_stdout(text.buf):
-            sh(command)
-        # Following lines copied from edo.T
-        # Append new empty line and put dot there to make it easy to add new text.
-        text.buf.a(text.buf.dot, '\n')
-        # Also put mark there to make it easy to select the new text.
-        # Everything you type after the last batch of output is selected.
-        text.buf.mark['@'] = text.buf.dot
+    # Keymaps
          
     def init_edsel_keymaps(self):
         self.display_keys = {
