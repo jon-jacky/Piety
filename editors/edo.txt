@@ -2,9 +2,12 @@ edo.py command summary:
 
  P  execute selected lines using Python InteractiveConsole class
  R  execute selected lines using Python exec function
+ T  execute selected lines as in P, append output to end of current buffer
 
  X buffer echo delay - execute editor or Python script in the named buffer 
     with command echo (Boolean), delay seconds between commands
 
-Revised June 2020
+ Z  execute current line with shell, append output to end of current buffer
+
+Revised Jun 2021
 

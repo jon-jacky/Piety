@@ -110,11 +110,7 @@ session  to crash.
 
 The *T* command, after it prints the output from the selected Python code
 at the end of the buffer, also adds a new empty line to end of buffer and
-sets mark and dot there.  Then new lines typed at the end of the buffer
-advance dot but leave the mark, so all text typed after the last Python
-output is in the selection region, ready to be executed by *]T*.   The
-*edsel* *C-j* display editing command invokes *edo* *]T*.  These turn any
-buffer into a Python REPL.
+sets dot there.  
 
 There are some inconveniences with *T*.  Error output still appears in the
 scrolling region, not the buffer.  Some Python output appears in very long
@@ -146,6 +142,10 @@ to save the output from *ls -l* in the buffer *ls.log*, use this command:
 *> ls.log !sh('ls -l')* Here the *!* preceding *sh* indicates that *sh*
 and what follows is a *Python* function call, not an editor command
 (this is only necessary if *wyshka* is not already in Python mode).
+
+There is a *Z* command that executes the current line with the  system
+shell, so you do not have to surround the command with *sh('...')*. *Z*
+appends the shell command output to the end of the  current buffer.
 
 ## Editor scripting ##
 

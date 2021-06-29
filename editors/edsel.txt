@@ -21,7 +21,7 @@ While display editing in a text window:
     C-g  cancel M-x command in progress
     C-h  backspace, delete character before cursor
     C-i  tab, insert spaces
-    C-j  run Python statements in region from mark (included) to dot (excluded), append output to current buffer    
+    C-j  execute current line with Python, append output to end of current bufferrun Python statements in region from mark (included) to dot (excluded), append output to current buffer    
     C-k  delete (kill) from cursor to end of line, save in paste buffer
     C-l  refresh entire screen
     C-m  return, open new line below, or break line at cursor
@@ -44,7 +44,7 @@ While display editing in a text window:
     M-b  move cursor (b)ackward one word
     M-f  move cursor (f)orward one word
     M-d  delete word at cursor, save in paste buffer
-    M-j  run system shell command in line preceding dot, append output to end of current buffer
+    M-j  execute current line with system shell, append output to end of current bufferrun Python statements in region from mark (included) to dot (excluded), append output to current buffer    
     M-q  fill paragraph containing cursor, or immediately preceding cursor
     M-v  move cursor backward one-half page (page up)
     M-x  enter a single command at the command line, return to display editing    
@@ -85,5 +85,5 @@ On the command line:
     up   (arrow key) retrieve previous line from history
     down (arrow key) retrieve next line from history
 
-Revised Apr 2021
+Revised Jun 2021
 

@@ -415,9 +415,9 @@ edge do not reappear.  You must use the display editing *refresh* command
 
 #### Undo ####
 
-**edsel** has no *undo* command.  But it is usually possible to recover
-the most recently deleted or altered text.  The command to restore the text
-depends on the command that deleted or altered it.
+**edsel** has no all-purpose *undo* command.  But it is usually possible
+to recover the most recently deleted or altered text.  The command to
+restore the text depends on the command that deleted or altered it.
 
 After command mode *delete* *d* or *change* *c*, or display mode *cut*
 *C-w*, the deleted lines can be pasted back into the buffer after dot with
@@ -483,18 +483,13 @@ session, where all the commands you type and all their output are saved in
 the buffer.  The *T* command is similar to *P*, but the Python output
 appears at the end of the same buffer.
 
-The *T* command also adds a new empty line to the end of the buffer and
-sets mark and dot there.  Then new lines typed at the end of the buffer
-advance dot but leave the mark, so all text typed after the last Python
-output is in the selection region.  So after the output appears, you  can
-type another Python command on the next line -- or a whole block of Python
-code, if you wish.   Then type RETURN, then type *M-x* to get a command
-prompt, then enter the *]T* command to  execute the code you just entered
-and begin the cycle again.
-
-The *edsel* display editing command *C-j* has the same effect as *]T*
-command. Just type *C-j* after you  enter each command or block of Python
-code - there is no need to leave display editing.
+The *edsel* display editing command *C-j* has the same effect as the *T*
+command with no arguments.  It executes the current line in the Python
+interpreter and appends any output to the end of the buffer.   Just type
+*C-j* after you  enter each Python statement -  there is no need to leave
+display editing.   You can use the *C-j* command to make a transcript of a
+Python session in a buffer, similar to what you would see in a terminal window.
+Just type *C-j* instead of *RET* at the end of each Python statement.
 
 All of the techniques described so far execute the Python code in the
 \_\_*main*\_\_ module.   It acts as a sort of scratchpad -- any objects you
@@ -519,21 +514,25 @@ Our goal is to write and run Python code entirely within an *edsel*
 session. Nevertheless, it is sometimes necessary to resort to the host
 system shell, for example to navigate the host file system.
 
-The *edsel* *sh* function executes its argument (a string) with the system
-shell (*bash*, for example). So it is possible to run system commands
-without leaving *edsel*, for  example *sh('ls -l')*.  If you started 
-*edsel* by importing it into a Python session with *import edsel* etc.
-then you have to type *edsel.sh('ls -l')*.
+In *edsel*, *sh* is a Python function that executes its argument (a string)
+with the system shell (*bash*, for example). So it is possible to run
+system commands frpm the *edsel* command prompt, for  example *!sh('ls
+-l')* (Remember, at the *:* command prompt you have to prefix Python
+statements with *!*.)  If you started  *edsel* by importing it into a
+Python session with *import edsel* etc. then you have to type
+*!edsel.sh('ls -l')*.
 
-Shell command output usually appears in the scrolling command region.  But
-if you invoke the *sh* function using the *T* command or *C-j* display
-editing command, the shell command output appears right below the command
-in the same buffer. Alternatively, you can use the output redirection
-capability of the *wyshka* shell to save command output in another buffer.
+The *Z* command executes the current line with the shell (so you do  not
+have to surround it with *sh('...')*. The display editing command *M-j*
+does the same thing.  The shell command output appears at the end of the
+buffer.  You can use the *M-j* command to make a transcript of a shell
+command session in a buffer, similar to what you would see in a terminal window.
+Just type *M-j* instead of *RET* at the end of each shell command line.
 
-The *M-j* display editing command executes a shell command in the line
-preceding dot, without having to quote it and pass it to the *sh*
-function.  The shell command output appears at the end of the current buffer.
+Shell command output usually appears in the scrolling command region.
+Alternatively, you can use *wyshka* shell output redirection to save
+command output in another buffer. The *Z* command and the *M-j* display
+editing command send the shell output to the end of the same buffer.
 
 ## API and data structures ##
 
@@ -588,5 +587,5 @@ or editing in the focus window does  not appear in the other window until
 you finish editing the line by typing  *Return*, or perform some other
 operation that calls *store_line*.
 
-Revised Apr 2021
+Revised Jun 2021
 

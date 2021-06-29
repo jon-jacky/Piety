@@ -67,11 +67,9 @@ def T(*args):
 def Z(*args):
     'Run shell command on single line at dot'
     # ignore any arguments for now - only works at dot
-    # sh function must be defined in the top-level module 
-    sh_cmd = 'sh(\'%s\')' % text.buf.lines[text.buf.dot].rstrip()
     with redirect_stdout(text.buf):
         # with redirect_stderr(text.buf): # FIXME - doesn't work
-            pysh.pushlines([sh_cmd]) # pushlines takes a list of strings
+        sh(text.buf.lines[text.buf.dot].rstrip())
     text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
     
 parse.ed_cmds += 'PRTZ' # so parse.command() recognizes new commands
