@@ -116,7 +116,6 @@ and *C-F* are the same.
     C-m  return, open new line below, or break line at cursor
     C-n  move cursor down to (n)ext line
     C-p  move cursor up to to (p)revious line
-    C-q  exchange mark and dot (move cursor to show where they are)
     C-r  search backwards (reverse) for previously entered search string
     C-s  search forwards for previously entered search string
     C-u  discard from start of line to cursor, save in paste buffer
@@ -144,6 +143,8 @@ then type the remaining key.
     C-x 2  create a new window by splitting window in two horizontally
     C-x 1  return to a single window by expanding the current window to fill frame
     C-x o  move to other window
+
+    C-x C-x  exchange mark and dot (move cursor to show where they are)
 
 Special keys on the keyboard:
 
@@ -256,9 +257,9 @@ bottom of the display. Then move  the cursor (which indicates dot)  down
 to the first line after the end of the region. As you move  the cursor,
 the end of the region moves also, always following one line behind dot.
 
-To see where the region begins in display editing mode, type *C-q*, which
+To see where the region begins in display editing mode, type *C-x C-x*, which
 exchanges dot and mark, so the cursor (which is always at dot) goes to the
-line at the beginning of the region.  Then type *C-q* to exchange them
+line at the beginning of the region.  Then type *C-x C-x* to exchange them
 again, so dot and the cursor return to the line after the end of the
 region.
 
@@ -284,9 +285,9 @@ When the region is moved, the mark (as well as other markers set with the
 *C-w* and *C-y*, another *C-w* cuts the region that was just pasted.
 
 It is possible for dot to *precede* mark.  This can occur after you type
-*C-q* to exchange them.  In this situation, the region comprises exactly
+*C-x C-x* to exchange them.  In this situation, the region comprises exactly
 the same lines - but now it begins at dot and extends to the line before
-mark.  In display mode, commands that use the region, *C-w* and *C-q*, work
+mark.  In display mode, commands that use the region, *C-w* and *C-x C-x*, work
 as well when dot precedes mark.
 
 In command mode, the region address range *[* only  works when mark

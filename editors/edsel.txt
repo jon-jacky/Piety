@@ -27,7 +27,6 @@ While display editing in a text window:
     C-m  return, open new line below, or break line at cursor
     C-n  move cursor down to (n)ext line
     C-p  move cursor up to to (p)revious line
-    C-q  exchange mark and dot (move cursor to show where they are)
     C-r  search backwards (reverse) for previously entered search string
     C-s  search forwards for previously entered search string
     C-u  discard from start of line to cursor, save in paste buffer
@@ -55,6 +54,8 @@ While display editing in a text window:
     C-x 2  create a new window by splitting window in two horizontally
     C-x 1  return to a single window by expanding the current window to fill frame
     C-x o  move to other window
+
+    C-x C-x  exchange mark and dot (move cursor to show where they are)
 
     Special keys on the keyboard:
 
