@@ -5,8 +5,33 @@ branches
 This is the *metakey* branch.  
 
 - **metakey**.  Support the *Meta* key modifier, often provided by the
-*Alt* key on the keyboard.  Add Meta key editing commands  similar to
-those in *readline* and *Emacs*.  Begun 15 Feb 2021.
+  *Alt* key on the keyboard.  Add Meta key display editing commands similar to
+  those in *readline* and *Emacs*: *M-b M-d M-f M-j M-v M-lt M-gt M-q*
+
+  Add *control-x* or *C_x* prefix for display editing commands similar to
+  *Emacs*: *C-x o C-x 1 C-x 2 C-x C-x*
+
+  To invoke commands, use *M-x* like *Emacs*, no longer *C-x* which is now 
+  a prefix.
+
+  Add *C-j* display editing command to execute current line in buffer with
+  Python and append output to the end of the buffer, makes any buffer into 
+  a Python REPL with a saved transcript.
+
+  Add *shell.sh()* function for invoking the system shell, add *edo* Z 
+  command and *M-j* display editing command to execute current line with
+  system shell and append output to end of buffer.
+
+  *edsel* internals: use *load_line()*, *store_line()* methods consistently
+  to move text between persistent text buffer and line buffer used for editing.
+
+  Bug fix: paragraph fill *]J* command *M-q* display editing command
+  handle the last line of the buffer correctly.
+
+  Revise *.md* and *.txt* files to explain new shell function and 
+  new display editing commands with *M-* modifier and *C-x* prefix, etc.
+
+  Begun 15 Feb 2021.
 
 Recent work in the *master* branch:
 
