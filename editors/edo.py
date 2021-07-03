@@ -65,7 +65,7 @@ def T(*args):
     text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
 
 def Z(*args):
-    'Run shell command on single line at dot'
+    'Run shell command on single line at dot, append output to current buffer'
     # ignore any arguments for now - only works at dot
     with redirect_stdout(text.buf):
         # with redirect_stderr(text.buf): # FIXME - doesn't work
