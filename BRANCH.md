@@ -2,11 +2,12 @@
 branches
 ========
 
-This is the *metakey* branch.  
+This is the *master* branch.  Branches recently merged into *master*:
 
-- **metakey**.  Support the *Meta* key modifier, often provided by the
-  *Alt* key on the keyboard.  Add Meta key display editing commands similar to
-  those in *readline* and *Emacs*: *M-b M-d M-f M-j M-v M-< M-> M-q*
+- **metakey**.  Merged 3 Jul 2021. Support the *Meta* key modifier, often
+  provided by the   *Alt* key on the keyboard.  Add Meta key display
+  editing commands similar to   those in *readline* and *Emacs*: *M-b M-d
+  M-f M-j M-v M-< M-> M-q*
 
   Add *control-x* or *C_x* prefix for display editing commands similar to
   *Emacs*: *C-x o C-x 1 C-x 2 C-x C-x*
