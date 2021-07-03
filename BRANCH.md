@@ -6,13 +6,17 @@ This is the *metakey* branch.
 
 - **metakey**.  Support the *Meta* key modifier, often provided by the
   *Alt* key on the keyboard.  Add Meta key display editing commands similar to
-  those in *readline* and *Emacs*: *M-b M-d M-f M-j M-v M-lt M-gt M-q*
+  those in *readline* and *Emacs*: *M-b M-d M-f M-j M-v M-< M-> M-q*
 
   Add *control-x* or *C_x* prefix for display editing commands similar to
   *Emacs*: *C-x o C-x 1 C-x 2 C-x C-x*
 
-  To invoke commands, use *M-x* like *Emacs*, no longer *C-x* which is now 
-  a prefix.
+  After receiving the *C-x* prefix, *edsel* blocks, waiting until the
+  second character is received.   If *edsel* is running under the *Piety*
+  scheduler, no other tasks can run during this interval.
+
+  To invoke commands from display editing mode, use *M-x* like *Emacs*, no
+  longer *C-x* which is now  a prefix.
 
   Add *C-j* display editing command to execute current line in buffer with
   Python and append output to the end of the buffer, makes any buffer into 
