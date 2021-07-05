@@ -4,12 +4,12 @@ branches
 
 This is the *master* branch.  Branches recently merged into *master*:
 
-- **metakey**.  Merged 3 Jul 2021. Support the *Meta* key modifier, often
+- **metakey**.  Merged 3 Jul 2021. Support the *Meta* key modifier *M-*, often
   provided by the   *Alt* key on the keyboard.  Add Meta key display
   editing commands similar to   those in *readline* and *Emacs*: *M-b M-d
-  M-f M-j M-v M-< M-> M-q*
+  M-f M-v M-< M-> M-q*
 
-  Add *control-x* or *C_x* prefix for display editing commands similar to
+  Add the *Control-x* prefix *C-x* for display editing commands similar to
   *Emacs*: *C-x o C-x 1 C-x 2 C-x C-x*
 
   After receiving the *C-x* prefix, *edsel* blocks, waiting until the
@@ -19,18 +19,22 @@ This is the *master* branch.  Branches recently merged into *master*:
   To invoke commands from display editing mode, use *M-x* like *Emacs*, no
   longer *C-x* which is now  a prefix.
 
-  Add *C-j* display editing command to execute current line in buffer with
-  Python and append output to the end of the buffer, makes any buffer into 
-  a Python REPL with a saved transcript.
+  Add the *C-j* display editing command to execute the current line in the
+  buffer with Python and append output to the end of the buffer.  This
+  makes any buffer into  a Python REPL with a saved transcript.  
 
-  Add *shell.sh()* function for invoking the system shell, add *edo* Z 
-  command and *M-j* display editing command to execute current line with
-  system shell and append output to end of buffer.
+  *C-j* replaces *C-t* (*^T*) from Feb 2021 (below).  It only works on 
+  the current line.  Neither *C-j* nor *T* advance the mark.
 
-  *edsel* internals: use *load_line()*, *store_line()* methods consistently
-  to move text between persistent text buffer and line buffer used for editing.
+  Add the *edo* Z command and the *M-j* display editing command, to
+  execute the current line with the system shell and append the output to
+  the end of the buffer.
 
-  Bug fix: paragraph fill *]J* command *M-q* display editing command
+  *edsel* internals: use the *load_line()* and *store_line()* methods
+  consistently to move text between the persistent text buffer and the
+  line editing buffer.
+
+  Bug fix: the paragraph fill *]J* command and *M-q* display editing command
   handle the last line of the buffer correctly.
 
   Revise *.md* and *.txt* files to explain new shell function and 
@@ -230,6 +234,6 @@ Sep 2017.
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
 
-Revised Feb 2021
+Revised Jul 2021
 
 
