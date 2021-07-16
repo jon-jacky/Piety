@@ -20,7 +20,7 @@ prev_word = re.compile(r'\w\W') # Word char then non-word char
 class Console(object):
     'Wrapper that adapts console applications for cooperative multitasking'
     def __init__(self, name=__module__,
-                 prompt=(lambda: ''), reader=getkey.getkey,
+                 prompt=(lambda: ''), reader=getkey.GetKey(),
                  process_line=(lambda line: None),
                  stopped=(lambda line: False),
                  startup=(lambda: None), cleanup=(lambda: None),

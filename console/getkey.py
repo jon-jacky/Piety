@@ -1,88 +1,142 @@
 """
 getkey.py - Get 'key' from keyboard: single character or key sequence
+
+Provides the GetKey class with a __class__ method that gets a'key'
+from keyboard: a single character or key sequence.
+
+This method does *not* block after receiving a prefix character  such
+as C_x.  Instead, this method  always returns immediately after
+receiving each single character.  If the character is a prefix, and
+more characters are expected, this method just returns the empty
+string, ''.   If the character is not a prefix (it is a printing
+character or a self-contained  control character) this method
+returns that character.  If the character is the last character in a
+multicharacter sequence, this method returns the whole sequence
+including the prefix  character(s) and the last character.
+
+Also, the method might read multiple characters in one call,
+if more than one character arrived since the last call.  This
+might happen for special function keys, arrow keys etc. that include
+a prefix plus contents, all sent rapidly.   If the method reads
+more than a single character in one call, it immediately returns
+the entire sequence of characters it read.
+
+This is implemented by a Python class, not a function, so each instance
+can store the prefix character(s) between calls.  The method is a 
+__class__ method so it can be called with the same syntax as a function,
+as if the instance name were a function name, to make the calls a little
+more compact.
+
+Each key sequence begins with prefix character or characters indicating more
+follows. ESC is the prefix for the meta commands and terminal control
+codes. C_x is the prefix for some key sequences such as C_x o, the
+edsel  command  to switch to the other window.  ESC-[ (called CSI) is
+the prefix for terminal control codes.
+
+To avoid waiting indefinitely for a sequence that never finishes,
+reading C_g (that is, CTRL g or ^g) at any time ends waiting,
+discards any incomplete sequence, and immediately returns just C_g.
+So the user can type C_g if a program appears hung when reading a command.
+C_g is used as the Cancel command by some programs.
 """
 
 import util, terminal, key
 
-def getkey():
-    """
-    Get 'key' from keyboard: single character or key sequence.
+class GetKey:
+
+    def __init__(self):
+        self.prefix = '' 
+
+    def __call__(self):
+    
+        c = terminal.getchar() 
+    
+        # No prefix, prefix character arrives, start prefix
+        if self.prefix == '' and c in (key.esc, key.C_x): # more to come?
+            self.prefix = c
+            return ''
+    
+        # No prefix, ordinary character arrives, just return this character
+        elif self.prefix == '':
+            return c
+
+        # Handle each prefix
+    
+        # esc prefix for meta keys and ANSI terminal control codes
+        elif self.prefix == key.esc: 
+
+            # ANSI escape codes for terminal control, begin with esc-[ called csi
+            if c == '[':
+                self.prefix += '['
+                return '' # now keyseq == key.csi, wait for rest of sequence
         
-    This version *blocks* while collecting multi-character key sequences.
-    We find that unfortunately select does *not* indicate when
-    subsequent chars from keyboard key sequences are ready,
-    so we read each character from here without returning.
+            # C_g is the cancel command, stop waiting for more keys and return now
+            elif c == key.C_g:
+                self.prefix = '' # reset self.prefix and return
+                return key.C_g
+    
+            # Meta keys, begin with esc then one other key but not [
+            else:
+                keyseq = self.prefix + c
+                self.prefix = '' 
+                return keyseq
 
-    Each key sequence begins with prefix char or chars indicating more follows.
-    esc is the prefix for the meta commands and terminal control codes.
-    esc-[ (called csi) is the prefix for terminal control codes.
-
-    To avoid blocking indefinitely waiting for a sequence that never finishes,
-    reading C_g (that is, CTRL g or ^g) at any time ends waiting,
-    discards any incomplete sequence, and immediately returns just C_g.
-    So the user can type C_g if a program appears hung when reading a command.
-    C_g is used as the Cancel command by some programs.
-    """
-    keyseq = terminal.getchar()
-
-    # Handle each prefix as a special case
-
-    # esc prefix for meta keys and ANSI terminal control codes
-    if keyseq == key.esc: 
-        keyseq += terminal.getchar() # block waiting, then get next key
-
-        # C_g is the cancel command, stop waiting for more keys and return now
-        if keyseq[-1] == key.C_g:
-            return key.C_g
-
-        # ANSI escape codes for terminal control, begin with esc-[ called csi
-        elif keyseq == key.csi:
-            keyseq += terminal.getchar() # block waiting, then get next key
+        # CSI prefix for control keys
+        elif self.prefix == key.csi:
             # For now we only support the four arrow keys: csi+'A' etc.
             #  with just one char after csi, so we can return now
+            keyseq = self.prefix + c
+            self.prefix = ''
             return keyseq
-
-        # Meta keys, begin with esc then one other key but not [
-        else:
-            return keyseq
-
-    # ctrl-X prefix for window commands and buffer commands
-    elif keyseq == key.C_x:
-        keyseq += terminal.getchar() # block waiting, then get next key
-
-        # C_g is the cancel command, stop waiting for more keys and return now
-        if keyseq[-1] == key.C_g:
-            return key.C_g
+    
+        # ctrl-X prefix for window commands and buffer commands
+        elif self.prefix == key.C_x:
+    
+            # C_g is the cancel command, stop waiting for more keys and return now
+            if c == key.C_g:
+                self.prefix = ''
+                return key.C_g
+    
+            # C-x M-<char> just returns  M-<char>
+            # FIXME? This code doesn't handle C-g or ANSI escape sequences
+            elif c == key.esc:
+                self.prefix += c
+                return '' # wait for char after esc
+    
+            # C_x + one more key
+            else:
+                keyseq = self.prefix + c
+                self.prefix = ''
+                return keyseq
 
         # C-x M-<char> just returns  M-<char>
         # FIXME? This code doesn't handle C-g or ANSI escape sequences
-        elif keyseq[-1] == key.esc:
-            keyseq += terminal.getchar() # get <char> after esc
-            return keyseq[-2:] # return M-<char>
+        elif self.prefix == key.C_x + key.esc: 
+                # C-x M-<char> case
+                keyseq = self.prefix + c # add <char> after esc
+                self.prefix = ''
+                return keyseq[-2:] # return M-<char>
 
-        # C_x + one more key
+        # Unrecognized prefix - clear prefix and return this character
         else:
-            return keyseq
-
-    # Other prefixes to come? Maybe C-c and the whole Emacs menagerie
-
-    # No prefix - just return the single character
-    else:
-        return keyseq
+            self.prefix = ''
+            return c
 
 def main():
-    'Demonstrate getkey function'
+    'Demonstrate getkey'
+    getkey = GetKey()
+
     util.putstr('> ')
     terminal.set_char_mode()
-    line = ''
-    k = '' # anything but cr
+    line = []
+    k = 'x' # anything but cr or ''
     while k != key.cr:
-        k = getkey()
-        line += k
+        k = getkey() # return '' if incomplete prefix
+        line += [k]  # include [''] if incomplete prefix
         util.putstr(k)
     terminal.set_line_mode()
     print() 
-    print([ c for c in line ]) # show any esc or other unprintables
+    print([ [c for c in k] for k in line ]) # show any esc or other unprintables
 
 if __name__ == '__main__':
     main()
