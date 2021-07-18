@@ -588,9 +588,5 @@ or editing in the focus window does  not appear in the other window until
 you finish editing the line by typing  *Return*, or perform some other
 operation that calls *store_line*.
 
-After receiving the *C-x* prefix, *edsel* blocks, waiting until the second
-character is received.   If *edsel* is running under the *Piety* scheduler,
-no other tasks can run during this interval.
-
 Revised Jul 2021
 

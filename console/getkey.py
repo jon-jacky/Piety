@@ -50,6 +50,12 @@ class GetKey:
     def __call__(self):
     
         c = terminal.getchar() 
+
+        # C_g is the unconditional cancel command, 
+        # always discard any prefix and just return C_g itself.
+        if c == key.C_g:
+            self.prefix = ''
+            return key.C_g
     
         # No prefix, prefix character arrives, start prefix
         if self.prefix == '' and c in (key.esc, key.C_x): # more to come?
@@ -69,11 +75,6 @@ class GetKey:
             if c == '[':
                 self.prefix += '['
                 return '' # now keyseq == key.csi, wait for rest of sequence
-        
-            # C_g is the cancel command, stop waiting for more keys and return now
-            elif c == key.C_g:
-                self.prefix = '' # reset self.prefix and return
-                return key.C_g
     
             # Meta keys, begin with esc then one other key but not [
             else:
@@ -92,30 +93,10 @@ class GetKey:
         # ctrl-X prefix for window commands and buffer commands
         elif self.prefix == key.C_x:
     
-            # C_g is the cancel command, stop waiting for more keys and return now
-            if c == key.C_g:
-                self.prefix = ''
-                return key.C_g
-    
-            # C-x M-<char> just returns  M-<char>
-            # FIXME? This code doesn't handle C-g or ANSI escape sequences
-            elif c == key.esc:
-                self.prefix += c
-                return '' # wait for char after esc
-    
             # C_x + one more key
-            else:
-                keyseq = self.prefix + c
-                self.prefix = ''
-                return keyseq
-
-        # C-x M-<char> just returns  M-<char>
-        # FIXME? This code doesn't handle C-g or ANSI escape sequences
-        elif self.prefix == key.C_x + key.esc: 
-                # C-x M-<char> case
-                keyseq = self.prefix + c # add <char> after esc
-                self.prefix = ''
-                return keyseq[-2:] # return M-<char>
+            keyseq = self.prefix + c
+            self.prefix = ''
+            return keyseq
 
         # Unrecognized prefix - clear prefix and return this character
         else:
