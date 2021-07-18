@@ -2,12 +2,10 @@
 branches
 ========
 
-This is the *noblock* branch:
+This is the *master* branch.  Branches recently merged into *master*:
 
-- **noblock**.  Do not block after prefix characters like *C-x* while waiting
-  for the next character.  Begun 5 Jul 2021.
-
-Branches recently merged into *master*:
+- **noblock**.  Merged 18 Jul 2021.  Do not block after prefix characters
+like *C-x* while waiting   for the ne  xt character.  Begun 5 Ju2021.
 
 - **metakey**.  Merged 3 Jul 2021. Support the *Meta* key modifier *M-*, often
   provided by the   *Alt* key on the keyboard.  Add Meta key display
