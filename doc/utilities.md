@@ -13,6 +13,7 @@ Python, or programmable in Python.
 | [pymbr](https://github.com/thanatos/pymbr) | Disk utility | Source, API | "library for reading and writing MBR partition data" |
 | [pyelftools](https://icyphox.sh/blog/python-for-re-1/), [via](https://news.ycombinator.com/item?id=19462795) | ELF utility | Source, API | ELF binary file utility and disassembly
 | [BITS](http://biosbits.org/) also at [YouTube](https://www.youtube.com/watch?v=36QIepyUuhg) and [PyCon](https://us.pycon.org/2015/schedule/presentation/378/)  | BIOS test utility | Source, API | "includes Python APIs to access various low-level functionality of the hardware ... without an OS in the way" |
+| [CHIPSEC](https://github.com/tianocore/edk2/blob/UDK2018/ShellBinPkg/UefiShell/X64/Shell.efi) | UEFI test utility | Source, API | Apparently includes Python 3.6.8 port to UEFI - !? | 
 | [FUSE](http://fuse.sourceforge.net/), also [here](http://en.wikipedia.org/wiki/Filesystem_in_Userspace) and [here](https://github.com/terencehonles/fusepy) and [here](http://sourceforge.net/apps/mediawiki/fuse/index.php?title=SimpleFilesystemHowto) | File system | Wrapper, API | "With FUSE it is possible to implement a fully functional filesystem in a userspace program." "a secure method for non privileged users to create and mount their own filesystem implementations." |
 | [pyfakefs](https://github.com/jmcgeheeiv/pyfakefs) | Mock file system | Source, API | "Using pyfakefs, your tests operate on a fake file system in memory without touching the real disk" |
 | [Py9P](http://repo.cat-v.org/py9p/) | Distributed file system | Source, API | "a pure Python implementation of the 9P (in particular 9p2000) distributed file system protocol ... includes both client and server APIs, and ... authentication" |
@@ -28,6 +29,8 @@ Python, or programmable in Python.
 | [Packet-Sniffer](https://github.com/EONRaider/Packet-Sniffer/) | Network | Source, API | "A simple pure-Python network packet sniffer" |
 | [pypacker](https://gitlab.com/mike01/pypacker) | Network | Source, API | " The fastest and simplest packet manipulation lib for Python", supports "sending/receiving packets on different layers and intercepting packets ... Easily create new protocols ..." "Pypacker is based on code of [dpkt](https://github.com/kbandla/dpkt) ..." |
 | [paramiko](http://www.lag.net/paramiko/), also [here](https://github.com/paramiko/paramiko) and [here](http://docs.paramiko.org/) | Network | Source, API | "paramiko is a module for python 2.2 (or higher) that implements the SSH2 protocol for secure (encrypted and authenticated) connections to remote machines." "It is written entirely in python (no C or platform-dependent code) ..." |
+| [tlslite](https://github.com/trevp/tlslite) | Network | Source, API | "... open source python library that implements SSL and TLS. ... pure python ... can use other libraries for faster crypto operations." |
+| [PEP543](https://peps.python.org/pep-0543/#interfaces)  | Network | API spec proposal| "This PEP would define a standard TLS interface in the form of a collection of abstract base classes. ... with the goal of reducing the dependence of the Python ecosystem on OpenSSL."|
 | [x84](https://github.com/jquast/x84/), also [docs](http://x84.readthedocs.org/en/latest/index.html) | Telnet/ssh server | Source, API | "supplies a scripting engine for developing character-at a time telnet or ssh server, such as MUD or BBS systems", "communication between sessions is provided through an event queuing framework", uses *miniboa*, *blessed*, *sqlitedict*, *paramiko*, and *web.py* |
 | [Penetration testing tools](http://dirk-loss.de/python-tools.htm) | Network, reverse engineering, forensics, malware analysis | Source, API, binding | "Most ... are written in Python, others are just Python bindings for existing C libraries" |
 | [ws30](https://github.com/jon-jacky/uw_python/blob/gh-pages/winter_2012/week05/ws30.py) | Web server | Source | "ws30 -- the thirty minute web server ... how fast could I write a simple web server in python?"  Simpler than the [server in the standard library](http://docs.python.org/2/library/basehttpserver.html) |
@@ -112,5 +115,5 @@ The component is a database whose query language is provided as a Python API.
 The component is a server that communicates using a protocol that has
 a Python API.
 
-Revised Nov 2020
+Revised Mar 2022
 
