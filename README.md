@@ -74,8 +74,7 @@ support experiments in the following areas:
 - **Cloud computing** - Run Python applications on virtual machines,
   minimizing resource consumption and startup time (as in
   [Mirage](http://www.openmirage.org/),
-  [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-
-  haskell-lightweight-virtual-machine-halv.html), or
+  [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), or
   [Erlang on Xen](http://erlangonxen.org/).
 
 Piety is written in Python 3 since June 2015.   Earlier work is saved in
