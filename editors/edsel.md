@@ -20,8 +20,8 @@ redirection and editor scripting.
 
 **edsel** serves as the programmers' user interface to the 
 [Piety](../README.md) system.   By providing text editing, a shell and a 
-window manager, it comprises a minimal but self-contained Python 
-programming environment.
+window manager, it comprises a minimal but self-contained
+programming environment within a single Python terminal session.
 
 **edsel** is most strongly influenced by
 [Emacs](https://www.gnu.org/software/emacs/manual/html_node/emacs/index.html),
@@ -588,5 +588,5 @@ or editing in the focus window does  not appear in the other window until
 you finish editing the line by typing  *Return*, or perform some other
 operation that calls *store_line*.
 
-Revised Jul 2021
+Revised Apr 2022
 

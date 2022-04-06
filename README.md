@@ -27,22 +27,35 @@ others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
 
 For now, Piety runs in an ordinary Python interpreter session on a host
-operating system.  The programmer's user interface to Piety is 
+operating system.   At this stage, the experiment is to see if it can be
+possible to create, edit, and run Python modules completely within a
+single Python session, without resorting to the host desktop or command
+line.  In the present configuration, the user interface to Piety is
 [edsel](editors/edsel.md), a combined  display editor, shell, and window
-manager, which together provide a minimal but self-contained Python
-programming environment.  
+manager, which together provide a minimal but self-contained programming
+environment within a single Python terminal session.
 
-I hope someday to run Piety on a bare machine (or bare VM) with no other
+I hope someday to run Piety on a bare machine with no other
 operating system, but only a Python interpreter with minimal support.
 There are only a few platform-dependent modules.  Most modules developed
 for Piety on a host operating system should also work on a bare machine.
 
-An overview of the Piety design appears [here](doc/analogies.md).  I have
+An overview of the Piety design appears [here](doc/analogies.md).  There is
 a [script](scripts/demo.py) that demonstrates many Piety features,
-described [here](scripts/demo.md).  Ongoing and recent work on Piety is
-described [here](BRANCH.md).
+described [here](scripts/demo.md).   Another page describes the Piety
+[directories](DIRECTORIES.md) and their contents. Ongoing and recent work
+on Piety is described [here](BRANCH.md).
 
-Piety might be used for ---
+The Piety system has no dependencies, other than Python itself
+(including a few standard library modules).  This makes Piety a
+minimal self-contained system, written in a uniform style throughout.
+Alternatively, it might be possible to assemble similar functionality
+from [other projects](doc/utilities.md), but I expect the resulting
+system would be larger and harder to understand than Piety.
+
+Piety is a personal project and I have no expectation to make it generally
+useful.  Nevertheless, a more complete Piety system in the future might
+support experiments in the following areas:
 
 - **Education** - Exhibit and explain almost all of the code for an
     entire system, expressed in a readable high-level language (as
@@ -54,24 +67,21 @@ Piety might be used for ---
     system constructs (like the alternative to the file system
     proposed for [LispOs](https://github.com/robert-strandh/LispOS)).
 
-- **Embedded computing** - Run standalone Python applications on minimal platforms (something like [PyMite](https://wiki.python.org/moin/PyMite) or [Micro Python](http://micropython.org/)).
+- **Embedded computing** - Run standalone Python applications on minimal
+  platforms (something like [PyMite](https://wiki.python.org/moin/PyMite) or
+  [Micro Python](http://micropython.org/)).
 
-- **Cloud computing** - Run Python applications on virtual machines, minimizing resource consumption and startup time (as in [Mirage](http://www.openmirage.org/), [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-haskell-lightweight-virtual-machine-halv.html), [Erlang on Xen](http://erlangonxen.org/), and [OSv](http://osv.io/)).
-
-Another page describes the Piety [directories](DIRECTORIES.md) and
-their contents.
-
-The Piety system has no dependencies, other than Python itself
-(including a few standard library modules).  This makes Piety a
-minimal self-contained system, written in a uniform style throughout.
-Alternatively, it might be possible to assemble similar functionality
-from [other projects](doc/utilities.md), but I expect the resulting
-system would be larger and harder to understand than Piety.
+- **Cloud computing** - Run Python applications on virtual machines,
+  minimizing resource consumption and startup time (as in
+  [Mirage](http://www.openmirage.org/),
+  [HalVM](http://corp.galois.com/blog/2010/11/30/galois-releases-the-
+  haskell-lightweight-virtual-machine-halv.html), or
+  [Erlang on Xen](http://erlangonxen.org/).
 
 Piety is written in Python 3 since June 2015.   Earlier work is saved in
 this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).   Piety now requires Python 3.5.
 
-Revised Mar 2022
+Revised Apr 2022
 
 
