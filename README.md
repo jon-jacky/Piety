@@ -4,11 +4,11 @@ Piety
 
 **Piety** is a notional operating system to be written in Python.
 
-[Introduction](#Introduction)
-[Project Status](#Project-Status)
-[Roadmap](#Roadmap)
-[Dependencies](#Dependencies)
-[Python Versions](#Python-Versions)
+[Introduction](#Introduction)  
+[Project Status](#Project-Status)  
+[Roadmap](#Roadmap)  
+[Dependencies](#Dependencies)  
+[Python Versions](#Python-Versions)  
 
 ## Introduction ##
 
