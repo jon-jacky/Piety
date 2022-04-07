@@ -2,7 +2,7 @@
 Operating System Analogies in Piety
 ===================================
 
-Piety is an operating system, but it is not like a conventional
+Piety aspires to be an operating system, but it is not like a conventional
 operating system such as Linux or Windows.  Instead, our whole world
 --- the entire computer system that Piety manages --- is a single
 long-running Python session and its contents.  We make no attempt to
@@ -174,5 +174,5 @@ The operating system that Piety resembles the most is
 multitasking, uses a text buffer class as a building block, and uses a
 multiwindow text editor as its desktop and system shell.
 
-Revised Oct 2020
+Revised Apr 2022
 
