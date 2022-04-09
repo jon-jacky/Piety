@@ -2,12 +2,12 @@
 Operating System Analogies in Piety
 ===================================
 
-Piety aspires to be an operating system, but it is not like a conventional
+Piety aspires to be an operating system, but not like a conventional
 operating system such as Linux or Windows.  Instead, our whole world
 --- the entire computer system that Piety manages --- is a single
 long-running Python session and its contents.  We make no attempt to
 code something like Linux, but using Python instead of C
-(as they attempted [here](https://github.com/jtauber/pyv6)).
+(as they attempted in [pyv6](https://github.com/jtauber/pyv6)).
 Instead we do something quite different: we code the facilities needed to 
 operate a simple personal computer, including its applications, all within 
 a single Python session.  The result does not much resemble a conventional 

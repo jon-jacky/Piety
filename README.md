@@ -31,16 +31,15 @@ Piety is an experiment to see if I can put together something similar
 today, but using a familiar programming language running on ordinary
 hardware. (For other projects in a similar spirit, again see
 [doc/precursors.md](doc/precursors.md).)  I aim to produce, in Python, a
-simple but self-contained personal computer operating system,  Let's  see
+simple but self-contained personal computer operating system.  Let's  see
 how far we can get with just Python. There is already a lot of work by
 others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
 
-An overview of the Piety design appears [here](doc/analogies.md).  There is
-a [script](scripts/demo.py) that demonstrates many Piety features,
-described [here](scripts/demo.md).   Another page describes the Piety
-[directories](DIRECTORIES.md) and their contents. Ongoing and recent work
-on Piety is described [here](BRANCH.md).
+Here is an explanation of the Piety [design](doc/analogies.md).  Here is a
+[demo](scripts/demo.md) that exhibits many Piety features. Another page
+describes the Piety [directories](DIRECTORIES.md) and their contents.
+Ongoing and recent work on Piety is described [here](BRANCH.md).
 
 ## Project Status ##
 
@@ -70,24 +69,28 @@ decide what to work on next as I go along.  I often go back and rewrite
 what I have already done, to make it easier to work with or just to
 improve the style.
 
-There is no roadmap, but the project divides naturally into two parts,
-corresponding to the user space and the kernel of a conventional operating
-system.  The user space of Piety is the programming environment that runs
-in a Python terminal session hosted on any conventional operating system.
-All the work I have done so far is in this part. The kernel of Piety is
-the part that replaces the kernel of a conventional operating system,
-including just enough C or assembler code to start the Python interpreter and
-connect it to the hardware, and then Python for most of kernel including
-device drivers and file system.  I have not even begun this part.
-It would require a more concentrated, sustained effort than I have  been
-able to make so far.
+There is no roadmap, but the project divides naturally into two parts: the
+*hosted* part and the *bare machine* part.   
 
-It is likely that work in the near future will continue in the user space.
+The hosted part can run in a Python terminal session on any conventional
+operating system. All the work I have done so far, including the
+programming environment, is in this part.
+
+The *bare machine* part corresponds to parts of the boot loader and
+kernel of a conventional operating system. It will include  just enough C
+or assembler code to start the Python interpreter and connect it to the
+hardware, and then Python for the device drivers, file system, and network
+stack. I have not even begun this part. It would require a more
+concentrated, sustained effort than I have  been able to make so far.
+
+It is likely that work in the near future will continue in the hosted part.
 I can always add features and improve the convenience of the programming
-environment.  I might also add other applications, for example a simple
-text-only web browser in pure Python.  I would observe the discipline that
-any applications must be developed completely within the Piety programming
-environment.
+environment.  I might add other hosted applications, for example a simple
+text-only web browser in pure Python.  
+
+I will observe the discipline that Piety is *self-hosted*: any new Piety
+modules must be developed completely within the already-existing Piety
+programming environment.
 
 ## Dependencies ##
 
