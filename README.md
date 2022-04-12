@@ -4,13 +4,13 @@ Piety
 
 **Piety** is a notional operating system to be written in Python.
 
-[Introduction](#Introduction)  
-[Project Status](#Project-Status)  
+[Motivation and Goals](#Motivation-and-Goals)  
+[Current Status](#Current-Status)  
 [Roadmap](#Roadmap)  
 [Dependencies](#Dependencies)  
 [Python Versions](#Python-Versions)  
 
-## Introduction ##
+## Motivation and Goals ##
 
 Piety is a response to this impulse:
 
@@ -36,61 +36,77 @@ how far we can get with just Python. There is already a lot of work by
 others that we might be able to use or adapt (see
 [doc/utilities.md](doc/utilities.md)).
 
-Here is an explanation of the Piety [design](doc/analogies.md).  Here is a
-[demo](scripts/demo.md) that exhibits many Piety features. Another page
-describes the Piety [directories](DIRECTORIES.md) and their contents.
-Ongoing and recent work on Piety is described [here](BRANCH.md).
-
-## Project Status ##
+## Current Status ##
 
 For now, Piety runs in an ordinary Python interpreter session on a host
-operating system.   At this stage, the experiment is to see if it can be
-possible to create, edit, and run Python modules completely within a
-single Python session, without resorting to the host desktop or command
-line.  In the present configuration, the user interface to Piety is
-[edsel](editors/edsel.md), a combined  display editor, shell, and window
-manager, which together provide a minimal but self-contained programming
-environment within a single Python terminal session.
+operating system.   
 
-I hope someday to run Piety on a bare machine with no other
-operating system, but only a Python interpreter with minimal support.
-There are only a few platform-dependent modules.  Most modules developed
-for Piety on a host operating system should also work on a bare machine.
+At this time, Piety provides concurrent [tasks](piety/README.md),
+[jobs](scripts/session.md) that can be suspended and resumed, a Python-
+based [shell](shells/wyshka.md) with output redirection,  a [line
+editor](editors/ed.md), and a [display editor](editors/edsel.md). 
+
+The display editor includes a built-in shell and window manager, which
+together provide a minimal but self-contained programming environment
+within a single Python terminal session.  It is the programmer's user
+interface to the Piety system.
+
+There are some small [samples](samples/README.md) and
+[scripts](scripts/README.md) for demos and testing.  This
+[demo](scripts/demo.md) exhibits many Piety features.
+
+Here is an explanation of the Piety [design](doc/analogies.md).   Other
+pages describe the Piety [directories](DIRECTORIES.md) and their contents,
+and its [modular structure](doc/modules.md).
 
 ## Roadmap ##
 
-There is no roadmap -- no plan for a sequence of steps to bring Piety
-to some pre-defined state of completion.
+This project is a series of experiments. There is no plan for a sequence
+of steps to bring Piety to some completed, finished state.  Instead, here
+are some notes about my working method, and some experiments I might try
+in the future.
 
-Piety is a personal project and I have no expectation to make it generally
-useful.  I have brought Piety to its present state by working  in short
+I have brought Piety to its present state by working  in short
 bursts on an irregular schedule, when I can find the time and interest.  I
 decide what to work on next as I go along.  I often go back and rewrite
 what I have already done, to make it easier to work with or just to
 improve the style.
 
-There is no roadmap, but the project divides naturally into two parts: the
-*hosted* part and the *bare machine* part.   
+A history of some of this past work appears [here](BRANCH.md) (it omits
+the early years).
 
-The hosted part can run in a Python terminal session on any conventional
-operating system. All the work I have done so far, including the
-programming environment, is in this part.
+I hope someday to run Piety on a bare machine with no other
+operating system, but only a Python interpreter with minimal support.
 
-The *bare machine* part corresponds to parts of the boot loader and
-kernel of a conventional operating system. It will include  just enough C
-or assembler code to start the Python interpreter and connect it to the
-hardware, and then Python for the device drivers, file system, and network
-stack. I have not even begun this part. It would require a more
-concentrated, sustained effort than I have  been able to make so far.
+Piety divides naturally into two parts: the *hosted* part and the *native*
+part.  The hosted part includes the applications, shells, job control,
+tasking, and the programming environment. It can run  on any conventional
+operating system that provides a Python interpreter. The native part is
+the code needed to run the Python interpreter and the hosted part on a
+bare machine.  Any conventional operating system can serve as the native
+part, but the goal is to replace that with something much smaller, which
+is itself mostly written in Python.  
+
+(The Python interpreter itself is the third part of a complete Piety
+system, but I don't have to write that part.)
+
+All the work I have done so far, including the programming environment, is
+in the hosted part. I have not even begun work on the native part.
+That would require a more concentrated, sustained effort than I have been
+able to make so far.
 
 It is likely that work in the near future will continue in the hosted part.
 I can always add features and improve the convenience of the programming
 environment.  I might add other hosted applications, for example a simple
 text-only web browser in pure Python.  
 
-I will observe the discipline that Piety is *self-hosted*: any new Piety
-modules must be developed completely within the already-existing Piety
-programming environment.
+At this stage, the experiment is to see if it can be possible to create,
+edit, and run Python code using only the programming environment we have
+built so far, without resorting to the host desktop or command line.
+
+I will try to observe the discipline that Piety is *self-hosted*: any new
+Piety code must be developed within its already existing programming
+environment.
 
 ## Dependencies ##
 
