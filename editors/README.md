@@ -13,18 +13,23 @@ There are several editors here, a series of experiments beginning with *ed.py*
 and culminating in *edsel*.  We expect to use *edsel* most of the time, but are
 keeping the intermediate experiments as well.
 
-The main steps in the sequence of increasing functionality are:
-*ed.py* (line editor), *edie* (adds built-in Python interpreter),
-*edo* (adds Python interpreter and
-scripting), *edda* (adds display, but still provides only *ed* commands for
-line editing), and *edsel* (adds display editing at any character position).
+The main steps in the sequence of increasing functionality are: *ed.py*
+(line editor), *edie* (adds built-in Python interpreter), *edo* (adds
+Python interpreter and scripting), *edda* (adds display, but still
+provides only *ed* commands for line editing), and *edsel* (adds display
+editing at any character position).
+
+Each editor in this sequence imports its predecessor.  The result is a
+structure where *edsel* has all its predecessors nested inside, like a
+matryoshka doll.  Functionality is spread among *edsel* and all the
+imported programs.
 
 Another dimension arises from wrapping these programs in a
-[Console](../console/README.md) object that collects input without blocking,
-so they can run in the cooperative multitasking system,
+[Console](../console/README.md) object that collects input without
+blocking, so they can run in the cooperative multitasking system,
 [Piety](../piety/README.md).  Here *etty* wraps *ed*, *edna* wraps *edo*,
-and *desoto* wraps *edda*.  *edsel* is already a *Console* object,
-so it doesn't require a wrapper.
+and *desoto* wraps *edda*.  More nesting!  *edsel* is already a *Console*
+object, so it doesn't require a wrapper.
 
 Several of the programs and modules here are described by
 their own *.md* and *.txt* files (*ed.md* and *ed.txt* for *ed.py*, etc.)
@@ -114,4 +119,5 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Oct 2020
+Revised Apr 2022
+

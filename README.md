@@ -9,6 +9,7 @@ Piety
 [Roadmap](#Roadmap)  
 [Dependencies](#Dependencies)  
 [Python Versions](#Python-Versions)  
+[Tested Platform](#Tested-Platform)
 
 ## Motivation and Goals ##
 
@@ -122,6 +123,14 @@ system would be larger and harder to understand than Piety.
 Piety is written in Python 3 since June 2015.   Earlier work is saved in
 this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).   Piety now requires Python 3.5.
+
+## Tested Platform ##
+
+The Piety software has only run on one computer: a MacBook
+Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El Capitan,
+the most recent version that runs on my hardware).    It has only run in
+the Mac OS Terminal, through version 2.6.2 (361.2). It has only
+run on CPython downloaded from python.org, through version 3.9.0.
 
 Revised Apr 2022
 
