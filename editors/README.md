@@ -13,7 +13,7 @@ There are several editors here, a series of experiments beginning with *ed.py*
 and culminating in *edsel*.  We expect to use *edsel* most of the time, but are
 keeping the intermediate experiments as well.
 
-The main steps in the sequence of increasing functionality are: *ed.py*
+The steps in the sequence of increasing functionality are: *ed.py*
 (line editor), *edie* (adds built-in Python interpreter), *edo* (adds
 Python interpreter and scripting), *edda* (adds display, but still
 provides only *ed* commands for line editing), and *edsel* (adds display

@@ -1,4 +1,4 @@
-
+o
 Piety
 =====
 
@@ -79,22 +79,21 @@ the early years).
 I hope someday to run Piety on a bare machine with no other
 operating system, but only a Python interpreter with minimal support.
 
-Piety divides naturally into two parts: the *hosted* part and the *native*
-part.  The hosted part includes the applications, shells, job control,
-tasking, and the programming environment. It can run  on any conventional
-operating system that provides a Python interpreter. The native part is
-the code needed to run the Python interpreter and the hosted part on a
-bare machine.  Any conventional operating system can serve as the native
-part, but the goal is to replace that with something much smaller, which
-is itself mostly written in Python.  
-
-(The Python interpreter itself is the third part of a complete Piety
-system, but I don't have to write that part.)
+Piety divides naturally into two independent parts: the *hosted* part and
+the *native* part.  The hosted part includes the applications, shells, job
+control, tasking, and the programming environment.  It can run in any
+Python interpreter.   The native part includes the 
+Python interpreter itself, and the support needed to run the
+interpreter  on the computer hardware.   Almost any general-purpose
+operating system can serve as the support, but the goal is to replace
+that with a special-purpose operating system which is itself mostly
+written in Python.
 
 All the work I have done so far, including the programming environment, is
-in the hosted part. I have not even begun work on the native part.
-That would require a more concentrated, sustained effort than I have been
-able to make so far.
+in the hosted part.  I have researched [several
+approaches](doc/baremachine.md) to building the native part, but have not
+begun work on any.   Every approach would require a more concentrated,
+sustained effort than I have been able to make so far.
 
 It is likely that work in the near future will continue in the hosted part.
 I can always add features and improve the convenience of the programming
@@ -128,7 +127,7 @@ this repository in the *python2* tag.  The conversion is described
 
 The Piety software has only run on one computer: a MacBook
 Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El Capitan,
-the most recent version that runs on my hardware).    It has only run in
+the most recent version that runs on that hardware).    It has only run in
 the Mac OS Terminal, through version 2.6.2 (361.2). It has only
 run on CPython downloaded from python.org, through version 3.9.0.
 

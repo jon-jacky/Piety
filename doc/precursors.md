@@ -200,7 +200,7 @@ more on [HN](https://news.ycombinator.com/item?id=16134618),
 [Andre](https://github.com/rust-embedded/rust-raspi3-OS-tutorials) (RPi Rust, 2019),
 [CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford, 2012),
 [CS194-24](http://www.cs.berkeley.edu/~kubitron/courses/cs194-24-S13/index_lectures.html) (Berkeley),
-[Baking Pi](http://www.cl.cam.ac.uk/freshers/raspberrypi/tutorials/os/)
+[Baking Pi](http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/)
 (Cambridge, RPi asm, 2012), 
 [OS from Scratch](http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) (Birmingham, more in [HN](https://news.ycombinator.com/item?id=8380822)),
 [OS Development](http://littleosbook.github.io/), (RIT Stockholm, more on [HN](https://news.ycombinator.com/item?id=13258063)),
