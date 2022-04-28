@@ -4,20 +4,19 @@ Python on a bare machine
 
 I hope someday to run [Piety](../README.md) on a bare machine with no other
 operating system, but only a Python interpreter with minimal support.
-
 I have researched several approaches:
 
-[Hardware](#Hardware)
-[Software](#Software)
-[Linux](#Linux)
-[NopSys](#NopSys)
-[Raspberry Pi](#Raspberry-Pi)
-[MicroPython](#MicroPython)
-[UEFI](#UEFI)
-[Unikernel](#Unikernel)
-[Conclusions](#Conclusions)
+[Hardware Requirements](#Hardware-Requirements)  
+[Software Requirements](#Software-Requirements)  
+[Linux](#Linux)  
+[NopSys](#NopSys)  
+[Raspberry Pi](#Raspberry-Pi)  
+[MicroPython](#MicroPython)  
+[UEFI](#UEFI)  
+[Unikernel](#Unikernel)  
+[Conclusions](#Conclusions)  
 
-## Hardware ##
+## Hardware Requirements ##
 
 I want to run Piety on a self-contained personal computer.  It must not
 need another computer or terminal to use it; it must include its own
@@ -27,7 +26,7 @@ It must have enough memory to store thousands of pages of text (documents,
 program source, and web pages) and enough processor power to run the
 programs to use them (text editors, interperters/compilers, web browsers).
 
-## Software ##
+## Software Requirements ##
 
 I want to run Piety as the complete standalone software system on the
 personal computer,  running directly on the hardware, without needing to
@@ -78,7 +77,7 @@ personal computer you must add a power supply, keyboard, and display.
 They are somewhat slower and have less memory and mass storage than most
 modern personal computers, but they are still usable.
 
-The Raspberry Pi provides an accessible path into low-level programming.   
+The Raspberry Pi provides an accessible path into low-level programming.
 Many tutorials including university courses teach how to write a simple
 operating system from scratch on the Raspberry Pi, in
 [assembler](https://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/),
@@ -96,7 +95,6 @@ repository is C, not C++.
 A Raspberry Pi can run a purpose-built Linux such as *Raspbian*,
 so it can be treated like a variant of the Linux systems described
 in the preceding section.
-
 For example, [PiratePython](https://github.com/pimoroni/PiratePython)
 (also at [HN](https://news.ycombinator.com/item?id=16180975)) is a
 *Raspbian* build configured to run Python applications.
@@ -150,7 +148,7 @@ To come ...
 
 ## Conclusions ##
 
-The hardware requirements for my Python-powered personal computer are
+The hardware requirements for the Python-powered personal computer are
 modest. Almost any personal computer of any age or performance level should
 work, even an old netbook, or any of the Raspberry Pi models (except the
 Pico).  Small microcontrollers would probably not work, however.
@@ -169,7 +167,7 @@ MicroPython runs on microcontrollers that are too small to serve as self-
 contained personal computers.  Porting MicroPython to a larger computer
 would likely take as much work as porting CPython to the same bare
 machine, but would only result in a nonstandard implementation with an
-incomplete standard library.  And yet, and yet ... compilation to native
+incomplete standard library.  And yet ... compilation to native
 code and inline assembler code is intriguing.
 
 Running Python on UEFI or a Unikernel seems to provide no advantages over
