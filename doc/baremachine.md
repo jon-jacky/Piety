@@ -8,8 +8,8 @@ I have researched several approaches:
 
 [Hardware Requirements](#Hardware-Requirements)  
 [Software Requirements](#Software-Requirements)  
-[Software Goals](#Software-Goals)
-[Porting Python](#Porting-Python)
+[Software Goals](#Software-Goals)  
+[Porting Python](#Porting-Python)  
 [Linux](#Linux)  
 [NopSys](#NopSys)  
 [MicroPython](#MicroPython)  
@@ -36,11 +36,11 @@ run in a virtual machine or container hosted by another operating system.
 
 ## Software Goals ##
 
-A goal for Piety is to be able to  use the Python REPL to inspect and
+Piety should be able to  use the Python REPL to inspect and
 manipulate any data in the running system, including operating system data
 structures and device registers.
 
-A goal is for Piety to be self-hosted: once it has reached a barely
+Piety should be self-hosted: once it has reached a barely
 usable state, further development of the Piety system should be done  on
 the personal computer by using Piety itself.   
 
@@ -149,7 +149,7 @@ Perhaps the Python interpreter could be ported to some of these.
 environment for the Raspberry Pi", for building C++ programs that run  on
 the RPi without an operating system, for example this [music
 synthesizer](https://github.com/probonopd/MiniDexed)
-Most of the code in its Github repository is C, not C++.  
+Most of the code in its Github repository is C, not C++.
 Perhaps the Python interpreter could be ported to it.
 
 A Raspberry Pi can run a purpose-built Linux such as *Raspbian*,
@@ -171,10 +171,9 @@ far as blinking an LED connected to one of the Pi GPIO pins, but
 apparently does not support any of the other hardware.
 
 There is a  port the *Circuit Python* fork of MicroPython to the Pis,
-decribed [here](https://learn.adafruit.com/circuitpython-on-raspberry-pi-
-bare-metal-no-os).   The 
+decribed [here](https://learn.adafruit.com/circuitpython-on-raspberry-pi-bare-metal-no-os).   The 
 [release notes](https://github.com/adafruit/circuitpython/releases/tag/7.3.0-beta.2) 
-(from Apr 2022) say this port is "considered alpha and
+(Apr 2022) say this port is "considered alpha and
 will have bugs and missing functionality", but there is already a
 [manual](https://cdn-learn.adafruit.com/downloads/pdf/circuitpython-on-raspberry-pi-bare-metal-no-os.pdf) 
 available.   It supports the Pi HDMI port and can use it to drive an 
@@ -199,7 +198,7 @@ programs that run on UEFI without another operating system (see
 
 UEFI is interesting for Piety because it is an alternative operating
 system that ought to be simpler than Linux -- no kernel or processes.
-And, it is already installed on the machine!
+And, it is already installed on the machine.
 But it turns out that UEFI is not simple.  One developer
 [observes](https://news.ycombinator.com/item?id=24888307)
 "my mobo's UEFI is typically larger than the kernel it runs."
@@ -208,11 +207,11 @@ Python has been ported to run on UEFI without a conventional operating
 system.  These ports were created to run Python scripts that test UEFI
 itself; they were not intended for general-purpose Python programming. A
 port of Python version 3.6.8 is discussed 
-[here](https://chipsec.github.io/installation/USB%20with%20UEFI%20Shell.html).  
+[here](https://chipsec.github.io/installation/USB%20with%20UEFI%20Shell.html)..
 A port of MicroPython is discussed
-[here](https://www.intel.com/content/www/us/en/developer/articles/technical/implementing-micropython-as-a-uefi-test-framework.html) .
-and [here](https://github.com/tianocore/edk2-staging/tree/MicroPythonTestFramework/MicroPythonPkg).
-).
+[here](https://www.intel.com/content/www/us/en/developer/articles/technical/implementing-micropython-as-a-uefi-test-framework.html)
+and 
+[here](https://github.com/tianocore/edk2-staging/tree/MicroPythonTestFramework/MicroPythonPkg).
 
 An earlier project ported Python to the GRUB bootloader to test the BIOS, see
 [here](https://biosbits.org/),
@@ -247,7 +246,7 @@ NopSys ...
 
 The Circuit Python port to the larger Raspberry Pis looks promising. They may
 have already accomplished on this hardware what a CPython port to NopSys
-would do on x86. If it can support Piety development on the Pis, it would
+would do on x86. If it can support Piety development on the Pis, it might
 be worth putting up with the low performance and packaging inconvenience
 of the Pi hardware, and the nonstandard Circuit Python dialect.
 
