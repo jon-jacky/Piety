@@ -53,7 +53,7 @@ require programming languages and tools not included in Piety.
 The Python interpreter must be adapted, or *ported*, to any environment
 where it runs.  That environment is usually a conventional operating
 system, but it can be nothing more than a minimal connection to the
-machine's hardwaware, as in *NopSys* and *MicroPython* (below).
+machine's hardware, as in *NopSys* and *MicroPython* (below).
 
 *Porting* is a [software development
 project](https://devguide.python.org/porting/) whose product is called a
@@ -120,7 +120,7 @@ microcontrollers that MicroPython is written for are much smaller and
 slower than the processor in a modern personal computer.  The *pyboard*, a
 small single-board computer designed to run MicroPython, has an ARM Cortex
 M4 CPU running at 168 MHz, with 1024KiB flash ROM and 192KiB RAM.
-MicroPython has been ported to  other microcontroller boards with similar
+MicroPython has been ported to other microcontroller boards with similar
 resources.
 
 The next section discusses a recent effort to port a fork of MicroPython
@@ -160,9 +160,11 @@ For example, [PiratePython](https://github.com/pimoroni/PiratePython)
 *Raspbian* build configured to run Python applications.  It uses
 an existing Python port to Linux.
 
-The Raspberry Pis are larger and faster than the microcontrollers that
-MicroPython was created for.  A MicroPython port to the Pis might support
-a personal computer.
+The Raspberry Pi models are larger and faster than the microcontrollers
+that MicroPython was created for.  A MicroPython port to a Pi might
+support a personal computer. (The Raspberry Pi Pico (RP2040), a small
+microcontroller, is the only Pi that is not suitable for a personal
+computer.)
 
 An early experiment with porting MicroPython  to the Raspberry Pi Zero
 (ARM 11 at 1 GHz, 512MB RAM) is described
@@ -170,13 +172,15 @@ An early experiment with porting MicroPython  to the Raspberry Pi Zero
 far as blinking an LED connected to one of the Pi GPIO pins, but
 apparently does not support any of the other hardware.
 
-There is a  port the *Circuit Python* fork of MicroPython to the Pis,
+There is a  port the 
+[Circuit Python](https://learn.adafruit.com/welcome-to-circuitpython) 
+fork of MicroPython to the Pis,
 decribed [here](https://learn.adafruit.com/circuitpython-on-raspberry-pi-bare-metal-no-os).   The 
 [release notes](https://github.com/adafruit/circuitpython/releases/tag/7.3.0-beta.2) 
 (Apr 2022) say this port is "considered alpha and
 will have bugs and missing functionality", but there is already a
 [manual](https://cdn-learn.adafruit.com/downloads/pdf/circuitpython-on-raspberry-pi-bare-metal-no-os.pdf) 
-available.   It supports the Pi HDMI port and can use it to drive an 
+available.   It supports the Pi HDMI port and has been used to drive an 
 [e-ink display](https://blog.adafruit.com/2021/11/02/bare-metal-circuitpython-on-a-raspberry-pi-hdmi-and-e-ink/).
 The *Adafruit* company, the project sponsor, says  "One of the plans is to
 make a little computer with a keyboard, that is just CircuitPython."
@@ -227,7 +231,38 @@ features are provided on a particular computer, or how to access them
 
 ## Unikernel ## 
 
-To come ...
+A [unikernel](https://en.wikipedia.org/wiki/Unikernel) comprises a single
+application combined with just enough of an operating system to support
+it, which can run on a bare machine or virtual machine without a
+conventional operating system.  The movitivation is to make a small,
+efficient, and secure system by eliminating all the machinery not needed
+by that one  application, such as a shell and processes, and retaining
+only the essential device drivers, etc.  Unikernels are usually
+considered as alternatives to conventional virtual machines or containers
+for running network applications on virtual machine hosts in the cloud.
+Here is a [review](https://github.com/cetic/unikernels) and 
+[another](https://github.com/papers-we-love/papers-we-love/tree/master/unikernels)
+and a recent
+[discussion](https://news.ycombinator.com/item?id=30247022).
+
+There are unikernels for running applications in a single language.
+[MirageOS](https://mirage.io/) 
+uses OCaml and 
+[HalVM](https://galois.com/project/halvm/) 
+uses Haskell.   They suggest that a Unikernel might be built for Python.
+
+Several years ago I was encouraged by this
+[report](http://blog.netbsd.org/tnf/entry/an_internet_ready_os_from)
+to try an  
+[experiment](https://github.com/jon-jacky/Piety/tree/master/unikernel) 
+with a system called
+[Rump Kernel](https://github.com/rumpkernel/wiki/wiki)
+to make a unikernel from the CPython interpreter and parts of the NetBSD
+operating system.  I got as far as booting my unikernel on the QEMU
+virtual machine monitor, only to learn that it could not read from the 
+keyboard and could not handle the standard input -- this was not needed
+for its intended use in the cloud.  The Rump Kernel project became inactive
+and so did my interest in unikernels.
 
 ## Conclusions ##
 
@@ -244,12 +279,13 @@ developing  subsequent stages in the Piety project.
 
 NopSys ...
 
-The Circuit Python port to the larger Raspberry Pis looks promising. They may
+The Circuit Python port to the Raspberry Pi looks promising. They may
 have already accomplished on this hardware what a CPython port to NopSys
-would do on x86. If it can support Piety development on the Pis, it might
+would do on x86. If it can support Piety development on the Pi, it might
 be worth putting up with the low performance and packaging inconvenience
 of the Pi hardware, and the nonstandard Circuit Python dialect.
-
+Piety fits right in with the Pi's niche in educational and hobby computing.
+ 
 Running Python on UEFI or a Unikernel seems to provide no advantages over
 Python on Linux.  Both include a large amount of opaque non-Python code with no
 obvious path to  replacing it.  Both are likely to be less convenient to

@@ -80,14 +80,13 @@ I hope someday to run Piety on a bare machine with no other
 operating system, but only a Python interpreter with minimal support.
 
 Piety divides naturally into two independent parts: the *hosted* part and
-the *native* part.  The hosted part includes the applications, shells, job
-control, tasking, and the programming environment.  It can run in any
-Python interpreter.   The native part includes the 
-Python interpreter itself, and the support needed to run the
-interpreter  on the computer hardware.   Almost any general-purpose
-operating system can serve as the support, but the goal is to replace
-that with a special-purpose operating system which is itself mostly
-written in Python.
+the *native* part.  The hosted part can run in any Python interpreter. It
+includes the applications, shells, job control, tasking, and the
+programming environment. The native part includes the  Python interpreter
+itself, and the support needed to run the interpreter  on the computer
+hardware.   Almost any general-purpose operating system can serve as the
+support, but the goal is to replace that with a special-purpose operating
+system which is itself mostly written in Python.
 
 All the work I have done so far, including the programming environment, is
 in the hosted part.  I have researched [several
