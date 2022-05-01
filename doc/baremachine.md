@@ -240,8 +240,8 @@ by that one  application, such as a shell and processes, and retaining
 only the essential device drivers, etc.  Unikernels are usually
 considered as alternatives to conventional virtual machines or containers
 for running network applications on virtual machine hosts in the cloud.
-Here is a [review](https://github.com/cetic/unikernels) and 
-[another](https://github.com/papers-we-love/papers-we-love/tree/master/unikernels)
+Here is a [review](https://github.com/cetic/unikernels) and an extensive
+[reading list](https://github.com/papers-we-love/papers-we-love/tree/master/unikernels)
 and a recent
 [discussion](https://news.ycombinator.com/item?id=30247022).
 
@@ -253,16 +253,16 @@ uses Haskell.   They suggest that a Unikernel might be built for Python.
 
 Several years ago I was encouraged by this
 [report](http://blog.netbsd.org/tnf/entry/an_internet_ready_os_from)
-to try an  
+to try an
 [experiment](https://github.com/jon-jacky/Piety/tree/master/unikernel) 
 with a system called
 [Rump Kernel](https://github.com/rumpkernel/wiki/wiki)
 to make a unikernel from the CPython interpreter and parts of the NetBSD
 operating system.  I got as far as booting my unikernel on the QEMU
-virtual machine monitor, only to learn that it could not read from the 
-keyboard and could not handle the standard input -- this was not needed
-for its intended use in the cloud.  The Rump Kernel project became inactive
-and so did my interest in unikernels.
+virtual machine monitor, only to find that it could not read from the 
+keyboard.  I submitted an
+[issue](https://github.com/rumpkernel/rumprun/issues/64)
+but the Rump Kernel project became inactive before it could be fixed.
 
 ## Conclusions ##
 
