@@ -90,8 +90,32 @@ programmer only see the Python part.
 
 ## NopSys ## 
 
-To come ...
+[NopSys](https://github.com/nopsys/nopsys) ("No Operating System") is an
+attempt to provide the minimum amount of low-level code needed to support
+an operating system written in a high-level language.  It was used to
+build [CogNOS](https://github.com/nopsys/CogNOS) (also
+[here](https://charig.github.io/assets/papers/SCDE-DLS.pdf)), a standalone
+SmallTalk language system that runs on a bare machine.   Among all the
+[projects I surveyed](doc/precursors.md),  this one appears closest to my
+goals for Piety.
 
+NopSys is not an operating system.  It is only  a bootloader, and some
+event handlers that perform the essential register management required by
+the hardware before handing off the event to the high level language. 
+NopSys is for x86 hardware, and comprises 3428 lines of C and 608 lines
+of assembler.
+
+The Cog virtual machine (for the Smalltalk language) was ported to NopSys
+by adding methods for reading and writing CPU control registers,
+interacting with hardware I/O ports, reading a timer, and connecting to an
+interrupt handler.    The CogNos operating system, including interrupt
+handlers, device drivers and the file system, is written in SmallTalk.
+
+NopSys is supposed to be language-independent, but has only been used to
+build CogNos.  CogNos was able to run some tests and performance
+experiments, but (the authors write) "there  would certainly be much more
+work needed before one could consider deploying our system." The project
+became inactive before that happened.
 
 ## MicroPython ## 
 
@@ -151,6 +175,9 @@ the RPi without an operating system, for example this [music
 synthesizer](https://github.com/probonopd/MiniDexed)
 Most of the code in its Github repository is C, not C++.
 Perhaps the Python interpreter could be ported to it.
+There is already a Smalltalk port to the Pi that uses Circle
+[here](https://github.com/michaelengel/crosstalk)
+(discussed [here](https://news.ycombinator.com/item?id=23874206#23883895)).
 
 A Raspberry Pi can run a purpose-built Linux such as *Raspbian*,
 so it can be treated like a variant of the Linux systems described
@@ -174,7 +201,7 @@ apparently does not support any of the other hardware.
 
 There is a  port the 
 [Circuit Python](https://learn.adafruit.com/welcome-to-circuitpython) 
-fork of MicroPython to the Pis,
+fork of MicroPython to the Pi,
 decribed [here](https://learn.adafruit.com/circuitpython-on-raspberry-pi-bare-metal-no-os).   The 
 [release notes](https://github.com/adafruit/circuitpython/releases/tag/7.3.0-beta.2) 
 (Apr 2022) say this port is "considered alpha and
@@ -249,7 +276,7 @@ There are unikernels for running applications in a single language.
 [MirageOS](https://mirage.io/) 
 uses OCaml and 
 [HalVM](https://galois.com/project/halvm/) 
-uses Haskell.   They suggest that a Unikernel might be built for Python.
+uses Haskell.   They suggest that a unikernel might be built for Python.
 
 Several years ago I was encouraged by this
 [report](http://blog.netbsd.org/tnf/entry/an_internet_ready_os_from)
@@ -271,27 +298,34 @@ modest. Almost any personal computer of any age or performance level should
 work, even an old netbook, or any of the Raspberry Pi models (except the
 Pico).  Small microcontrollers would probably not work, however.
 
-Running Python as process 1 on a minimal Linux is the obvious
-first step.   It is just a configuration  task, not a development project.
-It uses an existing Python port and there are already example Linux
-configurations to copy or imitate.  And, Linux makes a good platform for
-developing  subsequent stages in the Piety project.
+Running Python as process 1 on a minimal Linux is the obvious first step.
+It is just a configuration task, not a development project. It uses an
+existing Python port and there are already example Linux configurations to
+copy or imitate.   It would make a good interim system to use while I work
+on the following stages.  If I don't finish them, it would make a
+respectable final state.
 
-NopSys ...
+*CogNOS* with *NopSys* shows a way to proceed: Port CPython to NopSys,
+using the port of the Cog VM for Smalltalk as a model. Then, write  the
+rest of the operating system in Python, using the Smalltalk code  for
+CogNOS as a model.  That is easily said, but would be a difficult project
+(for me), and it would take (me) a long time before it was complete
+enough to self-host its own development.
 
-The Circuit Python port to the Raspberry Pi looks promising. They may
-have already accomplished on this hardware what a CPython port to NopSys
-would do on x86. If it can support Piety development on the Pi, it might
-be worth putting up with the low performance and packaging inconvenience
-of the Pi hardware, and the nonstandard Circuit Python dialect.
-Piety fits right in with the Pi's niche in educational and hobby computing.
+An alternate path that looks promising would use the Circuit Python port to
+the Raspberry Pi. They may have already accomplished on this hardware what
+a CPython port to NopSys would do on x86.  If it can support Piety
+development on the Pi, it might be worth putting up with the low
+performance and packaging inconvenience of the Pi hardware, and the
+nonstandard Circuit Python dialect. Piety fits right in with the Pi's
+niche in educational and hobby computing.
  
-Running Python on UEFI or a Unikernel seems to provide no advantages over
+Running Python on UEFI or a unikernel provides no advantages over
 Python on Linux.  Both include a large amount of opaque non-Python code with no
 obvious path to  replacing it.  Both are likely to be less convenient to
-work with than Linux. The value of UEFI and Unikernels is that they are
+work with than Linux. The value of UEFI and unikernels is that they are
 working examples of  how to structure a system differently from a Linux
 kernel and its processes.
 
-Revised Apr 2022
+Revised May 2022
 
