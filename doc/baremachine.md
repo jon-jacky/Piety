@@ -50,7 +50,7 @@ require programming languages and tools not included in Piety.
 
 ## Porting Python ##
 
-The Python interpreter must be adapted, or *ported*, to any environment
+A Python interpreter must be adapted, or *ported*, to any environment
 where it runs.  That environment is usually a conventional operating
 system, but it can be nothing more than a minimal connection to the
 machine's hardware, as in *NopSys* and *MicroPython* (below).
@@ -95,8 +95,8 @@ attempt to provide the minimum amount of low-level code needed to support
 an operating system written in a high-level language.  It was used to
 build [CogNOS](https://github.com/nopsys/CogNOS) (also
 [here](https://charig.github.io/assets/papers/SCDE-DLS.pdf)), a standalone
-SmallTalk language system that runs on a bare machine.   Among all the
-[projects I surveyed](doc/precursors.md),  this one appears closest to my
+Smalltalk language system that runs on a bare machine.   Among all the
+[projects I surveyed](precursors.md),  this one appears closest to my
 goals for Piety.
 
 NopSys is not an operating system.  It is only  a bootloader, and some
@@ -109,7 +109,7 @@ The Cog virtual machine (for the Smalltalk language) was ported to NopSys
 by adding methods for reading and writing CPU control registers,
 interacting with hardware I/O ports, reading a timer, and connecting to an
 interrupt handler.    The CogNos operating system, including interrupt
-handlers, device drivers and the file system, is written in SmallTalk.
+handlers, device drivers and the file system, is written in Smalltalk.
 
 NopSys is supposed to be language-independent, but has only been used to
 build CogNos.  CogNos was able to run some tests and performance
@@ -181,7 +181,7 @@ There is already a Smalltalk port to the Pi that uses Circle
 
 A Raspberry Pi can run a purpose-built Linux such as *Raspbian*,
 so it can be treated like a variant of the Linux systems described
-in the preceding section.
+in a preceding section.
 For example, [PiratePython](https://github.com/pimoroni/PiratePython)
 (also at [HN](https://news.ycombinator.com/item?id=16180975)) is a
 *Raspbian* build configured to run Python applications.  It uses
@@ -199,7 +199,7 @@ An early experiment with porting MicroPython  to the Raspberry Pi Zero
 far as blinking an LED connected to one of the Pi GPIO pins, but
 apparently does not support any of the other hardware.
 
-There is a  port the 
+There is a port of the 
 [Circuit Python](https://learn.adafruit.com/welcome-to-circuitpython) 
 fork of MicroPython to the Pi,
 decribed [here](https://learn.adafruit.com/circuitpython-on-raspberry-pi-bare-metal-no-os).   The 
@@ -314,7 +314,7 @@ enough to self-host its own development.
 
 An alternate path that looks promising would use the Circuit Python port to
 the Raspberry Pi. They may have already accomplished on this hardware what
-a CPython port to NopSys would do on x86.  If it can support Piety
+a CPython port to NopSys would do on x86.  If it can support self-hosted Piety
 development on the Pi, it might be worth putting up with the low
 performance and packaging inconvenience of the Pi hardware, and the
 nonstandard Circuit Python dialect. Piety fits right in with the Pi's
