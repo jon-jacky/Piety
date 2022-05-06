@@ -111,11 +111,12 @@ interacting with hardware I/O ports, reading a timer, and connecting to an
 interrupt handler.    The CogNos operating system, including interrupt
 handlers, device drivers and the file system, is written in Smalltalk.
 
-NopSys is supposed to be language-independent, but has only been used to
-build CogNos.  CogNos was able to run some tests and performance
+NopSys is supposed to be language-independent -- the authors write  "we're
+eager to see people create PyNOS, RubyNos, etc." -- but has only been used
+to build CogNos.  CogNos was able to run some tests and performance
 experiments, but (the authors write) "there  would certainly be much more
 work needed before one could consider deploying our system." The project
-became inactive before that happened.
+became inactive before that happened.apparently 
 
 ## MicroPython ## 
 
@@ -200,7 +201,7 @@ far as blinking an LED connected to one of the Pi GPIO pins, but
 apparently does not support any of the other hardware.
 
 There is a port of the 
-[Circuit Python](https://learn.adafruit.com/welcome-to-circuitpython) 
+[Circuit Python](https://docs.circuitpython.org/en/latest/README.html)
 fork of MicroPython to the Pi,
 decribed [here](https://learn.adafruit.com/circuitpython-on-raspberry-pi-bare-metal-no-os).   The 
 [release notes](https://github.com/adafruit/circuitpython/releases/tag/7.3.0-beta.2) 
@@ -230,9 +231,6 @@ programs that run on UEFI without another operating system (see
 UEFI is interesting for Piety because it is an alternative operating
 system that ought to be simpler than Linux -- no kernel or processes.
 And, it is already installed on the machine.
-But it turns out that UEFI is not simple.  One developer
-[observes](https://news.ycombinator.com/item?id=24888307)
-"my mobo's UEFI is typically larger than the kernel it runs."
 
 Python has been ported to run on UEFI without a conventional operating
 system.  These ports were created to run Python scripts that test UEFI
@@ -250,10 +248,12 @@ An earlier project ported Python to the GRUB bootloader to test the BIOS, see
 [here](https://news.ycombinator.com/item?id=9453677),
 and [here](https://www.youtube.com/watch?v=36QIepyUuhg).
 
-It seems UEFI ought to be simpler than Linux, but it is not simpler to
-set up or use.   In contrast to Linux, explanations of UEFI are fragmented
-and often confusing. It can be difficult even to find out what UEFI
-features are provided on a particular computer, or how to access them
+It seems UEFI ought to be simpler than Linux,  but it is not simple.  One
+developer [observes](https://news.ycombinator.com/item?id=24888307) "my
+mobo's UEFI is typically larger than the kernel it runs." And, it is not
+simple to set up or use.   In contrast to Linux, explanations of UEFI are
+fragmented and often confusing. It can be difficult even to find out what
+UEFI features are provided on a particular computer, or how to access them
 ("Does the UEFI shell work on this machine?" etc.).
 
 ## Unikernel ## 
@@ -312,13 +312,14 @@ CogNOS as a model.  That is easily said, but would be a difficult project
 (for me), and it would take (me) a long time before it was complete
 enough to self-host its own development.
 
-An alternate path that looks promising would use the Circuit Python port to
-the Raspberry Pi. They may have already accomplished on this hardware what
-a CPython port to NopSys would do on x86.  If it can support self-hosted Piety
-development on the Pi, it might be worth putting up with the low
-performance and packaging inconvenience of the Pi hardware, and the
-nonstandard Circuit Python dialect. Piety fits right in with the Pi's
-niche in educational and hobby computing.
+An alternate path that looks promising would use the Circuit Python port
+to the Raspberry Pi. They may have already accomplished on this hardware
+what a CPython port to NopSys would do on x86.  If Circuit Python can be
+self-hosted on the  Pi and support Piety's cooperative multitasking,  it
+might be worth putting up with the low performance and packaging
+inconvenience of the Pi hardware, and the nonstandard Circuit Python
+dialect. Piety fits right in with the Pi's niche in educational and hobby
+computing.
  
 Running Python on UEFI or a unikernel provides no advantages over
 Python on Linux.  Both include a large amount of opaque non-Python code with no
