@@ -116,7 +116,7 @@ eager to see people create PyNOS, RubyNos, etc." -- but has only been used
 to build CogNos.  CogNos was able to run some tests and performance
 experiments, but (the authors write) "there  would certainly be much more
 work needed before one could consider deploying our system." The project
-became inactive before that happened.apparently 
+apparently became inactive before that happened.
 
 ## MicroPython ## 
 
