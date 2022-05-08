@@ -24,9 +24,10 @@ I want to run Piety on a self-contained personal computer.  It must not
 need another computer or terminal to use it; it must include its own
 keyboard and display.
 
-It must have enough memory to store thousands of pages of text (documents,
-program source, and web pages) and enough processor power to run the
-programs to use them (text editors, interperters/compilers, web browsers).
+I want to experiment with lots of data in memory, so the computer must
+have enough to store thousands of pages of text (documents, program
+source, and web pages) and enough processor power to run the programs to
+use them (text editors, interperters/compilers, web browsers).
 
 ## Software Requirements ##
 

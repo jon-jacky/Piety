@@ -40,9 +40,11 @@ others that we might be able to use or adapt (see
 ## Current Status ##
 
 For now, Piety runs in an ordinary Python interpreter session on a host
-operating system.   
+operating system.   Here is an explanation of the Piety
+[design](doc/analogies.md).
 
-At this time, Piety provides concurrent [tasks](piety/README.md),
+
+At this time, Piety provides [cooperative multitasking](piety/README.md),
 [jobs](scripts/session.md) that can be suspended and resumed, a Python-
 based [shell](shells/wyshka.md) with output redirection,  a [line
 editor](editors/ed.md), and a [display editor](editors/edsel.md). 
@@ -50,15 +52,16 @@ editor](editors/ed.md), and a [display editor](editors/edsel.md).
 The display editor includes a built-in shell and window manager, which
 together provide a minimal but self-contained programming environment
 within a single Python terminal session.  It is the programmer's user
-interface to the Piety system.
+interface to the Piety system.  It provides the CPython interpreter,
+which can be invoked in
+[several ways](editors/edsel.md#Writing-and-running-Python-in-edsel).
 
 There are some small [samples](samples/README.md) and
-[scripts](scripts/README.md) for demos and testing.  This
+[scripts](scripts/README) for demos and testing.  This
 [demo](scripts/demo.md) exhibits many Piety features.
 
-Here is an explanation of the Piety [design](doc/analogies.md).   Other
-pages describe the Piety [directories](DIRECTORIES.md) and their contents,
-and its [modular structure](doc/modules.md).
+Other pages describe the Piety [directories](DIRECTORIES.md) and their
+contents, and its [modular structure](doc/modules.md).
 
 ## Roadmap ##
 
