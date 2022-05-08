@@ -565,7 +565,10 @@ display editing at any character position).
 Each editor in this sequence imports its predecessor.  The result is a
 structure where *edsel* has all its predecessors nested inside, like a
 matryoshka doll.  Functionality is spread among *edsel* and all the
-imported programs.
+imported programs.  To make it a little more convenient, the modules
+are all made available at top level in the *edsel* module by these
+statements:  *import edda; edo = edda.edo; ed = edo.ed; text = ed.text;
+frame = edda.frame* 
 
 ## Limitations ##
 
