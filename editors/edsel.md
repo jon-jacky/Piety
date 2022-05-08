@@ -541,7 +541,7 @@ In *edsel*, the window data structures must be prefixed by the *frame*
 module name: *frame.win* is the current window, *frame.windows* is the
 list of windows, etc.
 
-If you started *edsel* in an interactive Python session by *import *edsel*,
+If you started *edsel* in an interactive Python session by *import edsel*,
 then you must also add *edsel* to the prefix: *edsel.frame.win* etc.
 This applies to all the directions here.
 
@@ -555,6 +555,17 @@ etc. (Or *edsel.ed.prompt* etc.)
 
 In *edsel*, calls to the *edda* API require a prefix:
 *edda.o(2)*, *edda.h(12)* etc.  (Or *edsel.edda.o(2)* etc.)
+
+This modular structure is the result of how *edsel* was developed. I wrote
+a series of editors with increasing functionality: *ed.py* (line editor),
+*edo* (adds Python interpreter and scripting), *edda* (adds display, but
+still provides only *ed* commands for line editing), and finally *edsel* (adds
+display editing at any character position).
+
+Each editor in this sequence imports its predecessor.  The result is a
+structure where *edsel* has all its predecessors nested inside, like a
+matryoshka doll.  Functionality is spread among *edsel* and all the
+imported programs.
 
 ## Limitations ##
 
@@ -588,5 +599,5 @@ or editing in the focus window does  not appear in the other window until
 you finish editing the line by typing  *Return*, or perform some other
 operation that calls *store_line*.
 
-Revised Apr 2022
+Revised May 2022
 
