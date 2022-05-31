@@ -47,25 +47,12 @@ class Buffer(object):
                 '  %-8s' % self.mode + 
                 ' %s' % (self.filename if self.filename else '(no file)'))
 
-    # write method for other programs (besides editors) to write into buffers
-    # The call print(s, file=buffer), invokes this method to write s to buffer
-    # Experiments show that this Python print calls this write method twice,
-    # first write for the contents s, second write for end string
-    # even when end string is default \n or empty ''
-    # So here we alternate reading contents and discarding end string
+    # write method for other programs (besides editors) to write into buffers.
+    # print(s, file=buffer)  invokes this method to write s to buffer.
+    # with redirect_stdout(buffer): ...  writes program output to buffer.
+    # s or program output appears at the end of the buffer.
     def write(self, s):
-        'Invoked by print(s, file=buffer), writes s to buffer'
-        #print([c for c in s]) # DEBUG reveals second write for end string
-        #print('end_phase %s' % self.end_phase) # DEBUG
-        if self.end_phase:
-            # ignore the end string, buffer lines must end with \n
-            # self.lines.append(self.contents) # already  includes final'\n'
-            # self.a(self.dot, self.contents) # append command, advances dot
-            self.insert_other(self.nlines()+1, self.contents.splitlines(True))
-        else:
-            # store contents string until we get end string
-            self.contents = s
-        self.end_phase = not self.end_phase # alternates False True False ...
+        self.insert(self.nlines()+1, s.rstrip().splitlines(keepends=True))
 
     # line addresses
 
@@ -162,9 +149,7 @@ class Buffer(object):
 
     # helpers for r(ead), a(ppend), i(nsert), c(hange) etc.
 
-    # This method is called by both insert and insert_other, below
-    # It separated out so we can display insert and insert_other differently.
-    def insert_lines(self, iline, lines):
+    def insert(self, iline, lines):
         """
         Insert lines (list of strings) before iline,
         update dot to last inserted line
@@ -177,20 +162,6 @@ class Buffer(object):
         for c in self.mark:
             if self.mark[c] >= iline:
                 self.mark[c] += nlines
-
-    def insert(self, iline, lines):
-        """
-        Insert lines when this buffer is the current buffer.
-        If displaying, update the focus window via a wrapper in textframe or...
-        """
-        self.insert_lines(iline, lines)
-
-    def insert_other(self, iline, lines):
-        """
-        Insert lines when this buffer is *not* the current buffer.
-        If displaying, update other windows via wrapper but *not* focus window.
-        """
-        self.insert_lines(iline, lines)
 
     def replace(self, iline, line):
         'replace the line at iline with another single line'

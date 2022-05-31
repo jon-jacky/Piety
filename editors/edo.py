@@ -7,6 +7,7 @@ edo.py - ed + wyshka, ed with command interpreter that also provides python
 """
 
 import ed, parse, check, pysh, samysh, wyshka, bufimport, shellcmd
+import traceback
 from contextlib import redirect_stdout, redirect_stderr
 
 text = ed.text # so we can use it without ed prefix
@@ -59,16 +60,14 @@ def T(*args):
     """
     valid, start, end, _, _ = check.irange(text.buf, args)
     if valid: # includes start <= end, maybe not so for mark and dot
-        with redirect_stdout(text.buf):
-            # with redirect_stderr(text.buf): # FIXME - doesn't work
-                pysh.pushlines(text.buf.lines[start:end+1])
+        with redirect_stderr(text.buf), redirect_stdout(text.buf):
+            pysh.pushlines(text.buf.lines[start:end+1])
     text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
 
 def Z(*args):
     'Run shell command on single line at dot, append output to current buffer'
     # ignore any arguments for now - only works at dot
-    with redirect_stdout(text.buf):
-        # with redirect_stderr(text.buf): # FIXME - doesn't work
+    with redirect_stderr(text.buf), redirect_stdout(text.buf):
         sh(text.buf.lines[text.buf.dot].rstrip())
     text.buf.a(text.buf.dot, '\n') # Append new empty line and put dot there
     

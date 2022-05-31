@@ -1,5 +1,5 @@
 """
-py - Multiwindow display implemented by a list of window instances,
+frame.py - Multiwindow display implemented by a list of window instances,
             with a scrolling command region at the bottom of the display.
 """
 
@@ -75,12 +75,12 @@ def put_message(msg):
     util.putstr(msg + '\n')
     put_display_cursor()
 
-def init(cmd_h, buffer):
+def init(cmd_h, buf):
     'Initialize frame with one window into buffer.'
     global win, ifocus
     # must assign frame size before create first window
     scale(nlines, cmd_h)
-    win = window.Window(buffer, frame_top, windows_h-1, ncols) # -1 excl status
+    win = window.Window(buf, frame_top, windows_h-1, ncols) # -1 excl status
     win.focus = True
     windows.append(win)
     ifocus = 0
@@ -254,25 +254,46 @@ def locate(origin, destination):
             win.set_marker(destination)
         put_command_cursor()
 
-def insert(start, end):
+def insert(buf, start, end):
     """
     Insert text: ed a i c m r t y commands
+    buf - buffer where text is inserted
     start, end - line numbers of inserted text after insertion
     """
-    if mode != Mode.input: # ed commands m r t y
-        win.modify(start, end)
-    elif mode == Mode.input: # input mode after ed commands a i c
-        win.update_for_input()
-    for w in windows:
-        if w.samebuf(win):
-            w.adjust_insert(start, end)
-    if mode == Mode.input:
-        win.put_cursor_for_input()
-    elif mode == Mode.command:
-        win.set_marker(win.buf.dot)
-        put_command_cursor()
-    elif mode == Mode.display:
-        put_display_cursor()
+    if buf == win.buf: # if buffer is the current buffer ...
+        if mode != Mode.input: # ed commands m r t y
+            win.modify(start, end)
+        elif mode == Mode.input: # input mode after ed commands a i c
+            win.update_for_input()
+        for w in windows:
+            if w.samebuf(win):
+                w.adjust_insert(start, end)
+        if mode == Mode.input:
+            win.put_cursor_for_input()
+        elif mode == Mode.command:
+            win.set_marker(win.buf.dot)
+            put_command_cursor()
+        elif mode == Mode.display:
+            put_display_cursor()
+    
+    # Insert text into buffer which might not be the current buffer.
+    # Search for windows (if any) which display that buffer.
+    # start, end - line numbers of inserted text after insertion.
+    # column - where to put cursor, might not be column 1.    
+    else: # ... else buf arg is not the current buffer ...
+        for w in windows:
+            if w.buf == buf:
+                w.saved_dot = w.buf.dot
+                w.modify(start, end)
+        # Now put the cursor back in focus window, or at command line
+        column = console.start_col + console.point if console else 0
+        if mode == Mode.input: # can't put input cursor til other windows done
+            win.put_cursor_for_input(column=column)
+        elif mode == Mode.display:
+            put_display_cursor(column=column)
+        elif mode == Mode.command:
+            put_command_cursor(column=column)
+
 
 def delete(start, end):
     """
@@ -313,33 +334,13 @@ def mutate(start, end):
 # Update one or more windows with buffer contents, where the buffer 
 # is explicit, it is a parameter.
 
-def status(buffer):
+def status(buf):
     'Update status line for given buffer in all of its windows'
     for w in windows:
-        if w.buf == buffer:
+        if w.buf == buf:
             w.update_status()
     if mode == Mode.command:
         put_command_cursor()
-
-def insert_other(buffer, start, end):
-    """
-    Insert text into buffer which might not be the current buffer.
-    Search for windows (if any) which display that buffer.
-    start, end - line numbers of inserted text after insertion.
-    column - where to put cursor, might not be column 1.    
-    """
-    for w in windows:
-        if w.buf == buffer:
-            w.saved_dot = w.buf.dot
-            w.modify(start, end)
-    # Now put the cursor back in focus window, or at command line
-    column = console.start_col + console.point if console else 0
-    if mode == Mode.input: # can't put input cursor til other windows done
-        win.put_cursor_for_input(column=column)
-    elif mode == Mode.display:
-        put_display_cursor(column=column)
-    elif mode == Mode.command:
-        put_command_cursor(column=column)
 
 # Called at application startup to ensure the frame is initialized only once.
 # The same application may be started, exited, started again several times

@@ -69,15 +69,9 @@ class BufferFrame(buffer_Buffer):
     def insert(self, iline, lines):
         'Insert lines before iline'
         super().insert(iline, lines)
-        if displaying: frame.insert(iline, self.dot)          
-
-    def insert_other(self, iline, lines):
-        """
-        Insert lines when this buffer is not the current buffer,
-        for example when this buffer is updated by a background task.
-        """
-        super().insert_other(iline, lines)
-        if displaying: frame.insert_other(self, iline, self.dot)
+        # Pass this buffer, self, as first arg here.
+        # Note that frame.insert is not a method, it's just a function
+        if displaying: frame.insert(self, iline, self.dot)
 
     def r(self, iline, filename):
         'Read file contents into buffer after iline.'
