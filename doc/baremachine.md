@@ -95,6 +95,7 @@ programmer only see the Python part.
 attempt to provide the minimum amount of low-level code needed to support
 an operating system written in a high-level language.  It was used to
 build [CogNOS](https://github.com/nopsys/CogNOS) (also
+[here](https://github.com/nopsys/SmalltalkNOS) and
 [here](https://charig.github.io/assets/papers/SCDE-DLS.pdf)), a standalone
 Smalltalk language system that runs on a bare machine.   Among all the
 [projects I surveyed](precursors.md),  this one appears closest to my
@@ -109,8 +110,9 @@ of assembler.
 The Cog virtual machine (for the Smalltalk language) was ported to NopSys
 by adding methods for reading and writing CPU control registers,
 interacting with hardware I/O ports, reading a timer, and connecting to an
-interrupt handler.    The CogNos operating system, including interrupt
-handlers, device drivers and the file system, is written in Smalltalk.
+interrupt handler. The CogNos operating system, including
+[interrupt handlers, device drivers and the file system](https://github.com/nopsys/SmalltalkNOS), 
+is written in Smalltalk.
 
 NopSys is supposed to be language-independent -- the authors write  "we're
 eager to see people create PyNOS, RubyNos, etc." -- but has only been used
