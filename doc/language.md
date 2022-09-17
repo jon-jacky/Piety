@@ -1,6 +1,11 @@
 
 Here are some language processors for Python and/or in Python.
 
+This table has not been updated since Feb 2020.  There is a more recent
+collection of pertinent links here:
+
+<https://github.com/pfalcon/awesome-python-compilers>
+
 | Processor | Type | Description |
 | --------- | ---- | ----------- |
 | [CPython](http://docs.python.org/devguide/index.html) | Interpreter, compiler | Reference implementation from [python.org](http://www.python.org/).  [Source](http://hg.python.org/cpython/branches) (pick a version, then select *browse*, for example [2.7](http://hg.python.org/cpython/file/c163e5011bd3)).  [Developers' Guide](http://docs.python.org/devguide/index.html), for example [here](http://docs.python.org/devguide/setup.html#directory-structure) and [here](http://docs.python.org/devguide/compiler.html).  [API](http://docs.python.org/2.7/c-api/index.html).  [Video](http://pyvideo.org/video/635/stepping-through-cpython), also [here](http://pyvideo.org/video/1777/all-singing-all-dancing-python-bytecode).  Here is a [brief explanation](http://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1) and [links](http://stackoverflow.com/questions/5216634/a-good-book-article-about-python-interpreter?lq=1) to others (more recently [here](http://eli.thegreenplace.net/category/programming/python/python-internals/)).  Still more starting [here](http://utcc.utoronto.ca/~cks/space/blog/python/WhyCPythonBytecode).  Ten hours of [video lectures](http://pgbovine.net/cpython-internals.htm). |
@@ -39,3 +44,4 @@ Here are some language processors for Python and/or in Python.
 | [Pythoniac](https://mail.python.org/pipermail/python-list/2002-June/152587.html) and [here](https://mail.python.org/pipermail/python-list/2002-June/163423.html), also [here](https://groups.google.com/forum/#!msg/comp.lang.python/paIIR2LJ2aI/QT0l0EWk2SUJ) | Bytecode interpreter in hardware (ideas, discussion) | "The PVM (Python Virtual Machine) processes objects (via pointers on the stack), which are treated in a 'black box' fashion - i.e. they have add, subtract, compare etc. methods that are called by the PVM ... These methods of objects may not actually be coded for in Python ... the PVM is unaware, in the majority of cases, of what actually needs to be done to manipulate objects, it just makes calls to non Python code. ... how to go about dealing with this in a Python processor? |
 | [pyCPU](http://pycpu.wordpress.com/), also [here](http://sourceforge.net/projects/pycpu/) | Bytecode interpreter for FPGA | "an implementation of a hardware CPU in [myHDL](http://www.myhdl.org). The CPU can directly execute something very similar to python bytecode (but only a very restricted instruction set).", "Running a very small subset of Python on an FPGA is possible." |
 
+Revised Sep 2022
