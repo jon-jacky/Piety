@@ -41,6 +41,7 @@ Python, or programmable in Python.
 | [httpie](https://github.com/jkbr/httpie) | Web client | Source | "a CLI, cURL-like tool ... written in Python ... uses the excellent [Requests](http://docs.python-requests.org/en/latest/) and [Pygments](http://pygments.org/) libraries" |
 | [Grail](http://en.wikipedia.org/wiki/Grail_%28web_browser%29), also [here](https://github.com/mdoege/grailbrowser) and [here](http://grail.sourceforge.net/info/papers/restofus.html) | Web browser | Source, applets | A web browser in Python written in 1995 by Guido van Rossum.  Abandoned 1999. Supports HTML 2.0.  Requires Tcl/Tk. Works in Python 2.7. [Trail](https://github.com/mdoege/Trail) is a recently enhanced version. |
 | [uzbl](http://uzbl.org/), also [here](https://github.com/Dieterbe/uzbl) | Web browser | Wrapper, configuration, client | "Uses WebKitGtk+ for rendering and network interaction", "Uses a set of scripts (mostly Python) ... so things work out of the box; yet plenty of room for customization."  |
+| [offpunk](https://notabug.org/ploum/offpunk) | Web browser | Source | "A command-line and offline-first smolnet browser/feed reader for Gemini, Gopher, Spartan and Web ..." |
 | [weasyprint](http://weasyprint.org/), also [here](https://github.com/Kozea/WeasyPrint) | Web page renderer | Source | "converts web documents (HTML with CSS, SVG, ...) to PDF" |
 | [Linux Framebuffer](http://blog.daum.net/nskystars/2626663) | Graphics | Source, API | "Drawing to the Linux Framebuffer in Python" Writes to /dev/fb0 using fcntl, mmap, struct.  Looks like a general technique for doing low-level I/O in Linux.  Based on C code [here](http://doc.qt.digia.com/3.0/emb-framebuffer-howto.html), but simpler. |
 | [Python X Library](http://python-xlib.sourceforge.net/) | Graphics | Source, API | "a fully functional X client library for Python programs. It is written entirely in Python, in contrast to earlier X libraries for Python (the ancient X extension and the newer plxlib) which were interfaces to the C Xlib." |
@@ -118,5 +119,4 @@ The component is a database whose query language is provided as a Python API.
 The component is a server that communicates using a protocol that has
 a Python API.
 
-Revised Mar 2022
-
+Revised Sep 2022

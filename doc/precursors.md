@@ -91,6 +91,7 @@ Here are some examples.
 | [Khoros](http://outofhanwell.wordpress.com/2008/08/16/khoros-a-lua-operating-system/), [lv0](http://lv0.org/), also [here](http://lua-users.org/lists/lua-l/2011-08/msg01189.html) | P | 2008 -- | Lua, C | Bare machine | x86-64 | "elite, micro, minimal, nano, old school, pico, retro, rock solid, secure, simple, stable, straight edge or suckless OS" |
 | [eLua](http://www.eluaproject.net/doc/v0.8/en_arch_overview.html) | R | 2011? -- | Lua, C | Bare machine | [eLuaBrain](http://eluabrain.blogspot.fr/) (Cortex-M3) and many more | "embedded software ... with the power of Lua ... on a wide range of microcontroller architectures" |
 | [LuaOs](http://luaos.net/docs/manual.php), [SafeLua](http://luaos.net/docs/safelua-api.html) | P | 2011 -- | Lua (SafeLua) | Bare machine, Native OS, Sandbox |  Linux | "customizable light-weight sandboxes ... run untrusted code safely" | 
+| [load81](https://github.com/antirez/load81) | P | 2011 | Lua, C | Sandbox | OS X, Linux | "... to teach children how to write Lua programs. It features a graphical programming environment and a Commodore-64 style integrated editor ..." |
 | [luakernel](https://github.com/ers35/luakernel), also at [HN](https://news.ycombinator.com/item?id=8486178) | P | 2014 | Lua | Bare machine | x86 | "Lua + SQLite running on bare metal x86" "file primitive ... purely in Lua ... a pre-initialized ramfs" "lua coroutines as the core of the scheduling" |
 | [Node9](https://github.com/jvburnes/node9/blob/master/doc/node9-hackers-guide.txt), also [lua-users](http://lua-users.org/lists/lua-l/2015-06/msg00311.html) and [HN](https://news.ycombinator.com/item?id=9704517) | P | 2015 | Lua, C | Host OS | OS X now, Linux etc. possible | Inferno implemented with Lua, LuaJIT, libuv. "Build your distributed applications by linking your compute nodes ... over the Inferno/Plan9 9p resource sharing system." |
 | [ES Operating System](http://code.google.com/p/es-operating-system/), also [here](http://code.google.com/p/es-operating-system/wiki/XV_Semana_Informatica) | P | 2004 -- | Javascript ("ECMAScript"), C++ | Bare machine | x86 | "pure component operating system ... components written in C++ can be seamlessly controlled from ECMAScript" |
@@ -218,5 +219,4 @@ Here are more links on operating system
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
 
-Revised Dec 2021
-
+Revised Sep 2022
