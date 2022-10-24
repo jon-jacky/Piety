@@ -6,7 +6,7 @@ frame.py - Multiwindow display implemented by a list of window instances,
 from enum import Enum
 import util, terminal, terminal_util, display, window
 
-# Hook for display updates from background tasks to restore cursor etc.
+# Hook to restore cursor etc. after display updates from background tasks.
 console = None  # default: no updates from background tasks,no restore needed
 
 class Mode(Enum):
@@ -268,32 +268,29 @@ def insert(buf, start, end):
         for w in windows:
             if w.samebuf(win):
                 w.adjust_insert(start, end)
-        if mode == Mode.input:
-            win.put_cursor_for_input()
-        elif mode == Mode.command:
-            win.set_marker(win.buf.dot)
-            put_command_cursor()
-        elif mode == Mode.display:
-            put_display_cursor()
-    
-    # Insert text into buffer which might not be the current buffer.
-    # Search for windows (if any) which display that buffer.
+        column=1 # default in put cursor functions
+
+    # Insert text into buffer buf when it is *not* the the current buffer.
+    # Search for windows (if any) which display that buffer,
     # start, end - line numbers of inserted text after insertion.
     # column - where to put cursor, might not be column 1.    
     else: # ... else buf arg is not the current buffer ...
         for w in windows:
-            if w.buf == buf:
+            if w.buf == buf:  
                 w.saved_dot = w.buf.dot
                 w.modify(start, end)
-        # Now put the cursor back in focus window, or at command line
-        column = console.start_col + console.point if console else 0
-        if mode == Mode.input: # can't put input cursor til other windows done
-            win.put_cursor_for_input(column=column)
-        elif mode == Mode.display:
-            put_display_cursor(column=column)
-        elif mode == Mode.command:
-            put_command_cursor(column=column)
 
+    # In case there is another task updating other window,
+    #  we must restore cursor position on current window or command line
+    column = console.start_col + console.point if console else 1
+
+    # Now put the cursor back in focus window, or at command line
+    if mode == Mode.input: # can't put input cursor til other windows done
+        win.put_cursor_for_input(column=column)
+    elif mode == Mode.display:
+        put_display_cursor(column=column)
+    elif mode == Mode.command:
+        put_command_cursor(column=column)
 
 def delete(start, end):
     """

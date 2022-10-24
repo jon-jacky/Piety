@@ -51,6 +51,7 @@ class Buffer(object):
     # print(s, file=buffer)  invokes this method to write s to buffer.
     # with redirect_stdout(buffer): ...  writes program output to buffer.
     # s or program output appears at the end of the buffer.
+    # This code writes at the end of the buffer, not a the current dot position
     def write(self, s):
         self.insert(self.nlines()+1, s.rstrip().splitlines(keepends=True))
 
