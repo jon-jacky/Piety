@@ -156,6 +156,7 @@ key commands, not alt key commands or arrow keys.  For example, use
 C-f and C-b to move the cursor forward and back one character at a
 time, but not M-f and M-b to move the cursor forward and back a word
 at a time.  Use C-p and C-n to move the cursor to the previous line or
-the next line, but not the up- and down-arrow keys.
+the next line, but not the up- and down-arrow keys.   Use C-z to switch
+from display editing to the command line, but not M-x.
 
 Revised Dec 2022
