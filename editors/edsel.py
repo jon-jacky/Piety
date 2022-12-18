@@ -69,7 +69,7 @@ class Console(console.Console):
             super().refresh() # just refresh the command line
         else:
             self.store_line()
-            frame.refresh(self.start_col + self.point)
+            frame.refresh()
 
     def open_line(self):
         """
@@ -80,10 +80,11 @@ class Console(console.Console):
         suffix = self.line[self.point:].rstrip('\n')
         text.buf.replace(text.buf.dot, prefix + '\n') # similar to store_line
         display.kill_line() # from cursor to end of line
-        text.buf.a(text.buf.dot, suffix + '\n') # calls frame.insert()
+        # Must update self.point etc. *before* text.buf.a calls frame.insert
         self.line = suffix
         self.point = 0
         self.start_col = 1
+        text.buf.a(text.buf.dot, suffix + '\n') # calls frame.insert()
 
     def join_prev(self):
         'Helper - join this line to previous. At first line do nothing.'
@@ -93,7 +94,7 @@ class Console(console.Console):
             text.buf.j(text.buf.dot-1, text.buf.dot)
             self.load_line()
             self.point = new_point
-            frame.put_display_cursor(column=(self.start_col + self.point))
+            frame.put_display_cursor()
         else:
             pass
 
@@ -113,7 +114,7 @@ class Console(console.Console):
             self.store_line()
             text.buf.j(text.buf.dot, text.buf.dot+1)
             self.load_line()
-            frame.put_display_cursor(column=(self.start_col + self.point))
+            frame.put_display_cursor()
         else:
             pass
 
@@ -133,7 +134,7 @@ class Console(console.Console):
             text.buf.l(iline)
             self.load_line()
             self.point = min(jcol, len(self.line))
-            frame.put_display_cursor(column=(self.start_col + self.point))
+            frame.put_display_cursor()
         if iline == text.buffer.no_match:
             frame.put_message('? no match')
 
@@ -420,6 +421,8 @@ edsel = Console(prompt=(lambda: wyshka.prompt),
                process_line=edda.process_line,
                stopped=(lambda command: ed.quit),
                startup=edda.startup, cleanup=edda.cleanup)
+
+frame.console = edsel # frame needs edsel console instance to position cursor
 
 edsel.keymap = (lambda: (edsel.edsel_command_keymap
                         if edsel.collecting_command

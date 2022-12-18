@@ -18,7 +18,7 @@ bimport, breload, sh = edo.bimport, edo.breload, edo.sh
 
 def L():
     'Refresh'
-    frame.refresh(1) # start at column 1
+    frame.refresh()
 
 def o(*args):
     'Window commands: o(2) horiz. split, o(1) one window, o() next window'

@@ -2,32 +2,31 @@
 demo.py
 =======
 
-**[demo.py](demo.py)** demonstrates many features of the Piety system,
-including concurrent tasks, job control, editors, a windowing system,
+**[demo.py](demo.py)** demonstrates several features of the Piety system,
+including concurrent tasks, a display editor, a windowing system,
 and an enhanced shell.
 
-**demo.py** uses the Piety scheduler to run the four jobs created by
-*[session.py](session.py)*, concurrently with two timestamp tasks.  Each timestamp
-task updates an editor buffer.
-You can see these buffers update in their windows as you edit in another window
-or on the command line.
+**demo.py** uses the Piety scheduler to run the
+[edsel](../editors/edsel) display editor as a task,
+concurrently with two timestamp tasks.  Each timestamp task updates an
+editor buffer.  You can see these buffers update in their windows as
+you edit in another window or on the command line.
 
-Here is a sample session that demonstrates this.  Here *>>* is
-Piety's Python prompt (with two brackets, to distinguish it from
-the standard Python prompt with three brackets *>>>*).
-Here *:* is the editor command
-prompt, you type the commands that follow.  First, start the script and
-run the [edsel](../editors/edsel.md) display editor.
-The *edsel* screen with one window appears:
+Here is a sample session that demonstrates this.  Here *>>* is Piety's
+Python prompt (with two brackets, to distinguish it from the standard
+Python prompt with three brackets *>>>*) and *:* is the editor
+command prompt.
 
-    ... $ python3 -im demo
-    .   ts1                   0  Text     (no file)
-    .   ts2                   0  Text     (no file)
-    . * main                  1  Text     (no file)
-    >> edsel.main(c=12)
-    ... edsel screen with 12-line scrolling region appears ...
+First, start the script:
 
-Next, type commands at the *edsel* command prompt to create
+    $ python3 -im demo
+
+The *edsel* screen with one window appears, showing the *main* buffer
+containing the line *This is the main buffer*.  At the bottom of the
+screen is a two-line scrolling command entry region, where you type
+commands at the *:* prompt.
+
+Type commands at the *edsel* command prompt to create
 two new windows that show timestamps updating, then traverse to
 the original *main* window and edit.  The *o2* command splits the window,
 *b ts1* makes *ts1* the current buffer (and displays it in the focus window),
@@ -58,18 +57,24 @@ To exit display editing mode and return to the command prompt, type *^Z*.
 
 Some interesting commands to type at the *edsel* command prompt:
 
- - *b ts1* - in the focus window, display the buffer that contains the
+ - *h 12* - Enlarge the scrolling command region to 12 lines, so 
+ you can observe multiple commands or multiline output.
+
+ - *n* - List all the editor text buffers.
+
+ - *b ts1* - In the focus window, display the buffer that contains the
  timeout messages from *ts1task*.  This window updates each time the
  task generates a new message, even when another window gets focus
  and updates as its text is edited.
 
-Some interesting Python commands to type at the *Python* command prompt.
-(The three editor jobs have the *[wyshka](../shells/wyshka.py)* shell built-in,
-so you can use the Python command line without exiting the editor, by prefixing
-each Python command with an exclamation point, or by typing just an
-exclamation point on the command line by itself to switch to Python.)
+The *edsel* display editor has the *[wyshka](../shells/wyshka.py)*
+shell built-in, so you can use the Python command line without exiting
+the editor, by prefixing each Python command with an exclamation
+point, or by typing just an exclamation point on the command line by
+itself to switch to a Python command prompt.  Switch back to the
+editor prompt by typing just a colon on the Python command line.
 
- - *jobs()* - show information about jobs
+Some interesting Python commands to type at the *Python* command prompt.
 
  - *piety.tasks()* - show information about tasks
 
@@ -83,7 +88,7 @@ exclamation point on the command line by itself to switch to Python.)
 
  - *piety.cycle.period=1.0* - cause *ts1* buffer to resume updating once a second
 
- - *edm.a('append line after dot')* - or any other call from the *ed* API.
+ - *edsel.ed.a('append line after dot')* - or any other call from the *ed* API.
 
 With *piety.cycle.period=0.0001* -- 10,000 events/second -- we can type
 comfortably in the *main* buffer, with no lost characters -- although 
@@ -96,18 +101,47 @@ a million times a second).
 ### API and data structures ###
 
 You can access the editor API from the Python prompt
-by prefixing them with *edm.* ("*ed* module"): *edm.n()*, etc.
-We have to use this module name to distinguish it from the *ed* job.
+by prefixing them with *edsel.ed.* as in *edsel.ed.n()*, etc.
 
 You can access the storage API and data structures by prefixing them 
-with *text.*: *text.buffers* etc.
+with *edsel.text.*, as in *edsel.text.buffers* etc.
 
 You can access the display API and data structures by prefixing them
-with *frame.*: *frame.windows* etc.
+with *edsel.frame.*, as in *edsel.frame.windows* etc.
 
 ### Bugs ###
 
-This demonstration works as described here when you run the display editor
-*edsel*, but not *edda*.  For now, *edsel* is hard-coded into the demo.
+There is no graceful way to exit from a program that uses Piety
+tasking.  In this demo, you can type Q at the editor command prompt to
+exit the editor, but then there is no more command prompt, so you have
+to type control-C (^C or C-c) to get back to the CPython prompt *>>>*,
+then you can type *exit()* or control-D (^D or C-d) to exit.  Neither
+of these works at the wyshka Python prompt *>>*.
 
-Revised Oct 2020
+There is problem when any program that uses multiple character
+keycodes runs as a task under Piety.  In this demo, the problem appears
+when using the display editor, or when editing the command line.
+
+Only keystrokes that make single-character keycodes work correctly
+each time.  That includes all the regular alphanumeric and symbol keys,
+and also control characters formed by holding down the control key,
+and then typing another key. For example, control-f to move the cursor
+forward one character (also written ^f or C-f) work as intended.
+
+Keystrokes that make multiple character keycodes have a delayed
+effect.  They are only effective when you press the next key.  These
+include keycodes formed by holding down the alt key, then typing another
+key, for example alt-f to move the cursor forward one word (also
+written M-f).  You must type M-f twice to get the cursor to advance by
+one word, then the next keystroke, whatever it is, causes the cursor
+to advance by a word again.  The arrow keys also exhibit the same
+problem, because they also send multiple-character keycodes.
+
+To run this demo wihout encountering this problem, use only control
+key commands, not alt key commands or arrow keys.  For example, use
+C-f and C-b to move the cursor forward and back one character at a
+time, but not M-f and M-b to move the cursor forward and back a word
+at a time.  Use C-p and C-n to move the cursor to the previous line or
+the next line, but not the up- and down-arrow keys.
+
+Revised Dec 2022

@@ -17,7 +17,8 @@ The steps in the sequence of increasing functionality are: *ed.py*
 (line editor), *edie* (adds built-in Python interpreter), *edo* (adds
 Python interpreter and scripting), *edda* (adds display, but still
 provides only *ed* commands for line editing), and *edsel* (adds display
-editing at any character position).
+editing at any character position).  There is also *edsel_task*, which 
+runs *edsel* as a single task under the Piety scheduler.
 
 Each editor in this sequence imports its predecessor.  The result is a
 structure where *edsel* has all its predecessors nested inside, like a
@@ -29,7 +30,11 @@ Another dimension arises from wrapping these programs in a
 blocking, so they can run in the cooperative multitasking system,
 [Piety](../piety/README.md).  Here *etty* wraps *ed*, *edna* wraps *edo*,
 and *desoto* wraps *edda*.  More nesting!  *edsel* is already a *Console*
-object, so it doesn't require a wrapper.
+object, so it doesn't require a wrapper.  
+
+Yet another dimension arises from running programs as tasks under
+the Piety scheduler.  We have found that some bugs only appear when
+programs are run as tasks.  *edsel_task.py* runs *edsel* as a single task.
 
 Several of the programs and modules here are described by
 their own *.md* and *.txt* files (*ed.md* and *ed.txt* for *ed.py*, etc.)
@@ -87,6 +92,8 @@ Files in this directory:
 
 - **edsel.txt**: command summary for *edsel.py*.
 
+- **edsel_task.py**: runs *edsel* as a single task under the Piety scheduler.
+
 - **etty.md**: explanation of *etty.py*.
 
 - **etty.py**: wraps *ed.py* in a *Console* object
@@ -119,5 +126,5 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Apr 2022
+Revised Dec 2022
 

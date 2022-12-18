@@ -219,6 +219,7 @@ class Console(object):
         self.line = '' # empty line at beginning of cycle
         self.point = 0 # index into self.line at beginning of cycle
         self.start_col = len(self.prompt())+1 # 1-based indexing, not 0-based
+        display.move_to_column(1) # can't always assume cursor is already here
         util.putstr(self.prompt() + self.line) # line might be empty
         self.move_to_point() # might not be end of line
         terminal.set_char_mode() # enter inline editing, exit at restore()

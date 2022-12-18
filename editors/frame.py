@@ -6,8 +6,8 @@ frame.py - Multiwindow display implemented by a list of window instances,
 from enum import Enum
 import util, terminal, terminal_util, display, window
 
-# Hook to restore cursor etc. after display updates from background tasks.
-console = None  # default: no updates from background tasks,no restore needed
+# console instance, if present, stores column where cursor should go
+console = None # code below defaults to column 1 if no Console
 
 class Mode(Enum):
     """
@@ -60,14 +60,16 @@ def refresh_windows():
 
 # Functions called by clients
 
-def put_command_cursor(column=1):
-    'Put cursor at command line in scroll region, at given column, default 1'
-    display.put_cursor(cmd_n, column) # last line on display
+def put_command_cursor():
+    'Put cursor at command line in scroll region'
+    display.put_cursor(cmd_n, 1) # last line on display
+    if console: console.move_to_point() # set column, default 1
 
-def put_display_cursor(column=1):
-    'Put cursor at dot in focus window, at given column, default 1'
+def put_display_cursor():
+    'Put cursor at dot, point in focus window'
     wdot = win.wline(win.buf.dot)
-    display.put_cursor(wdot, column)
+    display.put_cursor(wdot, 1)
+    if console: console.move_to_point() # set column, default 1
 
 def put_message(msg):
     'While in display mode, write a message in scrolling command region'
@@ -113,10 +115,9 @@ def display_mode():
 
 # Manage the entire frame
 
-def refresh(column):
+def refresh():
     """
     Clear, update entire display in command mode, otherwise just the windows.
-    column - where to put cursor, might not be column 1.
     """
     if mode == Mode.command:
         display.put_cursor(1,1)
@@ -124,9 +125,9 @@ def refresh(column):
     refresh_windows()
     if mode == Mode.command:
         display.set_scroll(cmd_1, cmd_n)
-        put_command_cursor(column=column)
+        put_command_cursor()
     elif mode == Mode.display:
-        put_display_cursor(column=column)
+        put_display_cursor()
 
 def rescale(new_cmd_h):
     """
@@ -144,7 +145,7 @@ def rescale(new_cmd_h):
                  else windows_h - (nwindows-1)*win_hdiv) # including status
         w.resize(frame_top + iwin*win_hdiv, win_h-1, ncols) # -1 excl status
         w.locate(w.buf.dot if w is win else w.saved_dot)
-    refresh(1)
+    refresh()
 
 def restore():
     """
@@ -268,29 +269,23 @@ def insert(buf, start, end):
         for w in windows:
             if w.samebuf(win):
                 w.adjust_insert(start, end)
-        column=1 # default in put cursor functions
 
     # Insert text into buffer buf when it is *not* the the current buffer.
     # Search for windows (if any) which display that buffer,
     # start, end - line numbers of inserted text after insertion.
-    # column - where to put cursor, might not be column 1.    
     else: # ... else buf arg is not the current buffer ...
         for w in windows:
             if w.buf == buf:  
                 w.saved_dot = w.buf.dot
                 w.modify(start, end)
 
-    # In case there is another task updating other window,
-    #  we must restore cursor position on current window or command line
-    column = console.start_col + console.point if console else 1
-
     # Now put the cursor back in focus window, or at command line
     if mode == Mode.input: # can't put input cursor til other windows done
-        win.put_cursor_for_input(column=column)
+        win.put_cursor_for_input()
     elif mode == Mode.display:
-        put_display_cursor(column=column)
+        put_display_cursor()
     elif mode == Mode.command:
-        put_command_cursor(column=column)
+        put_command_cursor()
 
 def delete(start, end):
     """
