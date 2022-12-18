@@ -12,19 +12,19 @@ concurrently with two timestamp tasks.  Each timestamp task updates an
 editor buffer.  You can see these buffers update in their windows as
 you edit in another window or on the command line.
 
-Here is a sample session that demonstrates this.  Here *>>* is Piety's
-Python prompt (with two brackets, to distinguish it from the standard
-Python prompt with three brackets *>>>*) and *:* is the editor
-command prompt.
+Here is a sample session that demonstrates this.  First, at the system
+command line, change directory to the Piety scripts directory, then
+type the command to set up the Python path to find all the Piety modules, 
+then type the command to start the demo:
 
-First, start the script:
-
+    $ cd ~/Piety/scripts
+    $ . ../bin/asyncio_paths
     $ python3 -im demo
 
 The *edsel* screen with one window appears, showing the *main* buffer
 containing the line *This is the main buffer*.  At the bottom of the
 screen is a two-line scrolling command entry region, where you type
-commands at the *:* prompt.
+commands at the *:* editor prompt.
 
 Type commands at the *edsel* command prompt to create
 two new windows that show timestamps updating, then traverse to
@@ -69,12 +69,15 @@ Some interesting commands to type at the *edsel* command prompt:
 
 The *edsel* display editor has the *[wyshka](../shells/wyshka.py)*
 shell built-in, so you can use the Python command line without exiting
-the editor, by prefixing each Python command with an exclamation
-point, or by typing just an exclamation point on the command line by
-itself to switch to a Python command prompt.  Switch back to the
-editor prompt by typing just a colon on the Python command line.
+the editor, by prefixing each Python command at the editor command
+prompt with an exclamation point, or by typing just an exclamation
+point on the editor command line by itself to switch to a Python
+command line.  The *wyshka* Python prompt has just two darts, *>>*,
+to distinguish it from the standard Python prompt.  Exit *wyshka* and
+return to the editor command line by typing just a colon at the *>>* prompt on
+the Python command line.
 
-Some interesting Python commands to type at the *Python* command prompt.
+Some interesting Python commands to try:
 
  - *piety.tasks()* - show information about tasks
 
@@ -92,22 +95,22 @@ Some interesting Python commands to type at the *Python* command prompt.
 
 With *piety.cycle.period=0.0001* -- 10,000 events/second -- we can type
 comfortably in the *main* buffer, with no lost characters -- although 
-cursor blinks furiously.   This is on an
+the cursor blinks furiously.   This is on an
 early 2011 MacBook Pro, 2.3 GHz Intel Core i5, 4 GB, OS X 10.11.6 El
 Capitan, with CPython 3.9.  Even with period 0.000001 we can type with
-no lost characters, display is updating at a blur (but probably not
+no lost characters, the display is updating at a blur (but probably not
 a million times a second).
 
 ### API and data structures ###
 
 You can access the editor API from the Python prompt
-by prefixing them with *edsel.ed.* as in *edsel.ed.n()*, etc.
+by prefixing calls with *edsel.ed.* as in *edsel.ed.n()*, etc.
 
-You can access the storage API and data structures by prefixing them 
-with *edsel.text.*, as in *edsel.text.buffers* etc.
+You can access the storage API and data structures by prefixing identifiers
+and calls with *edsel.text.*, as in *edsel.text.buffers* etc.
 
-You can access the display API and data structures by prefixing them
-with *edsel.frame.*, as in *edsel.frame.windows* etc.
+You can access the display API and data structures by prefixing identifiers
+and calls with *edsel.frame.*, as in *edsel.frame.windows* etc.
 
 ### Bugs ###
 
@@ -118,7 +121,9 @@ to type control-C (^C or C-c) to get back to the CPython prompt *>>>*,
 then you can type *exit()* or control-D (^D or C-d) to exit.  Neither
 of these works at the wyshka Python prompt *>>*.
 
-There is problem when any program that uses multiple character
+Type C-c etc. in the same way to exit after a crash and traceback.
+
+There is a problem when any program that uses multiple character
 keycodes runs as a task under Piety.  In this demo, the problem appears
 when using the display editor, or when editing the command line.
 
@@ -126,7 +131,7 @@ Only keystrokes that make single-character keycodes work correctly
 each time.  That includes all the regular alphanumeric and symbol keys,
 and also control characters formed by holding down the control key,
 and then typing another key. For example, control-f to move the cursor
-forward one character (also written ^f or C-f) work as intended.
+forward one character (also written ^F or C-f) work as intended.
 
 Keystrokes that make multiple character keycodes have a delayed
 effect.  They are only effective when you press the next key.  These
