@@ -13,4 +13,4 @@ export PATH=$PIETY/bin:$PIETY/scripts:$PATH
 #  and select-based event loop.
 # For other platforms, replace unix, vt_terminal and/or select in this path.
 # Recall that scripts import from samples and editors
-export PYTHONPATH=$PIETY/samples:$PIETY/util:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shell:$PIETY/unix:$PIETY/vt_terminal:$PIETY/select:$PYTHONPATH
+export PYTHONPATH=$PIETY/scripts:$PIETY/samples:$PIETY/util:$PIETY/console:$PIETY/editors:$PIETY/piety:$PIETY/shells:$PIETY/unix:$PIETY/vt_terminal:$PIETY/select:$PIETY/wrappers:/users/jon/tao:$PYTHONPATH
