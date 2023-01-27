@@ -43,6 +43,7 @@ So the user can type C_g if a program appears hung when reading a command.
 C_g is used as the Cancel command by some programs.
 """
 
+import time # DEBUG
 import util, terminal, key
 
 class GetKey:
@@ -54,8 +55,9 @@ class GetKey:
     def __call__(self):
     
         c = terminal.getchar()
+        self.console.debug_line += [time.time()] # DEBUG
         self.console.debug_line += [c] # DEBUG
-
+        
         # C_g is the unconditional cancel command, 
         # always discard any prefix and just return C_g itself.
         if c == key.C_g:

@@ -136,20 +136,20 @@ There is a problem when any program that uses multiple character
 keycodes runs as a task under Piety.  In this demo, the problem appears
 when using the display editor, or when editing the command line.
 
-Only keystrokes that make single-character keycodes work correctly
+Only keystrokes that make single-character keycodes display correctly
 each time.  That includes all the regular alphanumeric and symbol keys,
 and also control characters formed by holding down the control key,
 and then typing another key. For example, control-f to move the cursor
 forward one character (also written ^F or C-f) work as intended.
 
 Keystrokes that make multiple character keycodes have a delayed
-effect.  They are only effective when you press the next key.  These
-include keycodes formed by holding down the alt key, then typing another
-key, for example alt-f to move the cursor forward one word (also
-written M-f).  You must type M-f twice to get the cursor to advance by
-one word, then the next keystroke, whatever it is, causes the cursor
-to advance by a word again.  The arrow keys also exhibit the same
-problem, because they also send multiple-character keycodes.
+effect.  They are only appear on the display when you press the next
+key.  These include keycodes formed by holding down the alt key, then
+typing another key, for example alt-f to move the cursor forward one
+word (also written M-f).  You must type M-f twice to get the cursor to
+advance by one word, then the next keystroke, whatever it is, causes
+the cursor to advance by a word again.  The arrow keys also exhibit
+the same problem, because they also send multiple-character keycodes.
 
 To run this demo wihout encountering this problem, use only control
 key commands, not alt key commands or arrow keys.  For example, use
@@ -159,4 +159,19 @@ at a time.  Use C-p and C-n to move the cursor to the previous line or
 the next line, but not the up- and down-arrow keys.   Use C-z to switch
 from display editing to the command line, but not M-x.
 
-Revised Dec 2022
+This problem does not appear when *edsel* (etc.) are run without
+Piety tasking, for example by just running *python3 edsel.py*.
+The problem only appears when the programs are run as Piety tasks,
+as in *demo.py* or *scripts/edsel_piety.py*.
+
+We instrumented the code (in *console_debug.py* etc.) and found that
+the behavior *and timing* of the code that reads and interprets
+keystrokes, and constructs the output terminal display command
+strings, is the same whether or not the code runs under Piety tasking.
+It must be that the output (that is, the writing) of the display
+command strings are delayed, when running under Piety tasking -- but
+only when the input commands have multiple characters.  This is not
+accessible to our instrumentation, but must occur somewhere in the
+depths of the Python runtime or perhaps even in the Mac OS.
+
+Revised Jan 2023

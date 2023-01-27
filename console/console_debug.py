@@ -8,6 +8,7 @@ console.py - Console class, a wrapper that adapts console applications
 """
 
 import sys, string, re
+import time # DEBUG
 import util, terminal, key # getkey, display # now use display_debug etc, below
 import getkey_debug as getkey      #  so all the getkey continue to work
 import display_debug as display    #  so all the display.foo continue to work
@@ -159,6 +160,7 @@ class Console(object):
         To avoid blocking in reader, must only call handler when input is ready
         """
         keycode = self.reader() # returns '' when keycode is not complete
+        self.debug_line += [time.time()] # DEBUG
         self.debug_line += [keycode] # DEBUG
         if keycode:
             self.handle_key(keycode)

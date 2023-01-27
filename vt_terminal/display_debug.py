@@ -5,6 +5,7 @@ display - Update the terminal display using ANSI control sequences.
 # This putstr always writes to display even when stdout is redirected
 
 import os
+import time # DEBUG
 
 ttyname = os.ctermid() # usually returns '/dev/tty'
 tty = open(ttyname, 'w')
@@ -21,6 +22,7 @@ def putstr(s):
     print(s, end='', flush=True, file=tty)
 
 def putstr_debug(console, s):
+    console.debug_line += [time.time()] # DEBUG
     console.debug_line += [ s ]
     print(s, end='', flush=True, file=tty)
 
