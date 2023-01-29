@@ -26,7 +26,10 @@ Modules used by terminal applications.
    access its history in any application the uses *console*
    with the *key* module, and the built-in default table.
 
-- **console_debug.py**: Instrumented version of **console.py**.  
+- **console_debug.md**: Directions for using *console_debug* and
+    *console_task*.
+
+- **console_debug.py**: Instrumented version of **console.py**.
     Imports *getkey_debug* and *display_debug*.
 
 - **console_task.py**: Tests a *Console* object running as a task under
