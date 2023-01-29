@@ -164,7 +164,8 @@ Piety tasking, for example by just running *python3 edsel.py*.
 The problem only appears when the programs are run as Piety tasks,
 as in *demo.py* or *scripts/edsel_piety.py*.
 
-We instrumented the code (in *console_debug.py* etc.) and found that
+We instrumented the code 
+(in [*console_debug.py*](../console/console_debug.md) etc.) and found that
 the behavior *and timing* of the code that reads and interprets
 keystrokes, and constructs the output terminal display command
 strings, is the same whether or not the code runs under Piety tasking.

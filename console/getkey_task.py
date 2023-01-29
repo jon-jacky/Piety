@@ -1,5 +1,6 @@
 """
-getkey_piety.py - Like test in getkey.py main() but with Piety scheduler,
+getkey_task.py - Like test in getkey.py main() but 
+                 run as a task under the Piety scheduler,
                   modeled on editors/edsel_piety
 """
 

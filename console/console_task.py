@@ -1,6 +1,7 @@
 """
-console_piety.py - Test console object runningr under Piety scheduler
-                based on edsel.py and getkey_piety.py
+console_task.py - Test console object running as a task under Piety scheduler.
+                 Imports console_debug, the instrumented version of console.
+                 This module is based on edsel.py and getkey_task.py
 """
 
 import sys # for sys.stdin

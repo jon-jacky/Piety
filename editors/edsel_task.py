@@ -1,15 +1,20 @@
 """
-edsel_task.py - Runs edsel display editor as a single task 
- under the Piety scheduler.   Extracted from from demo.py
+edsel_task.py - Runs edsel display editor as a task under the Piety scheduler
+                made by cutting from timestamp_tasks.py
 """
 
 import sys # for sys.stdin
 
 import edsel, piety
 
+# abbreviation so we can use module names without prefix
+ed = edsel.ed
+text = edsel.text
+frame = edsel.frame
+
 # Create the main buffer and add some content
-edsel.text.startup('main')
-edsel.ed.i('This is the main buffer')
+text.startup('main')
+ed.i('This is the main buffer')
 
 # The edsel task handles keyboard input without blocking
 
@@ -19,8 +24,9 @@ console1 = piety.Task(name="console", input=sys.stdin,
                      handler=edsel.edsel.handler, enabled=piety.true)
 
 def main():
-    edsel.edsel.main() # edsel console object method, not edsel module function
+    edsel.edsel.main() #edsel console object method, not edsel module function.
     piety.run()
 
 if __name__ == '__main__':
     main()
+

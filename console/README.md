@@ -19,14 +19,26 @@ Modules used by terminal applications.
 
   The editing keycodes and their effects are configured by a table.
 
-  *Console* works with *Key* (see below) to read keycodes.
+  *Console* works with *GetKey* (see below) to read keycodes.
 
 - **console.txt**: command summary for *Console* with *Key*,
    similar to Unix *readline*.  How to edit the command line and
    access its history in any application the uses *console*
    with the *key* module, and the built-in default table.
 
-- **key.py**: defines *Key* class that can collect, store, and return
+- **console_debug.py**: Instrumented version of **console.py**.  
+    Imports *getkey_debug* and *display_debug*.
+
+- **console_task.py**: Tests a *Console* object running as a task under
+    the Piety scheduler.  Imports the instrumented *console_debug*.
+
+- **getkey.py**: defines *GetKey* class that can collect, store, and return
     single character or multi-character keycodes, used by *Console*.
 
-Revised Mar 2019
+- **getkey_debug.py**: Instrumented version of *getkey.py*, 
+    imported by *console_debug*.
+
+- **getkey_task.py**: Like the test in *getkey.py* *main()*,
+    but runs as a task under the Piety scheduler.
+
+Revised Jan 2023

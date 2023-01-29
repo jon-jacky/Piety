@@ -1,5 +1,7 @@
 """
-console_debug.py - same as console.py but with debugging code included.
+console_debug.py - Instrumented version of console. Lines below marked DEBUG
+                  log data and timestamps to the list debug_line. This module
+                  also imports the instrumented getkey_debug and display_debug.
 
 console.py - Console class, a wrapper that adapts console applications
  for cooperative multitasking. Collects input string without blocking,
@@ -484,7 +486,7 @@ class Console(object):
 
         return (lambda: self.command_keymap) # default keymap
 
-# Put this a module level so we can inspect it at >>> after main exits
+# Put this at module level so we can inspect it at >>> after main exits
 echo = Console(prompt=(lambda: '> '), process_line=print)
 
 def main():

@@ -1,5 +1,6 @@
 """
-display - Update the terminal display using ANSI control sequences.
+display_debug - Instrumented version of display. Lines below marked DEBUG
+                  log data and timestamps to the list console.debug_line.
 """
 
 # This putstr always writes to display even when stdout is redirected
@@ -23,7 +24,7 @@ def putstr(s):
 
 def putstr_debug(console, s):
     console.debug_line += [time.time()] # DEBUG
-    console.debug_line += [ s ]
+    console.debug_line += [ s ] # DEBUG
     print(s, end='', flush=True, file=tty)
 
 esc = '\x1B'     # \e does not work 'invalid \x escape'

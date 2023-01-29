@@ -126,5 +126,6 @@ Files in this directory:
 
 - **window.py**: defines Window class used by *frame*.
 
-Revised Dec 2022
+Revised Jan 2023
+
 

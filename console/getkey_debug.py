@@ -1,6 +1,6 @@
 """
-getkey_debug.py - Like getkey but also logs each character it receives
-                   to the list console.debug_line
+getkey_debug.py - Instrumented version of getkey. Lines below marked DEBUG
+                  log data and timestamps to the list console.debug_line.
 
 getkey.py - Get 'key' from keyboard: single character or key sequence
 
