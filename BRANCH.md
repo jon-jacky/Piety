@@ -2,7 +2,26 @@
 branches
 ========
 
-This is the *master* branch.  Branches recently merged into *master*:
+This is the *master* branch.  Recent work in the *master* branch:
+
+- Jan 2023. Add instrumented modules *console_debug*, *getkey_debug*, 
+  *display_debug*, *console_task* for investigating tasking bug in *demo*.
+
+- Dec 2022. Tasking *demo*: Simplify, remove *session* module with its
+  jobs.  Just run *edsel* and two timestamp tasks.  *frame*: Set cursor
+  column correctly during tasking by using *console.move_to_point*.
+
+- May 2022. *frame*, *textframe*: Revise, generalize *insert* function 
+  so we can remove *insert_other*, now unnecessary.
+
+  *baremachine.md*: Finish writeup on approaches to running Piety on a 
+  bare machine.
+
+- April 2022. *Piety/README.md*: Finish total rewrite for better accuracy,
+  style, and organization, description of current state of the project, 
+  roadmap.
+
+Branches recently merged into *master*:
 
 - **noblock**.  Merged 18 Jul 2021.  Do not block after prefix characters
   like *C-x* while waiting for the next character.  Begun 5 Jul 2021.
