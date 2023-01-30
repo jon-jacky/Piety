@@ -11,15 +11,19 @@ This is the *master* branch.  Recent work in the *master* branch:
   jobs.  Just run *edsel* and two timestamp tasks.  *frame*: Set cursor
   column correctly during tasking by using *console.move_to_point*.
 
-- May 2022. *frame*, *textframe*: Revise, generalize *insert* function 
-  so we can remove *insert_other*, now unnecessary.
+- May 2022. *buffer*, *frame*, *textframe*: To better support tasking,
+  revise, generalize *insert* function so we can remove
+  *insert_other*, now unnecessary.
 
-  *baremachine.md*: Finish writeup on approaches to running Piety on a 
-  bare machine.
+  *edo*: In *T* function, redirect *stderr* and *stdout* to editor buffer.
+  Error output still not appearing, see also Feb 2021 below.
 
-- April 2022. *Piety/README.md*: Finish total rewrite for better accuracy,
-  style, and organization, description of current state of the project, 
-  roadmap.
+  *doc/baremachine.md*: Finish writeup on approaches to running Python
+  without an operating system.
+
+- April 2022. *Piety/README.md*: Finish complete rewrite for better
+  accuracy, style, and organization, with a current description of the
+  state of the project and a roadmap.
 
 Branches recently merged into *master*:
 
@@ -255,7 +259,5 @@ Sep 2017.
     *frame* does not depend on *edsel*, *ed*, or any other
     application.  Applications communicate with *frame* using the new
     *update* and *updatecall* modules.  Begun 8 Mar 2017.
-
-Revised Jul 2021
 
 
