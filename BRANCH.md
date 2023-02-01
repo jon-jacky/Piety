@@ -2,7 +2,21 @@
 branches
 ========
 
-This is the *master* branch.  Recent work in the *master* branch:
+This is the *master* branch.  
+
+Work in this *master* branch ended on 31 Jan 2023.  This version is
+labelled with the tag *version1*.  No further commits here are
+planned.  Perhaps there will be a few more small commits for bug fixes
+or minor revisions.
+
+This *master* branch contains the Piety system described here in
+*Piety/README.md*.  A total rewrite of Piety is now underway in the
+*rewrite* branch.  It might be quite a while before the code in
+*rewrite* provides equivalent functionality to the code here in
+*master*.  See *BRANCH.md* in the *rewrite* branch for the current
+status of that branch.
+
+Recent work in the *master* branch:
 
 - Jan 2023. Add instrumented modules *console_debug*, *getkey_debug*, 
   *display_debug*, *console_task* for investigating tasking bug in *demo*.
