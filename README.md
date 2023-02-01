@@ -63,6 +63,13 @@ There are some small [samples](samples/README.md) and
 Other pages describe the Piety [directories](DIRECTORIES.md) and their
 contents, and its [modular structure](doc/modules.md).
 
+NOTE: The preceding paragraphs describe the Piety version in the
+*master* branch, labelled with the *version1* tag.  Work on this
+version ended in Jan 2023.  A total rewrite is now underway in the *rewrite*
+branch, to simplify the code and improve its organization and clarity.
+It might be quite a while before the code in *rewrite* provides
+equivalent functionality to *master*.
+
 ## Roadmap ##
 
 This project is a series of experiments. There is no plan for a sequence
@@ -110,6 +117,10 @@ I will try to observe the discipline that Piety is *self-hosted*: any new
 Piety code must be developed within its already existing programming
 environment.
 
+NOTE: At this writing (Feb 2023) a total rewrite is underway in the
+*rewrite* branch, to simplify the code and improve its organization
+and clarity.
+
 ## Dependencies ##
 
 The Piety system has no dependencies, other than Python itself
@@ -133,5 +144,5 @@ the most recent version that runs on that hardware).    It has only run in
 the Mac OS Terminal, through version 2.6.2 (361.2). It has only
 run on CPython downloaded from python.org, through version 3.9.0.
 
-Revised Apr 2022
+Revised Feb 2023
 
