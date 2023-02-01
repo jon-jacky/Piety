@@ -1,8 +1,0 @@
-# forwinerr.edsel - last command updates screen incorrectly
-E lines120.txt
-10
-o2
-B lines.txt
-20
-o2
-B instop.edsel

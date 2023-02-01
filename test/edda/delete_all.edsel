@@ -1,9 +1,0 @@
-# delete_all.edsel - two windows, delete all
-E lines.txt
-o2
-1
-o
-35
-o
-,d
-# test finished.

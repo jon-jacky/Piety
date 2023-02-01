@@ -1,7 +1,0 @@
-# forwinprefix.edsel - commands before command that updates screen incorrectly
-E lines120.txt
-10
-o2
-B lines.txt
-20
-o2

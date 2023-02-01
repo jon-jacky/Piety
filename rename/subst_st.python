@@ -1,8 +1,0 @@
-
-for bufname in ed.st.buffers:
-    if bufname.endswith('.py') or bufname.endswith('.md'):
-        ed.b(bufname)
-        #        ed.s(1,ed.S(),'storage','text',True,False)
-        # ed.s(1,ed.S(),'st.buf','text.buf',True,False)
-        ed.s(1,ed.S(),'frame_wrapper','textframe',True,False)
-

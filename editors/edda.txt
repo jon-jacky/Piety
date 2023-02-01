@@ -1,8 +1,0 @@
-edda.py command summary:
-
- o2  split window, horizontal
- o   move to next window
- o1  return to single window
-
- h    balance windows (make all about the same size)
- h N  set scrolling command region to N lines (h 2, h 12 etc.)

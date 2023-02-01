@@ -1,9 +1,0 @@
-# del_to_S.edsel - delete from one window lines below dot that appear in both
-#  frame must have enough lines so both windows contain past line 5 of 40 
-E lines.txt
-5
-o2
-+,$d
-o
-.=
-# test finished

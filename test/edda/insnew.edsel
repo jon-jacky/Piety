@@ -1,9 +1,0 @@
-# insnew.edsel - startup, in main a ... , B new.txt
-#                 should not see text from main in new.txt
-a
-This is a new line in main.
-.
-B new.txt
-b main
-b new.txt
-# test finished

@@ -1,7 +1,0 @@
-# E5o2d.edsel - delete from one window lines including dot that appear in both
-#  frame must have enough lines so both windows contain line 5 of 40
-E lines.txt
-5
-o2
-2,8d
-# test finished

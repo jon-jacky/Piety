@@ -1,8 +1,0 @@
-# Eo21d.edsel - delete from one window lines that appear in another
-# cmd_h assumes we start with 33 col term so bottom window shows 35..40
-!cmd_h=20
-E lines.txt
-o2
-1
-3,37d
-# test finished

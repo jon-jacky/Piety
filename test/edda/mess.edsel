@@ -1,8 +1,0 @@
-# mess.edsel - display junk on the screen, prepare to demo !frame.refresh()
-!frame.display.put_render(2,5,'XXXXXXXXXXXXXXXX', frame.display.white_bg)
-!frame.display.put_render(7,10,'YYYYYYYYYYYYYYYYYYYYY', frame.display.white_bg)
-!frame.display.put_render(13,15,'ZZZZZZZZZZZZZZZZZZZZZZZZZZ', frame.display.white_bg)
-!frame.display.put_render(18,20,'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', frame.display.white_bg)
-!frame.put_command_cursor()
-# test finished
-
