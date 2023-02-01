@@ -8,8 +8,8 @@ Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch, to simplify the code and improve its
 organization and clarity.
 
-This *master* branch and the *version1* tag contain the original Piety
-system described here in *Piety/README.md*.  It might be quite a while
+The *master* branch and the *version1* tag contain the original Piety
+system described in *Piety/README.md*.  It might be quite a while
 before the code in *rewrite* provides equivalent functionality to
 the code in *master*.
 
