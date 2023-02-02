@@ -5,23 +5,21 @@ pycall.py - Callable Python interpreter using standard library code module.
 import sys, code
 
 main_globals = sys.modules['__main__'].__dict__
-
-interpreter = code.InteractiveConsole(locals=main_globals)
+interpreter  = code.InteractiveConsole(locals=main_globals)
 
 def pycall(cmd):
     """
-    Push cmd, a line of text,  to Python code.InteractiveConsole interpreter
+    Push cmd, a line of text, to Python code.InteractiveConsole interpreter
     Return True if continuation line expected, False otherwise.
     """
-    continuation = interpreter.push(cmd) # True if continuation line expected
-    return continuation
+    return interpreter.push(cmd)
 
 def main():
-    print("Home-made Python REPL. Type exit() to exit")
-
+    """
+    Home-made Python REPL. Type exit() to exit.
+    """
     ps1 = '>> '  # first line prompt, different from CPython >>>
     ps2 = '.. '  # continuation line prompt
-
     continuation = False # True when continuation line expected
 
     while True:
