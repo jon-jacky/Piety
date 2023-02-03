@@ -8,7 +8,7 @@ The Piety repository is organized into these directories:
 
 - **doc**: notes and documents.
 
-- **editors**: display editor *edsel*.
+- **editors**: line editor *ed*, display editor *edsel* (to come).
 
 - **shells**: callable Python interpreter.
 
