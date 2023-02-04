@@ -1,19 +1,28 @@
 """
-ed.py - Line editor inspired by the classic Unix ed, but even simpler
+sked.py - Stone Knife Editor, minimal line editor inspired by classic Unix ed,
+           but even simpler.
 
-There is no main function - just call these functions from Python REPL.
+No main program!  Editor commands are just functions defined here, to
+call from the Python REPL.
+
+Global data used by these functions, includng the text buffer, are
+defined and initialized elsewhere, in skedinit.py, so this sked module
+can be reloaded into a running editor session after revising or adding
+functions, without re-initializing variables and losing data.
+
+skedinit is *conditionally* executed, only the first time this module
+is imported in a Python session.  See code below.
+
+The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
 
-from pycall import pycall
-
-# buffer is zero indexed, but we want first line of file to be at index 1
-# so first entry in buffer list is never used - it's always just '\n'
-buffer = ['\n']  # '\n' at index 0 is never used
-o = 0            # dot, index of current line in buffer.  o looks like ed .
-
-filename = 'main'     # default, reassigned by e command
-searchstring = 'main' # default, reassigned by s(earch) and r(everse) commands
-pagesize = 12         # default, reassigned by z command
+# Define and initialize global variables used by sked editing functions.
+# Conditinally exec only the *first* time this module is imported in a session.
+# Then we can reload this module without re-initializing those variables.
+try:
+    _ = o
+except:
+    exec(open("skedinit.py").read())
 
 def S():
     'Return index of last line in buffer.  S looks a bit like classic ed $'
@@ -110,41 +119,26 @@ def p(start=None, end=None):
         if not printline(iline):  # False if we reached end of buffer
             break
 
-def z(nlines=None):
+def v(nlines=None):
     """
-    Scroll, print next nlines lines starting with the line after dot.
+    Page down, print next nlines lines starting with the line after dot.
     Default nlines is pagesize, if nlines present assign to nlines.
     Set dot to last line printed, print error message if we reach end of buf.
+    This is z command in classic ed, but name here is from emacs C-v command.
     """
     global pagesize
     nlines = nlines if nlines else pagesize
     pagesize = nlines
     p(o+1, o+pagesize)
 
-# We almost don't need a main method.
-# Why not just call all the functions from the regular Python prompt?
-# BUT we do need this for a few special cases:
-# 1. Empty line calls advance() to go to advance to next line and print
-# 2. q to exit
-def main():
+def mv(nlines=None):
     """
-    The ed command interpreter is just a home-made Python REPL 
-    copied from shells/pycall.py main()
+    Page up, print previous nlines lines ending with the line before dot.
+    Name is from emacs M-v command.
     """
-    ps1 = '>> '  # first line prompt, different from CPython >>>
-    ps2 = '.. '  # continuation line prompt
-    continuation = False # True when continuation line expected
-
-    while True:
-        prompt = ps2 if continuation else ps1
-        cmd = input(prompt)  # python -i makes readline editing work here.
-        # Must trap exit() here, do *not* exit calling Python session.
-        if cmd in ('exit()','q'): # q is standard ed quit command.
-            break
-        elif cmd == '':  # if no command, advance line and print
-            advance()
-        else:
-            continuation = pycall(cmd)
-
-if __name__ == '__main__':
-    main()
+    global pagesize, o
+    nlines = nlines if nlines else pagesize
+    pagesize = nlines
+    start, end = o-(pagesize+1), o-1
+    p(start, end)
+    o = start # p puts dot at end
