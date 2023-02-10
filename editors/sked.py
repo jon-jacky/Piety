@@ -44,7 +44,10 @@ def e(fname):
     saved = True
 
 def w(fname=None):
-    'Write buffer to file, default name is in filename.'
+    """
+    Write buffer to file, default fname is in filename.
+    If fname is given, assign it to filename to be used for future writes.
+    """
     global filename
     fname = fname if fname else filename
     success = False # Might fail if path doesn't exist, no permission etc.
@@ -56,63 +59,20 @@ def w(fname=None):
         print('%s, %d lines' % (filename, S()))
         saved = True
 
-# File viewing functions
+# File viewer functions
 
 def st():
     'status, print information about editing session'
     print('%s, %d lines, at line %d, %s' %  (filename, S(), o,
           'no changes need to be saved' if saved else 'unsaved changes'))
-
-def s(target=None):
-    """
-    Search forward to end of buffer for next line containing target string.
-    If target found, print line and assign to dot.
-    If target not found, do not change dot.
-    Assign target to searchstring for use in future searches.
-    If target is omitted, use stored searchstring.  
-    NOTE: In Unix ed, s is substitute not search. Our ed.py uses c for subst.
-    There is no search command in Unix ed, it is implicit in line address.
-    """
-    global o, searchstring
-    found = False
-    target = target if target else searchstring
-    searchstring = target
-    for iline in range(o+1,S()+1):
-        if target in buffer[iline]:
-            found = True
-            print(buffer[iline], end='') # line already ends with \n
-            o = iline
-            break
-    if not found:
-        print("? '%s' not found" % searchstring)
-
-def r(target=None):
-    """
-    Search backward to start of buffer for next line containing target string.
-    Other details like s, above.
-    NOTE: in Unix ed, r is read file not reverse search.  Our ed.py just has e.
-    """
-    global o, searchstring
-    found = False
-    target = target if target else searchstring
-    searchstring = target
-    for iline in range(o-1,0,-1): # search backwards
-        if target in buffer[iline]:
-            found = True
-            print(buffer[iline], end='') # line already ends with \n
-            o = iline
-            break
-    if not found:
-        print("? '%s' not found" % searchstring)
             
 def printline(iline):
     """
-    Check line number within buffer, then print line or error message
-    Return True if line printed, False if reached end of buffer
-    Advance dot if line printed.
+    Check iline within buffer, then print line or error message.
+    Assign dot and return True if line printed, False if iline not in buffer.
     """
     global o
-    if iline <= S():
+    if iline > 0 and iline <= S():
         print(buffer[iline], end='') # line already ends with \n
         o = iline
         return True
@@ -122,13 +82,15 @@ def printline(iline):
 
 def p(start=None, end=None):
     """
-    Print range of lines from buffer, from index start through end.
+    Print lines start through end, *inclusive*.
     Default with no arguments prints the line at dot.
-    With no end arg, just print the line at start.
-    Set dot to index of last line printed.
-    Print error message and return if we reach end of buffer
+    With no end argument, just print the one line at start.
+    Set dot to the last line printed.
+    If start is 0 -- or anything less than 1 -- set start to 1.
+    If end is past end of buffer, print through end then print '? eob'
     """
-    start = start if start else o
+    start = start if start else o  # BUG: if start == 0 assigns start = o
+    start = start if start > 0 else 1
     end = end if end else start
     for iline in range(start, end+1):
         if not printline(iline):  # False if we reached end of buffer
@@ -158,6 +120,46 @@ def mv(nlines=None):
     p(start, end)
     o = start # p puts dot at end
 
+
+def s(target=None):
+    """
+    Search forward to end of buffer for next line containing target string.
+    If target found, print line and assign to dot.
+    If target not found, leave dot unchanged and print '? <target> not found'
+    Assign target to searchstring for use in future searches.
+    If target is omitted, use stored searchstring.  
+    """
+    global o, searchstring
+    found = False
+    target = target if target else searchstring
+    searchstring = target
+    for iline in range(o+1,S()+1):
+        if target in buffer[iline]:
+            found = True
+            print(buffer[iline], end='') # line already ends with \n
+            o = iline
+            break
+    if not found:
+        print("? '%s' not found" % searchstring)
+
+def r(target=None):
+    """
+    Search backward to start of buffer for next line containing target string.
+    Other details like s, above.
+    """
+    global o, searchstring
+    found = False
+    target = target if target else searchstring
+    searchstring = target
+    for iline in range(o-1,0,-1): # search backwards
+        if target in buffer[iline]:
+            found = True
+            print(buffer[iline], end='') # line already ends with \n
+            o = iline
+            break
+    if not found:
+        print("? '%s' not found" % searchstring)
+
 # Editing functions
 
 def a(iline=None):
@@ -181,8 +183,10 @@ def a(iline=None):
 
 def d(start=None, end=None):
     """
-    d(elete) lines from buffer and save in yank (paste) buffer
-    set dot to line preceding deletion, can use a(ppend) to replace deletion
+    d(elete) lines start through end *inclusive*.
+    Save deleted lines in yank (paste) buffer.
+    Set dot to last line *preceding* deletion, 
+    so we can then use y(ank) to replace the deletion.
     """
     global buffer, yank, o, saved
     start = start if start else o
