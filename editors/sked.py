@@ -125,7 +125,6 @@ def bstatus(bname):
     'Return string of information about named stored buffer'
     if bname in buffers:
         buf = buffers[bname]
-        # FIXME line up columns: current, bufname, n of lines, filename, saved
         status = ('%s%-15s %7d   %-30s  %s' % 
                   ('*' if bufname == buf[3] else ' ', 
                    buf[3], len(buf[0])-1, buf[2], 
