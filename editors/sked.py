@@ -12,6 +12,8 @@ functions here.
 The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
 
+import os # for os.path.basename, used in store_buffer
+
 # Define and initialize global variables used by sked editing functions.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
@@ -26,11 +28,51 @@ def S():
     'Return index of last line in buffer.  S looks a bit like classic ed $'
     return len(buffer)-1  # -1 because of zero based index
 
+def status():
+    'status: return string of information about editing session'
+    return ('%s, at line %d of %d, file %s, %s' %
+            (bufname, o, S(), filename, 
+             'saved' if saved else 'unsaved changes'))
+
+def st():
+    'st(atus), print line of information about editing session'
+    print(status())
+
 # File and buffer functions
 
+def save_buffer():
+    'Save state of current buffer including text, dot etc.'
+    global buffers
+    # index        0  1         2        3             4         5      6
+    bstate = (buffer, o, filename, bufname, searchstring, pagesize, saved,
+              #  7
+              yank)
+    buffers[bufname] = bstate
+
+def restore_buffer(bname):
+    'Restore state of buffer bname to current buffer'
+    global buffer, o, filename, bufname, searchstring, pagesize, saved, yank
+    buffer, o, filename, bufname, searchstring, pagesize, saved, yank \
+        = buffers[bname]
+
+def bname(filename):
+    'Generate buffer name from filename'
+    basename = os.path.basename(filename)
+    # Make unique bufname for example for both README.md and editors/README.md 
+    bufname = basename
+    suffix = 1
+    while bufname in buffers and filename != buffers[bufname][2]:
+        suffix += 1
+        bufname = basename + '<%d>' % suffix
+    return bufname
+
 def e(fname): 
-    'Load file named fname into buffer, replacing any previous contents.'
-    global filename, buffer, o, saved
+    """
+    Load named file into buffer, replacing previous contents.
+    But first save buffer state so it can be restored on command.
+    """
+    global filename, buffer, o, saved, bufname
+    if S() > 0: save_buffer()
     try:
         with open(fname, mode='r') as fd:
             # fd.readlines reads file into a list of strings, one per line
@@ -39,16 +81,17 @@ def e(fname):
     except FileNotFoundError:
         buffer = ['\n'] # start new file
     filename = fname
+    bufname = bname(filename)
     o = S() # index of last line 
-    print('%s, %d lines' % (filename, o))
     saved = True
+    print('%s, %d lines' % (filename, o))
 
 def w(fname=None):
     """
     Write buffer to file, default fname is in filename.
     If fname is given, assign it to filename to be used for future writes.
     """
-    global filename
+    global filename, bufname
     fname = fname if fname else filename
     success = False # Might fail if path doesn't exist, no permission etc.
     with open(fname, 'w') as fd:
@@ -56,15 +99,46 @@ def w(fname=None):
         success = True
     if success:
         filename = fname
-        print('%s, %d lines' % (filename, S()))
+        bufname = bname(filename)
         saved = True
+        print('%s, %d lines' % (filename, S()))
+
+def b(bname=None):
+    """
+    Save current buffer and restore named buffer.
+    If buffer name not given, switch back to previous buffer
+    """
+    global prev_bufname
+    if S() > 0: save_buffer()
+    if not bname: bname = prev_bufname
+    if bname == bufname:
+        print('? buffer %s is already the current buffer' % bufname)
+        return
+    if bname in buffers:
+        prev_bufname = bufname
+        restore_buffer(bname)
+        st()
+    else:
+        print('? no buffer %s' % bname)
+
+def bstatus(bname):
+    'Return string of information about named stored buffer'
+    if bname in buffers:
+        buf = buffers[bname]
+        # FIXME line up columns: current, bufname, n of lines, filename, saved
+        status = ('%s%-15s %7d   %-30s  %s' % 
+                  ('*' if bufname == buf[3] else ' ', 
+                   buf[3], len(buf[0])-1, buf[2], 
+                   'saved' if buf[6] else 'unsaved changes'))
+    else:
+        status = '%s not in stored buffers' % bname
+    return status
+
+def n():
+    'Print information about stored buffers'
+    for bname in buffers: print(bstatus(bname))
 
 # File viewer functions
-
-def st():
-    'status, print information about editing session'
-    print('%s, %d lines, at line %d, %s' %  (filename, S(), o,
-          'no changes need to be saved' if saved else 'unsaved changes'))
             
 def printline(iline):
     """
