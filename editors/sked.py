@@ -120,10 +120,10 @@ def mv(nlines=None):
     p(start, end)
     o = start # p puts dot at end
 
-
-def s(target=None):
+def s(target=None, forward=True):
     """
-    Search forward to end of buffer for next line containing target string.
+    Search to end of buffer for next line containing target string.
+    Default searches forward, set forward=False to search backward.
     If target found, print line and assign to dot.
     If target not found, leave dot unchanged and print '? <target> not found'
     Assign target to searchstring for use in future searches.
@@ -133,7 +133,7 @@ def s(target=None):
     found = False
     target = target if target else searchstring
     searchstring = target
-    for iline in range(o+1,S()+1):
+    for iline in range(o+1,S()+1) if forward else range(o-1,0,-1):
         if target in buffer[iline]:
             found = True
             print(buffer[iline], end='') # line already ends with \n
@@ -143,22 +143,8 @@ def s(target=None):
         print("? '%s' not found" % searchstring)
 
 def r(target=None):
-    """
-    Search backward to start of buffer for next line containing target string.
-    Other details like s, above.
-    """
-    global o, searchstring
-    found = False
-    target = target if target else searchstring
-    searchstring = target
-    for iline in range(o-1,0,-1): # search backwards
-        if target in buffer[iline]:
-            found = True
-            print(buffer[iline], end='') # line already ends with \n
-            o = iline
-            break
-    if not found:
-        print("? '%s' not found" % searchstring)
+    'Search backward to start of buffer for next line containing target string'
+    s(target, forward=False)
 
 # Editing functions
 
