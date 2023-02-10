@@ -89,7 +89,8 @@ def p(start=None, end=None):
     If start is 0 -- or anything less than 1 -- set start to 1.
     If end is past end of buffer, print through end then print '? eob'
     """
-    start = start if start else o  # BUG: if start == 0 assigns start = o
+    if isinstance(start, int) and start < 1: start = 1 # guard next statement
+    start = start if start else o # None, 0 are both False, guard above needed
     start = start if start > 0 else 1
     end = end if end else start
     for iline in range(start, end+1):
