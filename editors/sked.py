@@ -1,6 +1,5 @@
 """
-sked.py - Stone Knife Editor, minimal line editor inspired by classic Unix ed,
-           but even simpler.
+sked.py - Stone Knife Editor, line editor inspired by classic Unix ed.
 
 No main program!  Editor commands are just functions defined here, to
 call from the Python REPL.
@@ -43,17 +42,14 @@ def st():
 def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
-    # index        0  1         2        3             4         5      6
-    bstate = (buffer, o, filename, bufname, searchstring, pagesize, saved,
-              #  7
-              yank)
+    # index         0         1       2   3    4
+    bstate = bufname, filename, buffer, o, yank, saved 
     buffers[bufname] = bstate
 
 def restore_buffer(bname):
     'Restore state of buffer bname to current buffer'
-    global buffer, o, filename, bufname, searchstring, pagesize, saved, yank
-    buffer, o, filename, bufname, searchstring, pagesize, saved, yank \
-        = buffers[bname]
+    global bufname, filename, buffer, o, yank, saved
+    bufname, filename, buffer, o, yank, saved = buffers[bname]
 
 def bname(filename):
     'Generate buffer name from filename'
@@ -61,7 +57,7 @@ def bname(filename):
     # Make unique bufname for example for both README.md and editors/README.md 
     bufname = basename
     suffix = 1
-    while bufname in buffers and filename != buffers[bufname][2]:
+    while bufname in buffers and filename != buffers[bufname][1]:
         suffix += 1
         bufname = basename + '<%d>' % suffix
     return bufname
@@ -71,7 +67,7 @@ def e(fname):
     Load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
-    global filename, buffer, o, saved, bufname
+    global filename, buffer, o, saved, bufname, prev_bufname
     if S() > 0: save_buffer()
     try:
         with open(fname, mode='r') as fd:
@@ -80,6 +76,7 @@ def e(fname):
             buffer = ['\n'] + fd.readlines() # each line in buffer ends with \n
     except FileNotFoundError:
         buffer = ['\n'] # start new file
+    prev_bufname = bufname
     filename = fname
     bufname = bname(filename)
     o = S() # index of last line 
@@ -91,7 +88,7 @@ def w(fname=None):
     Write buffer to file, default fname is in filename.
     If fname is given, assign it to filename to be used for future writes.
     """
-    global filename, bufname
+    global filename, bufname, saved
     fname = fname if fname else filename
     success = False # Might fail if path doesn't exist, no permission etc.
     with open(fname, 'w') as fd:
@@ -126,9 +123,9 @@ def bstatus(bname):
     if bname in buffers:
         buf = buffers[bname]
         status = ('%s%-15s %7d   %-30s  %s' % 
-                  ('*' if bufname == buf[3] else ' ', 
-                   buf[3], len(buf[0])-1, buf[2], 
-                   'saved' if buf[6] else 'unsaved changes'))
+                  ('*' if bufname == buf[0] else ' ', 
+                   buf[0], len(buf[2])-1, buf[1], 
+                   'saved' if buf[5] else 'unsaved changes'))
     else:
         status = '%s not in stored buffers' % bname
     return status
@@ -136,6 +133,23 @@ def bstatus(bname):
 def n():
     'Print information about stored buffers'
     for bname in buffers: print(bstatus(bname))
+
+def k():
+    """
+    k(ill) the current buffer and delete it from stored buffers.
+    Replace the current buffer with the previous buffer.
+    """
+    if bufname == 'scratch.txt':
+        print("? can't kill scratch.txt buffer")
+        return
+    if not saved:
+        answer = input('? %s buffer has unsaved changes, type y to kill anyway: '                        % (bufname))
+        if not answer[0] in 'yY':
+            return
+    if bufname in buffers: # current buffer might not be saved yet
+        del buffers[bufname]
+    # prev buffer may have been killed, but there is always a saved scratch.txt
+    restore_buffer(prev_bufname if prev_bufname in buffers else 'scratch.txt')
 
 # File viewer functions
             
@@ -152,6 +166,15 @@ def printline(iline):
     else:
         print('? end of buffer')
         return False
+
+def l():
+    'advance one line and print'
+    printline(o+1)
+
+def ml():
+   'go back one line and print'
+   printline(o-1)
+
 
 def p(start=None, end=None):
     """
@@ -172,25 +195,25 @@ def p(start=None, end=None):
 
 def v(nlines=None):
     """
-    Page down, print next nlines lines starting with the line after dot.
+    Page down, print next nlines lines starting with  dot.
     Default nlines is pagesize, if nlines present assign to nlines.
     Set dot to last line printed, print error message if we reach end of buf.
     This is z command in classic ed, but name here is from emacs C-v command.
     """
     global pagesize
-    nlines = nlines if nlines else pagesize
+    if nlines is None: nlines = pagesize
     pagesize = nlines
-    p(o+1, o+pagesize)
+    p(o, o+pagesize-1)
 
 def mv(nlines=None):
     """
-    Page up, print previous nlines lines ending with the line before dot.
+    Page up, print previous nlines lines ending with  dot.
     Name is from emacs M-v command.
     """
     global pagesize, o
-    nlines = nlines if nlines else pagesize
+    if nlines is None: nlines = pagesize
     pagesize = nlines
-    start, end = o-(pagesize+1), o-1
+    start, end = o-pagesize, o
     p(start, end)
     o = start # p puts dot at end
 
@@ -220,12 +243,22 @@ def r(target=None):
     'Search backward to start of buffer for next line containing target string'
     s(target, forward=False)
 
+def tail(nlines=None):
+    """
+    tail: print the last nlines lines of the buffer, leave dot at the end.
+    Default nlines is pagesize, if nlines present assign to pagesize.
+    """
+    global pagesize
+    if not nlines: nlines = pagesize
+    pagesize = nlines
+    p(S()-pagesize,S())
+
 # Editing functions
 
 def a(iline=None):
     'a(ppend) lines after iline (default dot), type just . on a line to exit'
     global buffer, o, saved
-    iline = iline if iline else o
+    if iline is None: iline = o
     if iline < 0 or iline > S():
         print('? %d out of range, last line is %d' % (iline, S()))
         return
@@ -275,3 +308,33 @@ def y(iline=None):
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
     o = iline + len(yank)
     saved = False
+
+def c(old=None, new=None, start=None, end=None, count=-1):
+    """
+    Replace old string with new string on each line in range.
+    Replace in lines start through end, default just replaces in current line.
+    If old is None or '', use stored searchstring
+     otherwise assign old to searchstring
+     Can use '' as placeholder for default old
+    If new is None, use stored replacestring.
+     Can use '' in new to delete old, but can't use '' as placeholder.
+    If new is not None, assign new to replacestring.
+    Default count=-1 replaces all occurences on each line.
+    Assign count to n to replace first n occurrences on each line.
+    """
+    global searchstring, replacestring, o
+    if not start: start = o
+    if not end: end = start
+    # FIXME: add range checking on start, end
+    if not old: old = searchstring
+    searchstring = old
+    if new is None: new = replacestring
+    if new is not None: replacestring = new
+    for iline in range(start, end+1): # range is not inclusive so +1
+        buffer[iline] = buffer[iline].replace(old, new, count)
+    o = end
+
+def cp(old=None, new=None, start=None, end=None, count=-1):
+    'change line and print.  Call c above, then p'
+    c(old, new, start, end, count)
+    p()

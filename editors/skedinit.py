@@ -11,14 +11,18 @@ skedinit - Define and initialize global variables used by editor functions
 buffer = ['\n']  # '\n' at index 0 is never used
 o = 0            # dot, index of current line in buffer.  o looks like ed .
 
-filename = 'test.txt' # reassigned by e(dit) and w(rite) commands
-bufname = 'test.txt'  # Basename of filename, reassigned by e and w
-searchstring = 'def ' # reassigned by s(earch) and r(everse) commands
+filename = 'scratch.txt' # reassigned by e(dit) and w(rite) commands
+bufname = filename  # Basename of filename, reassigned by e and w
+searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) commands
+replacestring = '??? ' # reassigned by c(hange) command
 pagesize = 12         # reassigned by v and mv page up/down commands
 saved = True          # True when no unsaved changes, safe to run e(dit).
 
 yank = [] # yank (paste) buffer
 
-buffers = {} # saved buffers, dictionary from names to tuples of buffer state
+# saved buffers, dictionary from buffer names to tuples of buffer state
+# initialize so there is always a saved buffer to switch back to
+bufstate = (bufname, filename, buffer, o, yank, saved)
+buffers = { bufname: bufstate }
 
-prev_bufname = 'test.txt' # so we can easily switch back.
+prev_bufname = bufname # so we can switch back even before we save any buffers
