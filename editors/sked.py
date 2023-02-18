@@ -17,11 +17,15 @@ import os # for os.path.basename, used in store_buffer
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = o
+    _ = dot # if dot is already defined, then skedinit was already exec'd
 except:
     exec(open("skedinit.py").read())
 
 # utility functions
+
+def o():
+    'Return dot, index of current line.  o looks a bit like classic ed .'
+    return dot
 
 def S():
     'Return index of last line in buffer.  S looks a bit like classic ed $'
@@ -29,7 +33,7 @@ def S():
 
 def status():
     'status: return string of information about editing session'
-    return (f'{bufname}, at line {o} of {S()}, file {filename}, ' 
+    return (f'{bufname}, at line {dot} of {S()}, file {filename}, ' 
             f"{'saved' if saved else 'unsaved changes'}")
 
 def st():
@@ -42,13 +46,13 @@ def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
     # index         0         1       2   3    4
-    bstate = bufname, filename, buffer, o, yank, saved 
+    bstate = bufname, filename, buffer, dot, yank, saved 
     buffers[bufname] = bstate
 
 def restore_buffer(bname):
     'Restore state of buffer bname to current buffer'
-    global bufname, filename, buffer, o, yank, saved
-    bufname, filename, buffer, o, yank, saved = buffers[bname]
+    global bufname, filename, buffer, dot, yank, saved
+    bufname, filename, buffer, dot, yank, saved = buffers[bname]
 
 def bname(filename):
     'Generate buffer name from filename'
@@ -58,7 +62,7 @@ def bname(filename):
     suffix = 1
     while bufname in buffers and filename != buffers[bufname][1]:
         suffix += 1
-        bufname = basename + '<%d>' % suffix
+        bufname = basename + f'<{suffix}>'
     return bufname
 
 def e(fname): 
@@ -66,7 +70,7 @@ def e(fname):
     Load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
-    global filename, buffer, o, saved, bufname, prev_bufname
+    global filename, buffer, dot, saved, bufname, prev_bufname
     if S() > 0: save_buffer()
     try:
         with open(fname, mode='r') as fd:
@@ -78,9 +82,9 @@ def e(fname):
     prev_bufname = bufname
     filename = fname
     bufname = bname(filename)
-    o = S() # index of last line 
+    dot = S() # index of last line 
     saved = True
-    print(f'{filename}, {o} lines')
+    print(f'{filename}, {dot} lines')
 
 def w(fname=None):
     """
@@ -88,7 +92,7 @@ def w(fname=None):
     If fname is given, assign it to filename to be used for future writes.
     """
     global filename, bufname, saved
-    fname = fname if fname else filename
+    if not fname: fname = filename
     success = False # Might fail if path doesn't exist, no permission etc.
     with open(fname, 'w') as fd:
         fd.writelines(buffer[1:]) # first line of file is at index 1 not 0
@@ -158,10 +162,10 @@ def printline(iline):
     Check iline within buffer, then print line or error message.
     Assign dot and return True if line printed, False if iline not in buffer.
     """
-    global o
+    global dot
     if iline > 0 and iline <= S():
         print(buffer[iline], end='') # line already ends with \n
-        o = iline
+        dot = iline
         return True
     else:
         print('? end of buffer')
@@ -169,11 +173,11 @@ def printline(iline):
 
 def l():
     'advance one line and print'
-    printline(o+1)
+    printline(dot+1)
 
 def ml():
    'go back one line and print'
-   printline(o-1)
+   printline(dot-1)
 
 
 def p(start=None, end=None):
@@ -186,9 +190,9 @@ def p(start=None, end=None):
     If end is past end of buffer, print through end then print '? eob'
     """
     if isinstance(start, int) and start < 1: start = 1 # guard next statement
-    start = start if start else o # None, 0 are both False, guard above needed
-    start = start if start > 0 else 1
-    end = end if end else start
+    if not start: start = dot # None, 0 are both False, guard above needed
+    if start <= 0: start = 1
+    if not end: end = start
     for iline in range(start, end+1):
         if not printline(iline):  # False if we reached end of buffer
             break
@@ -203,19 +207,19 @@ def v(nlines=None):
     global pagesize
     if nlines is None: nlines = pagesize
     pagesize = nlines
-    p(o, o+pagesize-1)
+    p(dot, dot+pagesize-1)
 
 def mv(nlines=None):
     """
     Page up, print previous nlines lines ending with  dot.
     Name is from emacs M-v command.
     """
-    global pagesize, o
+    global pagesize, dot
     if nlines is None: nlines = pagesize
     pagesize = nlines
-    start, end = o-pagesize, o
+    start, end = dot-pagesize, dot
     p(start, end)
-    o = start # p puts dot at end
+    dot = start # p puts dot at end
 
 def s(target=None, forward=True):
     """
@@ -226,15 +230,15 @@ def s(target=None, forward=True):
     Assign target to searchstring for use in future searches.
     If target is omitted, use stored searchstring.  
     """
-    global o, searchstring
+    global dot, searchstring
     found = False
-    target = target if target else searchstring
+    if not target: target = searchstring
     searchstring = target
-    for iline in range(o+1,S()+1) if forward else range(o-1,0,-1):
+    for iline in range(dot+1,S()+1) if forward else range(dot-1,0,-1):
         if target in buffer[iline]:
             found = True
             print(buffer[iline], end='') # line already ends with \n
-            o = iline
+            dot = iline
             break
     if not found:
         print(f"? '{searchstring}' not found")
@@ -257,12 +261,12 @@ def tail(nlines=None):
 
 def a(iline=None):
     'a(ppend) lines after iline (default dot), type just . on a line to exit'
-    global buffer, o, saved
-    if iline is None: iline = o
+    global buffer, dot, saved
+    if iline is None: iline = dot
     if iline < 0 or iline > S():
-        print('? %d out of range, last line is %d' % (iline, S()))
+        print(f'? {iline} out of range, last line is {S()}')
         return
-    o = iline
+    dot = iline
     while True:
         success = False
         line = input()  # Can this fail?  Yes, by ^C for example
@@ -270,8 +274,8 @@ def a(iline=None):
         if success:
             if line == '.':
                 return
-            buffer[o+1:o+1] = [line + '\n'] # sic, append line after dot
-            o +=1
+            buffer[dot+1:dot+1] = [line + '\n'] # sic, append line after dot
+            dot += 1
             saved = False
 
 def d(start=None, end=None):
@@ -281,32 +285,32 @@ def d(start=None, end=None):
     Set dot to last line *preceding* deletion, 
     so we can then use y(ank) to replace the deletion.
     """
-    global buffer, yank, o, saved
-    start = start if start else o
-    end = end if end else start
+    global buffer, yank, dot, saved
+    if not start: start = dot
+    if not end: end = start
     if start < 1 or start > S():
-        print('? start %d out of range, last line is %d' % (start, S()))
+        print(f'? start {start} out of range, last line is {S()}')
         return
     if end != start and (end < 1 or end > S()):
-        print('? end %d out of range, last line is %d' % (start, S()))
+        print(f'? end {end} out of range, last line is {S()}')
         return
     if start > end:
-        print('? start %d follows end %d' % (start, end))
+        print(f'? start {start} follows end {end}')
         return
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
-    o = start-1
+    dot = start-1
     saved = False
 
 def y(iline=None):
     'Append yank buffer contents after iline (defalt dot)'
-    global buffer, o, saved
-    iline = iline if iline else o
+    global buffer, dot, saved
+    if not iline: iline = dot
     if iline < 0 or iline > S():
-        print('? %d out of range, last line is %d' % (iline, S()))
+        print(f'? {iline} out of range, last line is {S()}')
         return
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
-    o = iline + len(yank)
+    dot = iline + len(yank)
     saved = False
 
 def c(old=None, new=None, start=None, end=None, count=-1):
@@ -322,8 +326,8 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     Default count=-1 replaces all occurences on each line.
     Assign count to n to replace first n occurrences on each line.
     """
-    global searchstring, replacestring, o
-    if not start: start = o
+    global searchstring, replacestring, dot
+    if not start: start = dot
     if not end: end = start
     # FIXME: add range checking on start, end
     if not old: old = searchstring
@@ -332,7 +336,7 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     if new is not None: replacestring = new
     for iline in range(start, end+1): # range is not inclusive so +1
         buffer[iline] = buffer[iline].replace(old, new, count)
-    o = end
+    dot = end
 
 def cp(old=None, new=None, start=None, end=None, count=-1):
     'change line and print.  Call c above, then p'
