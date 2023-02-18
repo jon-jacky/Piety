@@ -29,9 +29,8 @@ def S():
 
 def status():
     'status: return string of information about editing session'
-    return ('%s, at line %d of %d, file %s, %s' %
-            (bufname, o, S(), filename, 
-             'saved' if saved else 'unsaved changes'))
+    return (f'{bufname}, at line {o} of {S()}, file {filename}, ' 
+            f"{'saved' if saved else 'unsaved changes'}")
 
 def st():
     'st(atus), print line of information about editing session'
@@ -81,7 +80,7 @@ def e(fname):
     bufname = bname(filename)
     o = S() # index of last line 
     saved = True
-    print('%s, %d lines' % (filename, o))
+    print(f'{filename}, {o} lines')
 
 def w(fname=None):
     """
@@ -98,7 +97,7 @@ def w(fname=None):
         filename = fname
         bufname = bname(filename)
         saved = True
-        print('%s, %d lines' % (filename, S()))
+        print(f'{filename}, {S()} lines')
 
 def b(bname=None):
     """
@@ -109,25 +108,26 @@ def b(bname=None):
     if S() > 0: save_buffer()
     if not bname: bname = prev_bufname
     if bname == bufname:
-        print('? buffer %s is already the current buffer' % bufname)
+        print(f'? buffer {bufname} is already the current buffer')
         return
     if bname in buffers:
         prev_bufname = bufname
         restore_buffer(bname)
         st()
     else:
-        print('? no buffer %s' % bname)
+        print(f'? no buffer {bname}')
 
 def bstatus(bname):
     'Return string of information about named stored buffer'
     if bname in buffers:
         buf = buffers[bname]
+        # Use old fashinoned % formatting to get left-justified columns
         status = ('%s%-15s %7d   %-30s  %s' % 
                   ('*' if bufname == buf[0] else ' ', 
                    buf[0], len(buf[2])-1, buf[1], 
                    'saved' if buf[5] else 'unsaved changes'))
     else:
-        status = '%s not in stored buffers' % bname
+        status = f'{bname} not in stored buffers'
     return status
 
 def n():
@@ -143,7 +143,7 @@ def k():
         print("? can't kill scratch.txt buffer")
         return
     if not saved:
-        answer = input('? %s buffer has unsaved changes, type y to kill anyway: '                        % (bufname))
+        answer = input(f'{bufname} has unsaved changes, type y to kill anyway: ')
         if not answer[0] in 'yY':
             return
     if bufname in buffers: # current buffer might not be saved yet
@@ -237,7 +237,7 @@ def s(target=None, forward=True):
             o = iline
             break
     if not found:
-        print("? '%s' not found" % searchstring)
+        print(f"? '{searchstring}' not found")
 
 def r(target=None):
     'Search backward to start of buffer for next line containing target string'
