@@ -31,6 +31,27 @@ def S():
     'Return index of last line in buffer.  S looks a bit like classic ed $'
     return len(buffer)-1  # -1 because of zero based index
 
+def line_valid(iline):
+    """
+    If iline is within range return True,
+    otherwise print error message and return False.
+    """
+    if 0 < iline <= S():
+        return True
+    else:
+        print(f'? line {iline} out of range 1 .. {S()}')
+        return False
+
+def range_valid(start, end):
+    """
+    If start .. end is within range return True,
+    otherwise print error message(s) and return false.
+    """
+    if line_valid(start) and ((start == end) or line_valid(end)): 
+        return True
+    else: 
+        return False
+
 def status():
     'status: return string of information about editing session'
     return (f'{bufname}, at line {dot} of {S()}, file {filename}, ' 
@@ -156,68 +177,50 @@ def k():
     restore_buffer(prev_bufname if prev_bufname in buffers else 'scratch.txt')
 
 # File viewer functions
-            
-def printline(iline):
-    """
-    Check iline within buffer, then print line or error message.
-    Assign dot and return True if line printed, False if iline not in buffer.
-    """
-    global dot
-    if iline > 0 and iline <= S():
-        print(buffer[iline], end='') # line already ends with \n
-        dot = iline
-        return True
-    else:
-        print('? end of buffer')
-        return False
-
-def l():
-    'advance one line and print'
-    printline(dot+1)
-
-def ml():
-   'go back one line and print'
-   printline(dot-1)
-
 
 def p(start=None, end=None):
     """
     Print lines start through end, *inclusive*.
     Default with no arguments prints the line at dot.
     With no end argument, just print the one line at start.
-    Set dot to the last line printed.
-    If start is 0 -- or anything less than 1 -- set start to 1.
-    If end is past end of buffer, print through end then print '? eob'
     """
-    if isinstance(start, int) and start < 1: start = 1 # guard next statement
-    if not start: start = dot # None, 0 are both False, guard above needed
-    if start <= 0: start = 1
+    global dot
+    if not start: start = dot
     if not end: end = start
+    if not range_valid(start, end):
+        return
     for iline in range(start, end+1):
-        if not printline(iline):  # False if we reached end of buffer
-            break
+        print(buffer[iline], end='') # line already ends with \n
+    dot = end
+
+def l():
+    'advance one line and print'
+    p(dot+1)
+
+def rl():
+    'go back one line and print'
+    p(dot-1)
 
 def v(nlines=None):
     """
     Page down, print next nlines lines starting with  dot.
-    Default nlines is pagesize, if nlines present assign to nlines.
-    Set dot to last line printed, print error message if we reach end of buf.
-    This is z command in classic ed, but name here is from emacs C-v command.
+    Default nlines is pagesize, if nlines present assign to pagesize.
+    Stop at end of buffer if we reach it.  Set dot to last line printed.
     """
     global pagesize
     if nlines is None: nlines = pagesize
     pagesize = nlines
-    p(dot, dot+pagesize-1)
+    start, end = dot, min(dot+pagesize-1, S())
+    p(start, end)
 
-def mv(nlines=None):
+def rv(nlines=None):
     """
     Page up, print previous nlines lines ending with  dot.
-    Name is from emacs M-v command.
     """
     global pagesize, dot
     if nlines is None: nlines = pagesize
     pagesize = nlines
-    start, end = dot-pagesize, dot
+    start, end = max(dot-pagesize, 1), dot
     p(start, end)
     dot = start # p puts dot at end
 
@@ -288,14 +291,7 @@ def d(start=None, end=None):
     global buffer, yank, dot, saved
     if not start: start = dot
     if not end: end = start
-    if start < 1 or start > S():
-        print(f'? start {start} out of range, last line is {S()}')
-        return
-    if end != start and (end < 1 or end > S()):
-        print(f'? end {end} out of range, last line is {S()}')
-        return
-    if start > end:
-        print(f'? start {start} follows end {end}')
+    if not range_valid(start, end):
         return
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
@@ -306,8 +302,7 @@ def y(iline=None):
     'Append yank buffer contents after iline (defalt dot)'
     global buffer, dot, saved
     if not iline: iline = dot
-    if iline < 0 or iline > S():
-        print(f'? {iline} out of range, last line is {S()}')
+    if not line_valid(iline):
         return
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
     dot = iline + len(yank)
@@ -329,7 +324,8 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     global searchstring, replacestring, dot
     if not start: start = dot
     if not end: end = start
-    # FIXME: add range checking on start, end
+    if not range_valid(start, end):
+        return
     if not old: old = searchstring
     searchstring = old
     if new is None: new = replacestring
