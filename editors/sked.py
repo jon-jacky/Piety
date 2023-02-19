@@ -266,8 +266,7 @@ def a(iline=None):
     'a(ppend) lines after iline (default dot), type just . on a line to exit'
     global buffer, dot, saved
     if iline is None: iline = dot
-    if iline < 0 or iline > S():
-        print(f'? {iline} out of range, last line is {S()}')
+    if not line_valid(iline):
         return
     dot = iline
     while True:
