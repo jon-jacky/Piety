@@ -175,6 +175,7 @@ def k():
         del buffers[bufname]
     # prev buffer may have been killed, but there is always a saved scratch.txt
     restore_buffer(prev_bufname if prev_bufname in buffers else 'scratch.txt')
+    st() # print status about restored buffer so we know k() worked.
 
 # File viewer functions
 
@@ -208,20 +209,23 @@ def v(nlines=None):
     Stop at end of buffer if we reach it.  Set dot to last line printed.
     """
     global pagesize
+    if dot == S():
+        print('? end of buffer')
+        return
     if nlines is None: nlines = pagesize
     pagesize = nlines
-    start, end = dot, min(dot+pagesize-1, S())
-    p(start, end)
+    p(dot, min(dot+pagesize-1, S()))
 
 def rv(nlines=None):
-    """
-    Page up, print previous nlines lines ending with  dot.
-    """
+    'Page up, print previous nlines lines ending with  dot.'
     global pagesize, dot
+    if dot == 1:
+        print('? start of buffer')
+        return
     if nlines is None: nlines = pagesize
     pagesize = nlines
-    start, end = max(dot-pagesize, 1), dot
-    p(start, end)
+    start = max(dot-pagesize, 1)
+    p(start, dot)
     dot = start # p puts dot at end
 
 def s(target=None, forward=True):
