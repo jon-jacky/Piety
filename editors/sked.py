@@ -262,15 +262,21 @@ def tail(nlines=None):
     global pagesize
     if not nlines: nlines = pagesize
     pagesize = nlines
-    p(S()-pagesize,S())
+    p(max(S()-pagesize, 1), S())
 
 # Editing functions
 
 def a(iline=None):
-    'a(ppend) lines after iline (default dot), type just . on a line to exit'
+    """
+    a(ppend) lines after iline (default dot), type just . on a line to exit.
+    Just type a() to begin adding text to an empty buffer.
+    After that, must type a(0) to insert text at the beginning of a buffer.
+    """
     global buffer, dot, saved
     if iline is None: iline = dot
-    if not line_valid(iline):
+    # Can't use line_valid - must allow append after line 0 to append at line 1.
+    if not (0 <= iline <= S()):
+        print(f'? line {iline} out of range 1 .. {S()}')
         return
     dot = iline
     while True:
