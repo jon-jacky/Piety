@@ -230,7 +230,7 @@ def rv(nlines=None):
 
 def s(target=None, forward=True):
     """
-    Search to end of buffer for next line containing target string.
+    s(earch) forward  for next line containing target string.
     Default searches forward, set forward=False to search backward.
     If target found, print line and assign to dot.
     If target not found, leave dot unchanged and print '? <target> not found'
@@ -251,7 +251,7 @@ def s(target=None, forward=True):
         print(f"? '{searchstring}' not found")
 
 def r(target=None):
-    'Search backward to start of buffer for next line containing target string'
+    'r(everse) search backward for next line containing target string'
     s(target, forward=False)
 
 def tail(nlines=None):
@@ -308,7 +308,7 @@ def d(start=None, end=None):
     saved = False
 
 def y(iline=None):
-    'Append yank buffer contents after iline (defalt dot)'
+    'y(ank), that is paste, yank buffer contents after iline (default dot)'
     global buffer, dot, saved
     if not iline: iline = dot
     if not line_valid(iline):
@@ -319,8 +319,8 @@ def y(iline=None):
 
 def c(old=None, new=None, start=None, end=None, count=-1):
     """
-    Replace old string with new string on each line in range.
-    Replace in lines start through end, default just replaces in current line.
+    c(hange), replace old string with new string on each line in range.
+    Replace in lines start through end, default replaces in current line.
     If old is None or '', use stored searchstring
      otherwise assign old to searchstring
      Can use '' as placeholder for default old
@@ -344,6 +344,6 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     dot = end
 
 def cp(old=None, new=None, start=None, end=None, count=-1):
-    'change line and print.  Call c above, then p'
+    'c(hange) line and p(rint).  Call c above, then p'
     c(old, new, start, end, count)
     p()
