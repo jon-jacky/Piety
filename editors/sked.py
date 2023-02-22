@@ -33,7 +33,7 @@ def S():
 
 def line_valid(iline):
     """
-    If iline is within range return True,
+    If iline is within buffer return True,
     otherwise print error message and return False.
     """
     if 0 < iline <= S():
@@ -44,7 +44,7 @@ def line_valid(iline):
 
 def range_valid(start, end):
     """
-    If start .. end is within range return True,
+    If start .. end is within buffer return True,
     otherwise print error message(s) and return false.
     """
     if line_valid(start) and ((start == end) or line_valid(end)): 
@@ -67,16 +67,16 @@ def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
     # index         0         1       2   3    4
-    bstate = bufname, filename, buffer, dot, yank, saved 
+    bstate = bufname, filename, buffer, dot, saved 
     buffers[bufname] = bstate
 
 def restore_buffer(bname):
-    'Restore state of buffer bname to current buffer'
-    global bufname, filename, buffer, dot, yank, saved
-    bufname, filename, buffer, dot, yank, saved = buffers[bname]
+    'Restore state of saved buffer bname to current saved buffer'
+    global bufname, filename, buffer, dot, saved
+    bufname, filename, buffer, dot, saved = buffers[bname]
 
 def bname(filename):
-    'Generate buffer name from filename'
+    'Generate buffer name from file name, ensure each file gets unique bname'
     basename = os.path.basename(filename)
     # Make unique bufname for example for both README.md and editors/README.md 
     bufname = basename
@@ -88,7 +88,7 @@ def bname(filename):
 
 def e(fname): 
     """
-    Load named file into buffer, replacing previous contents.
+    e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
     global filename, buffer, dot, saved, bufname, prev_bufname
@@ -109,7 +109,7 @@ def e(fname):
 
 def w(fname=None):
     """
-    Write buffer to file, default fname is in filename.
+    w(rite) buffer to file, default fname is in filename.
     If fname is given, assign it to filename to be used for future writes.
     """
     global filename, bufname, saved
@@ -126,7 +126,7 @@ def w(fname=None):
 
 def b(bname=None):
     """
-    Save current buffer and restore named buffer.
+    b(uffer), save current buffer and restore named buffer.
     If buffer name not given, switch back to previous buffer
     """
     global prev_bufname
@@ -150,13 +150,13 @@ def bstatus(bname):
         status = ('%s%-15s %7d   %-30s  %s' % 
                   ('*' if bufname == buf[0] else ' ', 
                    buf[0], len(buf[2])-1, buf[1], 
-                   'saved' if buf[5] else 'unsaved changes'))
+                   'saved' if buf[4] else 'unsaved changes'))
     else:
         status = f'{bname} not in stored buffers'
     return status
 
 def n():
-    'Print information about stored buffers'
+    'n(ames), print names and other information about stored buffers'
     for bname in buffers: print(bstatus(bname))
 
 def k():
@@ -181,7 +181,7 @@ def k():
 
 def p(start=None, end=None):
     """
-    Print lines start through end, *inclusive*.
+    p(rint) lines start through end, *inclusive*.
     Default with no arguments prints the line at dot.
     With no end argument, just print the one line at start.
     """
@@ -195,16 +195,16 @@ def p(start=None, end=None):
     dot = end
 
 def l():
-    'advance one line and print'
+    'l(ine), advance one line and print'
     p(dot+1)
 
 def rl():
-    'go back one line and print'
+    'r(everse) l(ine), go back one line and print'
     p(dot-1)
 
 def v(nlines=None):
     """
-    Page down, print next nlines lines starting with  dot.
+    v, page down, print next nlines lines starting with dot.
     Default nlines is pagesize, if nlines present assign to pagesize.
     Stop at end of buffer if we reach it.  Set dot to last line printed.
     """
@@ -217,7 +217,7 @@ def v(nlines=None):
     p(dot, min(dot+pagesize-1, S()))
 
 def rv(nlines=None):
-    'Page up, print previous nlines lines ending with  dot.'
+    'r(everse) v, page up, print previous nlines lines ending with dot.'
     global pagesize, dot
     if dot == 1:
         print('? start of buffer')

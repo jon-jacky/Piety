@@ -22,7 +22,7 @@ yank = [] # yank (paste) buffer
 
 # saved buffers, dictionary from buffer names to tuples of buffer state
 # initialize so there is always a saved buffer to switch back to
-bufstate = (bufname, filename, buffer, dot, yank, saved)
+bufstate = (bufname, filename, buffer, dot, saved)
 buffers = { bufname: bufstate }
 
 prev_bufname = bufname # so we can switch back even before we save any buffers

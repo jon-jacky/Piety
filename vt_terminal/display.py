@@ -28,6 +28,7 @@ cuf = csi+'C'    # cursor forward (right), default 1 char
 cup = csi+'%d;%dH' # cursor position %d line, %d column
 dch = csi+'%dP'  # delete chars, remove %d chars at current position
 ed  = csi+'J'    # erase display from cursor to end
+eu  = csi+'1J'   # erase display from top to cursor
 el  = csi+'%dK'  # erase in line, %d is 0 start, 1 end, or 2 all
 el_end = el % 0  # 0: erase from cursor to end of line
 el_all = el % 2  # 2: erase entire line
@@ -94,8 +95,11 @@ def move_to_column(column):
 
 # used by edsel and window, they also use render (above)
 
-def erase(): # erase_display in gnu readline
+def erase(): # erase_display in gnu readline, erase from cursor to end
     putstr(ed)
+
+def erase_above(): # erase from top of display to cursor
+    putstr(eu)
 
 def put_cursor(line, column):      # not in emacs or gnu readline
     putstr(cup % (line, column))
