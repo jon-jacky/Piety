@@ -23,6 +23,9 @@ except:
 
 # utility functions
 
+# Use printline instead of print where we will suppress printing during display
+printline = print # I hope reassigning printline doesn't replace print!
+
 def o():
     'Return dot, index of current line.  o looks a bit like classic ed .'
     return dot
@@ -191,7 +194,7 @@ def p(start=None, end=None):
     if not range_valid(start, end):
         return
     for iline in range(start, end+1):
-        print(buffer[iline], end='') # line already ends with \n
+        printline(buffer[iline], end='') # line already ends with \n
     dot = end
 
 def l():
@@ -244,7 +247,7 @@ def s(target=None, forward=True):
     for iline in range(dot+1,S()+1) if forward else range(dot-1,0,-1):
         if target in buffer[iline]:
             found = True
-            print(buffer[iline], end='') # line already ends with \n
+            printline(buffer[iline], end='') # line already ends with \n
             dot = iline
             break
     if not found:
@@ -342,8 +345,4 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     for iline in range(start, end+1): # range is not inclusive so +1
         buffer[iline] = buffer[iline].replace(old, new, count)
     dot = end
-
-def cp(old=None, new=None, start=None, end=None, count=-1):
-    'c(hange) line and p(rint).  Call c above, then p'
-    c(old, new, start, end, count)
-    p()
+    p() # print the last line after changing it
