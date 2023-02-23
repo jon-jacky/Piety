@@ -4,9 +4,9 @@ editors
 
 Text editors
 
-- **fred.py**: Display editor that uses the same commands as *sked*.
+- **frame.py**: Display editor that uses the same commands as *sked*.
 
-- **fredinit.py**: Define and initialize global variables used by *fred*.
+- **frameinit.py**: Define and initialize global variables used by *frame*.
 
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 

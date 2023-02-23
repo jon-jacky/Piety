@@ -1,11 +1,11 @@
 """
-fred.py - Frame Editor - display buffer contents in a 'frame' of windows
+frame.py - Frame Editor - display buffer contents in a 'frame' of windows
           as they are updated by commands in the sked line editor.
 """
 
 import sys # skip argument declaration has file=sys.stdout
 import terminal_util, display
-import sked as sk
+import sked as ed
 
 # Define and initialize global variables used by fred display functions.
 # Conditinally exec only the *first* time this module is imported in a session.
@@ -40,13 +40,13 @@ def win(nlines=None):
     flines = nlines
     display.put_cursor(wlines, 1) # window status line
     display.erase_above()
-    display.render(sk.status().ljust(tcols)[:tcols+1], display.white_bg)   
+    display.render(ed.status().ljust(tcols)[:tcols+1], display.white_bg)   
     display.set_scroll(flines+1, tlines)
     display.put_cursor(tlines, 1)
-    sk.printline = skip # suppress printing during display
+    ed.printline = skip # suppress printing during display
 
 def cl():
     'cl(ear) away the text editing frame, by restoring full screen scrolling'
     display.set_scroll(1, tlines)
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
-    sk.printline = print # re-enable printing when no display
+    ed.printline = print # re-enable printing when no display
