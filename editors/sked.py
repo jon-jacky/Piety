@@ -24,7 +24,12 @@ except:
 # utility functions
 
 # Use printline instead of print where we will suppress printing during display
-printline = print # I hope reassigning printline doesn't replace print!
+printline = print
+
+def move_dot(iline):
+    'Assign iline to dot. This is in a function so it can be patched by frame.'
+    global dot
+    dot = iline
 
 def o():
     'Return dot, index of current line.  o looks a bit like classic ed .'
@@ -94,7 +99,7 @@ def e(fname):
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
-    global filename, buffer, dot, saved, bufname, prev_bufname
+    global filename, buffer, saved, bufname, prev_bufname
     if S() > 0: save_buffer()
     try:
         with open(fname, mode='r') as fd:
@@ -106,7 +111,7 @@ def e(fname):
     prev_bufname = bufname
     filename = fname
     bufname = bname(filename)
-    dot = S() # index of last line 
+    move_dot(S()) # index of last line
     saved = True
     print(f'{filename}, {dot} lines')
 
@@ -188,14 +193,13 @@ def p(start=None, end=None):
     Default with no arguments prints the line at dot.
     With no end argument, just print the one line at start.
     """
-    global dot
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
         return
     for iline in range(start, end+1):
         printline(buffer[iline], end='') # line already ends with \n
-    dot = end
+    move_dot(end)
 
 def l():
     'l(ine), advance one line and print'
@@ -221,7 +225,7 @@ def v(nlines=None):
 
 def rv(nlines=None):
     'r(everse) v, page up, print previous nlines lines ending with dot.'
-    global pagesize, dot
+    global pagesize
     if dot == 1:
         print('? start of buffer')
         return
@@ -229,7 +233,7 @@ def rv(nlines=None):
     pagesize = nlines
     start = max(dot-pagesize, 1)
     p(start, dot)
-    dot = start # p puts dot at end
+    move_dot(start) # p puts dot at end
 
 def s(target=None, forward=True):
     """
@@ -240,7 +244,7 @@ def s(target=None, forward=True):
     Assign target to searchstring for use in future searches.
     If target is omitted, use stored searchstring.  
     """
-    global dot, searchstring
+    global searchstring
     found = False
     if not target: target = searchstring
     searchstring = target
@@ -248,7 +252,7 @@ def s(target=None, forward=True):
         if target in buffer[iline]:
             found = True
             printline(buffer[iline], end='') # line already ends with \n
-            dot = iline
+            move_dot(iline)
             break
     if not found:
         print(f"? '{searchstring}' not found")
@@ -275,13 +279,13 @@ def a(iline=None):
     Just type a() to begin adding text to an empty buffer.
     After that, must type a(0) to insert text at the beginning of a buffer.
     """
-    global buffer, dot, saved
+    global buffer, saved
     if iline is None: iline = dot
     # Can't use line_valid - must allow append after line 0 to append at line 1.
     if not (0 <= iline <= S()):
         print(f'? line {iline} out of range 1 .. {S()}')
         return
-    dot = iline
+    move_dot(iline)
     while True:
         success = False
         line = input()  # Can this fail?  Yes, by ^C for example
@@ -290,7 +294,7 @@ def a(iline=None):
             if line == '.':
                 return
             buffer[dot+1:dot+1] = [line + '\n'] # sic, append line after dot
-            dot += 1
+            move_dot(dot+1)
             saved = False
 
 def d(start=None, end=None):
@@ -300,24 +304,24 @@ def d(start=None, end=None):
     Set dot to last line *preceding* deletion, 
     so we can then use y(ank) to replace the deletion.
     """
-    global buffer, yank, dot, saved
+    global buffer, yank, saved
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
         return
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
-    dot = start-1
+    move_dot(start-1)
     saved = False
 
 def y(iline=None):
     'y(ank), that is paste, yank buffer contents after iline (default dot)'
-    global buffer, dot, saved
+    global buffer, saved
     if not iline: iline = dot
     if not line_valid(iline):
         return
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
-    dot = iline + len(yank)
+    move_dot(iline + len(yank))
     saved = False
 
 def c(old=None, new=None, start=None, end=None, count=-1):
@@ -333,7 +337,7 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     Default count=-1 replaces all occurences on each line.
     Assign count to n to replace first n occurrences on each line.
     """
-    global searchstring, replacestring, dot
+    global searchstring, replacestring
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
@@ -344,5 +348,4 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     if new is not None: replacestring = new
     for iline in range(start, end+1): # range is not inclusive so +1
         buffer[iline] = buffer[iline].replace(old, new, count)
-    dot = end
-    p() # print the last line after changing it
+    p() # print the last line after changing it, move dot there

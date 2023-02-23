@@ -15,6 +15,8 @@ try:
 except:
     exec(open("frameinit.py").read())
 
+# Functions to patch into sked module
+
 def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
     Do nothing, assign to sked.printline to suppress printing during display
@@ -22,6 +24,15 @@ def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
     return
 
+ed_move_dot = ed.move_dot # save it so we can restore it 
+
+def move_dot(iline):
+    'Move current line, dot, to iline'
+    ed_move_dot(iline)
+    # For now, just update status line with new dot
+    display.put_cursor(wlines, 1) # window status line
+    display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
+    display.put_cursor(tlines, 1) # return cursor to command line
 # At this time there is just one window that fills the frame.
 
 def win(nlines=None):
@@ -31,7 +42,7 @@ def win(nlines=None):
     Clear text from frame, set scrolling region to lines below frame.
     Show status line about current buffer at bottom of frame.
     """
-    global tlines, tcols, flines, wlines
+    global tlines, tcols, flines, wlines, ed_move_dot
     if not nlines: nlines = flines
     tlines, tcols = terminal_util.dimensions()
     if nlines > tlines - 2:
@@ -43,10 +54,15 @@ def win(nlines=None):
     display.render(ed.status().ljust(tcols)[:tcols+1], display.white_bg)   
     display.set_scroll(flines+1, tlines)
     display.put_cursor(tlines, 1)
+    # Patch functions in sked
     ed.printline = skip # suppress printing during display
+    ed_move_dot = ed.move_dot # save latest version so it can be restored
+    ed.move_dot = move_dot    # patch sked with version defined above
 
 def cl():
     'cl(ear) away the text editing frame, by restoring full screen scrolling'
     display.set_scroll(1, tlines)
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
+    # Restore patched functions in sked
     ed.printline = print # re-enable printing when no display
+    ed.move_dot = ed_move_dot
