@@ -15,7 +15,7 @@ try:
 except:
     exec(open("frameinit.py").read())
 
-# Functions to patch into sked module
+# Display functions that replace ('patch') functions in the sked module
 
 def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
@@ -24,15 +24,25 @@ def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
     return
 
-ed_move_dot = ed.move_dot # save it so we can restore it 
-
-def move_dot(iline):
-    'Move current line, dot, to iline'
-    ed_move_dot(iline)
-    # For now, just update status line with new dot
+def update_status():
+    'Update status line at the bottom of the window'
     display.put_cursor(wlines, 1) # window status line
     display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
     display.put_cursor(tlines, 1) # return cursor to command line
+
+_move_dot = ed.move_dot # save it so we can restore it 
+
+def move_dot(iline):
+    'Move current line, dot, to iline'
+    _move_dot(iline)
+    update_status() # for now, just update status line with new dot
+
+_restore_buffer = ed.restore_buffer
+
+def restore_buffer(bname):
+    _restore_buffer(bname)
+    update_status()
+ 
 # At this time there is just one window that fills the frame.
 
 def win(nlines=None):
@@ -42,7 +52,7 @@ def win(nlines=None):
     Clear text from frame, set scrolling region to lines below frame.
     Show status line about current buffer at bottom of frame.
     """
-    global tlines, tcols, flines, wlines, ed_move_dot
+    global tlines, tcols, flines, wlines, _move_dot
     if not nlines: nlines = flines
     tlines, tcols = terminal_util.dimensions()
     if nlines > tlines - 2:
@@ -56,8 +66,10 @@ def win(nlines=None):
     display.put_cursor(tlines, 1)
     # Patch functions in sked
     ed.printline = skip # suppress printing during display
-    ed_move_dot = ed.move_dot # save latest version so it can be restored
+    _move_dot = ed.move_dot # save latest version so it can be restored
     ed.move_dot = move_dot    # patch sked with version defined above
+    _restore_buffer = ed.restore_buffer
+    ed.restore_buffer = restore_buffer
 
 def cl():
     'cl(ear) away the text editing frame, by restoring full screen scrolling'
@@ -65,4 +77,5 @@ def cl():
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
     # Restore patched functions in sked
     ed.printline = print # re-enable printing when no display
-    ed.move_dot = ed_move_dot
+    ed.move_dot = _move_dot
+    ed.restore_buffer = _restore_buffer

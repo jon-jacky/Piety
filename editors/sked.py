@@ -21,15 +21,18 @@ try:
 except:
     exec(open("skedinit.py").read())
 
-# utility functions
+# Placeholder functions that can be replaced ('patched') by display code
 
 # Use printline instead of print where we will suppress printing during display
+# printline can be replaced by a do-nothing function while display is active.
 printline = print
 
 def move_dot(iline):
-    'Assign iline to dot. This is in a function so it can be patched by frame.'
+    'Assign iline to dot. Replacement function can then move display cursor'
     global dot
     dot = iline
+
+# Utility functions
 
 def o():
     'Return dot, index of current line.  o looks a bit like classic ed .'
@@ -70,6 +73,7 @@ def st():
     print(status())
 
 # File and buffer functions
+
 
 def save_buffer():
     'Save state of current buffer including text, dot etc.'
@@ -257,6 +261,21 @@ def s(target=None, forward=True):
     if not found:
         print(f"? '{searchstring}' not found")
 
+def grep(target=None, start=None, end=None):
+    'Print each line in range start, end that contains target string'
+    global searchstring
+    found = False
+    if not target: target = searchstring
+    searchstring = target
+    if not start: start = dot
+    if not end: end = start
+    for iline in range(start, end+1):
+        if target in buffer[iline]:
+            found = True
+            p(iline) # print line and advance dot
+    if not found:
+        print(f"? '{searchstring}' not found")
+
 def r(target=None):
     'r(everse) search backward for next line containing target string'
     s(target, forward=False)
@@ -347,5 +366,6 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     if new is None: new = replacestring
     if new is not None: replacestring = new
     for iline in range(start, end+1): # range is not inclusive so +1
-        buffer[iline] = buffer[iline].replace(old, new, count)
-    p() # print the last line after changing it, move dot there
+        if old in buffer[iline]:
+            buffer[iline] = buffer[iline].replace(old, new, count)
+            p(iline) # print each line after changing it, move dot there
