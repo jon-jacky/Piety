@@ -45,6 +45,13 @@ def restore_buffer(bname):
     _restore_buffer(bname)
     update_status()
  
+_e = ed.e
+
+# Name wrapped fcn eW to distinguish from sked e after from sked/frame import *
+def eW(fname):
+    _e(fname)
+    update_status()
+
 # Show, clear display editing window.  Turn display editing on and off.
 
 def enable_display():
@@ -55,12 +62,15 @@ def enable_display():
     ed.move_dot = move_dot    # patch sked with version defined above
     _restore_buffer = ed.restore_buffer
     ed.restore_buffer = restore_buffer
+    _e = ed.e
+    ed.e = eW
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
     ed.printline = print # re-enable printing when no display
     ed.move_dot = _move_dot
     ed.restore_buffer = _restore_buffer
+    ed.e = _e
 
 def win(nlines=None):
     """
