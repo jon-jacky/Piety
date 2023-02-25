@@ -272,7 +272,8 @@ def grep(target=None, start=None, end=None):
     for iline in range(start, end+1):
         if target in buffer[iline]:
             found = True
-            p(iline) # print line and advance dot
+            print('%3d %s' % (iline, buffer[iline]), end='') 
+            move_dot(iline)
     if not found:
         print(f"? '{searchstring}' not found")
 

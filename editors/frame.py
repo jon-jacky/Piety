@@ -15,7 +15,15 @@ try:
 except:
     exec(open("frameinit.py").read())
 
-# Display functions that replace ('patch') functions in the sked module
+# Utility functions
+
+def update_status():
+    'Update status line at the bottom of the window'
+    display.put_cursor(wlines, 1) # window status line
+    display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
+    display.put_cursor(tlines, 1) # return cursor to command line
+
+# Display fcns that wrap and replace ('patch') functions in the sked module
 
 def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
@@ -23,12 +31,6 @@ def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     Argument declaration must be the same as builtin print
     """
     return
-
-def update_status():
-    'Update status line at the bottom of the window'
-    display.put_cursor(wlines, 1) # window status line
-    display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
-    display.put_cursor(tlines, 1) # return cursor to command line
 
 _move_dot = ed.move_dot # save it so we can restore it 
 
@@ -43,39 +45,50 @@ def restore_buffer(bname):
     _restore_buffer(bname)
     update_status()
  
-# At this time there is just one window that fills the frame.
+# Show, clear display editing window.  Turn display editing on and off.
 
-def win(nlines=None):
-    """
-    Create win(dow) for display editor at the top of the terminal window.
-    Default frame size nlines is stored flines, if nlines given replace flines.
-    Clear text from frame, set scrolling region to lines below frame.
-    Show status line about current buffer at bottom of frame.
-    """
-    global tlines, tcols, flines, wlines, _move_dot
-    if not nlines: nlines = flines
-    tlines, tcols = terminal_util.dimensions()
-    if nlines > tlines - 2:
-        print(f'? {nlines} lines will not fit in terminal of {tlines} lines')
-        return
-    flines = nlines
-    display.put_cursor(wlines, 1) # window status line
-    display.erase_above()
-    display.render(ed.status().ljust(tcols)[:tcols+1], display.white_bg)   
-    display.set_scroll(flines+1, tlines)
-    display.put_cursor(tlines, 1)
-    # Patch functions in sked
+def enable_display():
+    'Replace ("patch") functions in sked with wrapped display editing fcns'
+    global _move_dot, _restore_buffer
     ed.printline = skip # suppress printing during display
     _move_dot = ed.move_dot # save latest version so it can be restored
     ed.move_dot = move_dot    # patch sked with version defined above
     _restore_buffer = ed.restore_buffer
     ed.restore_buffer = restore_buffer
 
-def cl():
-    'cl(ear) away the text editing frame, by restoring full screen scrolling'
-    display.set_scroll(1, tlines)
-    display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
-    # Restore patched functions in sked
+def disable_display():
+    'Re-replace patched fcns in sked with original fcns without display'
     ed.printline = print # re-enable printing when no display
     ed.move_dot = _move_dot
     ed.restore_buffer = _restore_buffer
+
+def win(nlines=None):
+    """
+    Create win(dow) for display editor at the top of the terminal window.
+    Default frame size nlines is stored flines, if nlines given replace flines.
+    Enable display by replacing ('patching) fcns in sked with wrappers here
+    Clear text from frame, set scrolling region to lines below frame.
+    Show status line about current buffer at bottom of frame.
+    """
+    global tlines, tcols, flines, wlines
+    if not nlines: nlines = flines
+    tlines, tcols = terminal_util.dimensions()
+    if nlines > tlines - 2:
+        print(f'? {nlines} lines will not fit in terminal of {tlines} lines')
+        return
+    flines = nlines
+    wlines = flines
+    enable_display()
+    display.put_cursor(wlines, 1) # window status line
+    display.erase_above()
+    display.set_scroll(flines+1, tlines)
+    update_status()
+
+def clr():
+    """
+    cl(ear) away display frame by restoring full screen scrolling.
+    Restore patched functions in sked to original no-display versions
+    """
+    disable_display()
+    display.set_scroll(1, tlines)
+    display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
