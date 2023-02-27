@@ -7,15 +7,40 @@ import sys # skip argument declaration has file=sys.stdout
 import terminal_util, display
 import sked as ed
 
-# Define and initialize global variables used by fred display functions.
+# Define and initialize global variables used by frame display functions.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = flines # if flines is already defined, then fredinit was already exec'd
+    _ = flines # if flines is already defined, then frameinit was already exec'd
 except:
     exec(open("frameinit.py").read())
 
-# Utility functions
+# Display functions
+
+def open_frame():
+    'Clear display above status line and limit scrolling to the lines below'
+    display.put_cursor(wlines, 1) # window status line
+    display.erase_above()
+    display.set_scroll(flines+1, tlines)
+
+def update_lines(nlines, bstart, wstart):
+    """
+    Display consecutive lines (a 'segment') from the buffer in the window.
+    Move cursor to line wstart in window.  Display nlines starting at bstart
+    in the buffer.  Clip nlines to fit in window if needed.  Pad buffer lines
+    with empty lines to reach nlines if needed. Move cursor to line after last.
+    """
+    nlines = min(nlines, wlines-wstart+1) # clip nlines to fit window
+    nblines = min(nlines, len(ed.buffer)-bstart+1) # n of lines from buffer
+    nelines = nlines - nblines # number of empty lines at end of window
+    display.put_cursor(wstart, 1)
+    for line in ed.buffer[bstart:bstart+nblines]:
+        display.putstr(line.rstrip('\n')[:tcols+1])
+        display.kill_line() # end of buffer line to window edge
+        display.next_line()
+    for iline in range(nelines): # empty lines at end of window
+        display.kill_line() # entire line
+        display.next_line()
 
 def update_status():
     'Update status line at the bottom of the window'
@@ -23,7 +48,7 @@ def update_status():
     display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
     display.put_cursor(tlines, 1) # return cursor to command line
 
-# Display fcns that wrap and replace ('patch') functions in the sked module
+# Display editor commands that wrap and replace ('patch') editing cmds in sked
 
 def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
@@ -52,7 +77,7 @@ def eW(fname):
     _e(fname)
     update_status()
 
-# Show, clear display editing window.  Turn display editing on and off.
+# Turn display editing on and off.  Show, clear display editing frame.
 
 def enable_display():
     'Replace ("patch") functions in sked with wrapped display editing fcns'
@@ -89,9 +114,12 @@ def win(nlines=None):
     flines = nlines
     wlines = flines
     enable_display()
-    display.put_cursor(wlines, 1) # window status line
-    display.erase_above()
-    display.set_scroll(flines+1, tlines)
+    open_frame()
+    update_status()
+
+def zen():
+    'Alternative to win() for a distraction-free writing experience'
+    open_frame()
     update_status()
 
 def clr():
