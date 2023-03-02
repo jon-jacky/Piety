@@ -70,7 +70,7 @@ def status():
 
 def st():
     'st(atus), print line of information about editing session'
-    print(status())
+    printline(status())
 
 # File and buffer functions
 
@@ -115,9 +115,9 @@ def e(fname):
     prev_bufname = bufname
     filename = fname
     bufname = bname(filename)
-    move_dot(S()) # index of last line
+    move_dot(1) # start of buffer, *not* end
     saved = True
-    print(f'{filename}, {dot} lines')
+    print(f'{filename}, {S()} lines')
 
 def w(fname=None):
     """

@@ -42,6 +42,16 @@ def update_lines(nlines, bstart, wstart):
         display.kill_line() # entire line
         display.next_line()
 
+def locate_segment():
+    """
+    Select segment to put in window, that best positions dot in the window.
+    Return btop, line in current buffer to put at line 1 in window
+    """
+    if ed.dot < wlines - 1: # dot in window when window starts at buffer top
+        return 1
+    else: 
+        return ed.dot - (wlines // 2) # put dot near center of window
+
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wlines, 1) # window status line
@@ -68,33 +78,43 @@ _restore_buffer = ed.restore_buffer
 
 def restore_buffer(bname):
     _restore_buffer(bname)
-    update_status()
+    btop = locate_segment() # btop: line in buffer at top of window
+    update_lines(wlines-1, btop, 1) # fill window starting at btop in buffer
  
+_st = ed.st # save it so we can restore it
+
+def st():
+    _st()
+    update_status()
+
 _e = ed.e
 
-# Name wrapped fcn eW to distinguish from sked e after from sked/frame import *
-def eW(fname):
+def e(fname):
     _e(fname)
+    update_lines(wlines-1, 1, 1) # fill window with top of buffer
     update_status()
 
 # Turn display editing on and off.  Show, clear display editing frame.
 
 def enable_display():
     'Replace ("patch") functions in sked with wrapped display editing fcns'
-    global _move_dot, _restore_buffer
+    global _move_dot, _restore_buffer, _st, _e
     ed.printline = skip # suppress printing during display
     _move_dot = ed.move_dot # save latest version so it can be restored
     ed.move_dot = move_dot    # patch sked with version defined above
     _restore_buffer = ed.restore_buffer
     ed.restore_buffer = restore_buffer
+    _st = ed.st
+    ed.st = st
     _e = ed.e
-    ed.e = eW
+    ed.e = e
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
     ed.printline = print # re-enable printing when no display
     ed.move_dot = _move_dot
     ed.restore_buffer = _restore_buffer
+    ed.st = _st
     ed.e = _e
 
 def win(nlines=None):
@@ -115,6 +135,8 @@ def win(nlines=None):
     wlines = flines
     enable_display()
     open_frame()
+    btop = locate_segment()
+    update_lines(wlines-1, btop, 1)
     update_status()
 
 def zen():
