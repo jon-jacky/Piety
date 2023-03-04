@@ -45,9 +45,9 @@ def update_lines(nlines, bstart, wstart):
 def locate_segment():
     """
     Select segment to put in window, that best positions dot in the window.
-    Return btop, line in current buffer to put at line 1 in window
+    Return buftop, line in current buffer to put at line 1 in window
     """
-    if ed.dot < wlines - 1: # dot in window when window starts at buffer top
+    if ed.dot < wlines - 1: # dot is near top of buffer, show first page
         return 1
     else: 
         return ed.dot - (wlines // 2) # put dot near center of window
@@ -67,29 +67,33 @@ def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
     return
 
+# _<name> with leading underscore for saved ref to ed.<name> in this module
 _move_dot = ed.move_dot # save it so we can restore it 
 
-def move_dot(iline):
+# <name>_ with trailing underscore for fcn in this module that wraps ed.<name>
+# prevents name clash and shadowing of ed.<name> after 'from frame import *'
+def move_dot_(iline):
     'Move current line, dot, to iline'
     _move_dot(iline)
     update_status() # for now, just update status line with new dot
 
 _restore_buffer = ed.restore_buffer
 
-def restore_buffer(bname):
+def restore_buffer_(bname):
+    global buftop
     _restore_buffer(bname)
-    btop = locate_segment() # btop: line in buffer at top of window
-    update_lines(wlines-1, btop, 1) # fill window starting at btop in buffer
+    buftop = locate_segment() # buftop: line in buffer at top of window
+    update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
  
 _st = ed.st # save it so we can restore it
 
-def st():
+def st_():
     _st()
     update_status()
 
 _e = ed.e
 
-def e(fname):
+def e_(fname):
     _e(fname)
     update_lines(wlines-1, 1, 1) # fill window with top of buffer
     update_status()
@@ -101,13 +105,13 @@ def enable_display():
     global _move_dot, _restore_buffer, _st, _e
     ed.printline = skip # suppress printing during display
     _move_dot = ed.move_dot # save latest version so it can be restored
-    ed.move_dot = move_dot    # patch sked with version defined above
+    ed.move_dot = move_dot_    # patch sked with version defined above
     _restore_buffer = ed.restore_buffer
-    ed.restore_buffer = restore_buffer
+    ed.restore_buffer = restore_buffer_
     _st = ed.st
-    ed.st = st
+    ed.st = st_
     _e = ed.e
-    ed.e = e
+    ed.e = e_
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
@@ -125,7 +129,7 @@ def win(nlines=None):
     Clear text from frame, set scrolling region to lines below frame.
     Show status line about current buffer at bottom of frame.
     """
-    global tlines, tcols, flines, wlines
+    global tlines, tcols, flines, wlines, buftop
     if not nlines: nlines = flines
     tlines, tcols = terminal_util.dimensions()
     if nlines > tlines - 2:
@@ -135,8 +139,8 @@ def win(nlines=None):
     wlines = flines
     enable_display()
     open_frame()
-    btop = locate_segment()
-    update_lines(wlines-1, btop, 1)
+    buftop = locate_segment()
+    update_lines(wlines-1, buftop, 1)
     update_status()
 
 def zen():

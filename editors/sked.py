@@ -262,18 +262,20 @@ def s(target=None, forward=True):
         print(f"? '{searchstring}' not found")
 
 def grep(target=None, start=None, end=None):
-    'Print each line in range start, end that contains target string'
+    """
+    Print each line in range start, end that contains target string.
+    Default range is entire buffer.  Current line, dot, is *not* changed.
+    """
     global searchstring
     found = False
     if not target: target = searchstring
     searchstring = target
-    if not start: start = dot
-    if not end: end = start
+    if not start: start = 1
+    if not end: end = S()
     for iline in range(start, end+1):
         if target in buffer[iline]:
             found = True
             print('%3d %s' % (iline, buffer[iline]), end='') 
-            move_dot(iline)
     if not found:
         print(f"? '{searchstring}' not found")
 
@@ -357,7 +359,7 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     Default count=-1 replaces all occurences on each line.
     Assign count to n to replace first n occurrences on each line.
     """
-    global searchstring, replacestring
+    global searchstring, replacestring, saved
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
@@ -369,4 +371,5 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     for iline in range(start, end+1): # range is not inclusive so +1
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
+            saved = False
             p(iline) # print each line after changing it, move dot there
