@@ -52,6 +52,15 @@ def locate_segment():
     else: 
         return ed.dot - (wlines // 2) # put dot near center of window
 
+def put_marker(bufline, attribs):
+    'On the display, mark first char in line bufline in buffer with attribs'
+    line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
+    ch0 = line[0] if line else ' '  # line might be empty
+    winline = bufline - buftop + 1
+    if winline < 1: winline = 1
+    display.put_cursor(winline, 1)
+    display.render(ch0, attribs)
+
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wlines, 1) # window status line
@@ -84,6 +93,7 @@ def restore_buffer_(bname):
     _restore_buffer(bname)
     buftop = locate_segment() # buftop: line in buffer at top of window
     update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
+    put_marker(ed.dot, display.white_bg)
  
 _st = ed.st # save it so we can restore it
 
@@ -96,6 +106,7 @@ _e = ed.e
 def e_(fname):
     _e(fname)
     update_lines(wlines-1, 1, 1) # fill window with top of buffer
+    put_marker(ed.dot, display.white_bg)
     update_status()
 
 # Turn display editing on and off.  Show, clear display editing frame.
@@ -141,6 +152,7 @@ def win(nlines=None):
     open_frame()
     buftop = locate_segment()
     update_lines(wlines-1, buftop, 1)
+    put_marker(ed.dot, display.white_bg)
     update_status()
 
 def zen():
