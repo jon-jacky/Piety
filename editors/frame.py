@@ -38,7 +38,7 @@ def update_lines(nlines, bstart, wstart):
         display.putstr(line.rstrip('\n')[:tcols+1])
         display.kill_line() # end of buffer line to window edge
         display.next_line()
-    for iline in range(nelines): # empty lines at end of window
+    for iline in range(nelines+1): # empty lines at end of window
         display.kill_line() # entire line
         display.next_line()
 
@@ -55,7 +55,7 @@ def locate_segment():
 def put_marker(bufline, attribs):
     'On the display, mark first char in line bufline in buffer with attribs'
     line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
-    ch0 = line[0] if line else ' '  # line might be empty
+    ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
     winline = bufline - buftop + 1
     if winline < 1: winline = 1
     display.put_cursor(winline, 1)
