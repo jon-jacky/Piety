@@ -67,6 +67,18 @@ def update_status():
     display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
     display.put_cursor(tlines, 1) # return cursor to command line
 
+def refresh():
+    '(Re)Display buffer segment, marker, status without moving segment'
+    update_lines(wlines-1, buftop, 1)
+    put_marker(ed.dot, display.white_bg)
+    update_status()
+    
+def recenter():
+    'Move buffer segment to put dot in center, display segment, marker, status'
+    global buftop
+    buftop = locate_segment()
+    refresh()
+
 # Display editor commands that wrap and replace ('patch') editing cmds in sked
 
 def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
@@ -83,8 +95,13 @@ _move_dot = ed.move_dot # save it so we can restore it
 # prevents name clash and shadowing of ed.<name> after 'from frame import *'
 def move_dot_(iline):
     'Move current line, dot, to iline'
+    put_marker(ed.dot, display.clear)
     _move_dot(iline)
-    update_status() # for now, just update status line with new dot
+    if buftop <= ed.dot <= buftop + wlines - 2:
+        put_marker(ed.dot, display.white_bg)
+        update_status()
+    else:
+        recenter()
 
 _restore_buffer = ed.restore_buffer
 
