@@ -16,3 +16,5 @@ wintop = 1 # index of first line of window in frame
 wlines = flines # N of lines in current window, including status line.
 bufname = 'scratch.txt' # name of buffer displayed in current window
 buftop = 1 # index in buffer of line displayed at the top of the window.
+
+displaying = False  # initially display is not enabled.

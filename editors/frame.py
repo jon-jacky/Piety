@@ -79,6 +79,37 @@ def recenter():
     buftop = locate_segment()
     refresh()
 
+def win(nlines=None):
+    """
+    Create or resize win(dow) for display at the top of the terminal window.
+    Call wopen (below) to enable display and create window, call win to resize.
+    Default frame size nlines is stored flines, if nlines given replace flines.
+    Enable display by replacing ('patching) fcns in sked with wrappers here
+    Clear text from frame, set scrolling region to lines below frame.
+    Show status line about current buffer at bottom of frame.
+    """
+    global tlines, tcols, flines, wlines, buftop
+    tlines, tcols = terminal_util.dimensions()
+    if not nlines: nlines = flines
+    if nlines > tlines - 2:
+        print(f'? {nlines} lines will not fit in terminal of {tlines} lines')
+        return
+    flines = nlines
+    wlines = flines
+    ed.pagesize = wlines - 2
+    open_frame()
+    recenter()
+
+def zen(nlines=None):
+    'Alternative to wopen for a distraction-free writing experience'
+    open_frame()
+    update_status()
+
+def clr():
+    'cl(ea)r window from display by restoring full-screen scrolling'
+    display.set_scroll(1, tlines)
+    display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
+
 # Display editor commands that wrap and replace ('patch') editing cmds in sked
 
 def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
@@ -122,9 +153,7 @@ _e = ed.e
 
 def e_(fname):
     _e(fname)
-    update_lines(wlines-1, 1, 1) # fill window with top of buffer
-    put_marker(ed.dot, display.white_bg)
-    update_status()
+    recenter()
 
 # Turn display editing on and off.  Show, clear display editing frame.
 
@@ -149,39 +178,28 @@ def disable_display():
     ed.st = _st
     ed.e = _e
 
-def win(nlines=None):
+def wopen(nlines=None):
     """
-    Create win(dow) for display editor at the top of the terminal window.
-    Default frame size nlines is stored flines, if nlines given replace flines.
-    Enable display by replacing ('patching) fcns in sked with wrappers here
-    Clear text from frame, set scrolling region to lines below frame.
-    Show status line about current buffer at bottom of frame.
+    w(open) window for display editor at the top of the terminal window. 
+    Call wopen to begin display editing, commands will update the display.
     """
-    global tlines, tcols, flines, wlines, buftop
-    if not nlines: nlines = flines
-    tlines, tcols = terminal_util.dimensions()
-    if nlines > tlines - 2:
-        print(f'? {nlines} lines will not fit in terminal of {tlines} lines')
+    global displaying
+    if displaying:
+        print('Window is already open')
         return
-    flines = nlines
-    wlines = flines
     enable_display()
-    open_frame()
-    buftop = locate_segment()
-    update_lines(wlines-1, buftop, 1)
-    put_marker(ed.dot, display.white_bg)
-    update_status()
+    win(nlines)
+    displaying = True
 
-def zen():
-    'Alternative to win() for a distraction-free writing experience'
-    open_frame()
-    update_status()
-
-def clr():
+def wclose():
     """
-    cl(ear) away display frame by restoring full screen scrolling.
-    Restore patched functions in sked to original no-display versions
+     w(close) display editing window.
+     Call wclose to stop display editing.
     """
+    global displaying
+    if not displaying:
+        print('Window is already closed')
+        return
+    clr()
     disable_display()
-    display.set_scroll(1, tlines)
-    display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
+    displaying = False
