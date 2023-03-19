@@ -115,7 +115,7 @@ def e(fname):
     prev_bufname = bufname
     filename = fname
     bufname = bname(filename)
-    move_dot(1) # start of buffer, *not* end
+    move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
     saved = True
     print(f'{filename}, {S()} lines')
 
@@ -293,7 +293,8 @@ def tail(nlines=None):
     pagesize = nlines
     p(max(S()-pagesize, 1), S())
 
-# Editing functions
+# Placeholder to be wrapped, patched by display code.
+append_move_dot = move_dot
 
 def a(iline=None):
     """
@@ -316,7 +317,7 @@ def a(iline=None):
             if line == '.':
                 return
             buffer[dot+1:dot+1] = [line + '\n'] # sic, append line after dot
-            move_dot(dot+1)
+            append_move_dot(dot+1)
             saved = False
 
 def d(start=None, end=None):
@@ -371,5 +372,6 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     for iline in range(start, end+1): # range is not inclusive so +1
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
+            print(buffer[iline], end='') # print even when display enabled
+            move_dot(iline)
             saved = False
-            p(iline) # print each line after changing it, move dot there

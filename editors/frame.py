@@ -127,7 +127,7 @@ _move_dot = ed.move_dot # save it so we can restore it
 def move_dot_(iline):
     'Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
-    _move_dot(iline)
+    ed.dot = iline # this is all that ed.move_dot does
     if buftop <= ed.dot <= buftop + wlines - 2:
         put_marker(ed.dot, display.white_bg)
         update_status()
@@ -155,6 +155,27 @@ def e_(fname):
     _e(fname)
     recenter()
 
+_append_move_dot = ed.append_move_dot
+
+def append_move_dot_(iline):
+    """
+    The appended line has already been added to the buffer.
+    iline is the index in the buffer of the appended line.
+    When adding the first line in an empty buffer, iline here is 1
+    dot has not yet been moved to the appended line.
+    """
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline # this is all ed.append_move_dot does
+    if buftop <= ed.dot <= buftop + wlines - 2:
+        wstart = ed.dot - buftop + 1 # dot line in window
+        nlines = wlines - wstart # dot to end of window
+        bstart = ed.dot
+        update_lines(nlines, bstart, wstart)
+        put_marker(ed.dot, display.white_bg)
+        update_status()
+    else:
+       recenter()
+
 # Turn display editing on and off.  Show, clear display editing frame.
 
 def enable_display():
@@ -169,6 +190,7 @@ def enable_display():
     ed.st = st_
     _e = ed.e
     ed.e = e_
+    ed.append_move_dot = append_move_dot_
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
@@ -177,6 +199,7 @@ def disable_display():
     ed.restore_buffer = _restore_buffer
     ed.st = _st
     ed.e = _e
+    ed.append_move_dot = _append_move_dot
 
 def wopen(nlines=None):
     """
@@ -184,7 +207,7 @@ def wopen(nlines=None):
     Call wopen to begin display editing, commands will update the display.
     """
     global displaying
-    if displaying:
+    if displaying: # if we enable_display() twice something awful will happen!
         print('Window is already open')
         return
     enable_display()
