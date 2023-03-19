@@ -159,7 +159,8 @@ _append_move_dot = ed.append_move_dot
 
 def append_move_dot_(iline):
     """
-    The appended line has already been added to the buffer.
+    Display appended line, which has already been added to the buffer.
+    Move down all the lines below the appended line.
     iline is the index in the buffer of the appended line.
     When adding the first line in an empty buffer, iline here is 1
     dot has not yet been moved to the appended line.
@@ -174,7 +175,7 @@ def append_move_dot_(iline):
         put_marker(ed.dot, display.white_bg)
         update_status()
     else:
-       recenter()
+        recenter()
 
 # Turn display editing on and off.  Show, clear display editing frame.
 
