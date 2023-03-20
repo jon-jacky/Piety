@@ -155,18 +155,18 @@ def e_(fname):
     _e(fname)
     recenter()
 
-_append_move_dot = ed.append_move_dot
+_move_dot_etc = ed.move_dot_etc
 
-def append_move_dot_(iline):
+def move_dot_etc_(iline):
     """
-    Display appended line, which has already been added to the buffer.
-    Move down all the lines below the appended line.
-    iline is the index in the buffer of the appended line.
-    When adding the first line in an empty buffer, iline here is 1
-    dot has not yet been moved to the appended line.
+    Move dot to iline and update display from dot to end of window, inclusive.
+    Also move marker and update status line. Page down if needed.
+    This does the right thing to display both a(ppend) and d(elete) commands!
+    In a(ppend), when this is called iline is the first appended line.
+    In d(elete), iline is the first line preceding the deleted lines.
     """
     put_marker(ed.dot, display.clear)
-    ed.dot = iline # this is all ed.append_move_dot does
+    ed.dot = iline # this is all ed.move_dot_etc does
     if buftop <= ed.dot <= buftop + wlines - 2:
         wstart = ed.dot - buftop + 1 # dot line in window
         nlines = wlines - wstart # dot to end of window
@@ -191,7 +191,7 @@ def enable_display():
     ed.st = st_
     _e = ed.e
     ed.e = e_
-    ed.append_move_dot = append_move_dot_
+    ed.move_dot_etc = move_dot_etc_
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
@@ -200,7 +200,7 @@ def disable_display():
     ed.restore_buffer = _restore_buffer
     ed.st = _st
     ed.e = _e
-    ed.append_move_dot = _append_move_dot
+    ed.move_dot_etc = _move_dot_etc
 
 def wopen(nlines=None):
     """

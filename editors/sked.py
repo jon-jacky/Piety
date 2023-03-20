@@ -15,7 +15,8 @@ import os # for os.path.basename, used in store_buffer
 
 # Define and initialize global variables used by sked editing functions.
 # Conditinally exec only the *first* time this module is imported in a session.
-# Then we can reload this module without re-initializing those variables.
+# Then we can reload this module without re-initializing those variables,
+# so we retain buffer contents and other state when we reload.
 try:
     _ = dot # if dot is already defined, then skedinit was already exec'd
 except:
@@ -294,7 +295,7 @@ def tail(nlines=None):
     p(max(S()-pagesize, 1), S())
 
 # Placeholder to be wrapped, patched by display code.
-append_move_dot = move_dot
+move_dot_etc = move_dot
 
 def a(iline=None):
     """
@@ -317,7 +318,7 @@ def a(iline=None):
             if line == '.':
                 return
             buffer[dot+1:dot+1] = [line + '\n'] # sic, append line after dot
-            append_move_dot(dot+1)
+            move_dot_etc(dot+1)
             saved = False
 
 def d(start=None, end=None):
@@ -334,7 +335,7 @@ def d(start=None, end=None):
         return
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
-    move_dot(start-1)
+    move_dot_etc(start-1)
     saved = False
 
 def y(iline=None):
