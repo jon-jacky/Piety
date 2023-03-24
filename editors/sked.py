@@ -22,7 +22,7 @@ try:
 except:
     exec(open("skedinit.py").read())
 
-# Placeholder functions that can be replaced ('patched') by display code
+# Placeholder functions that can be replaced by display code
 
 # Use printline instead of print where we will suppress printing during display
 # printline can be replaced by a do-nothing function while display is active.
@@ -294,8 +294,8 @@ def tail(nlines=None):
     pagesize = nlines
     p(max(S()-pagesize, 1), S())
 
-# Placeholder to be wrapped, patched by display code.
-move_dot_etc = move_dot
+# Placeholder that can be replaced by display code.
+move_dot_a = move_dot
 
 def a(iline=None):
     """
@@ -318,8 +318,10 @@ def a(iline=None):
             if line == '.':
                 return
             buffer[dot+1:dot+1] = [line + '\n'] # sic, append line after dot
-            move_dot_etc(dot+1)
+            move_dot_a(dot+1)
             saved = False
+
+move_dot_d = move_dot # placeholder
 
 def d(start=None, end=None):
     """
@@ -335,8 +337,11 @@ def d(start=None, end=None):
         return
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
-    move_dot_etc(start-1)
+    move_dot_d(start-1)
     saved = False
+
+# Placeholder that can be replaced by display code
+move_dot_y = move_dot
 
 def y(iline=None):
     'y(ank), that is paste, yank buffer contents after iline (default dot)'
@@ -345,8 +350,11 @@ def y(iline=None):
     if not line_valid(iline):
         return
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
-    move_dot(iline + len(yank))
+    move_dot_y(iline + len(yank))
     saved = False
+
+# Placeholder ...
+move_dot_c = move_dot
 
 def c(old=None, new=None, start=None, end=None, count=-1):
     """
@@ -374,5 +382,5 @@ def c(old=None, new=None, start=None, end=None, count=-1):
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
             print(buffer[iline], end='') # print even when display enabled
-            move_dot(iline)
+            move_dot_c(iline)
             saved = False

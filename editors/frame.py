@@ -79,6 +79,22 @@ def recenter():
     buftop = locate_segment()
     refresh()
 
+def update_window(new_dot, bstart):
+    """
+    Move dot to new_dot and update display from bstart to end of window.
+    Also move marker and update status line. Page down if needed.
+    """
+    put_marker(ed.dot, display.clear)
+    ed.dot = new_dot # this is all that move_dot(new_dot) does
+    if buftop <= ed.dot <= buftop + wlines - 2:
+        wstart = bstart - buftop + 1 # dot line in window
+        nlines = wlines - wstart # dot to end of window
+        update_lines(nlines, bstart, wstart)
+        put_marker(ed.dot, display.white_bg)
+        update_status()
+    else:
+        recenter()
+
 def win(nlines=None):
     """
     Create or resize win(dow) for display at the top of the terminal window.
@@ -155,9 +171,9 @@ def e_(fname):
     _e(fname)
     recenter()
 
-_move_dot_etc = ed.move_dot_etc
+_move_dot_a = ed.move_dot_a
 
-def move_dot_etc_(iline):
+def move_dot_a_(iline):
     """
     Move dot to iline and update display from dot to end of window, inclusive.
     Also move marker and update status line. Page down if needed.
@@ -165,17 +181,30 @@ def move_dot_etc_(iline):
     In a(ppend), when this is called iline is the first appended line.
     In d(elete), iline is the first line preceding the deleted lines.
     """
-    put_marker(ed.dot, display.clear)
-    ed.dot = iline # this is all ed.move_dot_etc does
-    if buftop <= ed.dot <= buftop + wlines - 2:
-        wstart = ed.dot - buftop + 1 # dot line in window
-        nlines = wlines - wstart # dot to end of window
-        bstart = ed.dot
-        update_lines(nlines, bstart, wstart)
-        put_marker(ed.dot, display.white_bg)
-        update_status()
-    else:
-        recenter()
+    update_window(iline, iline)
+
+_move_dot_d = ed.move_dot_d
+
+def move_dot_d_(iline):
+    """
+    Move dot to iline and update dislay from iline+1 to end of window.
+    iline (dot) is the last line before the delete, iline+1 is first line after.
+    """
+    update_window(iline, iline+1)
+
+_move_dot_y = ed.move_dot_y
+
+def move_dot_y_(iline):
+    """
+    iline here is the new dot, the last of the lines appended from yank.
+    The first of the lines appended from yank is at iline - len(yank) + 1
+    """
+    update_window(iline, iline-len(ed.yank)+1)
+
+_move_dot_c = ed.move_dot_c
+
+def move_dot_c_(iline):
+    return
 
 # Turn display editing on and off.  Show, clear display editing frame.
 
@@ -191,7 +220,10 @@ def enable_display():
     ed.st = st_
     _e = ed.e
     ed.e = e_
-    ed.move_dot_etc = move_dot_etc_
+    ed.move_dot_a = move_dot_a_
+    ed.move_dot_d = move_dot_d_
+    ed.move_dot_y = move_dot_y_
+    ed.move_dot_c = move_dot_c_
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
@@ -200,7 +232,10 @@ def disable_display():
     ed.restore_buffer = _restore_buffer
     ed.st = _st
     ed.e = _e
-    ed.move_dot_etc = _move_dot_etc
+    ed.move_dot_a = _move_dot_a
+    ed.move_dot_d = _move_dot_d
+    ed.move_dot_y = _move_dot_y
+    ed.move_dot_c = _move_dot_c
 
 def wopen(nlines=None):
     """
