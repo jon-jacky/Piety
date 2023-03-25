@@ -175,11 +175,8 @@ _move_dot_a = ed.move_dot_a
 
 def move_dot_a_(iline):
     """
-    Move dot to iline and update display from dot to end of window, inclusive.
+    Move dot to iline and update display from dot to end of window.
     Also move marker and update status line. Page down if needed.
-    This does the right thing to display both a(ppend) and d(elete) commands!
-    In a(ppend), when this is called iline is the first appended line.
-    In d(elete), iline is the first line preceding the deleted lines.
     """
     update_window(iline, iline)
 
@@ -204,7 +201,14 @@ def move_dot_y_(iline):
 _move_dot_c = ed.move_dot_c
 
 def move_dot_c_(iline):
-    return
+    'Move dot, redisplay line at dot, mark current line, update status'
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline
+    display.put_cursor(ed.dot, 1)
+    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols+1])
+    display.kill_line()
+    put_marker(ed.dot, display.white_bg)
+    update_status()
 
 # Turn display editing on and off.  Show, clear display editing frame.
 
