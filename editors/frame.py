@@ -126,20 +126,15 @@ def clr():
     display.set_scroll(1, tlines)
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
 
-# Display editor commands that wrap and replace ('patch') editing cmds in sked
-
-def skip(value, sep=' ', end='\n', file=sys.stdout, flush=False):
-    """
-    Do nothing, assign to sked.printline to suppress printing during display
-    Argument declaration must be the same as builtin print
-    """
-    return
+# Display editor commands that replace ('patch') editing cmds in sked
 
 # _<name> with leading underscore for saved ref to ed.<name> in this module
+
 _move_dot = ed.move_dot # save it so we can restore it 
 
-# <name>_ with trailing underscore for fcn in this module that wraps ed.<name>
+# <name>_ w/ trailing underscore for fcn here the replaces ed.<name>
 # prevents name clash and shadowing of ed.<name> after 'from frame import *'
+
 def move_dot_(iline):
     'Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
@@ -150,11 +145,20 @@ def move_dot_(iline):
     else:
         recenter()
 
+# no _printline from ed needed here, printline_ replaces builtin print
+def printline_(value, sep=' ', end='\n', file=sys.stdout, flush=False):
+    """
+    Do nothing, assign to sked.printline to suppress printing during display
+    Argument declaration must be the same as builtin print
+    """
+    return
+
 _restore_buffer = ed.restore_buffer
 
 def restore_buffer_(bname):
     global buftop
-    _restore_buffer(bname)
+    # This next line does exactly what ed.restore_buffer does
+    ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
     buftop = locate_segment() # buftop: line in buffer at top of window
     update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
     put_marker(ed.dot, display.white_bg)
@@ -162,14 +166,20 @@ def restore_buffer_(bname):
 _st = ed.st # save it so we can restore it
 
 def st_():
-    _st()
     update_status()
 
-_e = ed.e
+_move_dot_e = ed.move_dot_e
 
-def e_(fname):
-    _e(fname)
+def move_dot_e_(iline):
+    ed.dot = iline
     recenter()
+
+_set_saved = ed.set_saved
+
+def set_saved_(status):
+    'Assign ed.saved and update_status, so saved in status line updates'
+    ed.saved = status # this is all that ed.set_saved does
+    update_status()
 
 _move_dot_a = ed.move_dot_a
 
@@ -214,16 +224,24 @@ def move_dot_c_(iline):
 
 def enable_display():
     'Replace ("patch") functions in sked with wrapped display editing fcns'
-    global _move_dot, _restore_buffer, _st, _e
-    ed.printline = skip # suppress printing during display
+    # Reassign all _<name> = ed.<name> because ed may have been reloaded
+    global _move_dot, _restore_buffer, _st,  _set_saved, _move_dot_e, \
+           _move_dot_a, _move_dot_d, _move_dot_y, _move_dot_c
+    ed.printline = printline_ # suppress printing during display
     _move_dot = ed.move_dot # save latest version so it can be restored
     ed.move_dot = move_dot_    # patch sked with version defined above
     _restore_buffer = ed.restore_buffer
     ed.restore_buffer = restore_buffer_
     _st = ed.st
     ed.st = st_
-    _e = ed.e
-    ed.e = e_
+    _set_saved = ed.set_saved
+    ed.set_saved = set_saved_
+    _move_dot_e = ed.move_dot_e
+    _move_dot_a = ed.move_dot_a
+    _move_dot_d = ed.move_dot_e
+    _move_dot_y = ed.move_dot_y
+    _move_dot_c = ed.move_dot_c
+    ed.move_dot_e = move_dot_e_
     ed.move_dot_a = move_dot_a_
     ed.move_dot_d = move_dot_d_
     ed.move_dot_y = move_dot_y_
@@ -235,7 +253,8 @@ def disable_display():
     ed.move_dot = _move_dot
     ed.restore_buffer = _restore_buffer
     ed.st = _st
-    ed.e = _e
+    ed.move_dot_e = _move_dot_e
+    ed.set_saved = _set_saved
     ed.move_dot_a = _move_dot_a
     ed.move_dot_d = _move_dot_d
     ed.move_dot_y = _move_dot_y

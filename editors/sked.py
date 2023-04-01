@@ -75,7 +75,6 @@ def st():
 
 # File and buffer functions
 
-
 def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
@@ -99,6 +98,8 @@ def bname(filename):
         bufname = basename + f'<{suffix}>'
     return bufname
 
+move_dot_e = move_dot  # placeholder, can be replaced by display code
+
 def e(fname): 
     """
     e(dit), load named file into buffer, replacing previous contents.
@@ -116,9 +117,14 @@ def e(fname):
     prev_bufname = bufname
     filename = fname
     bufname = bname(filename)
-    move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
-    saved = True
+    saved = True # put this *before* move_dot for display code
+    move_dot_e(min(S(),1)) # start of buffer, empty buffer S() is 0
     print(f'{filename}, {S()} lines')
+
+def set_saved(status): 
+    'Placeholder that can be replaced with display code'
+    global saved
+    saved = status
 
 def w(fname=None):
     """
@@ -134,7 +140,7 @@ def w(fname=None):
     if success:
         filename = fname
         bufname = bname(filename)
-        saved = True
+        set_saved(True)
         print(f'{filename}, {S()} lines')
 
 def b(bname=None):
@@ -318,8 +324,8 @@ def a(iline=None):
             if line == '.':
                 return
             buffer[dot+1:dot+1] = [line + '\n'] # sic, append line after dot
+            saved = False # put this before move_dot for display
             move_dot_a(dot+1)
-            saved = False
 
 move_dot_d = move_dot # placeholder
 
@@ -337,8 +343,8 @@ def d(start=None, end=None):
         return
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
+    saved = False # put this before move_dot for display
     move_dot_d(start-1)
-    saved = False
 
 # Placeholder that can be replaced by display code
 move_dot_y = move_dot
@@ -350,11 +356,11 @@ def y(iline=None):
     if not line_valid(iline):
         return
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
+    saved = False # put this before move_dot for display
     move_dot_y(iline + len(yank))
-    saved = False
 
 # Placeholder ...
-move_dot_c = move_dot
+move_dot_c = move_dot # placeholder
 
 def c(old=None, new=None, start=None, end=None, count=-1):
     """
@@ -382,5 +388,5 @@ def c(old=None, new=None, start=None, end=None, count=-1):
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
             print(buffer[iline], end='') # print even when display enabled
+            saved = False # put this *before* move_dot for display code
             move_dot_c(iline)
-            saved = False
