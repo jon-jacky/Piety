@@ -300,8 +300,9 @@ def tail(nlines=None):
     pagesize = nlines
     p(max(S()-pagesize, 1), S())
 
-# Placeholder that can be replaced by display code.
-move_dot_a = move_dot
+# Editing functions
+
+move_dot_a = move_dot  # can be replaced by display code
 
 def a(iline=None):
     """
@@ -327,7 +328,7 @@ def a(iline=None):
             saved = False # put this before move_dot for display
             move_dot_a(dot+1)
 
-move_dot_d = move_dot # placeholder
+move_dot_d = move_dot # can be replaced by display code
 
 def d(start=None, end=None):
     """
@@ -346,8 +347,7 @@ def d(start=None, end=None):
     saved = False # put this before move_dot for display
     move_dot_d(start-1)
 
-# Placeholder that can be replaced by display code
-move_dot_y = move_dot
+move_dot_y = move_dot # can be replaced by display code
 
 def y(iline=None):
     'y(ank), that is paste, yank buffer contents after iline (default dot)'
@@ -359,13 +359,12 @@ def y(iline=None):
     saved = False # put this before move_dot for display
     move_dot_y(iline + len(yank))
 
-# Placeholder ...
-move_dot_c = move_dot # placeholder
+move_dot_c = move_dot # can be replaced by display code
 
 def c(old=None, new=None, start=None, end=None, count=-1):
     """
     c(hange), replace old string with new string on each line in range.
-    Replace in lines start through end, default replaces in the current line.
+    Replace in lines start through end, default replaces in current line.
     If old is None or '', use stored searchstring
      otherwise assign old to searchstring
      Can use '' as placeholder for default old
