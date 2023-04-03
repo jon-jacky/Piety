@@ -365,7 +365,7 @@ move_dot_c = move_dot # placeholder
 def c(old=None, new=None, start=None, end=None, count=-1):
     """
     c(hange), replace old string with new string on each line in range.
-    Replace in lines start through end, default replaces in current line.
+    Replace in lines start through end, default replaces in the current line.
     If old is None or '', use stored searchstring
      otherwise assign old to searchstring
      Can use '' as placeholder for default old
@@ -387,6 +387,6 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     for iline in range(start, end+1): # range is not inclusive so +1
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
-            print(buffer[iline], end='') # print even when display enabled
             saved = False # put this *before* move_dot for display code
-            move_dot_c(iline)
+            move_dot_c(iline) # puts cursor on command line for print below
+            print(buffer[iline], end='') # print even when display enabled

@@ -136,7 +136,7 @@ _move_dot = ed.move_dot # save it so we can restore it
 # prevents name clash and shadowing of ed.<name> after 'from frame import *'
 
 def move_dot_(iline):
-    'Move current line, dot, to iline'
+    'Display effect of ed move_dot function.  Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that ed.move_dot does
     if buftop <= ed.dot <= buftop + wlines - 2:
@@ -148,7 +148,7 @@ def move_dot_(iline):
 # no _printline from ed needed here, printline_ replaces builtin print
 def printline_(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
-    Do nothing, assign to sked.printline to suppress printing during display
+    Do nothing, assign to ed.printline to suppress printing during display
     Argument declaration must be the same as builtin print
     """
     return
@@ -156,6 +156,7 @@ def printline_(value, sep=' ', end='\n', file=sys.stdout, flush=False):
 _restore_buffer = ed.restore_buffer
 
 def restore_buffer_(bname):
+    'Display effect of ed restore_buffer function, fill entire window'
     global buftop
     # This next line does exactly what ed.restore_buffer does
     ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
@@ -166,11 +167,13 @@ def restore_buffer_(bname):
 _st = ed.st # save it so we can restore it
 
 def st_():
+    'Display effect of ed st(atus) function: update status line'
     update_status()
 
 _move_dot_e = ed.move_dot_e
 
 def move_dot_e_(iline):
+    'Display effect of ed e(dit) fcn: display new buffer contents around iline'
     ed.dot = iline
     recenter()
 
@@ -185,7 +188,10 @@ _move_dot_a = ed.move_dot_a
 
 def move_dot_a_(iline):
     """
-    Move dot to iline and update display from dot to end of window.
+    Display effect of ed a(ppend) function, appending a single line.
+    A single call to ed a() might call this several times, once for each line.
+    Move dot to iline and update display from dot to end of window,
+    because all lines below the appended line must be pushed down.
     Also move marker and update status line. Page down if needed.
     """
     update_window(iline, iline)
@@ -194,7 +200,9 @@ _move_dot_d = ed.move_dot_d
 
 def move_dot_d_(iline):
     """
-    Move dot to iline and update dislay from iline+1 to end of window.
+    Display effect of ed d(elete) function, deleting one or more lines.
+    Move dot to iline and update dislay from iline+1 to end of window,
+    because all lines below the deleted lines must be moved up.
     iline (dot) is the last line before the delete, iline+1 is first line after.
     """
     update_window(iline, iline+1)
@@ -203,6 +211,8 @@ _move_dot_y = ed.move_dot_y
 
 def move_dot_y_(iline):
     """
+    Display effect of ed y(ank) function, appending one or more deleted lines.
+    All lines below the appended lines must be moved down.
     iline here is the new dot, the last of the lines appended from yank.
     The first of the lines appended from yank is at iline - len(yank) + 1
     """
@@ -211,10 +221,16 @@ def move_dot_y_(iline):
 _move_dot_c = ed.move_dot_c
 
 def move_dot_c_(iline):
-    'Move dot, redisplay line at dot, mark current line, update status'
+    """
+    Display the effect of the ed c(hange) function, replacing the changed line.
+    A call to c() might call this several times, once for each changed line.
+    Move dot to iline, redisplay line, mark current line, update status.
+    """
     put_marker(ed.dot, display.clear)
     ed.dot = iline
-    display.put_cursor(ed.dot, 1)
+    winline = ed.dot - buftop + 1
+    if winline < 1: winline = 1
+    display.put_cursor(winline, 1)
     display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols+1])
     display.kill_line()
     put_marker(ed.dot, display.white_bg)
