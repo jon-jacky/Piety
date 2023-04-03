@@ -52,13 +52,16 @@ def locate_segment():
     else: 
         return ed.dot - (wlines // 2) # put dot near center of window
 
+def wline(iline):
+    'Return index of line in window that displays iline from buffer'
+    wiline = iline - buftop + 1
+    return wiline if wiline >=1 else 1
+
 def put_marker(bufline, attribs):
     'On the display, mark first char in line bufline in buffer with attribs'
     line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
     ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
-    winline = bufline - buftop + 1
-    if winline < 1: winline = 1
-    display.put_cursor(winline, 1)
+    display.put_cursor(wline(bufline), 1)
     display.render(ch0, attribs)
 
 def update_status():
@@ -224,13 +227,11 @@ def move_dot_c_(iline):
     """
     Display the effect of the ed c(hange) function, replacing the changed line.
     A call to c() might call this several times, once for each changed line.
-    Move dot to iline, redisplay line, mark current line, update status.
+    Move dot to iline, redisplay line, mark current line, update the status.
     """
     put_marker(ed.dot, display.clear)
     ed.dot = iline
-    winline = ed.dot - buftop + 1
-    if winline < 1: winline = 1
-    display.put_cursor(winline, 1)
+    display.put_cursor(wline(ed.dot), 1)
     display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols+1])
     display.kill_line()
     put_marker(ed.dot, display.white_bg)
