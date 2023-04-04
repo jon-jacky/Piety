@@ -102,13 +102,15 @@ def win(nlines=None):
     """
     Create or resize win(dow) for display at the top of the terminal window.
     Call wopen (below) to enable display and create window, call win to resize.
-    Default frame size nlines is stored flines, if nlines given replace flines.
-    Enable display by replacing ('patching) fcns in sked with wrappers here
-    Clear text from frame, set scrolling region to lines below frame.
+    Frame size is stored in flines.  First, clear above flines to clear frame.
+    If nlines is given, assign to flines.  Smaller nlines enlarges cmd region.
+    Set scrolling region to lines below flines.
     Show status line about current buffer at bottom of frame.
     """
     global tlines, tcols, flines, wlines, buftop
     tlines, tcols = terminal_util.dimensions()
+    display.put_cursor(flines+1, 1)
+    display.erase_above() # clear old window in case new nlines < flines
     if not nlines: nlines = flines
     if nlines > tlines - 2:
         print(f'? {nlines} lines will not fit in terminal of {tlines} lines')

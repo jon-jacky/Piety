@@ -22,7 +22,7 @@ try:
 except:
     exec(open("skedinit.py").read())
 
-# Placeholder functions that can be replaced by display code
+# Utility functions
 
 # Use printline instead of print where we will suppress printing during display
 # printline can be replaced by a do-nothing function while display is active.
@@ -32,8 +32,6 @@ def move_dot(iline):
     'Assign iline to dot. Replacement function can then move display cursor'
     global dot
     dot = iline
-
-# Utility functions
 
 def o():
     'Return dot, index of current line.  o looks a bit like classic ed .'
@@ -387,5 +385,5 @@ def c(old=None, new=None, start=None, end=None, count=-1):
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
             saved = False # put this *before* move_dot for display code
-            move_dot_c(iline) # puts cursor on command line for print below
+            move_dot_c(iline) # puts cursor on the command line for print below
             print(buffer[iline], end='') # print even when display enabled
