@@ -96,9 +96,7 @@ def bname(filename):
         bufname = basename + f'<{suffix}>'
     return bufname
 
-move_dot_e = move_dot  # placeholder, can be replaced by display code
-
-def e(fname): 
+def e(fname, move_dot=move_dot):  # move_dot is a hook for display code 
     """
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
@@ -116,7 +114,7 @@ def e(fname):
     filename = fname
     bufname = bname(filename)
     saved = True # put this *before* move_dot for display code
-    move_dot_e(min(S(),1)) # start of buffer, empty buffer S() is 0
+    move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
     print(f'{filename}, {S()} lines')
 
 def set_saved(status): 

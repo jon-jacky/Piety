@@ -175,12 +175,13 @@ def display_st():
     'Display effect of ed st(atus) function: update status line'
     update_status()
 
-_move_dot_e = ed.move_dot_e
-
 def display_e(iline):
     'Display effect of ed e(dit) fcn: display new buffer contents around iline'
     ed.dot = iline
     recenter()
+
+def e(fname):
+    ed.e(fname, move_dot=display_e)
 
 _set_saved = ed.set_saved
 
@@ -244,7 +245,7 @@ def display_c(iline):
 def enable_display():
     'Replace ("patch") functions in sked with wrapped display editing fcns'
     # Reassign all _<name> = ed.<name> because ed may have been reloaded
-    global _move_dot, _restore_buffer, _st,  _set_saved, _move_dot_e, \
+    global _move_dot, _restore_buffer, _st,  _set_saved,  \
            _move_dot_a, _move_dot_d, _move_dot_y, _move_dot_c
     ed.printline = display_printline # suppress printing during display
     _move_dot = ed.move_dot # save latest version so it can be restored
@@ -255,12 +256,10 @@ def enable_display():
     ed.st = display_st
     _set_saved = ed.set_saved
     ed.set_saved = display_set_saved
-    _move_dot_e = ed.move_dot_e
     _move_dot_a = ed.move_dot_a
-    _move_dot_d = ed.move_dot_e
+    _move_dot_d = ed.move_dot_d
     _move_dot_y = ed.move_dot_y
     _move_dot_c = ed.move_dot_c
-    ed.move_dot_e = display_e
     ed.move_dot_a = display_a
     ed.move_dot_d = display_d
     ed.move_dot_y = display_y
@@ -272,7 +271,6 @@ def disable_display():
     ed.move_dot = _move_dot
     ed.restore_buffer = _restore_buffer
     ed.st = _st
-    ed.move_dot_e = _move_dot_e
     ed.set_saved = _set_saved
     ed.move_dot_a = _move_dot_a
     ed.move_dot_d = _move_dot_d

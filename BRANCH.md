@@ -13,6 +13,9 @@ and improve its organization and clarity.
 
 Recent work in the *rewrite* branch:
 
+- 8 Apr 2023: Reach stopping place in patch branch of ed branch,
+  merge patch back into ed, make new fparam branch from ed branch.
+
 - 9 Feb 2023: Remove *shells* directory and *pycall*, not needed.
 
 - 2 Feb 2023: Make the *ed* branch for work on our line editor *sked.py*.
