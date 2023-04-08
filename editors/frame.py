@@ -137,10 +137,10 @@ def clr():
 
 _move_dot = ed.move_dot # save it so we can restore it 
 
-# <name>_ w/ trailing underscore for fcn here the replaces ed.<name>
+# display_<name> for fcn here that replaces ed.<name>
 # prevents name clash and shadowing of ed.<name> after 'from frame import *'
 
-def move_dot_(iline):
+def display_move_dot(iline):
     'Display effect of ed move_dot function.  Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that ed.move_dot does
@@ -150,8 +150,8 @@ def move_dot_(iline):
     else:
         recenter()
 
-# no _printline from ed needed here, printline_ replaces builtin print
-def printline_(value, sep=' ', end='\n', file=sys.stdout, flush=False):
+# no _printline from ed needed here, display_printline replaces builtin print
+def display_printline(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
     Do nothing, assign to ed.printline to suppress printing during display
     Argument declaration must be the same as builtin print
@@ -160,7 +160,7 @@ def printline_(value, sep=' ', end='\n', file=sys.stdout, flush=False):
 
 _restore_buffer = ed.restore_buffer
 
-def restore_buffer_(bname):
+def display_restore_buffer(bname):
     'Display effect of ed restore_buffer function, fill entire window'
     global buftop
     # This next line does exactly what ed.restore_buffer does
@@ -171,27 +171,27 @@ def restore_buffer_(bname):
  
 _st = ed.st # save it so we can restore it
 
-def st_():
+def display_st():
     'Display effect of ed st(atus) function: update status line'
     update_status()
 
 _move_dot_e = ed.move_dot_e
 
-def move_dot_e_(iline):
+def display_e(iline):
     'Display effect of ed e(dit) fcn: display new buffer contents around iline'
     ed.dot = iline
     recenter()
 
 _set_saved = ed.set_saved
 
-def set_saved_(status):
+def display_set_saved(status):
     'Assign ed.saved and update_status, so saved in status line updates'
     ed.saved = status # this is all that ed.set_saved does
     update_status()
 
 _move_dot_a = ed.move_dot_a
 
-def move_dot_a_(iline):
+def display_a(iline):
     """
     Display effect of ed a(ppend) function, appending a single line.
     A single call to ed a() might call this several times, once for each line.
@@ -203,7 +203,7 @@ def move_dot_a_(iline):
 
 _move_dot_d = ed.move_dot_d
 
-def move_dot_d_(iline):
+def display_d(iline):
     """
     Display effect of ed d(elete) function, deleting one or more lines.
     Move dot to iline and update dislay from iline+1 to end of window,
@@ -214,7 +214,7 @@ def move_dot_d_(iline):
 
 _move_dot_y = ed.move_dot_y
 
-def move_dot_y_(iline):
+def display_y(iline):
     """
     Display effect of ed y(ank) function, appending one or more deleted lines.
     All lines below the appended lines must be moved down.
@@ -225,7 +225,7 @@ def move_dot_y_(iline):
 
 _move_dot_c = ed.move_dot_c
 
-def move_dot_c_(iline):
+def display_c(iline):
     """
     Display the effect of the ed c(hange) function, replacing the changed line.
     A call to c() might call this several times, once for each changed line.
@@ -246,25 +246,25 @@ def enable_display():
     # Reassign all _<name> = ed.<name> because ed may have been reloaded
     global _move_dot, _restore_buffer, _st,  _set_saved, _move_dot_e, \
            _move_dot_a, _move_dot_d, _move_dot_y, _move_dot_c
-    ed.printline = printline_ # suppress printing during display
+    ed.printline = display_printline # suppress printing during display
     _move_dot = ed.move_dot # save latest version so it can be restored
-    ed.move_dot = move_dot_    # patch sked with version defined above
+    ed.move_dot = display_move_dot    # patch sked with version defined above
     _restore_buffer = ed.restore_buffer
-    ed.restore_buffer = restore_buffer_
+    ed.restore_buffer = display_restore_buffer
     _st = ed.st
-    ed.st = st_
+    ed.st = display_st
     _set_saved = ed.set_saved
-    ed.set_saved = set_saved_
+    ed.set_saved = display_set_saved
     _move_dot_e = ed.move_dot_e
     _move_dot_a = ed.move_dot_a
     _move_dot_d = ed.move_dot_e
     _move_dot_y = ed.move_dot_y
     _move_dot_c = ed.move_dot_c
-    ed.move_dot_e = move_dot_e_
-    ed.move_dot_a = move_dot_a_
-    ed.move_dot_d = move_dot_d_
-    ed.move_dot_y = move_dot_y_
-    ed.move_dot_c = move_dot_c_
+    ed.move_dot_e = display_e
+    ed.move_dot_a = display_a
+    ed.move_dot_d = display_d
+    ed.move_dot_y = display_y
+    ed.move_dot_c = display_c
 
 def disable_display():
     'Re-replace patched fcns in sked with original fcns without display'
