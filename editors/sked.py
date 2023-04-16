@@ -24,10 +24,6 @@ except:
 
 # Utility functions
 
-# Use printline instead of print where we will suppress printing during display
-# printline can be replaced by a do-nothing function while display is active.
-printline = print
-
 def move_dot(iline):
     'Assign iline to dot. Replacement function can then move display cursor'
     global dot
@@ -69,7 +65,7 @@ def status():
 
 def st():
     'st(atus), print line of information about editing session'
-    printline(status())
+    print(status())
 
 # File and buffer functions
 
@@ -122,7 +118,7 @@ def set_saved(status):
     global saved
     saved = status
 
-def w(fname=None):
+def w(fname=None, set_saved=set_saved): # Hook for display code
     """
     w(rite) buffer to file, default fname is in filename.
     If fname is given, assign it to filename to be used for future writes.
@@ -139,7 +135,7 @@ def w(fname=None):
         set_saved(True)
         print(f'{filename}, {S()} lines')
 
-def b(bname=None):
+def b(bname=None, restore_buffer=restore_buffer, st=st): # hooks for display 
     """
     b(uffer), save current buffer and restore named buffer.
     If buffer name not given, switch back to previous buffer
@@ -174,7 +170,7 @@ def n():
     'n(ames), print names and other information about stored buffers'
     for bname in buffers: print(bstatus(bname))
 
-def k():
+def k(restore_buffer=restore_buffer, st=st): # hooks for display code
     """
     k(ill) the current buffer and delete it from stored buffers.
     Replace the current buffer with the previous buffer.
@@ -194,7 +190,7 @@ def k():
 
 # File viewer functions
 
-def p(start=None, end=None):
+def p(start=None, end=None, printline=print, move_dot=move_dot): # hooks 
     """
     p(rint) lines start through end, *inclusive*.
     Default with no arguments prints the line at dot.
@@ -208,15 +204,15 @@ def p(start=None, end=None):
         printline(buffer[iline], end='') # line already ends with \n
     move_dot(end)
 
-def l():
+def l(p=p):  # p is hook for display code
     'l(ine), advance one line and print'
     p(dot+1)
 
-def rl():
+def rl(p=p):  # p is hook for display code
     'r(everse) l(ine), go back one line and print'
     p(dot-1)
 
-def v(nlines=None):
+def v(nlines=None, p=p):  # p is hook for display code
     """
     v, page down, print next nlines lines starting with dot.
     Default nlines is pagesize, if nlines present assign to pagesize.
@@ -230,7 +226,7 @@ def v(nlines=None):
     pagesize = nlines
     p(dot, min(dot+pagesize-1, S()))
 
-def rv(nlines=None):
+def rv(nlines=None, p=p, move_dot=move_dot):  # hooks for display code
     'r(everse) v, page up, print previous nlines lines ending with dot.'
     global pagesize
     if dot == 1:
@@ -242,7 +238,7 @@ def rv(nlines=None):
     p(start, dot)
     move_dot(start) # p puts dot at end
 
-def s(target=None, forward=True):
+def s(target=None, forward=True, printline=print, move_dot=move_dot):  # hooks 
     """
     s(earch) forward  for next line containing target string.
     Default searches forward, set forward=False to search backward.
@@ -286,7 +282,7 @@ def r(target=None):
     'r(everse) search backward for next line containing target string'
     s(target, forward=False)
 
-def tail(nlines=None):
+def tail(nlines=None, p=p):  # p is hook for display code
     """
     tail: print the last nlines lines of the buffer, leave dot at the end.
     Default nlines is pagesize, if nlines present assign to pagesize.
@@ -300,7 +296,7 @@ def tail(nlines=None):
 
 move_dot_a = move_dot  # can be replaced by display code
 
-def a(iline=None):
+def a(iline=None, move_dot=move_dot, move_dot_a=move_dot): # hooks for display
     """
     a(ppend) lines after iline (default dot), type just . on a line to exit.
     Just type a() to begin adding text to an empty buffer.
@@ -324,9 +320,7 @@ def a(iline=None):
             saved = False # put this before move_dot for display
             move_dot_a(dot+1)
 
-move_dot_d = move_dot # can be replaced by display code
-
-def d(start=None, end=None):
+def d(start=None, end=None, move_dot=move_dot): # hook for display code
     """
     d(elete) lines start through end *inclusive*.
     Save deleted lines in yank (paste) buffer.
@@ -341,11 +335,9 @@ def d(start=None, end=None):
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
     saved = False # put this before move_dot for display
-    move_dot_d(start-1)
+    move_dot(start-1)
 
-move_dot_y = move_dot # can be replaced by display code
-
-def y(iline=None):
+def y(iline=None, move_dot=move_dot): # hook for display code
     'y(ank), that is paste, yank buffer contents after iline (default dot)'
     global buffer, saved
     if not iline: iline = dot
@@ -353,11 +345,9 @@ def y(iline=None):
         return
     buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
     saved = False # put this before move_dot for display
-    move_dot_y(iline + len(yank))
+    move_dot(iline + len(yank))
 
-move_dot_c = move_dot # can be replaced by display code
-
-def c(old=None, new=None, start=None, end=None, count=-1):
+def c(old=None, new=None, start=None, end=None, count=-1, move_dot=move_dot):
     """
     c(hange), replace old string with new string on each line in range.
     Replace in lines start through end, default replaces in current line.
@@ -383,5 +373,5 @@ def c(old=None, new=None, start=None, end=None, count=-1):
         if old in buffer[iline]:
             buffer[iline] = buffer[iline].replace(old, new, count)
             saved = False # put this *before* move_dot for display code
-            move_dot_c(iline) # puts cursor on the command line for print below
+            move_dot(iline) # puts cursor on the command line for print below
             print(buffer[iline], end='') # print even when display enabled

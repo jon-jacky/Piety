@@ -133,13 +133,6 @@ def clr():
 
 # Display editor commands that replace ('patch') editing cmds in sked
 
-# _<name> with leading underscore for saved ref to ed.<name> in this module
-
-_move_dot = ed.move_dot # save it so we can restore it 
-
-# display_<name> for fcn here that replaces ed.<name>
-# prevents name clash and shadowing of ed.<name> after 'from frame import *'
-
 def display_move_dot(iline):
     'Display effect of ed move_dot function.  Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
@@ -150,15 +143,39 @@ def display_move_dot(iline):
     else:
         recenter()
 
-# no _printline from ed needed here, display_printline replaces builtin print
-def display_printline(value, sep=' ', end='\n', file=sys.stdout, flush=False):
+def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
-    Do nothing, assign to ed.printline to suppress printing during display
-    Argument declaration must be the same as builtin print
+    Pass to ed cmds printline arg to suppress printing during display.
+    Argument declaration must be the same as builtin print.
     """
     return
 
-_restore_buffer = ed.restore_buffer
+def display_p(start=None, end=None):
+    ed.p(start, end, print_nothing, display_move_dot)
+
+p = display_p
+
+def l():
+    ed.l(display_p)
+
+def rl():
+    ed.rl(display_p)
+
+def v(nlines=None):
+    ed.v(nlines, display_p)
+
+def rv(nlines=None):
+    ed.rv(nlines, display_p, display_move_dot)
+
+def s(target=None, forward=True):
+    ed.s(target, forward, print_nothing, display_move_dot)
+
+def r(target=None):
+    'r(everse) search backward for next line containing target string'
+    s(target, forward=False)
+
+def tail(nlines=None):
+    ed.tail(nlines, display_p)
 
 def display_restore_buffer(bname):
     'Display effect of ed restore_buffer function, fill entire window'
@@ -168,12 +185,12 @@ def display_restore_buffer(bname):
     buftop = locate_segment() # buftop: line in buffer at top of window
     update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
     put_marker(ed.dot, display.white_bg)
- 
-_st = ed.st # save it so we can restore it
 
-def display_st():
-    'Display effect of ed st(atus) function: update status line'
-    update_status()
+def b(bname=None):
+    ed.b(bname, display_restore_buffer, update_status)
+
+def k():
+    ed.k(display_restore_buffer, update_status)
 
 def display_e(iline):
     'Display effect of ed e(dit) fcn: display new buffer contents around iline'
@@ -181,16 +198,15 @@ def display_e(iline):
     recenter()
 
 def e(fname):
-    ed.e(fname, move_dot=display_e)
-
-_set_saved = ed.set_saved
+    ed.e(fname, display_e)
 
 def display_set_saved(status):
     'Assign ed.saved and update_status, so saved in status line updates'
     ed.saved = status # this is all that ed.set_saved does
     update_status()
 
-_move_dot_a = ed.move_dot_a
+def w(fname=None):
+    ed.w(fname, display_set_saved)
 
 def display_a(iline):
     """
@@ -202,7 +218,8 @@ def display_a(iline):
     """
     update_window(iline, iline)
 
-_move_dot_d = ed.move_dot_d
+def a(iline=None):
+    ed.a(iline, display_move_dot, display_a)
 
 def display_d(iline):
     """
@@ -213,7 +230,8 @@ def display_d(iline):
     """
     update_window(iline, iline+1)
 
-_move_dot_y = ed.move_dot_y
+def d(start=None, end=None):
+    ed.d(start, end, display_d)
 
 def display_y(iline):
     """
@@ -224,7 +242,8 @@ def display_y(iline):
     """
     update_window(iline, iline-len(ed.yank)+1)
 
-_move_dot_c = ed.move_dot_c
+def y(iline=None):
+    ed.y(iline, display_y)
 
 def display_c(iline):
     """
@@ -240,65 +259,5 @@ def display_c(iline):
     put_marker(ed.dot, display.white_bg)
     update_status()
 
-# Turn display editing on and off.  Show, clear display editing frame.
-
-def enable_display():
-    'Replace ("patch") functions in sked with wrapped display editing fcns'
-    # Reassign all _<name> = ed.<name> because ed may have been reloaded
-    global _move_dot, _restore_buffer, _st,  _set_saved,  \
-           _move_dot_a, _move_dot_d, _move_dot_y, _move_dot_c
-    ed.printline = display_printline # suppress printing during display
-    _move_dot = ed.move_dot # save latest version so it can be restored
-    ed.move_dot = display_move_dot    # patch sked with version defined above
-    _restore_buffer = ed.restore_buffer
-    ed.restore_buffer = display_restore_buffer
-    _st = ed.st
-    ed.st = display_st
-    _set_saved = ed.set_saved
-    ed.set_saved = display_set_saved
-    _move_dot_a = ed.move_dot_a
-    _move_dot_d = ed.move_dot_d
-    _move_dot_y = ed.move_dot_y
-    _move_dot_c = ed.move_dot_c
-    ed.move_dot_a = display_a
-    ed.move_dot_d = display_d
-    ed.move_dot_y = display_y
-    ed.move_dot_c = display_c
-
-def disable_display():
-    'Re-replace patched fcns in sked with original fcns without display'
-    ed.printline = print # re-enable printing when no display
-    ed.move_dot = _move_dot
-    ed.restore_buffer = _restore_buffer
-    ed.st = _st
-    ed.set_saved = _set_saved
-    ed.move_dot_a = _move_dot_a
-    ed.move_dot_d = _move_dot_d
-    ed.move_dot_y = _move_dot_y
-    ed.move_dot_c = _move_dot_c
-
-def wopen(nlines=None):
-    """
-    w(open) window for display editor at the top of the terminal window. 
-    Call wopen to begin display editing, commands will update the display.
-    """
-    global displaying
-    if displaying: # if we enable_display() twice something awful will happen!
-        print('Window is already open')
-        return
-    enable_display()
-    win(nlines)
-    displaying = True
-
-def wclose():
-    """
-     w(close) display editing window.
-     Call wclose to stop display editing.
-    """
-    global displaying
-    if not displaying:
-        print('Window is already closed')
-        return
-    clr()
-    disable_display()
-    displaying = False
+def c(old=None, new=None, start=None, end=None, count=-1):
+    ed.c(old, new, start, end, count, display_c)
