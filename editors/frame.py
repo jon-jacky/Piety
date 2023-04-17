@@ -15,7 +15,7 @@ try:
 except:
     exec(open("frameinit.py").read())
 
-# Display functions
+# Display functions: building blocks
 
 def open_frame():
     'Clear display above status line and limit scrolling to the lines below'
@@ -98,6 +98,149 @@ def update_window(new_dot, bstart):
     else:
         recenter()
 
+# Display functions: show effects of editing commands
+
+# Functions used by editing commands defined in the sked module.
+# The default arguments defined in sked produce no display output. 
+# These functions, when passed to fcns in sked, do produce display output.
+# In this way they are used to define the wrapped display commands below.
+# The function here display_<name> is passed to the sked fcn ed.<name>.
+
+def display_move_dot(iline):
+    'Display effect of ed move_dot function.  Move current line, dot, to iline'
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline # this is all that ed.move_dot does
+    if buftop <= ed.dot <= buftop + wlines - 2:
+        put_marker(ed.dot, display.white_bg)
+        update_status()
+    else:
+        recenter()
+
+def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
+    """
+    Pass to ed cmds printline arg to suppress printing during display.
+    Argument declaration must be the same as builtin print.
+    """
+    return
+
+def display_restore_buffer(bname):
+    'Display effect of ed restore_buffer function, fill entire window'
+    global buftop
+    # This next line does exactly what ed.restore_buffer does
+    ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
+    buftop = locate_segment() # buftop: line in buffer at top of window
+    update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
+    put_marker(ed.dot, display.white_bg)
+
+def display_e(iline):
+    'Display effect of ed e(dit) fcn: display new buffer contents around iline'
+    ed.dot = iline
+    recenter()
+
+def display_set_saved(status):
+    'Assign ed.saved and update_status, so saved in status line updates'
+    ed.saved = status # this is all that ed.set_saved does
+    update_status()
+
+def display_a(iline):
+    """
+    Display effect of ed a(ppend) function, appending a single line.
+    A single call to ed a() might call this several times, once for each line.
+    Move dot to iline and update display from dot to end of window,
+    because all lines below the appended line must be pushed down.
+    Also move marker and update status line. Page down if needed.
+    """
+    update_window(iline, iline)
+
+def display_d(iline):
+    """
+    Display effect of ed d(elete) function, deleting one or more lines.
+    Move dot to iline and update dislay from iline+1 to end of window,
+    because all lines below the deleted lines must be moved up.
+    iline (dot) is the last line before the delete, iline+1 is first line after.
+    """
+    update_window(iline, iline+1)
+
+def display_y(iline):
+    """
+    Display effect of ed y(ank) function, appending one or more deleted lines.
+    All lines below the appended lines must be moved down.
+    iline here is the new dot, the last of the lines appended from yank.
+    The first of the lines appended from yank is at iline - len(yank) + 1
+    """
+    update_window(iline, iline-len(ed.yank)+1)
+
+def display_c(iline):
+    """
+    Display the effect of the ed c(hange) function, replacing the changed line.
+    A call to c() might call this several times, once for each changed line.
+    Move dot to iline, redisplay line, mark current line, update the status.
+    """
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline
+    display.put_cursor(wline(ed.dot), 1)
+    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols+1])
+    display.kill_line()
+    put_marker(ed.dot, display.white_bg)
+    update_status()
+
+# Display functions: editing commands
+
+# Editing functions that generate display output
+# by wrapping functions from sked and passing the display fcns defined above.
+
+def e(fname):
+    ed.e(fname, display_e)
+
+def b(bname=None):
+    ed.b(bname, display_restore_buffer, update_status)
+
+def k():
+    ed.k(display_restore_buffer, update_status)
+
+def w(fname=None):
+    ed.w(fname, display_set_saved)
+
+def display_p(start=None, end=None):
+    ed.p(start, end, print_nothing, display_move_dot)
+
+p = display_p
+
+def l():
+    ed.l(display_p)
+
+def rl():
+    ed.rl(display_p)
+
+def v(nlines=None):
+    ed.v(nlines, display_p)
+
+def rv(nlines=None):
+    ed.rv(nlines, display_p, display_move_dot)
+
+def s(target=None, forward=True):
+    ed.s(target, forward, print_nothing, display_move_dot)
+
+def r(target=None):
+    s(target, forward=False)
+
+def tail(nlines=None):
+    ed.tail(nlines, display_p)
+
+def a(iline=None):
+    ed.a(iline, display_move_dot, display_a)
+
+def d(start=None, end=None):
+    ed.d(start, end, display_d)
+
+def y(iline=None):
+    ed.y(iline, display_y)
+
+def c(old=None, new=None, start=None, end=None, count=-1):
+    ed.c(old, new, start, end, count, display_c)
+
+# Display functions: window management
+
 def win(nlines=None):
     """
     Create or resize win(dow) for display at the top of the terminal window.
@@ -131,133 +274,3 @@ def clr():
     display.set_scroll(1, tlines)
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
 
-# Display editor commands that replace ('patch') editing cmds in sked
-
-def display_move_dot(iline):
-    'Display effect of ed move_dot function.  Move current line, dot, to iline'
-    put_marker(ed.dot, display.clear)
-    ed.dot = iline # this is all that ed.move_dot does
-    if buftop <= ed.dot <= buftop + wlines - 2:
-        put_marker(ed.dot, display.white_bg)
-        update_status()
-    else:
-        recenter()
-
-def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
-    """
-    Pass to ed cmds printline arg to suppress printing during display.
-    Argument declaration must be the same as builtin print.
-    """
-    return
-
-def display_p(start=None, end=None):
-    ed.p(start, end, print_nothing, display_move_dot)
-
-p = display_p
-
-def l():
-    ed.l(display_p)
-
-def rl():
-    ed.rl(display_p)
-
-def v(nlines=None):
-    ed.v(nlines, display_p)
-
-def rv(nlines=None):
-    ed.rv(nlines, display_p, display_move_dot)
-
-def s(target=None, forward=True):
-    ed.s(target, forward, print_nothing, display_move_dot)
-
-def r(target=None):
-    'r(everse) search backward for next line containing target string'
-    s(target, forward=False)
-
-def tail(nlines=None):
-    ed.tail(nlines, display_p)
-
-def display_restore_buffer(bname):
-    'Display effect of ed restore_buffer function, fill entire window'
-    global buftop
-    # This next line does exactly what ed.restore_buffer does
-    ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
-    buftop = locate_segment() # buftop: line in buffer at top of window
-    update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
-    put_marker(ed.dot, display.white_bg)
-
-def b(bname=None):
-    ed.b(bname, display_restore_buffer, update_status)
-
-def k():
-    ed.k(display_restore_buffer, update_status)
-
-def display_e(iline):
-    'Display effect of ed e(dit) fcn: display new buffer contents around iline'
-    ed.dot = iline
-    recenter()
-
-def e(fname):
-    ed.e(fname, display_e)
-
-def display_set_saved(status):
-    'Assign ed.saved and update_status, so saved in status line updates'
-    ed.saved = status # this is all that ed.set_saved does
-    update_status()
-
-def w(fname=None):
-    ed.w(fname, display_set_saved)
-
-def display_a(iline):
-    """
-    Display effect of ed a(ppend) function, appending a single line.
-    A single call to ed a() might call this several times, once for each line.
-    Move dot to iline and update display from dot to end of window,
-    because all lines below the appended line must be pushed down.
-    Also move marker and update status line. Page down if needed.
-    """
-    update_window(iline, iline)
-
-def a(iline=None):
-    ed.a(iline, display_move_dot, display_a)
-
-def display_d(iline):
-    """
-    Display effect of ed d(elete) function, deleting one or more lines.
-    Move dot to iline and update dislay from iline+1 to end of window,
-    because all lines below the deleted lines must be moved up.
-    iline (dot) is the last line before the delete, iline+1 is first line after.
-    """
-    update_window(iline, iline+1)
-
-def d(start=None, end=None):
-    ed.d(start, end, display_d)
-
-def display_y(iline):
-    """
-    Display effect of ed y(ank) function, appending one or more deleted lines.
-    All lines below the appended lines must be moved down.
-    iline here is the new dot, the last of the lines appended from yank.
-    The first of the lines appended from yank is at iline - len(yank) + 1
-    """
-    update_window(iline, iline-len(ed.yank)+1)
-
-def y(iline=None):
-    ed.y(iline, display_y)
-
-def display_c(iline):
-    """
-    Display the effect of the ed c(hange) function, replacing the changed line.
-    A call to c() might call this several times, once for each changed line.
-    Move dot to iline, redisplay line, mark current line, update the status.
-    """
-    put_marker(ed.dot, display.clear)
-    ed.dot = iline
-    display.put_cursor(wline(ed.dot), 1)
-    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols+1])
-    display.kill_line()
-    put_marker(ed.dot, display.white_bg)
-    update_status()
-
-def c(old=None, new=None, start=None, end=None, count=-1):
-    ed.c(old, new, start, end, count, display_c)

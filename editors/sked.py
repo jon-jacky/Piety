@@ -24,11 +24,6 @@ except:
 
 # Utility functions
 
-def move_dot(iline):
-    'Assign iline to dot. Replacement function can then move display cursor'
-    global dot
-    dot = iline
-
 def o():
     'Return dot, index of current line.  o looks a bit like classic ed .'
     return dot
@@ -63,6 +58,22 @@ def status():
     return (f'{bufname}, at line {dot} of {S()}, file {filename}, ' 
             f"{'saved' if saved else 'unsaved changes'}")
 
+# Display code hooks
+
+# These functions are passed as arguments to other functions here.
+# They do not produce display output, but can be replaced by 
+# functions from other modules that do produce display output.  
+
+def move_dot(iline):
+    'Assign iline to dot. Replacement function can then move display cursor'
+    global dot
+    dot = iline
+
+def restore_buffer(bname):
+    'Restore state of saved buffer bname to current saved buffer'
+    global bufname, filename, buffer, dot, saved
+    bufname, filename, buffer, dot, saved = buffers[bname]
+
 def st():
     'st(atus), print line of information about editing session'
     print(status())
@@ -75,11 +86,6 @@ def save_buffer():
     # index         0         1       2   3    4
     bstate = bufname, filename, buffer, dot, saved 
     buffers[bufname] = bstate
-
-def restore_buffer(bname):
-    'Restore state of saved buffer bname to current saved buffer'
-    global bufname, filename, buffer, dot, saved
-    bufname, filename, buffer, dot, saved = buffers[bname]
 
 def bname(filename):
     'Generate buffer name from file name, ensure each file gets unique bname'
@@ -293,8 +299,6 @@ def tail(nlines=None, p=p):  # p is hook for display code
     p(max(S()-pagesize, 1), S())
 
 # Editing functions
-
-move_dot_a = move_dot  # can be replaced by display code
 
 def a(iline=None, move_dot=move_dot, move_dot_a=move_dot): # hooks for display
     """
