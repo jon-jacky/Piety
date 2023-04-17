@@ -64,19 +64,24 @@ def status():
 # They do not produce display output, but can be replaced by 
 # functions from other modules that do produce display output.  
 
+def st():
+    'st(atus), print line of information about editing session'
+    print(status())
+
 def move_dot(iline):
     'Assign iline to dot. Replacement function can then move display cursor'
     global dot
     dot = iline
 
+def set_saved(status): 
+    'Assign status to saved.  Replacement function can update status line'
+    global saved
+    saved = status
+
 def restore_buffer(bname):
     'Restore state of saved buffer bname to current saved buffer'
     global bufname, filename, buffer, dot, saved
     bufname, filename, buffer, dot, saved = buffers[bname]
-
-def st():
-    'st(atus), print line of information about editing session'
-    print(status())
 
 # File and buffer functions
 
@@ -118,11 +123,6 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     saved = True # put this *before* move_dot for display code
     move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
     print(f'{filename}, {S()} lines')
-
-def set_saved(status): 
-    'Placeholder that can be replaced with display code'
-    global saved
-    saved = status
 
 def w(fname=None, set_saved=set_saved): # Hook for display code
     """

@@ -17,12 +17,6 @@ except:
 
 # Display functions: building blocks
 
-def open_frame():
-    'Clear display above status line and limit scrolling to the lines below'
-    display.put_cursor(wlines, 1) # window status line
-    display.erase_above()
-    display.set_scroll(flines+1, tlines)
-
 def update_lines(nlines, bstart, wstart):
     """
     Display consecutive lines (a 'segment') from the buffer in the window.
@@ -240,6 +234,12 @@ def c(old=None, new=None, start=None, end=None, count=-1):
     ed.c(old, new, start, end, count, display_c)
 
 # Display functions: window management
+
+def open_frame():
+    'Clear display above status line and limit scrolling to the lines below'
+    display.put_cursor(wlines, 1) # window status line
+    display.erase_above()
+    display.set_scroll(flines+1, tlines)
 
 def win(nlines=None):
     """
