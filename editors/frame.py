@@ -244,7 +244,6 @@ def open_frame():
 def win(nlines=None):
     """
     Create or resize win(dow) for display at the top of the terminal window.
-    Call wopen (below) to enable display and create window, call win to resize.
     Frame size is stored in flines.  First, clear above flines to clear frame.
     If nlines is given, assign to flines.  Smaller nlines enlarges cmd region.
     Set scrolling region to lines below flines.
@@ -265,7 +264,7 @@ def win(nlines=None):
     recenter()
 
 def zen(nlines=None):
-    'Alternative to wopen for a distraction-free writing experience'
+    'Alternative to win for a distraction-free writing experience'
     open_frame()
     update_status()
 
