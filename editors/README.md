@@ -37,7 +37,7 @@ terminates abnormally for any reason -- including a program crash or
 Python does not exit, but control returns to the Python prompt, and 
 all the data in the session remains intact, so you can simply resume working.
 
-Here *from sked import (star)* imports the
+Here *from sked import \** imports the
 command names from *sked* into the REPL so they can be used without
 qualification:
 *e(...)* instead of *sked.e(...)*.
@@ -76,8 +76,8 @@ Then:
     >>> win(24)
     ...
 
-The command names in *frame* are the same as in *sked*.  
-Here *from frame import (star)* loads the commands from *frame* into 
+The command names in *frame* are the same as in *sked*.
+Here *from frame import \** loads the commands from *frame* into 
 the REPL, replacing the commands with the same names imported earlier
 from *sked*.
 
@@ -111,7 +111,7 @@ To finish display editing and return to line editing in *sked*:
 
 Here *clr()* dismisses the window by restoring full screen scrolling,
 so the window contents soon scroll away at the top of the terminal.
-Here *from sked import (star)* copies the commands in *sked*
+Here *from sked import \** copies the commands in *sked*
 back into the REPL, replacing the commands with the same names from *frame*.
 
 Revised Apr 2023
