@@ -22,12 +22,13 @@ to call from the Python REPL.
 
 To edit:
 
-   $ python3 -i 
-   ...
-   >>> import sked
-   >>> from sked import *
-   >>> e('README.md')
-   ...
+    $ python3 -i 
+    ...
+    >>> import sked
+    >>> from sked import *
+    >>> e('README.md')
+    >>> a()
+    ...
 
 Here the Python *-i* (interactive) option enables editing on the command
 line and also command history.  And, it ensures that if a function 
@@ -42,12 +43,17 @@ qualification:
 *e(...)* instead of *sked.e(...)*.
 
 The *e* (edit) command loads a file into a buffer in the editor.
+
+The *a* (append) command adds text to the buffer.  Just type lines of 
+text on the following lines, each will go into the buffer until you type
+a period by itself at the start of a line to exit from the *a* command.
+
 Then other commands can edit in the buffer and print its contents on 
 the terminal.
 
 There is no continually updating display that shows the buffer contents.
 Editor command output appears in the REPL, then scrolls up as more commands
-are typed and executed. You could edit with *sked* on an old printing terminal!
+are typed and executed. You could edit with *sked* on an old printing terminal.
 
 To see all the commands and arguments that are available, read the source, or 
 type *help(sked)* in the REPL.  Type *help(e)* (for example) to learn 
@@ -92,6 +98,9 @@ the Python REPL because their effects are now visible in the display window.
 If you do want to see their output in the python REPL, you can still
 run the command in *sked* by prefixing the command name with the 
 module name: *sked.p()*.
+
+Help text in *frame* is cryptic.  To see the more helpful text in *sked*
+you must prefix the command name with the module name: *help(sked.e)*.
 
 To finish display editing and return to line editing in *sked*:
 
