@@ -2,14 +2,19 @@
 branches
 ========
 
-This is the *fparam* branch, branched from the *ed* branch,
-which itself is branched from the *rewrite* branch.
+This is the *ed* branch, branched from the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 22 Apr 2023: Revise editors/README.md to describe recent work on
+   *sked and *frame* in the *patch* and *fparam* branches.
+
+- 20 Apr 2023: All sked functions are now displaying in the *fparam* branch,
+   merge back into the *ed* branch.
 
 -  8 Apr 2023 Make *fparam* branch of *ed* branch to work on display code.
    Instead of patching functions in *sked*, display functions are passed 
