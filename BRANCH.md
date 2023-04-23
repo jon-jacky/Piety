@@ -2,13 +2,17 @@
 branches
 ========
 
-This is the *ed* branch, branched from the *rewrite* branch.
+This is the *inwindow* branch, branched from the *ed* branch, which
+is branched from the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 22 Apr 2023: Make *inwindow* branch of *ed* branch to work on display code:
+   Type lines into the a (append) command in place in the display window.
 
 - 22 Apr 2023: Revise editors/README.md to describe recent work on
    *sked and *frame* in the *patch* and *fparam* branches.
