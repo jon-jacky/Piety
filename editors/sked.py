@@ -83,6 +83,10 @@ def restore_buffer(bname):
     global bufname, filename, buffer, dot, saved
     bufname, filename, buffer, dot, saved = buffers[bname]
 
+def input_line():
+    'Call builtin input() and return line'
+    return input()
+
 # File and buffer functions
 
 def save_buffer():
@@ -300,11 +304,15 @@ def tail(nlines=None, p=p):  # p is hook for display code
 
 # Editing functions
 
-def a(iline=None, move_dot=move_dot, move_dot_a=move_dot): # hooks for display
+def a(iline=None, move_dot=move_dot, input_line=input_line,
+      move_dot_a=move_dot):
     """
-    a(ppend) lines after iline (default dot), type just . on a line to exit.
+    a(ppend) lines after iline (default dot).
+    This function is the only way to add text to the buffer in sked.
+    Type a() RET, then type lines of text, type just . on a line to exit.
     Just type a() to begin adding text to an empty buffer.
     After that, must type a(0) to insert text at the beginning of a buffer.
+    move_dot, input_line, and move_dot_a are placeholders for display fcns.
     """
     global buffer, saved
     if iline is None: iline = dot
@@ -315,7 +323,7 @@ def a(iline=None, move_dot=move_dot, move_dot_a=move_dot): # hooks for display
     move_dot(iline)
     while True:
         success = False
-        line = input()  # Can this fail?  Yes, by ^C for example
+        line = input_line()  # Can this fail?  Yes, by ^C for example
         success = True
         if success:
             if line == '.':

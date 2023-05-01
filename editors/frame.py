@@ -136,16 +136,6 @@ def display_set_saved(status):
     ed.saved = status # this is all that ed.set_saved does
     update_status()
 
-def display_a(iline):
-    """
-    Display effect of ed a(ppend) function, appending a single line.
-    A single call to ed a() might call this several times, once for each line.
-    Move dot to iline and update display from dot to end of window,
-    because all lines below the appended line must be pushed down.
-    Also move marker and update status line. Page down if needed.
-    """
-    update_window(iline, iline)
-
 def display_d(iline):
     """
     Display effect of ed d(elete) function, deleting one or more lines.
@@ -177,6 +167,30 @@ def display_c(iline):
     display.kill_line()
     put_marker(ed.dot, display.white_bg)
     update_status()
+
+# Display functions: append mode for sked a() command
+
+# Enter append mode by typing a() in the REPL.
+# Then enter the lines of text in place in the display window.
+# Exit append mode by typing . by itself at the start of a line.
+# We do not update the status line in append mode, to minimize cursor motion.
+
+# That's how we plan to make it work.
+# For now we are still entering text in the REPL - revisions to come
+
+def display_input_line():
+    'Call builtin input() and return line'
+    return input()
+
+def display_a(iline):
+    """
+    Display effect of ed a(ppend) function, appending a single line.
+    A single call to ed a() might call this several times, once for each line.
+    Move dot to iline and update display from dot to end of window,
+    because all lines below the appended line must be pushed down.
+    Also move marker and update status line. Page down if needed.
+    """
+    update_window(iline, iline)
 
 # Display functions: editing commands
 
@@ -222,7 +236,7 @@ def tail(nlines=None):
     ed.tail(nlines, display_p)
 
 def a(iline=None):
-    ed.a(iline, display_move_dot, display_a)
+    ed.a(iline, display_move_dot, display_input_line, display_a)
 
 def d(start=None, end=None):
     ed.d(start, end, display_d)
