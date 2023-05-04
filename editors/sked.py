@@ -84,7 +84,7 @@ def restore_buffer(bname):
     bufname, filename, buffer, dot, saved = buffers[bname]
 
 def input_line():
-    'Call builtin input() and return line'
+    'Call builtin input and return the line it gets'
     return input()
 
 # File and buffer functions

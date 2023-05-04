@@ -36,20 +36,24 @@ def update_lines(nlines, bstart, wstart):
         display.kill_line() # entire line
         display.next_line()
 
-def locate_segment():
+def locate_segment(iline):
     """
-    Select segment to put in window, that best positions dot in the window.
+    Select segment to put in window, that best positions iline in the window.
     Return buftop, line in current buffer to put at line 1 in window
     """
-    if ed.dot < wlines - 1: # dot is near top of buffer, show first page
+    if iline < wlines - 1: # iline is near top of buffer, show first page
         return 1
     else: 
-        return ed.dot - (wlines // 2) # put dot near center of window
+        return iline - (wlines // 2) # put iline near center of window
 
 def wline(iline):
     'Return index of line in window that displays iline from buffer'
     wiline = iline - buftop + 1
     return wiline if wiline >=1 else 1
+
+def in_window(iline):
+    'Return True if buffer index iline is within the window'
+    return (buftop <= iline <= buftop + wlines - 2)
 
 def put_marker(bufline, attribs):
     'On the display, mark first char in line bufline in buffer with attribs'
@@ -73,7 +77,7 @@ def refresh():
 def recenter():
     'Move buffer segment to put dot in center, display segment, marker, status'
     global buftop
-    buftop = locate_segment()
+    buftop = locate_segment(ed.dot)
     refresh()
 
 def update_window(new_dot, bstart):
@@ -83,18 +87,35 @@ def update_window(new_dot, bstart):
     """
     put_marker(ed.dot, display.clear)
     ed.dot = new_dot # this is all that move_dot(new_dot) does
-    if buftop <= ed.dot <= buftop + wlines - 2:
-        wstart = bstart - buftop + 1 # dot line in window
-        nlines = wlines - wstart # dot to end of window
+    if in_window(ed.dot):
+        wstart = wline(bstart) # bstart line in window
+        nlines = wlines - wstart # wstart to end of window
         update_lines(nlines, bstart, wstart)
         put_marker(ed.dot, display.white_bg)
-        update_status()
+        update_status() 
     else:
         recenter()
 
+def open_line(iline):
+    """
+    Open line after iline. Put cursor there to prepare for input().
+    If text after iline, push it all down one line to make room for new line.
+    """
+    global buftop
+    if not in_window(iline+1):
+        buftop = locate_segment(iline)
+        update_lines(wlines-1, buftop, 1)
+    display.put_cursor(wline(iline+1), 1)
+    if ed.S() >= iline+1: # more lines after this one in buffer
+        display.kill_line() # clear this line to prepare for input()
+        wstart = wline(iline) + 2
+        nlines = wlines - wstart - 1
+        update_lines(nlines, iline+1, wstart) # push lines down
+        display.put_cursor(wline(iline+1),1) #restore cursor after update_lines
+
 # Display functions: show effects of editing commands
 
-# Functions used by editing commands defined in the sked module.
+# Display fcns passed as args to editing commands defined in the sked module.
 # The default arguments defined in sked produce no display output. 
 # These functions, when passed to fcns in sked, do produce display output.
 # In this way they are used to define the wrapped display commands below.
@@ -104,7 +125,7 @@ def display_move_dot(iline):
     'Display effect of ed move_dot function.  Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that ed.move_dot does
-    if buftop <= ed.dot <= buftop + wlines - 2:
+    if in_window(ed.dot):
         put_marker(ed.dot, display.white_bg)
         update_status()
     else:
@@ -122,7 +143,7 @@ def display_restore_buffer(bname):
     global buftop
     # This next line does exactly what ed.restore_buffer does
     ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
-    buftop = locate_segment() # buftop: line in buffer at top of window
+    buftop = locate_segment(ed.dot) # buftop: line in buffer at top of window
     update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
     put_marker(ed.dot, display.white_bg)
 
@@ -175,22 +196,48 @@ def display_c(iline):
 # Exit append mode by typing . by itself at the start of a line.
 # We do not update the status line in append mode, to minimize cursor motion.
 
-# That's how we plan to make it work.
-# For now we are still entering text in the REPL - revisions to come
+def display_start_a(iline):
+    """
+    Call once when user types a() in the REPL. Move dot to iline.
+    Open line after dot. Put cursor there to prepare for display_input_line.
+    If any text after dot, push it all down one line to make room for new line.
+    """
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline # sked a() does this.  iline might be far from previous dot.
+    open_line(ed.dot) # create space, move cursor to prepare for first input()
 
 def display_input_line():
-    'Call builtin input() and return line'
-    return input()
+    """
+    Call this function when cursor is already on open line, ready for input()
+    Call builtin input() and return line that was input.
+    If line is just . by itself, that means exit append mode, close that line.
+    This function only updates window when exiting append mode after '.'
+    display_a updates window when input() returns a line of text to append.
+    """
+    line = input() # sked a() does this
+    if line == '.': # done with append mode, so close line
+        if ed.S() >= ed.dot:  # more in the buffer after this line
+            wstart = wline(ed.dot+1)
+            nlines = wlines - wstart
+            update_lines(nlines, ed.dot+1, wstart) # move lines up
+        else:
+            display.kill_line() # get rid of '.' - must we reset cursor first? 
+        update_status() # also returns cursor to REPL command line
+    return line # caller sked a() tests line, may exit from append mode
 
 def display_a(iline):
     """
     Display effect of ed a(ppend) function, appending a single line.
     A single call to ed a() might call this several times, once for each line.
-    Move dot to iline and update display from dot to end of window,
-    because all lines below the appended line must be pushed down.
-    Also move marker and update status line. Page down if needed.
+    Text of line is already on screen at iline, put there by previous input().
+    We only call this fcn if input() did *not* return '.',
+    so we can advance dot to iline now.
+    Move cursor down, open next line to prepare for next input() call.
+    If any more buffer lines follow this line, move them all down.
     """
-    update_window(iline, iline)
+    put_marker(ed.dot, display.clear)
+    ed.dot = ed.dot + 1  # advance dot to line just input(), like sked a()
+    open_line(ed.dot) # create space, move cursor to prepare for next input()
 
 # Display functions: editing commands
 
@@ -236,7 +283,7 @@ def tail(nlines=None):
     ed.tail(nlines, display_p)
 
 def a(iline=None):
-    ed.a(iline, display_move_dot, display_input_line, display_a)
+    ed.a(iline, display_start_a, display_input_line, display_a)
 
 def d(start=None, end=None):
     ed.d(start, end, display_d)
