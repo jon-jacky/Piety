@@ -101,13 +101,15 @@ def open_line(iline):
     """
     global buftop
     if not in_window(iline+1):
+        display.put_cursor(wlines, 1) # window status line
+        display.erase_above() # erase entire window contents above status line
         buftop = locate_segment(iline)
         update_lines(buftop, 1, wlines-1)
     display.put_cursor(wline(iline+1), 1)
     if ed.S() >= iline+1: # more lines after this one in buffer
         display.kill_line() # clear this line to prepare for input()
         wstart = wline(iline) + 2
-        nlines = wlines - wstart - 1
+        nlines = wlines - wstart
         update_lines(iline+1, wstart, nlines) # push lines down
         display.put_cursor(wline(iline+1),1) #restore cursor after update_lines
 
@@ -162,6 +164,7 @@ def display_d(iline):
     Display effect of ed d(elete) function, deleting one or more lines.
     Move dot to iline and update display from iline+1 to end of window,
     because all lines below the deleted lines must be moved up.
+    At the end of the buffer, write empty lines at the bottom of the window.
     iline (dot) is the last line before the delete, iline+1 is first line after.
     Also move marker and update status line. Page down if needed.
     """
@@ -170,19 +173,17 @@ def display_d(iline):
     if in_window(ed.dot):
         bstart = iline + 1
         wstart = wline(bstart) # bstart line in window
-        nlines = wlines - wstart # n of lines wstart to end of window
+        nlines = wlines - wstart # n of lines from wstart to end of window
         update_lines(bstart, wstart, nlines)
-        nblines = len(ed.buffer)-bstart+1 # n lines to end buf
+        nblines = len(ed.buffer)-bstart+1 # n of lines to end of buffer
         nelines = nlines - nblines # n of empty lines at end of window
         for iline in range(nelines+1): # make empty lines at end of window
-            display.kill_line() # entire line
+            display.kill_whole_line()
             display.next_line()
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
         recenter()
-
-    # update_window(iline, iline+1) # now display_d has update_window inline
 
 def display_y(iline):
     """
@@ -220,6 +221,8 @@ def display_start_a(iline):
     Open line after dot. Put cursor there to prepare for display_input_line.
     If any text after dot, push it all down one line to make room for new line.
     """
+    display.put_cursor(wlines, 1) # status line does not update in append mode
+    display.render('Appending...'.ljust(tcols)[:tcols+1],display.white_bg)  
     put_marker(ed.dot, display.clear)
     ed.dot = iline # sked a() does this.  iline might be far from previous dot.
     open_line(ed.dot) # create space, move cursor to prepare for first input()
@@ -228,18 +231,21 @@ def display_input_line():
     """
     Call this function when cursor is already on open line, ready for input()
     Call builtin input() and return line that was input.
+    input() itself displays the line in the window as it is typed.
     If line is just . by itself, that means exit append mode, close that line.
     This function only updates window when exiting append mode after '.'
     display_a updates window when input() returns a line of text to append.
     """
     line = input() # sked a() does this
     if line == '.': # done with append mode, so close line
-        if ed.S() >= ed.dot:  # more in the buffer after this line
+        if ed.S() > ed.dot:  # more in the buffer after this line
             wstart = wline(ed.dot+1)
             nlines = wlines - wstart
             update_lines(ed.dot+1, wstart, nlines) # move lines up
         else:
-            display.kill_line() # get rid of '.' - must we reset cursor first? 
+            display.put_cursor(wline(ed.dot)+1,1)
+            display.kill_whole_line() # erase '.'
+        put_marker(ed.dot, display.white_bg)
         update_status() # also returns cursor to REPL command line
     return line # caller sked a() tests line, may exit from append mode
 
