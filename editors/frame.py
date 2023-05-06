@@ -17,23 +17,19 @@ except:
 
 # Display functions: building blocks
 
-def update_lines(nlines, bstart, wstart):
+def update_lines(bstart, wstart, nlines):
     """
     Display consecutive lines (a 'segment') from the buffer in the window.
-    Move cursor to line wstart in window.  Display nlines starting at bstart
-    in the buffer.  Clip nlines to fit in window if needed.  Pad buffer lines
-    with empty lines to reach nlines if needed. Move cursor to line after last.
+    Display nlines, starting at bstart in buffer, starting at wstart in window.
+    Clip nlines if needed, to fit in window, and not run past end of buffer.
+    Leave cursor after the last line displayed.
     """
-    nlines = min(nlines, wlines-wstart+1) # clip nlines to fit window
-    nblines = min(nlines, len(ed.buffer)-bstart+1) # n of lines from buffer
-    nelines = nlines - nblines # number of empty lines at end of window
+    nlines = min(nlines, wlines-wstart+1) # n of lines at end of window
+    nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
     display.put_cursor(wstart, 1)
-    for line in ed.buffer[bstart:bstart+nblines]:
+    for line in ed.buffer[bstart:bstart+nlines]:
         display.putstr(line.rstrip('\n')[:tcols+1])
         display.kill_line() # end of buffer line to window edge
-        display.next_line()
-    for iline in range(nelines+1): # empty lines at end of window
-        display.kill_line() # entire line
         display.next_line()
 
 def locate_segment(iline):
@@ -70,7 +66,9 @@ def update_status():
 
 def refresh():
     '(Re)Display buffer segment, marker, status without moving segment'
-    update_lines(wlines-1, buftop, 1)
+    display.put_cursor(wlines, 1) # window status line
+    display.erase_above() # erase entire window contents above status line
+    update_lines(buftop, 1, wlines-1)
     put_marker(ed.dot, display.white_bg)
     update_status()
     
@@ -90,7 +88,7 @@ def update_window(new_dot, bstart):
     if in_window(ed.dot):
         wstart = wline(bstart) # bstart line in window
         nlines = wlines - wstart # wstart to end of window
-        update_lines(nlines, bstart, wstart)
+        update_lines(bstart, wstart, nlines)
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
@@ -104,13 +102,13 @@ def open_line(iline):
     global buftop
     if not in_window(iline+1):
         buftop = locate_segment(iline)
-        update_lines(wlines-1, buftop, 1)
+        update_lines(buftop, 1, wlines-1)
     display.put_cursor(wline(iline+1), 1)
     if ed.S() >= iline+1: # more lines after this one in buffer
         display.kill_line() # clear this line to prepare for input()
         wstart = wline(iline) + 2
         nlines = wlines - wstart - 1
-        update_lines(nlines, iline+1, wstart) # push lines down
+        update_lines(iline+1, wstart, nlines) # push lines down
         display.put_cursor(wline(iline+1),1) #restore cursor after update_lines
 
 # Display functions: show effects of editing commands
@@ -143,8 +141,10 @@ def display_restore_buffer(bname):
     global buftop
     # This next line does exactly what ed.restore_buffer does
     ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
+    display.put_cursor(wlines, 1) # window status line
+    display.erase_above() # erase entire window above status line
     buftop = locate_segment(ed.dot) # buftop: line in buffer at top of window
-    update_lines(wlines-1, buftop, 1) # fill window starting at buftop in buffer
+    update_lines(buftop, 1, wlines-1) # fill window starting at buftop in buffer
     put_marker(ed.dot, display.white_bg)
 
 def display_e(iline):
@@ -160,11 +160,29 @@ def display_set_saved(status):
 def display_d(iline):
     """
     Display effect of ed d(elete) function, deleting one or more lines.
-    Move dot to iline and update dislay from iline+1 to end of window,
+    Move dot to iline and update display from iline+1 to end of window,
     because all lines below the deleted lines must be moved up.
     iline (dot) is the last line before the delete, iline+1 is first line after.
+    Also move marker and update status line. Page down if needed.
     """
-    update_window(iline, iline+1)
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline # this is all that move_dot(iline) does
+    if in_window(ed.dot):
+        bstart = iline + 1
+        wstart = wline(bstart) # bstart line in window
+        nlines = wlines - wstart # n of lines wstart to end of window
+        update_lines(bstart, wstart, nlines)
+        nblines = len(ed.buffer)-bstart+1 # n lines to end buf
+        nelines = nlines - nblines # n of empty lines at end of window
+        for iline in range(nelines+1): # make empty lines at end of window
+            display.kill_line() # entire line
+            display.next_line()
+        put_marker(ed.dot, display.white_bg)
+        update_status() 
+    else:
+        recenter()
+
+    # update_window(iline, iline+1) # now display_d has update_window inline
 
 def display_y(iline):
     """
@@ -219,7 +237,7 @@ def display_input_line():
         if ed.S() >= ed.dot:  # more in the buffer after this line
             wstart = wline(ed.dot+1)
             nlines = wlines - wstart
-            update_lines(nlines, ed.dot+1, wstart) # move lines up
+            update_lines(ed.dot+1, wstart, nlines) # move lines up
         else:
             display.kill_line() # get rid of '.' - must we reset cursor first? 
         update_status() # also returns cursor to REPL command line
