@@ -78,22 +78,6 @@ def recenter():
     buftop = locate_segment(ed.dot)
     refresh()
 
-def update_window(new_dot, bstart):
-    """
-    Move dot to new_dot and update display from bstart to end of window.
-    Also move marker and update status line. Page down if needed.
-    """
-    put_marker(ed.dot, display.clear)
-    ed.dot = new_dot # this is all that move_dot(new_dot) does
-    if in_window(ed.dot):
-        wstart = wline(bstart) # bstart line in window
-        nlines = wlines - wstart # wstart to end of window
-        update_lines(bstart, wstart, nlines)
-        put_marker(ed.dot, display.white_bg)
-        update_status() 
-    else:
-        recenter()
-
 def open_line(iline):
     """
     Open line after iline. Put cursor there to prepare for input().
@@ -191,8 +175,20 @@ def display_y(iline):
     All lines below the appended lines must be moved down.
     iline here is the new dot, the last of the lines appended from yank.
     The first of the lines appended from yank is at iline - len(yank) + 1
+    Update the display from there to the end of the window.
+    Also move marker and update status line. Page down if needed.
     """
-    update_window(iline, iline-len(ed.yank)+1)
+    put_marker(ed.dot, display.clear)
+    ed.dot = iline # this is all that move_dot(iline) does
+    bstart = iline - len(ed.yank) + 1
+    if in_window(ed.dot):
+        wstart = wline(bstart) # bstart line in window
+        nlines = wlines - wstart # wstart to end of window
+        update_lines(bstart, wstart, nlines)
+        put_marker(ed.dot, display.white_bg)
+        update_status() 
+    else:
+        recenter()
 
 def display_c(iline):
     """
@@ -242,7 +238,9 @@ def display_input_line():
             wstart = wline(ed.dot+1)
             nlines = wlines - wstart
             update_lines(ed.dot+1, wstart, nlines) # move lines up
-        else:
+            if in_window(ed.S()+1): # on the last page, at least one empty line
+                display.kill_whole_line() # extra line left by removing '.'
+        else: # at the end of the buffer
             display.put_cursor(wline(ed.dot)+1,1)
             display.kill_whole_line() # erase '.'
         put_marker(ed.dot, display.white_bg)
