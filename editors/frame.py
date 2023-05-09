@@ -78,6 +78,17 @@ def recenter():
     buftop = locate_segment(ed.dot)
     refresh()
 
+def update_below(bstart, offset=0):
+    """
+    Update lines in the window starting with (including) buffer line bstart
+    down to (but not including) the status line. Accept default offset=0 
+    to begin updating at present position of bstart in the window, or
+    optionally assign offset to move bstart and following lines down.
+    """
+    wstart = wline(bstart) + offset
+    nlines = wlines - wstart
+    update_lines(bstart, wstart, nlines)
+
 def open_line(iline):
     """
     Open line after iline. Put cursor there to prepare for input().
@@ -92,10 +103,8 @@ def open_line(iline):
     display.put_cursor(wline(iline+1), 1)
     if ed.S() >= iline+1: # more lines after this one in buffer
         display.kill_line() # clear this line to prepare for input()
-        wstart = wline(iline) + 2
-        nlines = wlines - wstart
-        update_lines(iline+1, wstart, nlines) # push lines down
-        display.put_cursor(wline(iline+1),1) #restore cursor after update_lines
+        update_below(iline + 1, 1) # offset 1 for line we just cleared
+        display.put_cursor(wline(iline+1),1) # restore cursor after update_...
 
 # Display functions: show effects of editing commands
 
@@ -146,20 +155,18 @@ def display_set_saved(status):
 def display_d(iline):
     """
     Display effect of ed d(elete) function, deleting one or more lines.
-    Move dot to iline and update display from iline+1 to end of window,
+    iline (dot) is the last line before the delete, iline+1 is first line after.
+    Move dot to iline and update display from dot + 1 to end of window,
     because all lines below the deleted lines must be moved up.
     At the end of the buffer, write empty lines at the bottom of the window.
-    iline (dot) is the last line before the delete, iline+1 is first line after.
     Also move marker and update status line. Page down if needed.
     """
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that move_dot(iline) does
     if in_window(ed.dot):
-        bstart = iline + 1
-        wstart = wline(bstart) # bstart line in window
-        nlines = wlines - wstart # n of lines from wstart to end of window
-        update_lines(bstart, wstart, nlines)
-        nblines = len(ed.buffer)-bstart+1 # n of lines to end of buffer
+        update_below(ed.dot + 1)
+        nlines = wlines - wline(ed.dot + 1) # n of lines to end of window
+        nblines = ed.S() - ed.dot # n of lines to end of buffer
         nelines = nlines - nblines # n of empty lines at end of window
         for iline in range(nelines+1): # make empty lines at end of window
             display.kill_whole_line()
@@ -180,11 +187,8 @@ def display_y(iline):
     """
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that move_dot(iline) does
-    bstart = iline - len(ed.yank) + 1
     if in_window(ed.dot):
-        wstart = wline(bstart) # bstart line in window
-        nlines = wlines - wstart # wstart to end of window
-        update_lines(bstart, wstart, nlines)
+        update_below(ed.dot - len(ed.yank) + 1) # first yanked line
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
@@ -235,9 +239,7 @@ def display_input_line():
     line = input() # sked a() does this
     if line == '.': # done with append mode, so close line
         if ed.S() > ed.dot:  # more in the buffer after this line
-            wstart = wline(ed.dot+1)
-            nlines = wlines - wstart
-            update_lines(ed.dot+1, wstart, nlines) # move lines up
+            update_below(ed.dot + 1)
             if in_window(ed.S()+1): # on the last page, at least one empty line
                 display.kill_whole_line() # extra line left by removing '.'
         else: # at the end of the buffer
@@ -355,4 +357,3 @@ def clr():
     'cl(ea)r window from display by restoring full-screen scrolling'
     display.set_scroll(1, tlines)
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
-
