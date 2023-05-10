@@ -28,9 +28,13 @@ def update_lines(bstart, wstart, nlines):
     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
     display.put_cursor(wstart, 1)
     for line in ed.buffer[bstart:bstart+nlines]:
-        display.putstr(line.rstrip('\n')[:tcols+1])
+        display.putstr(line.rstrip('\n')[:tcols])
         display.kill_line() # end of buffer line to window edge
         display.next_line()
+
+def update_window():
+    'Update entire window up to status line, starting at line buftop in buffer'
+    update_lines(buftop, 1, wlines-1)
 
 def locate_segment(iline):
     """
@@ -61,14 +65,14 @@ def put_marker(bufline, attribs):
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wlines, 1) # window status line
-    display.render(ed.status().ljust(tcols)[:tcols+1],display.white_bg)  
+    display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
     display.put_cursor(tlines, 1) # return cursor to command line
 
 def refresh():
     '(Re)Display buffer segment, marker, status without moving segment'
     display.put_cursor(wlines, 1) # window status line
     display.erase_above() # erase entire window contents above status line
-    update_lines(buftop, 1, wlines-1)
+    update_window()
     put_marker(ed.dot, display.white_bg)
     update_status()
     
@@ -99,7 +103,7 @@ def open_line(iline):
         display.put_cursor(wlines, 1) # window status line
         display.erase_above() # erase entire window contents above status line
         buftop = locate_segment(iline)
-        update_lines(buftop, 1, wlines-1)
+        update_window()
     display.put_cursor(wline(iline+1), 1)
     if ed.S() >= iline+1: # more lines after this one in buffer
         display.kill_line() # clear this line to prepare for input()
@@ -139,7 +143,7 @@ def display_restore_buffer(bname):
     display.put_cursor(wlines, 1) # window status line
     display.erase_above() # erase entire window above status line
     buftop = locate_segment(ed.dot) # buftop: line in buffer at top of window
-    update_lines(buftop, 1, wlines-1) # fill window starting at buftop in buffer
+    update_window()
     put_marker(ed.dot, display.white_bg)
 
 def display_e(iline):
@@ -203,7 +207,7 @@ def display_c(iline):
     put_marker(ed.dot, display.clear)
     ed.dot = iline
     display.put_cursor(wline(ed.dot), 1)
-    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols+1])
+    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols])
     display.kill_line()
     put_marker(ed.dot, display.white_bg)
     update_status()
@@ -222,7 +226,7 @@ def display_start_a(iline):
     If any text after dot, push it all down one line to make room for new line.
     """
     display.put_cursor(wlines, 1) # status line does not update in append mode
-    display.render('Appending...'.ljust(tcols)[:tcols+1],display.white_bg)  
+    display.render('Appending...'.ljust(tcols)[:tcols],display.white_bg)  
     put_marker(ed.dot, display.clear)
     ed.dot = iline # sked a() does this.  iline might be far from previous dot.
     open_line(ed.dot) # create space, move cursor to prepare for first input()
