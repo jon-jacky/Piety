@@ -17,6 +17,25 @@ except:
 
 # Display functions: building blocks
 
+def in_window(iline):
+    'Return True if buffer index iline is within the window.'
+    return (buftop <= iline <= buftop + wlines - 2)
+
+def wline(iline):
+    'Return index of line in window that displays iline from buffer.'
+    wiline = iline - buftop + 1
+    return wiline if wiline >=1 else 1
+
+def locate_segment(iline):
+    """
+    Select segment to put in window, that best positions iline in the window.
+    Return buftop, line in current buffer to put at line 1 in window.
+    """
+    if iline < wlines - 1: # iline is near top of buffer, show first page
+        return 1
+    else: 
+        return iline - (wlines // 2) # put iline near center of window
+
 def update_lines(bstart, wstart, nlines):
     """
     Display consecutive lines (a 'segment') from the buffer in the window.
@@ -35,52 +54,6 @@ def update_lines(bstart, wstart, nlines):
 def update_window():
     'Update entire window up to status line, starting at line buftop in buffer'
     update_lines(buftop, 1, wlines-1)
-
-def locate_segment(iline):
-    """
-    Select segment to put in window, that best positions iline in the window.
-    Return buftop, line in current buffer to put at line 1 in window
-    """
-    if iline < wlines - 1: # iline is near top of buffer, show first page
-        return 1
-    else: 
-        return iline - (wlines // 2) # put iline near center of window
-
-def wline(iline):
-    'Return index of line in window that displays iline from buffer'
-    wiline = iline - buftop + 1
-    return wiline if wiline >=1 else 1
-
-def in_window(iline):
-    'Return True if buffer index iline is within the window'
-    return (buftop <= iline <= buftop + wlines - 2)
-
-def put_marker(bufline, attribs):
-    'On the display, mark first char in line bufline in buffer with attribs'
-    line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
-    ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
-    display.put_cursor(wline(bufline), 1)
-    display.render(ch0, attribs)
-
-def update_status():
-    'Update status line at the bottom of the window'
-    display.put_cursor(wlines, 1) # window status line
-    display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
-    display.put_cursor(tlines, 1) # return cursor to command line
-
-def refresh():
-    '(Re)Display buffer segment, marker, status without moving segment'
-    display.put_cursor(wlines, 1) # window status line
-    display.erase_above() # erase entire window contents above status line
-    update_window()
-    put_marker(ed.dot, display.white_bg)
-    update_status()
-    
-def recenter():
-    'Move buffer segment to put dot in center, display segment, marker, status'
-    global buftop
-    buftop = locate_segment(ed.dot)
-    refresh()
 
 def update_below(bstart, offset=0):
     """
@@ -109,6 +82,33 @@ def open_line(iline):
         display.kill_line() # clear this line to prepare for input()
         update_below(iline + 1, 1) # offset 1 for line we just cleared
         display.put_cursor(wline(iline+1),1) # restore cursor after update_...
+
+def put_marker(bufline, attribs):
+    'On the display, mark first char in line bufline in buffer with attribs'
+    line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
+    ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
+    display.put_cursor(wline(bufline), 1)
+    display.render(ch0, attribs)
+
+def update_status():
+    'Update status line at the bottom of the window'
+    display.put_cursor(wlines, 1) # window status line
+    display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
+    display.put_cursor(tlines, 1) # return cursor to command line
+
+def refresh():
+    '(Re)Display buffer segment, marker, status without moving segment'
+    display.put_cursor(wlines, 1) # window status line
+    display.erase_above() # erase entire window contents above status line
+    update_window()
+    put_marker(ed.dot, display.white_bg)
+    update_status()
+    
+def recenter():
+    'Move buffer segment to put dot in center, display segment, marker, status'
+    global buftop
+    buftop = locate_segment(ed.dot)
+    refresh()
 
 # Display functions: show effects of editing commands
 

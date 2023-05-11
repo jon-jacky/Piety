@@ -27,6 +27,7 @@ To edit:
     >>> import sked
     >>> from sked import *
     >>> e('README.md')
+    README.md, 117 lines
     >>> a()
     ...
 
@@ -85,7 +86,9 @@ Here *win(24)* opens a display window 24 lines tall at the top of
 the same terminal where the Python REPL runs.  This window shows 
 the lines in the buffer around the current line, dot.
 (24 lines is just an example, it is a good choice when the terminal
-is 33 lines tall.) 
+is 33 lines tall.)  You can use the *win* command to grow or shrink the 
+window at any time, to make more or less room for command output in
+the Python REPL.
 
 The Python REPL continues to run and scroll up in the remaining lines
 at the bottom of the terminal. 
@@ -93,13 +96,20 @@ Here you can type the same editing commands you used in *sked*,
 but now the window updates to show the changes in the buffer as
 they are made.
 
+When you type *a()* to start the *append* command, the cursor moves
+up from the Python REPL to the text insertion point in the window.
+Then when you type, each character appears immediately in the window at the 
+intended location.  This continues until you type . at the beginning 
+of a line to exit append mode.  Then the line with '.' disappears 
+and the cursor returns to the Python REPL for the next command.
+
 Some commands, for example *p()* (print), no longer print output in
 the Python REPL because their effects are now visible in the display window.
 If you do want to see their output in the python REPL, you can still
 run the command in *sked* by prefixing the command name with the 
 module name: *sked.p()*.
 
-Help text in *frame* is cryptic.  To see the more helpful text in *sked*
+Help text in *frame* is cryptic.  To see the more helpful text from *sked*
 you must prefix the command name with the module name: *help(sked.e)*.
 
 To finish display editing and return to line editing in *sked*:
@@ -109,9 +119,12 @@ To finish display editing and return to line editing in *sked*:
     >>> from sked import *
     ...
 
+(You might want to do this to edit broken display code in *frame*.)
 Here *clr()* dismisses the window by restoring full screen scrolling,
 so the window contents soon scroll away at the top of the terminal.
 Here *from sked import \** copies the commands in *sked*
 back into the REPL, replacing the commands with the same names from *frame*.
+To resume display editing, repeat *from frame import \** and
+*win()* (*win()* without an argument restores the previous window size).
 
-Revised Apr 2023
+Revised May 2023
