@@ -64,10 +64,6 @@ def status():
 # They do not produce display output, but can be replaced by 
 # functions from other modules that do produce display output.  
 
-def st():
-    'st(atus), print line of information about editing session'
-    print(status())
-
 def move_dot(iline):
     'Assign iline to dot. Replacement function can then move display cursor'
     global dot
@@ -82,6 +78,7 @@ def restore_buffer(bname):
     'Restore state of saved buffer bname to current saved buffer'
     global bufname, filename, buffer, dot, saved
     bufname, filename, buffer, dot, saved = buffers[bname]
+    print(status()) # print the new buffer name
 
 def input_line():
     'Call builtin input and return the line it gets'
@@ -145,7 +142,7 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
         set_saved(True)
         print(f'{filename}, {S()} lines')
 
-def b(bname=None, restore_buffer=restore_buffer, st=st): # hooks for display 
+def b(bname=None, restore_buffer=restore_buffer): 
     """
     b(uffer), save current buffer and restore named buffer.
     If buffer name not given, switch back to previous buffer
@@ -159,7 +156,6 @@ def b(bname=None, restore_buffer=restore_buffer, st=st): # hooks for display
     if bname in buffers:
         prev_bufname = bufname
         restore_buffer(bname)
-        st()
     else:
         print(f'? no buffer {bname}')
 
@@ -180,7 +176,7 @@ def n():
     'n(ames), print names and other information about stored buffers'
     for bname in buffers: print(bstatus(bname))
 
-def k(restore_buffer=restore_buffer, st=st): # hooks for display code
+def k(restore_buffer=restore_buffer):
     """
     k(ill) the current buffer and delete it from stored buffers.
     Replace the current buffer with the previous buffer.
@@ -196,7 +192,6 @@ def k(restore_buffer=restore_buffer, st=st): # hooks for display code
         del buffers[bufname]
     # prev buffer may have been killed, but there is always a saved scratch.txt
     restore_buffer(prev_bufname if prev_bufname in buffers else 'scratch.txt')
-    st() # print status about restored buffer so we know k() worked.
 
 # File viewer functions
 

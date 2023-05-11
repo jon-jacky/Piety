@@ -137,14 +137,9 @@ def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
 
 def display_restore_buffer(bname):
     'Display effect of ed restore_buffer function, fill entire window'
-    global buftop
     # This next line does exactly what ed.restore_buffer does
     ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
-    display.put_cursor(wlines, 1) # window status line
-    display.erase_above() # erase entire window above status line
-    buftop = locate_segment(ed.dot) # buftop: line in buffer at top of window
-    update_window()
-    put_marker(ed.dot, display.white_bg)
+    recenter()
 
 def display_e(iline):
     'Display effect of ed e(dit) fcn: display new buffer contents around iline'
@@ -261,7 +256,6 @@ def display_a(iline):
     We only call this fcn if input() did *not* return '.',
     so we can advance dot to iline now.
     Move cursor down, open next line to prepare for next input() call.
-    If any more buffer lines follow this line, move them all down.
     """
     put_marker(ed.dot, display.clear)
     ed.dot = ed.dot + 1  # advance dot to line just input(), like sked a()
@@ -276,10 +270,10 @@ def e(fname):
     ed.e(fname, display_e)
 
 def b(bname=None):
-    ed.b(bname, display_restore_buffer, update_status)
+    ed.b(bname, display_restore_buffer)
 
 def k():
-    ed.k(display_restore_buffer, update_status)
+    ed.k(display_restore_buffer)
 
 def w(fname=None):
     ed.w(fname, display_set_saved)
