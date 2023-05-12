@@ -119,7 +119,6 @@ To finish display editing and return to line editing in *sked*:
     >>> from sked import *
     ...
 
-(You might want to do this to edit broken display code in *frame*.)
 Here *clr()* dismisses the window by restoring full screen scrolling,
 so the window contents soon scroll away at the top of the terminal.
 Here *from sked import \** copies the commands in *sked*
