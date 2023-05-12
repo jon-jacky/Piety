@@ -125,6 +125,6 @@ so the window contents soon scroll away at the top of the terminal.
 Here *from sked import \** copies the commands in *sked*
 back into the REPL, replacing the commands with the same names from *frame*.
 To resume display editing, repeat *from frame import \** and
-*win()* (*win()* without an argument restores the previous window size).
+*win()* (*win* without an argument restores the previous window size).
 
 Revised May 2023
