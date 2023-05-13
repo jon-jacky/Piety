@@ -11,6 +11,9 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
+- 12 May 2023: revised a(ppend) command now working, merge *inwindow* branch
+  back into *ed* branch.
+
 - 22 Apr 2023: Make *inwindow* branch of *ed* branch to work on display code:
    Type lines into the a (append) command in place in the display window.
 
