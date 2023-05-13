@@ -42,4 +42,4 @@ Recent work in the *rewrite* branch:
 -  1 Feb 2023: Delete most files and directories for a fresh start.
    Revise *BRANCH.md*, *DIRECTORIES.md*, and *bin/paths*.
 
-Revised Apr 2023
+Revised May 2023
