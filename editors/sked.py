@@ -297,7 +297,7 @@ def tail(nlines=None, p=p):  # p is hook for display code
     pagesize = nlines
     p(max(S()-pagesize, 1), S())
 
-# Editing functions
+# Basic editing functions
 
 def a(iline=None, move_dot=move_dot, input_line=input_line,
       move_dot_a=move_dot):
@@ -382,3 +382,30 @@ def c(old=None, new=None, start=None, end=None, count=-1, move_dot=move_dot):
             saved = False # put this *before* move_dot for display code
             move_dot(iline) # puts cursor on the command line for print below
             print(buffer[iline], end='') # print even when display enabled
+
+# Formatting functions
+
+def indent(start=None, end=None, nspaces=None, outdent=False):
+    """
+    indent, move text to the right by prefixing spaces at the left margin.
+    Indent lines start through end inclusive, default just indent at dot.
+    Indent by nspaces spaces, default nindent, assign given nspaces to nindent.
+    If outdent, move text to left by removing characters from left margin.
+    """
+    global nindent
+    if not start: start = dot
+    if not end: end = start
+    if not range_valid(start, end):
+        return
+    if not nspaces: nspaces = nindent
+    nindent = nspaces
+    for iline in range(start, end+1): # start, end inclusive
+        if outdent:
+            buffer[iline] = buffer[iline][nspaces:]
+        else: # indent
+            buffer[iline] = ' '*nspaces + buffer[iline]
+    move_dot(iline)
+
+def outdent(start=None, end=None, nspaces=None):
+    'outdent: move text left by removing characters at left margin.'
+    indent(start, end, nspaces, outdent=True)
