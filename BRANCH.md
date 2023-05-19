@@ -10,6 +10,12 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
+- 19 May 2023: Make *format* branch of *ed* branch to add indent and 
+  wrap functions to *sked* and *edsel*.
+
+- 19 May 2023: rename *frame.py* and *frameinit.py* to *edsel.py* and
+  *edselinit.py*.
+
 - 12 May 2023: revised a(ppend) command now working, merge *inwindow* branch
   back into *ed* branch.
 
