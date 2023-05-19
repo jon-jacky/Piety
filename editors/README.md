@@ -4,9 +4,9 @@ editors
 
 Text editors
 
-- **frame.py**: Display editor that uses the same commands as *sked*.
+- **edsel.py**: Display editor that uses the same commands as *sked*.
 
-- **frameinit.py**: Define and initialize global variables used by *frame*.
+- **edselinit.py**: Define and initialize global variables used by *edsel*.
 
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 
@@ -64,21 +64,21 @@ The commands all have names that are just one or two letters.
 
 The name *sked* is inspired by Kragen Sitaker's Stone Knife Forth.
 
-### frame ###
+### edsel ###
 
-**frame.py** is a display editor that uses the same commands as *sked*.
+**edsel.py** is a display editor that uses the same commands as *sked*.
 
-To edit with *frame*, first begin *sked* as explained in the previous section.
+To edit with *edsel*, first begin *sked* as explained in the previous section.
 Then:
 
     ...
-    >>> import frame
-    >>> from frame import *
+    >>> import edsel
+    >>> from edsel import *
     >>> win(24)
     ...
 
-The command names in *frame* are the same as in *sked*.
-Here *from frame import \** loads the commands from *frame* into 
+The command names in *edsel* are the same as in *sked*.
+Here *from edsel import \** loads the commands from *edsel* into 
 the REPL, replacing the commands with the same names imported earlier
 from *sked*.
 
@@ -109,7 +109,7 @@ If you do want to see their output in the python REPL, you can still
 run the command in *sked* by prefixing the command name with the 
 module name: *sked.p()*.
 
-Help text in *frame* is cryptic.  To see the more helpful text from *sked*
+Help text in *edsel* is cryptic.  To see the more helpful text from *sked*
 you must prefix the command name with the module name: *help(sked.e)*.
 
 To finish display editing and return to line editing in *sked*:
@@ -121,9 +121,12 @@ To finish display editing and return to line editing in *sked*:
 
 Here *clr()* dismisses the window by restoring full screen scrolling,
 so the window contents soon scroll away at the top of the terminal.
-Here *from sked import \** copies the commands in *sked*
-back into the REPL, replacing the commands with the same names from *frame*.
-To resume display editing, repeat *from frame import \** and
+Here *from sked import \** copies the commands in *sked* back into the REPL.
+To resume display editing, repeat *from edsel import \** and
 *win()* (*win* without an argument restores the previous window size).
+
+The name *edsel* is from the [Edsel](https://en.wikipedia.org/wiki/Edsel)
+automobile:
+[*it has the new ideas next year's cars are copying!*](https://www.alamy.com/stock-photo-ford-edsel-advert-for-the-1958-model-edsel-convertible-25549787.html?imageid=B9FEB0EB-5F12-45D5-9327-D0BB90416BF1&p=13044&pn=1&searchId=6cb698f459186cbb7fdcfa8a40b23782&searchtype=0)
 
 Revised May 2023

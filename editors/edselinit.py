@@ -1,5 +1,5 @@
 """
-frameinit.py - Define and initialize global variables used by *frame*.
+edselinit.py - Define and initialize global variables used by *edsel*.
 """
 
 # The top of the frame is always the top of the terminal window, its line 1

@@ -1,6 +1,7 @@
 """
-frame.py - Frame Editor - display buffer contents in a 'frame' of windows
-          as they are updated by commands in the sked line editor.
+edsel.py - Display editor that uses the same commands as *sked*.
+           Display buffer contents in a window
+           as they are updated by commands in the sked line editor.
 """
 
 import sys # skip argument declaration has file=sys.stdout
@@ -11,9 +12,9 @@ import sked as ed
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = flines # if flines is already defined, then frameinit was already exec'd
+    _ = flines # if flines is already defined, then edselinit was already exec'd
 except:
-    exec(open("frameinit.py").read())
+    exec(open("edselinit.py").read())
 
 # Display functions: building blocks
 
@@ -319,7 +320,10 @@ def c(old=None, new=None, start=None, end=None, count=-1):
 # Display functions: window management
 
 def open_frame():
-    'Clear display above status line and limit scrolling to the lines below'
+    """
+    Create a 'frame' to contain windows, potentially more than one.
+    Clear display above status line and limit scrolling to the lines below.
+    """
     display.put_cursor(wlines, 1) # window status line
     display.erase_above()
     display.set_scroll(flines+1, tlines)
@@ -329,6 +333,7 @@ def win(nlines=None):
     Create or resize win(dow) for display at the top of the terminal window.
     Frame size is stored in flines.  First, clear above flines to clear frame.
     If nlines is given, assign to flines.  Smaller nlines enlarges cmd region.
+    Use of flines and nlines here assumes just one window, maybe revise later.
     Set scrolling region to lines below flines.
     Show status line about current buffer at bottom of frame.
     """
