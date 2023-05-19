@@ -2,7 +2,8 @@
 branches
 ========
 
-This is the *ed* branch, which is branched from the *rewrite* branch.
+This is the *format* branch of the *ed* branch, which is branched from 
+the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
