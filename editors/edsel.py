@@ -129,6 +129,17 @@ def display_move_dot(iline):
     else:
         recenter()
 
+def display_change_lines(start, end):
+    'Display effect of ed change_lines fcn. Redraw start to end, move dot.'
+    put_marker(ed.dot, display.clear)
+    ed.dot = end # this is all that ed.change_lines does
+    if in_window(ed.dot):
+        update_lines(start, wline(start), end-start+1) # bstart, wstart, nlines
+        put_marker(ed.dot, display.white_bg)
+        update_status()
+    else:
+        recenter()
+
 def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
     """
     Pass to ed cmds printline arg to suppress printing during display.
@@ -316,6 +327,12 @@ def y(iline=None):
 
 def c(old=None, new=None, start=None, end=None, count=-1):
     ed.c(old, new, start, end, count, display_c)
+
+def indent(start=None, end=None, nspaces=None, outdent=False):
+    ed.indent(start, end, nspaces, outdent, display_change_lines)
+
+def outdent(start=None, end=None, nspaces=None):
+    ed.outdent(start, end, nspaces, display_change_lines) 
 
 # Display functions: window management
 

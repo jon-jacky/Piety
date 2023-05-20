@@ -69,6 +69,10 @@ def move_dot(iline):
     global dot
     dot = iline
 
+def change_lines(start, end):
+    'In sked, just assign end to dot.  Replacement function does much more.'
+    move_dot(end)
+
 def set_saved(status): 
     'Assign status to saved.  Replacement function can update status line'
     global saved
@@ -385,7 +389,8 @@ def c(old=None, new=None, start=None, end=None, count=-1, move_dot=move_dot):
 
 # Formatting functions
 
-def indent(start=None, end=None, nspaces=None, outdent=False):
+def indent(start=None, end=None, nspaces=None, outdent=False,
+           change_lines=change_lines): # hook for display code
     """
     indent, move text to the right by prefixing spaces at the left margin.
     Indent lines start through end inclusive, default just indent at dot.
@@ -404,8 +409,8 @@ def indent(start=None, end=None, nspaces=None, outdent=False):
             buffer[iline] = buffer[iline][nspaces:]
         else: # indent
             buffer[iline] = ' '*nspaces + buffer[iline]
-    move_dot(iline)
+    change_lines(start, end) # move dot to end
 
-def outdent(start=None, end=None, nspaces=None):
+def outdent(start=None, end=None, nspaces=None, change_lines=change_lines):
     'outdent: move text left by removing characters at left margin.'
-    indent(start, end, nspaces, outdent=True)
+    indent(start, end, nspaces, True, change_lines)
