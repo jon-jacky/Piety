@@ -334,6 +334,9 @@ def indent(start=None, end=None, nspaces=None, outdent=False):
 def outdent(start=None, end=None, nspaces=None):
     ed.outdent(start, end, nspaces, display_change_lines) 
 
+def wrap(start=None, end=None, lmarg=None, rmarg=None):
+    ed.wrap(start, end, lmarg, rmarg, move_dot=display_y)
+
 # Display functions: window management
 
 def open_frame():
@@ -365,6 +368,7 @@ def win(nlines=None):
     flines = nlines
     wlines = flines
     ed.pagesize = wlines - 2
+    ed.rmargin = tcols - 2
     open_frame()
     recenter()
 

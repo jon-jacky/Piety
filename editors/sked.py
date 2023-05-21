@@ -12,6 +12,7 @@ The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
 
 import os # for os.path.basename, used in store_buffer
+import textwrap
 
 # Define and initialize global variables used by sked editing functions.
 # Conditinally exec only the *first* time this module is imported in a session.
@@ -394,23 +395,52 @@ def indent(start=None, end=None, nspaces=None, outdent=False,
     """
     indent, move text to the right by prefixing spaces at the left margin.
     Indent lines start through end inclusive, default just indent at dot.
-    Indent by nspaces spaces, default nindent, assign given nspaces to nindent.
+    Indent by nspaces spaces, default lmargin, assign given nspaces to lmargin.
     If outdent, move text to left by removing characters from left margin.
     """
-    global nindent
+    global lmargin
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
         return
-    if not nspaces: nspaces = nindent
-    nindent = nspaces
+    if not nspaces: nspaces = lmargin
+    lmargin = nspaces # int
+    margin = ' '*nspaces # str
     for iline in range(start, end+1): # start, end inclusive
         if outdent:
             buffer[iline] = buffer[iline][nspaces:]
         else: # indent
-            buffer[iline] = ' '*nspaces + buffer[iline]
+            buffer[iline] = margin + buffer[iline]
     change_lines(start, end) # move dot to end
 
 def outdent(start=None, end=None, nspaces=None, change_lines=change_lines):
     'outdent: move text left by removing characters at left margin.'
     indent(start, end, nspaces, True, change_lines)
+
+def wrap(start=None, end=None, lmarg=None, rmarg=None,
+         move_dot=move_dot): # hook for display code
+    """
+    Replace lines from start through end with wrapped (filled) lines.
+    start and end both default to dot, you usually assign at least one.
+    left and right margins default to lmargin, rmargin.
+    if lmarg (or rmarg) is given, lmargin (or rmargin) is set to that value.
+    """
+    global lmargin, rmargin, yank
+    if not start: start = dot
+    if not end: end = dot
+    if not range_valid(start, end):
+        return
+    if not lmarg: lmarg = lmargin
+    lmargin = lmarg
+    if not rmarg: rmarg = rmargin
+    rmargin = rmarg
+    lines = buffer[start:end+1]
+    slines = ''.join(lines) # textwrap requires single string not list
+    margin = lmargin*' '
+    wlines = textwrap.wrap(slines, width=rmargin, initial_indent=margin,
+                           subsequent_indent=margin) # returns list of lines
+    wrapped = [ line + '\n' for line in wlines ]
+    buffer[start:end+1] = []  # delete unwrapped lines
+    buffer[start:start] = wrapped # sic, insert lines at this position
+    yank = wrapped # HACK so we can use edsel display_y for move_dot
+    move_dot(start + len(wrapped) - 1) # move dot to end of wrapped text
