@@ -421,7 +421,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
          move_dot=move_dot): # hook for display code
     """
     Replace lines from start through end with wrapped (filled) lines.
-    start and end both default to dot, you usually assign at least one.
+    start and end both default to dot, good for wrapping one long line.
     left and right margins default to lmargin, rmargin.
     if lmarg (or rmarg) is given, lmargin (or rmargin) is set to that value.
     """
@@ -442,5 +442,20 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     wrapped = [ line + '\n' for line in wlines ]
     buffer[start:end+1] = []  # delete unwrapped lines
     buffer[start:start] = wrapped # sic, insert lines at this position
-    yank = wrapped # HACK so we can use edsel display_y for move_dot
+    yank = wrapped # FIXME hack so we can use edsel display_y for move_dot
     move_dot(start + len(wrapped) - 1) # move dot to end of wrapped text
+
+def j(start=None, end=None, move_dot=move_dot):
+    """
+    j(oin) successive lines into one line. Replace line breaks with spaces.
+    start defaults to dot, end defaults to dot+1 to join next line to dot.
+    """
+    if not start: start = dot
+    if not end: end = dot+1
+    if not range_valid(start, end):
+        return
+    lines = [ line.rstrip('\n') for line in buffer[start:end+1] ]
+    joined = ' '.join(lines)+'\n' # put spaces between joined lines
+    buffer[start:end+1] = [] # delete unjoined lines
+    buffer[start:start] = [ joined ] # insert [ joined ] lines at start
+    move_dot(start) # move dot to joined line

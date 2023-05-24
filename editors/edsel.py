@@ -219,6 +219,12 @@ def display_c(iline):
     put_marker(ed.dot, display.white_bg)
     update_status()
 
+def display_j(iline):
+    'Display effect of ed j(oin lines) function.'
+    display.put_cursor(wline(iline), 1)
+    display.putstr(ed.buffer[iline].rstrip('\n')[:tcols])
+    display_d(iline)
+
 # Display functions: append mode for sked a() command
 
 # Enter append mode by typing a() in the REPL.
@@ -336,6 +342,9 @@ def outdent(start=None, end=None, nspaces=None):
 
 def wrap(start=None, end=None, lmarg=None, rmarg=None):
     ed.wrap(start, end, lmarg, rmarg, move_dot=display_y)
+
+def j(start=None, end=None):
+    ed.j(start, end, move_dot=display_j)
 
 # Display functions: window management
 
