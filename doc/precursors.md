@@ -131,6 +131,13 @@ Here are some examples.
 | [PylotOS](https://www.sra.uni-hannover.de/People/naumann/2018_master_naumann.pdf), also [here](https://www.stefannaumann.de/static/resources/2017-12-mpy.pdf), [via](https://www.stefannaumann.de/)  | S  | 2018 | Micro Python | Bare machine | Raspberry Pi Zero | "In PylotOS the domain concept is the equivalent to processes ... Domains cannot share any state or information with other domains." -- How !? |
 | [Kernel module](https://medium.com/@yon.goldschmidt/running-python-in-the-linux-kernel-7cbcbd44503c), also [github](https://github.com/Jongy/micropython/tree/linux-kernel/ports/linux-kernel) | P | 2019 | Micro Python | Hosted | Linux | "port of MicroPython that runs as a Linux kernel module."  |
 | [snakeware](https://github.com/joshiemoore/snakeware), also [HN](https://news.ycombinator.com/item?id=23391380), [reddit](https://www.reddit.com/r/Python/comments/gstn6b/snakeware_a_new_linux_distro_with_a_fully_python/) | P | 2020 | Python | Hosted | Linux (with pygame)  | "Linux distro with a Python userspace inspired by the Commodore 64" |
+| [Tulip Creative Computer](https://notes.variogram.com/2023/02/14/tulip/),
+also [GitHub](https://github.com/bwhitman/tulipcc)
+| P | 2022 -- | Micro Python | Hosted, Bare Machine 
+| [Mac OS 10.15, ESP32 dev board + custom PCB]
+(https://github.com/bwhitman/tulipcc/blob/main/docs/tulip_build.md)
+| "a self contained portable creative computer, with a display and keyboard and sound. ...
+running in real time, on specialized hardware." |
 
 Key to **T** (project **Type**) column, perhaps an indicator of
 project size and longevity:
