@@ -8,6 +8,8 @@ Text editors
 
 - **edselinit.py**: Define and initialize global variables used by *edsel*.
 
+- **pmacs.py**: Invoke editor functions with emacs keycodes.
+
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 
 - **skedinit.py**: Define and initialize global variables used by *sked*.
