@@ -2,13 +2,18 @@
 branches
 ========
 
-This is the *ed* branch, which is branched from the *rewrite* branch.
+This is the *pmacs* branch, branched from the *ed* branch, which is
+branched from the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 28 May 2023: Make *pmacs* branch to *ed* branch to invoke editor functions
+  with emacs keycodes so you don't have to invoke the functions from the 
+  Python REPL.
 
 - 28 May 2023: Indent, wrap, and join functions working, merge *format*
   branch back into *ed* branch.
