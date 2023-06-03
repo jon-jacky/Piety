@@ -2,18 +2,16 @@
 keyseq.py
 =========
 
-Construct emacs-style key sequence from one or more characters.
+**keyseq.py**: construct emacs-style key sequence from one or more characters.
 
 Define function keyseq(c).  On each call, pass in a single character.
 Do not block waiting for sequence to complete, return after each call.
 When sequence is complete, return the entire sequence (maybe single char).
 When sequence is incomplete, return the empty string ''.
+Pass in C_g (^G) to cancel incomplete sequence in progress and just return C_g.
+
 Following emacs nomenclature, we call a sequence of one or more characters
 that can be used as an editor command a 'key'.
-
-This module provides one function, keyseq, which takes a single character
-argument and returns a key (sequence), or returns the empty string to indicate 
-an incomplete sequence is still being constructed.
 
 This function does *not* block after receiving a prefix character  such
 as C_x.  Instead, this function  always returns immediately after
@@ -43,5 +41,17 @@ reading C_g (that is, CTRL g or ^g) at any time ends waiting,
 discards any incomplete sequence, and immediately returns just C_g.
 So the user can type C_g if a program appears hung when reading a command.
 C_g is used as the Cancel command by some programs.
+
+This module is in the vt_terminal directory (not the editors directory or
+elsewhere) because here meta keys M-... are key sequences starting
+with the ASCII escape character.  Also, here cursor arrow keys
+are key sequences staring with the ANSI control sequence introducer (csi)
+esc-[   These are true of VT-style video terminals and emulators but might
+not be true of other platforms, where they might be represented by 
+keyboard scan codes or something else.
+
+In the modules in the editors directory, keys (including key sequences) 
+are referred to only by name.  Their internal structure as sequences of
+ASCII characters (or something else) is not visible.
 
 Revised Jun 2023
