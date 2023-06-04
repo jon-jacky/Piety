@@ -1,11 +1,5 @@
 """
 keyseq.py - construct emacs-style key sequence from one or more characters.
-
-Define function keyseq(c).  On each call, pass in a single character.
-Do not block waiting for sequence to complete, return after each call.
-When sequence is complete, return the entire sequence (maybe single char).
-When sequence is incomplete, return the empty string ''.
-Pass in C_g (^G) to cancel incomplete sequence in progress and just return C_g.
 """
 
 import util, terminal, key
@@ -19,6 +13,7 @@ def keyseq(c):
     Do not block waiting for sequence to complete, return after each call.
     When sequence is complete, return the entire sequence (maybe single char).
     When sequence is incomplete, return the empty string ''.
+    Pass in C_g (^G) to cancel incomplete sequence and just return C_g.
     """
     global prefix
 
