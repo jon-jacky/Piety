@@ -29,7 +29,7 @@ def request(prompt):
 
 def request_search():
     if not prev_k in (key.C_s, key.C_r):
-        response = request(f'search (default {ed.searchstring}): ')
+        response = request(f'Search string (default {ed.searchstring}): ')
         if response: ed.searchstring = response
 
 def fwd_search():
@@ -40,6 +40,19 @@ def bkwd_search():
     request_search()
     edsel.r()
 
+def switch_buffer():
+    response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
+    if response: ed.prev_bufname = response
+    edsel.b()
+
+def replace_string():
+    response = request(f'Replace string (default {ed.searchstring}): ') 
+    if response: ed.searchstring = response
+    response = request(
+     f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
+    if response: ed.replacestring = response
+    edsel.c()
+
 # Table from keys to editor functions
 keycode = {
     # cursor movement
@@ -49,9 +62,10 @@ keycode = {
     key.M_v: edsel.rv,  # page up
     key.M_lt: (lambda: edsel.p(1)), # go to top, line 1.  lt is <.
     key.M_gt: (lambda: edsel.p(ed.S())), # go to bottom, last line.  gt is >.
-    # search
+    # search and replace
     key.C_s: fwd_search,
     key.C_r: bkwd_search,
+    key.M_percent: replace_string, # M-%
     # editing
     key.C_k: edsel.d,   # delete line
     key.C_y: edsel.y,   # yank (paste) deleted line
@@ -59,6 +73,7 @@ keycode = {
     # formatting
     key.M_q: edsel.wrap,  # wrap, single long line
     # buffers and files
+    key.C_x + 'b' : switch_buffer,
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
@@ -92,6 +107,7 @@ def pm():
         k = keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.C_z:
+                prev_k = k
                 break
             else:
                 fcn = keycode.get(k, lambda: util.putstr(key.bel))

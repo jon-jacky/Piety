@@ -95,6 +95,8 @@ M_z = esc + 'z'
 M_lt = esc + '<'
 M_gt = esc + '>'
 
+M_percent = esc + '%'
+
 # ANSI codes for arrow keys
 
 csi = esc+'[' # ANSI control sequence introducer
