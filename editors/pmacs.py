@@ -53,6 +53,14 @@ def replace_string():
     if response: ed.replacestring = response
     edsel.c()
 
+def find_file():
+    filename = request('Find file: ')
+    edsel.e(filename)
+
+def write_named_file():
+    filename = request('Write file: ')
+    edsel.w(filename)
+
 # Table from keys to editor functions
 keycode = {
     # cursor movement
@@ -74,7 +82,10 @@ keycode = {
     key.M_q: edsel.wrap,  # wrap, single long line
     # buffers and files
     key.C_x + 'b' : switch_buffer,
+    key.C_x + key.C_f : find_file,
+    key.C_x + 'k' : edsel.k, # edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
+    key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
 }
