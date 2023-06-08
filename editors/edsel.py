@@ -332,7 +332,7 @@ def y(iline=None):
     ed.y(iline, display_y)
 
 def c(old=None, new=None, start=None, end=None, count=-1):
-    ed.c(old, new, start, end, count, display_c)
+    ed.c(old, new, start, end, count, print_nothing, display_c)
 
 def indent(start=None, end=None, nspaces=None, outdent=False):
     ed.indent(start, end, nspaces, outdent, display_change_lines)

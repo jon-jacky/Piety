@@ -359,7 +359,8 @@ def y(iline=None, move_dot=move_dot): # hook for display code
     saved = False # put this before move_dot for display
     move_dot(iline + len(yank))
 
-def c(old=None, new=None, start=None, end=None, count=-1, move_dot=move_dot):
+def c(old=None, new=None, start=None, end=None, count=-1, printline=print,
+      move_dot=move_dot):
     """
     c(hange), replace old string with new string on each line in range.
     Replace in lines start through end, default replaces in current line.
@@ -386,7 +387,7 @@ def c(old=None, new=None, start=None, end=None, count=-1, move_dot=move_dot):
             buffer[iline] = buffer[iline].replace(old, new, count)
             saved = False # put this *before* move_dot for display code
             move_dot(iline) # puts cursor on the command line for print below
-            print(buffer[iline], end='') # print even when display enabled
+            printline(buffer[iline], end='') # don't print when display enabled
 
 # Formatting functions
 
