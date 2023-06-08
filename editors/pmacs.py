@@ -13,11 +13,18 @@ import util, terminal, key, display, edsel
 import sked as ed
 from keyseq import keyseq
 
+
 def append():
     'Restore line mode, run edsel a(), return to char mode'
     terminal.set_line_mode()
     edsel.a()
     terminal.set_char_mode()
+
+def inform(message):
+    'Put informational message on prompt line, do not prompt, return nothing'
+    display.put_cursor(promptline, 1)
+    display.kill_whole_line()
+    display.putstr(message)
 
 def request(prompt):
     display.put_cursor(promptline, 1)
@@ -61,6 +68,28 @@ def write_named_file():
     filename = request('Write file: ')
     edsel.w(filename)
 
+mark = 1 # mark:ed.dot defines range of lines for cut C_w etc.
+
+def set_mark():
+    'Set mark at current dot'
+    global mark
+    mark = ed.dot
+    inform(f'Mark set at line {mark}')
+
+def exchange_mark():
+    'Exchange mark and dot so you can see mark.'
+    global mark
+    iline, mark = mark, ed.dot
+    edsel.display_move_dot(iline) # assigns ed.dot = iline
+
+# FIXME: emacs C-w cuts from mark (inclusive) up to dot *exclusive*.
+# But present edsel.d() deletes through dot *inclusive*.
+# For now, our cut() must work the same way so edsel d() display still works.
+# Later fix sked, edsel, pmacs so d() cut() and y() work like emacs C_w C_y.
+def cut():
+    (start, end) = (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
+    edsel.d(start, end)
+
 # Table from keys to editor functions
 keycode = {
     # cursor movement
@@ -78,6 +107,10 @@ keycode = {
     key.C_k: edsel.d,   # delete line
     key.C_y: edsel.y,   # yank (paste) deleted line
     key.cr: append,   # open line and enter append mode 
+    # cut and paste
+    key.C_at: set_mark,
+    key.C_x + key.C_x : exchange_mark, # exchange dot and mark,
+    key.C_w:  cut,    # use existing C_y (yank) for paste
     # formatting
     key.M_q: edsel.wrap,  # wrap, single long line
     # buffers and files
