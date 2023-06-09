@@ -82,12 +82,16 @@ def exchange_mark():
     iline, mark = mark, ed.dot
     edsel.display_move_dot(iline) # assigns ed.dot = iline
 
+def range():
+    'Return start, end for ascending range defined by mark and dot'
+    return (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
+
 # FIXME: emacs C-w cuts from mark (inclusive) up to dot *exclusive*.
 # But present edsel.d() deletes through dot *inclusive*.
 # For now, our cut() must work the same way so edsel d() display still works.
 # Later fix sked, edsel, pmacs so d() cut() and y() work like emacs C_w C_y.
 def cut():
-    (start, end) = (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
+    start, end = range()
     edsel.d(start, end)
 
 # Table from keys to editor functions
