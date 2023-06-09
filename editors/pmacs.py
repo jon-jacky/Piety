@@ -94,6 +94,13 @@ def cut():
     start, end = range()
     edsel.d(start, end)
 
+def yank():
+    'Paste yank buffer after dot, move mark to first pasted line'
+    global mark
+    prev_dot = ed.dot
+    edsel.y()
+    mark = prev_dot + 1 # first pasted line
+
 # Table from keys to editor functions
 keycode = {
     # cursor movement
@@ -109,7 +116,7 @@ keycode = {
     key.M_percent: replace_string, # M-%
     # editing
     key.C_k: edsel.d,   # delete line
-    key.C_y: edsel.y,   # yank (paste) deleted line
+    key.C_y: yank,   # yank (paste) deleted line
     key.cr: append,   # open line and enter append mode 
     # cut and paste
     key.C_at: set_mark,
