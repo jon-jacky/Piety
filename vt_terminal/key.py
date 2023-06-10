@@ -92,10 +92,12 @@ M_x = esc + 'x'
 M_y = esc + 'y'
 M_z = esc + 'z'
 
-M_lt = esc + '<'
-M_gt = esc + '>'
+M_lt = esc + '<' # emacs go to top
+M_gt = esc + '>' # emacs go to end
 
-M_percent = esc + '%'
+M_percent = esc + '%' # emacs replace string
+
+M_carat = esc + '^' # emacs join lines
 
 # ANSI codes for arrow keys
 

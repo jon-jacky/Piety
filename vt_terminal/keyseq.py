@@ -24,7 +24,7 @@ def keyseq(c):
         return key.C_g
 
     # No prefix, prefix character arrives, start prefix
-    if prefix == '' and c in (key.esc, key.C_x): # more to come?
+    if prefix == '' and c in (key.esc, key.C_x, key.C_c): # more to come?
         prefix = c
         return ''
 
@@ -58,6 +58,13 @@ def keyseq(c):
     # ctrl-X prefix for window commands and buffer commands
     elif prefix == key.C_x:
         # C_x + one more key
+        kseq = prefix + c
+        prefix = ''
+        return kseq
+
+    # ctrl-C prefix for indent commands
+    elif prefix == key.C_c:
+        # C_c + one more key
         kseq = prefix + c
         prefix = ''
         return kseq

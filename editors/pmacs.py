@@ -9,10 +9,8 @@ Then, if we edit more commands into pm, we can load them without restarting
 the session by reload(pmacs).  The argument to reload must be the module name.
 """
 
-import util, terminal, key, display, edsel
+import util, terminal, key, keyseq, display, edsel
 import sked as ed
-from keyseq import keyseq
-
 
 def append():
     'Restore line mode, run edsel a(), return to char mode'
@@ -101,6 +99,22 @@ def yank():
     edsel.y()
     mark = prev_dot + 1 # first pasted line
 
+def wrap():
+    start, end = range()
+    edsel.wrap(start, end)
+
+def join():
+    start, end = range()
+    edsel.j(start, end)
+
+def indent():
+    start, end = range()
+    edsel.indent(start, end)
+
+def outdent():
+    start, end = range()
+    edsel.outdent(start, end)
+
 # Table from keys to editor functions
 keycode = {
     # cursor movement
@@ -121,13 +135,16 @@ keycode = {
     # cut and paste
     key.C_at: set_mark,
     key.C_x + key.C_x : exchange_mark, # exchange dot and mark,
-    key.C_w:  cut,    # use existing C_y (yank) for paste
+    key.C_w:  cut,    # use existing C_y (yank, above) for paste
     # formatting
-    key.M_q: edsel.wrap,  # wrap, single long line
+    key.M_q: wrap,
+    key.M_carat: join,
+    key.C_c + '>': indent, # like in emacs Python mode
+    key.C_c + '<': outdent,
     # buffers and files
     key.C_x + 'b' : switch_buffer,
     key.C_x + key.C_f : find_file,
-    key.C_x + 'k' : edsel.k, # edsel.k prompts if file is unsaved
+    key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     # miscellaneous
@@ -159,7 +176,7 @@ def pm():
     terminal.set_char_mode()
     while True:
         c = terminal.getchar()
-        k = keyseq(c)
+        k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.C_z:
                 prev_k = k
