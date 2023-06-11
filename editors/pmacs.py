@@ -9,6 +9,7 @@ Then, if we edit more commands into pm, we can load them without restarting
 the session by reload(pmacs).  The argument to reload must be the module name.
 """
 
+import sys, importlib
 import util, terminal, key, keyseq, display, edsel
 import sked as ed
 
@@ -88,6 +89,7 @@ def range():
 # But present edsel.d() deletes through dot *inclusive*.
 # For now, our cut() must work the same way so edsel d() display still works.
 # Later fix sked, edsel, pmacs so d() cut() and y() work like emacs C_w C_y.
+
 def cut():
     start, end = range()
     edsel.d(start, end)
@@ -114,6 +116,17 @@ def indent():
 def outdent():
     start, end = range()
     edsel.outdent(start, end)
+
+def reload():
+    'Reload module for current buffer'
+    modname = ed.bufname[:-3] # trim trailing '.py'
+    importlib.reload(sys.modules[modname])
+    print(f'Reload module {modname}')
+
+def save_reload():
+    'Write out buffer, reload module, so file and module stay consistent.'
+    ed.w()
+    reload() # synchronization?  Does w() finish before reload() begins?
 
 # Table from keys to editor functions
 keycode = {
@@ -147,6 +160,7 @@ keycode = {
     key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
+    key.C_x + key.C_r : save_reload, # emacs find-file read-only is different
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
 }

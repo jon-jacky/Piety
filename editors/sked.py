@@ -145,7 +145,7 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
         filename = fname
         bufname = bname(filename)
         set_saved(True)
-        print(f'{filename}, {S()} lines')
+        print(f'Wrote {filename}, {S()} lines')
 
 def b(bname=None, restore_buffer=restore_buffer): 
     """
