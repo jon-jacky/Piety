@@ -156,16 +156,17 @@ keycode = {
     key.C_c + '<': outdent,
     # buffers and files
     key.C_x + 'b' : switch_buffer,
+    # key.C_x + key.C_b: ed.n, # list buffers FIXME \n in char mode
     key.C_x + key.C_f : find_file,
     key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
-    key.C_x + key.C_r : save_reload, # emacs find-file read-only is different
+    key.C_x + key.C_r : save_reload, # *not* like emacs find-file read-only
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
 }
 
-promptline = 21
+promptline = edsel.flines+1
 
 def open_promptline():
     global promptline
