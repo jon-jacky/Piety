@@ -336,8 +336,8 @@ def d(start=None, end=None, move_dot=move_dot): # hook for display code
     """
     d(elete) lines start through end *inclusive*.
     Save deleted lines in yank (paste) buffer.
-    Set dot to last line *preceding* deletion, 
-    so we can then use y(ank) to replace the deletion.
+    Set dot to first line *following* deletion, 
+    so consecutive d's delete a section.
     """
     global buffer, yank, saved
     if not start: start = dot
@@ -347,17 +347,17 @@ def d(start=None, end=None, move_dot=move_dot): # hook for display code
     yank = buffer[start:end+1] # range includes end, unlike Python slices
     buffer[start:end+1] = [] 
     saved = False # put this before move_dot for display
-    move_dot(start-1)
+    move_dot(start) # FIXME what if we delete last line in buffer?
 
 def y(iline=None, move_dot=move_dot): # hook for display code
-    'y(ank), that is paste, yank buffer contents after iline (default dot)'
+    'y(ank), that is paste, yank buffer contents *before* iline (default dot)'
     global buffer, saved
     if not iline: iline = dot
     if not line_valid(iline):
         return
-    buffer[iline+1:iline+1] = yank # append yank buffer contents after iline
+    buffer[iline:iline] = yank # append yank buffer contents *before* iline
     saved = False # put this before move_dot for display
-    move_dot(iline + len(yank))
+    move_dot(iline + len(yank)) # same text line, now first after yanked
 
 def c(old=None, new=None, start=None, end=None, count=-1, printline=print,
       move_dot=move_dot):

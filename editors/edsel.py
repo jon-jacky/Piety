@@ -175,9 +175,9 @@ def display_d(iline):
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that move_dot(iline) does
     if in_window(ed.dot):
-        update_below(ed.dot + 1)
-        nlines = wlines - wline(ed.dot + 1) # n of lines to end of window
-        nblines = ed.S() - ed.dot # n of lines to end of buffer
+        update_below(ed.dot)
+        nlines = wlines - wline(ed.dot) # n of lines to end of window
+        nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
         nelines = nlines - nblines # n of empty lines at end of window
         for iline in range(nelines+1): # make empty lines at end of window
             display.kill_whole_line()
@@ -191,15 +191,16 @@ def display_y(iline):
     """
     Display effect of ed y(ank) function, appending one or more deleted lines.
     All lines below the appended lines must be moved down.
-    iline here is the new dot, the last of the lines appended from yank.
-    The first of the lines appended from yank is at iline - len(yank) + 1
+    iline here is the new dot, the first line after the yanked lines
+    (this is actually the same line of text where dot was before yank).
+    The first of the lines appended from yank is at iline - len(yank)
     Update the display from there to the end of the window.
     Also move marker and update status line. Page down if needed.
     """
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that move_dot(iline) does
     if in_window(ed.dot):
-        update_below(ed.dot - len(ed.yank) + 1) # first yanked line
+        update_below(ed.dot - len(ed.yank)) # first yanked line
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:

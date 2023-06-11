@@ -99,7 +99,7 @@ def yank():
     global mark
     prev_dot = ed.dot
     edsel.y()
-    mark = prev_dot + 1 # first pasted line
+    mark = prev_dot # first pasted line
 
 def wrap():
     start, end = range()
@@ -156,7 +156,7 @@ keycode = {
     key.C_c + '<': outdent,
     # buffers and files
     key.C_x + 'b' : switch_buffer,
-    key.C_x + key.C_b: ed.n, # list buffers FIXME \n in char mode
+    key.C_x + key.C_b: ed.n, # list buffers  
     key.C_x + key.C_f : find_file,
     key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
