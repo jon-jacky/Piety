@@ -145,7 +145,7 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
         filename = fname
         bufname = bname(filename)
         set_saved(True)
-        print(f'Wrote {filename}, {S()} lines')
+        print(f'Wrote {filename}, {S()} lines\n\r', end='') # \n\r char mode
 
 def b(bname=None, restore_buffer=restore_buffer): 
     """
@@ -179,7 +179,7 @@ def bstatus(bname):
 
 def n():
     'n(ames), print names and other information about stored buffers'
-    for bname in buffers: print(bstatus(bname))
+    for bname in buffers: print(bstatus(bname)+'\n\r', end='') # for char mode
 
 def k(restore_buffer=restore_buffer):
     """

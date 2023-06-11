@@ -121,7 +121,7 @@ def reload():
     'Reload module for current buffer'
     modname = ed.bufname[:-3] # trim trailing '.py'
     importlib.reload(sys.modules[modname])
-    print(f'Reload module {modname}')
+    print(f'Reload module {modname}\n\r', end='') # \n\r end for char mode
 
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'
@@ -156,7 +156,7 @@ keycode = {
     key.C_c + '<': outdent,
     # buffers and files
     key.C_x + 'b' : switch_buffer,
-    # key.C_x + key.C_b: ed.n, # list buffers FIXME \n in char mode
+    key.C_x + key.C_b: ed.n, # list buffers FIXME \n in char mode
     key.C_x + key.C_f : find_file,
     key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
@@ -174,6 +174,7 @@ def open_promptline():
     display.set_scroll(promptline+1, edsel.tlines) # open prompt line
     display.put_cursor(promptline, 1)
     display.kill_whole_line() 
+    display.put_cursor(edsel.tlines, 1)
 
 def close_promptline():
     display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
