@@ -87,10 +87,6 @@ def exchange_mark():
     iline, mark = mark, ed.dot
     edsel.display_move_dot(iline) # assigns ed.dot = iline
 
-def range():
-    'Return start, end for ascending range defined by mark and dot'
-    return (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
-
 def in_region(f):
     'Execute function f on the region defined by mark and dot.'
     global mark
@@ -98,40 +94,8 @@ def in_region(f):
         start, end = (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
         f(start, end)
     else:
-        f()
+        f() # mark deactivated, just execute f on dot
     mark = 0 # deactivate mark
-
-# FIXME: emacs C-w cuts from mark (inclusive) up to dot *exclusive*.
-# But present edsel.d() deletes through dot *inclusive*.
-# For now, our cut() must work the same way so edsel d() display still works.
-# Later fix sked, edsel, pmacs so d() cut() and y() work like emacs C_w C_y.
-
-def cut():
-    start, end = range()
-    edsel.d(start, end)
-
-def yank():
-    'Paste yank buffer after dot, move mark to first pasted line'
-    global mark
-    prev_dot = ed.dot
-    edsel.y()
-    mark = prev_dot # first pasted line
-
-def wrap():
-    start, end = range()
-    edsel.wrap(start, end)
-
-def join():
-    start, end = range()
-    edsel.j(start, end)
-
-def indent():
-    start, end = range()
-    edsel.indent(start, end)
-
-def outdent():
-    start, end = range()
-    edsel.outdent(start, end)
 
 def reload():
     'Reload module for current buffer'
@@ -159,18 +123,17 @@ keycode = {
     key.M_percent: replace_string, # M-%
     # editing
     key.C_k: edsel.d,   # delete line
-    key.C_y: yank,   # yank (paste) deleted line
+    key.C_y: edsel.y, # yank (paste) deleted lines
     key.cr: append,   # open line and enter append mode 
     # cut and paste
     key.C_at: set_mark,
     key.C_x + key.C_x : exchange_mark, # exchange dot and mark,
-    key.C_w:  cut,    # use existing C_y (yank, above) for paste
+    key.C_w: (lambda: in_region(edsel.d)), # cut, use C_y (yank above) to paste
     # formatting
-    # key.M_q: wrap,
     key.M_q: (lambda: in_region(edsel.wrap)),
-    key.M_carat: join,
-    key.C_c + '>': indent, # like in emacs Python mode
-    key.C_c + '<': outdent,
+    key.M_carat: (lambda: in_region(edsel.j)), # join lines
+    key.C_c + '>': (lambda: in_region(edsel.indent)), # like emacs Python mode
+    key.C_c + '<': (lambda: in_region(edsel.outdent)),
     # buffers and files
     key.C_x + 'b' : switch_buffer,
     key.C_x + key.C_b: ed.n, # list buffers  
@@ -198,7 +161,7 @@ def pm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
     Supported keys and the fcns they invoke are expressed in keycode table.
-    Exit by typing M_x (that's alt X).
+    Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
     global prev_k
     open_promptline()
