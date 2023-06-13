@@ -13,6 +13,14 @@ import sys, importlib
 import util, terminal, key, keyseq, display, edsel
 import sked as ed
 
+# Define and initialize global variables used by pmacs.
+# Conditinally exec only the *first* time this module is imported in a session.
+# Then we can reload this module without re-initializing those variables.
+try:
+    _ = mark # if mark is already defined, then pmacsinit was already exec'd
+except:
+    exec(open("pmacsinit.py").read())
+
 def append():
     'Restore line mode, run edsel a(), return to char mode'
     terminal.set_line_mode()
@@ -67,8 +75,6 @@ def write_named_file():
     filename = request('Write file: ')
     edsel.w(filename)
 
-mark = 1 # mark:ed.dot defines range of lines for cut C_w etc.
-
 def set_mark():
     'Set mark at current dot'
     global mark
@@ -84,6 +90,16 @@ def exchange_mark():
 def range():
     'Return start, end for ascending range defined by mark and dot'
     return (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
+
+def in_region(f):
+    'Execute function f on the region defined by mark and dot.'
+    global mark
+    if mark: # mark activated
+        start, end = (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
+        f(start, end)
+    else:
+        f()
+    mark = 0 # deactivate mark
 
 # FIXME: emacs C-w cuts from mark (inclusive) up to dot *exclusive*.
 # But present edsel.d() deletes through dot *inclusive*.
@@ -150,7 +166,8 @@ keycode = {
     key.C_x + key.C_x : exchange_mark, # exchange dot and mark,
     key.C_w:  cut,    # use existing C_y (yank, above) for paste
     # formatting
-    key.M_q: wrap,
+    # key.M_q: wrap,
+    key.M_q: (lambda: in_region(edsel.wrap)),
     key.M_carat: join,
     key.C_c + '>': indent, # like in emacs Python mode
     key.C_c + '<': outdent,
@@ -166,8 +183,6 @@ keycode = {
     key.C_l: edsel.refresh, # refresh, frame
 }
 
-promptline = edsel.flines+1
-
 def open_promptline():
     global promptline
     promptline = edsel.flines+1 # may have changed since prev pm() call
@@ -179,13 +194,11 @@ def open_promptline():
 def close_promptline():
     display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
 
-prev_k = key.C_z
-
 def pm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
     Supported keys and the fcns they invoke are expressed in keycode table.
-    Exit by typing C_z (that's ^Z).
+    Exit by typing M_x (that's alt X).
     """
     global prev_k
     open_promptline()
@@ -194,7 +207,7 @@ def pm():
         c = terminal.getchar()
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
-            if k == key.C_z:
+            if k == key.M_x:
                 prev_k = k
                 break
             else:

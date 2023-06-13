@@ -355,7 +355,7 @@ def y(iline=None, move_dot=move_dot): # hook for display code
     if not iline: iline = dot
     if not line_valid(iline):
         return
-    buffer[iline:iline] = yank # append yank buffer contents *before* iline
+    buffer[iline:iline] = yank # insert yank buffer contents *before* iline
     saved = False # put this before move_dot for display
     move_dot(iline + len(yank)) # same text line, now first after yanked
 
