@@ -8,7 +8,9 @@ Text editors
 
 - **edselinit.py**: Define and initialize global variables used by *edsel*.
 
-- **pmacs.py**: Invoke editor functions with emacs keycodes.
+- **dmacs.py**: Invoke editor functions with emacs keycodes.
+
+- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
 
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 
@@ -131,4 +133,4 @@ The name *edsel* is from the [Edsel](https://en.wikipedia.org/wiki/Edsel)
 automobile:
 [*it has the new ideas next year's cars are copying!*](https://www.alamy.com/stock-photo-ford-edsel-advert-for-the-1958-model-edsel-convertible-25549787.html?imageid=B9FEB0EB-5F12-45D5-9327-D0BB90416BF1&p=13044&pn=1&searchId=6cb698f459186cbb7fdcfa8a40b23782&searchtype=0)
 
-Revised May 2023
+Revised Jun 2023

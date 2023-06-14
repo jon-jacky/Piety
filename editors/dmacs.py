@@ -1,25 +1,27 @@
 """
-pmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
+dmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
 
-The module name pmacs differs from the editor function name pm
+The module name dmacs differs from the editor function name dm
 so the function name does not shadow the module name when we do
-'from pmacs import pm' so we can type the function name in the REPL
-without the module name prefix, just pm() not pmacs.pm().   
-Then, if we edit more commands into pm, we can load them without restarting
-the session by reload(pmacs).  The argument to reload must be the module name.
+'from dmacs import dm' so we can type the function name in the REPL
+without the module name prefix, just dm() not dmacs.dm().   
+Then, if we edit more commands into dm, we can load them without restarting
+the session by reload(dmacs).  The argument to reload must be the module name.
+
+The name dmacs means 'dumb emacs' or maybe 'grade D emacs', barely not F (fail).
 """
 
 import sys, importlib
 import util, terminal, key, keyseq, display, edsel
 import sked as ed
 
-# Define and initialize global variables used by pmacs.
+# Define and initialize global variables used by dmacs.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = mark # if mark is already defined, then pmacsinit was already exec'd
+    _ = mark # if mark is already defined, then dmacsinit was already exec'd
 except:
-    exec(open("pmacsinit.py").read())
+    exec(open("dmacsinit.py").read())
 
 def append():
     'Restore line mode, run edsel a(), return to char mode'
@@ -148,7 +150,7 @@ keycode = {
 
 def open_promptline():
     global promptline
-    promptline = edsel.flines+1 # may have changed since prev pm() call
+    promptline = edsel.flines+1 # may have changed since prev dm() call
     display.set_scroll(promptline+1, edsel.tlines) # open prompt line
     display.put_cursor(promptline, 1)
     display.kill_whole_line() 
@@ -157,9 +159,9 @@ def open_promptline():
 def close_promptline():
     display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
 
-def pm():
+def dm():
     """
-    pmacs editor: invoke editor functions with emacs control keys.
+    dmacs editor: invoke editor functions with emacs control keys.
     Supported keys and the fcns they invoke are expressed in keycode table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
