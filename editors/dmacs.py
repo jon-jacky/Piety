@@ -8,7 +8,7 @@ without the module name prefix, just dm() not dmacs.dm().
 Then, if we edit more commands into dm, we can load them without restarting
 the session by reload(dmacs).  The argument to reload must be the module name.
 
-The name dmacs means 'dumb emacs' or maybe 'grade D emacs', barely not F (fail).
+The name means 'dumb emacs' or maybe 'grade D emacs', barely above F (fail).
 """
 
 import sys, importlib
@@ -62,12 +62,20 @@ def switch_buffer():
     edsel.b()
 
 def replace_string():
+    global mark
     response = request(f'Replace string (default {ed.searchstring}): ') 
     if response: ed.searchstring = response
     response = request(
      f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
     if response: ed.replacestring = response
-    edsel.c()
+    # Write out logic of in_region fcn (below) inline here.
+    # I tried in_region here, with lambda to adjust arg list, didn't work.
+    if mark: # mark activated
+        start, end = (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
+        edsel.c(ed.searchstring, ed.replacestring, start, end)
+    else:
+        edsel.c(ed.searchstring, ed.replacestring) # replace at ed.dot only
+    mark = 0 # deactivate mark
 
 def find_file():
     filename = request('Find file: ')
@@ -111,7 +119,7 @@ def save_reload():
     reload() # synchronization?  Does w() finish before reload() begins?
 
 # Table from keys to editor functions
-keycode = {
+keymap = {
     # cursor movement
     key.C_n: edsel.l,  # next line
     key.C_p: edsel.rl,  # previous line
@@ -162,7 +170,7 @@ def close_promptline():
 def dm():
     """
     dmacs editor: invoke editor functions with emacs control keys.
-    Supported keys and the fcns they invoke are expressed in keycode table.
+    Supported keys and the fcns they invoke are expressed in keymap table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
     global prev_k
@@ -176,7 +184,7 @@ def dm():
                 prev_k = k
                 break
             else:
-                fcn = keycode.get(k, lambda: util.putstr(key.bel))
+                fcn = keymap.get(k, lambda: util.putstr(key.bel))
                 fcn()
                 prev_k = k
     terminal.set_line_mode()
