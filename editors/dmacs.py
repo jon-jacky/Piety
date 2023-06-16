@@ -61,22 +61,6 @@ def switch_buffer():
     if response: ed.prev_bufname = response
     edsel.b()
 
-def replace_string():
-    global mark
-    response = request(f'Replace string (default {ed.searchstring}): ') 
-    if response: ed.searchstring = response
-    response = request(
-     f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
-    if response: ed.replacestring = response
-    # Write out logic of in_region fcn (below) inline here.
-    # I tried in_region here, with lambda to adjust arg list, didn't work.
-    if mark: # mark activated
-        start, end = (mark, ed.dot) if mark < ed.dot else (ed.dot, mark)
-        edsel.c(ed.searchstring, ed.replacestring, start, end)
-    else:
-        edsel.c(ed.searchstring, ed.replacestring) # replace at ed.dot only
-    mark = 0 # deactivate mark
-
 def find_file():
     filename = request('Find file: ')
     edsel.e(filename)
@@ -106,6 +90,17 @@ def in_region(f):
     else:
         f() # mark deactivated, just execute f on dot
     mark = 0 # deactivate mark
+
+def replace_string():
+    response = request(f'Replace string (default {ed.searchstring}): ') 
+    if response: ed.searchstring = response
+    response = request(
+     f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
+    if response: ed.replacestring = response
+    # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
+    def c1(start=None, end=None):
+        edsel.c(ed.searchstring, ed.replacestring, start, end)
+    in_region(c1)
 
 def reload():
     'Reload module for current buffer'
