@@ -34,6 +34,7 @@ def inform(message):
     display.put_cursor(promptline, 1)
     display.kill_whole_line()
     display.putstr(message)
+    display.put_cursor(edsel.tlines, 1)
 
 def request(prompt):
     display.put_cursor(promptline, 1)
@@ -102,6 +103,13 @@ def replace_string():
         edsel.c(ed.searchstring, ed.replacestring, start, end)
     in_region(c1)
 
+def kill_line():
+    'Delete single line, accumulate consecutive deleted lines in yank buffer'
+    if prev_k != key.C_k: # first C_k, rewrite yank buffer
+        edsel.d()
+    else: 
+        edsel.d(None,None,True) # consecutive C_k, append line to yank buffer
+
 def reload():
     'Reload module for current buffer'
     modname = ed.bufname[:-3] # trim trailing '.py'
@@ -127,7 +135,7 @@ keymap = {
     key.C_r: bkwd_search,
     key.M_percent: replace_string, # M-%
     # editing
-    key.C_k: edsel.d,   # delete line
+    key.C_k: kill_line, # append consecutive killed lines to yank buffer
     key.C_y: edsel.y, # yank (paste) deleted lines
     key.cr: append,   # open line and enter append mode 
     # cut and paste

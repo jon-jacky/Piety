@@ -326,8 +326,8 @@ def tail(nlines=None):
 def a(iline=None):
     ed.a(iline, display_start_a, display_input_line, display_a)
 
-def d(start=None, end=None):
-    ed.d(start, end, display_d)
+def d(start=None, end=None, append=False):
+    ed.d(start, end, append, display_d)
 
 def y(iline=None):
     ed.y(iline, display_y)

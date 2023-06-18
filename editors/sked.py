@@ -268,7 +268,7 @@ def s(target=None, forward=True, printline=print, move_dot=move_dot):  # hooks
             move_dot(iline)
             break
     if not found:
-        print(f"? '{searchstring}' not found")
+        print(f"? '{searchstring}' not found\n\r", end="") # for char mode
 
 def grep(target=None, start=None, end=None):
     """
@@ -332,19 +332,24 @@ def a(iline=None, move_dot=move_dot, input_line=input_line,
             saved = False # put this before move_dot for display
             move_dot_a(dot+1)
 
-def d(start=None, end=None, move_dot=move_dot): # hook for display code
+def d(start=None, end=None, append=None, move_dot=move_dot):
     """
     d(elete) lines start through end *inclusive*.
     Save deleted lines in yank (paste) buffer.
     Set dot to first line *following* deletion, 
     so consecutive d's delete a section.
+    If append=False (the default), rewrite yank buffer on each call.
+    If append=True, append to yank buffer so consecutive d's accumulate there.
     """
     global buffer, yank, saved
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
         return
-    yank = buffer[start:end+1] # range includes end, unlike Python slices
+    if not append: # default, rewrite yank buffer on each call 
+        yank = buffer[start:end+1] # range includes end, unlike Python slices
+    else:
+        yank += buffer[start:end+1] # append to accumulated consecutive d's
     buffer[start:end+1] = [] 
     saved = False # put this before move_dot for display
     move_dot(start) # FIXME what if we delete last line in buffer?
