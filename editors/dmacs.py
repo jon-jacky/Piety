@@ -36,38 +36,61 @@ def inform(message):
     display.putstr(message)
     display.put_cursor(edsel.tlines, 1)
 
+cancel = '???'
+
+def cancelled(response):
+    """
+    Python input() does not return on ^G or any other control character.
+    To cancel input(), must type printable chars into the input string itself.
+    User types '???' at the end of the input string to cancel input().
+    Caller can test for this and handle it.
+    """
+    return response.endswith(cancel)
+
 def request(prompt):
     display.put_cursor(promptline, 1)
     display.kill_whole_line()
     terminal.set_line_mode()
     response = input(prompt)
+    if cancelled(response):
+        inform('Cancelled')  # also puts cursor at tlines
+    else: 
+        display.put_cursor(edsel.tlines, 1)
     terminal.set_char_mode()
     return response
 
 def request_search():
     if not prev_k in (key.C_s, key.C_r):
         response = request(f'Search string (default {ed.searchstring}): ')
-        if response: ed.searchstring = response
+        if response and not cancelled(response): ed.searchstring = response
+        return response # because caller always check cancelled(response)
+    else:
+        return ed.searchstring # callers always check cancelled(response)
 
 def fwd_search():
-    request_search()
+    response = request_search() # might update ed.searchstring
+    if cancelled(response): return # response might indicate search cancelled
     edsel.s()
 
 def bkwd_search():
-    request_search()
+    response = request_search()
+    if cancelled(response): return
     edsel.r()
 
 def switch_buffer():
     response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
+    if cancelled(response): return
     if response: ed.prev_bufname = response
     edsel.b()
 
 def find_file():
     filename = request('Find file: ')
+    if cancelled(filename): return
     edsel.e(filename)
 
 def write_named_file():
     filename = request('Write file: ')
+    if cancelled(filename): return
     edsel.w(filename)
 
 def set_mark():
@@ -94,9 +117,11 @@ def in_region(f):
 
 def replace_string():
     response = request(f'Replace string (default {ed.searchstring}): ') 
+    if cancelled(response): return
     if response: ed.searchstring = response
     response = request(
      f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
+    if cancelled(response): return
     if response: ed.replacestring = response
     # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
     def c1(start=None, end=None):
@@ -118,7 +143,7 @@ def reload():
 
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'
-    ed.w()
+    edsel.w()
     reload() # synchronization?  Does w() finish before reload() begins?
 
 # Table from keys to editor functions

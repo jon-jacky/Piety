@@ -41,7 +41,7 @@ def line_valid(iline):
     if 0 < iline <= S():
         return True
     else:
-        print(f'? line {iline} out of range 1 .. {S()}')
+        print(f'? line {iline} out of range 1 .. {S()}\n\r', end='')
         return False
 
 def range_valid(start, end):
@@ -128,7 +128,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     bufname = bname(filename)
     saved = True # put this *before* move_dot for display code
     move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
-    print(f'{filename}, {S()} lines')
+    print(f'{filename}, {S()} lines\n\r', end='')
 
 def w(fname=None, set_saved=set_saved): # Hook for display code
     """
@@ -156,13 +156,13 @@ def b(bname=None, restore_buffer=restore_buffer):
     if S() > 0: save_buffer()
     if not bname: bname = prev_bufname
     if bname == bufname:
-        print(f'? buffer {bufname} is already the current buffer')
+        print(f'? buffer {bufname} is already the current buffer\r\n', end='')
         return
     if bname in buffers:
         prev_bufname = bufname
         restore_buffer(bname)
     else:
-        print(f'? no buffer {bname}')
+        print(f'? no buffer {bname}\n\r', end='')
 
 def bstatus(bname):
     'Return string of information about named stored buffer'
@@ -187,7 +187,7 @@ def k(restore_buffer=restore_buffer):
     Replace the current buffer with the previous buffer.
     """
     if bufname == 'scratch.txt':
-        print("? can't kill scratch.txt buffer")
+        print("? can't kill scratch.txt buffer\n\r", end="")
         return
     if not saved:
         answer = input(f'{bufname} has unsaved changes, type y to kill anyway: ')
@@ -230,7 +230,7 @@ def v(nlines=None, p=p):  # p is hook for display code
     """
     global pagesize
     if dot == S():
-        print('? end of buffer')
+        print('? end of buffer\r\n', end='')
         return
     if nlines is None: nlines = pagesize
     pagesize = nlines
@@ -240,7 +240,7 @@ def rv(nlines=None, p=p, move_dot=move_dot):  # hooks for display code
     'r(everse) v, page up, print previous nlines lines ending with dot.'
     global pagesize
     if dot == 1:
-        print('? start of buffer')
+        print('? start of buffer\r\n', end='')
         return
     if nlines is None: nlines = pagesize
     pagesize = nlines
