@@ -1,0 +1,64 @@
+
+notes
+=====
+
+Notes on the code in the editors *sked*, *edsel*, and *dmacs*.
+
+### sked ###
+
+Line editor based on the classic Unix ed.
+
+No main program!  Editor commands are just functions defined here, to
+call from the Python REPL.
+
+Global variables used by these functions are defined and initialized
+in skedinit.py, which must be executed before calling any of the
+functions here.
+
+This module produces no display output, except print statements that
+print to the Python REPL.  However, many functions here include optional
+place- holder arguments which are hooks for display functions that could
+be defined in other modules.  Therefore this module can serve as the
+foundation for display editors.
+
+In this module we usually use print('...\n\r', end='') because it prints
+end-of- line  correctly in both the terminal line mode used in the
+Python REPL and in the terminal raw character mode used in some
+displays.
+
+### edsel ###
+
+Display editor that uses the same commands as *sked*.
+
+Display buffer contents in a window as they are updated by the sked editor.
+
+This module has three sections, that define three kinds of functions:
+
+1. Display building blocks
+
+2. Display functions that show effects of editing commands
+
+Display fcns passed as args to editing commands defined in the sked
+module.  The default arguments defined in sked produce no display
+output.   These functions, when passed to fcns in sked, do produce
+display output.  In this way they are used to define the wrapped display
+commands below.  The function here display_<name> is passed to the sked
+fcn ed.<name>.
+
+3. Editing commands
+
+Editing functions that generate display output
+by wrapping functions from sked and passing the display fcns defined above.
+
+### dmacs ###
+
+Invoke editor functions with emacs keys (control keys or key seqs).
+
+The module name dmacs differs from the editor function name dm
+so the function name does not shadow the module name when we do
+'from dmacs import dm' so we can type the function name in the REPL
+without the module name prefix, just dm() not dmacs.dm().   
+Then, if we edit more commands into dm, we can load them without restarting
+the session by reload(dmacs).  The argument to reload must be the module name.
+
+Revised Jun 2023

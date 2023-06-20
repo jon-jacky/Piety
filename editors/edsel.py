@@ -1,7 +1,9 @@
 """
 edsel.py - Display editor that uses the same commands as *sked*.
-           Display buffer contents in a window
-           as they are updated by commands in the sked line editor.
+
+Display buffer contents in a window as they are updated by the sked editor.
+
+See README.md for directions on using edsel, see NOTES.md about its code. 
 """
 
 import sys # skip argument declaration has file=sys.stdout
@@ -112,12 +114,6 @@ def recenter():
     refresh()
 
 # Display functions: show effects of editing commands
-
-# Display fcns passed as args to editing commands defined in the sked module.
-# The default arguments defined in sked produce no display output. 
-# These functions, when passed to fcns in sked, do produce display output.
-# In this way they are used to define the wrapped display commands below.
-# The function here display_<name> is passed to the sked fcn ed.<name>.
 
 def display_move_dot(iline):
     'Display effect of ed move_dot function.  Move current line, dot, to iline'
@@ -281,9 +277,6 @@ def display_a(iline):
     open_line(ed.dot) # create space, move cursor to prepare for next input()
 
 # Display functions: editing commands
-
-# Editing functions that generate display output
-# by wrapping functions from sked and passing the display fcns defined above.
 
 def e(fname):
     ed.e(fname, display_e)

@@ -1,12 +1,7 @@
 """
 dmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
 
-The module name dmacs differs from the editor function name dm
-so the function name does not shadow the module name when we do
-'from dmacs import dm' so we can type the function name in the REPL
-without the module name prefix, just dm() not dmacs.dm().   
-Then, if we edit more commands into dm, we can load them without restarting
-the session by reload(dmacs).  The argument to reload must be the module name.
+See README.md for directions on using dmacs, see NOTES.md about its code. 
 
 The name means 'dumb emacs' or maybe 'grade D emacs', barely above F (fail).
 """

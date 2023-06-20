@@ -4,9 +4,7 @@ sked.py - Stone Knife Editor, line editor inspired by classic Unix ed.
 No main program!  Editor commands are just functions defined here, to
 call from the Python REPL.
 
-Global variables used by these functions are defined and initialized
-in skedinit.py, which must be executed before calling any of the
-functions here.
+See README.md for directions on using sked, see NOTES.md about its code. 
 
 The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
@@ -49,10 +47,7 @@ def range_valid(start, end):
     If start .. end is within buffer return True,
     otherwise print error message(s) and return false.
     """
-    if line_valid(start) and ((start == end) or line_valid(end)): 
-        return True
-    else: 
-        return False
+    return line_valid(start) and ((start == end) or line_valid(end)) 
 
 def status():
     'status: return string of information about editing session'
@@ -200,7 +195,7 @@ def k(restore_buffer=restore_buffer):
 
 # File viewer functions
 
-def p(start=None, end=None, printline=print, move_dot=move_dot): # hooks 
+def p(start=None, end=None, printline=print, move_dot=move_dot): # with hooks 
     """
     p(rint) lines start through end, *inclusive*.
     Default with no arguments prints the line at dot.
@@ -236,7 +231,7 @@ def v(nlines=None, p=p):  # p is hook for display code
     pagesize = nlines
     p(dot, min(dot+pagesize-1, S()))
 
-def rv(nlines=None, p=p, move_dot=move_dot):  # hooks for display code
+def rv(nlines=None, p=p, move_dot=move_dot):  # with hooks for display code
     'r(everse) v, page up, print previous nlines lines ending with dot.'
     global pagesize
     if dot == 1:
@@ -354,7 +349,7 @@ def d(start=None, end=None, append=None, move_dot=move_dot):
     saved = False # put this before move_dot for display
     move_dot(start) # FIXME what if we delete last line in buffer?
 
-def y(iline=None, move_dot=move_dot): # hook for display code
+def y(iline=None, move_dot=move_dot): # move_dot is hook for display code
     'y(ank), that is paste, yank buffer contents *before* iline (default dot)'
     global buffer, saved
     if not iline: iline = dot
@@ -397,7 +392,7 @@ def c(old=None, new=None, start=None, end=None, count=-1, printline=print,
 # Formatting functions
 
 def indent(start=None, end=None, nspaces=None, outdent=False,
-           change_lines=change_lines): # hook for display code
+           change_lines=change_lines): # change_lines is hook for display code
     """
     indent, move text to the right by prefixing spaces at the left margin.
     Indent lines start through end inclusive, default just indent at dot.
@@ -424,7 +419,7 @@ def outdent(start=None, end=None, nspaces=None, change_lines=change_lines):
     indent(start, end, nspaces, True, change_lines)
 
 def wrap(start=None, end=None, lmarg=None, rmarg=None,
-         move_dot=move_dot): # hook for display code
+         move_dot=move_dot): # move_dot is hook for display code
     """
     Replace lines from start through end with wrapped (filled) lines.
     start and end both default to dot, good for wrapping one long line.
