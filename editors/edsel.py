@@ -3,7 +3,7 @@ edsel.py - Display editor that uses the same commands as *sked*.
 
 Display buffer contents in a window as they are updated by the sked editor.
 
-See README.md for directions on using edsel, see NOTES.md about its code. 
+See README.md for directions on using edsel, NOTES.txt about its code. 
 """
 
 import sys # skip argument declaration has file=sys.stdout

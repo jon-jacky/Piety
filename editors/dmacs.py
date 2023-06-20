@@ -1,7 +1,7 @@
 """
 dmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
 
-See README.md for directions on using dmacs, see NOTES.md about its code. 
+See README.md for directions on using dmacs, NOTES.txt about its code. 
 
 The name means 'dumb emacs' or maybe 'grade D emacs', barely above F (fail).
 """

@@ -4,6 +4,11 @@ editors
 
 Text editors
 
+- **README,md**: Directions for using the *sked*, *edsel*, and *dmacs* editors,
+  see below.
+
+- **NOTES.md**: Notes on the code in *sked*, *edsel*, and *dmacs*.
+
 - **edsel.py**: Display editor that uses the same commands as *sked*.
 
 - **edselinit.py**: Define and initialize global variables used by *edsel*.

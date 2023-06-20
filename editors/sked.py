@@ -4,7 +4,7 @@ sked.py - Stone Knife Editor, line editor inspired by classic Unix ed.
 No main program!  Editor commands are just functions defined here, to
 call from the Python REPL.
 
-See README.md for directions on using sked, see NOTES.md about its code. 
+See README.md for directions on using sked, NOTES.txt about its code. 
 
 The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
