@@ -4,6 +4,8 @@ notes
 
 Notes on the code in the editors *sked*, *edsel*, and *dmacs*.
 
+This is a .txt not an .md file to emphasize its roughness and incompleteness.
+
 ### sked ###
 
 Line editor based on the classic Unix ed.
