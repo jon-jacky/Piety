@@ -201,13 +201,15 @@ before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
 
-The only reason to use *M-x* to return to the Python REPL while using
-*dmacs* is to view and assign configuration variables, such as
-*sked.lmargin* etc.
-
 In *dmacs*, as in *sked* and *edsel*, you can only use control keys
 to edit within a line when you are entering that line in append mode,
 or when you are entering a string in response to a prompt.
+To edit a line that has already been added to the buffer, you 
+must use the *M-%* key to substitute text in the line.
+
+The only reason to use *M-x* to return to the Python REPL while using
+*dmacs* is to view and assign configuration variables, such as
+*sked.lmargin* etc.
 
 The name *dmacs* means 'dumb emacs' or maybe 'grade D emacs', barely above
 F (fail).
