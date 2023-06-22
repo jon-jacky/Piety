@@ -200,6 +200,7 @@ line.  Type the string and press RETURN.  You can edit the string inline
 before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
+(The emacs *C-g* cancel key is not effective in *dmacs*.)
 
 In *dmacs*, as in *sked* and *edsel*, you can only use control keys
 to edit within a line when you are entering that line in append mode,
