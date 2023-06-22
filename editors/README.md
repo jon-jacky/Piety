@@ -153,7 +153,8 @@ automobile:
 ### dmacs ###
 
 **dmacs.py** is a display editor where you invoke *edsel* functions by 
-typing [emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf)
+typing some of the 
+[emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf)
 (or key sequences).  When running *dmacs*,
 you no longer have to use the Python REPL to edit.  Every *edsel* function 
 can be invoked by a keystroke or two.
@@ -171,7 +172,7 @@ to edit.   To exit *dm* and return to the Python prompt, type the control
 key *M-x* ("meta x", formed by holding down the ALT key while you type x).
 Then the *dm* function returns and the Python prompt reappears.  Now 
 you can return to typing *edsel* function calls (or any other Python
-statements).
+statements).  You can type *dm()* again to resume *dmacs*.
 
 To see what control keys are available, see the *keymap* 
 dictionary in the *dmacs.py* source code file, which associates 
@@ -194,13 +195,27 @@ typing RETURN, or to remain in append mode by forgetting to type the period.
 If your session seems unresponsive, try exiting append mode by  typing
 RETURN then a period at the beginning of a line.
 
-When *dmacs* needs a string, to name a file, buffer, search string,
-or replacement string, it prompts for it on the line below the status
+When you type a key that invokes a function that has a string argument
+-- to name a file, buffer, seach string or replacement string --
+*dmacs* prompts for it on the line below the status
 line.  Type the string and press RETURN.  You can edit the string inline
 before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
-(The emacs *C-g* cancel key is not effective in *dmacs*.)
+(The emacs *C-g* cancel key is not available in *dmacs*.)
+
+Some keys invoke functions that can optionally act on a range of
+lines called the *region*.
+To define the region, type the key *C-space* (press the control key
+and type the space bar).  This sets the *mark*, one end of the region.
+Then move the current line *dot* to the other end of the region
+(the mark can appear before or after dot in the buffer).
+Then type the key to invoke the function.   It will act on 
+the lines from *mark* through *dot*, inclusive.
+The mark is de-activated after the function executes, so you have 
+to set the mark again before each function call that uses it.
+When the mark is not activated, those functions only act on the current
+line, dot.
 
 In *dmacs*, as in *sked* and *edsel*, you can only use control keys
 to edit within a line when you are entering that line in append mode,
