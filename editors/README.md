@@ -153,7 +153,8 @@ automobile:
 ### dmacs ###
 
 **dmacs.py** is a display editor where you invoke *edsel* functions by 
-typing emacs control keys (or key sequences).  When running *dmacs*,
+typing [emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf)
+(or key sequences).  When running *dmacs*,
 you no longer have to use the Python REPL to edit.  Every *edsel* function 
 can be invoked by a keystroke or two.
 
