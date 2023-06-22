@@ -194,7 +194,7 @@ typing RETURN, or to remain in append mode by forgetting to type the period.
 If your session seems unresponsive, try exiting append mode by  typing
 RETURN then a period at the beginning of a line.
 
-When *pmacs* needs a string, to name a file, buffer, search string,
+When *dmacs* needs a string, to name a file, buffer, search string,
 or replacement string, it prompts for it on the line below the status
 line.  Type the string and press RETURN.  You can edit the string inline
 before you press RETURN.  There is always a default, just press RETURN
