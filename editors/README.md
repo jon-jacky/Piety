@@ -105,12 +105,24 @@ Here you can type the same editing commands you used in *sked*,
 but now the window updates to show the changes in the buffer as
 they are made.
 
-When you type *a()* to start the *append* command, the cursor moves
-up from the Python REPL to the text insertion point in the window.
+When you type *a()* to start the *append* command, the blinking cursor moves
+up from the Python REPL to the text insertion point in the window,
+and the message *Appending...* replaces the contents of the status line.
 Then when you type, each character appears immediately in the window at the 
 intended location.  This continues until you type . at the beginning 
-of a line to exit append mode.  Then the line with '.' disappears 
-and the cursor returns to the Python REPL for the next command.
+of a line to exit append mode.  Then the line with '.' disappears, 
+the usual text reappears on the status line, 
+and the blinking cursor returns to the Python REPL for the next command.
+
+In append mode, you can edit the line you are entering. 
+Thanks to the Python *-i* (interactive) option, 
+you can use control keys to move the cursor, insert and delete
+characters, and cut and paste words --- but only within that one line.
+When you type RETURN, the line is added to the buffer and you cannot
+edit it anymore.   The only way to edit a line in the buffer is to call
+sked functions at the Python REPL.  You can call 
+the *c* (change) function to substitute text in that line.
+Or, you can delete the line and append a different one.
 
 Some commands, for example *p()* (print), no longer print output in
 the Python REPL because their effects are now visible in the display window.
@@ -137,5 +149,66 @@ To resume display editing, repeat *from edsel import \** and
 The name *edsel* is from the [Edsel](https://en.wikipedia.org/wiki/Edsel)
 automobile:
 [*it has the new ideas next year's cars are copying!*](https://www.alamy.com/stock-photo-ford-edsel-advert-for-the-1958-model-edsel-convertible-25549787.html?imageid=B9FEB0EB-5F12-45D5-9327-D0BB90416BF1&p=13044&pn=1&searchId=6cb698f459186cbb7fdcfa8a40b23782&searchtype=0)
+
+### dmacs ###
+
+**dmacs.py** is a display editor where you invoke *edsel* functions by 
+typing emacs control keys (or key sequences).  When running *dmacs*,
+you no longer have to use the Python REPL to edit.  Every *edsel* function 
+can be invoked by a keystroke or two.
+
+To run *dmacs*, first start *sked*, then *edsel*, as described above.  Then,
+
+    ...
+    >>> import dmacs
+    >>> from dmacs import dm
+    >>> dm()
+
+After you type *dm()*, the Python prompt does not appear because Python
+is busy executing the *dm* function.  Now you can type emacs control keys
+to edit.   To exit *dm* and return to the Python prompt, type the control
+key *M-x* ("meta x", formed by holding down the ALT key while you type x).
+Then the *dm* function returns and the Python prompt reappears.  Now 
+you can return to typing *edsel* function calls (or any other Python
+statements).
+
+To see what control keys are available, see the *keymap* 
+dictionary in the *dmacs.py* source code file, which associates 
+each key with its function.  Each control
+key has the same function in *dmacs* as it does in *emacs*.
+(There is one exception: C-x C-r invokes *dmacs save_reload*, 
+which writes out the current buffer to a file and reloads that
+file as a Python module.)
+
+There is no control key to enter append mode. Instead, simply type RETURN
+at any time while running *dmacs*.  An empty line will open below the
+current line and the blinking cursor will appear there.  Now append
+mode works just as it does in *sked* and *edsel*: you can
+type in any number of lines, editing in the most recent line as you go,
+until you type a period at the beginning of line to exit append mode.
+
+When *dmacs* is in append mode, it does not respond to any of its
+control keys.  It is easy to enter append mode by mistake by
+typing RETURN, or to remain in append mode by forgetting to type the period.
+If your session seems unresponsive, try exiting append mode by  typing
+RETURN then a period at the beginning of a line.
+
+When *pmacs* needs a string, to name a file, buffer, search string,
+or replacement string, it prompts for it on the line below the status
+line.  Type the string and press RETURN.  You can edit the string inline
+before you press RETURN.  There is always a default, just press RETURN
+to accept it.  To cancel the operation, type '???' by itself, or at
+the end of the string, then press RETURN.
+
+The only reason to use *M-x* to return to the Python REPL while using
+*dmacs* is to view and assign configuration variables, such as
+*sked.lmargin* etc.
+
+In *dmacs*, as in *sked* and *edsel*, you can only use control keys
+to edit within a line when you are entering that line in append mode,
+or when you are entering a string in response to a prompt.
+
+The name *dmacs* means 'dumb emacs' or maybe 'grade D emacs', barely above
+F (fail).
 
 Revised Jun 2023

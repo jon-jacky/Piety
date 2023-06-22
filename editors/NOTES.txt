@@ -49,8 +49,9 @@ fcn ed.<name>.
 
 3. Editing commands
 
-Editing functions that generate display output
-by wrapping functions from sked and passing the display fcns defined above.
+Editing functions that generate display output by wrapping functions from
+sked and passing the display fcns defined above. Each function here has
+the same name as the sked function it wraps.
 
 ### dmacs ###
 
