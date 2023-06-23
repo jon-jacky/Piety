@@ -9,6 +9,8 @@ Text editors
 
 - **NOTES.txt**: Notes on the code in *sked*, *edsel*, and *dmacs*.
 
+- **HOW.md**: How we program.
+
 - **edsel.py**: Display editor that uses the same commands as *sked*.
 
 - **edselinit.py**: Define and initialize global variables used by *edsel*.
