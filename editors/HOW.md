@@ -35,14 +35,14 @@ We do all of our work in a long-running interactive Python session.
 We do not run "programs" or "applications".  Instead, we type commands 
 to the Python interpreter that import 
 modules and call functions in those modules.  The function calls 
-are transient, although the data they create can persist.  
+are transient, although the data they create can persist.
 The function calls might take over the keyboard and screen
 for a while, but the Python interpreter is often visible in part of 
 the screen, and is always accessible with a keystroke or two.
 
 We don't invent command languages or write command interpreters; 
-we use Python for that.  The Python interpreter itself is the 'main
-program' that invokes the functions in the modules we write.
+we use Python for that.  The Python interpreter itself is the "main
+program" that invokes the functions in the modules we write.
 
 ### Reload functions, not data ###
 
@@ -83,7 +83,7 @@ This is not as serious a limitation as it might seem.
 Python provides a rich collection of data types
 including lists, tuples, dictionaries, sets and more, which,
 by themselves or in combination, are sufficient to support
-any application.  We define module-level variables
+any activity.  We define module-level variables
 built up from these types, and write functions that use them.
 
 Revised Jun 2023
