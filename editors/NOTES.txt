@@ -26,7 +26,7 @@ foundation for display editors.
 In this module we usually use print('...\n\r', end='') because it prints
 end-of- line  correctly in both the terminal line mode used in the
 Python REPL and in the terminal raw character mode used in some
-displays.
+display functions.
 
 ### edsel ###
 
@@ -34,11 +34,11 @@ Display editor that uses the same commands as *sked*.
 
 Display buffer contents in a window as they are updated by the sked editor.
 
-This module has three sections, that define three kinds of functions:
+This module has four sections, that define four kinds of functions:
 
-1. Display building blocks
+1. Display building blocks that do not depend on sked
 
-2. Display functions that show effects of editing commands
+2. Display functions that show effects of sked editing commands
 
 Display fcns passed as args to editing commands defined in the sked
 module.  The default arguments defined in sked produce no display
@@ -52,6 +52,8 @@ fcn ed.<name>.
 Editing functions that generate display output by wrapping functions from
 sked and passing the display fcns defined above. Each function here has
 the same name as the sked function it wraps.
+
+4. Window management functions that do not depend on sked
 
 ### dmacs ###
 

@@ -23,6 +23,15 @@ Text editors
 
 - **skedinit.py**: Define and initialize global variables used by *sked*.
 
+
+### Introduction ###
+
+The modules here comprise a minimal Python programming environment.
+We can have all of our source code, our editors, and the interactive Python
+interpreter always available in our Python session. We can write code that
+we load and run immediately, without restarting the session or losing
+any work in progress. See [how we program](HOW.md).
+
 ### sked ###
 
 **sked.py** is the Stone Knife Editor, a line editor inspired by the classic 
@@ -72,6 +81,15 @@ type *help(sked)* in the REPL.  Type *help(e)* (for example) to learn
 about the *e* command, likewise for all the other commands.
 Type *dir(sked)* to see just the names of functions and variables.
 The commands all have names that are just one or two letters.
+
+To add or change behavior in *sked*, simply edit the module and reload 
+it.  Changes are effective immediately, without restarting the Python
+session or losing any work in progress.
+
+    ...
+    >>> from importlib import reload
+    >>> reload(sked)
+    ...
 
 The name *sked* is inspired by Kragen Sitaker's Stone Knife Forth.
 
@@ -180,9 +198,7 @@ To see what control keys are available, see the *keymap*
 dictionary in the *dmacs.py* source code file, which associates 
 each key with its function.  Each control
 key has the same function in *dmacs* as it does in *emacs*.
-(There is one exception: C-x C-r invokes *dmacs save_reload*, 
-which writes out the current buffer to a file and reloads that
-file as a Python module.)
+(There is one exception: *C-x C-r*, see below.)
 
 There is no control key to enter append mode. Instead, simply type RETURN
 at any time while running *dmacs*.  An empty line will open below the
@@ -218,6 +234,11 @@ The mark is de-activated after the function executes, so you have
 to set the mark again before each function call that uses it.
 When the mark is not activated, those functions only act on the current
 line, dot.
+
+You can make changes in any module effective immediately, without
+restarting the Python session or losing work in progress.  Just type
+*C-x C-r* to invoke *dmacs save_reload*, which writes out the current buffer
+to a file and reloads that file as a Python module.
 
 In *dmacs*, as in *sked* and *edsel*, you can only use control keys
 to edit within a line when you are entering that line in append mode,

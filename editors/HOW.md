@@ -8,7 +8,7 @@ Python session.
 We write code that we load and run immediately, without restarting
 the session or losing any work in progress.
 
-Our editors here -- *sked*, *edsel*, and *dmacs* --
+Our editors here -- [*sked*, *edsel*, and *dmacs*](README.md) --
 were developed in this way.  The first two hundred
 lines of *sked* were written in another editor and
 then imported into an interactive Python session. 
@@ -23,7 +23,7 @@ edsel to write dmacs.
 To make this possible, we had to adopt a Python coding style
 that has some unusual features.  The small collection of modules
 here that we have written in this style comprise a Python programming 
-environment which is minimal, even crude.  But we have found
+environment which is minimal, even crude.  But we find
 that its malleability and responsiveness
 motivate us to continue working in it, despite its lack of conveniences.
 
@@ -60,7 +60,7 @@ including all our work in progress.
 
 We do not want to separate functions and the data they use into different
 modules, since this would proliferate modules and also make the code 
-more complicated by requiring the functions to qualify each data item
+more verbose by requiring the functions to qualify each data item
 with its module name.
 
 Our solution is to put each module's data definitions into a separate file
