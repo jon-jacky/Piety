@@ -64,6 +64,7 @@ qualification:
 *e(...)* instead of *sked.e(...)*.
 
 The *e* (edit) command loads a file into a buffer in the editor.
+You can load several (or many) files, each into its own buffer.
 
 The *a* (append) command adds text to the buffer.  Just type lines of 
 text on the following lines, each will go into the buffer until you type

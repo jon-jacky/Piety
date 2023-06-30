@@ -13,12 +13,12 @@ were developed in this way.  The first two hundred
 lines of *sked* were written in another editor and
 then imported into an interactive Python session. 
 After that, sked was developed incrementally
-in the long running session.  We used sked
+in the long running session.  We used *sked*
 to edit its own source code, adding functions one or two 
 at a time, then reloading the module into the same session,
 using the new functions right away on the same source files.
-Proceeding in the same way, we used sked to write edsel, and 
-edsel to write dmacs.
+Proceeding in the same way, we used *sked* to write *edsel*, and 
+*edsel* to write *dmacs*.
 
 To make this possible, we had to adopt a Python coding style
 that has some unusual features.  The small collection of modules
@@ -75,15 +75,25 @@ code in the file *skedinit.py*.
 
 In Python, reloading a class into a running Python session is not
 useful, because persistent objects continue to use the old class
-definition.   Therefore, we do not write classes. (Classes in 
-Python itself, or in code written by others, are not a problem
+definition.   Therefore, we do not write classes. (Classes built
+into  Python itself, or in code written by others, are not a problem
 because we do not reload them.)
 
-This is not as serious a limitation as it might seem.
-Python provides a rich collection of data types
-including lists, tuples, dictionaries, sets and more, which,
-by themselves or in combination, are sufficient to support
-any activity.  We define module-level variables
-built up from these types, and write functions that use them.
+This is not as serious a limitation as it might seem. Classes are not
+really necessary because Python already provides a rich collection of
+built-in compound data types which, by themselves or in combination, are
+sufficient to support any activity. Then we can write ordinary functions
+that act on these, instead of methods.
+
+In particular, we use dictionaries instead of objects.  The 
+dictionary keys act as attribute names and dictionary values
+act as attribute values.   This has the advantage that new
+attributes can be added at any time without requiring changes
+to existing code and without invalidating any persistent data.
+We use the dictionary *get* method to read dictionary items,
+because this does not crash when an item is missing from old
+persistent data; it just returns an appropriate default.
+For examples, see the functions *save_buffer* and *restore_buffer*
+in the *sked* module.
 
 Revised Jun 2023

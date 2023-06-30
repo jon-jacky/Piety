@@ -22,9 +22,10 @@ rmargin = 78          # right margin for wrap
 
 yank = [] # yank (paste) buffer
 
-# saved buffers, dictionary from buffer names to tuples of buffer state
+# saved buffers, dictionary from buffer names to dict of buffer items
 # initialize so there is always a saved buffer to switch back to
-bufstate = (bufname, filename, buffer, dot, saved)
-buffers = { bufname: bufstate }
+buffers = dict()
+buffers[bufname] = {'bufname': bufname, 'filename': filename, 
+                    'buffer': buffer, 'dot': dot, 'saved': saved }
 
 prev_bufname = bufname # so we can switch back even before we save any buffers

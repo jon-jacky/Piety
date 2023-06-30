@@ -145,8 +145,7 @@ def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
 
 def display_restore_buffer(bname):
     'Display effect of ed restore_buffer function, fill entire window'
-    # This next line does exactly what ed.restore_buffer does
-    ed.bufname, ed.filename, ed.buffer, ed.dot, ed.saved = ed.buffers[bname]
+    ed.restore_buffer(bname)
     recenter()
 
 def display_e(iline):

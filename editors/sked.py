@@ -77,7 +77,11 @@ def set_saved(status):
 def restore_buffer(bname):
     'Restore state of saved buffer bname to current saved buffer'
     global bufname, filename, buffer, dot, saved
-    bufname, filename, buffer, dot, saved = buffers[bname]
+    bufname = buffers[bname].get('bufname', 'no name')
+    filename = buffers[bname].get('filename', 'no filename')
+    buffer = buffers[bname].get('buffer', ['\n'])
+    dot = buffers[bname].get('dot', 0)
+    saved = buffers[bname].get('saved', True)
     print(status()) # print the new buffer name
 
 def input_line():
@@ -89,19 +93,19 @@ def input_line():
 def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
-    # index         0         1       2   3    4
-    bstate = bufname, filename, buffer, dot, saved 
-    buffers[bufname] = bstate
+    buffers[bufname] = {'bufname': bufname, 'filename': filename, 
+                        'buffer': buffer, 'dot': dot, 'saved': saved }
 
 def bname(filename):
     'Generate buffer name from file name, ensure each file gets unique bname'
+    # If you load the same file twice, you get different bufnames
     basename = os.path.basename(filename)
     # Make unique bufname for example for both README.md and editors/README.md 
-    bufname = basename
+    bufname = basename # just a candidate bufname
     suffix = 1
-    while bufname in buffers and filename != buffers[bufname][1]:
+    while bufname in buffers: # candidate bufname is already in buffers - bad!
         suffix += 1
-        bufname = basename + f'<{suffix}>'
+        bufname = basename + f'<{suffix}>' # alter candidate bufname
     return bufname
 
 def e(fname, move_dot=move_dot):  # move_dot is a hook for display code 
@@ -109,6 +113,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
+    # FIXME? e() on same file again creates another buffer.
     global filename, buffer, saved, bufname, prev_bufname
     if S() > 0: save_buffer()
     try:
@@ -120,7 +125,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
         buffer = ['\n'] # start new file
     prev_bufname = bufname
     filename = fname
-    bufname = bname(filename)
+    bufname = bname(filename) # creates new buffer if e() on same file
     saved = True # put this *before* move_dot for display code
     move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
     print(f'{filename}, {S()} lines\n\r', end='')
@@ -163,11 +168,15 @@ def bstatus(bname):
     'Return string of information about named stored buffer'
     if bname in buffers:
         buf = buffers[bname]
+        buffername = buf.get('bufname','no name')
+        fname = buf.get('filename','no filename')
+        blines = buf.get('buffer',['\n'])
+        bsaved = buf.get('saved', True)
         # Use old fashinoned % formatting to get left-justified columns
         status = ('%s%-15s %7d   %-30s  %s' % 
-                  ('*' if bufname == buf[0] else ' ', 
-                   buf[0], len(buf[2])-1, buf[1], 
-                   'saved' if buf[4] else 'unsaved changes'))
+                  ('*' if bufname == buffername else ' ', 
+                   buffername, len(blines)-1, fname, 
+                   'saved' if bsaved else 'unsaved changes'))
     else:
         status = f'{bname} not in stored buffers'
     return status

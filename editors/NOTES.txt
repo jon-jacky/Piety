@@ -28,6 +28,17 @@ end-of- line  correctly in both the terminal line mode used in the
 Python REPL and in the terminal raw character mode used in some
 display functions.
 
+In save_buffer and restore_buffer we save buffer items as a dictionary
+not an object or tuple so we can add items later without requiring
+changes to existing code and without invalidating already existing saved
+buffers.  We use the dictionary get method to read dictionary items,
+because it does not crash if an item is missing from old saved data,
+it just returns an appropriate default.
+
+The items read from the dictionary are assigned to distinct global 
+variables at module level so they can be accessed by code or from the 
+REPL without verbose notation.
+
 ### edsel ###
 
 Display editor that uses the same commands as *sked*.
