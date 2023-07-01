@@ -113,8 +113,15 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
-    # FIXME? e() on same file again creates another buffer.
     global filename, buffer, saved, bufname, prev_bufname
+    if fname == filename:
+        print(f'? file {fname} is already in the current buffer\r\n', end='')
+        return
+    for buffername in buffers: # can't use bufname here - shadows sked.bufname
+        bfname = buffers[buffername].get('filename','no filename')
+        if fname == bfname:
+            print(f'? file {fname} is already in the saved buffer {buffername}\r\n', end='')
+            return
     if S() > 0: save_buffer()
     try:
         with open(fname, mode='r') as fd:
