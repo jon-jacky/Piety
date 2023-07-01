@@ -149,8 +149,9 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
         fd.writelines(buffer[1:]) # first line of file is at index 1 not 0
         success = True
     if success:
-        filename = fname
-        bufname = bname(filename)
+        if filename != fname: # we saved buffer with a new, different filename
+            filename = fname
+            bufname = bname(filename)
         set_saved(True)
         print(f'Wrote {filename}, {S()} lines\n\r', end='') # \n\r char mode
 
@@ -160,13 +161,13 @@ def b(bname=None, restore_buffer=restore_buffer):
     If buffer name not given, switch back to previous buffer
     """
     global prev_bufname
-    if S() > 0: save_buffer()
     if not bname: bname = prev_bufname
     if bname == bufname:
         print(f'? buffer {bufname} is already the current buffer\r\n', end='')
         return
     if bname in buffers:
         prev_bufname = bufname
+        if S() > 0: save_buffer()
         restore_buffer(bname)
     else:
         print(f'? no buffer {bname}\n\r', end='')
