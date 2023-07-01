@@ -200,12 +200,14 @@ Many sites provide instructions and examples for building operating
 systems: 
 [6.S081](https://pdos.csail.mit.edu/6.828/2019/index.html) (MIT, xv6 RISC-V, 2019),
 [6.828](http://pdos.csail.mit.edu/6.828/2018/xv6.html) (MIT, xv6 x86, 2018),
+[6.828](http://pdos.csail.mit.edu/6.828/2016/overview.html) (MIT, JOS exokernel x86, 2016),
 [CS140e](http://web.stanford.edu/class/cs140e/) (Stanford, RPi C, 2019),
 [CS140e](https://downey.io/blog/cs140e-writing-an-operating-system-in-rust) (Stanford, RPi Rust, 2018,
 more on [HN](https://news.ycombinator.com/item?id=16134618),
 [Andre](https://github.com/rust-embedded/rust-raspi3-OS-tutorials) (RPi Rust, 2019),
 [CS140](http://www.scs.stanford.edu/12au-cs140/) (Stanford, 2012),
 [CS194-24](http://www.cs.berkeley.edu/~kubitron/courses/cs194-24-S13/index_lectures.html) (Berkeley),
+[CS167/169](https://brown-cs1690.github.io/brown-cs167-s23/) (Brown, x86, Weenix),
 [Baking Pi](http://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/)
 (Cambridge, RPi asm, 2012), 
 [OS from Scratch](http://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) (Birmingham, more in [HN](https://news.ycombinator.com/item?id=8380822)),
@@ -224,4 +226,4 @@ Here are more links on operating system
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
 
-Revised May 2023
+Revised Jun 2023
