@@ -2,7 +2,7 @@
 branches
 ========
 
-This is the *pmacs* branch, branched from the *ed* branch, which is
+This is the *ed* branch, which is 
 branched from the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
@@ -10,6 +10,9 @@ here in the *rewrite* branch and its branches, to shorten and simplify
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 1 Jul 2023: dmacs editor working (no longer called pmacs), merge 
+  *pmacs* branch back into *ed* branch.
 
 - 28 May 2023: Make *pmacs* branch to *ed* branch to invoke editor functions
   with emacs keycodes so you don't have to invoke the functions from the 
@@ -55,4 +58,4 @@ Recent work in the *rewrite* branch:
 -  1 Feb 2023: Delete most files and directories for a fresh start.
    Revise *BRANCH.md*, *DIRECTORIES.md*, and *bin/paths*.
 
-Revised May 2023
+Revised Jul 2023
