@@ -65,8 +65,9 @@ contents, and its [modular structure](doc/modules.md).
 
 NOTE: The preceding paragraphs describe the Piety version in the
 *master* branch, labelled with the *version1* tag.  Work on this
-version ended in Jan 2023.  A total rewrite is now underway in the *rewrite*
-branch, to simplify the code and improve its organization and clarity.
+version ended in Jan 2023.  A total rewrite is now underway in the
+[*rewrite* branch](https://github.com/jon-jacky/Piety/tree/rewrite)
+to simplify the code and improve its organization and clarity.
 It might be quite a while before the code in *rewrite* provides
 equivalent functionality to *master*.
 
@@ -118,7 +119,8 @@ Piety code must be developed within its already existing programming
 environment.
 
 NOTE: At this writing (Feb 2023) a total rewrite is underway in the
-*rewrite* branch, to simplify the code and improve its organization
+[*rewrite* branch](https://github.com/jon-jacky/Piety/tree/rewrite)
+to simplify the code and improve its organization
 and clarity.
 
 ## Dependencies ##
