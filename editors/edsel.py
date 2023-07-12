@@ -13,10 +13,12 @@ import sked as ed
 # Define and initialize global variables used by frame display functions.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
+# Must use EDPATH because PYTHONPATH only works for import, not open()
+EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
     _ = flines # if flines is already defined, then edselinit was already exec'd
 except:
-    exec(open("edselinit.py").read())
+    exec(open(EDPATH + 'edselinit.py').read())
 
 # Display functions: building blocks
 
