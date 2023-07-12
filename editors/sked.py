@@ -16,10 +16,12 @@ import textwrap
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables,
 # so we retain buffer contents and other state when we reload.
+# Must use EDPATH because PYTHONPATH only works for import, not open()
+EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
     _ = dot # if dot is already defined, then skedinit was already exec'd
 except:
-    exec(open("skedinit.py").read())
+    exec(open(EDPATH + 'skedinit.py').read())
 
 # Utility functions
 

@@ -42,6 +42,7 @@ to call from the Python REPL.
 
 To edit:
 
+    $ . ~/Piety/bin/paths
     $ python3 -i 
     ...
     >>> import sked
@@ -51,7 +52,12 @@ To edit:
     >>> a()
     ...
 
-Here the Python *-i* (interactive) option enables editing on the command
+The first command here runs the *paths* script so you can run the editors
+in any directory -- Python will be able to find the modules to import.
+(You will have to change this command if Piety is not installed under 
+your home directory.) 
+In the *python3* command, 
+the *-i* (interactive) option enables editing on the command
 line and also command history.  And, it ensures that if a function 
 terminates abnormally for any reason -- including a program crash or 
 *^C* interrupt -- 
@@ -254,4 +260,4 @@ The only reason to use *M-x* to return to the Python REPL while using
 The name *dmacs* means 'dumb emacs' or maybe 'grade D emacs', barely above
 F (fail).
 
-Revised Jun 2023
+Revised Jul 2023
