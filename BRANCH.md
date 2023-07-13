@@ -2,14 +2,19 @@
 branches
 ========
 
-This is the *ed* branch, which is 
-branched from the *rewrite* branch.
+This is the *editline* branch, which branched from the *ed* branch,
+which is branched from the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 13 Jul 2023: make *editline* branch to *ed* branch.
+  Add *editline* module, non-blocking alternative to builtin *readline*,
+  to use in new *pmacs* editor without append mode so you can add or delete
+  text anywhere in the buffer at any time.
 
 - 1 Jul 2023: dmacs editor working (no longer called pmacs), merge 
   *pmacs* branch back into *ed* branch.
