@@ -119,7 +119,9 @@ def replace_string():
     response = request(
      f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
     if cancelled(response): return
-    if response: ed.replacestring = response
+    if response == '\\\\\\': ed.replacestring = '' # \\\ -> empty string
+    elif response: ed.replacestring = response # replace previous default
+    else: pass # use previous default
     # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
     def c1(start=None, end=None):
         edsel.c(ed.searchstring, ed.replacestring, start, end)

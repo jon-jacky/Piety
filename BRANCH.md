@@ -12,9 +12,8 @@ the code, and improve the responsiveness of the programming environment.
 Recent work in the *rewrite* branch:
 
 - 13 Jul 2023: make *editline* branch to *ed* branch.
-  Add *editline* module, non-blocking alternative to builtin *readline*,
-  to use in new *pmacs* editor without append mode so you can add or delete
-  text anywhere in the buffer at any time.
+  Add *editline* module, edit and display a string using readline control keys.
+  Add *pmacs*, edit text in lines anywhere in buffer, not just in append mode. 
 
 - 1 Jul 2023: dmacs editor working (no longer called pmacs), merge 
   *pmacs* branch back into *ed* branch.
