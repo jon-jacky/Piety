@@ -21,53 +21,63 @@ def move_to_point(point, line):
     # move_to_column and start_col are 1-based but point is 0-based
     display.move_to_column(start_col + point)
     return point, line
+
 def move_beginning(point, line):
     point = 0
     return move_to_point(point, line)
+
 def move_end(point, line):
     point = len(line) + 1
     return move_to_point(point, line)
+
 def insert_char(keycode, point, line): # not in keymap so keycode arg is okay
     line = (line[:point] + keycode + line[point:])
     point += 1
     display.insert_char(keycode)
     return point, line
+
 def delete_backward_char(point, line):
     if point > 0:
         line = (line[:point-1] + line[point:]) 
         point -= 1
         display.delete_backward_char()
     return point, line
+
 def backward_char(point, line):
     if point > 0:
         point -= 1
         display.backward_char()
     return point, line
+
 def delete_char(point, line):
     line = (line[:point] + line[point+1:])
     display.delete_char() # point does not change
     return point, line
+
 def forward_char(point, line):
     if point < len(line):
         point += 1
         display.forward_char()
     return point, line
+
 def forward_word(point, line):
     'Move to next non-word char (space or punctuation) after word'
-    # FIXME? Does not move over last word to reach end of line
+    # FIXME? Does not move over last word to end of line, must use move_end
     m = end_word.search(line, point)
     if m:
         point = m.end() # space after word is end() of end_word pattern
         point, line = move_to_point(point, line)
     return point, line
+
 def backward_word(point, line):
     'Move back to first char in preceding word (or this word)'
-    # FIXME? Does not move over first word to reach start of line
+    # FIXME? Does not move over first word to start of line, use move_beginning
     m = end_word.search(line[point-1::-1],1) # search reversed str from point
     if m:
         point = point - m.start()
         point, line = move_to_point(point, line)
     return point, line
+
 def kill_word(point, line):
     'Delete word, save in yank buffer'
     global yank_buffer
@@ -78,6 +88,7 @@ def kill_word(point, line):
         line = line[:point] + line[m.start()+1:]
         display.delete_nchars(point - (m.start()+1))
     return point, line
+
 def kill_line(point, line):
     'Delete line from point to end-of-line, save in yank buffer'
     global yank_buffer
@@ -88,6 +99,7 @@ def kill_line(point, line):
     line = line[:point] # point does not change
     display.kill_line()
     return point, line
+
 def discard(point, line): # name like gnu readline unix-line-discard
     'Delete line from start-of-line to point'
     global yank_buffer
@@ -100,12 +112,14 @@ def discard(point, line): # name like gnu readline unix-line-discard
     util.putstr(line)
     display.kill_line() # remove any leftover text past line
     return move_beginning(point, line) # replace cursor again
+
 def yank(point, line):
     'Paste (yank) string previously deleted by kill or discard'
     line = (line[:point] + yank_buffer + line[point:])
     point += len(yank_buffer)
     display.insert_string(yank_buffer)
     return point, line
+
 def tab_n(n_spaces, point, line): # not in keymap so n_spaces arg is ok
     'Insert n spaces at point'
     spaces = ' ' * n_spaces
@@ -113,11 +127,13 @@ def tab_n(n_spaces, point, line): # not in keymap so n_spaces arg is ok
     point += n_spaces
     display.insert_string(spaces)
     return point, line
+
 n_spaces = 4 # Used by tab, below.  In production use sked.indent.
 
 def tab(point, line):
     'Insert standard number of spaces at point'
     return tab_n(n_spaces, point, line)
+
 keymap = {
     key.bs: delete_backward_char, # C_h
     key.delete: delete_backward_char,
@@ -136,6 +152,7 @@ keymap = {
     key.M_b: backward_word,
     key.M_d: kill_word,
 }
+
 # globals used by main
 prev_k = ''
 line = ''
@@ -173,5 +190,6 @@ def main():
     # close_promptline() # from dmacs dm(), not used here
     # display.put_cursor(edsel.tlines, 1) # return cursor to command line # dm
     print('\n'+line)
+
 if __name__ == '__main__':
     main()
