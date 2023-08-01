@@ -14,12 +14,12 @@ start_word = re.compile(r'\W\w') # Non-word char then word char
 end_word = re.compile(r'\w\W') # Word char then non-word char
 
 # start_col = 2  # prompt is '> '
-start_col = 0    # initial tests
+start_col = 0    # default, no prompt or other chars at left margin
 
 def move_to_point(point, line):
     # start_col accounts for prompt or other chars in left margin
     # move_to_column and start_col are 1-based but point is 0-based
-    display.move_to_column(start_col + point)
+    display.move_to_column(start_col + point + 1) # point is zero based
     return point, line
 
 def move_beginning(point, line):
@@ -27,7 +27,7 @@ def move_beginning(point, line):
     return move_to_point(point, line)
 
 def move_end(point, line):
-    point = len(line) + 1
+    point = len(line)
     return move_to_point(point, line)
 
 def insert_char(keycode, point, line): # not in keymap so keycode arg is okay
@@ -61,25 +61,32 @@ def forward_char(point, line):
     return point, line
 
 def forward_word(point, line):
-    'Move to next non-word char (space or punctuation) after word'
-    # FIXME? Does not move over last word to end of line, must use move_end
+    """
+    Move to next non-word. char (space or punctuation) after word.
+    FIXME? Does not move over last word to end of line, must use move_end.
+    """
     m = end_word.search(line, point)
     if m:
-        point = m.end() # space after word is end() of end_word pattern
+        point = m.end() - 1 # space after word is end() of end_word pattern
         point, line = move_to_point(point, line)
     return point, line
 
 def backward_word(point, line):
-    'Move back to first char in preceding word (or this word)'
-    # FIXME? Does not move over first word to start of line, use move_beginning
+    """
+    Move back to first char in preceding word (or this word).
+    FIXME? Does not move over first word to start of line, use move_beginning.
+    """
     m = end_word.search(line[point-1::-1],1) # search reversed str from point
     if m:
-        point = point - m.start()
+        point = point - m.start() - 1
         point, line = move_to_point(point, line)
     return point, line
 
 def kill_word(point, line):
-    'Delete word, save in yank buffer'
+    """
+    Delete word, save in yank buffer.
+    FIXME?  Does not delete last word in line, must use repeated delete_char.
+    """
     global yank_buffer
     m = end_word.search(line, point)
     if m:
@@ -134,6 +141,13 @@ def tab(point, line):
     'Insert standard number of spaces at point'
     return tab_n(n_spaces, point, line)
 
+def refresh(point, line):
+    'Display line and point - use after line has gotten scrambled or ...'
+    display.move_to_column(start_col)
+    util.putstr(line)
+    display.kill_line() # remove any leftover text past line
+    return move_to_point(point, line)
+
 keymap = {
     key.bs: delete_backward_char, # C_h
     key.delete: delete_backward_char,
@@ -146,6 +160,7 @@ keymap = {
     # key.C_h is key.bs above
     # key.C_i is key.htab above
     key.C_k: kill_line,
+    key.C_l: refresh,
     key.C_u: discard,
     key.C_y: yank,
     key.M_f: forward_word,
