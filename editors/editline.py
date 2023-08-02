@@ -85,13 +85,16 @@ def backward_word(point, line):
 def kill_word(point, line):
     """
     Delete word, save in yank buffer.
-    FIXME?  Does not delete last word in line, must use repeated delete_char.
+    FIXME?  Does not delete last word in line, must use kill_line.
     """
     global yank_buffer
     m = end_word.search(line, point)
     if m:
         inline_yank = True
-        yank_buffer = line[point:m.start()+1]
+        cut_word = line[point:m.start()+1]
+        # repeat kill_word to append successive words to yank buffer
+        yank_buffer = (yank_buffer + cut_word if prev_fcn in cut_fcns
+                       else cut_word)
         line = line[:point] + line[m.start()+1:]
         display.delete_nchars(point - (m.start()+1))
     return point, line
@@ -119,6 +122,9 @@ def discard(point, line): # name like gnu readline unix-line-discard
     util.putstr(line)
     display.kill_line() # remove any leftover text past line
     return move_beginning(point, line) # replace cursor again
+
+prev_fcn = None
+cut_fcns = (kill_word, kill_line, discard)
 
 def yank(point, line):
     'Paste (yank) string previously deleted by kill or discard'
@@ -169,7 +175,6 @@ keymap = {
 }
 
 # globals used by main
-prev_k = ''
 line = ''
 point = 0
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
@@ -182,7 +187,7 @@ def main():
     This function is closely based on the dm function in the dmacs module.
     Enter string to edit at prompt, then type chars and ctrl keys, RET to exit.
     """
-    global prev_k, point, line
+    global prev_fcn, point, line
     line = input('Line to edit: ')
     point = len(line)
     util.putstr(line)
@@ -193,14 +198,16 @@ def main():
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.cr:
-                prev_k = k
                 break
             elif k in printing_chars:
                 point, line = insert_char(k, point, line)
-            else:
-                fcn = keymap.get(k, lambda point, line: util.putstr(key.bel))
+                prev_fcn = insert_char
+            elif k in keymap:
+                fcn = keymap[k]
                 point, line = fcn(point, line)
-                prev_k = k
+                prev_fcn = fcn
+            else:
+                util.putstr(key.bel) # FIXME makes no sound - why?
     terminal.set_line_mode()
     # close_promptline() # from dmacs dm(), not used here
     # display.put_cursor(edsel.tlines, 1) # return cursor to command line # dm
