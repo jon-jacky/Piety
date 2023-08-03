@@ -85,38 +85,46 @@ def backward_word(point, line):
 def kill_word(point, line):
     """
     Delete word, save in yank buffer.
+    Repeat kill_word to save consecutive words in yank buffer.
     FIXME?  Does not delete last word in line, must use kill_line.
     """
-    global yank_buffer
+    global yank_buffer, inline_yank
     m = end_word.search(line, point)
     if m:
-        inline_yank = True
+        inline_yank = True # distinguish from sked multi-line y(ank)
         cut_word = line[point:m.start()+1]
-        # repeat kill_word to append successive words to yank buffer
-        yank_buffer = (yank_buffer + cut_word if prev_fcn in cut_fcns
+        yank_buffer = (yank_buffer + cut_word if prev_fcn in yank_fcns
                        else cut_word)
         line = line[:point] + line[m.start()+1:]
         display.delete_nchars(point - (m.start()+1))
     return point, line
 
 def kill_line(point, line):
-    'Delete line from point to end-of-line, save in yank buffer'
-    global yank_buffer
-    inline_yank = True
+    """
+    Delete line from point to end-of-line, save in yank buffer.
+    Append killed segment to yank buffer if we are doing consecutive kills.
+    """
+    global yank_buffer, inline_yank
+    inline_yank = True # distinguish from sked multi-line y(ank)
     killed_segment = line[point:]
     if killed_segment: # Do not overwrite yank buffer with empty segment
-        yank_buffer = killed_segment
+        yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
+                       else killed_segment)
     line = line[:point] # point does not change
     display.kill_line()
     return point, line
 
 def discard(point, line): # name like gnu readline unix-line-discard
-    'Delete line from start-of-line to point'
-    global yank_buffer
-    inline_yank = True
+    """
+    Delete line from start-of-line to point, save in yank buffer.
+    Append killed segment to yank buffer if we are doing consecutive kills.
+    """
+    global yank_buffer, inline_yank
+    inline_yank = True # distinguish from sked multi-line y(ank)
     killed_segment = line[:point]
     if killed_segment: # Do not overwrite yank buffer with empty segment
-        yank_buffer = killed_segment
+        yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
+                       else killed_segment)
     line = line[point:]
     point, line = move_beginning(point, line) # accounts for prompt, assigns pt
     util.putstr(line)
@@ -124,7 +132,7 @@ def discard(point, line): # name like gnu readline unix-line-discard
     return move_beginning(point, line) # replace cursor again
 
 prev_fcn = None
-cut_fcns = (kill_word, kill_line, discard)
+yank_fcns = (kill_word, kill_line, discard) # fcns that update yank_buffer
 
 def yank(point, line):
     'Paste (yank) string previously deleted by kill or discard'
@@ -174,11 +182,11 @@ keymap = {
     key.M_d: kill_word,
 }
 
-# globals used by main
+# globals
 line = ''
 point = 0
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
-inline_yank = True
+inline_yank = True # distinguish from sked multi-line y(ank)
 yank_buffer = ''
 
 def main():
