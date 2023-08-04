@@ -2,19 +2,28 @@
 editline.py - functions to edit and display a string with readline control keys.
   
 Unlike readline, call and return for each key so you can edit without blocking.
-Each function takes current point (integer index) and line (string) arguments
-and returns the updated point and line.
 """
 
 import string, re
 import key, display
 import util, terminal, keyseq # only needed by main() test 
+
+# Define and initialize global variables used by editline.
+# Conditinally exec only the *first* time this module is imported in a session.
+# Then we can reload this module without re-initializing those variables.
+# Must use EDPATH because PYTHONPATH only works for import, not open()
+EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
+try:
+    _ = point # if point is already defined, editlineinit was already exec'd
+except:
+    exec(open(EDPATH + 'editlineinit.py').read())
+
+# used in main editing loop
+printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
+
 # used by forward word, backward word
 start_word = re.compile(r'\W\w') # Non-word char then word char
 end_word = re.compile(r'\w\W') # Word char then non-word char
-
-# start_col = 2  # prompt is '> '
-start_col = 0    # default, no prompt or other chars at left margin
 
 def move_to_point(point, line):
     # start_col accounts for prompt or other chars in left margin
@@ -88,10 +97,9 @@ def kill_word(point, line):
     Repeat kill_word to save consecutive words in yank buffer.
     FIXME?  Does not delete last word in line, must use kill_line.
     """
-    global yank_buffer, inline_yank
+    global yank_buffer
     m = end_word.search(line, point)
     if m:
-        inline_yank = True # distinguish from sked multi-line y(ank)
         cut_word = line[point:m.start()+1]
         yank_buffer = (yank_buffer + cut_word if prev_fcn in yank_fcns
                        else cut_word)
@@ -104,8 +112,7 @@ def kill_line(point, line):
     Delete line from point to end-of-line, save in yank buffer.
     Append killed segment to yank buffer if we are doing consecutive kills.
     """
-    global yank_buffer, inline_yank
-    inline_yank = True # distinguish from sked multi-line y(ank)
+    global yank_buffer
     killed_segment = line[point:]
     if killed_segment: # Do not overwrite yank buffer with empty segment
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
@@ -119,8 +126,7 @@ def discard(point, line): # name like gnu readline unix-line-discard
     Delete line from start-of-line to point, save in yank buffer.
     Append killed segment to yank buffer if we are doing consecutive kills.
     """
-    global yank_buffer, inline_yank
-    inline_yank = True # distinguish from sked multi-line y(ank)
+    global yank_buffer
     killed_segment = line[:point]
     if killed_segment: # Do not overwrite yank buffer with empty segment
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
@@ -131,7 +137,7 @@ def discard(point, line): # name like gnu readline unix-line-discard
     display.kill_line() # remove any leftover text past line
     return move_beginning(point, line) # replace cursor again
 
-prev_fcn = None
+# yank_fcns can't be defined until after we define kill_word etc.
 yank_fcns = (kill_word, kill_line, discard) # fcns that update yank_buffer
 
 def yank(point, line):
@@ -148,8 +154,6 @@ def tab_n(n_spaces, point, line): # not in keymap so n_spaces arg is ok
     point += n_spaces
     display.insert_string(spaces)
     return point, line
-
-n_spaces = 4 # Used by tab, below.  In production use sked.indent.
 
 def tab(point, line):
     'Insert standard number of spaces at point'
@@ -181,13 +185,6 @@ keymap = {
     key.M_b: backward_word,
     key.M_d: kill_word,
 }
-
-# globals
-line = ''
-point = 0
-printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
-inline_yank = True # distinguish from sked multi-line y(ank)
-yank_buffer = ''
 
 def main():
     """
