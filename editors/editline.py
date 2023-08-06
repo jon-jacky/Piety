@@ -186,23 +186,19 @@ keymap = {
     key.M_d: kill_word,
 }
 
-def main():
+def el():
     """
-    Test keys and functions in editline keymap table.  Also insert_char, key.cr
+    Call editline fcns on line starting at point, until user exits with M-x
     This function is closely based on the dm function in the dmacs module.
-    Enter string to edit at prompt, then type chars and ctrl keys, RET to exit.
     """
-    global prev_fcn, point, line
-    line = input('Line to edit: ')
-    point = len(line)
-    util.putstr(line)
-    # open_promptline() # from dmacs dm(), not used here
+    global point, line,  prev_fcn
     terminal.set_char_mode()
+    refresh(point, line)
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
-            if k == key.cr:
+            if k == key.M_x:
                 break
             elif k in printing_chars:
                 point, line = insert_char(k, point, line)
@@ -214,9 +210,4 @@ def main():
             else:
                 util.putstr(key.bel) # FIXME makes no sound - why?
     terminal.set_line_mode()
-    # close_promptline() # from dmacs dm(), not used here
-    # display.put_cursor(edsel.tlines, 1) # return cursor to command line # dm
-    print('\n'+line)
-
-if __name__ == '__main__':
-    main()
+    print() # print >>> prompt on next line
