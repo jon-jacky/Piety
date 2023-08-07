@@ -3,7 +3,8 @@ dmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
 
 See README.md for directions on using dmacs, NOTES.txt about its code. 
 
-The name means 'dumb emacs' or maybe 'grade D emacs', barely above F (fail).
+The name means 'dumb emacs' or 'defective emacs' or maybe 'grade D emacs',
+barely above F (fail).
 """
 
 import sys, importlib
@@ -194,9 +195,18 @@ def open_promptline():
 def close_promptline():
     display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
 
+def dmcmd(k):
+    """
+    Invoke a single dmacs command: look up k in keymap, run that command.
+    """
+    global prev_cmd
+    fcn = keymap.get(k, lambda: util.putstr(key.bel))
+    fcn()
+    prev_fcn = fcn
+
 def dm():
     """
-    dmacs editor: invoke editor functions with emacs control keys.
+    dmacs editor: loop invoking editor commands with emacs control keys.
     Supported keys and the fcns they invoke are expressed in keymap table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
@@ -211,9 +221,7 @@ def dm():
                 prev_fcn = None # there is no 'exit dmacs' fcn - just do it
                 break
             else:
-                fcn = keymap.get(k, lambda: util.putstr(key.bel))
-                fcn()
-                prev_fcn = fcn
+                dmcmd(k)
     terminal.set_line_mode()
     close_promptline()
     display.put_cursor(edsel.tlines, 1) # return cursor to command line

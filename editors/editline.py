@@ -186,10 +186,27 @@ keymap = {
     key.M_d: kill_word,
 }
 
+def elcmd(keycode, point, line):
+    """
+    Invoke a single editline command: look up k in keymap, run that command.
+    """
+    global prev_fcn
+    fcn = keymap[keycode]
+    prev_fcn = fcn
+    return fcn(point, line) # new point, line
+
+def elglob(keycode):
+    """
+    Invoke single editine command, update global variables
+    """
+    global point, line
+    point, line = elcmd(keycode, point, line)
+
 def el():
     """
-    Call editline fcns on line starting at point, until user exits with M-x
-    This function is closely based on the dm function in the dmacs module.
+    Test editline on the Python command line: loop invoking editor commands.
+    Type characters and control keys to edit inline, exit with M-x.
+    Update global variables
     """
     global point, line,  prev_fcn
     terminal.set_char_mode()
@@ -204,10 +221,8 @@ def el():
                 point, line = insert_char(k, point, line)
                 prev_fcn = insert_char
             elif k in keymap:
-                fcn = keymap[k]
-                point, line = fcn(point, line)
-                prev_fcn = fcn
+                point, line = elglob(k)
             else:
                 util.putstr(key.bel) # FIXME makes no sound - why?
     terminal.set_line_mode()
-    print() # print >>> prompt on next line
+    print() # advance to next line for Python prompt
