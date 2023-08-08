@@ -192,8 +192,9 @@ def elcmd(keycode, point, line):
     """
     global prev_fcn
     fcn = keymap[keycode]
-    prev_fcn = fcn
-    return fcn(point, line) # new point, line
+    point, line = fcn(point, line) # local point, line here
+    prev_fcn = fcn # must assign *after* calling fcn!
+    return point, line
 
 def elglob(keycode):
     """
@@ -221,7 +222,7 @@ def el():
                 point, line = insert_char(k, point, line)
                 prev_fcn = insert_char
             elif k in keymap:
-                point, line = elglob(k)
+                elglob(k) # update global point, line
             else:
                 util.putstr(key.bel) # FIXME makes no sound - why?
     terminal.set_line_mode()
