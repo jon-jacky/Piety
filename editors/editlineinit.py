@@ -2,8 +2,14 @@
 editlineinit.py - define and initialize global variables used in editline
 """
 
-line = str() # for testing, to make this module self-contained
-point = 0
+# For testing
+line = str() # immutable
+
+# For testing
+buffer = [ str() ] # mutable
+dot = 0 # index into buffer
+
+point = 0 # index into string being edited: line or buffer[dot]
 
 start_col = 0    # default, no prompt or other chars at left margin
 # start_col = 2  # when prompt is '> ' for example

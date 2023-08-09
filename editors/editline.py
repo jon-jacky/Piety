@@ -198,20 +198,36 @@ def elcmd(keycode, point, line):
 
 def elglob(keycode):
     """
-    Invoke single editine command, update global variables
+    Invoke single editine command, update immutable global variables.
     """
     global point, line
-    point, line = elcmd(keycode, point, line)
+    point, line = elcmd(keycode, point, line) # point, line are immutable
+
+def elcmd_aref(keycode, buffer, dot):
+    """
+    Invoke single editline command, update mutable buffer array parameter.
+    """
+    global point
+    point, buffer[dot] = elcmd(keycode, point, buffer[dot]) # buffer is mutable
+
+def elinsert_aref(keycode, buffer, dot):
+    """
+    Invoke insert_char command, update mutable buffer array parameter.
+    """
+    global point
+    point, buffer[dot] = insert_char(keycode, point, buffer[dot]) 
 
 def el():
     """
     Test editline on the Python command line: loop invoking editor commands.
     Type characters and control keys to edit inline, exit with M-x.
-    Update global variables
+    Comment/uncomment lines to switch between using elglob and elcmd_aref.
     """
     global point, line,  prev_fcn
+    # print(f'id(buffer) in caller el: {id(buffer)}\n') # DEBUG
     terminal.set_char_mode()
-    refresh(point, line)
+    # refresh(point, line) # immutable line, updated by eglob
+    refresh(point, buffer[dot]) # mutable buffer, updated by elcmd_aref
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
@@ -219,10 +235,12 @@ def el():
             if k == key.M_x:
                 break
             elif k in printing_chars:
-                point, line = insert_char(k, point, line)
+                # point, line = insert_char(k, point, line)
+                elinsert_aref(k, buffer, dot) # update mutable parameter: buffer
                 prev_fcn = insert_char
             elif k in keymap:
-                elglob(k) # update global point, line
+                # elglob(k) # update global immutable vars: point, line
+                elcmd_aref(k, buffer, dot) # update mutable parameter: buffer
             else:
                 util.putstr(key.bel) # FIXME makes no sound - why?
     terminal.set_line_mode()
