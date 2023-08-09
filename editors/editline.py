@@ -25,6 +25,8 @@ printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 start_word = re.compile(r'\W\w') # Non-word char then word char
 end_word = re.compile(r'\w\W') # Word char then non-word char
 
+# Functions that move point but do not change line contents
+
 def move_to_point(point, line):
     # start_col accounts for prompt or other chars in left margin
     # move_to_column and start_col are 1-based but point is 0-based
@@ -39,28 +41,10 @@ def move_end(point, line):
     point = len(line)
     return move_to_point(point, line)
 
-def insert_char(keycode, point, line): # not in keymap so keycode arg is okay
-    line = (line[:point] + keycode + line[point:])
-    point += 1
-    display.insert_char(keycode)
-    return point, line
-
-def delete_backward_char(point, line):
-    if point > 0:
-        line = (line[:point-1] + line[point:]) 
-        point -= 1
-        display.delete_backward_char()
-    return point, line
-
 def backward_char(point, line):
     if point > 0:
         point -= 1
         display.backward_char()
-    return point, line
-
-def delete_char(point, line):
-    line = (line[:point] + line[point+1:])
-    display.delete_char() # point does not change
     return point, line
 
 def forward_char(point, line):
@@ -89,6 +73,26 @@ def backward_word(point, line):
     if m:
         point = point - m.start() - 1
         point, line = move_to_point(point, line)
+    return point, line
+
+# Functions that change line contents
+
+def insert_char(keycode, point, line): # not in keymap so keycode arg is okay
+    line = (line[:point] + keycode + line[point:])
+    point += 1
+    display.insert_char(keycode)
+    return point, line
+
+def delete_backward_char(point, line):
+    if point > 0:
+        line = (line[:point-1] + line[point:]) 
+        point -= 1
+        display.delete_backward_char()
+    return point, line
+
+def delete_char(point, line):
+    line = (line[:point] + line[point+1:])
+    display.delete_char() # point does not change
     return point, line
 
 def kill_word(point, line):
@@ -188,12 +192,18 @@ keymap = {
 
 def elcmd(keycode, point, line):
     """
-    Invoke a single editline command: look up k in keymap, run that command.
+    Invoke a single editline command: look up key in keymap, run that command.
     """
     global prev_fcn
-    fcn = keymap[keycode]
-    point, line = fcn(point, line) # local point, line here
-    prev_fcn = fcn # must assign *after* calling fcn!
+    if keycode in printing_chars:
+        point, line = insert_char(keycode, point, line)
+        prev_fcn = insert_char
+    elif keycode in keymap:
+        fcn = keymap[keycode]
+        point, line = fcn(point, line) # local point, line here
+        prev_fcn = fcn # must assign *after* calling fcn!
+    else:
+        util.putstr(key.bel) # FIXME makes no sound - why?
     return point, line
 
 def elglob(keycode):
@@ -210,13 +220,6 @@ def elcmd_aref(keycode, buffer, dot):
     global point
     point, buffer[dot] = elcmd(keycode, point, buffer[dot]) # buffer is mutable
 
-def elinsert_aref(keycode, buffer, dot):
-    """
-    Invoke insert_char command, update mutable buffer array parameter.
-    """
-    global point
-    point, buffer[dot] = insert_char(keycode, point, buffer[dot]) 
-
 def el():
     """
     Test editline on the Python command line: loop invoking editor commands.
@@ -224,7 +227,6 @@ def el():
     Comment/uncomment lines to switch between using elglob and elcmd_aref.
     """
     global point, line,  prev_fcn
-    # print(f'id(buffer) in caller el: {id(buffer)}\n') # DEBUG
     terminal.set_char_mode()
     # refresh(point, line) # immutable line, updated by eglob
     refresh(point, buffer[dot]) # mutable buffer, updated by elcmd_aref
@@ -234,14 +236,9 @@ def el():
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.M_x:
                 break
-            elif k in printing_chars:
-                # point, line = insert_char(k, point, line)
-                elinsert_aref(k, buffer, dot) # update mutable parameter: buffer
-                prev_fcn = insert_char
-            elif k in keymap:
+            else:
                 # elglob(k) # update global immutable vars: point, line
                 elcmd_aref(k, buffer, dot) # update mutable parameter: buffer
-            else:
-                util.putstr(key.bel) # FIXME makes no sound - why?
     terminal.set_line_mode()
     print() # advance to next line for Python prompt
+
