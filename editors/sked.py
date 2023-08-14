@@ -355,7 +355,7 @@ def d(start=None, end=None, append=None, move_dot=move_dot):
     If append=False (the default), rewrite yank buffer on each call.
     If append=True, append to yank buffer so consecutive d's accumulate there.
     """
-    global buffer, yank, saved
+    global buffer, yank, saved, yank_lines
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
@@ -365,6 +365,7 @@ def d(start=None, end=None, append=None, move_dot=move_dot):
     else:
         yank += buffer[start:end+1] # append to accumulated consecutive d's
     buffer[start:end+1] = [] 
+    yank_lines = True # next y(ank) will yank whole line(s) from yank buffer
     saved = False # put this before move_dot for display
     move_dot(start) # FIXME what if we delete last line in buffer?
 

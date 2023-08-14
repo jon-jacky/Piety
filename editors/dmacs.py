@@ -199,7 +199,7 @@ def dmcmd(k):
     """
     Invoke a single dmacs command: look up k in keymap, run that command.
     """
-    global prev_cmd
+    global prev_fcn
     fcn = keymap.get(k, lambda: util.putstr(key.bel))
     fcn()
     prev_fcn = fcn
