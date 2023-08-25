@@ -17,7 +17,7 @@ def open_line(keycode):
     """
     suffix = ed.buffer[ed.dot:] # including final \n
     # Calls editline.kill_line, thanks to key.C_k, not keycode
-    editline.elcmd_aref(key.C_k, editline.point, ed.buffer[ed.dot])
+    editline.elcmd_aref(key.C_k, ed.buffer, ed.dot)
     ed.buffer[ed.dot+1:ed.dot+1] = suffix # sic, insert suffix after dot
     ed.dot = ed.dot + 1
     editline.point = 0
@@ -25,7 +25,7 @@ def open_line(keycode):
     # may need more after update_below - see edsel display_y and other uses
 # The following functions supercede and wrap functions in editline
 
-def join_prev(keycode):
+def join_prev():
     'Join this line to previous. At first line do nothing.'
     if ed.dot > 1:
         editline.point = len(ed.buffer[ed.dot-1])-1 # don't count \n
@@ -37,10 +37,10 @@ def delete_backward_char(keycode):
     """
     if editline.point > 0:
         # Calls editline.delete_backward_char, thanks to keycode
-        editline.elcmd_aref(keycode, editline.point, ed.buffer[ed.dot])
+        editline.elcmd_aref(keycode, ed.buffer, ed.dot)
     else: 
         join_prev() # see above
-def join_next(keycode):
+def join_next():
     'Join next line to this one. At last line do nothing.'
     if ed.dot < ed.S():
         ed.j() # defaults in ed.j join dot to dot+1
@@ -51,7 +51,7 @@ def delete_char(keycode):
     """
     if editline.point < len(ed.buffer[ed.dot]):
         # Calls editline.delete_char, thanks to keycode
-        editline.elcmd_aref(keycode, editline.point, ed.buffer[ed.dot])
+        editline.elcmd_aref(keycode, ed.buffer, ed.dot)
     else:
         join_next() # see above
 
@@ -59,22 +59,22 @@ def kill_line(keycode):
     """
     Kill entire line(s) or kill the rest of line at dot
     """
-    if True: # FIXME for now always use dmacs kill_line, work out logic later
+    if False: # FIXME for now always use editline kill_line
         dmacs.kill_line()
     else:
         # Calls editline kill_line, thanks to keycode
-        editline.elcmd_aref(keycode, editline.point, ed.buffer[ed.dot])
+        editline.elcmd_aref(keycode, ed.buffer, ed.dot)
 
 def yank(keycode):
     """
     Yank entire line(s) or yank word(s) within a line, depending on yank_lines
     """
-    if ed.yank_lines:
+    if False: # DEBUG, force editline yank
+    # if ed.yank_lines:
         ed.y() # yank entire line(s)
     else:
         # Calls editline.yank, thanks to keycode
-        editline.elcmd_aref(keycode, editline.point, ed.buffer[ed.dot])
-        return editline.yank(point, line) # yank word(s) within a line
+        editline.elcmd_aref(keycode, ed.buffer, ed.dot)
 
 def refresh(keycode):
     'pmacs refresh requires keycode arg but edsel refresh has none.'
@@ -105,6 +105,7 @@ def pm():
     """
     dmacs.open_promptline()
     terminal.set_char_mode()
+    display.put_cursor(edsel.wline(ed.dot), editline.point)
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
