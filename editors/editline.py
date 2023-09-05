@@ -7,7 +7,7 @@ Unlike readline, call and return for each key so you can edit without blocking.
 import string, re
 import key, display
 import util, terminal, keyseq # only needed by main() test 
-import sked as ed # for ed.yank_lines
+import sked as ed # for ed.yank_lines # FIXME shouldn't be necessary
 
 # Define and initialize global variables used by editline.
 # Conditinally exec only the *first* time this module is imported in a session.
@@ -39,7 +39,7 @@ def move_beginning(point, line):
     return move_to_point(point, line)
 
 def move_end(point, line):
-    point = len(line)
+    point = len(line.rstrip('\n')) # stop short of any final \n
     return move_to_point(point, line)
 
 def backward_char(point, line):
@@ -49,7 +49,7 @@ def backward_char(point, line):
     return point, line
 
 def forward_char(point, line):
-    if point < len(line):
+    if point < len(line) and line[point] != '\n':
         point += 1
         display.forward_char()
     return point, line
@@ -119,11 +119,11 @@ def kill_line(point, line):
     Append killed segment to yank buffer if we are doing consecutive kills.
     """
     global yank_buffer
-    killed_segment = line[point:]
+    killed_segment = line[point:] # includes final \n, if any
     if killed_segment: # Do not overwrite yank buffer with empty segment
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
                        else killed_segment)
-    line = line[:point] # point does not change
+    line = line[:point] + '\n' if killed_segment.endswith('\n') else ''
     ed.yank_lines = False # next yank will yank word(s) into a line
     display.kill_line()
     return point, line

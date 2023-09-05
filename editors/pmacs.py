@@ -105,7 +105,8 @@ def pm():
     """
     dmacs.open_promptline()
     terminal.set_char_mode()
-    display.put_cursor(edsel.wline(ed.dot), editline.point)
+    # point+1 to make put_cursor call consistent with editline move_to_column
+    display.put_cursor(edsel.wline(ed.dot), editline.point + 1)
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)

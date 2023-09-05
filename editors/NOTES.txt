@@ -2,7 +2,7 @@
 notes
 =====
 
-Notes on the code in the editors *sked*, *edsel*, and *dmacs*.
+Notes on the code in *Piety/editors*.
 
 This is a .txt not an .md file to emphasize its roughness and incompleteness.
 
@@ -73,6 +73,16 @@ the same name as the sked function it wraps.
 
 4. Window management functions that do not depend on sked
 
+We have considered moving out sections 1 and 4, which do not 
+depend on sked, to their own separate module titled 'frame'.
+
+This could make for a nicer modular structure where the dependencies
+are clearer.   But it also proliferates modules and makes code more verbose
+because edsel would need to put the 'frame.' prefix all over.
+
+Before attempting this, let's try adding multiple windows and see if these
+too could be provided in a sked-less frame module.
+
 ### dmacs ###
 
 Invoke editor functions with emacs keys (control keys or key seqs).
@@ -84,4 +94,23 @@ without the module name prefix, just dm() not dmacs.dm().
 Then, if we edit more commands into dm, we can load them without restarting
 the session by reload(dmacs).  The argument to reload must be the module name.
 
-Revised Jun 2023
+### editline ###
+
+This code may be used to edit a line in a text buffer, where 
+every line in the buffer ends with a newline character, Python '\n'.
+The standard Python readlines function puts it there when it loads the file.
+So code in this module has special cases to handle \n.  
+
+Functions in this module must always leave the newline character
+at the end of the line.  In particular, kill_line.
+
+Functions in this module also must work correctly with lines that
+do not end in \n.  They must not add \n where there was none.
+Again, kill_line.
+
+Functions in this module that advance point must not advance point
+past the final newline.   In particuler, move_end and forward_char.  
+This ensures that when new characters are typed, they are inserted 
+ahead of the final newline.
+
+Revised Sep 2023
