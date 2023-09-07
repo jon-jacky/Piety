@@ -99,6 +99,10 @@ the session by reload(dmacs).  The argument to reload must be the module name.
 This code may be used to edit a line in a text buffer, where 
 every line in the buffer ends with a newline character, Python '\n'.
 The standard Python readlines function puts it there when it loads the file.
+
+BUT this code may also be used to edit lone command lines, which might
+not end with \n.
+
 So code in this module has special cases to handle \n.  
 
 Functions in this module must always leave the newline character

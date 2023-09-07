@@ -98,6 +98,10 @@ def pmcmd(keycode):
     fcn = keymap[keycode]
     fcn(keycode)
 
+def restore_cursor_to_window():
+    # point+1 to make put_cursor call consistent with editline move_to_column
+    display.put_cursor(edsel.wline(ed.dot), editline.point + 1)
+
 def pm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
@@ -105,8 +109,8 @@ def pm():
     """
     dmacs.open_promptline()
     terminal.set_char_mode()
-    # point+1 to make put_cursor call consistent with editline move_to_column
-    display.put_cursor(edsel.wline(ed.dot), editline.point + 1)
+    edsel.restore_cursor = restore_cursor_to_window
+    edsel.restore_cursor()
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
@@ -120,5 +124,6 @@ def pm():
             elif k in dmacs.keymap:
                 dmacs.dmcmd(k)
     dmacs.close_promptline()
-    display.put_cursor(edsel.tlines, 1) # return cursor to command line
+    edsel.restore_cursor = edsel.restore_cursor_to_cmdline
+    edsel.restore_cursor()
     terminal.set_line_mode()
