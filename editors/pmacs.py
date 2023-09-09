@@ -30,6 +30,7 @@ def join_prev():
     if ed.dot > 1:
         editline.point = len(ed.buffer[ed.dot-1])-1 # don't count \n
         ed.j(ed.dot-1, ed.dot)
+
 def delete_backward_char(keycode):
     """
     If point is not at start of line, delete preceding character.
@@ -40,10 +41,12 @@ def delete_backward_char(keycode):
         editline.elcmd_aref(keycode, ed.buffer, ed.dot)
     else: 
         join_prev() # see above
+
 def join_next():
     'Join next line to this one. At last line do nothing.'
     if ed.dot < ed.S():
         ed.j() # defaults in ed.j join dot to dot+1
+
 def delete_char(keycode):
     """
     If point is not at end of line, delete character under cursor.
@@ -55,22 +58,31 @@ def delete_char(keycode):
     else:
         join_next() # see above
 
+yank_lines = True # initially when module loaded, reassigned while editing
+
 def kill_line(keycode):
     """
     Kill entire line(s) or kill the rest of line at dot
     """
-    if False: # FIXME for now always use editline kill_line
+    global yank_lines
+    if editline.point == 0:  # cursor at beginning of line, kill whole line
+        yank_lines = True
         dmacs.kill_line()
     else:
+        yank_lines = False # cursor within line, only kill from cursor to end
         # Calls editline kill_line, thanks to keycode
         editline.elcmd_aref(keycode, ed.buffer, ed.dot)
+
+def cut(keycode):
+    global yank_lines
+    yank_lines = True
+    dmacs.in_region(edsel.d)
 
 def yank(keycode):
     """
     Yank entire line(s) or yank word(s) within a line, depending on yank_lines
     """
-    if False: # DEBUG, force editline yank
-    # if ed.yank_lines:
+    if yank_lines:
         ed.y() # yank entire line(s)
     else:
         # Calls editline.yank, thanks to keycode
@@ -88,6 +100,7 @@ keymap = {
     key.bs: delete_backward_char, 
     key.C_d: delete_char,
     key.C_k: kill_line,
+    key.C_w: cut, 
     key.C_y: yank,
     key.C_l: refresh,
 }
@@ -107,6 +120,7 @@ def pm():
     pmacs editor: invoke editor functions with emacs control keys.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
+    global yank_lines
     dmacs.open_promptline()
     terminal.set_char_mode()
     edsel.restore_cursor = restore_cursor_to_window
@@ -121,6 +135,7 @@ def pm():
                 pmcmd(k)
             elif k in editline.printing_chars or k in editline.keymap:
                 editline.elcmd_aref(k, ed.buffer, ed.dot)
+                yank_lines = False # editing inline, yank word(s) into line
             elif k in dmacs.keymap:
                 dmacs.dmcmd(k)
     dmacs.close_promptline()

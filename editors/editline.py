@@ -7,7 +7,6 @@ Unlike readline, call and return for each key so you can edit without blocking.
 import string, re
 import key, display
 import util, terminal, keyseq # only needed by main() test 
-import sked as ed # for ed.yank_lines # FIXME shouldn't be necessary
 
 # Define and initialize global variables used by editline.
 # Conditinally exec only the *first* time this module is imported in a session.
@@ -109,7 +108,6 @@ def kill_word(point, line):
         yank_buffer = (yank_buffer + cut_word if prev_fcn in yank_fcns
                        else cut_word)
         line = line[:point] + line[m.start()+1:]
-        ed.yank_lines = False # next yank will yank word(s) into a line
         display.delete_nchars(point - (m.start()+1))
     return point, line
 
@@ -124,7 +122,6 @@ def kill_line(point, line):
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
                        else killed_segment)
     line = line[:point] + '\n' if killed_segment.endswith('\n') else ''
-    ed.yank_lines = False # next yank will yank word(s) into a line
     display.kill_line()
     return point, line
 
@@ -139,7 +136,6 @@ def discard(point, line): # name like gnu readline unix-line-discard
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
                        else killed_segment)
     line = line[point:]
-    ed.yank_lines = False # next yank will yank word(s) into a line
     point, line = move_beginning(point, line) # accounts for prompt, assigns pt
     util.putstr(line)
     display.kill_line() # remove any leftover text past line

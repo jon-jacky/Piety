@@ -21,7 +21,6 @@ lmargin = 4           # N of spaces to indent or outdent, left margin for wrap.
 rmargin = 78          # right margin for wrap
 
 yank = [] # yank (paste) buffer
-yank_lines = True  # Yank whole line(s).  False to yank words within a line.
 
 # saved buffers, dictionary from buffer names to dict of buffer items
 # initialize so there is always a saved buffer to switch back to
