@@ -6,6 +6,7 @@ import edsel
 from edsel import *
 import dmacs
 from dmacs import dm # so we can revert to dmacs if pmacs is broken
+import editline
 import pmacs
 from pmacs import pm
 win(24)

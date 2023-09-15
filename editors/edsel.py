@@ -95,11 +95,14 @@ def put_marker(bufline, attribs):
     display.put_cursor(wline(bufline), 1)
     display.render(ch0, attribs)
 
+def restore_cursor_to_cmdline():
+    display.put_cursor(tlines, 1)
+
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wlines, 1) # window status line
     display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
-    restore_cursor() # defined above in this module
+    restore_cursor_to_cmdline()
 
 def refresh():
     '(Re)Display buffer segment, marker, status without moving segment'
@@ -116,11 +119,6 @@ def recenter():
     refresh()
 
 # Display functions: show effects of editing commands
-
-def restore_cursor_to_cmdline():
-    display.put_cursor(tlines, 1)
-
-restore_cursor = restore_cursor_to_cmdline
 
 def display_move_dot(iline):
     'Display effect of ed move_dot function.  Move current line, dot, to iline'

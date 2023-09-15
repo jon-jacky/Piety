@@ -8,6 +8,19 @@ or 'pathetic emacs' or maybe 'Passing grade emacs, just above Fail'.
 import terminal, key, keyseq, display, edsel, dmacs, editline 
 import sked as ed
 
+# helper functions
+
+def reset_point():
+    'Possibly move editline.point if needed when dot moves to another line'
+    linelen = len(ed.buffer[ed.dot])
+    if editline.point > linelen:
+        editline.point = linelen - 1 # -1 to put point before final \n
+
+def restore_cursor_to_window():
+    reset_point()
+    # point+1 to make put_cursor call consistent with editline move_to_column
+    display.put_cursor(edsel.wline(ed.dot), editline.point + 1)
+
 # Some functions do not use keycode arg but pmcmd and pm require it to be there
 
 def open_line(keycode):
@@ -15,15 +28,16 @@ def open_line(keycode):
     Split line at point, replace line in buffer at dot
     with its prefix, append suffix after line at dot.
     """
-    suffix = ed.buffer[ed.dot:] # including final \n
+    suffix = ed.buffer[ed.dot][editline.point:] # including final \n
     # Calls editline.kill_line, thanks to key.C_k, not keycode
     editline.elcmd_aref(key.C_k, ed.buffer, ed.dot)
-    ed.buffer[ed.dot+1:ed.dot+1] = suffix # sic, insert suffix after dot
+    ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
-    editline.point = 0
+    editline.point = 0 # start of new suffix line
     edsel.update_below(ed.dot) # update display
-    # may need more after update_below - see edsel display_y and other uses
-# The following functions supercede and wrap functions in editline
+    restore_cursor_to_window()
+
+# The following functions supercede and wrap functions in other modules
 
 def join_prev():
     'Join this line to previous. At first line do nothing.'
@@ -89,10 +103,9 @@ def yank(keycode):
         editline.elcmd_aref(keycode, ed.buffer, ed.dot)
 
 def refresh(keycode):
-    'pmacs refresh requires keycode arg but edsel refresh has none.'
+    'Define pmacs whole window refresh here so we dont use editline refresh'
     edsel.refresh()
-
-# FIXME? add command to enter edsel/sked append mode?
+    restore_cursor_to_window() # edsel.refresh doesn't do this# FIXME? add command to enter edsel/sked append mode?
 
 keymap = {
     key.cr: open_line, 
@@ -111,10 +124,6 @@ def pmcmd(keycode):
     fcn = keymap[keycode]
     fcn(keycode)
 
-def restore_cursor_to_window():
-    # point+1 to make put_cursor call consistent with editline move_to_column
-    display.put_cursor(edsel.wline(ed.dot), editline.point + 1)
-
 def pm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
@@ -123,8 +132,7 @@ def pm():
     global yank_lines
     dmacs.open_promptline()
     terminal.set_char_mode()
-    edsel.restore_cursor = restore_cursor_to_window
-    edsel.restore_cursor()
+    restore_cursor_to_window()
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
@@ -137,8 +145,9 @@ def pm():
                 editline.elcmd_aref(k, ed.buffer, ed.dot)
                 yank_lines = False # editing inline, yank word(s) into line
             elif k in dmacs.keymap:
+                edsel.restore_cursor_to_cmdline()
                 dmacs.dmcmd(k)
+                restore_cursor_to_window()
     dmacs.close_promptline()
-    edsel.restore_cursor = edsel.restore_cursor_to_cmdline
-    edsel.restore_cursor()
+    edsel.restore_cursor_to_cmdline()
     terminal.set_line_mode()
