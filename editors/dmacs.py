@@ -218,7 +218,8 @@ def dm():
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.M_x:
-                prev_fcn = None # there is no 'exit dmacs' fcn - just do it
+                # preserve prev_fcn after dm exit for debugging and resuming
+                # prev_fcn = None # there is no 'exit dmacs' fcn - just do it
                 break
             else:
                 dmcmd(k)

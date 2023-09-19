@@ -121,8 +121,11 @@ def kill_line(point, line):
     if killed_segment: # Do not overwrite yank buffer with empty segment
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
                        else killed_segment)
-    line = line[:point] + '\n' if killed_segment.endswith('\n') else ''
+    line = line[:point]
     display.kill_line()
+    point -= 1
+    if killed_segment.endswith('\n'):
+        line = line + '\n'
     return point, line
 
 def discard(point, line): # name like gnu readline unix-line-discard

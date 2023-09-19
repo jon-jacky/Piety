@@ -30,7 +30,7 @@ def open_line(keycode):
     """
     suffix = ed.buffer[ed.dot][editline.point:] # including final \n
     # Calls editline.kill_line, thanks to key.C_k, not keycode
-    editline.elcmd_aref(key.C_k, ed.buffer, ed.dot)
+    editline.elcmd_aref(key.C_k, ed.buffer, ed.dot) # just leave prefix on dot
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
     editline.point = 0 # start of new suffix line
@@ -81,7 +81,8 @@ def kill_line(keycode):
     global yank_lines
     if editline.point == 0:  # cursor at beginning of line, kill whole line
         yank_lines = True
-        dmacs.kill_line()
+        dmacs.dmcmd(keycode) # keycode is C_k here
+        restore_cursor_to_window()
     else:
         yank_lines = False # cursor within line, only kill from cursor to end
         # Calls editline kill_line, thanks to keycode
@@ -90,21 +91,23 @@ def kill_line(keycode):
 def cut(keycode):
     global yank_lines
     yank_lines = True
-    dmacs.in_region(edsel.d)
+    dmacs.dmcmd(keycode) # keycode is C_w here
+    restore_cursor_to_window()
 
 def yank(keycode):
     """
     Yank entire line(s) or yank word(s) within a line, depending on yank_lines
     """
     if yank_lines:
-        ed.y() # yank entire line(s)
+        dmacs.dmcmd(keycode) # keycode is C_y here
+        restore_cursor_to_window()
     else:
         # Calls editline.yank, thanks to keycode
         editline.elcmd_aref(keycode, ed.buffer, ed.dot)
 
 def refresh(keycode):
     'Define pmacs whole window refresh here so we dont use editline refresh'
-    edsel.refresh()
+    dmacs.dmcmd(keycode) # keycode is C_l here
     restore_cursor_to_window() # edsel.refresh doesn't do this# FIXME? add command to enter edsel/sked append mode?
 
 keymap = {
