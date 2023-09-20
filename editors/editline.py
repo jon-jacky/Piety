@@ -118,13 +118,14 @@ def kill_line(point, line):
     """
     global yank_buffer
     killed_segment = line[point:] # includes final \n, if any
+    killed_newline = True if killed_segment.endswith('\n') else False
+    killed_segment = killed_segment.rstrip('\n')
     if killed_segment: # Do not overwrite yank buffer with empty segment
         yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
                        else killed_segment)
     line = line[:point]
     display.kill_line()
-    point -= 1
-    if killed_segment.endswith('\n'):
+    if killed_newline:
         line = line + '\n'
     return point, line
 
