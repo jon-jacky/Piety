@@ -43,7 +43,7 @@ def join_prev():
     'Join this line to previous. At first line do nothing.'
     if ed.dot > 1:
         editline.point = len(ed.buffer[ed.dot-1])-1 # don't count \n
-        ed.j(ed.dot-1, ed.dot)
+        edsel.j(ed.dot-1, ed.dot) # defaults in ed.j join dot to dot+1
 
 def delete_backward_char(keycode):
     """
@@ -52,25 +52,27 @@ def delete_backward_char(keycode):
     """
     if editline.point > 0:
         # Calls editline.delete_backward_char, thanks to keycode
-        editline.elcmd_aref(keycode, ed.buffer, ed.dot)
+        editline.elcmd_aref(keycode, ed.buffer, ed.dot) # keycode is DEL key.bs
     else: 
         join_prev() # see above
+    dmacs.prev_fcn = delete_backward_char
 
 def join_next():
     'Join next line to this one. At last line do nothing.'
     if ed.dot < ed.S():
-        ed.j() # defaults in ed.j join dot to dot+1
+        edsel.j() # defaults in ed.j join dot to dot+1
 
 def delete_char(keycode):
     """
     If point is not at end of line, delete character under cursor.
     Otherwise join next line to this one.  At end of last line do nothing.
     """
-    if editline.point < len(ed.buffer[ed.dot]):
+    if editline.point < len(ed.buffer[ed.dot].rstrip('\n')):
         # Calls editline.delete_char, thanks to keycode
-        editline.elcmd_aref(keycode, ed.buffer, ed.dot)
+        editline.elcmd_aref(keycode, ed.buffer, ed.dot) # keycode is C_d here
     else:
         join_next() # see above
+        restore_cursor_to_window()
 
 yank_lines = True # initially when module loaded, reassigned while editing
 
