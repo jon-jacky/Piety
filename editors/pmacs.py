@@ -33,8 +33,11 @@ def open_line(keycode):
     editline.elcmd_aref(key.C_k, ed.buffer, ed.dot) # just leave prefix on dot
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
+    if edsel.in_window(ed.dot):
+        edsel.update_below(ed.dot)
+    else:
+        edsel.recenter()
     editline.point = 0 # start of new suffix line
-    edsel.update_below(ed.dot) # update display
     restore_cursor_to_window()
 
 # The following functions supercede and wrap functions in other modules
