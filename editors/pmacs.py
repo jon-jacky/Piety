@@ -8,6 +8,16 @@ or 'pathetic emacs' or maybe 'Passing grade emacs, just above Fail'.
 import terminal, key, keyseq, display, edsel, dmacs, editline 
 import sked as ed
 
+# Define and initialize global variables used by pmacs functions.
+# Conditinally exec only the *first* time this module is imported in a session.
+# Then we can reload this module without re-initializing those variables.
+# Must use EDPATH because PYTHONPATH only works for import, not open()
+EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
+try:
+    _ = saved_put_marker # if already defined, then pmacsinit was already exec
+except:
+    exec(open(EDPATH + 'pmacsinit.py').read())
+
 # helper functions
 
 def reset_point():
@@ -125,12 +135,23 @@ keymap = {
     key.C_y: yank,
     key.C_l: refresh,
 }
+
 def pmcmd(keycode):
     """
     Execute a single pmacs command: dispatch on key k, run function
     """
     fcn = keymap[keycode]
     fcn(keycode)
+
+def clear_marker():
+    edsel.put_marker(ed.dot, display.clear)
+    display.put_cursor(edsel.tlines, 1)
+
+def put_no_marker(bufline, attribs): 
+    'Assign to edsel.put_marker to suppress marker while running pmacs'
+    pass
+
+# saved_put_marker is initialized in pmacsinit.py so we can restore
 
 def pm():
     """
@@ -140,6 +161,8 @@ def pm():
     global yank_lines
     dmacs.open_promptline()
     terminal.set_char_mode()
+    clear_marker()
+    edsel.put_marker = put_no_marker
     restore_cursor_to_window()
     while True:
         c = terminal.getchar()
@@ -157,5 +180,7 @@ def pm():
                 dmacs.dmcmd(k)
                 restore_cursor_to_window()
     dmacs.close_promptline()
+    edsel.put_marker = saved_put_marker # initialized in pmacsinit.py
+    edsel.put_marker(ed.dot, display.white_bg)
     edsel.restore_cursor_to_cmdline()
     terminal.set_line_mode()
