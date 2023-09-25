@@ -366,7 +366,9 @@ def d(start=None, end=None, append=None, move_dot=move_dot):
         yank += buffer[start:end+1] # append to accumulated consecutive d's
     buffer[start:end+1] = [] 
     saved = False # put this before move_dot for display
-    move_dot(start) # FIXME what if we delete last line in buffer?
+    # We might have deleted the last line in the buffer.
+    new_dot = start if start < len(buffer) else len(buffer)-1
+    move_dot(new_dot)
 
 def y(iline=None, move_dot=move_dot): # move_dot is hook for display code
     'y(ank), that is paste, yank buffer contents *before* iline (default dot)'
