@@ -1,5 +1,5 @@
 """
-pmacs.py - display editor that uses emacs control terminal, keys.
+pmacs.py - display editor that uses emacs control keys.
 
 pmacs might mean 'Python emacs' but actually means 'poor emacs'
 or 'pathetic emacs' or maybe 'Passing grade emacs, just above Fail'.

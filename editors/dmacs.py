@@ -182,6 +182,9 @@ keymap = {
     key.C_x + key.C_r : save_reload, # *not* like emacs find-file read-only
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
+    # arrow keys, send ANSI escape sequences
+    key.down: edsel.l, # next line
+    key.up: edsel.rl, # previous line
 }
 
 def open_promptline():

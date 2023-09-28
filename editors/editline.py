@@ -192,6 +192,9 @@ keymap = {
     key.M_f: forward_word,
     key.M_b: backward_word,
     key.M_d: kill_word,
+    # arrow keys, send ANSI escape sequences
+    key.left: backward_char,
+    key.right: forward_char,
 }
 
 def elcmd(keycode, point, line):
