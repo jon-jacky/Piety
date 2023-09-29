@@ -58,7 +58,7 @@ def request(prompt):
     return response
 
 def request_search():
-    if not prev_fcn in (fwd_search, bkwd_search):
+    if not prev_cmd in (fwd_search, bkwd_search):
         response = request(f'Search string (default {ed.searchstring}): ')
         if response and not cancelled(response): ed.searchstring = response
         return response # because caller always check cancelled(response)
@@ -130,7 +130,7 @@ def replace_string():
 
 def kill_line():
     'Delete single line, accumulate consecutive deleted lines in yank buffer'
-    if prev_fcn != kill_line: # first kill_line:, rewrite yank buffer
+    if prev_cmd != kill_line: # first kill_line:, rewrite yank buffer
         edsel.d()
     else: 
         edsel.d(None,None,True) # consecutive C_k, append line to yank buffer
@@ -202,18 +202,18 @@ def dmcmd(k):
     """
     Invoke a single dmacs command: look up k in keymap, run that command.
     """
-    global prev_fcn
-    fcn = keymap.get(k, lambda: util.putstr(key.bel))
-    fcn()
-    prev_fcn = fcn
+    global prev_cmd
+    cmd = keymap.get(k, lambda: util.putstr(key.bel))
+    cmd()
+    prev_cmd = cmd
 
 def dm():
     """
     dmacs editor: loop invoking editor commands with emacs control keys.
-    Supported keys and the fcns they invoke are expressed in keymap table.
+    Supported keys and the cmds they invoke are expressed in keymap table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
-    global prev_fcn
+    global prev_cmd
     open_promptline()
     terminal.set_char_mode()
     while True:
@@ -221,8 +221,7 @@ def dm():
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.M_x:
-                # preserve prev_fcn after dm exit for debugging and resuming
-                # prev_fcn = None # there is no 'exit dmacs' fcn - just do it
+                # preserve prev_cmd after dm exit for debugging and resuming
                 break
             else:
                 dmcmd(k)

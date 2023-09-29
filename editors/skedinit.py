@@ -20,7 +20,7 @@ saved = True          # True when no unsaved changes, safe to run e(dit).
 lmargin = 4           # N of spaces to indent or outdent, left margin for wrap.
 rmargin = 78          # right margin for wrap
 
-yank = [] # yank (paste) buffer
+yank_buffer = [] # yank (paste) buffer
 
 # saved buffers, dictionary from buffer names to dict of buffer items
 # initialize so there is always a saved buffer to switch back to

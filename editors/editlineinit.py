@@ -18,7 +18,7 @@ n_spaces = 4 # Used by tab.  In production maybe assign sked.indent.
 
 yank_buffer = str() # save killed (cut) words here to restore with yank (paste)
 
-prev_fcn = None # some functons behave differently when repeated
+prev_cmd = None # some functons behave differently when repeated
 
 
 

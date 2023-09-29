@@ -352,18 +352,18 @@ def d(start=None, end=None, append=None, move_dot=move_dot):
     Save deleted lines in yank (paste) buffer.
     Set dot to first line *following* deletion, 
     so consecutive d's delete a section.
-    If append=False (the default), rewrite yank buffer on each call.
-    If append=True, append to yank buffer so consecutive d's accumulate there.
+    If append=False (the default), rewrite yank_buffer on each call.
+    If append=True, append to yank_buffer so consecutive d's accumulate there.
     """
-    global buffer, yank, saved
+    global buffer, yank_buffer, saved
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
         return
-    if not append: # default, rewrite yank buffer on each call 
-        yank = buffer[start:end+1] # range includes end, unlike Python slices
+    if not append: # default, rewrite yank_buffer on each call 
+        yank_buffer = buffer[start:end+1] # range includes end, unlike Python slices
     else:
-        yank += buffer[start:end+1] # append to accumulated consecutive d's
+        yank_buffer += buffer[start:end+1] # append to accumulated consecutive d's
     buffer[start:end+1] = [] 
     saved = False # put this before move_dot for display
     # We might have deleted the last line in the buffer.
@@ -371,14 +371,14 @@ def d(start=None, end=None, append=None, move_dot=move_dot):
     move_dot(new_dot)
 
 def y(iline=None, move_dot=move_dot): # move_dot is hook for display code
-    'y(ank), that is paste, yank buffer contents *before* iline (default dot)'
+    'y(ank), that is paste, yank_buffer contents *before* iline (default dot)'
     global buffer, saved
     if not iline: iline = dot
     if not line_valid(iline):
         return
-    buffer[iline:iline] = yank # insert yank buffer contents *before* iline
+    buffer[iline:iline] = yank_buffer # insert yank_buffer contents *before* iline
     saved = False # put this before move_dot for display
-    move_dot(iline + len(yank)) # same text line, now first after yanked
+    move_dot(iline + len(yank_buffer)) # same text line, now first after yanked
 
 def c(old=None, new=None, start=None, end=None, count=-1, printline=print,
       move_dot=move_dot):
@@ -447,7 +447,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     left and right margins default to lmargin, rmargin.
     if lmarg (or rmarg) is given, lmargin (or rmargin) is set to that value.
     """
-    global lmargin, rmargin, yank
+    global lmargin, rmargin, yank_buffer
     if not start: start = dot
     if not end: end = dot
     if not range_valid(start, end):
@@ -464,7 +464,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     wrapped = [ line + '\n' for line in wlines ]
     buffer[start:end+1] = []  # delete unwrapped lines
     buffer[start:start] = wrapped # sic, insert lines at this position
-    yank = wrapped # FIXME hack so we can use edsel display_y for move_dot
+    yank_buffer = wrapped # FIXME? hack so we can use edsel display_y for move_dot
     move_dot(start + len(wrapped) - 1) # move dot to end of wrapped text
 
 def j(start=None, end=None, move_dot=move_dot):

@@ -200,7 +200,7 @@ def display_y(iline):
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that move_dot(iline) does
     if in_window(ed.dot):
-        update_below(ed.dot - len(ed.yank)) # first yanked line
+        update_below(ed.dot - len(ed.yank_buffer)) # first yanked line
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:

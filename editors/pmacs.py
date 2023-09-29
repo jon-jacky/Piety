@@ -68,7 +68,7 @@ def delete_backward_char(keycode):
         editline.elcmd_aref(keycode, ed.buffer, ed.dot) # keycode is DEL key.bs
     else: 
         join_prev() # see above
-    dmacs.prev_fcn = delete_backward_char
+    dmacs.prev_cmd = delete_backward_char
 
 def join_next():
     'Join next line to this one. At last line do nothing.'

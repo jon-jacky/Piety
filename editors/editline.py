@@ -105,7 +105,7 @@ def kill_word(point, line):
     m = end_word.search(line, point)
     if m:
         cut_word = line[point:m.start()+1]
-        yank_buffer = (yank_buffer + cut_word if prev_fcn in yank_fcns
+        yank_buffer = (yank_buffer + cut_word if prev_cmd in kill_cmds
                        else cut_word)
         line = line[:point] + line[m.start()+1:]
         display.delete_nchars(point - (m.start()+1))
@@ -121,7 +121,7 @@ def kill_line(point, line):
     killed_newline = True if killed_segment.endswith('\n') else False
     killed_segment = killed_segment.rstrip('\n')
     if killed_segment: # Do not overwrite yank buffer with empty segment
-        yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
+        yank_buffer = (yank_buffer + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[:point]
     display.kill_line()
@@ -137,7 +137,7 @@ def discard(point, line): # name like gnu readline unix-line-discard
     global yank_buffer
     killed_segment = line[:point]
     if killed_segment: # Do not overwrite yank buffer with empty segment
-        yank_buffer = (yank_buffer + killed_segment if prev_fcn in yank_fcns
+        yank_buffer = (yank_buffer + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[point:]
     point, line = move_beginning(point, line) # accounts for prompt, assigns pt
@@ -145,8 +145,8 @@ def discard(point, line): # name like gnu readline unix-line-discard
     display.kill_line() # remove any leftover text past line
     return move_beginning(point, line) # replace cursor again
 
-# yank_fcns can't be defined until after we define kill_word etc.
-yank_fcns = (kill_word, kill_line, discard) # fcns that update yank_buffer
+# kill_cmds can't be defined until after we define kill_word etc.
+kill_cmds = (kill_word, kill_line, discard) # cmds that update yank_buffer
 
 def yank(point, line):
     'Paste (yank) string previously deleted by kill or discard'
@@ -201,14 +201,14 @@ def elcmd(keycode, point, line):
     """
     Invoke a single editline command: look up key in keymap, run that command.
     """
-    global prev_fcn
+    global prev_cmd
     if keycode in printing_chars:
         point, line = insert_char(keycode, point, line)
-        prev_fcn = insert_char
+        prev_cmd = insert_char
     elif keycode in keymap:
-        fcn = keymap[keycode]
-        point, line = fcn(point, line) # local point, line here
-        prev_fcn = fcn # must assign *after* calling fcn!
+        cmd = keymap[keycode]
+        point, line = cmd(point, line) # local point, line here
+        prev_cmd = cmd # must assign *after* calling cmd!
     else:
         util.putstr(key.bel) # FIXME makes no sound - why?
     return point, line
@@ -233,7 +233,7 @@ def el():
     Type characters and control keys to edit inline, exit with M-x.
     Comment/uncomment lines to switch between using elglob and elcmd_aref.
     """
-    global point, line,  prev_fcn
+    global point, line,  prev_cmd
     terminal.set_char_mode()
     # refresh(point, line) # immutable line, updated by eglob
     refresh(point, buffer[dot]) # mutable buffer, updated by elcmd_aref
