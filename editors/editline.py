@@ -220,7 +220,7 @@ def elglob(keycode):
     global point, line
     point, line = elcmd(keycode, point, line) # point, line are immutable
 
-def elcmd_aref(keycode, buffer, dot):
+def runcmd(keycode, buffer, dot):
     """
     Invoke single editline command, update mutable buffer array parameter.
     """
@@ -231,12 +231,12 @@ def el():
     """
     Test editline on the Python command line: loop invoking editor commands.
     Type characters and control keys to edit inline, exit with M-x.
-    Comment/uncomment lines to switch between using elglob and elcmd_aref.
+    Comment/uncomment lines to switch between using elglob and runcmd.
     """
     global point, line,  prev_cmd
     terminal.set_char_mode()
     # refresh(point, line) # immutable line, updated by eglob
-    refresh(point, buffer[dot]) # mutable buffer, updated by elcmd_aref
+    refresh(point, buffer[dot]) # mutable buffer, updated by runcmd
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
@@ -245,7 +245,7 @@ def el():
                 break
             else:
                 # elglob(k) # update global immutable vars: point, line
-                elcmd_aref(k, buffer, dot) # update mutable parameter: buffer
+                runcmd(k, buffer, dot) # update mutable parameter: buffer
     terminal.set_line_mode()
     print() # advance to next line for Python prompt
 

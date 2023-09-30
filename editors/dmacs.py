@@ -198,7 +198,7 @@ def open_promptline():
 def close_promptline():
     display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
 
-def dmcmd(k):
+def runcmd(k):
     """
     Invoke a single dmacs command: look up k in keymap, run that command.
     """
@@ -213,7 +213,6 @@ def dm():
     Supported keys and the cmds they invoke are expressed in keymap table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
-    global prev_cmd
     open_promptline()
     terminal.set_char_mode()
     while True:
@@ -224,7 +223,7 @@ def dm():
                 # preserve prev_cmd after dm exit for debugging and resuming
                 break
             else:
-                dmcmd(k)
+                runcmd(k)
     terminal.set_line_mode()
     close_promptline()
     display.put_cursor(edsel.tlines, 1) # return cursor to command line
