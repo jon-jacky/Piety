@@ -2,7 +2,7 @@
 keyseq.py - construct emacs-style key sequence from one or more characters.
 """
 
-import util, terminal, key
+import terminal, key
 
 prefix = '' #  incomplete key sequence
 
@@ -76,7 +76,7 @@ def keyseq(c):
 
 def main():
     'Demonstrate keyseq'
-    util.putstr('> ')
+    terminal.putstr('> ')
     terminal.set_char_mode()
     line = []
     k = 'x' # anything but cr or ''
@@ -84,7 +84,7 @@ def main():
         c = terminal.getchar()
         k = keyseq(c) # return '' if incomplete prefix
         line += [k]  # include [''] if incomplete prefix
-        util.putstr(k)
+        terminal.putstr(k)
     terminal.set_line_mode()
     print() 
     print([ [c for c in k] for k in line ]) # show any esc or other unprintables

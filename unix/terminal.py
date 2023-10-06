@@ -15,7 +15,6 @@ http://man7.org/linux/man-pages/man3/termios.3.html
 """
 
 import sys, tty, termios
-from util import putstr
 
 fd = sys.stdin.fileno() # Isn't sys.stdin always fileno 0 ?
 line_mode_settings = termios.tcgetattr(fd) # in case someone calls restore first
@@ -54,6 +53,15 @@ def getchars(n):
     Get up to n characters from console keyboard, without waiting for RETURN
     """
     return sys.stdin.read(n)
+
+def putstr(s):
+    """
+    Print string (can be just one character) on stdout with no
+    formatting (unlike plain Python print).  Flush to force output immediately.
+    If you want newline, you must explicitly include it in s.
+    Prints to stdout, which may be redirected.
+    """
+    print(s, end='', flush=True)
 
 # Test
 

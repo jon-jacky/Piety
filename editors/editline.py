@@ -6,7 +6,7 @@ Unlike readline, call and return for each key so you can edit without blocking.
 
 import string, re
 import key, display
-import util, terminal, keyseq # only needed by main() test 
+import terminal, keyseq # only needed by main() test 
 
 # Define and initialize global variables used by editline.
 # Conditinally exec only the *first* time this module is imported in a session.
@@ -140,8 +140,9 @@ def discard(point, line): # name like gnu readline unix-line-discard
         yank_buffer = (yank_buffer + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[point:]
+    # FIXME below here is display updates, not working. Imitate kill_line ?
     point, line = move_beginning(point, line) # accounts for prompt, assigns pt
-    util.putstr(line)
+    display.putstr(line)
     display.kill_line() # remove any leftover text past line
     return move_beginning(point, line) # replace cursor again
 
@@ -170,7 +171,7 @@ def tab(point, line):
 def refresh(point, line):
     'Display line and point - use after line has gotten scrambled or ...'
     display.move_to_column(start_col)
-    util.putstr(line)
+    display.putstr(line)
     display.kill_line() # remove any leftover text past line
     return move_to_point(point, line)
 
@@ -210,7 +211,7 @@ def elcmd(keycode, point, line):
         point, line = cmd(point, line) # local point, line here
         prev_cmd = cmd # must assign *after* calling cmd!
     else:
-        util.putstr(key.bel) # FIXME makes no sound - why?
+        display.putstr(key.bel) # FIXME makes no sound - why?
     return point, line
 
 def elglob(keycode):

@@ -8,7 +8,7 @@ barely above F (fail).
 """
 
 import sys, importlib
-import util, terminal, key, keyseq, display, edsel
+import terminal, key, keyseq, display, edsel
 import sked as ed
 
 # Define and initialize global variables used by dmacs.
@@ -203,7 +203,7 @@ def runcmd(k):
     Invoke a single dmacs command: look up k in keymap, run that command.
     """
     global prev_cmd
-    cmd = keymap.get(k, lambda: util.putstr(key.bel))
+    cmd = keymap.get(k, lambda: display.putstr(key.bel))
     cmd()
     prev_cmd = cmd
 
