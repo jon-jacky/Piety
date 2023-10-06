@@ -417,16 +417,16 @@ def indent(start=None, end=None, nspaces=None, outdent=False,
     """
     indent, move text to the right by prefixing spaces at the left margin.
     Indent lines start through end inclusive, default just indent at dot.
-    Indent by nspaces spaces, default lmargin, assign given nspaces to lmargin.
+    Indent by nspaces spaces, default nindent, assign given nspaces to nindent.
     If outdent, move text to left by removing characters from left margin.
     """
-    global lmargin
+    global nindent
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
         return
-    if not nspaces: nspaces = lmargin
-    lmargin = nspaces # int
+    if not nspaces: nspaces = nindent
+    nindent = nspaces # int
     margin = ' '*nspaces # str
     for iline in range(start, end+1): # start, end inclusive
         if outdent:
