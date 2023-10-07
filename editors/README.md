@@ -2,35 +2,86 @@
 editors
 =======
 
-Text editors
-
-- **README.md**: Directions for using the *sked*, *edsel*, and *dmacs* editors,
-  see below.
-
-- **NOTES.txt**: Notes on the code in *sked*, *edsel*, and *dmacs*.
-
-- **HOW.md**: How we program.
-
-- **edsel.py**: Display editor that uses the same commands as *sked*.
-
-- **edselinit.py**: Define and initialize global variables used by *edsel*.
-
-- **dmacs.py**: Invoke editor functions with emacs keycodes.
-
-- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
-
-- **sked.py**: Line editor inspired by the classic Unix *ed*.
-
-- **skedinit.py**: Define and initialize global variables used by *sked*.
-
-
-### Introduction ###
-
 The modules here comprise a minimal Python programming environment.
 We can have all of our source code, our editors, and the interactive Python
 interpreter always available in our Python session. We can write code that
 we load and run immediately, without restarting the session or losing
 any work in progress. See [how we program](HOW.md).
+
+### Quick start ###
+
+There isn't any installation procedure.  Just run the editors out of
+your checked-out Piety repository, which should be under your home directory.
+
+Run this command to put the editor modules on your *PYTHONPATH*, so you can
+run the editors from any directory.  Note the dot at the beginning of the
+command:
+
+    . ~/Piety/bin/paths      
+
+Run this command to start *pmacs*, an Emacs-like editor:
+
+    python3 -im pm
+
+Now you can edit just as if you were
+using the *emacs* editor.  Many 
+[emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf) are
+supported.  
+
+To exit *pmacs* and return to the Python REPL, type *M-x* (*meta x*, hold the
+*alt* key while typing the *x* key).  Now you can type any Python statements,
+including the editor commands in *sked* and *edsel*.  To return to the
+*pmacs* editor, type the function call *pm()*.  Or, you can exit the Python 
+session.
+
+In *pmacs* you can edit several files in different buffers just as you would
+in Emacs,  but at this time there  is only one display window.
+
+More detailed directions appear in the sections below.  The *pmacs* editor
+imports the simpler editors *sked*, *edsel*, and *dmacs*, which can all be run
+by themselves for a simpler (but less convenient) editing experience; the
+sections below explain how.  The directions for all these editors are pertinent
+for using *pmacs*.
+
+[Files](#Files)
+[sked])(#sked)
+[edsel](#edsel)
+[dmacs](#dmacs)
+[pmacs](#pmacs)
+
+### Files ###
+
+- **README.md**: Directions for using the *sked*, *edsel*, *dmacs*, 
+  and *pmacs* editors.
+
+- **NOTES.txt**: Notes on the code in *sked*, *edsel*, *dmacs*, and *pmacs*.
+
+- **HOW.md**: How we program, notes on motivation and design.
+
+- **dm.py**: Script to start the *dmacs* editor.
+
+- **editline.py**: Functions to edit and display a string with *readline* 
+  control keys.  Used by *pmacs*.
+
+- **editlineinit.py**: Define and initialize global variables used
+  by *editline*.
+
+- **edsel.py**: Display editor that uses the same commands as *sked*.
+
+- **edselinit.py**: Define and initialize global variables used by *edsel*.
+
+- **dmacs.py**: Invoke editor functions with emacs keycodes, but you can only
+  enter text in this editor's append mode.
+
+- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
+
+- **pmacs.py**: Emacs-like editor.
+
+- **pmacsinit.py**: Define and initialize global variables used by *pmacs*.
+
+- **sked.py**: Line editor inspired by the classic Unix *ed*.
+
+- **skedinit.py**: Define and initialize global variables used by *sked*.
 
 ### sked ###
 
@@ -260,4 +311,9 @@ The only reason to use *M-x* to return to the Python REPL while using
 The name *dmacs* means 'dumb emacs' or maybe 'grade D emacs', barely above
 F (fail).
 
-Revised Jul 2023
+### pmacs ###
+
+Then name *pmacs* might mean 'Python emacs' but actually means 'poor emacs'
+or 'pathetic emacs'.
+
+Revised Oct 2023
