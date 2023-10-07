@@ -140,11 +140,9 @@ def discard(point, line): # name like gnu readline unix-line-discard
         yank_buffer = (yank_buffer + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[point:]
-    # FIXME below here is display updates, not working. Imitate kill_line ?
-    point, line = move_beginning(point, line) # accounts for prompt, assigns pt
-    display.putstr(line)
-    display.kill_line() # remove any leftover text past line
-    return move_beginning(point, line) # replace cursor again
+    point = 0
+    # display.discard() # prefix disappears, cursor and suffix remain, no good
+    return refresh(point, line)
 
 # kill_cmds can't be defined until after we define kill_word etc.
 kill_cmds = (kill_word, kill_line, discard) # cmds that update yank_buffer
@@ -171,7 +169,7 @@ def tab(point, line):
 def refresh(point, line):
     'Display line and point - use after line has gotten scrambled or ...'
     display.move_to_column(start_col)
-    display.putstr(line)
+    display.putstr(line.rstrip('\n'))
     display.kill_line() # remove any leftover text past line
     return move_to_point(point, line)
 
