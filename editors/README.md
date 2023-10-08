@@ -10,8 +10,8 @@ any work in progress. See [how we program](HOW.md).
 
 ### Quick start ###
 
-There isn't any installation procedure.  Just run the editors out of
-your checked-out Piety repository, which should be under your home directory.
+There isn't any installation procedure.  Just clone the 
+Piety repository under your home directory.
 
 Run this command to put the editor modules on your *PYTHONPATH*, so you can
 run the editors from any directory.  Note the dot at the beginning of the
@@ -23,28 +23,20 @@ Run this command to start *pmacs*, an Emacs-like editor:
 
     python3 -im pm
 
-Now you can edit just as if you were
-using the *emacs* editor.  Many 
+Now you can edit almost as if you were using Emacs.  Many 
 [emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf) are
-supported.  
+supported.  Differences from Emacs are discussed in the sections below.
 
-To exit *pmacs* and return to the Python REPL, type *M-x* (*meta x*, hold the
-*alt* key while typing the *x* key).  Now you can type any Python statements,
-including the editor commands in *sked* and *edsel*.  To return to the
-*pmacs* editor, type the function call *pm()*.  Or, you can exit the Python 
-session.
+Below the text editing window, instead of a 'mode line' as in Emacs,
+there are several lines devoted to the Python REPL.
+To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
+*alt* key while typing the *x* key).  To resume editing, type the function
+call *pm()* in the REPL.
 
-In *pmacs* you can edit several files in different buffers just as you would
-in Emacs,  but at this time there  is only one display window.
-
-More detailed directions appear in the sections below.  The *pmacs* editor
-imports the simpler editors *sked*, *edsel*, and *dmacs*, which can all be run
-by themselves for a simpler (but less convenient) editing experience; the
-sections below explain how.  The directions for all these editors are pertinent
-for using *pmacs*.
+More detailed directions appear in the sections below.  
 
 [Files](#Files)
-[sked])(#sked)
+[sked](#sked)
 [edsel](#edsel)
 [dmacs](#dmacs)
 [pmacs](#pmacs)
@@ -304,7 +296,7 @@ or when you are entering a string in response to a prompt.
 To edit a line that has already been added to the buffer, you 
 must use the *M-%* key to substitute text in the line.
 
-The only reason to use *M-x* to return to the Python REPL while using
+A reason to use *M-x* to return to the Python REPL while using
 *dmacs* is to view and assign configuration variables, such as
 *sked.lmargin* etc.
 
@@ -313,7 +305,39 @@ F (fail).
 
 ### pmacs ###
 
-Then name *pmacs* might mean 'Python emacs' but actually means 'poor emacs'
+*pmacs* is an Emacs-like editor.  Unlike *dmacs* and its predecessors, you do
+not have to use an append mode to enter text one line at a time.   Just type
+(or delete, or change) any amount of text anywhere at any time, as if you were
+using Emacs.
+To start *pmacs*, use the *pm* script with the command *python3 -im pm*, or call the function *pm()* at the Python REPL.
+
+Below the text editing window, instead of a 'mode line' as in Emacs,
+there are several lines devoted to the Python REPL.
+To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
+*alt* key while typing the *x* key).  Now you can type any Python statements,
+including the editor commands in *sked* and *edsel*.  You might need them
+to set some editor configuration options.  To resume editing,
+type the function call *pm()* in the REPL.
+To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
+dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
+
+In *pmacs* you can edit several files in different buffers just as you would
+in Emacs,  but at this time there  is only one display window. We plan to add
+support for multiple windows in the future.
+Two keycodes have different meanings than in Emacs: *C-x C-r* reloads the
+module from the current buffer into the Python session, so recent changes
+become effectively immediately, without restarting the Python session or
+losing work in progress.  *C-x C-a* enters *edsel/dmacs* append mode, where
+text must be added one line at a time until a period is typed by itself at the
+start of a line.  We find it can sometimes be refreshing to just  type line
+after line without the temptation to stop and revise what we just wrote.
+The *pmacs* editor provides all the functionality of the simpler editors
+*sked*, *edsel*, and *dmacs*, so the directions for these editors in the
+sections above are also pertinent for *pmacs*.   These editors can all be run
+by themselves for a simpler (but less convenient) editing experience; the
+sections above explain how.
+ 
+*pmacs* is still the *sked* line editor underneath.  So you can eithercut and paste text within a single line (you can cut from one line andpaste into another), or you can cut and paste one or more whole linesat a time.  You cannot cut and paste beginning in the middle of oneline and ending in the middle of another line.  In practice we have notfound this to be a serious limitation and we have no plans to change this.Then name *pmacs* might mean 'Python emacs' but actually means 'poor emacs'
 or 'pathetic emacs'.
 
 Revised Oct 2023
