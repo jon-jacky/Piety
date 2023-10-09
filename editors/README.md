@@ -317,8 +317,10 @@ there are several scrolling lines devoted to the Python REPL.
 To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
 *alt* key while typing the *x* key).  Now you can type any Python statements,
 including the editor commands from *sked* and *edsel*.  You might need them
-to set some editor configuration options.  To resume editing,
-type the function call *pm()* in the REPL.
+to set some editor configuration options.  For example, to set the text 
+window size to 12 lines and also expand the REPL scrolling region, type
+the *edsel* function call *win(12)* in the REPL.  To resume editing,
+type the function call *pm()*.
 
 To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
 dictionaries in the *dmacs*, *editline*, and *pmacs* modules.

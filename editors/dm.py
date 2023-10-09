@@ -6,5 +6,5 @@ import edsel
 from edsel import *
 import dmacs
 from dmacs import dm
-win(24)
+win(22)
 dm()
