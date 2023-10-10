@@ -19,7 +19,8 @@ command:
 
     . ~/Piety/bin/paths      
 
-Run this command to start *pmacs*, an Emacs-like editor:
+Run this command to start *pmacs*, a display editor that uses emacs control
+keys:
 
     python3 -im pm
 
@@ -40,6 +41,7 @@ More detailed directions appear in the sections below.
 [edsel](#edsel)  
 [dmacs](#dmacs)  
 [pmacs](#pmacs)  
+[Recovering from errors](#Recovering-from-errors)
 
 ### Files ###
 
@@ -237,7 +239,12 @@ To run *dmacs*, first start *sked*, then *edsel*, as described above.  Then,
     >>> from dmacs import dm
     >>> dm()
 
-After you type *dm()*, the Python prompt does not appear because Python
+Or, you can start *dmacs* from the system command line by running 
+the *dm* script:
+
+    python3 -im dm
+
+After you start *dmacs*, the Python prompt does not appear because Python
 is busy executing the *dm* function.  Now you can type emacs control keys
 to edit.   To exit *dm* and return to the Python prompt, type the control
 key *M-x* ("meta x", formed by holding down the ALT key while you type x).
@@ -273,8 +280,9 @@ to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
 (The emacs *C-g* cancel key is not available in *dmacs*.)
 To indicate that the string argument should be the empty string,
-type three backslashes, '\\\'.
-Some keys invoke functions that can optionally act on a range of
+type three backslashes.
+
+Some keys invoke functions that can optionally act on a range of 
 lines called the *region*.
 To define the region, type the key *C-space* (press the control key
 and type the space bar).  This sets the *mark*, one end of the region.
@@ -347,7 +355,7 @@ text must be added one line at a time until a period is typed by itself at the
 start of a line.  It can sometimes be satisfying to just  type line
 after line without any temptation to stop and revise what we just wrote.
 
-*pmacs* is still the *sked* line editor underneath.  
+*pmacs* is still the *sked* line editor underneath.
 The *C-space* command, *set mark*, marks the entire line, not a point
 within the Line.   Then the *C-w* command, *kill-region* or *cut*, cuts
 a sequence of whole lines from the marked line through the current line dot,
@@ -361,11 +369,11 @@ with the *M-d* *delete-word* command, the *C-u* *discard* command
 which cuts from the start of the line to the cursor, or the *C-k* 
 command issued with the cursor past column 1, which cuts from the
 cursor to the end of the line.   After any of these commands, or a
-sequence of them, *C-y* pastes all the cut words into a line after 
-the cursor.  *C-space* and *C-w* cannot be used to select and cut words 
-within a line.
+sequence of them, *C-y* pastes all the cut words after 
+the cursor.  You can cut from one line and paste into another.
+*C-space* and *C-w* cannot be used to select and cut words within a line.
 
-So you can either cut and paste words within single lines,  or you can cut and
+So you can either cut and paste words within a line,  or you can cut and
 paste one or more whole lines.  You cannot cut and paste beginning
 in the middle of one line and ending in the middle of another line.  We have
 not found this to be a serious limitation and have no plans to change this.
@@ -373,9 +381,33 @@ not found this to be a serious limitation and have no plans to change this.
 Then name *pmacs* might mean "Python Emacs" but actually means "partly
 inspired by Emacs" or maybe "poor imitation of Emacs".
 
-### Handling errors ###
+### Recovering from errors ###
 
-To come ...
+These editors work in a long-running Python session where you can edit the
+editor modules themselves, then reload them into the same Python session to
+test and use.   When you reload a revised module,  you are running untested
+code, so errors are expected.   Some errors can make the editor unusable or
+cause it to crash.   If a module contains a syntax error,  it will crash the
+reload command.
 
+It is usually possible to recover from errors and crashes without restarting
+the Python session.   You started the session with the Python *-i interactive*
+option, so a crash does not exit the session, but returns control to the
+Python  REPL.  Your program stops running, but all the code (modules) and data
+(text buffers) remain in the session so you can use them to correct the
+erroneous module.
+
+First, look at the display and try to read any traceback messages or other
+useful information.   Then, find the Python REPL prompt and type the function
+call *refresh()*.  The display restores and you can resume work. You can try
+to restart *pmacs* by typing the function call *pm()* and  try to avoid using
+the erroneous commmand.   If that fails, you can return to the Python prompt
+by typing *M-x*, and start a simpler editor that does not use the erroneous
+code.  Type *dm()* to run *dmacs* which does not provide inline editing, or
+just type the many *edsel* commands at  the REPL -- they do not use keycodes.
+You can even revert to *sked* which does not update the display at all.
+
+As a last resort, you can exit the Python session and use some other editor
+to correct the error.
 
 Revised Oct 2023
