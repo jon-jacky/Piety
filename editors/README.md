@@ -62,13 +62,13 @@ More detailed directions appear in the sections below.
 
 - **edselinit.py**: Define and initialize global variables used by *edsel*.
 
-- **dmacs.py**: Display editor that invokes *edsel* commands with emacs keys.
+- **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
 
 - **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
 
 - **pm.py**: Script to start the *pmacs* editor.
 
-- **pmacs.py**: Emacs-like editor.
+- **pmacs.py**: Display editor that uses Emacs control keys.
 
 - **pmacsinit.py**: Define and initialize global variables used by *pmacs*.
 
@@ -272,7 +272,8 @@ before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
 (The emacs *C-g* cancel key is not available in *dmacs*.)
-
+To indicate that the string argument should be the empty string,
+type three backslashes, '\\\'.
 Some keys invoke functions that can optionally act on a range of
 lines called the *region*.
 To define the region, type the key *C-space* (press the control key
@@ -306,7 +307,8 @@ F (fail).
 
 ### pmacs ###
 
-*pmacs* is an Emacs-like editor.  Unlike *dmacs* and its predecessors, you do
+*pmacs* is a display editor that uses Emacs control keys.
+Unlike *dmacs* and its predecessors, you do
 not have to use an append mode to enter text one line at a time.   Just type
 (or delete, or change) any amount of text anywhere at any time, as if you were
 using Emacs.
@@ -322,35 +324,58 @@ window size to 12 lines and also expand the REPL scrolling region, type
 the *edsel* function call *win(12)* in the REPL.  To resume editing,
 type the function call *pm()*.
 
+In *pmacs* you can edit several files in different buffers just as you would
+in Emacs,  but at this time there  is only one display window. We plan to
+support multiple windows in the future.
+
 To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
 dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
 
-In *pmacs* you can edit several files in different buffers just as you would
-in Emacs,  but at this time there  is only one display window. We plan to add
-support for multiple windows.
- 
-Two keycodes have different meanings than in Emacs: *C-x C-r* reloads the
+The *pmacs* editor provides all the functions and commands of its predecessors
+*sked*, *edsel*, and *dmacs*.  Most *pmacs* commands are actually *dmacs*
+commands, so its directions (above) are particulary pertinent.
+
+Two keycodes have different meanings in *pmacs* than in Emacs: 
+
+*C-x C-r* reloads the
 module from the current buffer into the Python session, so recent changes
 become effective immediately, without restarting the Python session or
-losing work in progress.  *C-x C-a* enters *edsel/dmacs* append mode, where
-text must be added one line at a time until a period is typed by itself at the
-start of a line.  We find it can sometimes be refreshing to just  type line
-after line without the temptation to stop and revise what we just wrote.
+losing work in progress.  
 
-The *pmacs* editor provides all the functionality of the simpler editors
-*sked*, *edsel*, and *dmacs*, so the directions for these editors in the
-sections above also apply to *pmacs*.   These editors can all be run
-by themselves for a simpler (but less convenient) editing experience; the
-sections above explain how.
+*C-x C-a* enters *edsel/dmacs* append mode, where
+text must be added one line at a time until a period is typed by itself at the
+start of a line.  It can sometimes be satisfying to just  type line
+after line without any temptation to stop and revise what we just wrote.
+
+*pmacs* is still the *sked* line editor underneath.  
+The *C-space* command, *set mark*, marks the entire line, not a point
+within the Line.   Then the *C-w* command, *kill-region* or *cut*, cuts
+a sequence of whole lines from the marked line through the current line dot,
+inclusive.   After *C-w*, *C-y* *yank* pastes that sequence of whole lines.
+Or, *yank* pastes a sequence of whole lines that were cut one by one 
+by consecutive *C-k* *kill-line* commands that were issued with the
+cursor in column 1.
+
+Or, you can cut words or sequences of words within a single line
+with the *M-d* *delete-word* command, the *C-u* *discard* command
+which cuts from the start of the line to the cursor, or the *C-k* 
+command issued with the cursor past column 1, which cuts from the
+cursor to the end of the line.   After any of these commands, or a
+sequence of them, *C-y* pastes all the cut words into a line after 
+the cursor.  *C-space* and *C-w* cannot be used to select and cut words 
+within a line.
+
+So you can either cut and paste words within single lines,  or you can cut and
+paste one or more whole lines.  You cannot cut and paste beginning
+in the middle of one line and ending in the middle of another line.  We have
+not found this to be a serious limitation and have no plans to change this.
  
-*pmacs* is still the *sked* line editor underneath.  So you can either cut and
-paste text within a single line (you can also cut from one line and paste into
-another), or you can cut and paste one or more whole lines at a time.  You
-cannot cut and paste beginning in the middle of one line and ending in the
-middle of another line.  We have not found this to be a serious limitation and
-we have no plans to change this.
- 
-Then name *pmacs* might mean "Python emacs" but actually means
-"poor imitation of emacs".
+Then name *pmacs* might mean "Python Emacs" but actually means "partly
+inspired by Emacs" or maybe "poor imitation of Emacs".
+
+### Handling errors ###
+
+To come ...
+
 
 Revised Oct 2023
