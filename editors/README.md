@@ -41,7 +41,7 @@ More detailed directions appear in the sections below.
 [edsel](#edsel)  
 [dmacs](#dmacs)  
 [pmacs](#pmacs)  
-[Recovering from errors](#Recovering-from-errors)
+[Recovering from errors](#Recovering-from-errors)  
 
 ### Files ###
 
@@ -402,7 +402,7 @@ useful information.   Then, find the Python REPL prompt and type the function
 call *refresh()*.  The display restores and you can resume work. You can try
 to restart *pmacs* by typing the function call *pm()* and  try to avoid using
 the erroneous commmand.   If that fails, you can return to the Python prompt
-by typing *M-x*, and start a simpler editor that does not use the erroneous
+by typing *M-x*, and start a simpler editor that does not import the erroneous
 code.  Type *dm()* to run *dmacs* which does not provide inline editing, or
 just type the many *edsel* commands at  the REPL -- they do not use keycodes.
 You can even revert to *sked* which does not update the display at all.
