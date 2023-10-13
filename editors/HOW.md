@@ -84,25 +84,23 @@ definition.   Therefore, we do not write classes. (Classes built
 into  Python itself, or in code written by others, are not a problem
 because we do not reload them.)
 
-Instead, we achieve similar effects with modules and dictionaries.
+Instead, we program with modules and dictionaries, which do acquire
+the new behaviors when modules are reloaded.
 
 An ordinary Python module resembles a class definition.   The module-level
-global variables are like attributes (instance variables) and the functions
-in the module are like methods
+global variables are like attributes (instance variables) and the functions in
+the module are like methods A module also resembles one object - a single
+instance of the data defined by the module.  You can have many objects of the
+same class in  the Python session at the same time, but you can only have one
+instance  of a module. We use modules instead of classes where *we only need
+one instance  to be active at a time*.
 
-A module also resembles one object - a single instance of the data
-defined by the module.  You can have many objects of the same class in 
-the Python session at the same time, but you can only have one instance 
-of a module.
- 
-We use modules instead of classes where *we only need one instance 
-to be active at a time*.   For example, our *sked* module defines
-the data and functions used by a text buffer in our editors.  The 
-editors can work with multiple buffers, but only one of the buffers
-is active at a time.  You can only insert text into one buffer
-at a time -- and so on.   Typically, you edit in the same *current
-buffer* for a while and then select another buffer to be the current
-buffer, then edit in that buffer, etc.
+For example, our *sked* module defines the data and functions used by a text
+buffer in our editors.  The  editors can work with multiple buffers, but only
+one of the buffers is active at a time.  You can only insert text into one
+buffer at a time -- and so on.   Typically, you edit in the same *current
+buffer* for a while and then select another buffer to be the current buffer,
+then edit in that buffer, etc.
 
 The state of the current buffer is stored in the module-level global
 variables of the *sked* module.  These variables are  updated by almost
@@ -120,15 +118,21 @@ from its dictionary.   See the functions *save_buffer* and
 
 The whole persistent collection of saved buffers is stored in a
 dictionary whose keys are the buffer names, and whose values are the
-dictionaries for each buffer.   It is a dictionary of dictionaries.
+dictionaries for each buffer.   It is a dictionary of dictionaries,
+*buffers* in the *sked* module.
 
-If we add or delete variables from the buffer module *sked*,
-we can make corresponding changes to to the code that saves
-and restores the variables in the dictionaries.   This does not
-invalidate the persistent data in the saved dictionaries.   
-When we restore module variables from a dictionary, 
-we use the *get* method to read dictionary items,
-because this does not crash when an item is missing from old
-persistent data; it just returns an appropriate default.
+When we add or delete variables from the buffer module *sked*, we make
+corresponding changes to to the code that saves and restores the
+variables in the dictionaries.   This does not invalidate the persistent
+data in the saved dictionaries. When we restore module variables from a
+dictionary,  we use the *get* method to read dictionary items, because
+this does not crash when an item is missing from old persistent data; it
+just returns an appropriate default.
+
+An alternative to saving and restoring module global variables from
+the dictionaries would be to pass the appropriate dictionary to 
+each function as its first argument.  This would be quite like the
+*self* argument in Python methods.  We rejected this alternative because
+it would make the code more verbose.
 
 Revised Oct 2023
