@@ -2,21 +2,16 @@
 editlineinit.py - define and initialize global variables used in editline
 """
 
-# For testing
-line = str() # immutable
+# line = str() # string being edited # NOW THIS IS A PASSED PARAMETER
 
-# For testing
-buffer = [ str() ] # mutable
-dot = 0 # index into buffer
+point = 0 # index into line (above), string being edited
 
-point = 0 # index into string being edited: line or buffer[dot]
+killed = str() # saved killed (cut) words, can be restored with yank (paste)
 
 start_col = 0    # default, no prompt or other chars at left margin
 # start_col = 2  # when prompt is '> ' for example
 
 n_spaces = 4 # Used by tab.  In production maybe assign sked.indent.
-
-yank_buffer = str() # save killed (cut) words here to restore with yank (paste)
 
 prev_cmd = None # some functons behave differently when repeated
 

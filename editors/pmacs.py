@@ -40,7 +40,7 @@ def open_line(keycode):
     """
     suffix = ed.buffer[ed.dot][el.point:] # including final \n
     # Calls el.kill_line, thanks to key.C_k, not keycode
-    el.runcmd(key.C_k, ed.buffer, ed.dot) # just leave prefix on dot
+    ed.buffer[ed.dot] = el.runcmd(key.C_k, ed.buffer[ed.dot]) # prefix on dot
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
     if edsel.in_window(ed.dot):
@@ -64,8 +64,8 @@ def delete_backward_char(keycode):
     Otherwise join to previous line.  At start of first line do nothing.
     """
     if el.point > 0:
-        # Calls el.delete_backward_char, thanks to keycode
-        el.runcmd(keycode, ed.buffer, ed.dot) # keycode is DEL key.bs
+        # Calls el.delete_backward_char, thanks to keycode DEL key.bs
+        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) 
     else: 
         join_prev() # see above
         dmacs.prev_cmd = delete_backward_char # el.runcmd above assigns prev...
@@ -82,8 +82,8 @@ def delete_char(keycode):
     Otherwise join next line to this one.  At end of last line do nothing.
     """
     if el.point < len(ed.buffer[ed.dot].rstrip('\n')):
-        # Calls el.delete_char, thanks to keycode
-        el.runcmd(keycode, ed.buffer, ed.dot) # keycode is C_d here
+        # Calls el.delete_char, thanks to keycode C_d
+        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
     else:
         join_next() # see above
         dmacs.prev_cmd = delete_char # el.runcmd above assigns prev...
@@ -102,8 +102,8 @@ def kill_line(keycode):
         restore_cursor_to_window()
     else:
         yank_lines = False # cursor within line, only kill from cursor to end
-        # Calls editline kill_line, thanks to keycode
-        el.runcmd(keycode, ed.buffer, ed.dot)
+        # Calls editline kill_line, thanks to keycode C_k
+        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
 
 def cut(keycode):
     global yank_lines
@@ -119,8 +119,8 @@ def yank(keycode):
         dmacs.runcmd(keycode) # keycode is C_y here
         restore_cursor_to_window()
     else:
-        # Calls el.yank, thanks to keycode
-        el.runcmd(keycode, ed.buffer, ed.dot)
+        # Calls el.yank, thanks to keycode C_y
+        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
 
 def refresh(keycode):
     'Define pmacs whole window refresh here so we dont use editline refresh'
@@ -182,7 +182,7 @@ def pm():
             elif k in keymap:
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
-                el.runcmd(k, ed.buffer, ed.dot)
+                ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
                 yank_lines = False # editing inline, yank word(s) into line
                 dmacs.prev_cmd = el.prev_cmd
             elif k in dmacs.keymap:
