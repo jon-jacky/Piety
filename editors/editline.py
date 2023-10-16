@@ -107,16 +107,16 @@ def delete_char(line):
 
 def kill_word(line):
     """
-    Delete word, save in yank buffer.
-    Repeat kill_word to save consecutive words in yank buffer.
+    Delete word, save in killed buffer.
+    Repeat kill_word to save consecutive words in killed buffer.
     FIXME?  Does not delete last word in line, must use kill_line.
     """
     global killed
     m = end_word.search(line, point)
     if m:
-        cut_word = line[point:m.start()+1]
-        killed = (killed + cut_word if prev_cmd in kill_cmds
-                       else cut_word)
+        killed_word = line[point:m.start()+1]
+        killed = (killed + killed_word if prev_cmd in kill_cmds
+                       else killed_word)
         line = line[:point] + line[m.start( )+1:]
         display.delete_nchars(point - (m.start()+1))
     return line
@@ -139,7 +139,7 @@ def kill_line(line):
         line = line + '\n'
     return line
 
-def discard(line): # name like gnu readline unix-line-discard
+def discard_line(line): # name like gnu readline unix-line-discard
     """
     Delete line from start-of-line to point, save in killed buffer.
     Append killed segment to killed buffer if we are doing consecutive kills.
@@ -151,15 +151,14 @@ def discard(line): # name like gnu readline unix-line-discard
                        else killed_segment)
     line = line[point:]
     point = 0
-    # display.discard() # prefix disappears, cursor and suffix remain, no good
     refresh(line)
     return line
 
 # kill_cmds can't be defined until after we define kill_word etc.
-kill_cmds = (kill_word, kill_line, discard) # cmds that update killed
+kill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed
 
 def yank(line):
-    'Paste (yank) string previously deleted by kill or discard'
+    'Yank (paste) string(s) deleted by kill_word, kill_line, or discard_line'
     global point
     line = (line[:point] + killed + line[point:])
     point += len(killed)
@@ -201,7 +200,7 @@ keymap = {
     # key.C_i is key.htab above
     key.C_k: kill_line,
     key.C_l: refresh,
-    key.C_u: discard,
+    key.C_u: discard_line,
     key.C_y: yank,
     key.M_f: forward_word,
     key.M_b: backward_word,

@@ -21,7 +21,7 @@ lmargin = 0           # left margin for wrap
 rmargin = 78          # right margin for wrap
 nindent = 4           # N of spaces to indent or outdent
 
-yank_buffer = [] # yank (paste) buffer
+killed = [] # yank (paste) buffer filled by kill_region or repeated kill_line
 
 # saved buffers, dictionary from buffer names to dict of buffer items
 # initialize so there is always a saved buffer to switch back to

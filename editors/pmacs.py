@@ -39,7 +39,7 @@ def open_line(keycode):
     with its prefix, append suffix after line at dot.
     """
     suffix = ed.buffer[ed.dot][el.point:] # including final \n
-    # Calls el.kill_line, thanks to key.C_k, not keycode
+    # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
     ed.buffer[ed.dot] = el.runcmd(key.C_k, ed.buffer[ed.dot]) # prefix on dot
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
@@ -89,38 +89,35 @@ def delete_char(keycode):
         dmacs.prev_cmd = delete_char # el.runcmd above assigns prev...
         restore_cursor_to_window()
 
-yank_lines = True # initially when module loaded, reassigned while editing
-
 def kill_line(keycode):
     """
-    Kill entire line(s) or kill the rest of line at dot
+    Kill the rest of line at dot or kill entire line(s)
     """
-    global yank_lines
-    if el.point == 0:  # cursor at beginning of line, kill whole line
-        yank_lines = True
+    global inline
+    if el.point == 0:  # cursor at beginning of line, kill whole line # FIXME
+        inline = False # FIXME - maybe switch if / else 
         dmacs.runcmd(keycode) # keycode is C_k here
         restore_cursor_to_window()
     else:
-        yank_lines = False # cursor within line, only kill from cursor to end
+        inline = True # cursor within line, only kill from cursor to end
         # Calls editline kill_line, thanks to keycode C_k
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
 
-def cut(keycode):
-    global yank_lines
-    yank_lines = True
+def kill_region(keycode):
+    global inline
+    inline = False
     dmacs.runcmd(keycode) # keycode is C_w here
     restore_cursor_to_window()
 
 def yank(keycode):
     """
-    Yank entire line(s) or yank word(s) within a line, depending on yank_lines
+    Yank entire line(s) or yank word(s) within a line, depending on inline
     """
-    if yank_lines:
+    if inline:
+        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) #C_k, el.yank
+    else:
         dmacs.runcmd(keycode) # keycode is C_y here
         restore_cursor_to_window()
-    else:
-        # Calls el.yank, thanks to keycode C_y
-        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
 
 def refresh(keycode):
     'Define pmacs whole window refresh here so we dont use editline refresh'
@@ -128,8 +125,7 @@ def refresh(keycode):
     restore_cursor_to_window() 
 
 def append(keycode):
-    # with key.cr, calls dmacs.append, which enters append mode.
-    dmacs.runcmd(key.cr) 
+    dmacs.runcmd(key.cr) # calls dmacs append, which enters append mode.
     restore_cursor_to_window()
 
 keymap = {
@@ -138,7 +134,7 @@ keymap = {
     key.bs: delete_backward_char, 
     key.C_d: delete_char,
     key.C_k: kill_line,
-    key.C_w: cut, 
+    key.C_w: kill_region,
     key.C_y: yank,
     key.C_l: refresh,
     key.C_x + key.C_a: append, # Enter dmacs append mode, exit with .
@@ -167,7 +163,7 @@ def pm():
     pmacs editor: invoke editor functions with emacs control keys.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
-    global yank_lines
+    global inline
     dmacs.open_promptline()
     terminal.set_char_mode()
     clear_marker()
@@ -183,7 +179,7 @@ def pm():
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
                 ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
-                yank_lines = False # editing inline, yank word(s) into line
+                inline = True # editing inline, kill and yank word(s) in line
                 dmacs.prev_cmd = el.prev_cmd
             elif k in dmacs.keymap:
                 edsel.restore_cursor_to_cmdline()
