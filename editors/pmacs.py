@@ -94,15 +94,29 @@ def kill_line(keycode):
     Kill the rest of line at dot or kill entire line(s)
     """
     global inline
-    if el.point == 0:  # cursor at beginning of line, kill whole line # FIXME
-        inline = False # FIXME - maybe switch if / else 
-        dmacs.runcmd(keycode) # keycode is C_k here
+    # Lone kill line or first kill line in a series is always inline
+    if dmacs.prev_cmd != kill_line: # or el.kill_line or ... ?
+        inline = True
+    # Exit inline mode and begin multiline mode in this condition:
+    # Previous kill line has emptied line except for final \n
+    # Then this repeated kill line removes final \n and begins multline mode
+    if inline and dmacs.prev_cmd == kill_line and ed.buffer[ed.dot] == '\n':
+        inline = False
+        # Enter multiline mode, copy killed line from inline buf to multiline
+        ed.killed = [ el.killed ] # cp el.killed to first line of sked.killed
+        # Delete the empty killed line from the buffer
+        edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
         restore_cursor_to_window()
-    else:
-        inline = True # cursor within line, only kill from cursor to end
-        # Calls editline kill_line, thanks to keycode C_k
-        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
-
+        # Now buffer and display are right, but killed has extra \n line at end
+        ed.killed.remove('\n') 
+    # inline kill line:
+    elif inline: # weaker condition, must follow previous stronger if...
+        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) # keycode C_k
+    # kill line that is part of a multiline sequence:
+    elif not inline:
+        edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
+        restore_cursor_to_window()
+    dmacs.prev_cmd = kill_line
 def kill_region(keycode):
     global inline
     inline = False

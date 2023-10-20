@@ -165,7 +165,7 @@ def yank(line):
     display.insert_string(killed)
     return line
 
-def tab_n(n_spaces):
+def tab_n(n_spaces, line): # n_spaces arg is ok because tab_n is not in keymap
     'Insert n spaces at point'
     global point
     spaces = ' ' * n_spaces
@@ -176,7 +176,7 @@ def tab_n(n_spaces):
 
 def tab(line):
     'Insert standard number of spaces at point'
-    line = tab_n(n_spaces)
+    line = tab_n(n_spaces, line)
     return line
 
 def refresh(line):
