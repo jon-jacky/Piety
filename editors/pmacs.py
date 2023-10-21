@@ -95,7 +95,7 @@ def kill_line(keycode):
     """
     global inline
     # Lone kill line or first kill line in a series is always inline
-    if dmacs.prev_cmd != kill_line: # or el.kill_line or ... ?
+    if dmacs.prev_cmd != kill_line:
         inline = True
     # Exit inline mode and begin multiline mode in this condition:
     # Previous kill line has emptied line except for final \n
@@ -108,7 +108,7 @@ def kill_line(keycode):
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
         restore_cursor_to_window()
         # Now buffer and display are right, but killed has extra \n line at end
-        ed.killed.remove('\n') 
+        ed.killed = [ ed.killed[0] ] # remove second item, '\n' line at index 1 
     # inline kill line:
     elif inline: # weaker condition, must follow previous stronger if...
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) # keycode C_k

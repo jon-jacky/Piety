@@ -361,17 +361,16 @@ within the Line.   Then the *C-w* command, *kill-region* or *cut*, cuts
 a sequence of whole lines from the marked line through the current line dot,
 inclusive.   After *C-w*, *C-y* *yank* pastes that sequence of whole lines.
 Or, *yank* pastes a sequence of whole lines that were cut one by one 
-by consecutive *C-k* *kill-line* commands that were issued with the
-cursor in column 1.
+by consecutive *C-k* *kill-line* commands.
 
 Or, you can cut words or sequences of words within a single line
 with the *M-d* *delete-word* command, the *C-u* *discard* command
-which cuts from the start of the line to the cursor, or the *C-k* 
-command issued with the cursor past column 1, which cuts from the
-cursor to the end of the line.   After any of these commands, or a
-sequence of them, *C-y* pastes all the cut words after 
-the cursor.  You can cut from one line and paste into another.
-*C-space* and *C-w* cannot be used to select and cut words within a line.
+which cuts from the start of the line to the cursor, or a single *C-k* 
+*kill-line* command which is not part of a consecutive sequence of *C-k*,
+which cuts from the cursor to the end of the line.   After any of these
+commands, or a sequence of them, *C-y* pastes all the cut words after  the
+cursor.  You can cut from one line and paste into another. *C-space* and *C-w*
+cannot be used to select and cut words within a line.
 
 So you can either cut and paste words within a line,  or you can cut and
 paste one or more whole lines.  You cannot cut and paste beginning
