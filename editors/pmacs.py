@@ -104,6 +104,7 @@ def kill_line(keycode):
         inline = False
         # Enter multiline mode, copy killed line from inline buf to multiline
         ed.killed = [ el.killed ] # cp el.killed to first line of sked.killed
+        el.killed = '' # clear el.killed, start over. NB string not list
         # Delete the empty killed line from the buffer
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
         restore_cursor_to_window()
