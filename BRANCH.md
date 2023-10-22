@@ -2,14 +2,16 @@
 branches
 ========
 
-This is the *editline* branch, which branched from the *ed* branch,
-which is branched from the *rewrite* branch.
+This is the *ed* branch, which is branched from the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 21 Oct 2023: *pmacs* emacs-like editor working.  Merge *editline* branch 
+  back into *ed* branch, with completed *editline* and *pmacs* modules.  
 
 - 13 Jul 2023: make *editline* branch to *ed* branch.
   Add *editline* module, edit and display a string using readline control keys.
@@ -65,4 +67,4 @@ Recent work in the *rewrite* branch:
 -  1 Feb 2023: Delete most files and directories for a fresh start.
    Revise *BRANCH.md*, *DIRECTORIES.md*, and *bin/paths*.
 
-Revised Jul 2023
+Revised Oct 2023
