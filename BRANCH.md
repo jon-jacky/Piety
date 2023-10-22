@@ -10,6 +10,9 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
+- 21 Oct 2023: Merge *ed* branch back into *rewrite* branch.  However, 
+  work continues in the *ed* branch and its branches.
+
 - 21 Oct 2023: *pmacs* emacs-like editor working.  Merge *editline* branch 
   back into *ed* branch, with completed *editline* and *pmacs* modules.  
 
