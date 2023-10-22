@@ -17,10 +17,11 @@ searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) commands
 replacestring = '??? ' # reassigned by c(hange) command
 pagesize = 12         # reassigned by v and mv page up/down commands
 saved = True          # True when no unsaved changes, safe to run e(dit).
-lmargin = 4           # N of spaces to indent or outdent, left margin for wrap.
+lmargin = 0           # left margin for wrap
 rmargin = 78          # right margin for wrap
+nindent = 4           # N of spaces to indent or outdent
 
-yank = [] # yank (paste) buffer
+killed = [] # yank (paste) buffer filled by kill_region or repeated kill_line
 
 # saved buffers, dictionary from buffer names to dict of buffer items
 # initialize so there is always a saved buffer to switch back to

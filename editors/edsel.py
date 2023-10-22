@@ -95,11 +95,14 @@ def put_marker(bufline, attribs):
     display.put_cursor(wline(bufline), 1)
     display.render(ch0, attribs)
 
+def restore_cursor_to_cmdline():
+    display.put_cursor(tlines, 1)
+
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wlines, 1) # window status line
     display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
-    display.put_cursor(tlines, 1) # return cursor to command line
+    restore_cursor_to_cmdline()
 
 def refresh():
     '(Re)Display buffer segment, marker, status without moving segment'
@@ -197,7 +200,7 @@ def display_y(iline):
     put_marker(ed.dot, display.clear)
     ed.dot = iline # this is all that move_dot(iline) does
     if in_window(ed.dot):
-        update_below(ed.dot - len(ed.yank)) # first yanked line
+        update_below(ed.dot - len(ed.killed)) # first yanked line
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:

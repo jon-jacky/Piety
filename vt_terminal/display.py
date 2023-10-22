@@ -9,7 +9,7 @@ import os
 ttyname = os.ctermid() # usually returns '/dev/tty'
 tty = open(ttyname, 'w')
 
-# Differs from util.putstr which writes to stdout and might be redirected
+# Differs from terminal.putstr which writes to stdout and might be redirected
 def putstr(s):
     """
     Print string (can be just one character) on display with no
@@ -31,6 +31,7 @@ ed  = csi+'J'    # erase display from cursor to end
 eu  = csi+'1J'   # erase display from top to cursor
 el  = csi+'%dK'  # erase in line, %d is 0 start, 1 end, or 2 all
 el_end = el % 0  # 0: erase from cursor to end of line
+el_begin = el % 1 # 1: erase from beginning of line to cursor
 el_all = el % 2  # 2: erase entire line
 ich = csi+'%d@'  # insert chars, make room for %d chars at current position
 decstbm = csi+'%d;%dr' # DEC Set Top Bottom Margins (set scrolling region
@@ -111,6 +112,10 @@ def kill_line():
 def kill_whole_line():
     'Erase entire line'
     putstr(el_all)
+
+def discard():
+    'Erase from beginning of line to cursor'
+    putstr(el_begin)
 
 def set_scroll(ltop, lbottom):
     'Set scrolling region to lines ltop through lbottom (line numbers)'

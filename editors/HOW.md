@@ -8,17 +8,17 @@ Python session.
 We write code that we load and run immediately, without restarting
 the session or losing any work in progress.
 
-Our editors here -- [*sked*, *edsel*, and *dmacs*](README.md) --
+Our editors here -- [*sked*, *edsel*, *dmacs*, and *pmacs*](README.md) --
 were developed in this way.  The first two hundred
 lines of *sked* were written in another editor and
 then imported into an interactive Python session. 
-After that, sked was developed incrementally
-in the long running session.  We used *sked*
+After that, *sked* was developed incrementally
+in the long running session.  We used the rudimentary *sked*
 to edit its own source code, adding functions one or two 
 at a time, then reloading the module into the same session,
 using the new functions right away on the same source files.
-Proceeding in the same way, we used *sked* to write *edsel*, and 
-*edsel* to write *dmacs*.
+Proceeding in the same way, we used *sked* to write *edsel*, 
+*edsel* to write *dmacs*, and *dmacs* to write *pmacs*.
 
 To make this possible, we had to adopt a Python coding style
 that has some unusual features.  The small collection of modules
@@ -29,22 +29,27 @@ motivate us to continue working in it, despite its lack of conveniences.
 
 The following sections describe some features of our programming style.
 
-### No programs, applications, or command interpreters ###
+### Long-running session ###
 
-We do all of our work in a long-running interactive Python session.
-We do not run "programs" or "applications".  Instead, we type commands 
-to the Python interpreter that import 
-modules and call functions in those modules.  The function calls 
-are transient, although the data they create can persist.
-The function calls might take over the keyboard and screen
-for a while, but the Python interpreter is often visible in part of 
-the screen, and is always accessible with a keystroke or two.
+We do not write "applications".  An application is software dedicated to
+a single activity.  It runs by itself in its own short-lived 
+Python session.  It loads a fixed set of functions and data that are
+isolated from other applications, that disappear when the application exits.
+In contrast, we work in a long-running Python session, where we build an
+ever-growing collection of functions and data that persist and
+support many activities, where all are potentially accessible to any others,
+and are always available for ad-hoc experiments at the REPL.
+
+The function calls  are transient, although the data they create can persist.
+The function calls might take over the keyboard and screen for a while, but
+the Python interpreter is often visible in part of  the screen, and is always
+accessible with a keystroke or two.
 
 We don't invent command languages or write command interpreters; 
 we use Python for that.  The Python interpreter itself is the "main
-program" that invokes the functions in the modules we write.
+program" that invokes the functions in our modules.
 
-### Reload functions, not data ###
+### Reloading modules ###
 
 We frequently reload modules to add functions we have just written.
 BUT we must do this in a way that that preserves all persistent data
@@ -71,29 +76,63 @@ but reloading the module does not re-initialize the data.
 For an example, see how the *sked* module conditionally *exec*'s the 
 code in the file *skedinit.py*.
 
-### No classes or objects ###
+### Modules and dictionaries instead of classes and objects ###
 
-In Python, reloading a class into a running Python session is not
+Reloading a class into a running Python session is not
 useful, because persistent objects continue to use the old class
 definition.   Therefore, we do not write classes. (Classes built
 into  Python itself, or in code written by others, are not a problem
 because we do not reload them.)
 
-This is not as serious a limitation as it might seem. Classes are not
-really necessary because Python already provides a rich collection of
-built-in compound data types which, by themselves or in combination, are
-sufficient to support any activity. Then we can write ordinary functions
-that act on these, instead of methods.
+Instead, we program with modules and dictionaries, which do acquire
+the new behaviors when modules are reloaded.
 
-In particular, we use dictionaries instead of objects.  The 
-dictionary keys act as attribute names and dictionary values
-act as attribute values.   This has the advantage that new
-attributes can be added at any time without requiring changes
-to existing code and without invalidating any persistent data.
-We use the dictionary *get* method to read dictionary items,
-because this does not crash when an item is missing from old
-persistent data; it just returns an appropriate default.
-For examples, see the functions *save_buffer* and *restore_buffer*
-in the *sked* module.
+An ordinary Python module resembles a class definition.   The module-level
+global variables are like attributes (instance variables) and the functions in
+the module are like methods A module also resembles one object - a single
+instance of the data defined by the module.  You can have many objects of the
+same class in  the Python session at the same time, but you can only have one
+instance  of a module. We use modules instead of classes where *we only need
+one instance  to be active at a time*.
 
-Revised Jun 2023
+For example, our *sked* module defines the data and functions used by a text
+buffer in our editors.  The  editors can work with multiple buffers, but only
+one of the buffers is active at a time.  You can only insert text into one
+buffer at a time -- and so on.   Typically, you edit in the same *current
+buffer* for a while and then select another buffer to be the current buffer,
+then edit in that buffer, etc.
+
+The state of the current buffer is stored in the module-level global
+variables of the *sked* module.  These variables are  updated by almost
+every editing command -- by every keystroke in  the *dmacs* and *pmacs*
+editors.
+
+The states of all the other buffers  are stored in dictionaries.  For
+each buffer, there is a dictionary.  The keys in this dictionary are the
+names of the variables in the *sked* module, and the values in this
+dictionary are the variable values.    When a new current buffer is
+selected, the variables of the previous current buffer are saved in its
+dictionary, and the variables in the new current buffer are restored
+from its dictionary.   See the functions *save_buffer* and
+*restore_buffer* in the *sked* module.
+
+The whole persistent collection of saved buffers is stored in a
+dictionary whose keys are the buffer names, and whose values are the
+dictionaries for each buffer.   It is a dictionary of dictionaries,
+*buffers* in the *sked* module.
+
+When we add or delete variables from the buffer module *sked*, we make
+corresponding changes to to the code that saves and restores the
+variables in the dictionaries.   This does not invalidate the persistent
+data in the saved dictionaries. When we restore module variables from a
+dictionary,  we use the *get* method to read dictionary items, because
+this does not crash when an item is missing from old persistent data; it
+just returns an appropriate default.
+
+An alternative to saving and restoring module global variables from
+the dictionaries would be to pass the appropriate dictionary to 
+each function as its first argument.  This would be quite like the
+*self* argument in Python methods.  We rejected this alternative because
+it would make the code more verbose.
+
+Revised Oct 2023

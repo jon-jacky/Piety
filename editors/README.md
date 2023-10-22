@@ -2,35 +2,81 @@
 editors
 =======
 
-Text editors
-
-- **README.md**: Directions for using the *sked*, *edsel*, and *dmacs* editors,
-  see below.
-
-- **NOTES.txt**: Notes on the code in *sked*, *edsel*, and *dmacs*.
-
-- **HOW.md**: How we program.
-
-- **edsel.py**: Display editor that uses the same commands as *sked*.
-
-- **edselinit.py**: Define and initialize global variables used by *edsel*.
-
-- **dmacs.py**: Invoke editor functions with emacs keycodes.
-
-- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
-
-- **sked.py**: Line editor inspired by the classic Unix *ed*.
-
-- **skedinit.py**: Define and initialize global variables used by *sked*.
-
-
-### Introduction ###
-
 The modules here comprise a minimal Python programming environment.
 We can have all of our source code, our editors, and the interactive Python
 interpreter always available in our Python session. We can write code that
 we load and run immediately, without restarting the session or losing
 any work in progress. See [how we program](HOW.md).
+
+### Quick start ###
+
+There isn't any installation procedure.  Just clone the 
+Piety repository under your home directory.
+
+Run this command to put the editor modules on your *PYTHONPATH*, so you can
+run the editors from any directory.  Note the dot at the beginning of the
+command:
+
+    . ~/Piety/bin/paths      
+
+Run this command to start *pmacs*, a display editor that uses emacs control
+keys:
+
+    python3 -im pm
+
+Now you can edit almost as if you were using Emacs.  Many 
+[emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf) are
+supported.  Differences from Emacs are discussed in the sections below.
+
+Below the text editing window, instead of a one line "minibuffer" as in Emacs,
+there are several scrolling lines devoted to the Python REPL.
+To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
+*alt* key while typing the *x* key).  To resume editing, type the function
+call *pm()* in the REPL.
+
+More detailed directions appear in the sections below.  
+
+[Files](#Files)  
+[sked](#sked)  
+[edsel](#edsel)  
+[dmacs](#dmacs)  
+[pmacs](#pmacs)  
+[Recovering from errors](#Recovering-from-errors)  
+
+### Files ###
+
+- **README.md**: Directions for using the *sked*, *edsel*, *dmacs*, 
+  and *pmacs* editors.
+
+- **NOTES.txt**: Notes on the code in *sked*, *edsel*, *dmacs*, and *pmacs*.
+
+- **HOW.md**: How we program, notes on motivation and design.
+
+- **dm.py**: Script to start the *dmacs* editor.
+
+- **editline.py**: Functions to edit and display a string with *readline* 
+  control keys.  Used by *pmacs*.
+
+- **editlineinit.py**: Define and initialize global variables used
+  by *editline*.
+
+- **edsel.py**: Display editor that uses the same commands as *sked*.
+
+- **edselinit.py**: Define and initialize global variables used by *edsel*.
+
+- **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
+
+- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
+
+- **pm.py**: Script to start the *pmacs* editor.
+
+- **pmacs.py**: Display editor that uses Emacs control keys.
+
+- **pmacsinit.py**: Define and initialize global variables used by *pmacs*.
+
+- **sked.py**: Line editor inspired by the classic Unix *ed*.
+
+- **skedinit.py**: Define and initialize global variables used by *sked*.
 
 ### sked ###
 
@@ -193,7 +239,12 @@ To run *dmacs*, first start *sked*, then *edsel*, as described above.  Then,
     >>> from dmacs import dm
     >>> dm()
 
-After you type *dm()*, the Python prompt does not appear because Python
+Or, you can start *dmacs* from the system command line by running 
+the *dm* script:
+
+    python3 -im dm
+
+After you start *dmacs*, the Python prompt does not appear because Python
 is busy executing the *dm* function.  Now you can type emacs control keys
 to edit.   To exit *dm* and return to the Python prompt, type the control
 key *M-x* ("meta x", formed by holding down the ALT key while you type x).
@@ -228,8 +279,10 @@ before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
 (The emacs *C-g* cancel key is not available in *dmacs*.)
+To indicate that the string argument should be the empty string,
+type three backslashes.
 
-Some keys invoke functions that can optionally act on a range of
+Some keys invoke functions that can optionally act on a range of 
 lines called the *region*.
 To define the region, type the key *C-space* (press the control key
 and type the space bar).  This sets the *mark*, one end of the region.
@@ -253,11 +306,107 @@ or when you are entering a string in response to a prompt.
 To edit a line that has already been added to the buffer, you 
 must use the *M-%* key to substitute text in the line.
 
-The only reason to use *M-x* to return to the Python REPL while using
+A reason to use *M-x* to return to the Python REPL while using
 *dmacs* is to view and assign configuration variables, such as
 *sked.lmargin* etc.
 
 The name *dmacs* means 'dumb emacs' or maybe 'grade D emacs', barely above
 F (fail).
 
-Revised Jul 2023
+### pmacs ###
+
+*pmacs* is a display editor that uses Emacs control keys.
+Unlike *dmacs* and its predecessors, you do
+not have to use an append mode to enter text one line at a time.   Just type
+(or delete, or change) any amount of text anywhere at any time, as if you were
+using Emacs.
+To start *pmacs*, use the *pm* script with the command *python3 -im pm*, or import *pmacs* and call the function *pm()* at the Python REPL.
+
+Below the text editing window, instead of a one line "minibuffer" as in Emacs,
+there are several scrolling lines devoted to the Python REPL.
+To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
+*alt* key while typing the *x* key).  Now you can type any Python statements,
+including the editor commands from *sked* and *edsel*.  You might need them
+to set some editor configuration options.  For example, to set the text 
+window size to 12 lines and also expand the REPL scrolling region, type
+the *edsel* function call *win(12)* in the REPL.  To resume editing,
+type the function call *pm()*.
+
+In *pmacs* you can edit several files in different buffers just as you would
+in Emacs,  but at this time there  is only one display window. We plan to
+support multiple windows in the future.
+
+To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
+dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
+
+The *pmacs* editor provides all the functions and commands of its predecessors
+*sked*, *edsel*, and *dmacs*.  Most *pmacs* commands are actually *dmacs*
+commands, so its directions (above) are particulary pertinent.
+
+Two keycodes have different meanings in *pmacs* than in Emacs: 
+
+*C-x C-r* reloads the
+module from the current buffer into the Python session, so recent changes
+become effective immediately, without restarting the Python session or
+losing work in progress.  
+
+*C-x C-a* enters *edsel/dmacs* append mode, where
+text must be added one line at a time until a period is typed by itself at the
+start of a line.  It can sometimes be satisfying to just  type line
+after line without any temptation to stop and revise what we just wrote.
+
+*pmacs* is still the *sked* line editor underneath.
+The *C-space* command, *set mark*, marks the entire line, not a point
+within the Line.   Then the *C-w* command, *kill-region* or *cut*, cuts
+a sequence of whole lines from the marked line through the current line dot,
+inclusive.   After *C-w*, *C-y* *yank* pastes that sequence of whole lines.
+Or, *yank* pastes a sequence of whole lines that were cut one by one 
+by consecutive *C-k* *kill-line* commands.
+
+Or, you can cut words or sequences of words within a single line
+with the *M-d* *delete-word* command, the *C-u* *discard* command
+which cuts from the start of the line to the cursor, or a single *C-k* 
+*kill-line* command which is not part of a consecutive sequence of *C-k*,
+which cuts from the cursor to the end of the line.   After any of these
+commands, or a sequence of them, *C-y* pastes all the cut words after  the
+cursor.  You can cut from one line and paste into another. *C-space* and *C-w*
+cannot be used to select and cut words within a line.
+
+So you can either cut and paste words within a line,  or you can cut and
+paste one or more whole lines.  You cannot cut and paste beginning
+in the middle of one line and ending in the middle of another line.  We have
+not found this to be a serious limitation and have no plans to change this.
+ 
+Then name *pmacs* might mean "Python Emacs" but actually means "partly
+inspired by Emacs" or maybe "poor imitation of Emacs".
+
+### Recovering from errors ###
+
+These editors work in a long-running Python session where you can edit the
+editor modules themselves, then reload them into the same Python session to
+test and use.   When you reload a revised module,  you are running untested
+code, so errors are expected.   Some errors can make the editor unusable or
+cause it to crash.   If a module contains a syntax error,  it will crash the
+reload command.
+
+It is usually possible to recover from errors and crashes without restarting
+the Python session.   You started the session with the Python *-i interactive*
+option, so a crash does not exit the session, but returns control to the
+Python  REPL.  Your program stops running, but all the code (modules) and data
+(text buffers) remain in the session so you can use them to correct the
+erroneous module.
+
+First, look at the display and try to read any traceback messages or other
+useful information.   Then, find the Python REPL prompt and type the function
+call *refresh()*.  The display restores and you can resume work. You can try
+to restart *pmacs* by typing the function call *pm()* and  try to avoid using
+the erroneous commmand.   If that fails, you can return to the Python prompt
+by typing *M-x*, and start a simpler editor that does not import the erroneous
+code.  Type *dm()* to run *dmacs* which does not provide inline editing, or
+just type the many *edsel* commands at  the REPL -- they do not use keycodes.
+You can even revert to *sked* which does not update the display at all.
+
+As a last resort, you can exit the Python session and use some other editor
+to correct the error.
+
+Revised Oct 2023

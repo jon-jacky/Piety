@@ -3,11 +3,12 @@ dmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
 
 See README.md for directions on using dmacs, NOTES.txt about its code. 
 
-The name means 'dumb emacs' or maybe 'grade D emacs', barely above F (fail).
+The name means 'dumb emacs' or 'defective emacs' or maybe 'grade D emacs',
+barely above F (fail).
 """
 
 import sys, importlib
-import util, terminal, key, keyseq, display, edsel
+import terminal, key, keyseq, display, edsel
 import sked as ed
 
 # Define and initialize global variables used by dmacs.
@@ -57,7 +58,7 @@ def request(prompt):
     return response
 
 def request_search():
-    if not prev_k in (key.C_s, key.C_r):
+    if not prev_cmd in (fwd_search, bkwd_search):
         response = request(f'Search string (default {ed.searchstring}): ')
         if response and not cancelled(response): ed.searchstring = response
         return response # because caller always check cancelled(response)
@@ -119,7 +120,9 @@ def replace_string():
     response = request(
      f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
     if cancelled(response): return
-    if response: ed.replacestring = response
+    if response == '\\\\\\': ed.replacestring = '' # \\\ -> empty string
+    elif response: ed.replacestring = response # replace previous default
+    else: pass # use previous default
     # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
     def c1(start=None, end=None):
         edsel.c(ed.searchstring, ed.replacestring, start, end)
@@ -127,7 +130,7 @@ def replace_string():
 
 def kill_line():
     'Delete single line, accumulate consecutive deleted lines in yank buffer'
-    if prev_k != key.C_k: # first C_k, rewrite yank buffer
+    if prev_cmd != kill_line: # first kill_line:, rewrite yank buffer
         edsel.d()
     else: 
         edsel.d(None,None,True) # consecutive C_k, append line to yank buffer
@@ -179,6 +182,9 @@ keymap = {
     key.C_x + key.C_r : save_reload, # *not* like emacs find-file read-only
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
+    # arrow keys, send ANSI escape sequences
+    key.down: edsel.l, # next line
+    key.up: edsel.rl, # previous line
 }
 
 def open_promptline():
@@ -192,13 +198,21 @@ def open_promptline():
 def close_promptline():
     display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
 
+def runcmd(k):
+    """
+    Invoke a single dmacs command: look up k in keymap, run that command.
+    """
+    global prev_cmd
+    cmd = keymap.get(k, lambda: display.putstr(key.bel))
+    cmd()
+    prev_cmd = cmd
+
 def dm():
     """
-    dmacs editor: invoke editor functions with emacs control keys.
-    Supported keys and the fcns they invoke are expressed in keymap table.
+    dmacs editor: loop invoking editor commands with emacs control keys.
+    Supported keys and the cmds they invoke are expressed in keymap table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
-    global prev_k
     open_promptline()
     terminal.set_char_mode()
     while True:
@@ -206,12 +220,10 @@ def dm():
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.M_x:
-                prev_k = k
+                # preserve prev_cmd after dm exit for debugging and resuming
                 break
             else:
-                fcn = keymap.get(k, lambda: util.putstr(key.bel))
-                fcn()
-                prev_k = k
+                runcmd(k)
     terminal.set_line_mode()
     close_promptline()
     display.put_cursor(edsel.tlines, 1) # return cursor to command line

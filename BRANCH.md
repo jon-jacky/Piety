@@ -10,6 +10,13 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
+- 21 Oct 2023: *pmacs* emacs-like editor working.  Merge *editline* branch 
+  back into *ed* branch, with completed *editline* and *pmacs* modules.  
+
+- 13 Jul 2023: make *editline* branch to *ed* branch.
+  Add *editline* module, edit and display a string using readline control keys.
+  Add *pmacs*, edit text in lines anywhere in buffer, not just in append mode. 
+
 - 2 Jul 2023: Merge *ed* branch back into *rewrite* branch.  However,
   work continues in the *ed* branch and its branches.
 
@@ -60,4 +67,4 @@ Recent work in the *rewrite* branch:
 -  1 Feb 2023: Delete most files and directories for a fresh start.
    Revise *BRANCH.md*, *DIRECTORIES.md*, and *bin/paths*.
 
-Revised Jul 2023
+Revised Oct 2023
