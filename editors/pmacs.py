@@ -91,7 +91,13 @@ def delete_char(keycode):
 
 def kill_line(keycode):
     """
-    Kill the rest of line at dot or kill entire line(s)
+    In inline mode, kill line from the cursor up to but not including final \n
+     save killed segment in editline.killed buffer for subsequent yank.
+    In multline mode, kill entire line including final \n
+     save consecutive killed lines in sked.killed buffer for subsequent yank.
+    Manage transitions between inline and multiline modes:
+    kill line on empty line consisting only of \n enters multiline mode.
+    kill line after any other command than kill line resumes inline mode.
     """
     global inline
     # Lone kill line or first kill line in a series is inline ...
