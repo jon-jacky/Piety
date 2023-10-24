@@ -18,7 +18,7 @@ replacestring = '??? ' # reassigned by c(hange) command
 pagesize = 12         # reassigned by v and mv page up/down commands
 saved = True          # True when no unsaved changes, safe to run e(dit).
 lmargin = 0           # left margin for wrap
-rmargin = 78          # right margin for wrap
+rmargin = 72          # right margin for wrap
 nindent = 4           # N of spaces to indent or outdent
 
 killed = [] # yank (paste) buffer filled by kill_region or repeated kill_line

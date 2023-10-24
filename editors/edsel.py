@@ -375,8 +375,23 @@ def win(nlines=None):
     flines = nlines
     wlines = flines
     ed.pagesize = wlines - 2
-    ed.rmargin = tcols - 2
+    ed.rmargin = tcols - 8
     open_frame()
+    recenter()
+
+def o2():
+    'split window'
+    global wlines
+    # Focus window is at top of frame, so wintop stays the same
+    wlines = wlines // 2  # split window in half
+    ed.pagesize = wlines - 2
+    recenter() # if dot was in lower half of frame, move it up to focus window
+
+def o1():
+    'restore single window'
+    global wlines
+    wlines = flines
+    ed.pagesize = wlines - 2 
     recenter()
 
 def zen(nlines=None):
@@ -388,3 +403,4 @@ def clr():
     'cl(ea)r window from display by restoring full-screen scrolling'
     display.set_scroll(1, tlines)
     display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
+
