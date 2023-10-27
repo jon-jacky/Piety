@@ -18,3 +18,11 @@ bufname = 'scratch.txt' # name of buffer displayed in current window
 buftop = 1 # index in buffer of line displayed at the top of the window.
 
 displaying = False  # initially display is not enabled.
+
+# saved windows including focus window, dict of dicts of window items
+# windows are identified by integer keys
+# saved windows are a dict not a list because smallest key might not be 0
+focus = 0 # key of focus window
+maxwindows = 2 # for now, the most that are useful in a vertical stack in term.
+windows[focus] = { 'wintop': wintop, 'wlines': wlines,  'bufname': ed.bufname }
+wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame

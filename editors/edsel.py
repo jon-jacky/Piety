@@ -379,20 +379,64 @@ def win(nlines=None):
     open_frame()
     recenter()
 
+def save_window(wkey, wintop, wlines, bufname):
+    'Save given window items in saved windows at the index wkey'
+    windows[wkey] = { 'wintop': wintop, 'wlines': wlines, 'bufname': bufname } 
+
+def restore_window(wkey):
+    'Restore saved window items at wkey to the focus window'    
+    global focus, wintop, wlines
+    # default values for missing keys are just the current values
+    focus = wkey
+    wintop = windows[wkey].get('wintop', wintop)
+    wlines = windows[wkey].get('wlines', wlines)
+    bufname = windows[wkey].get('bufname', ed.bufname)
+    if bufname != ed.bufname:
+        ed.prev_bufname = ed.bufname
+        restore_buffer(bufname)
+
 def o2():
-    'split window'
+    'Split focus window, focus remains in top half, bottom half is new saved'
     global wlines
-    # Focus window is at top of frame, so wintop stays the same
-    wlines = wlines // 2  # split window in half
+    if len(wkeys) >= maxwindows:
+        print('? No more windows\r\n', end='')
+        return
+    # When we split a window, top half remains focus window; keep same wintop.
+    prev_wlines = wlines # needed later to size lower window
+    wlines = wlines // 2 
     ed.pagesize = wlines - 2
-    recenter() # if dot was in lower half of frame, move it up to focus window
+    recenter() # if dot was in lower half of window, move it up
+    # Bottom half becomes new saved window
+    wkey = max(wkeys) + 1
+    # insert new wkey into wkeys right after focus window entry
+    for ikey, wkey in enumerate(wkeys):
+        if wkeys[ikey] == focus:
+            wkeys[ikey+1:ikey+1] = wkey # insert new wkey after focus entry
+            break
+    save_window(wkey, wtop + wlines, prev_wlines - wlines, ed.bufname)
 
 def o1():
-    'restore single window'
-    global wlines
+    'Return to single window, make focus window occupy the whole frame.'
+    global wintop, wlines
+    wintop = 1
     wlines = flines
     ed.pagesize = wlines - 2 
+    wkeys = [ focus ]
+    windows = [ windows[focus] ]
     recenter()
+
+def on():
+    'Next window, change focus to next window below in vertical stack'
+    global focus
+    if len(wkeys) <= 1:
+        print('? Only one window\r\n', end='')
+        return
+    for ikey, wkey in enumerate(wkeys):
+        if wkeys[ikey] == focus:
+            break
+    focus = (ikey + 1) % len(wkeys)
+    restore_window(focus)
+    refresh()
 
 def zen(nlines=None):
     'Alternative to win for a distraction-free writing experience'
