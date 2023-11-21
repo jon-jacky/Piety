@@ -1,21 +1,27 @@
 """
 edselinit.py - Define and initialize global variables used by *edsel*.
-"""
+"""  
 
-# The top of the frame is always the top of the terminal window, its line 1
+import sked as ed
+
+# The top of the frame is always the top of the terminal window, line 1
 # flines must always fit within the terminal window.
 
 tlines = 24 # N of lines in terminal window, later update with actual number
 tcols = 80  # N of columns in terminal window, later update ...
 flines = 20 # N of lines in frame, including all windows.
 
-# At this time there is just one window that occupies the entire frame
-# so wintop == 1 and wlines == flines always
+# From here on, 'window' means the software-generated window within the frame
+# whose top line and num. of lines might not be the same as the terminal widow.
+# Editing happens in the 'focus window', also called the 'current window'.
 
-wintop = 1 # index of first line of window in frame
-wlines = flines # N of lines in current window, including status line.
-bufname = 'scratch.txt' # name of buffer displayed in current window
-buftop = 1 # index in buffer of line displayed at the top of the window.
+# Typical case is just one window that occupies the entire frame
+# in that case wintop == 1 and wlines == flines
+
+wintop = 1 # index in frame of top line of focus window
+wlines = flines # N of lines in focus window, including status line.
+buftop = 1 # index in buffer of line at the wintop, top of the window.
+bufname = 'scratch.txt' # name of buffer displayed in focus window
 
 displaying = False  # initially display is not enabled.
 
@@ -24,5 +30,6 @@ displaying = False  # initially display is not enabled.
 # saved windows are a dict not a list because smallest key might not be 0
 focus = 0 # key of focus window
 maxwindows = 2 # for now, the most that are useful in a vertical stack in term.
+windows = {}
 windows[focus] = { 'wintop': wintop, 'wlines': wlines,  'bufname': ed.bufname }
 wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame

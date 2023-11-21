@@ -180,6 +180,10 @@ keymap = {
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     key.C_x + key.C_r : save_reload, # *not* like emacs find-file read-only
+    # windows
+    key.C_x + '2' : edsel.o2,
+    key.C_x + '1' : edsel.o1,
+    key.C_x + 'o' : edsel.on,
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
     # arrow keys, send ANSI escape sequences
