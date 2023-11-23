@@ -31,5 +31,6 @@ displaying = False  # initially display is not enabled.
 focus = 0 # key of focus window
 maxwindows = 2 # for now, the most that are useful in a vertical stack in term.
 windows = {}
-windows[focus] = { 'wintop': wintop, 'wlines': wlines,  'bufname': ed.bufname }
+windows[focus] = { 'wintop': wintop, 'wlines': wlines, 'buftop': buftop,
+                   'bufname': ed.bufname, 'dot': ed.dot }
 wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame

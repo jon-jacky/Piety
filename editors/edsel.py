@@ -100,7 +100,7 @@ def put_marker(bufline, attribs):
     'On the display, mark first char in line bufline in buffer with attribs'
     line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
     ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
-    display.put_cursor(wline(bufline), 1)
+    display.put_cursor(wintop + wline(bufline) - 1, 1)
     display.render(ch0, attribs)
 
 def restore_cursor_to_cmdline():
@@ -419,7 +419,7 @@ def restore_window(wkey):
 
 def o2():
     'Split focus window, focus remains in top half, bottom half is new saved'
-    global wintop, wlines
+    global wintop, wlines, wkeys
     if len(wkeys) >= maxwindows:
         print('? no more windows\r\n', end='')
         return
@@ -442,15 +442,16 @@ def o2():
     recenter() # center dot in this window also, calculate new buftop.
     save_window(wkey)
     restore_window(focus)
-    # FIXME? Set cursor to original focus window again?
 
 def o1():
     'Return to single window, make focus window occupy the whole frame.'
-    global wintop, wlines, wkeys, windows
+    global focus, wkeys, wintop, wlines
     if len(wkeys) <= 1:
         print('? only one window\r\n', end='')
         return
     windows.clear()
+    focus = 0
+    wkeys = [ focus ]
     wintop = 1
     wlines = flines
     ed.pagesize = wlines - 2
