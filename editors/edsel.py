@@ -25,8 +25,12 @@ def in_window(iline):
     return (buftop <= iline <= buftop + wlines - 2)
 
 def wline(iline):
-    'Return index of line in window that displays iline from buffer.'
-    wiline = iline - buftop + 1
+    """
+    Return index of line in window that displays iline from buffer.
+    Actually, return index of line in the frame, that is, the terminal window.
+    We can use the returned line index in terminal cursor positioning commands.
+    """    
+    wiline = wintop + (iline - buftop)
     return wiline if wiline >=1 else 1
 
 def locate_segment(iline):
@@ -100,7 +104,7 @@ def put_marker(bufline, attribs):
     'On the display, mark first char in line bufline in buffer with attribs'
     line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
     ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
-    display.put_cursor(wintop + wline(bufline) - 1, 1)
+    display.put_cursor(wline(bufline), 1)
     display.render(ch0, attribs)
 
 def restore_cursor_to_cmdline():

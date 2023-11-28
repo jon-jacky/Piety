@@ -135,7 +135,7 @@ def kill_line():
     else: 
         edsel.d(None,None,True) # consecutive C_k, append line to yank buffer
 
-def reload():
+def reload_buffer():
     'Reload module for current buffer'
     modname = ed.bufname[:-3] # trim trailing '.py'
     importlib.reload(sys.modules[modname])
@@ -144,7 +144,7 @@ def reload():
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'
     edsel.w()
-    reload() # synchronization?  Does w() finish before reload() begins?
+    reload_buffer() # synchronization?  Does w() finish before reload() begins?
 
 # Table from keys to editor functions
 keymap = {

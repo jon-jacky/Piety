@@ -29,7 +29,7 @@ def reset_point():
 def restore_cursor_to_window():
     reset_point()
     # point+1 to make put_cursor call consistent with editline move_to_column
-    display.put_cursor(edsel.wintop+edsel.wline(ed.dot)-1, el.point + 1)
+    display.put_cursor(edsel.wline(ed.dot), el.point + 1)
 
 # Some functions do not use keycode arg but runcmd and pm require it to be there
 

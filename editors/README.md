@@ -2,11 +2,22 @@
 editors
 =======
 
-The modules here comprise a minimal Python programming environment.
-We can have all of our source code, our editors, and the interactive Python
+There are four editors here, each built by extending (importing) its
+predecessors. *sked* is a line editor inspired by the classic Unix *ed*,
+operated by calling its functions at the Python REPL. *edsel* adds
+display windows to *sked*. *dmacs* supplements the *edsel* REPL with
+Emacs control keys. *pmacs* enriches *dmacs* with more flexible display
+editing.
+
+Each editor comprises a minimal Python programming environment.
+We can have all of our source code, our editor, and the interactive Python
 interpreter always available in our Python session. We can write code that
 we load and run immediately, without restarting the session or losing
 any work in progress. See [how we program](HOW.md).
+
+The programming environments defined here are crude.  But we
+find that their malleability and responsiveness motivate us to continue
+working in them, despite their lack of conveniences.
 
 ### Quick start ###
 
@@ -409,4 +420,4 @@ You can even revert to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Oct 2023
+Revised Nov 2023
