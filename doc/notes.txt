@@ -18570,5 +18570,109 @@ pmacs.open_line -> edsel.update_below -> edsel.wline, update_lines.
 Are we passing the correct wstart to update_lines?  But check whole path.
 
 
+ 1 Dec 2023
 
+Move notes.txt and other.txt from ~/notes/piety to ~/Piety/doc 
+so we can edit them on the Chromebook under version control, without
+having to load the whole notes repo onto the Chromebook.
 
+Jonathans-MBP-7:piety jon$ cp -i notes.txt other.txt ~/Piety/doc
+
+Now add, commit, and push:
+
+Jonathans-MBP-7:doc jon$ git add notes.txt other.txt
+
+Jonathans-MBP-7:doc jon$ git commit -am 'add notes.txt, other.txt - copied from notes/piety'
+[window a6a47c5] add notes.txt, other.txt - copied from notes/piety
+ 2 files changed, 32104 insertions(+)
+ create mode 100644 doc/notes.txt
+ create mode 100644 doc/other.txt
+
+Now spend about a half hour fighting with git:
+
+Jonathans-MBP-7:doc jon$ git push
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/jon-jacky/Piety/'
+
+- !?
+
+Last night from Chromebook we had to generate and use new
+'personal authentication token' to push.  It was
+
+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
+
+Jonathans-MBP-7:doc jon$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': (paste in PAT, it didn't echo)
+
+Then a long wait ... a minute or two ...
+
+fatal: unable to access 'https://github.com/jon-jacky/Piety/': Failed to connect to github.com port 443: Operation timed out
+
+Jonathans-MBP-7:doc jon$ git push
+
+long wait ...
+
+fatal: unable to access 'https://github.com/jon-jacky/Piety/': Could not resolve host: github.com
+
+-- !!??
+
+Are we still connected to net?
+
+Browser can't connect to github from link to Piety on my home page.
+It can connect to HN.  Is this a problem just with github?
+
+A few minutes later, try again to connect browser to github. 
+This time it works.  Try push again:
+
+Jonathans-MBP-7:doc jon$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': (paste in PAT)
+To https://github.com/jon-jacky/Piety
+ ! [rejected]        window -> window (fetch first)
+error: failed to push some refs to 'https://github.com/jon-jacky/Piety'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+
+Jonathans-MBP-7:doc jon$ git push https://github.com/jon-jacky/Piety  window
+To https://github.com/jon-jacky/Piety
+ ! [rejected]        window -> window (fetch first)
+error: failed to push some refs to 'https://github.com/jon-jacky/Piety'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+
+Jonathans-MBP-7:doc jon$ git pull
+remote: Enumerating objects: 9, done.
+remote: Counting objects: 100% (9/9), done.
+remote: Total 9 (delta 8), reused 9 (delta 8), pack-reused 0
+Unpacking objects: 100% (9/9), done.
+From https://github.com/jon-jacky/Piety
+   642ec83..cb22c50  window     -> origin/window
+There is no tracking information for the current branch.
+Please specify which branch you want to merge with.
+See git-pull(1) for details
+
+Jonathans-MBP-7:doc jon$ git pull origin window
+From https://github.com/jon-jacky/Piety
+ * branch            window     -> FETCH_HEAD
+error: There was a problem with the editor 'vi'.
+Not committing merge; use 'git commit' to complete the merge.
+Jonathans-MBP-7:doc jon$ git commit
+[window 5ad6525] Merge branch 'window' of https://github.com/jon-jacky/Piety into window
+
+Jonathans-MBP-7:doc jon$ git push origin window
+Counting objects: 7, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 359.11 KiB | 0 bytes/s, done.
+Total 7 (delta 3), reused 0 (delta 0)
+remote: Resolving deltas: 100% (3/3), completed with 2 local objects.
+remote: To https://github.com/jon-jacky/Piety
+   cb22c50..5ad6525  window -> window
+
+Finally!  Are the new files at github?   Yes!
