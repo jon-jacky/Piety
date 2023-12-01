@@ -11,12 +11,10 @@ import sked as ed, editline as el
 # Define and initialize global variables used by pmacs functions.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
     _ = saved_put_marker # if already defined, then pmacsinit was already exec
 except:
-    exec(open(EDPATH + 'pmacsinit.py').read())
+    from pmacsinit import *
 
 # helper functions
 
