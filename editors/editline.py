@@ -11,12 +11,10 @@ import terminal, keyseq # only needed by test
 # Define and initialize global variables used by editline.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
     _ = point # if point is already defined, editlineinit was already exec'd
 except:
-    exec(open(EDPATH + 'editlineinit.py').read())
+    from editlineinit import *
 
 # used in main editing loop
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end

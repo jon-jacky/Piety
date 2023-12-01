@@ -14,12 +14,10 @@ import sked as ed
 # Define and initialize global variables used by dmacs.
 # Conditinally exec only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
     _ = mark # if mark is already defined, then dmacsinit was already exec'd
 except:
-    exec(open(EDPATH + 'dmacsinit.py').read())
+    from dmacsinit import *
 
 def append():
     'Restore line mode, run edsel a(), return to char mode'
