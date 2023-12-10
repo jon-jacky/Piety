@@ -66,7 +66,6 @@ def delete_backward_char(keycode):
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) 
     else: 
         join_prev() # see above
-        dmacs.prev_cmd = delete_backward_char # el.runcmd above assigns prev...
         restore_cursor_to_window()
 
 def join_next():
@@ -84,7 +83,6 @@ def delete_char(keycode):
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
     else:
         join_next() # see above
-        dmacs.prev_cmd = delete_char # el.runcmd above assigns prev...
         restore_cursor_to_window()
 
 def kill_line(keycode):
@@ -123,7 +121,6 @@ def kill_line(keycode):
     elif not inline:
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
         restore_cursor_to_window()
-    dmacs.prev_cmd = kill_line
 
 def kill_region(keycode):
     global inline
@@ -168,7 +165,8 @@ def runcmd(keycode):
     """
     cmd = keymap[keycode]
     cmd(keycode)
-    # prev_cmd is assigned in fcns above, or in fcns they call
+    dmacs.prev_cmd = cmd
+    # FIXME?  A few cmd call el.runcmd but don't update el.prev_cmd first
 
 def clear_marker():
     edsel.put_marker(ed.dot, display.clear)
