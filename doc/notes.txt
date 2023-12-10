@@ -18802,9 +18802,9 @@ fatal: Authentication failed for 'https://github.com/jon-jacky/Piety/'
 - !?
 
 Last night from Chromebook we had to generate and use new
-'personal authentication token' to push.  It was
+'persill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed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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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onal authentication token' to push.  It was
 
-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
+  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
 
 Jonathans-MBP-7:doc jon$ git push
 Username for 'https://github.com': jon-jacky
@@ -19266,8 +19266,67 @@ kill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed
 Oh - that should be ok.  Does editline el() append consecutive killed words?
 Yes!  BUT pmacs does not.   So problem must be in pmacs wrapper of el.runcmd
 
-It looks like assigning el.prev_cmd = dmacs.prev_cmd comes *after* runcmd!
-Shouldn't it come *before* runcmd?   Try that.
+In pm(), it looks like assigning el.prev_cmd = dmacs.prev_cmd comes
+*after* runcmd! Shouldn't it come *before* runcmd?   Try that.
+
+It works!
+
+BUT what about calls to el.runcmd in pmacs fcns other than pm?  
+There are several.   Shouldn't they also be wrapped in assignments
+from/to dmacs.prev_cmd?     I think so.
+
+Ok, for now we just assign dmacs.prev_cmd = cmd in pmacs.runcmd.
+BUT in some cases that should really be el.runcmd, because we 
+pass it back in to el.runcmd.
+
+The right way to do this is to define el_runcmd which just wraps
+el.runcmd in prev_cmd assignments.   BUT then we can't have 
+all purpose pmacs runcmd that assigns prev_cmd, because pmacs
+fcns that call el_runcmd will already assign prev_cmd.
   
+
+on@penguin:~/Piety/editors$ git commit -am 'editline: bug fix, kill_word displa
+y.delete_nchars correct arg order
+> pmacs: in pm editline case, assign inline = True only for editline kill_word, discard_line
+> also assign el.prev_cmd = dmacs.prev_cmd before calling el.runcmd()
+> FIXME?  Be careful about assigning dmacs. and el.prev_cmd elsewhere in pmacs'
+[window ea187e4] editline: bug fix, kill_word display.delete_nchars correct arg order pmacs: in pm editline case, assign inline = True only for editline kill_word, discard_line also assign el.prev_cmd = dmacs.prev_cmd before calling el.runcmd() FIXME?  Be careful about assigning dmacs. and el.prev_cmd elsewhere in pmacs
+ 4 files changed, 742 insertions(+), 2 deletions(-)
+jon@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+
+Tried pasting in token from L18807  above:
+
+  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
+
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/jon-jacky/Piety/'
+
+Not sure if the token is no good or my copy/paste didn't work.
+Hard to tell because pw does not echo.  I may have got leading
+or trailing spaces in there.   Try again.   And again.
+No, they all fail.  I think I need new token.  
+
+See L496 in chromebook_1.txt.  Apparently the token above was indeed
+revoked, I have to generate yet another.  Grrr... It's late, do it tomorrow.
+
+I think we do have to wrap all the pmacs calls to el.runcmd with
+prev_cmd assignments.  What a nuisance, because then assignments
+to prev_cmd from pmacs itself all need special-case handling, depending
+on whether those fcns call el.runcmd.
+
+This is all just for C_k, C_u, and M_d, right?   I think C_k
+kill_line is the complicated one because there are *different* kill_line
+in pmacs and editline.  Does this create problems when prev_cmd  is
+kill_line?  Must we be careful to test which one it is?
+
+What a complicated mess.  This is a consequence of having a line-oriented
+editor underneath.
+
+We must be careful when editing to use C_k correctly.  When we want
+inline C_k - we *must not* do second C_k to delete empty line.
+When we want whole line C_k, we *must* do second C_k to delete empty line.
+This is what we must do when we want to cut/paste even a *single* whole line.
 
 
