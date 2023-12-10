@@ -200,9 +200,11 @@ def pm():
             elif k in keymap:
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
+                el.prev_cmd = dmacs.prev_cmd
                 ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
-                inline = True # editing inline, kill and yank word(s) in line
                 dmacs.prev_cmd = el.prev_cmd
+                if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
+                    inline = True
             elif k in dmacs.keymap:
                 edsel.restore_cursor_to_cmdline()
                 dmacs.runcmd(k)

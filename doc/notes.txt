@@ -18570,6 +18570,211 @@ pmacs.open_line -> edsel.update_below -> edsel.wline, update_lines.
 Are we passing the correct wstart to update_lines?  But check whole path.
 
 
+30 Nov 2023
+
+Starting work on Chromebook instead of Macbook!
+
+(Following lines copied, pasted from MyDrive/notes/chromebook_1.txt,L243 -- L440)First set up Piety development.
+
+jon@penguin:/$ git clone https://github.com/jon-jacky/Piety Piety
+fatal: could not create work tree dir 'Piety': Permission denied
+
+-- !?  Oh, we're in /
+
+jon@penguin:~$ git clone https://github.com/jon-jacky/Piety Piety
+Cloning into 'Piety'...
+remote: Enumerating objects: 8804, done.
+remote: Counting objects: 100% (1840/1840), done.
+remote: Compressing objects: 100% (606/606), done.
+remote: Total 8804 (delta 1304), reused 1767 (delta 1232), pack-reused 6964
+Receiving objects: 100% (8804/8804), 1.93 MiB | 5.48 MiB/s, done.
+Resolving deltas: 100% (6067/6067), done.
+
+Oh, but we're on the wrong branch.  Fix now.
+
+jon@penguin:~/Piety/editors$ git branch
+* master
+jon@penguin:~/Piety/editors$ git checkout window
+Branch 'window' set up to track remote branch 'window' from 'origin'.
+Switched to a new branch 'window'
+
+Now it looks right.
+
+Leave desk for about 20 minutes, return to find Chromebook screen dark.
+Typing keys does not revive it.  Tapping power key in urc briefly does
+revive it, showing previous contents - it did not reboot.
+
+WD disk light is blinking continually - !?
+
+Prepare to get Python.  First, on advice of Set up Linux on your
+Chromebook page - bookmarked:
+
+jon@penguin:~$ sudo apt-get update && sudo apt-get dist-upgrade
+... several hundred lines ...
+
+Try advice in https://www.makeuseof.com/install-python-ubuntu/
+
+jon@penguin:~$ sudo apt install python3
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+python3 is already the newest version (3.9.2-3).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+
+Oh, the command is python3 not python!
+
+jon@penguin:~$ which python3
+/usr/bin/python3
+
+So we should be ready to go.  First set up the paths:
+
+jon@penguin:~/Piety/bin$ . paths
+jon@penguin:~/Piety/bin$ echo $PIETY
+/home/jon/Piety
+jon@penguin:~/Piety/bin$ echo $PATH
+/home/jon/Piety/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+jon@penguin:~/Piety/bin$ echo $PYTHONPATH
+/home/jon/Piety/util:/home/jon/Piety/unix:/home/jon/Piety/vt_terminal:/home/jon/Piety/shells:/home/jon/Piety/editors:
+jon@penguin:~/Piety/bin$ pwd
+/home/jon/Piety/bin
+
+Now start pmacs.  If this works, I'll be astonished.
+
+jon@penguin:~/Piety/editors$ python3 -im pm
+...
+  File "/home/jon/Piety/editors/sked.py", line 24, in <module>
+    exec(open(EDPATH + 'skedinit.py').read())
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jon/Piety/editors/skedinit.py'
+
+But edsel.py contains:
+
+EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
+
+This is wrong on Linux because we're in /home/jon not /Users/jon
+See L305 above.
+
+The (temporary) fix for this is to get rid of EDPATH and
+replace exec(open...) with from edselinit import *
+which we already have in edsel.py
+
+BUT we don't have an editor -- except vim!  Can we figure that out?
+
+jon@penguin:~/Piety/editors$ vim sked.py
+... esc i to get into insert mode
+... replace exec(open(...)) with from skedinit ...
+... esc :wq to write out file and exit.
+jon@penguin:~/Piety/editors$ git diff sked.py
+...
+-    exec(open(EDPATH + 'skedinit.py').read())
++    from skedinit import 
+
+Oh, but we also have to delete the EDPATH line.  Done.
+
+Ditto in dmacs, editline, and pmacs.  Done. 
+
+jon@penguin:~/Piety/editors$ python3 -im pm
+...
+  File "/home/jon/Piety/editors/dmacsinit.py", line 7, in <module>
+    promptline = edsel.flines+1 # line after end of edsel frame
+NameError: name 'edsel' is not defined
+
+Right, because now we are importing edselinit not just exec'ing it 
+in the context of edsel.  So we have to import edsel in dmacsinit now.
+Also in pmacsinit.'
+
+jon@penguin:~/Piety/editors$ python3 -im pm
+...
+  File "/home/jon/Piety/editors/edsel.py", line 10, in <module>
+    import terminal_util, display
+ModuleNotFoundError: No module named 'terminal_util'
+
+But
+
+jon@penguin:~/Piety/editors$ ls ../unix
+__pycache__  README.md  terminal.py  terminal_util.py
+
+Is there an error in the PATH?
+
+jon@penguin:~/Piety/editors$ echo $PYTHONPATH
+
+Nothing!  I'm in a different terminal window and didn't run paths!
+
+jon@penguin:~/Piety/editors$ . ../bin/paths 
+jon@penguin:~/Piety/editors$ echo $PYTHONPATH
+/home/jon/Piety/util:/home/jon/Piety/unix:/home/jon/Piety/vt_terminal:/home/jon/Piety/shells:/home/jon/Piety/editors:
+
+jon@penguin:~/Piety/editors$ python3 -im pm
+...
+
+Finally it works -- sort of.   Window appears.  Status line is 
+almost illegible because background bar is very black and letters
+are very faint gray.  This might just be a feature of the theme or
+terminal settings.
+
+C-x C-f to read a file works.  Read edsel.py and README.md.
+C-x C-b lists buffers.  C-x b switches buffer. 
+M-x goes to Python REPL and pm() resumes editing.
+
+BUT C-n doesn't go to next line, it opens a new terminal window.
+And C-v doesn't page down, it pastes into the buffer.
+
+So the Term app is still interpreting the Chromebook keyboard 
+shortcuts.  
+
+Maybe we can run a Linux terminal?  
+
+jon@penguin:~/Piety/editors$ ls /bin/*term*
+/bin/garcon-terminal-handler  /bin/setterm  /bin/x-terminal-emulator
+
+Oh dear, xterm has to run under X, duh.
+
+This might be a show stopper.  Can we run X?  There are X programs in /bin.
+
+Hey, wasn't there an setting to turn on/off keyboard shortcuts in terminal?
+Yes, terminal settings > Keyboard & mouse - turn *everything* off.
+
+Now C-n and C-v work!   Piety is working on Chromebook Linux --
+the first time it has run on any computer besides my old Mac! 
+
+...$ git commit -am ...
+
+Author identity unknown
+
+** Please tell me who you are 
+
+...$ git config --global user.name jon-jacky
+
+ditto user.email "..."
+
+BUT then ... support for password authentication was removed ...
+
+Yes, we've seen this before.  Search email for github,
+find Sep 5 email with link.
+
+Log into github - says this token has no expiration date.  Try to 
+find use of token in notes.txt
+
+Find token 31 Jan 2023, L188
+
+ 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
+
+ Can't paste into terminal window because I disabled it
+ Re-enable C-v paste - but it still doesn't work.  
+ Maybe that code has expired.
+
+That's enough for today - try again tomorrow.
+
+Nah, regenerate token now:
+
+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
+
+It worked!  Look at github, committed files are there.
+
+A good day's work!
+
+(end of excerpt from My Drive/notes/chromebook_1.txt, L243 -- 440)
+
+
  1 Dec 2023
 
 Move notes.txt and other.txt from ~/notes/piety to ~/Piety/doc 
@@ -18676,3 +18881,393 @@ remote: To https://github.com/jon-jacky/Piety
    cb22c50..5ad6525  window -> window
 
 Finally!  Are the new files at github?   Yes!
+
+(Following lines copied from My Drive/notes/chromebook_1.txt, starting L444
+- L482)
+
+On the Mac, copy ~/notes/piety/notes.txt and other.txt to
+ ~/Piety/doc, add, commit push.   Then pull on Chromebook
+
+jon@penguin:~/Piety/doc$ git pull
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 11, done.
+remote: Counting objects: 100% (11/11), done.
+remote: Compressing objects: 100% (5/5), done.
+remote: Total 11 (delta 6), reused 11 (delta 6), pack-reused 0
+Unpacking objects: 100% (11/11), 360.77 KiB | 2.01 MiB/s, done.
+From https://github.com/jon-jacky/Piety
+   cb22c50..76ec644  window     -> origin/window
+Updating cb22c50..76ec644
+Fast-forward
+ doc/notes.txt | 18678 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ doc/other.txt | 13530 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 32208 insertions(+)
+ create mode 100644 doc/notes.txt
+ create mode 100644 doc/other.txt
+jon@penguin:~/Piety/doc$ ls
+analogies.md         language.md  other.md       python3.md  term.txt
+baremachine.md       modules.md   other.txt      README.md   utilities.md
+gracle_excerpts.txt  notes.txt    precursors.md  term.md
+
+So we got the new files.  What about the contents?
+
+jon@penguin:~/Piety/doc$ tail notes.txt
+... contents as expected ...
+
+(end of excerpts from My Drive/notes/chromebook_1.txt L444 -- 482)
+
+
+ 4 Dec 2023
+
+Now we can get back to programming Piety itself - we're trying to 
+fix those windows.   See 26 Nov above, L18571:
+
+update_window calls update_lines.  So they all work.  So what's the
+problem with C-w C-y and RET?
+
+BUG - C-y doesn't work because we keep getting back into inline mode.
+When sked.killed holds text, we should not be in inline mode.
+Workaround: M-x then pmacs.inline = False then C-y.  
+
+Back to lower window problem. Recall this from L18571:
+
+"First, see if we can just fix RET within line in lower window.  see above, 
+pmacs.open_line -> edsel.update_below -> edsel.wline, update_lines.
+Are we passing the correct wstart to update_lines?  But check whole path."
+
+Also DEL at start of line to join lines doesn't work in lower window.
+
+After these lower window problems C-l refresh does update window
+correctly.
+
+ 4 Dec 2023
+
+Let's fix bug with sked.inline first. 
+
+grep shows inline is only assigned and used in pmacs.  
+It is only assigned in four statements.
+
+
+    # Lone kill line or first kill line in a series is inline ...
+   if dmacs.prev_cmd != kill_line:
+        inline = True
+    # ... except begin multiline mode when kill empty line of only \n
+    if ed.buffer[ed.dot] == '\n':
+        inline = False # Enter multiline mode
+
+
+def kill_region(keycode):
+    global inline
+    inline = False
+
+
+def pm():
+      ...
+            elif k in el.printing_chars or k in el.keymap:
+                ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
+                inline = True # editing inline, kill and yank word(s) in line
+
+I think the problem is this last one - typing *any* printing character
+or line editing control code returns to inline.   Maybe only typing C-k
+inline should return to inline mode.   Or just C-k and the delete word
+code M-d and the delete segment code C-u.  In pmacs.py:
+
+-                inline = True # editing inline, kill and yank word(s) in line
++                if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
++                    inline = True
+
+I think that should do it.
+
+C-x C-r write pmacs, reload pmacs then >>> from pmacs ioprt pm
+No explicit tets, let's just see if C-k then C-y work as intended
+in the future.
+
+Now fix RET.  key.cr: open_line.  Compare code in this trace:
+
+pmacs.open_line -> edsel.update_below -> edsel.wline, update_lines.
+
+which doesn't work, to code in refresh(), which does.
+
+pmacs.refresh -> dmacs.runcmd(key.C_l) -> edsel.refresh -> edsel.erase_lines
+ -> edsel.update_window
+
+
+ 7 Dec 2023
+
+Briefly test C-k M-d C-u  and C-y.   Try repeated C-k then C-y 
+to cut and  paste, then M-d C-k inline then C-y.  C-w then C-y, 
+then more inline C-u M-d.
+
+BUG - C-y inline includes old inline cut.   When do we clear
+editline.killed ?   After inline C-y - but we may want to 
+repeat paste.   I think we want to do it wheb new C-k C-u or M-d
+after C-y.
+
+Do we really have to keep track of 'after C-y'.  Wouldn't it be acceptable
+to clear editline.killed on any C-k C-u M-d that does not follow another
+C-k C-u M-d? 
+
+Oh, we already tried to code that -- for example editline.kill_word has:
+
+        killed = (killed + killed_word if prev_cmd in kill_cmds
+                       else killed_word)
+
+where
+
+kill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed
+
+BUT I think the problem might be the prev_cmd is local to editline
+so it can't see cmds that aren't editline commands.
+
+Right, there is a prev_cmd in editlineinit.py which is different
+from the prev_cmd in dmacsinit.py
+
+Hmn - these two distinct prev_cmd invalidate all the prev_cmd code, right?
+Fix it in pmacs?  In editline branch in pm, before calling, first assign 
+editline.prev_cmd = dmacs.prev_cmd and then after editline fcn returns,
+dmacs.prev_cmd = editline.prev_cmd.
+
+We already assign dmacs.prev_cmd after el.runcmd returns.  
+So just add the complementary assignment before we call el.runcmd.
+
+We got a crash where echoing in terminal is turned off - 
+even after exit and restart python, terminal does not echo
+typed characters at shell or in Python REPL or in dmacs editor -- !!??
+So close that Term and open another.
+
+Now we have in pmacs.py pm:
+
+             elif k in el.printing_chars or k in el.keymap:
+                 ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
+-                inline = True # editing inline, kill and yank word(s) in line
++                el.prev_cmd = dmacs.prev_cmd
++                if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
++                    inline = True
+                 dmacs.prev_cmd = el.prev_cmd
+
+Now I suppose I should try some cut/paste.  
+
+C-u then C-y, also C-k then C-y both work inline.  Display updates
+and editline.killed has proper contents.
+
+BUT M-d kill word doesn't update display. C-l refresh does update
+display as expected, so buffer was updated currectly.
+Also, only *last* cut word appears in editline.killed.
+
+Let's see if we can get display to update first.  kill_word has line:
+
+        display.delete_nchars(point - (m.start()+1))
+
+where display has 
+
+def delete_char():
+    'Delete character under the cursor'
+    putstr(dch % 1)
+
+def delete_nchars(n):
+    'Delete n characters under, then after the cursor'
+    putstr(dch % n)    
+
+We try delete_char, it updates display .   So are we not handling n right?
+
+C_y after M_d in inline mode works, updates display with killed word.
+
+Is it possible the CB Term doesn't handle delete_nchars correctly?
+We could commit this code then pull on the mac ans see if it works there.
+
+First try editline by itself on CB, just run test fcn el().
+That works - M_d deletes word updates on display as expected.
+
+So code pmacs kill_word *after* el.kill_line must mess it up - !?
+But pmacs just has   
+
+            elif k in el.printing_chars or k in el.keymap:
+                ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
+                el.prev_cmd = dmacs.prev_cmd
+                if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
+                    inline = True
+                dmacs.prev_cmd = el.prev_cmd
+
+That's the whole case - it doesn't do anything with the display
+after that.   Loop in editline is:
+
+  while True:
+        c = terminal.getchar()
+        k = keyseq.keyseq(c)
+        if k: # keyseq returns '' if key sequence is not complete
+            if k == key.M_x:
+                break
+            else:
+                line = runcmd(k, line)
+
+Oh, where do we make multiple calls to keyseq?   Oh, it should just
+keep looping around.
+
+See if M_f and M_b work - but we know they do.  They work in pmacs, yes.
+
+How can M_d display update work in editline el() but not in pmacs pm() - ?
+In both cases we are calling editline.kill_word which calls
+
+What if we back out changes to pmacs adn try again?
+on@penguin:~/Piety/editors$ mv pmacs.py pmacs_prevcmd_inline.py
+jon@penguin:~/Piety/editors$ git checkout pmacs.py
+Updated 1 path from the index
+jon@penguin:~/Piety/editors$ diff pmacs.py pmacs_prevcmd_inline.py
+204c204,206
+<                 inline = True # editing inline, kill and yank word(s) in line
+---
+>                 el.prev_cmd = dmacs.prev_cmd
+>                 if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
+>                     inline = True
+
+Then kill pmacs.py buffer, then C-x C-f pmacs.py  C-x C-r reload then 
+from pmacs import pm.
+
+No, M_d doesn't display there either.  Try restarting python.
+M_d display still doesn't work.
+
+Try it on Mac downstairs?
+
+I am inclined to defer working on this problem and return to the 
+lower window display update problems.
+
+
+ 8 Dec 2023
+
+Tried repeated M_d on the old Mac downstairs.   It worked - the
+display updated as expected and repeated M_d were appended to
+editline.killed so C_y pasted them all back in.
+
+This was running the same version of pmacs.py that we tried 
+on the CB last night when we reverted.
+
+Have we found something that works on Mac but not CB?
+
+Repeated test with editline el() - now it *doesn't* work, 
+display does not updael() after M_d, on CB just like in pmacs.
+BUT I recall testing it last night and it worked -- !?
+Was I mestaken?
+
+This morning, editline el() definitely behaves like pmacs -
+M_d does not update on display until you type C_l refresh -
+C_y does paste.  And, repeated M_d to append to killed buffer.
+So the M_d not updating display til C_l does occur on CB in 
+both pmacs and editline el().
+
+What does editline el() do on the Mac?
+
+It behaves as intended - M_d updates display and repeated M_d append
+to killed buffer.  Here on CB M_d does not update display (today - but
+last night I recalled it did)
+
+Both Mac and CB are running the same version of editline, 
+with 'from editline import *' instead of exec(open... editline.py....)
+
+Both Mac and CB have a __pycache__ directory with all the 
+<name>.cpython-39.pyc
+
+Is this a real system difference?  It seems we are running identical
+source code.   Maybe the CB Term app doesn't handle the delete_nchars
+escape sequence properly?   I'm tempted to recode it as multiple
+calls to delete_char escape sequence, see if that works.
+
+Once again, ran editline el() on Mac -- it works, M_d updates display.
+Onec again, ran it on CB -- M_d doesn't update display - BUT 
+consecutive M_d to append to killed buffer - revealed after C_l refresh
+and C_y yank.
+
+It's the *same code*!  Also, Piety/editors vt_terminal and unix all
+contain __pycache__ dirs with .pyc files.  There are no obvious 
+environmental differences.
+
+Can it be that the CB Term app doesn't handle the delete n chars esc
+sequence?   I don't see how we can test this -- the only way we have
+to access Linux and Python is through the Term app.
+
+The *only* test is to rewrite kill_word to use repeated delete_char.
+
+What about my memory and notes that in editline el() on CB, M_d did
+update the display?   What changed?  We restarted the Python 
+sessions in a new Term?  That would recompile editline again?
+BUT we never changed the code!
+
+In editline, we did replace exec(open...) with from ... import *.
+Did we make that change on Mac?
+
+Yes, we did.  git log shows change on Nov 30, editline.py has date
+1 Dec and editline.cpython-39.pyc has date Dec 8.
+
+Mac is running Python 3.9.0 and CB is running 3.9.2
+
+Visually inspect editline editlineinit and display on CB and Mac.
+Also compare wc char, word, linecounts.  They are the same.
+
+Hey, I just noticed in kill_word
+
+      display.delete_nchars(point - (m.start()+1))
+
+But all the other lines imply m.start() is larger than point.
+Have I got this - expr backward?  And mac term ignores sign on 
+delete_nchars arg but CB Term does not?  
+
+Try reversing it.
+
+-        display.delete_nchars(point - (m.start()+1))
++        # display.delete_nchars(point - (m.start()+1)) # FIXME? args reversed?
++        # display.delete_nchars((m.start()+1) - point) -        display.delete_nchars(point - (m.start()+1))
+
+Has no effect.  M_d still does not update display, C_d does update display.
+
+ls -l shows we have new editline.py and new editline.cpython-39.pyc.
+
+Oh wait, we commented out *both* lines!  FIx now.
+
+YAY!  Now it works!   It looks like there is a difference in Mac terminal
+and CB Term - Mac terminal tolerates negative arg in this escape sequence - 
+it must treat arg as unsigned - but CB Term does not.
+
+Try pmacs.  
+
+Wrote editline.py, 249 lines
+Reload module editline
+>>> from pmacs import pm
+>>> pm()
+README_2.md, 423 lines
+
+Then edit in README_2.md.   YAY!  Now M_d updates display here too!
+
+BUT consecutive M_d do not append to editline killed buffer. killed
+only contains the last word killed.   This must be a problem with 
+pmacs code that wraps editline.runcmd.
+
+I think I see the problem.  It's the old key vs. command issue again.
+editline.py has cmd = keymap[keycode]
+
+kill_word etc. has
+
+       killed = (killed + killed_segment if prev_cmd in kill_cmds
+                       else killed_segment)
+
+where
+
+kill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed
+
+Oh - that should be ok.  Does editline el() append consecutive killed words?
+Yes!  BUT pmacs does not.   So problem must be in pmacs wrapper of el.runcmd
+
+It looks like assigning el.prev_cmd = dmacs.prev_cmd comes *after* runcmd!
+Shouldn't it come *before* runcmd?   Try that.
+  
+
+

@@ -116,7 +116,10 @@ def kill_word(line):
         killed = (killed + killed_word if prev_cmd in kill_cmds
                        else killed_word)
         line = line[:point] + line[m.start( )+1:]
-        display.delete_nchars(point - (m.start()+1))
+        # The following commented-out line works on Mac but not ChromeBook
+        # It seems Mac term tolerates negative argument but CB Term does not.
+        # display.delete_nchars(point - (m.start()+1)) # FIXME? args reversed?
+        display.delete_nchars((m.start()+1) - point) 
     return line
 
 def kill_line(line):

@@ -13527,4 +13527,144 @@ Vintage Work Pictures From Before the Dawn of AutoCAD
 via https://news.ycombinator.com/item?id=38423581 53 comments after 23 hours
 
 
+ 4 Dec 2023 
 
+https://news.ycombinator.com/item?id=38511697
+comments on History of the PDF (sensible.so) 
+
+Lots of comments explain that it can be hard to extract plain text from a PDF
+in the correct order for easy reading.
+
+
+ 5 Dec 2023
+
+https://news.ycombinator.com/item?id=38512656
+comments on 
+A case for moving away from the cloud and embracing local storage solutions
+147 comments after 2 days
+
+Lots of discussion of reliability/availability/risks of cloud services
+vs. NAS (Network Attached Storage) at home or ad-hoc ext hard disks.
+Some cloud services recommended/criticized by name.
+links to a Fortune article about the "cloud repatriation movement" but
+that's about companies not individuals.
+
+
+ 6 Dec 2023
+
+https://lucumr.pocoo.org/2016/10/30/i-dont-understand-asyncio/ (2016)
+
+"... it's a much more complex system than I expected and I am now at the
+point where I am very confident that I do not know how to use it
+properly.
+
+... So here is the current set of things that you need to know exist: ...
+(list of *15 language contructs* follows)
+
+.. In addition the language gained a few special methods that are new:.. "
+(five new dunder methods)
+
+https://lucumr.pocoo.org/2020/1/1/async-pressure/ (2020)
+I'm not feeling the async pressure
+
+https://lucumr.pocoo.org/2023/12/1/the-python-that-was/ (2023)
+Untyped Python: The Python That Was
+
+ "... you probably know my skepticism towards Python typing. ...
+
+I believe the conflict between the intrinsic philosophy of Python and
+the concept of typing is fundamental and profound ...
+
+Back in 2004 when I started ... Java was the go-to for serious web
+application projects ...  There (with Java) was the world of XPath,
+there was the world of DTDs, there was the world of SOAP and WSDL. There
+was the world where the inherent complexity of the system was so great,
+that you absolutely required an IDE. ... PHP was ridiculed, Python and
+Ruby did not appear in conversations and JavaScript on the server was
+non existent. ...
+
+Yet here I was, I built stuff in PHP and Python. ... My choice (was)
+driven  ... by the exceptional developer experience these languages
+offered, to a large part because of the lack of types. ...
+
+... the total surface area between me and the Python language runtime was
+tiny. ... I was able to understand everything between the code that I
+wrote, and the code that ran end to end. ... The developer experience
+was built around there being very few layers in the onion. ...
+
+Here is what has changed: we no longer trust developers as much and we
+are re-introducing the complexity that we were fighting. Modern Python
+can at times be impossible to comprehend for a developer. In a way in
+some areas we are creating the new Java. We became the people we
+originally displaced. Just that when we are not careful we are on a path
+to the world's worst Java. We put typing on a language that does not
+support it, our interpreter is slow, it has a GIL. We need to be careful
+not to forget that our roots are somewhere else. We should not
+collectively throw away the benefits we had. ...
+
+ Python is in a spot now where the time spent for me typing it, does not
+pay dividends. ..."
+
+
+ 8 Dec 2023
+
+Here is a tutorial - apparently about coding SVG by hand,
+rather than generating it from something like GraphViz.   
+
+https://svg-tutorial.com/
+
+via https://news.ycombinator.com/item?id=38556116 109 comments after 1 day
+
+
+https://news.ycombinator.com/item?id=38576809
+Ask HN: How do you do personal backups in 2023? (Google and Dropbox issues)
+
+12 comments after 5 hours.  Various recommendations, mostly NAS
+and various software.
+
+
+ 9 Dec 2023
+
+https://sts10.github.io/2022/12/14/antix-on-2008-macbook-5-1.html
+Reviving decade-old Macs with antiX and MX Linux
+
+via https://news.ycombinator.com/item?id=38565629  107 comments in 1 day
+
+
+https://emacsconf.org/2023/talks/eval/
+EmacsConf/ 2023/ talks/
+Editor Integrated REPL Driven Development for all languages
+
+00:04 Introduction
+00:35 The wonders of C-x C-e
+03:35 An overview of REPL Driven Development
+04:51 REPL Driven Development with Java
+07:28 Bring your own Read Protocol
+07:59 Use Case: RDD & Job Interviews
+
+Also includes a full transcript.
+
+https://emacsconf.org/2023/talks/scheme/
+EmacsConf/ 2023/ talks/
+Bringing joy to Scheme programming
+
+00:02 Introduction
+00:23 Interactive development
+01:18 REPL: Read Eval Print Loop
+02:53 Long-lasting loops
+04:07 Not interruptible
+05:23 No protocol
+05:51 Not scalable
+07:25 nREPL
+
+"There is already a solution called nREPL. It's a synchronous protocol
+which allows to send operations to the server and receive responses in a
+synchronous manner. ..."
+
+09:01 Arei, Ares, and how to try
+10:34 Demo
+11:27 Continuations
+12:32 Reading from stdin
+13:33 Fancy example with continuations
+... and more to 20:25 ...
+   
