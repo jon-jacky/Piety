@@ -166,7 +166,7 @@ def runcmd(keycode):
     cmd = keymap[keycode]
     cmd(keycode)
     dmacs.prev_cmd = cmd
-    # FIXME?  A few cmd call el.runcmd but don't update el.prev_cmd first
+    # Note: A few cmd call el.runcmd we believe we needn't update el.prev_cmd
 
 def clear_marker():
     edsel.put_marker(ed.dot, display.clear)
@@ -201,6 +201,7 @@ def pm():
                 el.prev_cmd = dmacs.prev_cmd
                 ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
                 dmacs.prev_cmd = el.prev_cmd
+                # key.C_k and inline are handled in kill_line, above
                 if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
                     inline = True
             elif k in dmacs.keymap:

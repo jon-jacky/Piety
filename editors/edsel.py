@@ -71,7 +71,7 @@ def update_below(bstart, offset=0):
     optionally assign offset to move bstart and following lines down.
     """
     wstart = wline(bstart) + offset
-    nlines = wlines - wstart
+    nlines = (wintop + wlines - 1) - wstart
     update_lines(bstart, wstart, nlines)
 
 def erase_lines(nlines):

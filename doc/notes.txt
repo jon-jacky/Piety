@@ -19237,6 +19237,11 @@ YAY!  Now it works!   It looks like there is a difference in Mac terminal
 and CB Term - Mac terminal tolerates negative arg in this escape sequence - 
 it must treat arg as unsigned - but CB Term does not.
 
+Go downstairs to look at Mac and confirm that the Mac code also
+has the same arg order: point - (m.start()+1) - I didn't somehow
+reverse it just on the CB.  The Mac really does handle this code
+differently than the CB.
+
 Try pmacs.  
 
 Wrote editline.py, 249 lines
@@ -19328,5 +19333,182 @@ We must be careful when editing to use C_k correctly.  When we want
 inline C_k - we *must not* do second C_k to delete empty line.
 When we want whole line C_k, we *must* do second C_k to delete empty line.
 This is what we must do when we want to cut/paste even a *single* whole line.
+
+
+10 Dec 2023
+
+Generate new token by clicking on button on mail msg from Dec 1 
+email from github:
+
+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
+
+Try again:
+
+jon@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+
+(Paste in token shown above)
+
+Enumerating objects: 15, done.
+Counting objects: 100% (15/15), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (8/8), done.
+Writing objects: 100% (8/8), 11.03 KiB | 114.00 KiB/s, done.
+Total 8 (delta 7), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (7/7), completed with 7 local objects.
+To https://github.com/jon-jacky/Piety
+   76ec644..ea187e4  window -> window
+
+Then, after git status we see ../doc/notes.txt is not committed,
+commit and push, but then we get prompted again for username and pw,
+Again, try to paste in same token, but it doesn't work.
+After a few tries, we do get it to work.  Is github going to demand 
+this for *every* push - !?  
+
+jon@penguin:~/Piety/editors$ git commit -am 'pmacs: assign prev_cmd in runcmd'
+[window 465759c] pmacs: assign prev_cmd in runcmd
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+jon@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+
+Paste in token again.
+Yes, apparently it is demanding token on every push.   Grrr....
+
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 468 bytes | 117.00 KiB/s, done.
+Total 4 (delta 3), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/jon-jacky/Piety
+   11db2ee..465759c  window -> window
+
+So token worked this time -- but what a nuisance!
+
+Wrote pmacs.py, 214 lines
+Reload module pmacs
+>>> from pmacs import pm
+>>> pm()
+
+Now I suppose we should try some tests that use prev_cmd.
+
+In particular, test pmacs, try some C_k and make sure - 
+1. One inline C_k then C_y - cut segment is pasted in place
+2. Consecutive C_k then C_y - all lines get pasted
+
+Also test editline, try:
+1. consecutive M_d M_d then C_y
+2. C_u then M_d then C_y
+3. M_d then C_k then C_y
+
+In Term with code in pmacs, characters are not echoing - not
+in C-x b prompt - which is just Python input() - and not in
+pmacs editing window, which is editline.   So it is some
+problem with Term, not our code.  We saw this before - how
+did we get out?
+
+L19045 - we closed that Term and opened another.
+
+This time - click little >_ icon in Term ULC to get menu -
+there is no 'Reset terminal' option but just clicking Penguin
+I do reset the terminal, including killing the running 
+program - I'm back to $ shell prompt in /home/jon, $PYTHONPATH
+is empty again - so that's like killing the term and opening
+a new one.  Run bin/paths and then start session with python3 -im pm.
+
+Now run those tests above.  C_k 1. and 2. work.  
+editline 1. 2. 3. all work.   So the M_d display update is
+working, inline and prev_cmd are apparently working.
+
+So the simple (trivial) tests pass.  Keep watching for errors in real
+use: C_y pastes from wrong killed buffer, or  pasted killed buffer
+contains extra content (it was not reset when it should have been).
+ 
+Return to fixing display updates in non-focus window.
+
+At L18954:
+---------------------------
+Back to lower window problem. Recall this from L18571:
+
+"First, see if we can just fix RET within line in lower window.  see above, 
+pmacs.open_line -> edsel.update_below -> edsel.wline, update_lines.
+Are we passing the correct wstart to update_lines?  But check whole path."
+
+Also DEL at start of line to join lines doesn't work in lower window.
+
+After these lower window problems C-l refresh does update window
+correctly.
+ ----------------------------- 
+
+At L18536:
+-------------------------------
+C-w and C-y work in the top window but not the bottom window.
+Bottom window just doesn't update.  Must type C-l to see effect
+of C-w or C-y in lower window.
+
+Curiously, C-x C-x  C-x C-x to exchange point and dot do work 
+in lower window - it
+just calls edsel.display_move_dot which calls put_marker(ed.dot, ...)
+which in turn calls put_cursor(wline(.....)
+
+So the problem with C-w and C-y in the window isn't explained by
+put_cursor - which apparently works correctly, so does put_marker.
+
+restore_cursor_to_window also called by pmacs.open_line which 
+is just typing RET within a line.   Hmn, in lower window it 
+seems to put the cursor in the right place but it doesn't display
+the suffix of the line - until you type C-l.   
+----------------------- 
+
+L18996:
+-----------------------
+Now fix RET.  key.cr: open_line.  Compare code in this trace:
+
+pmacs.open_line -> edsel.update_below -> edsel.wline, update_lines.
+
+which doesn't work, to code in refresh(), which does.
+
+pmacs.refresh -> dmacs.runcmd(key.C_l) -> edsel.refresh -> edsel.erase_lines
+ -> edsel.update_window
+------------------------
+
+Easiest to see problem after RET in the middle of a line in the lower window.
+
+So, the summary seems to be edsel.update_below does not work in lower
+window, but edsel.refresh does.  refresh mostly calls update_window
+update_window just calls update_lines(buftop, wintop, wlines-1)
+update_lines just puts cursor at wintop and puts lines starting at buftop.
+It works because it starts by putting the cursor at wintop, which
+is correct for each window including lower window.
+
+update_below is just:
+
+def update_below(bstart, offset=0):
+    wstart = wline(bstart) + offset
+    nlines = wlines - wstart
+    update_lines(bstart, wstart, nlines)
+
+where 
+
+def wline(iline):
+    wiline = wintop + (iline - buftop)
+    return wiline if wiline >=1 else 1
+
+1.  Do I have bstart, wstart in the right order in call to update_lines?
+Yes, I think so.
+
+2.  Do I have correct order in wlines - wstart ?
+I must - because it works in top window.  There must be an offset needed.
+I think wstart is relative to frame but wlines is relative to window.
+Look again at update_status: put_cursor(wintop+wlines-1)
+instead of just wlines - wstart, try (wintop+wlines-1) - wstart
+When wintop is 1, this reduces to the earlier code.
+
+Yes, now RET works in lower window.   So do C_w, repeated C_k and C_y.
+That was much easier than getting M_d to display!
 
 
