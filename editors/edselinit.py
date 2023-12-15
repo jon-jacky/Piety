@@ -19,7 +19,7 @@ flines = 20 # N of lines in frame, including all windows.
 # in that case wintop == 1 and wlines == flines
 
 wintop = 1 # index in frame of top line of focus window
-wlines = flines # N of lines in focus window, including status line.
+wheight = flines # N of lines in focus window, including status line.
 buftop = 1 # index in buffer of line at the wintop, top of the window.
 bufname = 'scratch.txt' # name of buffer displayed in focus window
 
@@ -31,6 +31,6 @@ displaying = False  # initially display is not enabled.
 focus = 0 # key of focus window
 maxwindows = 2 # for now, the most that are useful in a vertical stack in term.
 windows = {}
-windows[focus] = { 'wintop': wintop, 'wlines': wlines, 'buftop': buftop,
+windows[focus] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
                    'bufname': ed.bufname, 'dot': ed.dot }
 wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame

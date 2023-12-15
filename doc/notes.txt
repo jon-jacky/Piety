@@ -19348,7 +19348,7 @@ jon@penguin:~/Piety/editors$ git push
 Username for 'https://github.com': jon-jacky
 Password for 'https://jon-jacky@github.com': 
 
-(Paste in token shown above)
+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(Paste in token shown above)
 
 Enumerating objects: 15, done.
 Counting objects: 100% (15/15), done.
@@ -19511,4 +19511,304 @@ When wintop is 1, this reduces to the earlier code.
 Yes, now RET works in lower window.   So do C_w, repeated C_k and C_y.
 That was much easier than getting M_d to display!
 
+jon@penguin:~/Piety/editors$ git commit -am 'edsel.py: fix nlines in update_below to work in lower window
+> pmacs.py: revise comments
+> doc/notes.txt: recent updates'
+[window 0fb59d2] edsel.py: fix nlines in update_below to work in lower window pmacs.py: revise comments doc/notes.txt: recent updates
+ 3 files changed, 185 insertions(+), 2 deletions(-)
 
+jon@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+
+(paste in token above)
+
+Enumerating objects: 13, done.
+Counting objects: 100% (13/13), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (7/7), done.
+Writing objects: 100% (7/7), 2.92 KiB | 44.00 KiB/s, done.
+Total 7 (delta 6), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (6/6), completed with 6 local objects.
+To https://github.com/jon-jacky/Piety
+   465759c..0fb59d2  window -> window
+
+Confirm latest versions are at github.
+Haven't done that yet - got email saying my personal access token appeared
+in a commit, has been revoked, I must generate a new one.   Bah!
+
+Apparently this comes about when I try to paste token into password: prompt
+but fail.
+
+It might be worth contacting github support about this.
+
+Back to edsel.  We used that idiom twice, in update_status put_cursor call
+and in update_below nlines = rhs.   Should we write a functin for this?
+Have we already -- is it wlines?  The pertinent code is:
+
+def update_status():
+    display.put_cursor(wintop+wlines-1, 1) # window status line
+    ...
+
+def update_below(bstart, offset=0):
+    wstart = wline(bstart) + offset
+    nlines = (wintop + wlines - 1) - wstart
+    update_lines(bstart, wstart, nlines)  
+
+Then wline is:
+
+def wline(iline):
+    wiline = wintop + (iline - buftop)
+    ...
+
+No, it's not quite the same as wline, because buftop doesn't appear.
+what if we consider wlines -> iline ?  No, it doesn't quite work,
+because iline is the index of the line in the buffer and 
+wlines is number of lines in the window - which doesn't depend on the buffer.
+In our formula, we're just adjusting an offset for wintop.
+If we could think of a good name for this, that would make a fcn worthwhile.wl
+wline translates line in buffer to line in frame.
+w???? translates line in window to line in frame.
+
+No, this should be an argument-less fcn that returns the 
+whole wintop+wlines-1
+ 
+call it wbottom() analogous to wtop.   BUT then the constant wlines 
+should be renamed wsize so as not to confuse it with wline()  
+
+
+11 Dec 2023
+
+Rename wlines to wheight not wsize - be specific, if we ever do vertical
+window split (unlinkely!) we will also have wwidth. 
+
+grep shows wlines is pervasive!  Also that wheight is much better.
+
+BUG - status line scrolls up one line sometimes when status message
+appears at bottom of window.
+Oh, but that's only in notes.txt frame, not in code frame.  Maybe this
+got fixed in the course of other fixes - code frame is more recent.
+
+Restart notes frame.  Done.
+
+Now, no bogus scrolling.  BUT in code fram, we adjusted window width
+with CB Term and now there is bogus scrolling there.  Did adjusting 
+Term width cancel scrolling region?
+
+At REPL type win(24).  That calls set_scroll, indeed it fixes bogus
+scrolling.  So adjusting Term width in window mgr. cancels scrolling region,
+win() restores it.
+
+More window weirdness - in notes frame we got frozen cursor, no echo,
+cursor doesn't move.   Had to close Term and open a new one.
+
+Replace wlines with wheight in edsel using c(...) command.
+git diff reveals 
+
+-    nlines = min(nlines, wintop+wlines-wstart) # n of lines at end of window
++    nlines = min(nlines, wintop+wheight-wstart) # n of lines at end of window
+     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
+
+Can't we replace wintop+wheight with wbottom() - do we need +1 there?
+Yes, we do need the +1 to make it a strict translation - because
+wbottom() returns wintop + wheight - 1.  Also it looks right, like bstart+1:
+
+    nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
+
+We use wbottom in three places: update_status, update_below, update_lines.
+It's well worth defining it!
+
+Should test this before committing.  Those three fcns are pervasive!
+Just interact ad lib to exercise them all -- they all seem to work.
+
+BUG - if you kill a buffer in one window, and it is also displayed
+in another window, when you C_o to that window, pmacs crashes:
+
+                             bufname = buffers[bname].get('bufname', 'no
+name')
+KeyError: 'README_2.md'
+
+
+13 Dec 2023
+
+Here is a more complete traceback:
+
+File "/home/jon/Piety/editors/edsel.py", line 483, in on
+restore_window(focus)
+File "/home/jon/Piety/editors/edsel.py", line 426, in restore_window
+ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
+File "/home/jon/Piety/editors/sked.py", line 80, in restore_buffer
+bufname = buffers[bname].get('bufname', 'no name')       KeyError:
+'README_2.md'
+
+Oh, it's not get('bufname', ...) that's failing, it's buffers[bname].
+
+We need a guard 'if bname in buffers...' somewhere - but where?
+And what's the 'else' ?
+
+Oh, after the crash, that Term is in the weird no-echo mode.
+Reset term then restart pm at $ prompt.
+
+Try to fix by adding line in edsel restore_window
+
+     ...
+     bufname = windows[wkey].get('bufname', ed.bufname) # *local* bufname here!
++    # What if bufname is not in buffers?  It may have been killed.
++    # But scratch.txt is always in buffers.
++    bufname = bufname if bufname in ed.     bufname = windows[wkey].get('bufname', ed.bufname) # *local* bufname here!
++    # What if bufname is not in buffers?  It may have been killed.
++    # But scratch.txt is always in buffers.
++    bufname = bufname if bufname in buffers else 'scratch.txt'
+     if bufname != ed.bufname:
+         ed.prev_bufname = ed.bufname
+         ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.buffers else 'scratch.txt'
+     if bufname != ed.bufname:
+         ed.prev_bufname = ed.bufname
+         ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
+     ...
+
+BUt then after C_k kill buffer and C_o other window
+
+ reset_point()
+                 File "/home/jon/Piety/editors/pmacs.py", line 23, in reset_point
+     linelen = len(ed.buffer[ed.dot])
+                                     IndexError: list index out of range
+
+This crashes because ed.dot is now 0 and there is no line at that index.
+BUT isn't scratch.txt supposed to have one line at index zero: '\n'
+Yes, see skedinit.py, confirm in running session:
+
+>>> sked.buffers
+{'scratch.txt': {'bufname': 'scratch.txt', 'filename': 'scratch.txt',
+'buffer': ['\n'], 'dot': 0, 'saved': True}}
+
+I don't see what went wrong there.  And it's hard to tell because after
+every pmacs crash, Term is in no-echo mode.   Is some exception handler
+not running?  Is there a reset terminal command I can type blind?
+Try tl = pmacs.terminal.set_line_mode() then type tl() - it works!
+
+After crash with same traceback:
+
+>>> sked.dot
+23
+>>> sked.bufname
+'scratch.txt'
+>>> sked.buffer
+['\n']
+
+sked.dot was not reassigned, even though bufname and buffer where restored
+
+>>> sked.buffers[sked.bufname]
+{'bufname': 'scratch.txt', 'filename': 'scratch.txt', 'buffer': ['\n'],
+'dot': 0, 'saved': True}
+
+Why wasn't dot restored?  Look at sked.restore_buffer.  It looks like
+it does the right thing.  IT does assign dot and default is 0.
+
+dmacs C_x + o just runs edsel.on
+
+pmacs calls dmacs.runcmd but then, restore_cursor_to_window
+which calls reset_point with the crashing lineline = ... ed.buffer[ed.dot]...
+
+BUT I don't see any code in that path that reassigns ed.dot after 
+restore_buffer assigns it -- !?   Trace through again.
+ 
+
+14 Dec 2023
+
+Instead of reading the code path once more, maybe try the debugger?
+Like we did at on 2 Apr 2023, L5155: import pdb then pdb.run("... fcn call...")
+then (Pdb) s to step into fcn.
+
+Split window, delete current buffer in one, then:
+
+ pdb.run("edsel.on()")
+
+Just following along in code as we step through with debugger, we soon
+find:
+
+def save_window(wkey):
+    """
+    Save window items in saved windows at the index wkey.
+    wkey is arg so we can save windows other than focus window.
+    Save window's buffer also, next window might use a different buffer.
+    """
+    windows[wkey] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
+                      'bufname': ed.bufname, 'dot': ed.dot } 
+    ed.save_buffer() # FIXME? saves current buffer, not buffer for window wkey
+                     # BUT wkey is only used in o2 where buffer is the same
+
+Is this a problem?  The FIXME arises because save_buffer does not
+have a wkey arg.   
+
+After restore_window(focus) at end of on we get:
+
+(Pdb) ed.buffer
+['\n']
+(Pdb) ed.dot
+1
+(Pdb) 
+
+but
+
+(Pdb) ed.buffers['scratch.txt']
+{'bufname': 'scratch.txt', 'filename': 'scratch.txt', 'buffer': ['\n'],
+'dot': 0, 'saved': True}
+
+even though
+
+(Pdb) ed.bufname
+'scratch.txt'
+
+but then we Pdb n to the end of the fcn and we get back to >>> with no crash.
+
+BUT then >>> refresh() does crash with same error about ed.buffer[ed.dot]
+index out of range.
+
+I think we have to step through restore_window.
+
+Could we solve this problem with a hack, just initialize scratch.txt
+in buffers to ['\n','\n'] with dot = 1 not 0?   That would also fix
+weirdness where cursor doesn't apper, or appears in status line of
+window above.
+
+git diff skedinit.py:
+
+ # buffer is zero indexed, but we want first line of file to be at index 1
+ # so first entry in buffer list is never used - it's always just '\n'
+-buffer = ['\n']  # '\n' at index 0 is never used
+-dot = 0            # dot, index of current line in buffer
++buffer = ['\n','\n']  # '\n' at index 0 is never used, index 1 is first shown
++dot = 1            # dot, index of current line in buffer
+
+Then after startup
+
+>>> sked.buffers
+{'scratch.txt': {'bufname': 'scratch.txt', 'filename': 'scratch.txt',
+'buffer': ['\n', '\n'], 'dot': 1, 'saved': True}}
+
+Now run the test again: C-x C-f edsel.py, C-x 2, C-x k, C-x o
+
+That doesn't crash, but scratch.txt doesn't appear in bottom window,
+edsel.py just stays there and in status line - until C-l refreshes
+window with scratch.txt at line 2.  Does regular C-x o still work?
+Yes.   Destination window doesn't update in this case because  normally
+it doesn't - contents already there are valid.  This is sort of a weird
+case - as long as it doesn't crash, let's just leave it?
+No, it's sort of a wart - but let's try fixing it.
+
+NO, doesn't work at all - Now we have 
+
+ 
+>>> ed.bufname
+'scratch.txt'
+>>> ed.buffer
+['\n', '\n']
+>>> ed.dot
+492
+
+That's the dot 492 shown in status line of second window, which 
+was dot in edsel.py before we killed it.  So somehow ed.dot is
+not getting restored, and hack with two-line scratch.txt does
+not help.  Revert scratch.txt, refresh() at the end of edsel on fcn.
+  

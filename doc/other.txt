@@ -13667,4 +13667,25 @@ synchronous manner. ..."
 12:32 Reading from stdin
 13:33 Fancy example with continuations
 ... and more to 20:25 ...
-   
+
+
+12 Dec 2023
+
+https://news.ycombinator.com/item?id=38599113  14 comments after 1 day
+How to deorbit the Chromebook and repurpose it for innovators (theregister.com)    
+
+Comments on running Linux on Chromebooks.  Not the built-in Linux, but
+after setting up dual-boot or just wiping ChromeOS.  Some posts say
+it's not as good as installing Linux on an old Lenovo Thinkpad.
+
+
+13 Dec 2023
+
+https://olano.dev/2023-12-12-reclaiming-the-web-with-a-personal-reader/
+
+"... I tried several Python libraries to extract HTML content, but none
+worked as well as the readability one used by Firefox. Since its a
+JavaScript package, I had to resign myself to introducing an optional
+dependency on Node.js. ..."
+
+
