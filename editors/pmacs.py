@@ -8,13 +8,14 @@ or 'pathetic emacs' or maybe 'Passing grade emacs, just above Fail'.
 import terminal, key, keyseq, display, edsel, dmacs
 import sked as ed, editline as el
 
-# Define and initialize global variables used by pmacs functions.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by pmacs functions,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = saved_put_marker # if already defined, then pmacsinit was already exec
+    _ = saved_put_marker # if already defined, then pmacs was already imported
 except:
-    from pmacsinit import *
+    inline = True # kill (cut) and yank (paste) within a single line
+    saved_put_marker = edsel.put_marker # so we can restore after put_no_marker
 
 # helper functions
 

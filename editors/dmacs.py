@@ -11,13 +11,16 @@ import sys, importlib
 import terminal, key, keyseq, display, edsel
 import sked as ed
 
-# Define and initialize global variables used by dmacs.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by dmacs,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = mark # if mark is already defined, then dmacsinit was already exec'd
+    _ = mark # if mark is already defined, then dmacs was already imported
 except:
-    from dmacsinit import *
+    mark = 0 # line number, defines region for cut C_w etc.  0 means disabled.
+    promptline = edsel.flines+1 # line after end of edsel frame
+    prev_cmd = None
+    
 
 def append():
     'Restore line mode, run edsel a(), return to char mode'

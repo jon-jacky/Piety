@@ -19720,6 +19720,9 @@ Instead of reading the code path once more, maybe try the debugger?
 Like we did at on 2 Apr 2023, L5155: import pdb then pdb.run("... fcn call...")
 then (Pdb) s to step into fcn.
 
+
+15 Dec 2023
+
 Split window, delete current buffer in one, then:
 
  pdb.run("edsel.on()")
@@ -19811,4 +19814,184 @@ That's the dot 492 shown in status line of second window, which
 was dot in edsel.py before we killed it.  So somehow ed.dot is
 not getting restored, and hack with two-line scratch.txt does
 not help.  Revert scratch.txt, refresh() at the end of edsel on fcn.
-  
+
+Let's commit now, even with this error still there.
+
+jon@penguin:~/Piety/editors$ git commit -am 'edselinit, edsel: rename wlines 
+  to wheight
+> add wbottom function, use in update_lines, update_below, update_status
+> pm: define tl function to restore terminal line mode, can use after crash
+> NOT FIXED: edsel crashes when you change to window that shows killed buffer.'
+[window 2e981ad] edselinit, edsel: rename wlines to wheight add wbottom function, use in update_lines, update_below, update_status pm: define tl function to restore terminal line mode, can use after crash NOT FIXED: edsel crashes when you change to window that shows killed buffer.
+ 5 files changed, 367 insertions(+), 35 deletions(-)
+ 
+jon@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+
+Tried to paste in old token
+ 
+remote: Invalid username or password.
+fatal: Authentication failed for 'https://github.com/jon-jacky/Piety/'  
+
+Tried to paste in old token but of course it didn't work
+because it was revoked - see email from github on 12/10.
+Generate new token by pressing button on email.
+
+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
+
+Now practice pasting this in terminal window so we don't flub that
+and get it revoked again.   Now try git push again.
+
+@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+Enumerating objects: 17, done.
+Counting objects: 100% (17/17), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (9/9), 6.08 KiB | 183.00 KiB/s, done.
+Total 9 (delta 8), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (8/8), completed with 8 local objects.
+To https://github.com/jon-jacky/Piety
+   0fb59d2..2e981ad  window -> window
+ 
+It apparently worked.  Is latest push at github?   Yes!
+
+Next: merge each ...init.py back into its main module except... branch.
+
+How to test? First merge edselinit into edsel.  Then restart python session
+with pm, make sure edsel global vars are initialized.  Then load 
+buffers and split window to update edsel vars.  Then C-x C-r to reload
+and confirm variables were not re-initialized.
+
+>>> edsel.focus
+0
+>>> edsel.wkeys
+[0]
+>>> edsel.windows
+{0: {'wintop': 1, 'wheight': 20, 'buftop': 1, 'bufname': 'scratch.txt',
+'dot': 0}}
+
+Then update variables:
+
+>>> edsel.focus
+1
+>>> edsel.wkeys
+[0, 1]
+>>> edsel.windows
+{0: {'wintop': 1, 'wheight': 11, 'buftop': 1, 'bufname': 'sked.py',
+'dot': 1}, 
+ 1: {'wintop': 12, 'wheight': 11, 'buftop': 1, 'bufname':
+'edsel.py', 'dot': 1}}
+
+Now reload the module:
+
+>>> pm()
+Wrote edsel.py, 530 lines
+Reload module edsel
+
+>>> edsel.focus
+1
+>>> edsel.wkeys
+[0, 1]
+>>> edsel.windows
+{0: {'wintop': 1, 'wheight': 11, 'buftop': 1, 'bufname': 'sked.py',
+'dot': 1}, 
+ 1: {'wintop': 12, 'wheight': 11, 'buftop': 1, 'bufname':
+'edsel.py', 'dot': 1}}
+
+It's all still there - as expected.  Now the other modules.  Done.
+Now restart session without any ...init.py.   Seems to work.
+
+How to test?  Look at vars in each module, then do some work
+that assigns to them, then reload, confrm that vars are still there?
+
+We did edsel already. Next, sked
+
+>>> sked.buffers.keys()
+dict_keys(['scratch.txt', 'edsel.py', 'sked.py', 'dmacs.py',
+'editline.py', 'pmacs.py'])
+
+Wrote sked.py, 505 lines
+Reload module sked   
+
+>>> sked.buffers.keys()
+dict_keys(['scratch.txt', 'edsel.py', 'sked.py', 'dmacs.py',
+'editline.py', 'pmacs.py'])
+
+Still there.    Now dmacs:
+
+>>> dmacs.prev_cmd
+<function switch_buffer at 0x78e7373b80>
+
+Wrote dmacs.py, 234 lines
+Reload module dmacs
+
+>>> dmacs.prev_cmd
+<function save_reload at 0x78e73780d0>
+
+It's not the same value - in fact it's the reload command itself!
+What's important is, it was not re-initialized to None.  Now editline:
+
+>>> editline.killed
+'    editlinekilled = str() # saved killed (cut) words, can be restored
+with yank (paste)'
+
+Wrote editline.py, 258 lines
+Reload module editline\
+
+>>> editline.killed
+ '    killed = str() # saved killed (cut) words, can be restored with
+yank (paste)'
+
+It's still there.  Now pmacs.  After cut and paste two empty lines:
+
+>>> pmacs.inline 
+False
+
+Wrote pmacs.py, 216 lines
+Reload module pmacs
+
+>>> pmacs.inline 
+False
+
+It's still False.  Initialization in pmacs.py sets it True.
+That's the last of the five modules.
+
+Revew with git diff the five *.py, eyeball compare to *init.py at gitnub.
+
+jon@penguin:~/Piety/editors$ ls *init.py
+dmacsinit.py  editlineinit.py  edselinit.py  pmacsinit.py  skedinit.py
+jon@penguin:~/Piety/editors$ git rm *init.py
+rm 'editors/dmacsinit.py'
+rm 'editors/editlineinit.py'
+rm 'editors/edselinit.py'
+rm 'editors/pmacsinit.py'
+rm 'editors/skedinit.py'
+
+jon@penguin:~/Piety/editors$ git push
+Username for 'https://github.com': jon-jacky 
+Password for 'https://jon-jacky@github.com': 
+Enumerating objects: 5, done.
+Counting objects: 100% (5/5), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 358 bytes | 179.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
+To https://github.com/jon-jacky/Piety
+   2e981ad..84b2848  window -> window
+
+Pasted token from L19839 after password:  Apparently it workd.
+
+Look at github web page.  The ...init.py are gone, but we still have
+the old versions of all the main modules -- !?   But git diff showed
+they had all changed -- !?
+
+
+
+
+
+
+
