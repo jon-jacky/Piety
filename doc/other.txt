@@ -13689,3 +13689,27 @@ JavaScript package, I had to resign myself to introducing an optional
 dependency on Node.js. ..."
 
 
+15 Dec 2023
+
+https://news.ycombinator.com/item?id=38652339  61 comments after 20 hours
+Let it snow in your terminal (github.com/sontek)
+
+Little snowfall graphics demo.   Links to many alternatives, including
+this bash example.  Just prints one \* in a random color at a random
+column on each line.  Looks a bit like snow --- but falling up!
+
+ while sleep 0.1; do printf "%-$(( ( RANDOM % $(tput cols) ) - 1))s\e[0;$(( 30 + ($RANDOM % 8) ))m\*\n" ; done
+
+
+19 Dec 2023
+
+https://tcc.lovebyte.party/
+
+"LoveBytes Tiny Code Christmas is an event to help you take your first
+steps in demoscene sizecoding with Lua based fantasy consoles like
+TIC-80 and PICO-8! Over 12 days, from the 11th to the 22nd of December,
+learn the effects and techniques used in Byte Jams, Byte Battles, and
+Tiny Intros!"
+
+That is, 12 lessons.
+

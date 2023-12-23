@@ -19633,8 +19633,7 @@ KeyError: 'README_2.md'
 
 Here is a more complete traceback:
 
-File "/home/jon/Piety/editors/edsel.py", line 483, in on
-restore_window(focus)
+File "/home/jon/Piety/editors/edsel.py", line 483, in  restore_window(focus)
 File "/home/jon/Piety/editors/edsel.py", line 426, in restore_window
 ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
 File "/home/jon/Piety/editors/sked.py", line 80, in restore_buffer
@@ -19836,7 +19835,7 @@ fatal: Authentication failed for 'https://github.com/jon-jacky/Piety/'
 
 Tried to paste in old token but of course it didn't work
 because it was revoked - see email from github on 12/10.
-Generate new token by pressing button on email.
+Generate new jon@penguin:~/home$ # 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token by pressing button on email.
 
 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
 
@@ -19987,11 +19986,437 @@ Pasted token from L19839 after password:  Apparently it workd.
 
 Look at github web page.  The ...init.py are gone, but we still have
 the old versions of all the main modules -- !?   But git diff showed
-they had all changed -- !?
+they had all changed -- !?   Now git status shows they are modified - they
+didn't get committed?   Try repeatin the commands:
+
+jon@penguin:~/Piety/editors$ git commit -am 'move contents of all the 
+> ...init.py into all their main modules'
+[window efc00ac] move contents of all the ...init.py into all their main modules
+ 6 files changed, 268 insertions(+), 21 deletions(-)
+
+jon@penguin:~/Piety/editors$ git push 
+... again pasted token, it seemed to work ...
+
+Now git status shows no more modifed files.  Github web page
+shows new versions with initializations in except...
+
+So does that complete the window branch?  Just a few loose ends:
+1. crash when change to window that still displays killed buffer
+2. refresh() command - just refreshes focus window 
+
+also
+
+3.  separate frame out of edsel?  Is that even a good idea?
+
+Oh, and more important than 1,2,3
+
+0. README.md and maybe HOW.md and NOTES.txt
+
+Once more my token has been revoked!   See email just now, 15 Dec 5:36 pm.
+Must contact github tech support to find out how I am supposed to push
+these days.
+
+What about ssh keys?   Now that I'm using CB I certainy don't have
+ssh keys here - but I still had to do all that token stuff when I
+was using the Mac, which did have ssh keys -- I thought.
+
+support.github.com has Authentication button which eventually leads here:
+
+https://docs.github.com/en/authentication
+
+there's a button Overview and then scroll down to All Authentication docs,
+a long list of links.
+
+Maybe I can just set up ssh again -?
+
+Overview goes to this page:
+
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github
+
+Seems to say Personal access token is alternative to SSH key
+
+"Authenticating with the command line
+
+You can access repositories on GitHub from the command line in two ways,
+HTTPS and SSH, and both have a different way of authenticating. The
+method of authenticating is determined based on whether you choose an
+HTTPS or SSH remote URL when you clone the repository. ..."
+
+At L18584 above, we cloned the Piety repo on penguin (the Chromebook, or CB)
+with git clone https://...    So we use HTTPS.
+
+There is something called Git Credential Manager (GCM) that you have
+to install in your Linux.  After that you don't have to type credentials again.
+
+https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git
+
+BUT what happened to ssh?  I've only been using git clone https://...
+this year.   Did I use ssh URLs in version1?   Here on penguin, the CB:
+
+penguin:~/Piety/editors$ git remote -v
+origin  https://github.com/jon-jacky/Piety (fetch)   (note - no .git suffix)
+origin  https://github.com/jon-jacky/Piety (push)
+
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github
+
+"SSH
+
+...
+Every time you use Git to authenticate with GitHub, you'll be prompted
+to enter your SSH key passphrase, unless you've stored the key."
 
 
+Managing Remote Repositories
+https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories
+
+Shows how to switch remote URL from SSH to HTTPS and vice versa
 
 
+16 Dec 2023
+
+BUG - cut several lines with consecutive C-k then C-y pastes noithing
+
+pmacs.inline FALSE
+sked.killed ['\n']
+
+So the last line I cut was an empty line - \n by itself.   Does
+that cause sked.killed to reset?   
+
+Look on the old Mac in Piety.version1 with remote -v
+Right, origin fetch and push are both 
+
+Piety.version1: git@github.com:jon-jacky/Piety  (no .git suffix)
+
+How about the other repos?
+
+home: git@github.com:jon-jacky/home.git
+
+PyModel.git, FLiP also have git@...git URLs
+
+What about noreen?
+
+z: https://github.com/jon-jacky/CNTS.git 
+
+CNTS: https://github.com/jon-jacky/CNTS.git
+
+notes: ssh://jon@gorter.me.washington.edu/Users/jon/git/notes (no .git suffix)
+
+Wow!  That's old!
+
+I could look up how I created those repos.   There are notes 
+files for those ... somewhere.
+
+On Mac, ~/notes/home/notes.txt shows some git activity, but no git clone
+or creating the repo.
+  
+Ah, On mac ~/notes/tech/uw-migrate.txt is about the activity last
+summer/fall to create CNTS, z etc.
+
+Then lots of git activity in ~/notes/piety/notes.version1.txt of course.
+Creating the initial Piety git repo should be in there.
+
+I recall the process is to create a git repo at github, then 
+clone it to your local machine - doesn't github itself determine
+the remote URL?   ~/notes/tech/uw-migrate.txt should have recent examples.
 
 
+Later -- copy uw-migrate.txt to the Kindle so I can read it upstairs
+At 1 Oct 2022, at 12%, I see commands I used to create repos for Z etc.
+At 17%  I did git remote add origin https://github.com/jon-jacky/z-book.git
+Note, I used https URL.  Then when I try git push, github says I have
+to get personal access token.   If I used git@github.com URL instead,
+would ssh have worked?
 
+uw-migrate mentions these URLs:
+
+https:docs.github.com/en/repositories
+
+We already have looked at .../getting-started  .../authentication
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/about-ssh
+
+"... With SSH keys, you can connect to GitHub without supplying your
+username and personal access token at each visit ..."
+
+Possible experiment: On Chromebook, change Piety remote 
+from http://.... to git@....  then set up ssh following directions
+at the above page - we've done it before - and see if we can push
+without messing with personal access token.
+
+That's a lot of work.   On Mac, can't we just try pushing from
+a repo with an *existing* git@remote ?  We already have ssh set up
+on the Macbook.   See if we can push to a git@ remote even when
+we *can't* push to an https remote.   That's the first expt to try.
+THe home repo has a git@ remote.   Can we just try a push from there?
+
+But meanwhile, how can we back up work we're doing on Chromebook if
+we can't even push to github?
+
+What about those Linux Files in the CB file system?  Are they automatically
+synched?   Then can we copy them to a USB external disk?
+
+I just looked in CB file system, Linux Files Piety/doc/notes.txt - this file.
+Yes, the preceding sentence is already there.  They are synched.
+Is there a .git in the top level of CB Piety?  So I could git pull from CB?
+That could be a stopgap if I couldn't reach github.
+
+Yes, there is a .git at top level of CB Piety.
+
+There is some way to make a CB file appear in Linux file system.
+So could we copy notes and noreen directories from USB ext hard disk to 
+CB  file system, then make them known to Linux, edit in Linux, 
+see if Linux edits appear in CB file system.  Oh, but then
+there is no way to git pull from CB file system to ext hard disk.
+Because there is no command line and no git on the CB itself.
+We could only use CB Files GUI to copy updated files back to ext
+hard disk --- which is crude compared to git or rsync. 
+
+
+21 Dec 2023
+
+We started working on the Chromebook (CB) on Nov 30.
+
+git log here on CB shows ~/home/design.md updated on Nov 27 and Dec 2,
+but no notes about it above.   On Dec 2 did we edit, commit and push design
+here on CB or on the Mac?  In particular, were we able to push from
+here?   I don't think so, no notes about it in this file above.
+
+git pull in home on the three external backup disks Spare, WD2TB, WDBLUE,
+to update design.md and design.txt.
+
+On the Mac, most recent ~/home/design.txt and .md are 27 Nov.  git log
+shows most recent update to design.md there is on 27 Nov.   So we must have
+done 3 Dec push from CB.   Indeed, ls -lt shows design.txt .md on CB
+are from 2 Dec.
+
+Later ...  try git pull onto mac, get updates we made on CB.
+
+On mac in ~/home, 
+
+...$ git pull
+
+Pops up window to ask for password, I type in my old text password,
+not the token
+
+Identify added: /Users/jon/.ssh/id_rsa ((null))
+...
+    .... gh-pages -> origin/gh-pages
+
+There is no tracking information for the current branch
+
+...$ git pull origin gh-pages
+ 
+  design.md   | 5 +++++-
+  design.txt  | 5 +++++-
+
+2 files changed ...
+
+Now ls -l shows design.md design.txt 21 Dec
+
+Now try Piety
+
+...$ git pull origin window
+...
+
+Now without prompting for any password, it updares notes.txt, other.txt
+pm.py and the 5 *.py files, and removes the 5 *init.py files.
+ls -l confirms the editors/*.py files are new today and the *init.py
+files are gone.  Also doc/notes.txt and other.txt are new today.
+
+So it looks like pushing from CB and then pulling into Mac works, 
+even though we only previously pushed from those Mac directories.
+
+Now see if we can push from ~/home directory on mac.  Do we need
+that infernal token?   
+
+...$ git remote -v
+...
+origin git@github.com:jon-jacky/home.git (push)
+
+It's *not* and https URL - that's why it might not need token --- 
+ssh key was enough, once,   
+
+...$ cat > test1.txt
+...
+...$ git add text1.txt
+...$ git commit test1.txt -m '...'
+
+...$ git push
+...
+... (no complaints, no prompt for password)   
+...
+    ... gh-pages -> gh-pages
+
+It looks like it worked.   Look for file  at github.  Yes, text1.txt
+is there.  
+
+Try git pull on CB linux.  Oh, that might not work because git remote -v
+says it an https URL.   Try anyway:
+
+jon@penguin:~/home$ git pull
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 4, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (2/2), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0
+Unpacking objects: 100% (3/3), 383 bytes | 31.00 KiB/s, done.
+From https://github.com/jon-jacky/home
+   cc92df8..4e4173a  gh-pages   -> origin/gh-pages
+Updating cc92df8..4e4173a
+Fast-forward
+ test1.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+ create mode 100644 test1.txt
+
+It looks like it worked anyway, despite warning.
+        
+jon@penguin:~/home$ cat test1.txt
+This is test1.txt.  git add, commit to local repo, see if we can push to github
+without personal access token.  remote here is a git@... URL not https:...
+
+By 'remote here' I meant 'remote here on the the Mac'.
+
+So we can pull from this https URL without password or token.
+
+Next: try changing Piety URL to git@... and see if we can push without 
+password or token.
+
+
+22 Dec 2023
+
+Try committing to home from CB.   Create ~/home/test2.txt.  
+I'll bet it *won't* work - here we have https remote:
+
+jon@penguin:~/home$ git remote -v
+origin  https://github.com/jon-jacky/home (fetch)
+origin  https://github.com/jon-jacky/home (push)
+
+jon@penguin:~/home$ git add test2.txt
+jon@penguin:~/home$ git commit test2.txt -m 'first commit of new test2.txt to local home repo on Chromebook'
+[gh-pages 9e3fa66] first commit of new test2.txt to local home repo on Chromebook
+ 1 file changed, 2 insertions(+)
+ create mode 100644 test2.txt
+
+on@penguin:~/home$ git push origin gh-pages
+Username for 'https://github.com': jon-jacky
+Password for 'https://jon-jacky@github.com': 
+remote: Support for password authentication was removed on August 13, 2021.
+remote: Please see https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls for information on currently recommended modes of authentication.
+fatal: Authentication failed for 'https://github.com/jon-jacky/home/'
+
+Just tried the old password - as expected it doesn't work.  Next,
+try pasting in the revoked token.   
+
+jon@penguin:~/home$ # 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
+
+I tried pasting this in but got the same message as above.  Bah.
+
+Let's see if we can change remote.   Follow directions at:
+
+https://docs.github.com/en/get-started/getting-started-with-git/managing-remote-repositories
+
+jon@penguin:~/home$ git remote set-url origin git@github.com:jon-jacky/home.git
+jon@penguin:~/home$ git remote -v
+origin  git@github.com:jon-jacky/home.git (fetch)
+origin  git@github.com:jon-jacky/home.git (push)
+
+jon@penguin:~/home$ git push
+The authenticity of host 'github.com (20.29.134.23)' can't be established.
+ECDSA key fingerprint is SHA256:p2QAMXNIC1TJYWeIOttrVc98/R1BUFWu3/LiyKgUfQM.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? y
+Please type 'yes', 'no' or the fingerprint: yes
+Warning: Permanently added 'github.com,20.29.134.23' (ECDSA) to the list of known hosts.
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.  
+
+Ah, yes.   I haven't set up ssh on the CB.   So I guess I have to
+run ssh-keygen to create a public/private pair, and append the public
+key to something in my account at github?   Or, do I have to copy
+my public key at github to something on my Chromebook -- ?
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/checking-for-existing-ssh-keys
+
+Check for existing ssh keys:
+
+jon@penguin:~$ ls -al .ssh
+total 4
+drwx------ 1 jon jon  22 Dec 22 12:54 .
+drwxr-xr-x 1 jon jon 260 Dec 22 12:54 ..
+-rw-r--r-- 1 jon jon 444 Dec 22 12:54 known_hosts
+
+I think that means we don't have any.   Follow the directinos to add one:
+
+jon@penguin:~$ ssh-keygen -t ed25519 -C 'jon.p.jacky@gmail.com'
+Generating public/private ed25519 key pair.
+Enter file in which to save the key (/home/jon/.ssh/id_ed25519): 
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/jon/.ssh/id_ed25519
+Your public key has been saved in /home/jon/.ssh/id_ed25519.pub
+The key fingerprint is:
+SHA256:gTMMWwkYBi7VciYJ/DAjlKoXyQv9C+OZWDgg/h+ZuXI jon.p.jacky@gmail.com
+The key's randomart image is:
++--[ED25519 256]--+
+|=+==o...         |
+|oO= +=..         |
+|++=*. = .        |
+|* =.   o .       |
+|=o +    S        |
+|+.* . +          |
+| *.= *           |
+|. +o.Eo          |
+|    +o           |
++----[SHA256]-----+
+
+passphrase was piety2023
+
+jon@penguin:~$ ls -l .ssh
+total 12
+-rw------- 1 jon jon 464 Dec 22 13:14 id_ed25519
+-rw-r--r-- 1 jon jon 103 Dec 22 13:14 id_ed25519.pub
+-rw-r--r-- 1 jon jon 444 Dec 22 12:54 known_hosts
+
+jon@penguin:~$ eval "$(ssh-agent -s)"
+Agent pid 10229
+jon@penguin:~$ ssh-add ~/.ssh/id_ed25519
+Enter passphrase for /home/jon/.ssh/id_ed25519: 
+Identity added: /home/jon/.ssh/id_ed25519 (jon.p.jacky@gmail.com)
+
+Then went through the directions "Adding a new SSH key to your Github Account"
+all the way through Add SSH Key.    So we should be ready to push.
+
+
+jon@penguin:~/home$ git push
+Enumerating objects: 4, done.
+Counting objects: 100% (4/4), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 397 bytes | 79.00 KiB/s, done.
+Total 3 (delta 1), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (1/1), completed with 1 local object.
+To github.com:jon-jacky/home.git
+   4e4173a..9e3fa66  gh-pages -> gh-pages
+
+It seemed to work.  Yes, test2.txt is at github.
+
+Next: change Piety on CB remote to git@ URL.
+
+ 
