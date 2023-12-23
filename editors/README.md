@@ -68,26 +68,16 @@ More detailed directions appear in the sections below.
 - **editline.py**: Functions to edit and display a string with *readline* 
   control keys.  Used by *pmacs*.
 
-- **editlineinit.py**: Define and initialize global variables used
-  by *editline*.
-
 - **edsel.py**: Display editor that uses the same commands as *sked*.
 
-- **edselinit.py**: Define and initialize global variables used by *edsel*.
-
 - **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
-
-- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
 
 - **pm.py**: Script to start the *pmacs* editor.
 
 - **pmacs.py**: Display editor that uses Emacs control keys.
 
-- **pmacsinit.py**: Define and initialize global variables used by *pmacs*.
-
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 
-- **skedinit.py**: Define and initialize global variables used by *sked*.
 
 ### sked ###
 
@@ -188,11 +178,11 @@ at the bottom of the terminal.
 Here you can type the same editing commands you used in *sked*,
 but now the window updates to show the changes in the buffer as
 they are made.
-
+ 
 When you type *a()* to start the *append* command, the blinking cursor moves
 up from the Python REPL to the text insertion point in the window,
 and the message *Appending...* replaces the contents of the status line.
-Then when you type, each character appears immediately in the window at the 
+Then when you type, each character appears immediately in the window at the
 intended location.  This continues until you type . at the beginning 
 of a line to exit append mode.  Then the line with '.' disappears, 
 the usual text reappears on the status line, 
@@ -207,6 +197,11 @@ edit it anymore.   The only way to edit a line in the buffer is to call
 sked functions at the Python REPL.  You can call 
 the *c* (change) function to substitute text in that line.
 Or, you can delete the line and append a different one.
+
+Additional edsel commands enable you to have up to two windows 
+on the display in a
+vertical stack, showing different locations in the same buffer, or
+different buffers.
 
 Some commands, for example *p()* (print), no longer print output in
 the Python REPL because their effects are now visible in the display window.
@@ -343,9 +338,11 @@ window size to 12 lines and also expand the REPL scrolling region, type
 the *edsel* function call *win(12)* in the REPL.  To resume editing,
 type the function call *pm()*.
 
-In *pmacs* you can edit several files in different buffers just as you would
-in Emacs,  but at this time there  is only one display window. We plan to
-support multiple windows in the future.
+In *pmacs* you can edit several files in different buffers just as you
+would in Emacs.   
+You can have up to two windows on the display in a
+vertical stack, showing different locations in the same buffer, or
+different buffers.
 
 To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
 dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
@@ -420,4 +417,4 @@ You can even revert to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Nov 2023
+Revised Dec 2023
