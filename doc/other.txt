@@ -13713,3 +13713,78 @@ Tiny Intros!"
 
 That is, 12 lessons.
 
+
+23 Dec 2023
+
+https://en.wikipedia.org/wiki/Simple-As-Possible_computer
+
+"The Simple-As-Possible (SAP) computer is a simplified computer
+architecture designed for educational purposes and described in the book
+Digital Computer Electronics by Albert Paul Malvino and Jerald A. Brown. ..."
+
+The Wikipedia article links to implementations in Verilog/FPGA, TTL chips etc.
+
+
+26 Dec 2023
+
+https://news.ycombinator.com/item?id=38763933  95 comments after 1 day
+War of the workstations: How the lowest bidders shaped today's tech landscape
+(theregister.com )
+
+Lots of links to Lisp machine, Dylan etc. and earlier discussions about them.
+
+
+https://davecturner.github.io/2018/02/12/tla-in-isabelle.html
+TLA+ in Isabelle/HOL  - by David Turner, Feb 12 2018 - didn't he die recently?
+Looking at other blog pages suggests it's not *that* (Miranda etc.)David Turner
+
+
+https://logika.v3.sireum.org/
+
+  "Sireum Logika is both a highly-automated program verifier and a
+  manual (natural deduction) proof checker for propositional, predicate,
+  and programming logics, where manual proof steps can be used to help
+  automation. The Logika programming language is a subset of Scala that
+  is designed for verification ..."
+
+
+28 Dec 2023
+
+https://spinalhdl.github.io/NaxRiscv-Rtd/main/NaxRiscv/introduction/index.html
+
+https://github.com/SpinalHDL/NaxRiscv?tab=readme-ov-file
+
+NaxRiscv, RISC-V on FPGA, runs Debian Linux
+
+via https://fahrplan.events.ccc.de/congress/2023/fahrplan/events/11777.html 
+Schedule 37th Chaos Communication Congress 
+Lecture: Open CPU / SoC design, all the way up to Debian
+
+
+https://fahrplan.events.ccc.de/congress/2023/fahrplan/events/11929.html
+ Lecture: Turning Chromebooks into regular laptops
+
+  ... In this talk you will learn how ChromeOS hardware designed by Google
+  and it's board partners differ from regular laptops/desktops. ...
+
+links to In this talk you will learn how ChromeOS hardware designed bhttps://github.com/chrultrabook
+
+
+
+https://blogsystem5.substack.com/p/the-ides-we-had-30-years-ago-and
+
+"The IDEs we had 30 years ago... and we lost
+A deep dive into the text mode editors we had and how they compare to today's"
+
+Borland Turbo Pascal etc. with many screenshots
+
+via https://news.ycombinator.com/item?id=38792446  168 comments in 4 hours!
+Lots of praise for VSCode, JetBrains
+
+
+https://github.com/michalc/sqlite-memory-vfs
+
+"Python virtual filesystem for SQLite to read from and write to memory...."
+
+via https://news.ycombinator.com/item?id=38786012  10 comments in 1 day
+
