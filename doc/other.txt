@@ -13788,3 +13788,29 @@ https://github.com/michalc/sqlite-memory-vfs
 
 via https://news.ycombinator.com/item?id=38786012  10 comments in 1 day
 
+
+29 Dec 2023
+
+https://media.ccc.de/v/37c3-lightningtalks-57995-the-sorbus-computer-a-cheap-8-bit-computer-for-tinkering#t=290
+
+The Sorbus Computer: a cheap 8-bit computer for tinkering [video] (ccc.de)
+
+5-min lighting talk - just two IC's, 65C02 and Chinese RP2040 near clone but
+with more I/O ports, RP2040 provides everything: RAM, UART, I/O.  He also 
+provides 256 byte Wozmon monitor/debugger.
+\
+https://xayax.net/sorbus/
+https://github.com/SvOlli/sorbus
+
+
+30 Dec 2023
+
+https://pcb.mit.edu/
+The Art and Science of PCB Design 
+
+MIT IAP 2024 course with syllabus, technical resources and more.
+
+via https://news.ycombinator.com/item?id=38812244  53 comments after 23 hours
+
+Many comments about KiCAD an alteratives.
+

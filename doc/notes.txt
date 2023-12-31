@@ -20419,4 +20419,746 @@ It seemed to work.  Yes, test2.txt is at github.
 
 Next: change Piety on CB remote to git@ URL.
 
+
+29 Dec 2023   
+
+We find:
+
+jon@penguin:~/Piety$ git remote -v
+origin  git@github.com:jon-jacky/Piety.git (fetch)
+origin  git@github.com:jon-jacky/Piety.git (push)
+
+So we already did change remote on CB Piety.   Did we push anything?
+Apparenty not.  Now doc/other.txt is only file not up to date.
+
+jon@penguin:~/Piety/doc$ git commit other.txt -m 'recent updates'
+[window 6a34f4b] recent updates
+ 1 file changed, 75 insertions(+)
+
+jon@penguin:~/Piety/doc$ git push
+Enter passphrase for key '/home/jon/.ssh/id_ed25519': 
+Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 1.67 KiB | 39.00 KiB/s, done.
+Total 4 (delta 3), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To github.com:jon-jacky/Piety.git
+   4701926..6a34f4b  window -> window
+
+I used passphrase piety2023. 
+
+Before push, at github in other.txt last entry was 19 Dec to L13714.
+Now refresh github page for other.txt, has entry for 28 Dec to L13789.
+So we can push to github from CB Piety repo.
+
+Now github has Piety files not up-to-date on WD2TB disk.  Can
+we git pull from Github Piety to WD2TB, while WD2TB attached to CB?
+
+Argh, I lost notes because this maneuver reset all the terminals.
+BUT we now have
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety$ ls -a
+.   bin        DIRECTORIES.md  editors  README.md  vt_terminal
+..  BRANCH.md  doc             .git     unix
+
+...$ git remote -v
+origin https://github.com/jon-jacky/Piety/ (fetch)
+...
+
+So it's https not git@.  Let's try pull anyway:
+
+...
+Unpacking objects: 100% (13/13), 8.70 KiB | 2.00 KiB/s, done.
+From https://github.com/jon-jacky/Piety
+   efc00ac..6a34f4b  window     -> origin/window
+Already up to date.
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety$ cd doc
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety/doc$ ls -l other.txt
+-rwxr-xr-x 1 jon chronos-access 486954 Dec 20 18:11 other.txt
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety/doc$ tail other.txt
+13 Dec 2023
+
+https://olano.dev/2023-12-12-reclaiming-the-web-with-a-personal-reader/
+
+"... I tried several Python libraries to extract HTML content, but none
+worked as well as the readability one used by Firefox. Since its a
+JavaScript package, I had to resign myself to introducing an optional
+dependency on Node.js. ..."
+
+So it didn't get the latest.  Try again
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety/doc$ git pull origin window
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+From https://github.com/jon-jacky/Piety
+ * branch            window     -> FETCH_HEAD
+Updating efc00ac..6a34f4b
+Fast-forward
+ doc/notes.txt     | 433 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ doc/other.txt     |  99 +++++++++++++
+ editors/README.md |  29 ++--
+ 3 files changed, 541 insertions(+), 20 deletions(-)
+
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety/doc$ ls -l other.txt
+-rwxr-xr-x 1 jon chronos-access 490277 Dec 29 11:45 other.txt
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety/doc$ tail other.txt
+via https://news.ycombinator.com/item?id=38792446  168 comments in 4 hours!
+Lots of praise for VSCode, JetBrains
+
+
+https://github.com/michalc/sqlite-memory-vfs
+
+"Python virtual filesystem for SQLite to read from and write to memory...."
+
+via https://news.ycombinator.com/item?id=38786012  10 comments in 1 day
+
+It got it!  It works!  SO that simplifies our workflow with Piety - we
+can get ext hard disk up-to-date without going downstairs and connecting
+it to Mac.  
+
+While we're at it:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/Piety/doc$ cd ../..
+jon@penguin:/mnt/chromeos/removable/WD2TB$ cd home
+-bash: cd: home: No such file or directory
+jon@penguin:/mnt/chromeos/removable/WD2TB$ ls
+Piety
+
+Now go back to File app, select WD2TB/home with a click,
+the alt-click to get terminal into WD2TB/home
+In that terminal we get:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/home$ ls
+brackets.py      diary2md.py                                notes
+comments.md      index.html                                 others.html
+... etc. ...
+
+Now here in the terminal where we did git pull in Piety:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB$ ls
+home  Piety
+jon@penguin:/mnt/chromeos/removable/WD2TB$ cd home
+jon@penguin:/mnt/chromeos/removable/WD2TB/home$ ls
+brackets.py      diary2md.py                                notes
+comments.md      index.html                                 others.html
+... 
+
+
+on@penguin:/mnt/chromeos/removable/WD2TB/home$ git pull
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 13, done.
+remote: Counting objects: 100% (13/13), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 10 (delta 5), reused 9 (delta 4), pack-reused 0
+Unpacking objects: 100% (10/10), 2.23 KiB | 0 bytes/s, done.
+From https://github.com/jon-jacky/home
+   cc92df8..cbb3c7e  gh-pages   -> origin/gh-pages
+Updating cc92df8..cbb3c7e
+Fast-forward
+ computing.md  | 29 ++++++++++++++++++++++++++++-
+ computing.txt | 29 ++++++++++++++++++++++++++++-
+ test1.txt     |  2 ++
+ test2.txt     |  2 ++
+ 4 files changed, 60 insertions(+), 2 deletions(-)
+ create mode 100644 test1.txt
+ create mode 100644 test2.txt
+
+It apparently worked.  Yes, now we have test1.txt and test2.txt which
+we didn't have before
+
+on@penguin:/mnt/chromeos/removable/WD2TB/home$ grep -i '26 Dec' computing.txt
+28 Feb 2019, 26 Dec 2023
+26 Dec 2016
+
+That 26 Dec 2023 is for the new entry.   So that worked too.
+
+The next thing is to see if we can put repos for notes, noreen, readings, 
+and www on CB, then pull from those repos to hard disk.
+
+
+30 Dec 2023
+
+Next: put 'personal' repos on CB.  That is, repos *not* at github:
+notes, noreen, readings, www.
+
+Start with the smallest: readings 
+
+1. In readings on mac, git commit
+
+2. Connect WD2TB to mac.  In reaadings on WDT2B, git pull
+
+3. Connect WD2TB to CB.   In ~jon on CB Linux, git clone WD2TB/readings
+
+Now I suppose readings on CB remote will be WD2TB/readings.
+Do we want to git set remote on CB readings to something else? 
+What is the remote for readings repo on the Mac?
+
+I expect WD2TB readings remote is on Mac: /Users/jon/readings ... 
+
+But now we want to pull WD2TB readings from CB readings.   Unfortunately 
+CB readings will have a *different* path:  /home/jon/readings ...
+
+Do we have to change WD2TB readings remote with git set remote ... ?
+
+If so, then if we want to pull from Mac again we have to set remote back.
+And so on - we'd have to set remote again each time we connected WD2TB
+to one or the other.
+
+It would be better if we could have multiple remotes.  It seems
+git pull command does support that - we have already 'git push origin windows'
+that is, 'git push <remote> <branch>'.
+
+So is there a 'git add remote ...' command?
+
+We will have to set or add remote on each personal repo on each ext disk
+we use for backup: WD2TB, WDBLUE, Spare.
+
+Can we get revisions we make in CB repo back to Mac repo?
+It seems the process would be, in WD2TB repo pull from CB repo.
+Now WD2TB repo is up-to-date with CB repo.
+
+Then connect WD2TB to Mac. Can we git push from WD2TB repo to Mac repo?
+
+We want to pull, push from WD2TB repo back to CB repo or Mac repo.
+These are two different remotes.   This is better than push, pull
+from Mac repo or CB repo to WD2TB repo etc. because then Mac repo 
+and CB repo would each need a different remote for each backup hard disk
+repo.   Instead, the hard disk repos have to deal with just the
+Mac and CB repos.   
+
+It's too bad Mac and CB repos have to have different paths, due to
+Mac /Users/jon/... and CB /home/jon/...  That means each hard disk
+repo has to deal with two remotes.
+
+I suppose we could try to fix this with symbolic link: on CB
+/Users is symbolic link to /home - that way we could just continue
+to use the existing remote on each WD2TB personal repo for both
+CB and Mac.   But (even if it works) that seems fragile and obscure, and
+it's not clear what's going on - it's a trick to disguise what's going on.
+
+On setting up multiple remotes, what's the canonical git manual these days?
+
+https://git-scm.com/book/en/v2 - Pro Git book, toc on this page
+
+https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes - chapter
+
+https://git-scm.com/docs/user-manual - reference/user manual, toc here
+
+https://git-scm.com/docs/git-remote - man page, linked from user-manual toc
+
+Later - look on personal repos on Mac.  First, ~/readings
+
+...readings jon$ git remote -v
+origin ssh://jon@gorter.me.washington.edu/Users/jon/git/misc (fetch) 
+origin ssh://jon@gorter.me.washington.edu/Users/jon/git/misc (push)
+
+Wow, old!  gorter.me was a Mac in the MRFM lab!   I think this means
+it doesn't matter what the remote for the main working directories
+of the personal repos are, because we never push or pull to those
+remotes.   Those directories *are* the remotes, analogous to github.
+
+The remotes for ~/notes and ~/www are also gorter.me...
+
+BUT in ~/noreen, git remote -v prints nothing!  So does git remote (no args)
+So those personal repo working dirs really dont' need a remote at all.
+
+After we clone personal repos on CB, we could use git remote remove <name>
+to get rid of remotes, just to avoid confusion.
+
+Do we have any notes on how we made noreen repo and how we cloned it
+to WD2TB etc?   Maybe look in notes/mac/disk.txt.   Yes: L2101, 25 Oct 2021:
+
+"Make ~/noreen into a github repo, then clone on WD2TB ...
+
+notes/tech/notes.txt L208 describes how I made home repo on mac
+then put it on github ... starting with new empty dir. ..." 
+
+In ~/noreen, I used 
+
+ $ git init   
+ $ git add .
+ $ git commit -am 'initial commit ...'
+
+Then in /Volumes/WD2TB:
+
+ $ git clone ~/noreen/.git 
+
+Then in WD2TB/noreen we have
+
+ $ git remote -v
+origin /Users/jon/noreen/.git (fetch)
+origin /Users/jon/noreen/.git (push)
+
+So remote origin is the repo it was cloned from.
+
+Edit and commit latest version of Mac ~/readings repo and pull to WD2TB.
+
+...$ git remote -v
+origin /Users/jon/readings/.git (fetch)
+origin /Users/jon/readings/.git (push)
+
+As expected.
+
+...$ git pull
+...
+From /Users/jon/readings/
+   ... master  -> origin/master
+...
+ reading.txt | 3 ++-
+ 1 file changed ...
+
+I think we are ready to try putting readings personal
+repo on chromebook and adding it as a remote for WD2TB/readings.
+
+Better read the git docs on remote first, though.   Done, let's go:
+
+Plug WD2TB in to CB
+
+jon@penguin:~$ ls
+home  Piety  test.txt
+jon@penguin:~$ ls /mnt/chromeos/removable/
+WD2TB
+jon@penguin:~$ ls /mnt/chromeos/removable/WD2TB/
+home
+
+We need to make WD2TB/readings visible.  Navigate to WD2TB in File app,
+select readings, alt-click, select Terminal, do *not* select Restart Linux,
+instead select Recovery Terminal.  Oh, but that's just in /home/jon. Then:
+
+jon@penguin:~$ ls /mnt/chromeos/removable/WD2TB/
+home
+
+So we don't have readings.   Try again and this time Restart Linux.
+Save this file first!   Also save design.txt and other.txt in pmacs session
+in readings space.
+
+Now try again, select WD2TB/readings in File app, alt-click
+
+"Restart Linux?
+Your device didn't shut down properly.  Restart Linux to use Linux apps.
+[Open recovery terminal] [Restart Linux]"
+
+Oh, right, last night I just unplugged WD2TB without ejecting it.
+Select [Restart Linux].
+
+That doesn't work either.  We just get Term in ~jon, again it hasn't
+mounted WD2TB/readings.
+
+Eject and reconnect WD2TB, in File app navigate to WD2TB, select readings,
+alt-click, selecg Terminal.  Now terminal opens to WD2TB readings, yay!
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ cd ~jon
+jon@penguin:~$ pwd
+/home/jon
+jon@penguin:~$ ls
+home  Piety  test.txt
+jon@penguin:~$ git clone /mnt/chromeos/removable/WD2TB/readings/.git
+Cloning into 'readings'...
+done.
+
+jon@penguin:~$ ls
+home  Piety  readings  test.txt
+jon@penguin:~$ cd readings
+jon@penguin:~/readings$ ls
+arts.txt             brand.txt      movies-to-see.txt     quotes.txt
+bach.txt             campus.txt     movies.txt            ras_recommends.txt
+baldwin-pynchon.txt  carr.txt       music-to-try.txt      reading.txt
+bobjonesu.txt        dna.txt        nietzche_to_rico.txt  rockstars.txt
+book-group-list.pdf  ginsberg.txt   notes.txt             seen.txt
+bookgroup.txt        innocents.txt  performances.txt      spies.txt
+brand2.txt           lanier.txt     proust.txt
+
+jon@penguin:~/readings$ git remote -v
+origin  /mnt/chromeos/removable/WD2TB/readings/.git (fetch)
+origin  /mnt/chromeos/removable/WD2TB/readings/.git (push)
+
+I suppose we can just leave that remote there.
+
+jon@penguin:~/readings$ pwd
+/home/jon/readings 
+
+
+Now let's add this remote to readings on WD2TB.
+
+jon@penguin:~/readings$ cd /mnt/chromeos/removable/WD2TB/readings
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ git remote -v
+origin  /Users/jon/readings/.git (fetch)
+origin  /Users/jon/readings/.git (push)
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ git remote add \
+> chromebook /home/jon/readings/.git
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ git remote -v
+chromebook      /home/jon/readings/.git (fetch)
+chromebook      /home/jon/readings/.git (push)
+origin  /Users/jon/readings/.git (fetch)
+origin  /Users/jon/readings/.git (push)
+
+It apparently worked.   Now edit and commit in CB repo ~/readings/reading.txt 
+
+jon@penguin:~/readings$ git status
+On branch master
+Your branch is up to date with 'origin/master'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   reading.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+jon@penguin:~/readings$ git commit reading.txt -m 'recent update'
+[master 1d5b763] recent update
+ 1 file changed, 2 insertions(+)
+jon@penguin:~/readings$ git branch
+* master
+
+Now try pulling on WD2TB.  First, before pull:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ tail -n 4 reading.txt 
+Dec 2023
+
+Lush Life, David Hajda, biography of Jazz musician Billy Strayhorn (loaned by David from book group)
+Woody Guthrie: A Life, Joe Klein, w/N for book group (Secret Garden)
+
+Then pull:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ git pull chromebook
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 5, done.
+remote: Counting objects: 100% (5/5), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (3/3), 352 bytes | 0 bytes/s, done.
+From /home/jon/readings/
+ * [new branch]      master     -> chromebook/master
+You asked to pull from the remote 'chromebook', but did not specify
+a branch. Because this is not the default configured remote
+for your current branch, you must specify a branch on the command line.
+
+But did it pull?
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ tail -n 4 reading.txt 
+Dec 2023
+
+Lush Life, David Hajda, biography of Jazz musician Billy Strayhorn (loaned by David from book group)
+Woody Guthrie: A Life, Joe Klein, w/N for book group (Secret Garden)
+
+No it didn't.  Try again.
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ git pull chromebook master
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+From /home/jon/readings/
+ * branch            master     -> FETCH_HEAD
+Updating 6061e49..1d5b763
+Fast-forward
+ reading.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ 
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ tail -n 4 reading.txt 
+Lush Life, David Hajda, biography of Jazz musician Billy Strayhorn (loaned by David from book group)
+Woody Guthrie: A Life, Joe Klein, w/N for book group (Secret Garden)
+Emerald City and other stories, Jennifer Egan, read a few (found in our house)
+
+It worked!  So we have readings repo on Mac, on CB, and on WD2TB.
+We can pull from both Mac and CB to WD2TB.
+
+So we have backup of personal git repo on CB Linux on ext hard disk WD2TB.
+Not at github, not at Google Drive - soso it's private and under our control
+This was our goal, so we can continue using CB in a similar workflow to Mac.
+
+Next: add this remote on WDBLUE also, back up (that is, pull) there as well.
+
+Remember to use File app to eject WD2TB properly first!  Done.
+
+That term window doesn't know WD2TB was ejected! Can't see files, 
+but doesn't complain:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ ls
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ cd ../..
+jon@penguin:/mnt/chromeos/removable$ ls
+WD2TB
+jon@penguin:/mnt/chromeos/removable$ cd WD2TB/
+jon@penguin:/mnt/chromeos/removable/WD2TB$ ls
+readings
+jon@penguin:/mnt/chromeos/removable/WD2TB$ cd readings
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ ls
+jon@penguin:/mnt/chromeos/removable/WD2TB/readings$ 
+
+Close that terminal window, open a new one:
+
+jon@penguin:~$ cd /mnt/chromeos/removable/
+jon@penguin:/mnt/chromeos/removable$ ls
+WD2TB
+jon@penguin:/mnt/chromeos/removable$ ls WD2TB
+readings
+jon@penguin:/mnt/chromeos/removable$ ls WD2TB/readings
+(nothing) 
+
+Weird!  I had already plugged in WDBLUE.  In file app, navigate to WDBLUE,
+select readings, alt-click, select Terminal, new Terminal window opens:
+
+jon@penguin:/mnt/chromeos/removable/WDBLUE/readings$ 
+
+meanwhile, try that other terminal again:
+
+jon@penguin:/mnt/chromeos/removable$ ls
+WD2TB  WDBLUE
+
+Weird - go back to other term with WDBLUE
+
+jon@penguin:/mnt/chromeos/removable/WDBLUE/readings$ git remote -v
+origin  /Users/jon/readings/.git (fetch)
+origin  /Users/jon/readings/.git (push)
+jon@penguin:/mnt/chromeos/removable/WDBLUE/readings$ git remote add \
+chromebook /home/jon/readings/.git
+jon@penguin:/mnt/chromeos/removable/WDBLUE/readings$ git remote -v
+chromebook      /home/jon/readings/.git (fetch)
+chromebook      /home/jon/readings/.git (push)
+origin  /Users/jon/readings/.git (fetch)
+origin  /Users/jon/readings/.git (push) 
+
+Now try pulling from readings on CB
+
+jon@penguin:/mnt/chromeos/removable/WDBLUE/readings$ git pull chromebook master
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 8, done.
+remote: Counting objects: 100% (8/8), done.
+remote: Compressing objects: 100% (6/6), done.
+remote: Total 6 (delta 4), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (6/6), 648 bytes | 0 bytes/s, done.
+From /home/jon/readings/
+ * branch            master     -> FETCH_HEAD
+ * [new branch]      master     -> chromebook/master
+Updating 4407cae..1d5b763
+Fast-forward
+ reading.txt | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+jon@penguin:/mnt/chromeos/removable/WDBLUE/readings$ tail -n 4 reading.txt
+Lush Life, David Hajda, biography of Jazz musician Billy Strayhorn (loaned by David from book group)
+Woody Guthrie: A Life, Joe Klein, w/N for book group (Secret Garden)
+Emerald City and other stories, Jennifer Egan, read a few (found in our house)
+
+We got the latest version!
+
+Now use File app to eject WDBLUE.
+
+Try pushing from WDBLUE back to repo on Mac.
+
+Plug WDBLUE into mac, then in /Volumes/WDBLUE/readings
+
+Confirm git remote -v shows both chromebook and origin.
+Confirm newest entry is at the tail of reading.txt.  Then:
+
+...$ git push origin master
+...
+... (long explanation why this didn't work)
+...
+To /Users/jon/readings/.git
+ ! [remote rejected] master -> master (branch is currently checked out)
+error: failed to push some refs to '/Users/jon/readings.git'
+
+Cut/paste the whole long message with explanation to end
+of ~/notes/mac/disk.txt on mac.
+
+Let's not try to fix this now -- we can try to figure it out later
+if we ever need to do this.  
+
+For now, we're committed to  continue working on CB only, not Mac - we
+currently don't have any way to make repos on CB and Mac up-to-date with
+each other, we can only make repos on ext disks up-to-date with latest
+on Mac *or* CB, whichever we most recently pull from.
+
+Maybe we could add ext disks as remotes to repos on Mac, and pull 
+from Mac?  
+
+Never mind, defer that problem for now, get back to moving other
+personal repos to CB.
+
+Later  ... on the mac, write out all  editor buffers and then
+git commit in the remaining personal repos: notes, noreen.
+The commit command is:
+
+...$ git commit -am 'recent updates, last commit from Mac 
+                       before moving repo to ChromeBook'
+...
+
+We didn't write out or save mpb-bookmarks.html in www - we've stopped using it.
+
+Then connect WD2TB ext disk and git pull in personal repos on WD2TB:
+notes, noreen and even www. Now WD2TB is up-to-date with recent work on
+Mac. 
+
+Eject WD2TB from Mac, connect it to CB.
+
+Now, repeat what we did with readings repo starting at L20772:
+
+Use File app to  open a term window on WD2TB notes directory.  Pull
+notes repo to CB:
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ cd ~jon
+jon@penguin:~$ ls
+home  Piety  readings  test.txt
+jon@penguin:~$ git clone /mnt/chromeos/removable/WD2TB/notes/.git
+Cloning into 'notes'...
+done.
+Updating files: 100% (598/598), done.
+jon@penguin:~$ ls
+home  notes  Piety  readings  test.txt
+jon@penguin:~$ cd notes
+jon@penguin:~/notes$ ls
+ansys.txt  docs-2022  house       misc-2022    python         ump
+archive    epics      house-8334  nmodel       retire         uw-access
+arts       family     house-9129  nsf-cs       science        uw-lib
+car        fiuts      linux       opengpt      show           uwplse
+carl       flip       lrb         parallel     spec-explorer  uw_python
+carol      friends    mac         piety        tech           windows
+christmas  gerd       medical     programming  travel
+diary      home       misc        pymodel      tulips
+
+ then git remote add chromebook /home/jon/notes/.git
+etc.  Check add with git remote -v.
+
+jon@penguin:~/notes$ cd /mnt/chromeos/removable/WD2TB/notes/
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ git remote
+origin
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ git remote -v
+origin  /Users/jon/notes/.git (fetch)
+origin  /Users/jon/notes/.git (push)
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ git remote add \
+> chromebook /home/jon/notes/.git
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ git remote -v
+chromebook      /home/jon/notes/.git (fetch)
+chromebook      /home/jon/notes/.git (push)
+origin  /Users/jon/notes/.git (fetch)
+origin  /Users/jon/notes/.git (push)
+
+Ditto for noreen and www repos - we don't copy it here.  Done.
+
+Now we can begin working on the CB as we used to do on Mac.
+To begin with, revise ~/notes/house-9129/sprinkler.txt with today's
+water meter reading, and ~/noreen/harborview/progress.txt with 
+N's activities today.  Commit both and pull both to repos on WD2TB,
+confirm those repos are current.
+
+jon@penguin:~/notes/house-9129$ git commit sprinkler.txt -m 'todays meter reading etc.'
+[master 857f9a8] todays meter reading etc.
+ 1 file changed, 6 insertions(+)
+
+jon@penguin:~/noreen/harborview$ git commit progress.txt -m 'todays excursion'
+[master 088f1b6] todays excursion
+ 1 file changed, 16 insertions(+)
+
+Before commits, we did git diff to confirm intended revisions are there.
+Now pull to WD2TB
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ git pull chromebook master
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 7, done.
+remote: Counting objects: 100% (7/7), done.
+remote: Compressing objects: 100% (4/4), done.
+remote: Total 4 (delta 3), reused 0 (delta 0), pack-reused 0
+Unpacking objects: 100% (4/4), 444 bytes | 0 bytes/s, done.
+From /home/jon/notes/
+ * branch            master     -> FETCH_HEAD
+ * [new branch]      master     -> chromebook/master
+Updating b536bda..857f9a8
+Fast-forward
+ house-9129/sprinkler.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes$ cd house-9129/
+jon@penguin:/mnt/chromeos/removable/WD2TB/notes/house-9129$ tail -n 5 sprinkler.txt 
+30 Dec 2023
+
+ 3:15 pm - water meter 317127 
+Raining lightly all day, but puddles mostly gone in front and back yards.
+
+We got it.
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/noreen$ git pull chromebook master
+hint: Pulling without specifying how to reconcile divergent branches is
+...
+ harborview/progress.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+jon@penguin:/mnt/chromeos/removable/WD2TB/noreen/harborview$ tail -n 5 progress.
+txt
+... we see the expected revisions.
+
+So this is all working.  We can edit and commit to repos on CB and pull to  
+repos on ext disk WD2TB.
+
+We should commit these notes and push to github - we hope for the last
+time - we plan to move them back out of Piety/doc back into notes/piety
+
  
+
+
+
+
