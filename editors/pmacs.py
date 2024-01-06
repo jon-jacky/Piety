@@ -101,7 +101,8 @@ def kill_line(keycode):
     if dmacs.prev_cmd != kill_line:
         inline = True
     # ... except begin multiline mode when kill empty line of only \n
-    if ed.buffer[ed.dot] == '\n':
+    #      and we are not already in multiline mode
+    if ed.buffer[ed.dot] == '\n' and inline: 
         inline = False # Enter multiline mode
         # If this is second consecutive C_k, copy previously killed line from 
         #  inline editline.killed buffer to multiline sked.killed buffer
@@ -177,8 +178,6 @@ def put_no_marker(bufline, attribs):
     'Assign to edsel.put_marker to suppress marker while running pmacs'
     pass
 
-# saved_put_marker is initialized in pmacsinit.py so we can restore
-
 def pm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
@@ -210,7 +209,7 @@ def pm():
                 dmacs.runcmd(k)
                 restore_cursor_to_window()
     dmacs.close_promptline()
-    edsel.put_marker = saved_put_marker # initialized in pmacsinit.py
+    edsel.put_marker = saved_put_marker # initialized in except branch above
     edsel.put_marker(ed.dot, display.white_bg)
     edsel.restore_cursor_to_cmdline()
     terminal.set_line_mode()
