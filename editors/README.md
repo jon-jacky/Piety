@@ -118,6 +118,8 @@ qualification:
 
 The *e* (edit) command loads a file into a buffer in the editor.
 You can load several (or many) files, each into its own buffer.
+The *b* (buffer) command switches to the named buffer.  The *n* (names)
+command lists the buffers.
 
 The *a* (append) command adds text to the buffer.  Just type lines of 
 text on the following lines, each will go into the buffer until you type
@@ -198,10 +200,13 @@ sked functions at the Python REPL.  You can call
 the *c* (change) function to substitute text in that line.
 Or, you can delete the line and append a different one.
 
-Additional edsel commands enable you to have up to two windows 
-on the display in a
-vertical stack, showing different locations in the same buffer, or
-different buffers.
+Additional edsel commands enable you to have multiple windows  on the
+display in a vertical stack, showing different locations in the same
+buffer, or different buffers.  The *o2()* command splits the current
+window into two, *on()* moves the cursor into the other window, and
+*o1()* returns to a single window.  At this time you can only have two
+windows, because more are not useful in the small terminal we have
+available.
 
 Some commands, for example *p()* (print), no longer print output in
 the Python REPL because their effects are now visible in the display window.
@@ -406,15 +411,26 @@ erroneous module.
 
 First, look at the display and try to read any traceback messages or other
 useful information.   Then, find the Python REPL prompt and type the function
-call *refresh()*.  The display restores and you can resume work. You can try
-to restart *pmacs* by typing the function call *pm()* and  try to avoid using
-the erroneous commmand.   If that fails, you can return to the Python prompt
-by typing *M-x*, and start a simpler editor that does not import the erroneous
-code.  Type *dm()* to run *dmacs* which does not provide inline editing, or
-just type the many *edsel* commands at  the REPL -- they do not use keycodes.
-You can even revert to *sked* which does not update the display at all.
+call *refresh()*.  The display restores and you can resume work.   
+
+ You may find that, after a crash, the terminal does not echo the commands
+you type at the REPL prompt.  In that case, try typing the *tl()* command
+(which you will not see, of course) to restore the terminal.  Then
+try *refresh()* etc.
+ 
+The *refresh()* command only refreshes the focus window, so you may have
+to  use the *on()* command to move to another window and refresh that
+one also.
+
+You can try to restart *pmacs* by typing the function call *pm()* and
+try to avoid using the erroneous commmand.   If that fails, you can
+return to the Python prompt by typing *M-x*, and start a simpler editor
+that does not import the erroneous code.  Type *dm()* to run *dmacs*
+which does not provide inline editing, or just type the many *edsel*
+commands at  the REPL -- they do not use keycodes. You can even revert
+to *sked* which does not update the display at all.
 
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Dec 2023
+Revised Jan 2024
