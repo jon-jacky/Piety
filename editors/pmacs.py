@@ -1,8 +1,8 @@
 """
 pmacs.py - display editor that uses emacs control keys.
 
-pmacs might mean 'Python emacs' but actually means 'poor emacs'
-or 'pathetic emacs' or maybe 'Passing grade emacs, just above Fail'.
+pmacs might mean 'Python emacs' but actually means 'partly inspired by emacs'
+or maybe 'poor imitation of emacs'.
 """
 
 import terminal, key, keyseq, display, edsel, dmacs

@@ -433,11 +433,12 @@ def save_window(wkey):
     Save window items in saved windows at the index wkey.
     wkey is arg so we can save windows other than focus window.
     Save window's buffer also, next window might use a different buffer.
+    Assumes window's buffer is the current buffer, true in all save_window
+    uses now.  Maybe not always true in the future, must review each new use.    .
     """
     windows[wkey] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
-                      'bufname': ed.bufname, 'dot': ed.dot } 
-    ed.save_buffer() # FIXME? saves current buffer, not buffer for window wkey
-                     # BUT wkey is only used in o2 where buffer is the same
+                      'bufname': ed.bufname, 'dot': ed.dot } # current buffer
+    ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
 
 def restore_window(wkey):
     """
@@ -451,15 +452,14 @@ def restore_window(wkey):
     wheight = windows[wkey].get('wheight', wheight)
     buftop = windows[wkey].get('buftop', buftop)
     bufname = windows[wkey].get('bufname', ed.bufname) # *local* bufname here!
-    # What if bufname is not in buffers?  It may have been killed.
-    # But scratch.txt is always in buffers.
+    # Maybe bufname is not in buffers, it may have been killed.
+    # But scratch.txt is always in buffers. 
     bufname = bufname if bufname in ed.buffers else 'scratch.txt'
-    if bufname != ed.bufname:
-        ed.prev_bufname = ed.bufname
-        ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
-    else:
+    ed.prev_bufname = ed.bufname
+    ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
+    if bufname != 'scratch.txt':
         ed.dot = windows[wkey].get('dot', ed.dot)
-
+ 
 def o2():
     'Split focus window, focus remains in top half, bottom half is new saved'
     global wintop, wheight, wkeys

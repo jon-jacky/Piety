@@ -345,9 +345,11 @@ type the function call *pm()*.
 
 In *pmacs* you can edit several files in different buffers just as you
 would in Emacs.   
-You can have up to two windows on the display in a
+You can have multiple windows on the display in a
 vertical stack, showing different locations in the same buffer, or
 different buffers.
+At this time you can only have two windows, because more are not useful
+in the small terminal we have available.
 
 To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
 dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
