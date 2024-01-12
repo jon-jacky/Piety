@@ -136,7 +136,7 @@ Piety is written in Python 3 since June 2015.   Earlier work is saved in
 this repository in the *python2* tag.  The conversion is described
 [here](doc/python3.md).   Piety now requires Python 3.5.
 
-## Tested Platform ##
+## Tested Platforms ##
 
 Through November 2023, the Piety software only ran on one computer: a
 MacBook Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El
@@ -146,10 +146,10 @@ only ran on CPython downloaded from python.org, through version 3.9.0.
 
 Beginning in December 2023, Piety development moved to Linux
 running in a virtual machine on a Chromebook.  The *uname -a* command
-says it is *Linux penguin 5.15*, which I believe is a Chomebook fork of
+says it is *Linux penguin 5.15*, which I believe is a Chromebook fork of
 Debian. This is the Linux provided to ordinary users as part
-of the standard Chrombook software, it is not part of some 'developer
-mode'.   The Python version runing in this Linux is 3.9.2.
+of the standard Chromebook software, it is not part of some 'developer
+mode'.   The Python running in this Linux is CPython version 3.9.2.
 Piety runs in the Chromebook Linux Terminal app.
 The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
 purchased in 2023.  At this writing (12 Jan 2024) it is running
