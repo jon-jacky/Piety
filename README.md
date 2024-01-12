@@ -138,11 +138,22 @@ this repository in the *python2* tag.  The conversion is described
 
 ## Tested Platform ##
 
-The Piety software has only run on one computer: a MacBook
-Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El Capitan,
-the most recent version that runs on that hardware).    It has only run in
-the Mac OS Terminal, through version 2.6.2 (361.2). It has only
-run on CPython downloaded from python.org, through version 3.9.0.
+Through November 2023, the Piety software only ran on one computer: a
+MacBook Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El
+Capitan, the most recent version that runs on that hardware).    It
+only ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
+only ran on CPython downloaded from python.org, through version 3.9.0.
 
-Revised Feb 2023
+Beginning in December 2023, Piety development moved to Linux
+running in a virtual machine on a Chromebook.  The *uname -a* command
+says it is *Linux penguin 5.15*, which I believe is a Chomebook fork of
+Debian. This is the Linux provided to ordinary users as part
+of the standard Chrombook software, it is not part of some 'developer
+mode'.   The Python version runing in this Linux is 3.9.2.
+Piety runs in the Chromebook Linux Terminal app.
+The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
+purchased in 2023.  At this writing (12 Jan 2024) it is running
+ChromeOS Version 118.0.5993.164.
+
+Revised Jan 2024
 
