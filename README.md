@@ -138,11 +138,11 @@ this repository in the *python2* tag.  The conversion is described
 
 ## Tested Platforms ##
 
-Through November 2023, the Piety software only ran on one computer: a
+Through November 2023, the Piety software was only run on one computer: a
 MacBook Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El
 Capitan, the most recent version that runs on that hardware).    It
-only ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
-only ran on CPython downloaded from python.org, through version 3.9.0.
+ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
+ran on CPython downloaded from python.org, through version 3.9.0.
 
 Beginning in December 2023, Piety development moved to Linux
 running in a virtual machine on a Chromebook.  The *uname -a* command
