@@ -1,22 +1,21 @@
 """
 pmacs.py - display editor that uses emacs control keys.
 
-pmacs might mean 'Python emacs' but actually means 'poor emacs'
-or 'pathetic emacs' or maybe 'Passing grade emacs, just above Fail'.
+pmacs might mean 'Python emacs' but actually means 'partly inspired by emacs'
+or maybe 'poor imitation of emacs'.
 """
 
 import terminal, key, keyseq, display, edsel, dmacs
 import sked as ed, editline as el
 
-# Define and initialize global variables used by pmacs functions.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by pmacs functions,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
-    _ = saved_put_marker # if already defined, then pmacsinit was already exec
+    _ = saved_put_marker # if already defined, then pmacs was already imported
 except:
-    exec(open(EDPATH + 'pmacsinit.py').read())
+    inline = True # kill (cut) and yank (paste) within a single line
+    saved_put_marker = edsel.put_marker # so we can restore after put_no_marker
 
 # helper functions
 
@@ -68,7 +67,6 @@ def delete_backward_char(keycode):
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) 
     else: 
         join_prev() # see above
-        dmacs.prev_cmd = delete_backward_char # el.runcmd above assigns prev...
         restore_cursor_to_window()
 
 def join_next():
@@ -86,30 +84,38 @@ def delete_char(keycode):
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
     else:
         join_next() # see above
-        dmacs.prev_cmd = delete_char # el.runcmd above assigns prev...
         restore_cursor_to_window()
 
 def kill_line(keycode):
     """
-    Kill the rest of line at dot or kill entire line(s)
+    In inline mode, kill line from the cursor up to but not including final \n
+     save killed segment in editline.killed buffer for subsequent yank.
+    In multline mode, kill entire line including final \n
+     save consecutive killed lines in sked.killed buffer for subsequent yank.
+    Manage transitions between inline and multiline modes:
+    kill line on empty line consisting only of \n enters multiline mode.
+    kill line after any other command than kill line resumes inline mode.
     """
     global inline
-    # Lone kill line or first kill line in a series is always inline
+    # Lone kill line or first kill line in a series is inline ...
     if dmacs.prev_cmd != kill_line:
         inline = True
-    # Exit inline mode and begin multiline mode in this condition:
-    # Previous kill line has emptied line except for final \n
-    # Then this repeated kill line removes final \n and begins multline mode
-    if inline and dmacs.prev_cmd == kill_line and ed.buffer[ed.dot] == '\n':
-        inline = False
-        # Enter multiline mode, copy killed line from inline buf to multiline
-        ed.killed = [ el.killed ] # cp el.killed to first line of sked.killed
+    # ... except begin multiline mode when kill empty line of only \n
+    #      and we are not already in multiline mode
+    if ed.buffer[ed.dot] == '\n' and inline: 
+        inline = False # Enter multiline mode
+        # If this is second consecutive C_k, copy previously killed line from 
+        #  inline editline.killed buffer to multiline sked.killed buffer
+        if dmacs.prev_cmd == kill_line:
+            ed.killed = [el.killed+'\n'] # cp el.killed to 1st line sked.killed
+        else: # we just killed empty line of only \n
+            ed.killed = [] # clear sked.killed
         el.killed = '' # clear el.killed, start over. NB string not list
-        # Delete the empty killed line from the buffer
-        edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
+        # Delete the empty killed line from the buffer ...
+        edsel.d(None,None,True) # ... and append line to killed buffer
         restore_cursor_to_window()
         # Now buffer and display are right, but killed has extra \n line at end
-        ed.killed = [ ed.killed[0] ] # remove second item, '\n' line at index 1 
+        ed.killed.remove('\n') # remove '\n' line
     # inline kill line:
     elif inline: # weaker condition, must follow previous stronger if...
         ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) # keycode C_k
@@ -117,7 +123,7 @@ def kill_line(keycode):
     elif not inline:
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
         restore_cursor_to_window()
-    dmacs.prev_cmd = kill_line
+
 def kill_region(keycode):
     global inline
     inline = False
@@ -161,7 +167,8 @@ def runcmd(keycode):
     """
     cmd = keymap[keycode]
     cmd(keycode)
-    # prev_cmd is assigned in fcns above, or in fcns they call
+    dmacs.prev_cmd = cmd
+    # Note: A few cmd call el.runcmd we believe we needn't update el.prev_cmd
 
 def clear_marker():
     edsel.put_marker(ed.dot, display.clear)
@@ -170,8 +177,6 @@ def clear_marker():
 def put_no_marker(bufline, attribs): 
     'Assign to edsel.put_marker to suppress marker while running pmacs'
     pass
-
-# saved_put_marker is initialized in pmacsinit.py so we can restore
 
 def pm():
     """
@@ -193,15 +198,18 @@ def pm():
             elif k in keymap:
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
+                el.prev_cmd = dmacs.prev_cmd
                 ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
-                inline = True # editing inline, kill and yank word(s) in line
                 dmacs.prev_cmd = el.prev_cmd
+                # key.C_k and inline are handled in kill_line, above
+                if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
+                    inline = True
             elif k in dmacs.keymap:
                 edsel.restore_cursor_to_cmdline()
                 dmacs.runcmd(k)
                 restore_cursor_to_window()
     dmacs.close_promptline()
-    edsel.put_marker = saved_put_marker # initialized in pmacsinit.py
+    edsel.put_marker = saved_put_marker # initialized in except branch above
     edsel.put_marker(ed.dot, display.white_bg)
     edsel.restore_cursor_to_cmdline()
     terminal.set_line_mode()

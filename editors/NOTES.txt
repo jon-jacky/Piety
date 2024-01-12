@@ -14,15 +14,14 @@ No main program!  Editor commands are just functions defined here, to
 call from the Python REPL.
 
 Global variables used by these functions are defined and initialized
-in skedinit.py, which must be executed before calling any of the
-functions here.
-The way skedinit is executed (not imported) makes it possible to 
+in the except block in the try...except... at the beginning of the module,
+which must be executed before calling any of the functions here.
+It is only executed the first time the module is imported, not
+when it is reloaded.  This makes it possible to 
 reload the sked module while preserving work in progress (which 
-is stored in the global variables defined in skedinit).  The same
-method is used for the other editor modules, edsel and dmacs.
-EDPATH enables skedinit to be executed when sked is run from any 
-directory.  Note that EDPATH is hard-coded and will have to be edited
-to work on other sytems than mine.
+is stored in the global variables initialized in the except block).  The same
+method is used for the other editor modules, edsel, dmacs, pmacs
+and editline.  
 
 This module produces no display output, except print statements that
 print to the Python REPL.  However, many functions here include optional
@@ -78,10 +77,9 @@ depend on sked, to their own separate module titled 'frame'.
 
 This could make for a nicer modular structure where the dependencies
 are clearer.   But it also proliferates modules and makes code more verbose
-because edsel would need to put the 'frame.' prefix all over.
+because edsel would need to put the 'frame.' prefix all over.  
 
-Before attempting this, let's try adding multiple windows and see if these
-too could be provided in a sked-less frame module.
+So we decided against separating out a 'frame' module.
 
 ### dmacs ###
 
@@ -117,4 +115,42 @@ past the final newline.   In particuler, move_end and forward_char.
 This ensures that when new characters are typed, they are inserted 
 ahead of the final newline.
 
-Revised Sep 2023
+### pmacs ###
+
+In *pmacs*, *C_k kill_line* and *C_y yank* work in two modes: *inline*
+mode and *multiline* mode.  In inline mode, kill_line cuts a segment
+from the cursor up to but not including the newline character '\n' at
+the end of the line, saves the segment in *editline.killed*, and yank
+pastes the killed segment back into the line after the cursor.  In
+multiline mode, one or more consecutive  kill_line cuts a sequence of
+whole lines including the final newline, saves the lines in
+*sked.killed* and yank pastes the sequence of killed lines into the text
+buffer  after the current line.
+
+You transition from inline mode to multiline mode by using kill_line
+on an empty line consisting only of the newline character.  The usual
+way to do this is to type kill_line a second time after first using
+kill_line to cut the contents of the line, leaving an empty line.
+Those contents will be the first line that is pasted by a subsequent yank.
+
+You transition from multiline mode back to inline mode by typing
+kill_line after any command other than another kill_line. That kill_line
+will be in inline mode, unless it is made on an empty line consisting
+only of a newline.
+
+In the *pmacs* module, the *kill_line* function implements both modes
+and the transitions between them.  It is complicated because it has
+special cases for handling newlines, empty lines, and the history of
+commands. This is the cost we pay in complexity for supporting both
+modes in a reasonably convenient way, so you can just edit with
+kill_line and yank without thinking about the modes -- the commands just behave
+as you would wish.  We have tried to put all that complexity in just one
+place, the *pmacs* *kill_line* function.  The complexity derives from
+trying to provide convenient behavior in what is essentially a line-based
+editor.
+
+The *pmacs* *yank* function also handles both modes, but the logic there
+is simple.
+
+Revised Jan 2024
+

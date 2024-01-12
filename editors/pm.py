@@ -9,5 +9,6 @@ from dmacs import dm # so we can revert to dmacs if pmacs is broken
 import editline
 import pmacs
 from pmacs import pm
+tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 win(22)
 pm()

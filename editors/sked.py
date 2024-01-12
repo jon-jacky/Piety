@@ -12,16 +12,38 @@ The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 import os # for os.path.basename, used in store_buffer
 import textwrap
 
-# Define and initialize global variables used by sked editing functions.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by sked editing functions,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables,
 # so we retain buffer contents and other state when we reload.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
-    _ = dot # if dot is already defined, then skedinit was already exec'd
+    _ = dot # If dot is already defined, then this module was already imported.
 except:
-    exec(open(EDPATH + 'skedinit.py').read())
+    # buffer is zero indexed, but we want first line of file to be at index 1
+    # so first entry in buffer list is never used - it's always just '\n'
+    buffer = ['\n']  # '\n' at index 0 is never used
+    dot = 0            # dot, index of current line in buffer
+    
+    filename = 'scratch.txt' # reassigned by e(dit) and w(rite) commands
+    bufname = filename  # Basename of filename, reassigned by e and w
+    searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) cmds
+    replacestring = '??? ' # reassigned by c(hange) command
+    pagesize = 12         # reassigned by v and mv page up/down commands
+    saved = True          # True when no unsaved changes, safe to run e(dit).
+    lmargin = 0           # left margin for wrap
+    rmargin = 72          # right margin for wrap
+    nindent = 4           # N of spaces to indent or outdent
+    
+    killed = [] #yank(paste) buffer filled by kill_region or repeated  kill_line
+    
+    # saved buffers, dictionary from buffer names to dict of buffer items
+    # initialize so there is always a saved buffer to switch back to
+    buffers = dict()
+    buffers[bufname] = {'bufname': bufname, 'filename': filename, 
+                        'buffer': buffer, 'dot': dot, 'saved': saved }
+    
+    prev_bufname = bufname # so we can switch back even before we save any  bfas
+    
 
 # Utility functions
 

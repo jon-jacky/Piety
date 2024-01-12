@@ -10,36 +10,75 @@ import sys # skip argument declaration has file=sys.stdout
 import terminal_util, display
 import sked as ed
 
-# Define and initialize global variables used by frame display functions.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by this module,
+# but only the *first* time this module is imported.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
-    _ = flines # if flines is already defined, then edselinit was already exec'd
+    _ = flines # if this variable is defined, then module was already imported
 except:
-    exec(open(EDPATH + 'edselinit.py').read())
+    # The top of the frame is always the top of the terminal window, line 1
+    # flines must always fit within the terminal window.
+    
+    tlines = 24 # N of lines in terminal window, later update with actual number
+    tcols = 80  # N of columns in terminal window, later update ...
+    flines = 20 # N of lines in frame, including all windows.
+    
+    # From here on, 'window' means the software-generated window within frame
+    # whose top line and num. of lines might not be the same as the term  window
+    # Editing happens in the 'focus window', also called the 'current window'.
+    
+    # Typical case is just one window that occupies the entire frame
+    # in that case wintop == 1 and wlines == flines
+    
+    wintop = 1 # index in frame of top line of focus window
+    wheight = flines # N of lines in focus window, including status line.
+    buftop = 1 # index in buffer of line at the wintop, top of the window.
+    bufname = 'scratch.txt' # name of buffer displayed in focus window
+    
+    displaying = False  # initially display is not enabled.
+    
+    # saved windows including focus window, dict of dicts of window items
+    # windows are identified by integer keys
+    # saved windows are a dict not a list because smallest key might not be 0
+    focus = 0 # key of focus window
+    maxwindows = 2 # the most that are useful in a vertical stack in 20+ lines
+    windows = {}
+    windows[focus] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
+                       'bufname': ed.bufname, 'dot': ed.dot }
+    wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame
+    
 
 # Display functions: building blocks
 
 def in_window(iline):
     'Return True if buffer index iline is within the window.'
-    return (buftop <= iline <= buftop + wlines - 2)
+    return (buftop <= iline <= buftop + wheight - 2)
 
 def wline(iline):
-    'Return index of line in window that displays iline from buffer.'
-    wiline = iline - buftop + 1
+    """
+    Return index of line in frame that displays line at index iline in buffer.
+    This is the line in the terminal window, used for cursor positioning cmds.
+    """    
+    wiline = wintop + (iline - buftop)
     return wiline if wiline >=1 else 1
+
+def wbottom():
+    """
+    Return index of line in frame that displays the last line in window.
+    Usually this is the window's status line.
+    """
+    return wintop + wheight - 1
 
 def locate_segment(iline):
     """
+    iline is line in the buffer.
     Select segment to put in window, that best positions iline in the window.
-    Return buftop, line in current buffer to put at line 1 in window.
+    Return buftop, line in current buffer to put at top line in window
     """
-    if iline < wlines - 1: # iline is near top of buffer, show first page
+    if iline < wheight - 1: # iline is near top of buffer, show first page
         return 1
     else: 
-        return iline - (wlines // 2) # put iline near center of window
+        return iline - (wheight // 2) # put iline near center of window
 
 def update_lines(bstart, wstart, nlines):
     """
@@ -48,7 +87,7 @@ def update_lines(bstart, wstart, nlines):
     Clip nlines if needed, to fit in window, and not run past end of buffer.
     Leave cursor after the last line displayed.
     """
-    nlines = min(nlines, wlines-wstart+1) # n of lines at end of window
+    nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
     display.put_cursor(wstart, 1)
     for line in ed.buffer[bstart:bstart+nlines]:
@@ -58,7 +97,7 @@ def update_lines(bstart, wstart, nlines):
 
 def update_window():
     'Update entire window up to status line, starting at line buftop in buffer'
-    update_lines(buftop, 1, wlines-1)
+    update_lines(buftop, wintop, wheight-1)
 
 def update_below(bstart, offset=0):
     """
@@ -68,8 +107,17 @@ def update_below(bstart, offset=0):
     optionally assign offset to move bstart and following lines down.
     """
     wstart = wline(bstart) + offset
-    nlines = wlines - wstart
+    nlines = wbottom() - wstart
     update_lines(bstart, wstart, nlines)
+
+def erase_lines(nlines):
+    """
+    Completely erase nlines lines starting at current cursor position.
+    Leave cursor at line after last line erased.
+    """
+    for iline in range(nlines):
+        display.kill_whole_line()
+        display.next_line()
 
 def open_line(iline):
     """
@@ -78,8 +126,8 @@ def open_line(iline):
     """
     global buftop
     if not in_window(iline+1):
-        display.put_cursor(wlines, 1) # window status line
-        display.erase_above() # erase entire window contents above status line
+        display.put_cursor(wintop, 1) # first line of window
+        erase_lines(wheight-1) # erase window contents but not status line
         buftop = locate_segment(iline)
         update_window()
     display.put_cursor(wline(iline+1), 1)
@@ -100,15 +148,18 @@ def restore_cursor_to_cmdline():
 
 def update_status():
     'Update status line at the bottom of the window'
-    display.put_cursor(wlines, 1) # window status line
+    display.put_cursor(wbottom(), 1)
     display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
     restore_cursor_to_cmdline()
 
 def refresh():
-    '(Re)Display buffer segment, marker, status without moving segment'
-    display.put_cursor(wlines, 1) # window status line
-    display.erase_above() # erase entire window contents above status line
-    update_window()
+    """
+    Refresh the focus window.
+    (Re)Display lines from segment, marker, status without moving segment.
+    """
+    display.put_cursor(wintop, 1) # top line in window
+    erase_lines(wheight-1) # erase entire window contents above status line
+    update_window() # FIXME did we really have to erase_lines before this?
     put_marker(ed.dot, display.white_bg)
     update_status()
     
@@ -176,12 +227,10 @@ def display_d(iline):
     ed.dot = iline # this is all that move_dot(iline) does
     if in_window(ed.dot):
         update_below(ed.dot)
-        nlines = wlines - wline(ed.dot) # n of lines to end of window
+        nlines = wheight - wline(ed.dot) # n of lines to end of window
         nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
         nelines = nlines - nblines # n of empty lines at end of window
-        for iline in range(nelines+1): # make empty lines at end of window
-            display.kill_whole_line()
-            display.next_line()
+        erase_lines(nelines+1) # sic +1.  make empty lines at end of window.
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
@@ -239,7 +288,7 @@ def display_start_a(iline):
     Open line after dot. Put cursor there to prepare for display_input_line.
     If any text after dot, push it all down one line to make room for new line.
     """
-    display.put_cursor(wlines, 1) # status line does not update in append mode
+    display.put_cursor(wheight, 1) # status line does not update in append mode
     display.render('Appending...'.ljust(tcols)[:tcols],display.white_bg)  
     put_marker(ed.dot, display.clear)
     ed.dot = iline # sked a() does this.  iline might be far from previous dot.
@@ -351,7 +400,7 @@ def open_frame():
     Create a 'frame' to contain windows, potentially more than one.
     Clear display above status line and limit scrolling to the lines below.
     """
-    display.put_cursor(wlines, 1) # window status line
+    display.put_cursor(wheight, 1) # window status line
     display.erase_above()
     display.set_scroll(flines+1, tlines)
 
@@ -364,7 +413,7 @@ def win(nlines=None):
     Set scrolling region to lines below flines.
     Show status line about current buffer at bottom of frame.
     """
-    global tlines, tcols, flines, wlines, buftop
+    global tlines, tcols, flines, wheight
     tlines, tcols = terminal_util.dimensions()
     display.put_cursor(flines+1, 1)
     display.erase_above() # clear old window in case new nlines < flines
@@ -373,11 +422,101 @@ def win(nlines=None):
         print(f'? {nlines} lines will not fit in terminal of {tlines} lines')
         return
     flines = nlines
-    wlines = flines
-    ed.pagesize = wlines - 2
-    ed.rmargin = tcols - 2
+    wheight = flines
+    ed.pagesize = wheight - 2
+    ed.rmargin = tcols - 8
     open_frame()
     recenter()
+
+def save_window(wkey):
+    """
+    Save window items in saved windows at the index wkey.
+    wkey is arg so we can save windows other than focus window.
+    Save window's buffer also, next window might use a different buffer.
+    Assumes window's buffer is the current buffer, true in all save_window
+    uses now.  Maybe not always true in the future, must review each new use.    .
+    """
+    windows[wkey] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
+                      'bufname': ed.bufname, 'dot': ed.dot } # current buffer
+    ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
+
+def restore_window(wkey):
+    """
+    Restore saved window items at wkey to the focus window.
+    If window uses a different buffer, restore that buffer too.
+    """
+    global focus, wintop, wheight, buftop # but not bufname, dot, they are in ed
+    # default values for missing keys are just the current values
+    focus = wkey
+    wintop = windows[wkey].get('wintop', wintop)
+    wheight = windows[wkey].get('wheight', wheight)
+    buftop = windows[wkey].get('buftop', buftop)
+    bufname = windows[wkey].get('bufname', ed.bufname) # *local* bufname here!
+    # Maybe bufname is not in buffers, it may have been killed.
+    # But scratch.txt is always in buffers. 
+    bufname = bufname if bufname in ed.buffers else 'scratch.txt'
+    ed.prev_bufname = ed.bufname
+    ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
+    if bufname != 'scratch.txt':
+        ed.dot = windows[wkey].get('dot', ed.dot)
+ 
+def o2():
+    'Split focus window, focus remains in top half, bottom half is new saved'
+    global wintop, wheight, wkeys
+    if len(wkeys) >= maxwindows:
+        print('? no more windows\r\n', end='')
+        return
+    # When we split a window, top half remains focus window; keep same wintop.
+    prev_wheight = wheight # needed later to size lower window
+    wheight = wheight // 2 
+    ed.pagesize = wheight - 2
+    recenter()  # if dot was in lower half of window, move up. reassign buftop.
+    save_window(focus)
+    # bottom half
+    wkey = (max(wkeys) + 1) % maxwindows  # wkey for new window
+    # insert new wkey into wkeys right after focus window entry
+    for ikey, _ in enumerate(wkeys):
+        if wkeys[ikey] == focus:
+            wkeys[ikey+1:ikey+1] = [ wkey ] # insert new wkey after focus entry
+            break
+    # Calculate new bottom window position, size
+    wintop = wintop + wheight
+    wheight = prev_wheight - wheight
+    recenter() # center dot in this window also, calculate new buftop.
+    save_window(wkey)
+    restore_window(focus)
+
+def o1():
+    'Return to single window, make focus window occupy the whole frame.'
+    global focus, wkeys, wintop, wheight
+    if len(wkeys) <= 1:
+        print('? only one window\r\n', end='')
+        return
+    windows.clear()
+    focus = 0
+    wkeys = [ focus ]
+    wintop = 1
+    wheight = flines
+    ed.pagesize = wheight - 2
+    recenter() # reassigns buftop
+    save_window(focus) # will be overwritten when next time window is split
+
+def on():
+    'Next window, move focus to next window below, until wrap around to top'
+    global focus
+    if len(wkeys) <= 1:
+        print('? only one window\r\n', end='')
+        return
+    save_window(focus) # window contents (buffer and/or dot) may have changed
+    for ikey, wkey in enumerate(wkeys):
+        if wkeys[ikey] == focus:
+            break
+    ikey = (ikey + 1) % len(wkeys) # index of next window below, wrap around
+    focus = wkeys[ikey]
+    # What if buffer in new focus window has been killed?
+    # Handle that in restore_window.
+    restore_window(focus)
+    # Window is already visible, we should not have to refresh or recenter it.
 
 def zen(nlines=None):
     'Alternative to win for a distraction-free writing experience'
@@ -387,4 +526,5 @@ def zen(nlines=None):
 def clr():
     'cl(ea)r window from display by restoring full-screen scrolling'
     display.set_scroll(1, tlines)
-    display.put_cursor(tlines, 1) # set_scroll leaves cursor on line 1
+    restore_cursor_to_cmdline() # set_scroll leaves cursor on line 1
+

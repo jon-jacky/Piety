@@ -11,15 +11,16 @@ import sys, importlib
 import terminal, key, keyseq, display, edsel
 import sked as ed
 
-# Define and initialize global variables used by dmacs.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by dmacs,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
-    _ = mark # if mark is already defined, then dmacsinit was already exec'd
+    _ = mark # if mark is already defined, then dmacs was already imported
 except:
-    exec(open(EDPATH + 'dmacsinit.py').read())
+    mark = 0 # line number, defines region for cut C_w etc.  0 means disabled.
+    promptline = edsel.flines+1 # line after end of edsel frame
+    prev_cmd = None
+    
 
 def append():
     'Restore line mode, run edsel a(), return to char mode'
@@ -135,7 +136,7 @@ def kill_line():
     else: 
         edsel.d(None,None,True) # consecutive C_k, append line to yank buffer
 
-def reload():
+def reload_buffer():
     'Reload module for current buffer'
     modname = ed.bufname[:-3] # trim trailing '.py'
     importlib.reload(sys.modules[modname])
@@ -144,7 +145,7 @@ def reload():
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'
     edsel.w()
-    reload() # synchronization?  Does w() finish before reload() begins?
+    reload_buffer() # synchronization?  Does w() finish before reload() begins?
 
 # Table from keys to editor functions
 keymap = {
@@ -180,6 +181,10 @@ keymap = {
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     key.C_x + key.C_r : save_reload, # *not* like emacs find-file read-only
+    # windows
+    key.C_x + '2' : edsel.o2,
+    key.C_x + '1' : edsel.o1,
+    key.C_x + 'o' : edsel.on,
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
     # arrow keys, send ANSI escape sequences

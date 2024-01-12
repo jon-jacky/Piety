@@ -2,11 +2,22 @@
 editors
 =======
 
-The modules here comprise a minimal Python programming environment.
-We can have all of our source code, our editors, and the interactive Python
+There are four editors here, each built by extending (importing) its
+predecessors. *sked* is a line editor inspired by the classic Unix *ed*,
+operated by calling its functions at the Python REPL. *edsel* adds
+display windows to *sked*. *dmacs* supplements the *edsel* REPL with
+Emacs control keys. *pmacs* enriches *dmacs* with more flexible display
+editing.
+
+Each editor comprises a minimal Python programming environment.
+We can have all of our source code, our editor, and the interactive Python
 interpreter always available in our Python session. We can write code that
 we load and run immediately, without restarting the session or losing
 any work in progress. See [how we program](HOW.md).
+
+The programming environments defined here are crude.  But we
+find that their malleability and responsiveness motivate us to continue
+working in them, despite their lack of conveniences.
 
 ### Quick start ###
 
@@ -57,26 +68,16 @@ More detailed directions appear in the sections below.
 - **editline.py**: Functions to edit and display a string with *readline* 
   control keys.  Used by *pmacs*.
 
-- **editlineinit.py**: Define and initialize global variables used
-  by *editline*.
-
 - **edsel.py**: Display editor that uses the same commands as *sked*.
 
-- **edselinit.py**: Define and initialize global variables used by *edsel*.
-
 - **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
-
-- **dmacsinit.py**: Define and initialize global variables used by *dmacs*.
 
 - **pm.py**: Script to start the *pmacs* editor.
 
 - **pmacs.py**: Display editor that uses Emacs control keys.
 
-- **pmacsinit.py**: Define and initialize global variables used by *pmacs*.
-
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 
-- **skedinit.py**: Define and initialize global variables used by *sked*.
 
 ### sked ###
 
@@ -117,6 +118,8 @@ qualification:
 
 The *e* (edit) command loads a file into a buffer in the editor.
 You can load several (or many) files, each into its own buffer.
+The *b* (buffer) command switches to the named buffer.  The *n* (names)
+command lists the buffers.
 
 The *a* (append) command adds text to the buffer.  Just type lines of 
 text on the following lines, each will go into the buffer until you type
@@ -177,11 +180,11 @@ at the bottom of the terminal.
 Here you can type the same editing commands you used in *sked*,
 but now the window updates to show the changes in the buffer as
 they are made.
-
+ 
 When you type *a()* to start the *append* command, the blinking cursor moves
 up from the Python REPL to the text insertion point in the window,
 and the message *Appending...* replaces the contents of the status line.
-Then when you type, each character appears immediately in the window at the 
+Then when you type, each character appears immediately in the window at the
 intended location.  This continues until you type . at the beginning 
 of a line to exit append mode.  Then the line with '.' disappears, 
 the usual text reappears on the status line, 
@@ -196,6 +199,14 @@ edit it anymore.   The only way to edit a line in the buffer is to call
 sked functions at the Python REPL.  You can call 
 the *c* (change) function to substitute text in that line.
 Or, you can delete the line and append a different one.
+
+Additional edsel commands enable you to have multiple windows  on the
+display in a vertical stack, showing different locations in the same
+buffer, or different buffers.  The *o2()* command splits the current
+window into two, *on()* moves the cursor into the other window, and
+*o1()* returns to a single window.  At this time you can only have two
+windows, because more are not useful in the small terminal we have
+available.
 
 Some commands, for example *p()* (print), no longer print output in
 the Python REPL because their effects are now visible in the display window.
@@ -332,9 +343,13 @@ window size to 12 lines and also expand the REPL scrolling region, type
 the *edsel* function call *win(12)* in the REPL.  To resume editing,
 type the function call *pm()*.
 
-In *pmacs* you can edit several files in different buffers just as you would
-in Emacs,  but at this time there  is only one display window. We plan to
-support multiple windows in the future.
+In *pmacs* you can edit several files in different buffers just as you
+would in Emacs.   
+You can have multiple windows on the display in a
+vertical stack, showing different locations in the same buffer, or
+different buffers.
+At this time you can only have two windows, because more are not useful
+in the small terminal we have available.
 
 To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
 dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
@@ -398,15 +413,26 @@ erroneous module.
 
 First, look at the display and try to read any traceback messages or other
 useful information.   Then, find the Python REPL prompt and type the function
-call *refresh()*.  The display restores and you can resume work. You can try
-to restart *pmacs* by typing the function call *pm()* and  try to avoid using
-the erroneous commmand.   If that fails, you can return to the Python prompt
-by typing *M-x*, and start a simpler editor that does not import the erroneous
-code.  Type *dm()* to run *dmacs* which does not provide inline editing, or
-just type the many *edsel* commands at  the REPL -- they do not use keycodes.
-You can even revert to *sked* which does not update the display at all.
+call *refresh()*.  The display restores and you can resume work.   
+
+ You may find that, after a crash, the terminal does not echo the commands
+you type at the REPL prompt.  In that case, try typing the *tl()* command
+(which you will not see, of course) to restore the terminal.  Then
+try *refresh()* etc.
+ 
+The *refresh()* command only refreshes the focus window, so you may have
+to  use the *on()* command to move to another window and refresh that
+one also.
+
+You can try to restart *pmacs* by typing the function call *pm()* and
+try to avoid using the erroneous commmand.   If that fails, you can
+return to the Python prompt by typing *M-x*, and start a simpler editor
+that does not import the erroneous code.  Type *dm()* to run *dmacs*
+which does not provide inline editing, or just type the many *edsel*
+commands at  the REPL -- they do not use keycodes. You can even revert
+to *sked* which does not update the display at all.
 
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Oct 2023
+Revised Jan 2024

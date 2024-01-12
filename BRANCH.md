@@ -1,7 +1,6 @@
 
 branches
 ========
-
 This is the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
@@ -9,6 +8,15 @@ here in the *rewrite* branch and its branches, to shorten and simplify
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 12 Jan 2024: Finish work on the editors for now.  Merge *ed* branch
+  back into *rewrite* branch.
+
+- 11 Jan 2024: Multiple windows working in edsel, dmacs, and pmacs.
+  Merge *window* branch back into *ed* branch.
+
+- 21 Oct 2023: Make *window* branch to *ed* branch.  Add multiple windows
+  to *pmacs* editor.
 
 - 21 Oct 2023: Merge *ed* branch back into *rewrite* branch.  However, 
   work continues in the *ed* branch and its branches.

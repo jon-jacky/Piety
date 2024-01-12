@@ -8,15 +8,19 @@ import string, re
 import key, display
 import terminal, keyseq # only needed by test 
 
-# Define and initialize global variables used by editline.
-# Conditinally exec only the *first* time this module is imported in a session.
+# Define and initialize global variables used by editline,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
-# Must use EDPATH because PYTHONPATH only works for import, not open()
-EDPATH = '/Users/jon/Piety/editors/' # FIXME? assign via env var or cmd line?
 try:
-    _ = point # if point is already defined, editlineinit was already exec'd
+    _ = point # if point is already defined, editline was already imported
 except:
-    exec(open(EDPATH + 'editlineinit.py').read())
+    # line = str() # string being edited # NOW THIS IS A PASSED PARAMETER
+    point = 0 # index into line (above), string being edited
+    killed = str() # saved killed (cut) words, can be restored with yank (paste)
+    start_col = 0    # default, no prompt or other chars at left margin
+    # start_col = 2  # when prompt is '> ' for example
+    n_spaces = 4 # Used by tab.
+    prev_cmd = None # some functons behave differently when repeated
 
 # used in main editing loop
 printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
@@ -118,7 +122,10 @@ def kill_word(line):
         killed = (killed + killed_word if prev_cmd in kill_cmds
                        else killed_word)
         line = line[:point] + line[m.start( )+1:]
-        display.delete_nchars(point - (m.start()+1))
+        # The following commented-out line works on Mac but not ChromeBook
+        # It seems Mac term tolerates negative argument but CB Term does not.
+        # display.delete_nchars(point - (m.start()+1)) # FIXME? args reversed?
+        display.delete_nchars((m.start()+1) - point) 
     return line
 
 def kill_line(line):
