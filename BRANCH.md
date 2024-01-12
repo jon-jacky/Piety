@@ -11,6 +11,9 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
+- 11 Jan 2024: Multiple windows working in edsel, dmacs, and pmacs.
+  Merge *window* branch back into *ed* branch.
+
 - 21 Oct 2023: Make *window* branch to *ed* branch.  Add multiple windows
   to *pmacs* editor.
 
