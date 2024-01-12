@@ -14,15 +14,14 @@ No main program!  Editor commands are just functions defined here, to
 call from the Python REPL.
 
 Global variables used by these functions are defined and initialized
-in skedinit.py, which must be executed before calling any of the
-functions here.
-The way skedinit is executed (not imported) makes it possible to 
+in the except block in the try...except... at the beginning of the module,
+which must be executed before calling any of the functions here.
+It is only executed the first time the module is imported, not
+when it is reloaded.  This makes it possible to 
 reload the sked module while preserving work in progress (which 
-is stored in the global variables defined in skedinit).  The same
-method is used for the other editor modules, edsel and dmacs.
-EDPATH enables skedinit to be executed when sked is run from any 
-directory.  Note that EDPATH is hard-coded and will have to be edited
-to work on other sytems than mine.
+is stored in the global variables initialized in the except block).  The same
+method is used for the other editor modules, edsel, dmacs, pmacs
+and editline.  
 
 This module produces no display output, except print statements that
 print to the Python REPL.  However, many functions here include optional
@@ -78,10 +77,9 @@ depend on sked, to their own separate module titled 'frame'.
 
 This could make for a nicer modular structure where the dependencies
 are clearer.   But it also proliferates modules and makes code more verbose
-because edsel would need to put the 'frame.' prefix all over.
+because edsel would need to put the 'frame.' prefix all over.  
 
-Before attempting this, let's try adding multiple windows and see if these
-too could be provided in a sked-less frame module.
+So we decided against separating out a 'frame' module.
 
 ### dmacs ###
 
@@ -154,4 +152,5 @@ editor.
 The *pmacs* *yank* function also handles both modes, but the logic there
 is simple.
 
-Revised Oct 2023
+Revised Jan 2024
+

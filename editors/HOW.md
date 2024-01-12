@@ -68,14 +68,17 @@ modules, since this would proliferate modules and also make the code
 more verbose by requiring the functions to qualify each data item
 with its module name.
 
-Our solution is to put each module's data definitions into a separate file
-and code the module to execute that file's contents using Python *exec*, 
-but only the *first* time the module is imported into the Python session.
-In this way, the data can belong to the same module as the functions,
-but reloading the module does not re-initialize the data.
-For an example, see how the *sked* module conditionally *exec*'s the 
-code in the file *skedinit.py*.
-
+Our solution was to put a *try ... except ...* block at the beginning
+of each module.   The *try* block contains a single statement that 
+reads one of the variables in the module.  This statement succeeds
+every time the module is reloaded, but it fails the first time the
+module is imported.  Only that one time, the *except* block is executed.
+It initializes all the module-level variables in the module -- just that once.
+After that, the module can be reloaded any number of times without
+re-initializing any module-level variables.
+For example, see the *try ... except ...* block at the beginning 
+of the *sked* module.
+ 
 ### Modules and dictionaries instead of classes and objects ###
 
 Reloading a class into a running Python session is not
@@ -135,4 +138,47 @@ each function as its first argument.  This would be quite like the
 *self* argument in Python methods.  We rejected this alternative because
 it would make the code more verbose.
 
-Revised Oct 2023
+
+## Brevity: short function names, default arguments, global variables ###
+
+We often work at the Python REPL, so we try to make this as easy as
+possible.  We try to minimize typing effort. To achieve
+this, we sometimes employ programming practices that are usually
+considered poor style.
+
+At the Python REPL, commands are function calls.  So we use short function
+names.  The names of the functions in the *sked* editor that are editing
+commands are just single characters.  We use the same single-character 
+command names in *sked* as are used in the classic Unix editor *ed*.
+
+To further shorten function calls, we minimize the need to type function
+arguments by providing optional arguments with helpful default values.
+
+The helpful defaults are  context-dependent, so they can't be hard-coded
+in the function definitions. Instead, we code each optional argument in
+the form *arg=None*, so it can be omitted in function calls.  The body
+of the function contains a  statement of the form *if not arg: arg =
+default*  where *default* is a global variable that is updated while the
+program executes, to provide the most helpful default value at each time.
+If that argument is omitted from the function call, the default 
+argument is used.  Or, you may provide a value for the argument to 
+use instead of the default.
+
+For example, the default for the location where text is inserted,
+deleted, or changed, is updated by each editing operation to be the
+location where the most recent change was made.  The default text string
+to search for or replace is the same string as was last searched for or 
+replaced.  The default buffer to change to is the buffer that was most
+recently visited.
+
+To eliminate more function arguments, function bodies use global
+variables instead.   This works perfectly well when the same global 
+variable is always used by the function, so there is no need to pass 
+an argument.  We also use a global variable where the same variable value
+is used for many consecutive function calls.  In that case it is easier
+to reassign the global variable from time to time, than it is to pass an
+argument to every function call.   The variable *buffer* in the *sked*
+module is an example.
+
+Revised Jan 2024
+
