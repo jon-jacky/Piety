@@ -1,13 +1,16 @@
 
 branches
 ========
-This is the *rewrite* branch.
+This is the *tasks* branch off the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 12 Jan 2024: Begin *tasks* branch off *rewrite* brnach for experiments 
+  with tasks and  concurrency.
 
 - 12 Jan 2024: Finish work on the editors for now.  Merge *ed* branch
   back into *rewrite* branch.
