@@ -528,3 +528,22 @@ def clr():
     display.set_scroll(1, tlines)
     restore_cursor_to_cmdline() # set_scroll leaves cursor on line 1
 
+# Display *and* update functions for tasking experiments
+
+def write(line):
+    """
+    Append line to end of buffer *and* display updated buffer.
+    line is a string that does *not* end with \n, this write() adds it.
+    """
+    # FIXME?  Test that current buffer is in focus window?  Always True?
+    ed.buffer.append(line + '\n')
+    ed.dot = ed.S()  # last line in buffer, which we just added.
+    if in_window(ed.dot):
+        display.put_cursor(wline(ed.dot), 1)
+        display.putstr(line[:tcols])
+        # display.next_line() # makes extra newline
+        # FIXME?  put_marker(ed.dot, display.white_bg)
+        restore_cursor_to_cmdline()
+    else:
+        recenter()
+
