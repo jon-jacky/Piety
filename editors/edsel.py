@@ -528,14 +528,24 @@ def clr():
     display.set_scroll(1, tlines)
     restore_cursor_to_cmdline() # set_scroll leaves cursor on line 1
 
-# Display *and* update functions for tasking experiments
+
+# Functions for tasking experiments
+
+# A function named 'write' is magic: it can be invoked by any
+# print statment or it can be the target of output redirection.
+#
+# A print function call with the 
+# optional argument file=edsel passes its first argument to the 
+# edsel write function:
+#   print(..., file=edsel) 
+# Or, you can redirect output from any statement to the edsel write function:
+#   with redirect_stdout(edsel) as <destination>: <statement> 
 
 def write(line):
     """
-    Append line to end of buffer *and* display updated buffer.
-    line is a string that does *not* end with \n, this write() adds it.
+    Append line to end of current buffer and display updated buffer.
+    line is a string that does not end with \n, this write() adds it.
     """
-    # FIXME?  Test that current buffer is in focus window?  Always True?
     ed.buffer.append(line + '\n')
     ed.dot = ed.S()  # last line in buffer, which we just added.
     if in_window(ed.dot):
