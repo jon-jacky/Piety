@@ -531,15 +531,20 @@ def clr():
 
 # Functions for tasking experiments
 
-# A function named 'write' is magic: it can be invoked by any
-# print statment or it can be the target of output redirection.
-#
-# A print function call with the 
-# optional argument file=edsel passes its first argument to the 
-# edsel write function:
+# The write function here appends its argument to the sked text buffer
+# and updates the edsel focus window to show the new buffer contents.
+
+# Any Python function named 'write' is magic: it can be invoked by any
+# print statement or it can be the target of output redirection.
+
+# A print function call with the optional argument file=edsel causes print 
+# to pass its first argument to the edsel write function, to update the sked 
+# text buffer and the edsel focus window:
 #   print(..., file=edsel) 
-# Or, you can redirect output from any statement to the edsel write function:
-#   with redirect_stdout(edsel) as <destination>: <statement> 
+
+# Or, you can redirect output from any code block to the edsel write function,
+# so that code can update the sked text buffer and the edsel focus window:
+#   with redirect_stdout(edsel) as <destination>: <code block> 
 
 def write(line):
     """
