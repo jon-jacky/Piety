@@ -202,11 +202,13 @@ def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
 def display_restore_buffer(bname):
     'Display effect of ed restore_buffer function, fill entire window'
     ed.restore_buffer(bname)
+    save_window_bufinfo()
     recenter()
 
 def display_e(iline):
     'Display effect of ed e(dit) fcn: display new buffer contents around iline'
     ed.dot = iline
+    save_window_bufinfo()
     recenter()
 
 def display_set_saved(status):
@@ -440,12 +442,20 @@ def save_window(wkey):
                       'bufname': ed.bufname, 'dot': ed.dot } # current buffer
     ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
 
+def save_window_bufinfo():
+   """
+   Update focus window bufname and dot in saved windows.
+   Entry for focus window must already exist in saved windows.
+   """
+   windows[focus]['bufname'] = ed.bufname
+   windows[focus]['dot'] = ed.dot
+
 def restore_window(wkey):
     """
     Restore saved window items at wkey to the focus window.
     If window uses a different buffer, restore that buffer too.
     """
-    global focus, wintop, wheight, buftop # but not bufname, dot, they are in ed
+    global focus, wintop, wheight, buftop # but not bufname, dot, they're in ed.
     # default values for missing keys are just the current values
     focus = wkey
     wintop = windows[wkey].get('wintop', wintop)
@@ -548,7 +558,7 @@ def clr():
 
 def write(line):
     """
-    Append line to end of current buffer and display updated buffer.
+    Append line to end of current buffer and display updated buffer in focus win
     line is a string that does not end with \n, this write() adds it.
     """
     ed.buffer.append(line + '\n')
@@ -561,4 +571,47 @@ def write(line):
         restore_cursor_to_cmdline()
     else:
         recenter()
+
+def writebuf(bname, line):
+    """
+    Write to a buffer that might not be the current buffer.
+    If the named buffer is present in saved buffers, append line to its end.
+    If the named buffer is visible in the focus window, update that window
+    line is a string that does not end with \n, this function adds it.
+    """
+    if bname in ed.buffers:
+        # bname may not be ed.bname, named buffer may not be current buffer
+        ed.buffers[bname]['buffer'].append(line + '\n')
+        ed.buffers[bname]['dot'] = len(ed.buffers[bname]['buffer'])-1
+        # Current buffer text lines are the same as text lines in saved buffers
+        # BUT current buffer dot might not be the same, so must assign here
+        if bname == ed.bufname: ed.dot = ed.S()
+        # If the named buffer is visible in the focus window, update that window
+        # Focus window dot might not be at the end of the buffer
+        if bname == ed.bufname: # name of current buffer
+            if in_window(ed.dot): # assumes focus window shows current buffer
+                display.put_cursor(wline(ed.dot), 1)
+                display.putstr(line[:tcols])
+                restore_cursor_to_cmdline()
+            else:
+                recenter()
+
+def writebuf_show(bname, line):
+    """
+    Call writebuf to update buffer bname with line.
+    If buffer bname is in focus window, called writebuf will display it.
+    If buffer bname is in a window that is not the focus window, first make
+     that the focus window, then call writebuf to update buffer and display it.
+    If buffer bname is not in a window on the display, writebuf will update
+     it but not display it.
+    If buffer bname is not in buffers, writebuf does not attempt to update it.
+    """
+    wk = -1  # can't be a window key
+    # search for key of window that shows buffer bname
+    for wk in windows: # wk is integer window key
+        if windows[wk]['bufname'] == bname:
+            break
+    if wk in wkeys and wk != focus:  # if not found, wk is still -1
+        restore_window(wk)
+    writebuf(bname, line)
 

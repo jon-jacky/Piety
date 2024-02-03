@@ -20,7 +20,7 @@ def timer(n=1, delay=1.0, label=''):
     for i in range(n):
         time.sleep(delay)
         # For now use print with default args, which adds the \n itself.
-        print(f'{label} {i+1} {datetime.datetime.now()}') # \n\r', end='')
+        print(f'{label} {i+1} {datetime.datetime.now()}')
 
 # Threads that call timer 3 times, after 5 sec delay, with given label A or B
 ta = Thread(target=timer,args=(3,5,'A'))

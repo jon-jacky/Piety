@@ -159,6 +159,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     bufname = bname(filename) # creates new buffer if e() on same file
     saved = True # put this *before* move_dot for display code
     move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
+    save_buffer() # the new current buffer is also in the saved buffers
     print(f'{filename}, {S()} lines\n\r', end='')
 
 def w(fname=None, set_saved=set_saved): # Hook for display code
