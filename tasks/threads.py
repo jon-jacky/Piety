@@ -89,4 +89,43 @@ ptb = Thread(target=ptimer,args=(3,5,'B'))
 #
 # >>> ptb.start()
 # >>> pta.start()
+#
+# We created Writer objects (see edsel) by 
+#
+# >>> a = Writer('a.txt')
+# >>> b = Writer('b.txt')
+#
+# We find that these do not interleave:
+#
+# >>> with redirect_stdout(a) as buf: pta.start()
+# >>> with redirect_stdout(b) as buf: ptb.start()
+#
+# The preceding code nests the thread inside the redirect.  
+# We also tried nesting the redirect inside the thread:
 
+def fta():
+    with redirect_stdio(a) as buf: timer(10,5,'A')
+
+def ftb():
+    with redirect_stdio(b) as buf: timer(10,5,'B')
+
+# Then these interleave, but output is not always printed 
+# to intended destinations:
+#
+# >>> Thread(target=fta).start() 
+# >>> Thread(target=ftb).start() 
+# 
+# Indeed, official docs say this doesn't work:
+#
+# From https://docs.python.org/3/library/contextlib.html
+#
+# "contextlib.redirect_stdout(new_target)
+# Context manager for temporarily redirecting sys.stdout to another file
+# or file-like object. ...
+#
+# Note that the global side effect on sys.stdout means that this context
+# manager is not suitable for use in library code and most threaded
+# applications. It also has no effect on the output of subprocesses.
+# However, it is still a useful approach for many utility scripts."
+
+ 

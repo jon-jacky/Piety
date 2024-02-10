@@ -561,41 +561,43 @@ def write(line):
     Append line to end of current buffer and display updated buffer in focus win
     line is a string that does not end with \n, this write() adds it.
     """
-    ed.buffer.append(line + '\n')
-    ed.dot = ed.S()  # last line in buffer, which we just added.
-    if in_window(ed.dot):
-        display.put_cursor(wline(ed.dot), 1)
-        display.putstr(line[:tcols])
-        # display.next_line() # makes extra newline
-        # FIXME?  put_marker(ed.dot, display.white_bg)
-        restore_cursor_to_cmdline()
-    else:
-        recenter()
+    if line != '\n': # redirect_stdout and file=... always append extra \n line
+        ed.buffer.append(line + '\n')
+        ed.dot = ed.S()  # last line in buffer, which we just added.
+        if in_window(ed.dot):
+            display.put_cursor(wline(ed.dot), 1)
+            display.putstr(line[:tcols])
+            # display.next_line() # makes extra newline
+            # FIXME?  put_marker(ed.dot, display.white_bg)
+            restore_cursor_to_cmdline()
+        else:
+            recenter()
 
 def writebuf(bname, line):
     """
     Write to a buffer that might not be the current buffer.
     If the named buffer is present in saved buffers, append line to its end.
-    If the named buffer is visible in the focus window, update that window
+    If the named buffer is visible in the focus window, update that window.
     line is a string that does not end with \n, this function adds it.
     """
-    if bname in ed.buffers:
-        # bname may not be ed.bname, named buffer may not be current buffer
-        ed.buffers[bname]['buffer'].append(line + '\n')
-        ed.buffers[bname]['dot'] = len(ed.buffers[bname]['buffer'])-1
-        # Current buffer text lines are the same as text lines in saved buffers
-        # BUT current buffer dot might not be the same, so must assign here
-        if bname == ed.bufname: ed.dot = ed.S()
-        # If the named buffer is visible in the focus window, update that window
-        # Focus window dot might not be at the end of the buffer
-        if bname == ed.bufname: # name of current buffer
-            if in_window(ed.dot): # assumes focus window shows current buffer
-                display.put_cursor(wline(ed.dot), 1)
-                display.putstr(line[:tcols])
-                restore_cursor_to_cmdline()
-            else:
-                recenter()
-
+    if line != '\n': # redirect_stdout and file=... always append extra \n line
+        if bname in ed.buffers:
+            # bname may not be ed.bufname, named buffer may not be current buffer
+            ed.buffers[bname]['buffer'].append(line + '\n')
+            ed.buffers[bname]['dot'] = len(ed.buffers[bname]['buffer'])-1
+            # Current buffer text lines are the same as text lines in saved buffers
+            # BUT current buffer dot might not be the same, so must assign here
+            if bname == ed.bufname: ed.dot = ed.S()
+            # If the named buffer is visible in the focus window, update that window
+            # Focus window dot might not be at the end of the buffer
+            if bname == ed.bufname: # name of current buffer
+                if in_window(ed.dot): # assumes focus window shows current buffer
+                    display.put_cursor(wline(ed.dot), 1)
+                    display.putstr(line[:tcols])
+                    restore_cursor_to_cmdline()
+                else:
+                    recenter()
+    
 def writebuf_show(bname, line):
     """
     Call writebuf to update buffer bname with line.
@@ -614,4 +616,13 @@ def writebuf_show(bname, line):
     if wk in wkeys and wk != focus:  # if not found, wk is still -1
         restore_window(wk)
     writebuf(bname, line)
+
+class Writer():
+    """
+    Provide a method named write so we can redirect output to the named buffer.
+    Our buffers are just dicts not objects so they have no write method.
+    To use:  a = Writer('a.txt')  then: with redirect_stdout(a) as buf: ...
+    """
+    def __init__(self, bufname): self.bufname = bufname
+    def write(self, line): writebuf(self.bufname, line)
 
