@@ -621,8 +621,9 @@ class Writer():
     """
     Provide a method named write so we can redirect output to the named buffer.
     Our buffers are just dicts not objects so they have no write method.
-    To use:  a = Writer('a.txt')  then: with redirect_stdout(a) as buf: ...
+    Usage:  abuf = Writer('a.txt')  then: with redirect_stdout(abud) as buf: ...
+    Recall that a is the name of the sked/edsel append fucn, can't use a = ..
     """
     def __init__(self, bufname): self.bufname = bufname
-    def write(self, line): writebuf(self.bufname, line)
+    def write(self, line): writebuf_show(self.bufname, line)
 
