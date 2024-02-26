@@ -1,0 +1,53 @@
+writer.txt
+
+Notes on writer.py, which provides functions that put text into sked
+buffers and edsel windows, intended to be called from background tasks.
+
+Any Python function named 'write' is magic: it can be invoked by any
+print statement or it can be the target of output redirection.
+
+The write function defined here in the writer module updates the sked
+current buffer and the edsel focus window.
+
+You do not invoke the write function explicitly.  Instead, you specify
+the object (module or class instance) that cotains the write function 
+(or method).
+
+For example, a print function call with the optional argument
+file=writer sends the print output to the writer module, which invokes its
+write function to update the sked current buffer and the edsel
+focus window:
+
+  print(..., file=writer) 
+
+Or, you can redirect output from any code block to the writer module,
+so its write function can update the sked current buffer and the edsel focus window.
+For example:
+
+  with redirect_stdout(writer) as buf: print('...')
+
+Sometimes we want to update a sked buffer other than the current buffer.
+The writer module write method can't do that.  For that, we need an
+object with a write method that writes to the intended buffer.   The 
+buffers themselves are just dictionaries, not class instances, so they
+don't have write methods.  Instead, the writer module defines a Writer 
+class.  
+
+We create an instance of the Writer class for each buffer where we want
+to send output.   For example, to send output to the buffer named a.txt
+we create abuf:
+
+  abuf = Writer('a.txt')
+
+The abuf object contains a write method that writes output to a.txt.
+To print to a.txt:
+
+  print('...', file=abuf)
+
+To redirect output to a.txt:
+
+  with redirect_stdout(abuf) as buf: print('...')
+
+
+Revised Feb 2024
+   

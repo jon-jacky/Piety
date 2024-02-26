@@ -1,0 +1,194 @@
+threads.txt
+
+Notes on experiments with Python threading using the functions in timers.py.
+
+The name of the timers module is plural, but the name of
+its timer function is singular.   So we can say 'from timers import 
+timer' then 'reload timers' without a name clash.
+
+These experiments were run in a session with the pmacs editor,
+displaying one or two windows into buffers, with a scrolling Python
+REPL in several lines at the bottom of the terminal.
+
+The timer function repeats printing a timestamp message, with a given
+delay between messages.  It has this signature:
+
+def timer(n=1, delay=1.0, label=''): ...
+ 
+Example in the REPL without threading:
+
+>>> from timers import timer
+
+>>> timer()
+ 1 2024-01-12 21:06:40.986959
+
+The optional label argument can distinguish messages from different threads.
+ 
+>>> timer(3,1,'A')
+A 1 2024-01-12 21:06:51.511963
+A 2 2024-01-12 21:06:52.514235
+A 3 2024-01-12 21:06:53.516400
+
+You might want to print the messages to an editor buffer instead of the
+REPL. The writer module contains a write function that appends a string
+to the editor current buffer and displays the buffer in the focus
+window. To print the messages in the focus window, use redirect_stdout:
+
+>>> from contextlib import redirect_stdout
+
+>>> with redirect_stdout(writer) as buf: timer(3,1,'A') 
+
+(messages appear in focus window)
+  
+Now let's make two threads that execute concurrently,  printing
+alternating lines of output. In this example ta and tb are threads that
+call timer 3 times, after 5 sec delay, with given label A or B
+
+>>> from threading import Thread
+
+Create the thread objects but don't start them:
+
+>>> ta = Thread(target=timer,args=(3,5,'A'))
+>>> tb = Thread(target=timer,args=(3,5,'B'))
+ 
+To interleave printing messages in the scrolling REPL type these
+commands at the REPL prompt. Use the Thread start() method to run them
+in the background.
+  
+>>> ta.start()
+>>> tb.start()
+>>> A 1 2024-01-12 22:12:14.708146
+B 1 2024-01-12 22:12:17.277168
+A 2 2024-01-12 22:12:19.714243
+B 2 2024-01-12 22:12:22.283257
+A 3 2024-01-12 22:12:24.719974
+B 3 2024-01-12 22:12:27.289073
+
+We pass the long 5 sec delay to the timers here to give us time to type
+both start commands before messages start to appear in the REPL.
+ 
+You can only call start() on a thread once.  To run the threads again,
+you have to make new thread objects by repeating the ta = ... call etc.
+
+Alternatively, you don't have to first create a thread object 
+at all, you can just create and start a thread in one statement:
+
+>>> Thread(target=timer,args=(3,5,'A')).start()
+>>> Thread(target=timer,args=(3,5,'B')).start()
+...
+... messages interleave
+...
+
+Be sure to use the Thread start method, not the run method.
+Apparently the thread run() method runs the thread in the foreground and
+blocks the REPL until the thread exits.  The thread start() method runs
+the thread in the background and returns to the REPL right away.
+
+Unfortunately redirect_stdout does not work with threads, so
+we can't use it to print interleaving messages in an editor buffer.
+(We did some experiments that confirmed this.)
+ 
+From https://docs.python.org/3/library/contextlib.html:
+
+"contextlib.redirect_stdout(new_target)
+Context manager for temporarily redirecting sys.stdout to another file
+or file-like object. ...
+
+Note that the global side effect on sys.stdout means that this context
+manager is not suitable for use in library code and most threaded
+applications. It also has no effect on the output of subprocesses.
+
+However, it is still a useful approach for many utility scripts."
+
+We can't use redirect_stdout with threads, but we can still write
+code that sends output from different threads to different destinations.
+
+The ptimer function has a destination keyword argument that can be used
+to send its timestamp messages to any editor buffer, not just the
+current buffer. Its signature is:
+
+def ptimer(n=1, delay=1.0, label='', destination=sys.stdout): ...
+
+The default destination argument sends the messages to the REPL.
+
+To send messages to a different buffer, we must create an instance of 
+the Writer class from the writer module to collect and forward the messages
+(see writer.txt for more explanation).
+  
+>>> from writer import Writer
+
+>>> abuf = Writer('a.txt')
+
+Create a buffer a.txt in the focus window. Then to send the messages to
+a.txt without threading:
+
+>>> ptimer(3,5,'A',abuf)
+
+(a.txt updates in focus window)
+
+To send messages from two threads to a.txt, showing alternating messages,
+show a.txt in the focus window and type these commands:
+
+>>> Thread(target=ptimer,args=(5,10,'A', abuf)).start()
+>>> Thread(target=ptimer,args=(5,10,'B', abuf)).start()
+
+(A and B messages alternate in a.txt)
+
+We give ourselves a long 10 second delay so we can type the second
+Thread command before messages start appearing.   During that 
+delay, press the up-arrow key to restore the previous Thread command
+and use the inline REPL editor to change the A to B, then type
+return to start the second thread.
+
+We can update different windows from different threads.  Create 
+a buffer b.txt and show windows for both a.txt and b.txt.  Create
+a Writer for b.txt:
+
+>>> bbuf = Writer('b.txt')
+
+Then issue these two commands. Note the second command prints to bbuf:
+
+>>> Thread(target=ptimer,args=(5,10,'A', abuf)).start()
+>>> Thread(target=ptimer,args=(5,10,'B', bbuf)).start()
+
+We can try shorter delays to see if the display can keep up without
+getting scrambled.   
+
+With the present version of the pmacs editor, It is
+not possible to type commands while the display is updating rapidly
+because the cursor in the REPL keeps getting reset to the first column.
+
+However, we can work around that.  We can type commands that edit
+one window at a time from a single thread, then retrieve those same commands to update 
+update two windows from two threads.  
+
+First type this command, which writes 100 messages to a.txt in 10 seconds:
+
+>>> Thread(target=ptimer,args=(100,0.1,'A', abuf)).start()
+
+Then, after all the messages are printed, type this command, which does
+the same in b.txt:
+
+>>> Thread(target=ptimer, args=(100,0.1,'B',bbuf)).start()
+
+After all those messages are printed, retrieve the first command (for
+the a.txt buffer) by typing up-arrow in the REPL, then press RETURN to
+run it.  While it is running, press the up-arrow again to retrieve the
+command for b.txt, then type RETURN to run that.   Both buffers update
+ in two windows.
+
+With the 0.1 sec delay, both buffers update in two windows and no text
+is scrambled.  Also, the window status lines update and messages about
+changing the current buffer appear in the REPL -- that text  is not
+scrambled either.   We did not code any explicit synchronization between
+the threads and the pmacs editor, so it appears that the Python
+threading mechanism itself must allow each thread to always finish
+printing a complete line before it switches to another thread.
+
+The function threading.enumerate() lists the active threads.
+
+There is no simple way to kill a thread in Python.  The thread has
+to be coded in a particular way to make this possible.
+
+Revised Feb 2024
+
