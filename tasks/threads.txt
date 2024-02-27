@@ -1,6 +1,7 @@
 threads.txt
 
-Notes on experiments with Python threading using the functions in timers.py.
+Notes on experiments with Python threading using the functions in
+timers.py and writer.py
 
 The name of the timers module is plural, but the name of
 its timer function is singular.   So we can say 'from timers import 
@@ -158,9 +159,9 @@ With the present version of the pmacs editor, It is
 not possible to type commands while the display is updating rapidly
 because the cursor in the REPL keeps getting reset to the first column.
 
-However, we can work around that.  We can type commands that edit
-one window at a time from a single thread, then retrieve those same commands to update 
-update two windows from two threads.  
+However, we can work around that.  We can type commands that edit one
+window at a time from a single thread, then retrieve those same commands
+to update two windows from two threads.
 
 First type this command, which writes 100 messages to a.txt in 10 seconds:
 
