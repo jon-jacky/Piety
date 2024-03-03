@@ -28,6 +28,7 @@ space = ' '
 bel = '\a'   # bell, ^G
 bs  = '\b'   # backspace, ^H
 cr  = '\r'   # carriage return, ^M
+lf = '\n'    # line feed, ^J
 htab = '\t'  # horizontal tab, ^I
 
 delete = '\x7F' # del is a python keyword, ^?

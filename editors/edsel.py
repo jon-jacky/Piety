@@ -201,7 +201,7 @@ def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
 
 def display_restore_buffer(bname):
     'Display effect of ed restore_buffer function, fill entire window'
-    ed.restore_buffer(bname)
+    ed.restore_buffer(bname, print_nothing)
     save_window_bufinfo()
     recenter()
 
@@ -466,7 +466,7 @@ def restore_window(wkey):
     # But scratch.txt is always in buffers. 
     bufname = bufname if bufname in ed.buffers else 'scratch.txt'
     ed.prev_bufname = ed.bufname
-    ed.restore_buffer(bufname) # assign global bufname, buffer, dot etc.
+    ed.restore_buffer(bufname, print_nothing) # assign global bufname etc.
     if bufname != 'scratch.txt':
         ed.dot = windows[wkey].get('dot', ed.dot)
  

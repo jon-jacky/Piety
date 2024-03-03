@@ -15,11 +15,11 @@ try:
     _ = point # if point is already defined, editline was already imported
 except:
     # line = str() # string being edited # NOW THIS IS A PASSED PARAMETER
-    point = 0 # index into line (above), string being edited
-    killed = str() # saved killed (cut) words, can be restored with yank (paste)
-    start_col = 0    # default, no prompt or other chars at left margin
+    point = 0 # index into line (above) # PASSED PARAMETER, we can pass this one
+    start_col = 0  # PASSED PARAM default 0, no prompt or etc. at left margin
     # start_col = 2  # when prompt is '> ' for example
     n_spaces = 4 # Used by tab.
+    killed = str() # saved killed (cut) words, can be restored with yank (paste)
     prev_cmd = None # some functons behave differently when repeated
 
 # used in main editing loop
@@ -29,87 +29,88 @@ printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 start_word = re.compile(r'\W\w') # Non-word char then word char
 end_word = re.compile(r'\w\W') # Word char then non-word char
 
-# Functions that move point but do not change line contents
+# Function that updates line and point but does not appear in keymap table
 
-def move_to_point(line):
+def insert_char(keycode, line, point):
+    line = (line[:point] + keycode + line[point:])
+    point += 1
+    display.insert_char(keycode)
+    return line, point
+ 
+# Helper function, does not appear in keymap table
+# Updates display but does not update any variables so it does not return any.
+ 
+def move_to_point(point, start_col):
     # start_col accounts for prompt or other chars in left margin
     # move_to_column and start_col are 1-based but point is 0-based
     display.move_to_column(start_col + point + 1) # point is zero based
-    return line # not changed here but runcmd requires this
 
-def move_beginning(line):
-    global point
+# Functions that appear in the keymap table must all have the same arguments
+# and the same returned variables, even though many do not use all of them.
+ 
+# Functions that appear in keymap table
+# that move point but do not change line contents
+# We still must pass and return line because these appear in keymap table
+
+def move_beginning(line, point, start_col):
     point = 0
-    move_to_point(line)
-    return line # not changed here but runcmd requires this
+    move_to_point(point, start_col)
+    return line, point
 
-def move_end(line):
-    global point
+def move_end(line, point, start_col):
     point = len(line.rstrip('\n')) # stop short of any final \n
-    move_to_point(line)
-    return line # not changed here but runcmd requires this
+    move_to_point(point, start_col)
+    return line, point
 
-def backward_char(line):
-    global point
+def backward_char(line, point, start_col):
     if point > 0:
         point -= 1
         display.backward_char()
-    return line # not changed here but runcmd requires this
+    return line, point
 
-def forward_char(line):
-    global point
+def forward_char(line, point, start_col):
     if point < len(line) and line[point] != '\n':
         point += 1
         display.forward_char()
-    return line # not changed here but runcmd requires this
+    return line, point
 
-def forward_word(line):
+def forward_word(line, point, start_col):
     """
     Move to next non-word. char (space or punctuation) after word.
     FIXME? Does not move over last word to end of line, must use move_end.
     """
-    global point
     m = end_word.search(line, point)
     if m:
         point = m.end() - 1 # space after word is end() of end_word pattern
-        move_to_point(line)
-    return line # not changed here but runcmd requires this
+        move_to_point(point, start_col) 
+    return line, point
 
-def backward_word(line):
+def backward_word(line, point, start_col):
     """
     Move back to first char in preceding word (or this word).
     FIXME? Does not move over first word to start of line, use move_beginning.
     """
-    global point
     m = end_word.search(line[point-1::-1],1) # search reversed str from point
     if m:
         point = point - m.start() - 1
-        move_to_point(line)
-    return line # not changed here but runcmd requires this
+        move_to_point(point, start_col)
+    return line, point
 
-# Functions that change line contents
+# Functions that appear in keymap table and change line contents
 
-def insert_char(keycode, line):
-    global point
-    line = (line[:point] + keycode + line[point:])
-    point += 1
-    display.insert_char(keycode)
-    return line
-
-def delete_backward_char(line):
-    global point
+def delete_backward_char(line, point, start_col):
     if point > 0:
         line = (line[:point-1] + line[point:]) 
         point -= 1
         display.delete_backward_char()
-    return line
+    return line, point
 
-def delete_char(line):
+def delete_char(line, point, start_col):
     line = (line[:point] + line[point+1:])
     display.delete_char() # point does not change
-    return line
+    return line, point
 
-def kill_word(line):
+def kill_word(line, point, start_col):
     """
     Delete word, save in killed buffer.
     Repeat kill_word to save consecutive words in killed buffer.
@@ -126,9 +127,9 @@ def kill_word(line):
         # It seems Mac term tolerates negative argument but CB Term does not.
         # display.delete_nchars(point - (m.start()+1)) # FIXME? args reversed?
         display.delete_nchars((m.start()+1) - point) 
-    return line
+    return line, point
 
-def kill_line(line):
+def kill_line(line, point, start_col):
     """
     Delete line from point to end-of-line, save in killed buffer.
     Append killed segment to killed buffer if we are doing consecutive kills.
@@ -144,55 +145,53 @@ def kill_line(line):
     display.kill_line()
     if killed_newline:
         line = line + '\n'
-    return line
+    return line, point
 
-def discard_line(line): # name like gnu readline unix-line-discard
+def discard_line(line, point, start_col): # name like gnu readline unix-line-discard
     """
     Delete line from start-of-line to point, save in killed buffer.
     Append killed segment to killed buffer if we are doing consecutive kills.
     """
-    global point, killed
+    global killed
     killed_segment = line[:point]
     if killed_segment: # Do not overwrite killed buffer with empty segment
         killed = (killed + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[point:]
     point = 0
-    refresh(line)
-    return line
+    refresh(line, point, start_col)
+    return line, point
 
 # kill_cmds can't be defined until after we define kill_word etc.
 kill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed
 
-def yank(line):
+def yank(line, point, start_col):
     'Yank (paste) string(s) deleted by kill_word, kill_line, or discard_line'
-    global point
     line = (line[:point] + killed + line[point:])
     point += len(killed)
     display.insert_string(killed)
-    return line
+    return line, point
 
-def tab_n(n_spaces, line): # n_spaces arg is ok because tab_n is not in keymap
+def tab_n(n_spaces, line, point): # n_spaces arg ok because tab_n is not in keymap
     'Insert n spaces at point'
-    global point
     spaces = ' ' * n_spaces
     line = line[:point] + spaces + line[point:]
     point += n_spaces
     display.insert_string(spaces)
-    return line
+    return line, point
 
-def tab(line):
+def tab(line, point, start_col):
     'Insert standard number of spaces at point'
-    line = tab_n(n_spaces, line)
-    return line
+    line, point= tab_n(n_spaces, line, point)
+    return line, point
 
-def refresh(line):
+def refresh(line, point, start_col):
     'Display line and point - use after line has gotten scrambled or ...'
     display.move_to_column(start_col)
     display.putstr(line.rstrip('\n'))
     display.kill_line() # remove any leftover text past line
-    move_to_point(line)
-    return line
+    move_to_point(point, start_col)
+    return line, point
 
 keymap = {
     key.bs: delete_backward_char, # C_h
@@ -217,21 +216,21 @@ keymap = {
     key.right: forward_char,
 }
 
-def runcmd(keycode, line):
+def runcmd(keycode, line, point, start_col):
     """
     Invoke a single editline command: look up key in keymap, run that command.
     """
     global prev_cmd
     if keycode in printing_chars:
-        line = insert_char(keycode, line)
+        line, point = insert_char(keycode, line, point)
         prev_cmd = insert_char
     elif keycode in keymap:
         cmd = keymap[keycode]
-        line = cmd(line)
+        line, point = cmd(line, point, start_col)
         prev_cmd = cmd # must assign *after* calling cmd!
     else:
         display.putstr(key.bel)
-    return line
+    return line, point
 
 line = '' # for test el() below
 
@@ -241,9 +240,9 @@ def el():
     Type characters and control keys to edit inline, exit with M-x.
     Comment/uncomment lines to switch between using elglob and runcmd.
     """
-    global point, line, prev_cmd
+    global line, point, start_col, prev_cmd
     terminal.set_char_mode()
-    refresh(line)
+    refresh(line, point, start_col)
     while True:
         c = terminal.getchar()
         k = keyseq.keyseq(c)
@@ -251,7 +250,7 @@ def el():
             if k == key.M_x:
                 break
             else:
-                line = runcmd(k, line)
+                line, point = runcmd(k, line, point, start_col)
     terminal.set_line_mode()
     print() # advance to next line for Python prompt
 

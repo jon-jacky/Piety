@@ -98,7 +98,7 @@ def set_saved(status):
     global saved
     saved = status
 
-def restore_buffer(bname):
+def restore_buffer(bname, printline=print):
     'Restore state of saved buffer bname to current saved buffer'
     global bufname, filename, buffer, dot, saved
     bufname = buffers[bname].get('bufname', 'no name')
@@ -106,7 +106,7 @@ def restore_buffer(bname):
     buffer = buffers[bname].get('buffer', ['\n'])
     dot = buffers[bname].get('dot', 0)
     saved = buffers[bname].get('saved', True)
-    print(status()) # print the new buffer name
+    printline(status()) # print the new buffer name
 
 def input_line():
     'Call builtin input and return the line it gets'
@@ -180,7 +180,7 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
         set_saved(True)
         print(f'Wrote {filename}, {S()} lines\n\r', end='') # \n\r char mode
 
-def b(bname=None, restore_buffer=restore_buffer): 
+def b(bname=None, restore_buffer=restore_buffer):
     """
     b(uffer), save current buffer and restore named buffer.
     If buffer name not given, switch back to previous buffer

@@ -39,7 +39,8 @@ def open_line(keycode):
     """
     suffix = ed.buffer[ed.dot][el.point:] # including final \n
     # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-    ed.buffer[ed.dot] = el.runcmd(key.C_k, ed.buffer[ed.dot]) # prefix on dot
+    ed.buffer[ed.dot], el.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
+                                             el.point, el.start_col)
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
     if edsel.in_window(ed.dot):
@@ -64,7 +65,8 @@ def delete_backward_char(keycode):
     """
     if el.point > 0:
         # Calls el.delete_backward_char, thanks to keycode DEL key.bs
-        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) 
+        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                el.point, el.start_col) 
     else: 
         join_prev() # see above
         restore_cursor_to_window()
@@ -81,7 +83,8 @@ def delete_char(keycode):
     """
     if el.point < len(ed.buffer[ed.dot].rstrip('\n')):
         # Calls el.delete_char, thanks to keycode C_d
-        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot])
+        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                el.point, el.start_col)
     else:
         join_next() # see above
         restore_cursor_to_window()
@@ -118,7 +121,8 @@ def kill_line(keycode):
         ed.killed.remove('\n') # remove '\n' line
     # inline kill line:
     elif inline: # weaker condition, must follow previous stronger if...
-        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) # keycode C_k
+        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                el.point, el.start_col)
     # kill line that is part of a multiline sequence:
     elif not inline:
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
@@ -135,7 +139,8 @@ def yank(keycode):
     Yank entire line(s) or yank word(s) within a line, depending on inline
     """
     if inline:
-        ed.buffer[ed.dot] = el.runcmd(keycode, ed.buffer[ed.dot]) #C_k, el.yank
+        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                el.point, el.start_col)
     else:
         dmacs.runcmd(keycode) # keycode is C_y here
         restore_cursor_to_window()
@@ -178,14 +183,18 @@ def put_no_marker(bufline, attribs):
     'Assign to edsel.put_marker to suppress marker while running pmacs'
     pass
 
-def pm():
+def rpm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
+
+    rpm means 'raw pm' - this function requires terminal is already 
+    in char mode ('raw' mode) and it does not restore line mode
+    when it exits - so this rpm is the function to call from pysh,
+    our custom Python shell.  Call pm (below) from the Python >>> prompt.
     """
     global inline
     dmacs.open_promptline()
-    terminal.set_char_mode()
     clear_marker()
     edsel.put_marker = put_no_marker
     restore_cursor_to_window()
@@ -199,7 +208,8 @@ def pm():
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
                 el.prev_cmd = dmacs.prev_cmd
-                ed.buffer[ed.dot] = el.runcmd(k, ed.buffer[ed.dot])
+                ed.buffer[ed.dot], el.point = el.runcmd(k, ed.buffer[ed.dot],
+                                              el.point, el.start_col)
                 dmacs.prev_cmd = el.prev_cmd
                 # key.C_k and inline are handled in kill_line, above
                 if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
@@ -212,4 +222,19 @@ def pm():
     edsel.put_marker = saved_put_marker # initialized in except branch above
     edsel.put_marker(ed.dot, display.white_bg)
     edsel.restore_cursor_to_cmdline()
+
+
+def pm():
+    """ 
+    pmacs editor: invoke editor functions with emacs control keys.
+    Exit by typing M_x (that's alt X), like emacs 'do command'.
+
+    This function assumes terminal is in line mode.
+    It sets terminal character mode on entry and restores line mode on exit.
+    So call this function from standard Python >>> prompt.
+    Call rpm ('raw' pm) when terminal is already in char mode.
+    So call rpm from our custom pysh >> prompt.
+    """
+    terminal.set_char_mode() 
+    rpm() # raw pm, assumes term is already in char mode, doesn't restore mode
     terminal.set_line_mode()

@@ -6,5 +6,6 @@ import edsel
 from edsel import *
 import dmacs
 from dmacs import dm
+tl = dmacs.terminal.set_line_mode # type tl() to restore echo after crash
 win(22)
 dm()
