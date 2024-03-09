@@ -191,7 +191,7 @@ def refresh(line, point, start_col):
     display.putstr(line.rstrip('\n'))
     display.kill_line() # remove any leftover text past line
     move_to_point(point, start_col)
-    return line, point
+    return line, point # neither of these is updated
 
 keymap = {
     key.bs: delete_backward_char, # C_h

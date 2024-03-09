@@ -33,6 +33,19 @@ history = [''] # list of command strings, most recent at index 0
 i_cmd = -1 # integer index into history, code will assign to 0 or greater
 max_cmds = 20 # maximum number of commands in history
 
+def refresh_retrieved(cmd, point, start_col):
+    """
+    HACK replacement for el.refresh , for commands retrieved from history.
+    For some reason we don't understand, el.refresh does not work correctly
+    when applied to commands just retrieved fron history by C-p or C-n.
+    It offsets the command text one character to the left, but puts the
+    cursor at the intended location -- so inline editing doesn't work right.
+    We compensate by putting +1 in the call to display.move_to_column.
+    """
+    display.move_to_column(start_col+1) # +1 to push cmd back to right place
+    display.putstr(cmd.rstrip('\n')) # el.refresh has line not cmd
+    display.kill_line() # remove any leftover text past line
+    el.move_to_point(point, start_col)
 
 def pysh():
     """
@@ -71,21 +84,13 @@ def pysh():
                 if i_cmd < len(history)-1: i_cmd += 1
                 cmd = history[i_cmd]
                 point = len(cmd)
-                # el.refresh(cmd, point, start_col) # HACK inline below w/fix
-                display.move_to_column(start_col+1) # el.refresh has no +1
-                display.putstr(cmd.rstrip('\n')) # el.refresh has line not cmd
-                display.kill_line() # remove any leftover text past line
-                el.move_to_point(point, start_col)
+                refresh_retrieved(cmd, point, start_col)
             elif k in (key.C_n, key.down):
                 if i_cmd >= 0: i_cmd -= 1  # reaches -1 after most recent...
                 if i_cmd < 0: cmd = ''   # ... then set cmd empty
                 cmd = history[i_cmd]
                 point = len(cmd)
-                # el.refresh(cmd, point, start_col) # HACK inline below w/fix
-                display.move_to_column(start_col+1) # el.refresh has no +1
-                display.putstr(cmd.rstrip('\n')) # el.refresh has line not cmd
-                display.kill_line() # remove any leftover text past line
-                el.move_to_point(point, start_col)
+                refresh_retrieved(cmd, point, start_col)
             else:
                 cmd, point = el.runcmd(k, cmd, point, start_col) # edit cmd
     terminal.set_line_mode()
