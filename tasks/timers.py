@@ -53,3 +53,25 @@ def vtimer(n=1, delay=1.0, label='', destination=sys.stdout):
         time.sleep(vdelay)
         print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
         file=destination)
+
+class Timer():
+    """
+    Timer class, like vtimer fcn above but here delay and run are instance varss
+    so we can control multiple timers independtly
+    """
+    def __init__(self):
+        self.delay = 1.0 # can be edited while vtimer is running
+        self.run = True  # set False to exit before n runs out.
+
+    def timer(self, n=1, delay=1.0, label='', destination=sys.stdout):
+        self.delay = delay
+        self.run = True # in case it was set False on an earlier run
+        for i in range(n):
+            if not self.run: break
+            time.sleep(self.delay)
+            print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
+            file=destination)
+
+
+
+
