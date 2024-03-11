@@ -8,6 +8,20 @@ See writer.txt for more notes and explanation.
 import display
 import sked as ed
 import edsel as fr  # short for 'frame'
+import editline as el
+import pyshell as sh
+
+# Redefine these functions from edsel to also restore cursor to point
+
+def restore_cursor_to_cmdline():
+    'Unlike version in edsel, this version also sets column to point'
+    fr.restore_cursor_to_cmdline() # puts cursor in col 1
+    el.move_to_point(sh.point, sh.start_col)    
+
+def recenter():
+    fr.recenter() # calls fr.restore_cursor_to_cmdline via fr.update_status
+    el.move_to_point(sh.point, sh.start_col)    
+
 
 def write(line):
     """
@@ -20,9 +34,9 @@ def write(line):
         if fr.in_window(ed.dot):
             display.put_cursor(fr.wline(ed.dot), 1)
             display.putstr(line[:fr.tcols])
-            fr.restore_cursor_to_cmdline()
+            restore_cursor_to_cmdline()  # The one redefined above, not in edsel
         else:
-            fr.recenter()
+            recenter() # redefined above
 
 def writebuf(bname, line):
     """
@@ -45,9 +59,9 @@ def writebuf(bname, line):
                 if fr.in_window(ed.dot): # assumes focus window shows current buffer
                     display.put_cursor(fr.wline(ed.dot), 1)
                     display.putstr(line[:fr.tcols])
-                    fr.restore_cursor_to_cmdline()
+                    restore_cursor_to_cmdline() # Redefined above, not in edsel
                 else:
-                    fr.recenter()
+                    recenter() # redefined above
     
 def writebuf_show(bname, line):
     """

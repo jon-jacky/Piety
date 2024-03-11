@@ -37,4 +37,19 @@ def ptimer(n=1, delay=1.0, label='', destination=sys.stdout):
     """
     for i in range(n):
         time.sleep(delay)
-        print(f'{label} {i+1} {datetime.datetime.now()}', file=destination)
+        print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
+        file=destination)
+
+vdelay = 1.0 # used by vtimer below, can be edited while vtimer is running
+vrun = True  # used by vtimer, set False to exit before n runs out.
+
+def vtimer(n=1, delay=1.0, label='', destination=sys.stdout):
+    'Like ptimer above, but uses global vdelay that can be edited while running'
+    global vdelay, vrun
+    vdelay = delay
+    vrun = True # in case it was set False on an earlier run
+    for i in range(n):
+        if not vrun: break
+        time.sleep(vdelay)
+        print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
+        file=destination)
