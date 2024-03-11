@@ -14,8 +14,8 @@ def write(line):
     Append line to end of current sked buffer and display in edsel focus window.
     line is a string that does not end with \n, this write() adds it.
     """
-    if line != '\n': # redirect_stdout and file=... always append extra \n line
-        ed.buffer.append(line + '\n')
+    if line not in ('', '\n'): # redirect_stdout and file=... append extra \n
+        ed.buffer.append(line.rstrip('\n\r') + '\n') # line might have many \n
         ed.dot = ed.S()  # last line in buffer, which we just added.
         if fr.in_window(ed.dot):
             display.put_cursor(fr.wline(ed.dot), 1)
@@ -31,10 +31,10 @@ def writebuf(bname, line):
     If the named buffer is visible in the focus window, update that window.
     line is a string that does not end with \n, this function adds it.
     """
-    if line != '\n': # redirect_stdout and file=... always append extra \n line
+    if line not in ('', '\n'): # redirect_stdout and file=... append extra \n
         if bname in ed.buffers:
             # bname may not be ed.bufname, named buffer may not be current buffer
-            ed.buffers[bname]['buffer'].append(line + '\n')
+            ed.buffers[bname]['buffer'].append(line.rstrip('\n\r') + '\n')
             ed.buffers[bname]['dot'] = len(ed.buffers[bname]['buffer'])-1
             # Current buffer text lines are the same as text lines in saved buffers
             # BUT current buffer dot might not be the same, so must assign here

@@ -19,11 +19,12 @@ def timer(n=1, delay=1.0, label=''):
     Repeat n times (default 1).  Message includes time and optional label. 
     Optional label for distinguishing output from different function calls.
     Calls print() to print output to stdout, which can be redirected.
+    Calls print('...\n\r', end='') so it works in terminal char and line modes, 
     """
     for i in range(n):
         time.sleep(delay)
         # For now use print with default args, which adds the \n itself.
-        print(f'{label} {i+1} {datetime.datetime.now()}')
+        print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='')
   
 # This timer uses print(..., destination=...) to write to any buffer.
 
