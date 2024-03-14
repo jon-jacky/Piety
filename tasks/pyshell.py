@@ -16,6 +16,8 @@ then 'from pyshell import pysh'  then 'reload pyshell' without name conflict.
 import terminal, key, keyseq, display
 import edsel as fr # fr for frame
 import editline as el
+import pmacs
+
 from pycall import pycall # uses Python library code.InteractiveConsole
  
 cmd = '' # Python command
@@ -32,6 +34,23 @@ start_col = 3 # index of start of cmd on line, allowing for prompt ps1 or ps2
 history = [''] # list of command strings, most recent at index 0
 i_cmd = -1 # integer index into history, code will assign to 0 or greater
 max_cmds = 20 # maximum number of commands in history
+  
+# cmd_mode is needed to restore terminal cursor after it is used by a task. 
+cmd_mode = True  # True in Python REPL, False when editing in display window.
+
+def tm():
+    """
+    From the pysh Python REPL, use the tm() to command clear the cmd_mode flag
+    and begin the pmacs editor for editing buffers display windows.
+    Exit from display editing with M-x: set cmd_mode flag and return to REPL.
+    tm() must be issued from pysh REPL not standard Python REPL
+    because it assumes terminal is already in char mode.
+    """
+    global cmd_mode
+    cmd_mode = False
+    pmacs.rpm() # raw pmacs - assumes terminal is already in char mode
+    cmd_mode = True
+
 
 def refresh_retrieved(cmd, point, start_col):
     """

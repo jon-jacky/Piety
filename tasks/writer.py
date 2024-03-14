@@ -18,10 +18,16 @@ def restore_cursor_to_cmdline():
     fr.restore_cursor_to_cmdline() # puts cursor in col 1
     el.move_to_point(sh.point, sh.start_col)    
 
+def restore_cursor():
+    if sh.cmd_mode: # editing/running Python commands at pysh REPL
+        restore_cursor_to_cmdline()
+    else: # editing buffer in display window
+        pass # TK switch back to display window and set cursor
+
 def recenter():
     fr.recenter() # calls fr.restore_cursor_to_cmdline via fr.update_status
     el.move_to_point(sh.point, sh.start_col)    
-
+    # FIXME what if we are not in cmd_mode ?
 
 def write(line):
     """
