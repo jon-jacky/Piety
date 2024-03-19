@@ -56,8 +56,8 @@ def vtimer(n=1, delay=1.0, label='', destination=sys.stdout):
 
 class Timer():
     """
-    Timer class, like vtimer fcn above but here delay and run are instance varss
-    so we can control multiple timers independtly
+    Timer class, like vtimer fcn above but here delay and run are instance vars
+    so we can control multiple timers independently
     """
     def __init__(self):
         self.delay = 1.0 # can be edited while vtimer is running
@@ -71,7 +71,4 @@ class Timer():
             time.sleep(self.delay)
             print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
             file=destination)
-
-
-
-
+   

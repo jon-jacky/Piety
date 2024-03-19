@@ -22,8 +22,8 @@ except:
     # buffer is zero indexed, but we want first line of file to be at index 1
     # so first entry in buffer list is never used - it's always just '\n'
     buffer = ['\n']  # '\n' at index 0 is never used
-    dot = 0            # dot, index of current line in buffer
-    
+    dot = 0   # dot, index of current line in buffer
+    point = 0 # point, index of current column in dot. Not used here, for future  
     filename = 'scratch.txt' # reassigned by e(dit) and w(rite) commands
     bufname = filename  # Basename of filename, reassigned by e and w
     searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) cmds
@@ -100,11 +100,12 @@ def set_saved(status):
 
 def restore_buffer(bname, printline=print):
     'Restore state of saved buffer bname to current saved buffer'
-    global bufname, filename, buffer, dot, saved
+    global bufname, filename, buffer, dot, point, saved
     bufname = buffers[bname].get('bufname', 'no name')
     filename = buffers[bname].get('filename', 'no filename')
     buffer = buffers[bname].get('buffer', ['\n'])
     dot = buffers[bname].get('dot', 0)
+    point = buffers[bname].get('point', 0)
     saved = buffers[bname].get('saved', True)
     printline(status()) # print the new buffer name
 
@@ -118,7 +119,8 @@ def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
     buffers[bufname] = {'bufname': bufname, 'filename': filename, 
-                        'buffer': buffer, 'dot': dot, 'saved': saved }
+                        'buffer': buffer, 'dot': dot, 'point': point,
+                        'saved': saved }
 
 def bname(filename):
     'Generate buffer name from file name, ensure each file gets unique bname'

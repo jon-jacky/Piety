@@ -70,7 +70,7 @@ def pysh():
     """
     Custom Python REPL that uses our editline instead of builtin input function
     so other tasks can interleave and we can restore cursor in Python cmd line.
-    'pysh' rhymes with fish.
+    To exit pysh, type 'exit()' or ctrl-d.  'pysh' rhymes with fish.
     """
     global cmd, point, prompt, continuation, history, i_cmd
     terminal.set_char_mode()
@@ -99,6 +99,10 @@ def pysh():
                     fr.restore_cursor_to_cmdline()
                     display.putstr(prompt)
                     el.refresh(cmd, point, start_col)
+            elif k == key.C_d:  # ^D exits, alternative to 'exit()'
+                cmd = ''  # no command on line
+                point = 0
+                break       
             elif k in (key.C_p, key.up):
                 if i_cmd < len(history)-1: i_cmd += 1
                 cmd = history[i_cmd]

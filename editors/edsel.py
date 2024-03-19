@@ -44,7 +44,7 @@ except:
     maxwindows = 2 # the most that are useful in a vertical stack in 20+ lines
     windows = {}
     windows[focus] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
-                       'bufname': ed.bufname, 'dot': ed.dot }
+                       'bufname': ed.bufname, 'dot': ed.dot, 'point': ed.point }
     wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame
     
 
@@ -439,16 +439,17 @@ def save_window(wkey):
     uses now.  Maybe not always true in the future, must review each new use.    .
     """
     windows[wkey] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
-                      'bufname': ed.bufname, 'dot': ed.dot } # current buffer
+                      'bufname': ed.bufname, 'dot': ed.dot, 'point': ed.point}
     ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
 
 def save_window_bufinfo():
    """
-   Update focus window bufname and dot in saved windows.
+   Update focus window bufname, dot, and point in saved windows.
    Entry for focus window must already exist in saved windows.
    """
    windows[focus]['bufname'] = ed.bufname
    windows[focus]['dot'] = ed.dot
+   windows[focus]['point'] = ed.point
 
 def restore_window(wkey):
     """
@@ -469,6 +470,7 @@ def restore_window(wkey):
     ed.restore_buffer(bufname, print_nothing) # assign global bufname etc.
     if bufname != 'scratch.txt':
         ed.dot = windows[wkey].get('dot', ed.dot)
+        ed.point = windows[wkey].get('point', ed.point)
  
 def o2():
     'Split focus window, focus remains in top half, bottom half is new saved'

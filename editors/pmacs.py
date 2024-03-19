@@ -15,20 +15,21 @@ try:
     _ = saved_put_marker # if already defined, then pmacs was already imported
 except:
     inline = True # kill (cut) and yank (paste) within a single line
+    start_col = 0  # default 0, no prompt or etc. at left margin
     saved_put_marker = edsel.put_marker # so we can restore after put_no_marker
 
 # helper functions
 
 def reset_point():
-    'Possibly move el.point if needed when dot moves to another line'
+    'Possibly move ed.point if needed when dot moves to another line'
     linelen = len(ed.buffer[ed.dot])
-    if el.point > linelen:
-        el.point = linelen - 1 # -1 to put point before final \n
+    if ed.point > linelen:
+        ed.point = linelen - 1 # -1 to put point before final \n
 
 def restore_cursor_to_window():
     reset_point()
     # point+1 to make put_cursor call consistent with editline move_to_column
-    display.put_cursor(edsel.wline(ed.dot), el.point + 1)
+    display.put_cursor(edsel.wline(ed.dot), ed.point + 1)
 
 # Some functions do not use keycode arg but runcmd and pm require it to be there
 
@@ -37,17 +38,17 @@ def open_line(keycode):
     Split line at point, replace line in buffer at dot
     with its prefix, append suffix after line at dot.
     """
-    suffix = ed.buffer[ed.dot][el.point:] # including final \n
+    suffix = ed.buffer[ed.dot][ed.point:] # including final \n
     # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-    ed.buffer[ed.dot], el.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
-                                             el.point, el.start_col)
+    ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
+                                             ed.point, start_col)
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
     if edsel.in_window(ed.dot):
         edsel.update_below(ed.dot)
     else:
         edsel.recenter()
-    el.point = 0 # start of new suffix line
+    ed.point = 0 # start of new suffix line
     restore_cursor_to_window()
 
 # The following functions supercede and wrap functions in other modules
@@ -55,7 +56,7 @@ def open_line(keycode):
 def join_prev():
     'Join this line to previous. At first line do nothing.'
     if ed.dot > 1:
-        el.point = len(ed.buffer[ed.dot-1])-1 # don't count \n
+        ed.point = len(ed.buffer[ed.dot-1])-1 # don't count \n
         edsel.j(ed.dot-1, ed.dot) # defaults in ed.j join dot to dot+1
 
 def delete_backward_char(keycode):
@@ -63,10 +64,10 @@ def delete_backward_char(keycode):
     If point is not at start of line, delete preceding character.
     Otherwise join to previous line.  At start of first line do nothing.
     """
-    if el.point > 0:
+    if ed.point > 0:
         # Calls el.delete_backward_char, thanks to keycode DEL key.bs
-        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                el.point, el.start_col) 
+        ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                ed.point, start_col) 
     else: 
         join_prev() # see above
         restore_cursor_to_window()
@@ -81,10 +82,10 @@ def delete_char(keycode):
     If point is not at end of line, delete character under cursor.
     Otherwise join next line to this one.  At end of last line do nothing.
     """
-    if el.point < len(ed.buffer[ed.dot].rstrip('\n')):
+    if ed.point < len(ed.buffer[ed.dot].rstrip('\n')):
         # Calls el.delete_char, thanks to keycode C_d
-        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                el.point, el.start_col)
+        ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                ed.point, start_col)
     else:
         join_next() # see above
         restore_cursor_to_window()
@@ -121,8 +122,8 @@ def kill_line(keycode):
         ed.killed.remove('\n') # remove '\n' line
     # inline kill line:
     elif inline: # weaker condition, must follow previous stronger if...
-        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                el.point, el.start_col)
+        ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
+                                                ed.point, start_col)
     # kill line that is part of a multiline sequence:
     elif not inline:
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
@@ -139,8 +140,8 @@ def yank(keycode):
     Yank entire line(s) or yank word(s) within a line, depending on inline
     """
     if inline:
-        ed.buffer[ed.dot], el.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                el.point, el.start_col)
+        ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot], 
+                                                 ed.point, start_col)
     else:
         dmacs.runcmd(keycode) # keycode is C_y here
         restore_cursor_to_window()
@@ -208,8 +209,8 @@ def rpm():
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
                 el.prev_cmd = dmacs.prev_cmd
-                ed.buffer[ed.dot], el.point = el.runcmd(k, ed.buffer[ed.dot],
-                                              el.point, el.start_col)
+                ed.buffer[ed.dot], ed.point = el.runcmd(k, ed.buffer[ed.dot],
+                                              ed.point, start_col)
                 dmacs.prev_cmd = el.prev_cmd
                 # key.C_k and inline are handled in kill_line, above
                 if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
