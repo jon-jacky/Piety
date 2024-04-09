@@ -13,7 +13,7 @@ import editline
 import pmacs
 from pmacs import pm, rpm # use rpm when starting from pysh instead of >>>
 import pyshell
-from pyshell import pysh
+from pyshell import pysh, tpm # from pysh, use tpm not rpm to clear cmd_mode
 import writer # for tasks
 from writer import *
 import timers # for tasks         

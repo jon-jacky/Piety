@@ -1,5 +1,5 @@
 """
-writer.py - Functions that put text into sked buffers and edsel windows,
+writer.py - Functions that put text into editor buffers and windows,
              intended to be called from background tasks.
 
 See writer.txt for more notes and explanation. 
@@ -9,10 +9,11 @@ import display
 import sked as ed
 import edsel as fr  # short for 'frame'
 import editline as el
+import pmacs as pm
 import pyshell as sh
 
 # Redefine these functions from edsel to also restore cursor to point
-
+ 
 def restore_cursor_to_cmdline():
     'Unlike version in edsel, this version also sets column to point'
     fr.restore_cursor_to_cmdline() # puts cursor in col 1
@@ -20,14 +21,35 @@ def restore_cursor_to_cmdline():
 
 def restore_cursor():
     if sh.cmd_mode: # editing/running Python commands at pysh REPL
-        restore_cursor_to_cmdline()
-    else: # editing buffer in display window
-        pass # TK switch back to display window and set cursor
+        restore_cursor_to_cmdline() # redefined above, not the version in edsel
+    # This next case assumes other window is tocus window that needs restoring
+    # BUT if current window is intended focus window, this switches focus away
+    elif fr.n_windows() == 2: # HACK only works in this n == 2 special case
+        fr.on() # switch to next window - there can only be one other window
+        pm.restore_cursor_to_window()
+    else: # There is no other window, cursor is already where it is needed.
+        pass 
 
+# Local refresh and recenter in this module are copied from edsel
+# except here refresh does not call update_status 
+# so it doesn't call restore_cursor_to_cmdline, which we don't want.
+
+def refresh():
+    """
+    Refresh the focus window.
+    (Re)Display lines from segment, marker, status without moving segment.
+    """
+    display.put_cursor(fr.wintop, 1) # top line in window
+    fr.erase_lines(fr.wheight-1) # erase entire window contents above status line
+    fr.update_window() # FIXME did we really have to erase_lines before this?
+    fr.put_marker(ed.dot, display.white_bg)
+    # fr.update_status() # NOT! we don't want restore_cursor_to_cmdline
+    
 def recenter():
-    fr.recenter() # calls fr.restore_cursor_to_cmdline via fr.update_status
-    el.move_to_point(sh.point, sh.start_col)    
-    # FIXME what if we are not in cmd_mode ?
+    'Move buffer segment to put dot in center, display segment, marker, status'
+    # global buftop # use edsel.buftop instead
+    fr.buftop = fr.locate_segment(ed.dot)
+    refresh() # redefined above, not the version in edsel
 
 def write(line):
     """
@@ -40,9 +62,9 @@ def write(line):
         if fr.in_window(ed.dot):
             display.put_cursor(fr.wline(ed.dot), 1)
             display.putstr(line[:fr.tcols])
-            restore_cursor_to_cmdline()  # The one redefined above, not in edsel
         else:
-            recenter() # redefined above
+            recenter() # redefined above, not the version in edsel
+        restore_cursor()
 
 def writebuf(bname, line):
     """
@@ -65,9 +87,9 @@ def writebuf(bname, line):
                 if fr.in_window(ed.dot): # assumes focus window shows current buffer
                     display.put_cursor(fr.wline(ed.dot), 1)
                     display.putstr(line[:fr.tcols])
-                    restore_cursor_to_cmdline() # Redefined above, not in edsel
                 else:
-                    recenter() # redefined above
+                    recenter() # redefined above, not the version in edsel
+                restore_cursor()
     
 def writebuf_show(bname, line):
     """
@@ -84,7 +106,10 @@ def writebuf_show(bname, line):
     for wk in fr.windows: # wk is integer window key
         if fr.windows[wk]['bufname'] == bname:
             break
+    # if window with named buffer found, change focus - based on fr.on code
     if wk in fr.wkeys and wk != fr.focus:  # if not found, wk is still -1
+        fr.save_window(fr.focus) 
+        fr.focus = fr.wkeys[wk]
         fr.restore_window(wk)
     writebuf(bname, line)
 
@@ -97,5 +122,4 @@ class Writer():
     """
     def __init__(self, bufname): self.bufname = bufname
     def write(self, line): writebuf_show(self.bufname, line)
-
-
+    

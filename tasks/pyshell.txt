@@ -1,0 +1,26 @@
+pyshell.txtNotes on further experiments with Python threading using functionsin timer.py and writer.py with the pysh REPL from pyshell.py.It is easiest to explain by just showing this demonstration:Define the PYTHONPATH and run the tm script which imports thetimer and writer modules and starts the pysh REPL:...$  .  ~/Piety/bin/paths...$ python3 -pm tmAt the pysh prompt >> (not the standard Python prompt >>>), create two buffers in two windows:>> e('a.txt')a.txt, 0 lines>> o2()>> e('b.txt')b.txt, 0 linesNow we have two windows.  Create two writers and two timers:>> abuf = Writer('a.txt')>> bbuf = Writer('b.txt')>> ta = Timer()>> tb = Timer()Now start the A thread in the a.txt window>> Thread(target=ta.timer,args=(1000,1'A',abuf)).start()
+
+a.txt window updates with a new timer message every second,
+but we can still type in the pysh REPL:
+
+>> Thread(target=tb.timer,args=(1000,1'B',bbuf)).start()
+
+The b.txt window is also updating at 1/sec.
+We can type commands to change the speed of the timers.
+
+>> tb.delay = 0.5
+
+Now the tb window updates 2/sec.  We can still type at the pysh REPL
+
+>> ta.delay = 0.1
+
+Now the ta window updates 10/sec.  We can still type at the pysh REPL.
+
+Experiment with speeding up and slowing down the updates in both 
+windows.  How fast can you go and still type at the REPL?
+
+
+Revised Apr 2024
+
+
+   

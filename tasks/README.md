@@ -6,12 +6,12 @@ Experiments with tasking and concurrency.
 
 ### Files ###
 
-- **pyshell.py** - Custom Python REPL that uses our *editline* 
+- **pyshell.py** - Defines ustom Python REPL *pysh* that uses our *editline* 
    instead of builtin *input*.  Enables other tasks that write to the
    terminal to interleve with typing commands at our REPL.
 
-- **threads.txt**: Notes on experiments with Python threading using the
-   functions in *timers.py* and *writer.py*.
+- **pyshell.txt**: Notes on further experiments with Python threading   using functions in *timer* and *writer* with the *pysh* REPL.- **threads.txt**: Notes on initial experiments with Python threading
+   using the functions in *timers.py* and *writer.py*.
 
 - **timers.py**: Functions to run in tasking experiments, that print
    timestamps at intervals.
@@ -25,5 +25,5 @@ Experiments with tasking and concurrency.
 - **writer.txt**:  Notes on *writer.py*.
 
 
-Revised Mar 2024
+Revised Apr 2024
 
