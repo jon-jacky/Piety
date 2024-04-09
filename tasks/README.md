@@ -10,7 +10,9 @@ Experiments with tasking and concurrency.
    instead of builtin *input*.  Enables other tasks that write to the
    terminal to interleve with typing commands at our REPL.
 
-- **pyshell.txt**: Notes on further experiments with Python threading   using functions in *timer* and *writer* with the *pysh* REPL.- **threads.txt**: Notes on initial experiments with Python threading
+- **pyshell.txt**: Notes on further experiments with Python threading   using functions in *timer* and *writer* with the *pysh* REPL.
+
+- **threads.txt**: Notes on initial experiments with Python threading
    using the functions in *timers.py* and *writer.py*.
 
 - **timers.py**: Functions to run in tasking experiments, that print

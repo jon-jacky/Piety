@@ -397,6 +397,10 @@ def j(start=None, end=None):
 
 # Display functions: window management
 
+def n_windows(): 
+    'Return the number of windows shown on the display'
+    return len(wkeys)
+
 def open_frame():
     """
     Create a 'frame' to contain windows, potentially more than one.
@@ -475,7 +479,7 @@ def restore_window(wkey):
 def o2():
     'Split focus window, focus remains in top half, bottom half is new saved'
     global wintop, wheight, wkeys
-    if len(wkeys) >= maxwindows:
+    if n_windows() >= maxwindows:
         print('? no more windows\r\n', end='')
         return
     # When we split a window, top half remains focus window; keep same wintop.
@@ -501,7 +505,7 @@ def o2():
 def o1():
     'Return to single window, make focus window occupy the whole frame.'
     global focus, wkeys, wintop, wheight
-    if len(wkeys) <= 1:
+    if n_windows() <= 1:
         print('? only one window\r\n', end='')
         return
     windows.clear()
@@ -516,7 +520,7 @@ def o1():
 def on():
     'Next window, move focus to next window below, until wrap around to top'
     global focus
-    if len(wkeys) <= 1:
+    if n_windows() <= 1:
         print('? only one window\r\n', end='')
         return
     save_window(focus) # window contents (buffer and/or dot) may have changed

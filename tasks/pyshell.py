@@ -2,7 +2,7 @@
 pyshell.py - Custom Python REPL that uses our editline instead of builtin input.
 
 We need this to support tasking.  It enables other tasks writing to
-the terminal to interleave with typing commands at our REPL, and enables us
+the terminal to interleave with typing characters at our REPL, and enables us
 to restore the cursor to the correct position in the command line after
 another task moves it.
 
@@ -38,12 +38,13 @@ max_cmds = 20 # maximum number of commands in history
 # cmd_mode is needed to restore terminal cursor after it is used by a task. 
 cmd_mode = True  # True in Python REPL, False when editing in display window.
 
-def tm():
+def tpm():
     """
-    From the pysh Python REPL, use the tm() to command clear the cmd_mode flag
+    tpm "tasking pmacs"
+    From the pysh Python REPL, use the tpm() command to clear the cmd_mode flag
     and begin the pmacs editor for editing buffers display windows.
     Exit from display editing with M-x: set cmd_mode flag and return to REPL.
-    tm() must be issued from pysh REPL not standard Python REPL
+    tpm() must be issued from pysh REPL not standard Python REPL
     because it assumes terminal is already in char mode.
     """
     global cmd_mode

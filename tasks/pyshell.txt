@@ -1,4 +1,33 @@
-pyshell.txtNotes on further experiments with Python threading using functionsin timer.py and writer.py with the pysh REPL from pyshell.py.It is easiest to explain by just showing this demonstration:Define the PYTHONPATH and run the tm script which imports thetimer and writer modules and starts the pysh REPL:...$  .  ~/Piety/bin/paths...$ python3 -pm tmAt the pysh prompt >> (not the standard Python prompt >>>), create two buffers in two windows:>> e('a.txt')a.txt, 0 lines>> o2()>> e('b.txt')b.txt, 0 linesNow we have two windows.  Create two writers and two timers:>> abuf = Writer('a.txt')>> bbuf = Writer('b.txt')>> ta = Timer()>> tb = Timer()Now start the A thread in the a.txt window>> Thread(target=ta.timer,args=(1000,1'A',abuf)).start()
+pyshell.txtNotes on further experiments with Python threading using
+functionsin timer.py and writer.py with the pysh REPL from pyshell.py.
+
+It is easiest to explain by just showing this demonstration:
+
+Define the PYTHONPATH and run the tm script which imports the
+timer and writer modules and starts the pysh REPL:
+
+...$  .  ~/Piety/bin/paths
+...$ python3 -pm tm
+
+At the pysh prompt >> (not the standard Python prompt >>>),
+create two buffers in two windows:
+
+>> e('a.txt')
+a.txt, 0 lines
+>> o2()
+>> e('b.txt')b.txt, 0 lines
+
+Now we have two windows.  Create two writers and two timers:
+
+>> abuf = Writer('a.txt')
+>> bbuf = Writer('b.txt')
+
+>> ta = Timer()
+>> tb = Timer()
+
+Now start the A thread in the a.txt window
+
+>> Thread(target=ta.timer,args=(1000,1'A',abuf)).start()
 
 a.txt window updates with a new timer message every second,
 but we can still type in the pysh REPL:

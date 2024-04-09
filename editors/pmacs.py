@@ -27,7 +27,7 @@ def reset_point():
         ed.point = linelen - 1 # -1 to put point before final \n
 
 def restore_cursor_to_window():
-    reset_point()
+    # reset_point() # no longer needed, now pmacs maintains ed.point
     # point+1 to make put_cursor call consistent with editline move_to_column
     display.put_cursor(edsel.wline(ed.dot), ed.point + 1)
 
