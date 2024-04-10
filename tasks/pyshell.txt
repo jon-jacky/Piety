@@ -1,5 +1,7 @@
-pyshell.txtNotes on further experiments with Python threading using
-functionsin timer.py and writer.py with the pysh REPL from pyshell.py.
+pyshell.txt
+
+Notes on further experiments with Python threading using functions
+in timer.py and writer.py with the pysh REPL from pyshell.py.
 
 It is easiest to explain by just showing this demonstration:
 
