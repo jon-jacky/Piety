@@ -2,13 +2,16 @@
 branches
 ========
 
-This is the *pysh* branch off the *rewrite* branch.
+This is the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 9 Apr 2024: Finish work on the custom Python REPL and tasking code 
+  for now.  Merge *pysh* branch back into *rewrite* branch.
 
 - 27 Feb 2024: Begin *pysh* branch to provide a custom Python REPL that
   uses our *editline* so we can restore the cursor to the correct
