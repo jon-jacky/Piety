@@ -27,11 +27,23 @@ def reset_point():
         ed.point = linelen - 1 # -1 to put point before final \n
 
 def restore_cursor_to_window():
-    # reset_point() # no longer needed, now pmacs maintains ed.point
+    # reset_point() # no longer needed here, each pmacs fcn maintains ed.point
     # point+1 to make put_cursor call consistent with editline move_to_column
     display.put_cursor(edsel.wline(ed.dot), ed.point + 1)
 
 # Some functions do not use keycode arg but runcmd and pm require it to be there
+
+def next_line(keycode):
+    'Move to next line, same column, or end of line if next line is too short'
+    edsel.l() # advances dot
+    reset_point() # move to end of line if next line is too short
+    restore_cursor_to_window()
+
+def prev_line(keycode):
+    'Move to previous line, same col, or end of line if prev line is too short'
+    edsel.rl() # decrements dot
+    reset_point() # move to end of line if previous line is too short
+    restore_cursor_to_window()
 
 def open_line(keycode):
     """
@@ -156,6 +168,8 @@ def append(keycode):
     restore_cursor_to_window()
 
 keymap = {
+    key.C_n: next_line,
+    key.C_p: prev_line,
     key.cr: open_line, 
     key.delete: delete_backward_char,
     key.bs: delete_backward_char, 
@@ -165,7 +179,9 @@ keymap = {
     key.C_y: yank,
     key.C_l: refresh,
     key.C_x + key.C_a: append, # Enter dmacs append mode, exit with .
-}
+    # arrow keys, send ANSI escape sequences
+    key.down: next_line,
+    key.up: prev_line,}
 
 def runcmd(keycode):
     """
