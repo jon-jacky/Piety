@@ -203,8 +203,7 @@ def put_no_marker(bufline, attribs):
 def rpm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
-    Exit by typing M_x (that's alt X), like emacs 'do command'.
-
+    Exit by typing M_x (that's alt X), like emacs 'do command'. 
     rpm means 'raw pm' - this function requires terminal is already 
     in char mode ('raw' mode) and it does not restore line mode
     when it exits - so this rpm is the function to call from pysh,
@@ -225,6 +224,8 @@ def rpm():
                 runcmd(k)
             elif k in el.printing_chars or k in el.keymap:
                 el.prev_cmd = dmacs.prev_cmd
+                if ed.S() < 1: ed.buffer = ['\n','\n'] # initialize empty buffer   
+                if ed.dot == 0: ed.dot = 1 # buffer[0] is always dummy '\n'
                 ed.buffer[ed.dot], ed.point = el.runcmd(k, ed.buffer[ed.dot],
                                               ed.point, start_col)
                 dmacs.prev_cmd = el.prev_cmd

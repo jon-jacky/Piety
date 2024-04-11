@@ -1,7 +1,7 @@
 """
 edsel.py - Display editor that uses the same commands as *sked*.
 
-Display buffer contents in a window as they are updated by the sked editor.
+Display buffer contents in windows as they are updated by the sked editor.
 
 See README.md for directions on using edsel, NOTES.txt about its code. 
 """

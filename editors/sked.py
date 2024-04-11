@@ -139,7 +139,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
-    global filename, buffer, saved, bufname, prev_bufname
+    global filename, buffer, saved, bufname, prev_bufname, point
     if fname == filename:
         print(f'? file {fname} is already in the current buffer\r\n', end='')
         return
@@ -161,6 +161,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     bufname = bname(filename) # creates new buffer if e() on same file
     saved = True # put this *before* move_dot for display code
     move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
+    point = 0
     save_buffer() # the new current buffer is also in the saved buffers
     print(f'{filename}, {S()} lines\n\r', end='')
 
