@@ -400,7 +400,8 @@ def y(iline=None, move_dot=move_dot): # move_dot is hook for display code
     'y(ank), that is paste, killed contents *before* iline (default dot)'
     global buffer, saved
     if not iline: iline = dot
-    if not line_valid(iline):
+    if iline == 0: iline = 1 # buffer[0] is always inaccessible dummy \n
+    if S() > 0 and not line_valid(iline): # S() == 0 when yank to empty buffer
         return
     buffer[iline:iline] = killed # insert killed contents *before* iline
     saved = False # put this before move_dot for display
