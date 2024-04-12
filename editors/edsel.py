@@ -60,7 +60,7 @@ def wline(iline):
     This is the line in the terminal window, used for cursor positioning cmds.
     """    
     wiline = wintop + (iline - buftop)
-    return wiline if wiline >=1 else 1
+    return wiline if wiline >= wintop else wintop # wintop when buffer empty
 
 def wbottom():
     """

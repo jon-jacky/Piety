@@ -13,7 +13,7 @@ Line editor based on the classic Unix ed.
 No main program!  Editor commands are just functions defined here, to
 call from the Python REPL.
 
-Global variables used by these functions are defined and initialized
+Global variables used by editor functions are defined and initialized
 in the except block in the try...except... at the beginning of the module,
 which must be executed before calling any of the functions here.
 It is only executed the first time the module is imported, not
@@ -44,6 +44,40 @@ it just returns an appropriate default.
 The items read from the dictionary are assigned to distinct global 
 variables at module level so they can be accessed by code or from the 
 REPL without verbose notation.
+
+The text buffer is a list of lines, where every line ends with a newline
+character, '\n'.  This is because we load the buffer from a file by
+using the  file readlines method, which leaves the \n on each line.  We
+write the buffer out to a file by using the file writelines method,
+which does not append \n to each line, but assumes it is already there.
+
+So we must be careful to maintain the \n at the end of each line. There
+are many lines of code in sked and also the other editor modules that
+strip off the \n in contexts where it should not be, and other lines
+that append \n where it needs to be.  This is a nuisance to always have
+to get right, and makes the code look noisy and cluttered.
+
+In retrospect it might have been easier and cleaner to always work with
+lines with no final \n. To do that, we would  strip the final \n off
+each line when we read  a file, and append the final \n to each line
+when we write a file.  This would  put all the \n maintenance in just
+two places once and for all, and simplify the code elsewhere.
+
+We can refer to each line by its line number, its index in the list of
+lines in the buffer.   Python indexing is zero-based so the first line
+in the buffer has index 0.   It seems to make more sense and be more
+familiar to call the first line number 1, not 0.   So each buffer begins
+at index 0 with an initial empty line containing only '\n'.  This
+initial line is inaccessible: it is never  displayed, printed, or edited.
+We always work with buffer contents beginning with line 1.
+
+Maintaining and working around the initial empty line at index 0
+complicates the code, especially when adding text to an initially empty
+buffer.  In retrospect it might have been easier and cleaner  to treat
+the first line at index 0 as an ordinary line for all purposes. We would
+just have to remember that the first line in the buffer is  numbered 0
+(not 1) in those (now rare)  occasions where we refer to lines by line
+number.
 
 ### edsel ###
 
