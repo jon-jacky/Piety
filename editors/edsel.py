@@ -470,7 +470,8 @@ def restore_window(wkey):
     # Maybe bufname is not in buffers, it may have been killed.
     # But scratch.txt is always in buffers. 
     bufname = bufname if bufname in ed.buffers else 'scratch.txt'
-    if bufname != ed.bufname: ed.prev_bufname = ed.bufname # might be same buf
+    # If previous window has the same buffer, don't update prev_bufname
+    if bufname != ed.bufname: ed.prev_bufname = ed.bufname
     ed.restore_buffer(bufname, print_nothing) # assign *global* ed.bufname here
     if bufname != 'scratch.txt':
         ed.dot = windows[wkey].get('dot', ed.dot)
