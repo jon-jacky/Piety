@@ -86,8 +86,9 @@ def status():
 
 def move_dot(iline):
     'Assign iline to dot. Replacement function can then move display cursor'
-    global dot
+    global dot, point
     dot = iline
+    point = 0 # point on current line might be past end of destination line.
 
 def change_lines(start, end):
     'In sked, just assign end to dot.  Replacement function does much more.'
@@ -139,7 +140,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
     """
-    global filename, buffer, saved, bufname, prev_bufname, point
+    global filename, buffer, saved, bufname, prev_bufname
     if fname == filename:
         print(f'? file {fname} is already in the current buffer\r\n', end='')
         return
@@ -161,7 +162,6 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     bufname = bname(filename) # creates new buffer if e() on same file
     saved = True # put this *before* move_dot for display code
     move_dot(min(S(),1)) # start of buffer, empty buffer S() is 0
-    point = 0
     save_buffer() # the new current buffer is also in the saved buffers
     print(f'{filename}, {S()} lines\n\r', end='')
 
@@ -297,7 +297,7 @@ def s(target=None, forward=True, printline=print, move_dot=move_dot):  # hooks
     Assign target to searchstring for use in future searches.
     If target is omitted, use stored searchstring.  
     """
-    global searchstring, point
+    global searchstring
     found = False
     if not target: target = searchstring
     searchstring = target
@@ -306,7 +306,6 @@ def s(target=None, forward=True, printline=print, move_dot=move_dot):  # hooks
             found = True
             printline(buffer[iline], end='') # line already ends with \n
             move_dot(iline)
-            point = 0
             break
     if not found:
         print(f"? '{searchstring}' not found\n\r", end="") # for char mode

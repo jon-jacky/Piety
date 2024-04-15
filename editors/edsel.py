@@ -85,7 +85,7 @@ def update_lines(bstart, wstart, nlines):
     Display consecutive lines (a 'segment') from the buffer in the window.
     Display nlines, starting at bstart in buffer, starting at wstart in window.
     Clip nlines if needed, to fit in window, and not run past end of buffer.
-    Leave cursor after the last line displayed.
+    Leave cursor after the last line displayed, but do not update any globals.
     """
     nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
@@ -105,6 +105,7 @@ def update_below(bstart, offset=0):
     down to (but not including) the status line. Accept default offset=0 
     to begin updating at present position of bstart in the window, or
     optionally assign offset to move bstart and following lines down.
+    Leave cursor after the last line displayed, but do not update any globals.
     """
     wstart = wline(bstart) + offset
     nlines = wbottom() - wstart
@@ -113,7 +114,7 @@ def update_below(bstart, offset=0):
 def erase_lines(nlines):
     """
     Completely erase nlines lines starting at current cursor position.
-    Leave cursor at line after last line erased.
+    Leave cursor at line after last line erased.  Do not update any globals.
     """
     for iline in range(nlines):
         display.kill_whole_line()
@@ -174,7 +175,7 @@ def recenter():
 def display_move_dot(iline):
     'Display effect of ed move_dot function.  Move current line, dot, to iline'
     put_marker(ed.dot, display.clear)
-    ed.dot = iline # this is all that ed.move_dot does
+    ed.move_dot(iline)
     if in_window(ed.dot):
         put_marker(ed.dot, display.white_bg)
         update_status()
@@ -184,7 +185,7 @@ def display_move_dot(iline):
 def display_change_lines(start, end):
     'Display effect of ed change_lines fcn. Redraw start to end, move dot.'
     put_marker(ed.dot, display.clear)
-    ed.dot = end # this is all that ed.change_lines does
+    ed.move_dot(end)
     if in_window(ed.dot):
         update_lines(start, wline(start), end-start+1) # bstart, wstart, nlines
         put_marker(ed.dot, display.white_bg)
@@ -207,7 +208,7 @@ def display_restore_buffer(bname):
 
 def display_e(iline):
     'Display effect of ed e(dit) fcn: display new buffer contents around iline'
-    ed.dot = iline
+    ed.move_dot(iline)
     save_window_bufinfo()
     recenter()
 
@@ -226,9 +227,9 @@ def display_d(iline):
     Also move marker and update status line. Page down if needed.
     """
     put_marker(ed.dot, display.clear)
-    ed.dot = iline # this is all that move_dot(iline) does
+    ed.move_dot(iline)
     if in_window(ed.dot):
-        update_below(ed.dot)
+        update_below(ed.dot) # doesn't change dot, moves cursor to end of text
         nlines = wheight - wline(ed.dot) # n of lines to end of window
         nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
         nelines = nlines - nblines # n of empty lines at end of window
@@ -249,13 +250,23 @@ def display_y(iline):
     Also move marker and update status line. Page down if needed.
     """
     put_marker(ed.dot, display.clear)
-    ed.dot = iline # this is all that move_dot(iline) does
+    ed.move_dot(iline)
     if in_window(ed.dot):
         update_below(ed.dot - len(ed.killed)) # first yanked line
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
         recenter()
+
+def erase_bottom():
+    nlines = wheight - wline(ed.dot) # n of lines to end of window
+    nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
+    nelines = nlines - nblines # n of empty lines at end of window
+    erase_lines(nelines+1) # sic +1.  make empty lines at end of window.
+ 
+def display_wrap(iline):
+    display_y(iline)
+    erase_bottom()
 
 def display_c(iline):
     """
@@ -264,7 +275,7 @@ def display_c(iline):
     Move dot to iline, redisplay line, mark current line, update the status.
     """
     put_marker(ed.dot, display.clear)
-    ed.dot = iline
+    ed.move_dot(iline)
     display.put_cursor(wline(ed.dot), 1)
     display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols])
     display.kill_line()
@@ -275,7 +286,7 @@ def display_j(iline):
     'Display effect of ed j(oin lines) function.'
     display.put_cursor(wline(iline), 1)
     display.putstr(ed.buffer[iline].rstrip('\n')[:tcols])
-    display_d(iline)
+    display_d(iline) # assigns ed.dot directly, not with display_move_dot
 
 # Display functions: append mode for sked a() command
 
@@ -293,7 +304,7 @@ def display_start_a(iline):
     display.put_cursor(wheight, 1) # status line does not update in append mode
     display.render('Appending...'.ljust(tcols)[:tcols],display.white_bg)  
     put_marker(ed.dot, display.clear)
-    ed.dot = iline # sked a() does this.  iline might be far from previous dot.
+    ed.move_dot(iline) # sked a() does this.  iline might be far from previous dot.
     open_line(ed.dot) # create space, move cursor to prepare for first input()
 
 def display_input_line():
@@ -328,7 +339,7 @@ def display_a(iline):
     Move cursor down, open next line to prepare for next input() call.
     """
     put_marker(ed.dot, display.clear)
-    ed.dot = ed.dot + 1  # advance dot to line just input(), like sked a()
+    ed.move_dot(ed.dot + 1)  # advance dot to line just input(), like sked a()
     open_line(ed.dot) # create space, move cursor to prepare for next input()
 
 # Display functions: editing commands
@@ -390,7 +401,7 @@ def outdent(start=None, end=None, nspaces=None):
     ed.outdent(start, end, nspaces, display_change_lines) 
 
 def wrap(start=None, end=None, lmarg=None, rmarg=None):
-    ed.wrap(start, end, lmarg, rmarg, move_dot=display_y)
+    ed.wrap(start, end, lmarg, rmarg, move_dot=display_y) # FIXME display_wrap
 
 def j(start=None, end=None):
     ed.j(start, end, move_dot=display_j)
