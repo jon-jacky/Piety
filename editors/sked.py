@@ -297,7 +297,7 @@ def s(target=None, forward=True, printline=print, move_dot=move_dot):  # hooks
     Assign target to searchstring for use in future searches.
     If target is omitted, use stored searchstring.  
     """
-    global searchstring
+    global searchstring, point
     found = False
     if not target: target = searchstring
     searchstring = target
@@ -306,6 +306,7 @@ def s(target=None, forward=True, printline=print, move_dot=move_dot):  # hooks
             found = True
             printline(buffer[iline], end='') # line already ends with \n
             move_dot(iline)
+            point = 0
             break
     if not found:
         print(f"? '{searchstring}' not found\n\r", end="") # for char mode
