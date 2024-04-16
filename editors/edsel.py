@@ -227,7 +227,8 @@ def display_d(iline):
     Also move marker and update status line. Page down if needed.
     """
     put_marker(ed.dot, display.clear)
-    ed.move_dot(iline)
+    # ed.move_dot(iline) # move_dot sets point = 0, we *don't* want that here
+    ed.dot = iline # but no point = 0
     if in_window(ed.dot):
         update_below(ed.dot) # doesn't change dot, moves cursor to end of text
         nlines = wheight - wline(ed.dot) # n of lines to end of window
