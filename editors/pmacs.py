@@ -35,12 +35,14 @@ def restore_cursor_to_window():
 
 def next_line(keycode):
     'Move to next line, same column, or end of line if next line is too short'
+    edsel.restore_cursor_to_cmdline() # so any error message appears in REPL
     edsel.l() # advances dot
     reset_point() # move to end of line if next line is too short
     restore_cursor_to_window()
 
 def prev_line(keycode):
     'Move to previous line, same col, or end of line if prev line is too short'
+    edsel.restore_cursor_to_cmdline()
     edsel.rl() # decrements dot
     reset_point() # move to end of line if previous line is too short
     restore_cursor_to_window()
