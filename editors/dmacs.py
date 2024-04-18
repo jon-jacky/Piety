@@ -77,14 +77,18 @@ def bkwd_search():
     edsel.r()
 
 def switch_buffer():
+    global mark
     response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
     if cancelled(response): return
     if response: ed.prev_bufname = response
+    mark = 0 # But we don't reset mark when we change buffer by schangewindow
     edsel.b()
 
 def find_file():
+    global mark
     filename = request('Find file: ')
     if cancelled(filename): return
+    mark = 0
     edsel.e(filename)
 
 def write_named_file():
