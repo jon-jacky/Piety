@@ -99,18 +99,6 @@ def update_window():
     'Update entire window up to status line, starting at line buftop in buffer'
     update_lines(buftop, wintop, wheight-1)
 
-def update_below(bstart, offset=0):
-    """
-    Update lines in the window starting with (including) buffer line bstart
-    down to (but not including) the status line. Accept default offset=0 
-    to begin updating at present position of bstart in the window, or
-    optionally assign offset to move bstart and following lines down.
-    Leave cursor after the last line displayed, but do not update any globals.
-    """
-    wstart = wline(bstart) + offset
-    nlines = wbottom() - wstart
-    update_lines(bstart, wstart, nlines)
-
 def erase_lines(nlines):
     """
     Completely erase nlines lines starting at current cursor position.
@@ -119,6 +107,28 @@ def erase_lines(nlines):
     for iline in range(nlines):
         display.kill_whole_line()
         display.next_line()
+
+def erase_bottom():
+    """
+    Erase any old lines left over between end of buffer and bottom of window.
+    Leave cursor after last line erased.  Do not update any globals.
+    """
+    nlines = wheight - wline(ed.dot) # n of lines to end of window
+    nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
+    nelines = nlines - nblines # n of empty lines at end of window
+    erase_lines(nelines+1) # sic +1.  make empty lines at end of window.
+
+def update_below(bstart, offset=0):
+    """
+    Update lines in the window starting with (including) buffer line bstart
+    down to (but not including) the status line. Accept default offset=0 
+    to begin updating at present position of bstart in the window, or
+    optionally assign offset to move bstart and following lines down.
+    Leave cursor after last line displayed. Do not update any globals.
+    """
+    wstart = wline(bstart) + offset
+    nlines = wbottom() - wstart
+    update_lines(bstart, wstart, nlines)
 
 def open_line(iline):
     """
@@ -231,10 +241,7 @@ def display_d(iline):
     ed.dot = iline # but no point = 0
     if in_window(ed.dot):
         update_below(ed.dot) # doesn't change dot, moves cursor to end of text
-        nlines = wheight - wline(ed.dot) # n of lines to end of window
-        nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
-        nelines = nlines - nblines # n of empty lines at end of window
-        erase_lines(nelines+1) # sic +1.  make empty lines at end of window.
+        erase_bottom()
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
@@ -254,20 +261,11 @@ def display_y(iline):
     ed.move_dot(iline)
     if in_window(ed.dot):
         update_below(ed.dot - len(ed.killed)) # first yanked line
+        erase_bottom()
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
         recenter()
-
-def erase_bottom():
-    nlines = wheight - wline(ed.dot) # n of lines to end of window
-    nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
-    nelines = nlines - nblines # n of empty lines at end of window
-    erase_lines(nelines+1) # sic +1.  make empty lines at end of window.
- 
-def display_wrap(iline):
-    display_y(iline)
-    erase_bottom()
 
 def display_c(iline):
     """
@@ -402,7 +400,7 @@ def outdent(start=None, end=None, nspaces=None):
     ed.outdent(start, end, nspaces, display_change_lines) 
 
 def wrap(start=None, end=None, lmarg=None, rmarg=None):
-    ed.wrap(start, end, lmarg, rmarg, move_dot=display_y) # FIXME display_wrap
+    ed.wrap(start, end, lmarg, rmarg, move_dot=display_y)
 
 def j(start=None, end=None):
     ed.j(start, end, move_dot=display_j)
