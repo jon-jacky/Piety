@@ -2,13 +2,16 @@
 branches
 ========
 
-This is the *edfix* branch off the *rewrite* branch.
+This is the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
+
+- 18 Apr 2024.  Finish fixing editor bugs for now.  Merge *edfix* branch
+  back into *rewrite* branch.
 
 - 9 Apr 2024: Begin *edfix* branch to fix bugs recently found in the editors. 
 
@@ -94,4 +97,4 @@ Recent work in the *rewrite* branch:
 -  1 Feb 2023: Delete most files and directories for a fresh start.
    Revise *BRANCH.md*, *DIRECTORIES.md*, and *bin/paths*.
 
-Revised Jan 2024
+Revised Apr 2024
