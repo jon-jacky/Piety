@@ -29,7 +29,7 @@ Now we have two windows.  Create two writers and two timers:
 
 Now start the A thread in the a.txt window
 
->> Thread(target=ta.timer,args=(1000,1'A',abuf)).start()
+>> Thread(target=ta.timer,args=(1000,1,'A',abuf)).start()
 
 a.txt window updates with a new timer message every second,
 but we can still type in the pysh REPL:

@@ -19,14 +19,21 @@ def restore_cursor_to_cmdline():
     fr.restore_cursor_to_cmdline() # puts cursor in col 1
     el.move_to_point(sh.point, sh.start_col)    
 
+saved_focus = -1 # index of focus window *before* we switch to print tick msg
+
 def restore_cursor():
+    ## sh.cmd_mode = False # DEBUG for testing n_windows() == 2 case from REPL
     if sh.cmd_mode: # editing/running Python commands at pysh REPL
         restore_cursor_to_cmdline() # redefined above, not the version in edsel
     # This next case assumes other window is tocus window that needs restoring
     # BUT if current window is intended focus window, this switches focus away
     elif fr.n_windows() == 2: # HACK only works in this n == 2 special case
-        fr.on() # switch to next window - there can only be one other window
+        ## display.putstr(f'SWITCH WINDOW from {ed.bufname}') # DEBUG
+        fr.save_window(fr.focus) 
+        fr.focus = saved_focus
+        fr.restore_window(saved_focus)
         pm.restore_cursor_to_window()
+        ## display.putstr(f'AT POINT in {ed.bufname}') # DEBUG
     else: # There is no other window, cursor is already where it is needed.
         pass 
 
@@ -101,6 +108,7 @@ def writebuf_show(bname, line):
      it but not display it.
     If buffer bname is not in buffers, writebuf does not attempt to update it.
     """
+    global saved_focus # index of focus window before weswitch to print tick msg
     wk = -1  # can't be a window key
     # search for key of window that shows buffer bname
     for wk in fr.windows: # wk is integer window key
@@ -109,6 +117,7 @@ def writebuf_show(bname, line):
     # if window with named buffer found, change focus - based on fr.on code
     if wk in fr.wkeys and wk != fr.focus:  # if not found, wk is still -1
         fr.save_window(fr.focus) 
+        saved_focus = fr.focus
         fr.focus = fr.wkeys[wk]
         fr.restore_window(wk)
     writebuf(bname, line)

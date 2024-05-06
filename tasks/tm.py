@@ -1,7 +1,7 @@
 # Start pmacs editor with pyshell from command line in any dir: python3 -im tm
 # Like pm script but also imports writer, timers, pyshell for tasking expts. 
 # When script exits you see pmacs window and pysh >> (not >>>) REPL prompt.
-# Type rpm() to begin display editing, M-x to return to >>, exit()  when done
+# Type tpm() to begin display editing, M-x to return to >>, exit()  when done
 # First must define PYTHONPATH by . /Users/jon/piety/bin/paths, once in session
 import sked
 from sked import *
@@ -19,10 +19,11 @@ from writer import *
 import timers # for tasks         
 from timers import *
 from contextlib import redirect_stdout # for tasks
+import threading
 from threading import Thread
-from threading import enumerate
+threads = threading.enumerate # NOT from threading import enumerate. Name clash!
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 win(22)
-pysh() # Now at pysh >> prompt type rpm() for display editing, exit()  when done
+pysh() # Now at pysh >> prompt type tpm() for display editing, exit()  when done
 
 

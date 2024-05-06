@@ -483,6 +483,8 @@ def restore_window(wkey):
     # If previous window has the same buffer, don't update prev_bufname
     if bufname != ed.bufname: ed.prev_bufname = ed.bufname
     ed.restore_buffer(bufname, print_nothing) # assign *global* ed.bufname here
+    # Window dot and point might be different than its buffer's, restored above.
+    # Can be multiple windows looking at different locations in same buffer.
     if bufname != 'scratch.txt':
         ed.dot = windows[wkey].get('dot', ed.dot)
         ed.point = windows[wkey].get('point', ed.point)

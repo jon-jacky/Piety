@@ -11,6 +11,7 @@ The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 
 import os # for os.path.basename, used in store_buffer
 import textwrap
+## import display # DEBUG, for display.putstr for debugging info
 
 # Define and initialize global variables used by sked editing functions,
 # but only the *first* time this module is imported in a session.
@@ -102,6 +103,7 @@ def set_saved(status):
 def restore_buffer(bname, printline=print):
     'Restore state of saved buffer bname to current saved buffer'
     global bufname, filename, buffer, dot, point, saved
+    ## display.putstr(f'From {bufname} restore {bname}\n\r') # DEBUG
     bufname = buffers[bname].get('bufname', 'no name')
     filename = buffers[bname].get('filename', 'no filename')
     buffer = buffers[bname].get('buffer', ['\n'])

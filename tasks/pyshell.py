@@ -33,7 +33,7 @@ start_col = 3 # index of start of cmd on line, allowing for prompt ps1 or ps2
 
 history = [''] # list of command strings, most recent at index 0
 i_cmd = -1 # integer index into history, code will assign to 0 or greater
-max_cmds = 20 # maximum number of commands in history
+max_cmds = 100 # maximum number of commands in history.  20 is not enough!
   
 # cmd_mode is needed to restore terminal cursor after it is used by a task. 
 cmd_mode = True  # True in Python REPL, False when editing in display window.

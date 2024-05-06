@@ -69,6 +69,9 @@ class Timer():
         for i in range(n):
             if not self.run: break
             time.sleep(self.delay)
-            print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
-            file=destination)
-   
+            if destination == sys.stdout: # default
+                print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',
+                      file=destination)
+            else:
+                destination.write(f'{label} {i+1} {datetime.datetime.now()}\n\r')
+
