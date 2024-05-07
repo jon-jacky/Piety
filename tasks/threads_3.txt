@@ -1,0 +1,21 @@
+threads_3.txt
+
+Further experiments with Python threading using functions in timer.py and
+writer.py with the pysh REPL from pyshell.py.
+
+In this demonstration, we show a thread updating a buffer in one window,
+while we edit text in another buffer in its window, and type at our pysh
+REPL to control  the thread.
+
+>> o2()
+>> e('a.txt')
+a.txt, 0 lines
+>> ta = Timer()
+>> abuf = Writer('a.txt')
+>> Thread(target=ta.timer,args=(1000,5,'A',abuf)).start()
+>> on()
+>> tpm()
+
+Then M-x >> from threads_3 import *  so you can do >> threads()  >> ta.delay = 1
+etc.
+

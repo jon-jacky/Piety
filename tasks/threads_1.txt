@@ -1,4 +1,4 @@
-threads.txt
+threads_1.txt
 
 Notes on experiments with Python threading using the functions in
 timers.py and writer.py
@@ -191,5 +191,5 @@ The function threading.enumerate() lists the active threads.
 There is no simple way to kill a thread in Python.  The thread has
 to be coded in a particular way to make this possible.
 
-Revised Feb 2024
+Revised May 2024
 
