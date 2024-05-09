@@ -1,22 +1,37 @@
 threads_1.txt
 
-Notes on experiments with Python threading using the functions in
+Experiments with Python threading using the functions in
 timers.py and writer.py
 
 The name of the timers module is plural, but the name of
 its timer function is singular.   So we can say 'from timers import 
 timer' then 'reload timers' without a name clash.
 
-These experiments were run in a session with the pmacs editor,
-displaying one or two windows into buffers, with a scrolling Python
-REPL in several lines at the bottom of the terminal.
+To run these experiments, follow along in this file and type
+each command.  To begin, at the system command prompt, type this
+command to define PYTHONPATH so the commands work in any directory.
+Note the initial lone dot . at the start of the command:
 
+...S .  ~/Piety/bin/paths
+
+Then type this command to start the pmacs editor.  
+
+...% python3 -im pm
+
+An  empty  window appears with a cursor in it, and an empty Python REPL
+region below.
+
+Move the cursor to the Python REPL: type M-x ('meta x') by holding down
+the alt key and while you type the x key.  Now you can type Python
+statments at the REPL prompt >>>
+  
 The timer function repeats printing a timestamp message, with a given
 delay between messages.  It has this signature:
 
 def timer(n=1, delay=1.0, label=''): ...
  
-Example in the REPL without threading:
+The first example runs code in the REPL without threading.  Type these
+commands at the Python REPL prompt:
 
 >>> from timers import timer
 
@@ -34,6 +49,8 @@ You might want to print the messages to an editor buffer instead of the
 REPL. The writer module contains a write function that appends a string
 to the editor current buffer and displays the buffer in the focus
 window. To print the messages in the focus window, use redirect_stdout:
+
+>>> import writer
 
 >>> from contextlib import redirect_stdout
 
@@ -120,8 +137,14 @@ the Writer class from the writer module to collect and forward the messages
 
 >>> abuf = Writer('a.txt')
 
-Create a buffer a.txt in the focus window. Then to send the messages to
-a.txt without threading:
+Create a buffer a.txt in the focus window. 
+
+>>> e('a.txt')
+a.txt, 0 lines
+
+Then to send the messages to a.txt without threading:
+
+>>> from timers import ptimer
 
 >>> ptimer(3,5,'A',abuf)
 
@@ -145,6 +168,11 @@ We can update different windows from different threads.  Create
 a buffer b.txt and show windows for both a.txt and b.txt.  Create
 a Writer for b.txt:
 
+>>> o2()
+
+>>> e('b.txt')
+b.txt, 0 lines
+
 >>> bbuf = Writer('b.txt')
 
 Then issue these two commands. Note the second command prints to bbuf:
@@ -155,7 +183,7 @@ Then issue these two commands. Note the second command prints to bbuf:
 We can try shorter delays to see if the display can keep up without
 getting scrambled.   
 
-With the present version of the pmacs editor, It is
+With the version of the pmacs editor started by the pm script, it is
 not possible to type commands while the display is updating rapidly
 because the cursor in the REPL keeps getting reset to the first column.
 
@@ -178,10 +206,13 @@ run it.  While it is running, press the up-arrow again to retrieve the
 command for b.txt, then type RETURN to run that.   Both buffers update
  in two windows.
 
+It is difficult to start the second thread when the first window is
+updating at 10 messages/sec because the cursor resets to the first column.
+Press up-arrow and when you see a B in the fragment of text on the line,
+press RET.
+
 With the 0.1 sec delay, both buffers update in two windows and no text
-is scrambled.  Also, the window status lines update and messages about
-changing the current buffer appear in the REPL -- that text  is not
-scrambled either.   We did not code any explicit synchronization between
+is scrambled.   We did not code any explicit synchronization between
 the threads and the pmacs editor, so it appears that the Python
 threading mechanism itself must allow each thread to always finish
 printing a complete line before it switches to another thread.
