@@ -1,21 +1,91 @@
 threads_3.txt
 
-Further experiments with Python threading using functions in timer.py and
-writer.py with the pysh REPL from pyshell.py.
+Experiments with Python threading using the pmacs editor with timer.py
+and writer.py, with our custom pysh REPL from pyshell.py.
 
 In this demonstration, we show a thread updating a buffer in one window,
 while we edit text in another buffer in its window, and type at our pysh
 REPL to control  the thread.
+ 
+We need our custom pysh REPL for this demo so our code can
+restore the cursor to the correct location in the REPL as we
+type, after a task updates a window.  This is not possible with
+the standard Python REPL.
+
+It is easiest to explain by doing this demonstration. Just
+follow along, typing the statements here as you go. 
+
+(Alternatively, you can run the script in threads_2.py - see directions
+at the end of this file.)
+
+At the system command prompt (often $), define the PYTHONPATH, so this
+demo works in any directory.
+
+...$  .  ~/Piety/bin/paths
+
+Run the tm script (not pm) which imports the editor, timer, and writer
+modules, opens a window into the scratch.txt buffer, and starts the pysh REPL:
+
+...$ python3 -im tm
+
+At the pysh prompt >> (not the standard Python prompt >>>),
+split the window into two:
 
 >> o2()
+
+Create a buffer in one of the windows:
+
 >> e('a.txt')
 a.txt, 0 lines
+
+Create a timer object, and a Writer object that the thread
+will use to redirect thread output to a window:
+
 >> ta = Timer()
 >> abuf = Writer('a.txt')
->> Thread(target=ta.timer,args=(1000,5,'A',abuf)).start()
+
+Now start a thread that prints 1000 messages at 1 second
+intervals, redirected by the abuf writer to the a.txt window:
+
+>> Thread(target=ta.timer,args=(1000,1,'A',abuf)).start()
+
+The a.txt window updates with a new timer message every second.
+
+Type the command to change the focus to the other window.
+
 >> on()
+
+Type the command to move the cursor from the REPL into the editing window.
+
 >> tpm()
 
-Then M-x >> from threads_3 import *  so you can do >> threads()  >> ta.delay = 1
-etc.
+Wait for one more message to appear in the a.txt window, then the cursor
+moves to the scratch.txt window.  Now you can type and edit in
+scratch.txt while the timer messages appear in the a.txt window.
+
+Type M-x (hold down the alt key while typing x) to put the 
+cursor back in the REPL.  This command imports identifiers  
+ 
+>> from threads_3 import *
+
+so you can type commands like 
+
+>> ta.delay = 0.5 
+
+to change the rate  of the messages or 
+
+>> threads() 
+
+To show the running threads.
+
+As an alternative to typing the commands in this page,  you can run the
+script in threads_3.py.   Run the tm script as described above, then at
+the pysh prompt type 
+
+>> import threads_3.  
+
+Two windows will appear. Just start typing the in the scratch.txt window,
+as timer messages appear in the other window.
+
+Revised May 2024
 

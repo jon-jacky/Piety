@@ -1,16 +1,15 @@
 threads_2.txt
 
-Experiments with Python threading using functions
-in timer.py and writer.py with the pysh REPL from pyshell.py.
+Experiments with Python threading using the pmacs editor with timers.py
+and writer.py, with our custom pysh REPL from pyshell.py.
 
-In this demonstration, we show two threads updating two buffers
-in two windows, while we type at our pysh REPL to control 
-the threads.   
+In this demonstration, we show two threads rapidly updating two buffers
+in two windows, while we type at our pysh REPL to control  the threads.
 
-We need our pysh REPL for this demo so our windowing code can restore the
-cursor to the correct location in the REPL command line as we type, after
-it updates each of the windows.  This is not possible with the standard
-Python REPL.
+We need our custom pysh REPL for this demo so our windowing code can
+restore the cursor to the correct location in the REPL command line as we
+type, after it updates each of the windows.  This is not possible with
+the standard Python REPL.
 
 It is easiest to explain by doing this demonstration. Just
 follow along, typing the statements here as you go. 
@@ -51,7 +50,7 @@ intervals, redirected by the abuf Writer to the a.txt window:
 
 >> Thread(target=ta.timer,args=(1000,1,'A',abuf)).start()
 
-a.txt window updates with a new timer message every second,
+The a.txt window updates with a new timer message every second,
 but we can still type in the pysh REPL to start another thread:
 
 >> Thread(target=tb.timer,args=(1000,1,'B',bbuf)).start()

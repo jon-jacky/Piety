@@ -10,7 +10,7 @@ The write function defined here in the writer module updates the sked
 current buffer and the edsel focus window.
 
 You do not invoke the write function explicitly.  Instead, you specify
-the object (module or class instance) that cotains the write function 
+the object (module or class instance) that contains the write function 
 (or method).
 
 For example, a print function call with the optional argument
@@ -48,6 +48,9 @@ To redirect output to a.txt:
 
   with redirect_stdout(abuf) as buf: print('...')
 
+The writer module also contains code that restores the cursor to the
+correct location in the Python REPL or an editing window after 
+it writes text to the background task window.
 
-Revised Feb 2024
+Revised May 2024
    

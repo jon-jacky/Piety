@@ -1,6 +1,6 @@
 threads_1.txt
 
-Experiments with Python threading using the functions in
+Experiments with Python threading using the pmacs editor with
 timers.py and writer.py
 
 The name of the timers module is plural, but the name of
@@ -9,7 +9,7 @@ timer' then 'reload timers' without a name clash.
 
 To run these experiments, follow along in this file and type
 each command.  To begin, at the system command prompt, type this
-command to define PYTHONPATH so the commands work in any directory.
+command to define the PYTHONPATH so the commands work in any directory.
 Note the initial lone dot . at the start of the command:
 
 ...S .  ~/Piety/bin/paths
@@ -18,7 +18,7 @@ Then type this command to start the pmacs editor.
 
 ...% python3 -im pm
 
-An  empty  window appears with a cursor in it, and an empty Python REPL
+An  empty  window appears with the cursor in it, and an empty Python REPL
 region below.
 
 Move the cursor to the Python REPL: type M-x ('meta x') by holding down
@@ -47,7 +47,7 @@ A 3 2024-01-12 21:06:53.516400
 
 You might want to print the messages to an editor buffer instead of the
 REPL. The writer module contains a write function that appends a string
-to the editor current buffer and displays the buffer in the focus
+to the editor current buffer and displays the buffer in the editor focus
 window. To print the messages in the focus window, use redirect_stdout:
 
 >>> import writer
@@ -56,7 +56,7 @@ window. To print the messages in the focus window, use redirect_stdout:
 
 >>> with redirect_stdout(writer) as buf: timer(3,1,'A') 
 
-(messages appear in focus window)
+(messages appear in editor focus window)
   
 Now let's make two threads that execute concurrently,  printing
 alternating lines of output. In this example ta and tb are threads that
@@ -86,7 +86,7 @@ We pass the long 5 sec delay to the timers here to give us time to type
 both start commands before messages start to appear in the REPL.
  
 You can only call start() on a thread once.  To run the threads again,
-you have to make new thread objects by repeating the ta = ... call etc.
+you have to make new thread objects by repeating the ta = ... statement etc.
 
 Alternatively, you don't have to first create a thread object 
 at all, you can just create and start a thread in one statement:
@@ -104,7 +104,7 @@ the thread in the background and returns to the REPL right away.
 
 Unfortunately redirect_stdout does not work with threads, so
 we can't use it to print interleaving messages in an editor buffer.
-(We did some experiments that confirmed this.)
+We did some experiments that confirmed this.  It is explained here:
  
 From https://docs.python.org/3/library/contextlib.html:
 
@@ -183,9 +183,11 @@ Then issue these two commands. Note the second command prints to bbuf:
 We can try shorter delays to see if the display can keep up without
 getting scrambled.   
 
-With the version of the pmacs editor started by the pm script, it is
-not possible to type commands while the display is updating rapidly
-because the cursor in the REPL keeps getting reset to the first column.
+The pm script starts the pmacs editor with the standard Python REPL, so
+it is not possible to type commands while the display is updating
+rapidly. It is not possible to restore the cursor to the correct location
+in the standard Python REPL command line after writing a message  in a
+display window.
 
 However, we can work around that.  We can type commands that edit one
 window at a time from a single thread, then retrieve those same commands
@@ -221,6 +223,19 @@ The function threading.enumerate() lists the active threads.
 
 There is no simple way to kill a thread in Python.  The thread has
 to be coded in a particular way to make this possible.
+
+Recall that the pm script starts the pmacs editor with the standard
+Python REPL, so so it is not possible to type commands while the display
+is updating rapidly because is not always possible to restore the cursor
+to the correct location in the standard Python REPL command line after
+writing a message  in a display window.
+
+This is a serious limitation which often prevents using the standard
+Python REPL while displaying output from  other tasks.  Therefore we
+write our own custom Python REPL named pysh (rhymes with fish) that
+provides more control over the cursor in the Python command line.
+The experiments described in threads_2.txt and threads_3.txt demonstrate
+using our custom pysh REPL while other tasks rapidly update the display.
 
 Revised May 2024
 
