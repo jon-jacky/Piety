@@ -64,10 +64,10 @@ coroutines implemented by Python generators, and with the Python
   then starts our custom *pysh* Python interpreter.
 
 - **writer.py**: Functions that put text into sked buffers and edsel windows,
-  intended to be called from background tasks.  Code here also restores  
+  intended to be called from background tasks.  Code here also restores
   the cursor to the correct location in the *pysh* Python
   command line,   or in a display editing window, after a background task
-  updates an editor   window.
+  updates another window.
 
 - **writer.txt**:  Notes on *writer.py*.
 
