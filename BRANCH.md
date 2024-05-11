@@ -10,6 +10,8 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
+- 11 May 2024: Finish revising .md files at top level and under *doc*.
+
 -  9 May 2024: Begin revising top-level *README.md* and other *.md* files
    at top level and under *doc* to make them consistent with code in
    the *rewrite* branch.  Do this work in the *rewrite* branch.
