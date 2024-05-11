@@ -8,7 +8,6 @@ Piety
 [Current Status](#Current-Status)  
 [Roadmap](#Roadmap)  
 [Dependencies](#Dependencies)  
-[Python Versions](#Python-Versions)  
 [Tested Platform](#Tested-Platform)
 
 ## Motivation and Goals ##
@@ -39,37 +38,31 @@ others that we might be able to use or adapt (see
 
 ## Current Status ##
 
-For now, Piety runs in an ordinary Python interpreter session on a host
-operating system.   Here is an explanation of the Piety
-[design](doc/analogies.md).
+For now, Piety runs in an ordinary Python interpreter session in a single
+terminal on a host operating system. It provides an ed-like line editor, an
+Emacs-like display editor, and a custom Python interpreter.
 
+The display editor can support multiple buffers and windows in the terminal,
+and also a region for the Python interpreter. Together these provide a
+minimal but self-contained programming environment within a single Python
+terminal session.  
 
-At this time, Piety provides [cooperative multitasking](piety/README.md),
-[jobs](scripts/session.md) that can be suspended and resumed, a Python-
-based [shell](shells/wyshka.md) with output redirection,  a [line
-editor](editors/ed.md), and a [display editor](editors/edsel.md). 
+Python commands can redirect their output to editor buffers and windows.
+The programming environment supports experiments in tasking and concurrency.
+Concurrent tasks can also redirect their output to editor windows, updating
+the display as they are controlled by commands from the Python interpreter.
 
-The display editor includes a built-in shell and window manager, which
-together provide a minimal but self-contained programming environment
-within a single Python terminal session.  It is the programmer's user
-interface to the Piety system.  It provides the CPython interpreter,
-which can be invoked in
-[several ways](editors/edsel.md#Writing-and-running-Python-in-edsel).
+Piety development is self-hosted in this programming environment.  Code is
+added and revised in a long-running Python terminal session.  Code  is
+imported and reloaded into the session without restarting or  losing work in
+progress.   This is made possible by adopting a particular workflow and
+coding style.
 
-There are some small [samples](samples/README.md) and
-[scripts](scripts/README) for demos and testing.  This
-[demo](scripts/demo.md) exhibits many Piety features.
-
-Other pages describe the Piety [directories](DIRECTORIES.md) and their
-contents, and its [modular structure](doc/modules.md).
-
-NOTE: The preceding paragraphs describe the Piety version in the
-*master* branch, labelled with the *version1* tag.  Work on this
-version ended in Jan 2023.  A total rewrite is now underway in the *rewrite*
-branch, to simplify the code and improve its organization and clarity.
-It might be quite a while before the code in *rewrite* provides
-equivalent functionality to *master*.
-
+This version of Piety was started from scratch in February 2023.  Its
+development is ongoing here in the *rewrite* branch of the *Piety* repository.
+An archive of the earlier version of Piety that was abandoned in January 2023
+is here in the  *master* branch and *version1* tag.
+     
 ## Roadmap ##
 
 This project is a series of experiments. There is no plan for a sequence
@@ -83,8 +76,7 @@ decide what to work on next as I go along.  I often go back and rewrite
 what I have already done, to make it easier to work with or just to
 improve the style.
 
-A history of some of this past work appears [here](BRANCH.md) (it omits
-the early years).
+A history of some of this past work appears [here](BRANCH.md).
 
 I hope someday to run Piety on a bare machine with no other
 operating system, but only a Python interpreter with minimal support.
@@ -105,22 +97,10 @@ begun work on any.   Every approach would require a more concentrated,
 sustained effort than I have been able to make so far.
 
 It is likely that work in the near future will continue in the hosted part.
-I can always add features and improve the convenience of the programming
-environment.  I might add other hosted applications, for example a simple
-text-only web browser in pure Python.  
-
-At this stage, the experiment is to see if it can be possible to create,
-edit, and run Python code using only the programming environment we have
-built so far, without resorting to the host desktop or command line.
-
-I will try to observe the discipline that Piety is *self-hosted*: any new
-Piety code must be developed within its already existing programming
-environment.
-
-NOTE: At this writing (Feb 2023) a total rewrite is underway in the
-*rewrite* branch, to simplify the code and improve its organization
-and clarity.
-
+Until now, we have only experimented with tasks implemented by Python threads.
+Next, we expect to try experiments with coroutines implemented by Python generators,
+and after that, we may experiment the Python *asyncio* library.
+ 
 ## Dependencies ##
 
 The Piety system has no dependencies, other than Python itself
@@ -130,18 +110,12 @@ Alternatively, it might be possible to assemble similar functionality
 from [other projects](doc/utilities.md), but I expect the resulting
 system would be larger and harder to understand than Piety.
 
-## Python Versions ##
-
-Piety is written in Python 3 since June 2015.   Earlier work is saved in
-this repository in the *python2* tag.  The conversion is described
-[here](doc/python3.md).   Piety now requires Python 3.5.
-
 ## Tested Platforms ##
 
-Through November 2023, the Piety software was only run on one computer: a
-MacBook Pro (13 inch, early 2011), running Mac OS (through 10.11.6 El
-Capitan, the most recent version that runs on that hardware).    It
-ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
+Through November 2023, the abandoned *master* branch Piety software was only
+run on one computer: a MacBook Pro (13 inch, early 2011), running Mac OS
+(through 10.11.6 El Capitan, the most recent version that runs on that
+hardware). It ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
 ran on CPython downloaded from python.org, through version 3.9.0.
 
 Beginning in December 2023, Piety development moved to Linux
@@ -155,5 +129,5 @@ The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
 purchased in 2023.  At this writing (12 Jan 2024) it is running
 ChromeOS Version 118.0.5993.164.
 
-Revised Jan 2024
+Revised May 2024
 
