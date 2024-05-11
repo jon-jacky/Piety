@@ -39,26 +39,28 @@ others that we might be able to use or adapt (see
 ## Current Status ##
 
 For now, Piety runs in an ordinary Python interpreter session in a single
-terminal on a host operating system. It provides an ed-like line editor, an
-Emacs-like display editor, and a custom Python interpreter.
+terminal on a host operating system. 
 
-The display editor can support multiple buffers and windows in the terminal,
-and also a region for the Python interpreter. Together these provide a
-minimal but self-contained programming environment within a single Python
-terminal session.  
+Piety provides a [display editor](editors/README.md),  and a 
+[custom Python interpreter](tasks/pyshell.py). The display editor can support 
+multiple buffers and windows in the terminal, and also a region for the
+Python interpreter. Together these provide a minimal but self-contained
+programming environment within a single Python terminal session.
 
-Python commands can redirect their output to editor buffers and windows.
-The programming environment supports experiments in tasking and concurrency.
-Concurrent tasks can also redirect their output to editor windows, updating
-the display as they are controlled by commands from the Python interpreter.
+The editor is not just for creating text. Python commands including
+concurrent tasks can redirect their output to editor buffers and windows, so
+the editor can be used for data collection and animated display.  We have
+used it for [experiments in tasking and concurrency](tasks/README.md),
+where tasks update windows as we control their behavior by typing  commands
+at the Python interpreter.
 
 Piety development is self-hosted in this programming environment.  Code is
-added and revised in a long-running Python terminal session.  Code  is
-imported and reloaded into the session without restarting or  losing work in
-progress.   This is made possible by adopting a particular workflow and
-coding style.
+added and revised in a long-running Python session.  Code  is imported and
+reloaded into the session without restarting or  losing work in progress.
+To make this possible we adopted a
+[particular workflow and coding style](editors/HOW.md).
 
-This version of Piety was started from scratch in February 2023.  Its
+The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
 An archive of the earlier version of Piety that was abandoned in January 2023
 is here in the  *master* branch and *version1* tag.
@@ -91,15 +93,16 @@ support, but the goal is to replace that with a special-purpose operating
 system which is itself mostly written in Python.
 
 All the work I have done so far, including the programming environment, is
-in the hosted part.  I have researched [several
-approaches](doc/baremachine.md) to building the native part, but have not
-begun work on any.   Every approach would require a more concentrated,
-sustained effort than I have been able to make so far.
+in the hosted part.  I have researched 
+[several approaches](doc/baremachine.md) to building the native part, but
+have not begun work on any.   Every approach would require a more
+concentrated, sustained effort than I have been able to make so far.
 
 It is likely that work in the near future will continue in the hosted part.
-Until now, we have only experimented with tasks implemented by Python threads.
-Next, we expect to try experiments with coroutines implemented by Python generators,
-and after that, we may experiment the Python *asyncio* library.
+Until now, we have only experimented with tasks implemented by Python
+threads. Next, we expect to try experiments with coroutines implemented by
+Python generators, and after that, we may experiment the Python *asyncio*
+library.
  
 ## Dependencies ##
 
@@ -112,7 +115,7 @@ system would be larger and harder to understand than Piety.
 
 ## Tested Platforms ##
 
-Through November 2023, the abandoned *master* branch Piety software was only
+Through November 2023, the Piety software was only
 run on one computer: a MacBook Pro (13 inch, early 2011), running Mac OS
 (through 10.11.6 El Capitan, the most recent version that runs on that
 hardware). It ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
