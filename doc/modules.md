@@ -2,9 +2,8 @@
 Modular structure
 =================
 
-The Piety [directories](../DIRECTORIES.md) and modules are designed to
-enable Piety to run on different platforms and in different
-configurations.  
+The Piety directories and modules are designed to enable Piety to run on
+different platforms and in different configurations.
 
 A *platform* is a host operating system or a bare machine (including
 virtual machines), including the Python interpreter itself (CPython,
@@ -15,89 +14,29 @@ sometimes used for embedded systems).
 
 It is possible to customize Piety systems by choosing different
 subsets and combinations of modules.  To adapt to different
-platforms and configurations, there are some modules with the
+platforms and configurations, you can create modules with the
 same name and same API (but different internals) stored in
-different directories: for example, we have *select/eventloop.py* and
-*asyncio/eventloop.py*.  The chosen module can be included by
-adding its directory to the *$PYTHONPATH* and excluding the other.
-To help with this, there are commands in the *bin* directory.
+different directories.  
 
-In the following discussion, *use* or *depend on* means *import*.  The
-design attempts to minimize dependencies among modules.
+For example, we have the directory *unix* containing the module
+*terminal.py*.  To support a different platform,  we might add a directory
+*windows* that also contains a module *terminal.py* with  the same
+function names and arguments but different function bodies.
 
-- Modules that depend on particular platforms (host operating systems)
-  or configurations (devices) are separated out in directories with
-  specific names that indicate the dependence, for example *unix* or
-  *select* or *vt_terminal*.  Functionally-equivalent modules within
-  these directories provide the same API.  In particular, these
-  modules have the same generic names: *terminal*, *eventloop*,
-  *keyboard*, *display*.  The functions (etc.) within these modules
-  also have the same generic names: *run*, *self_insert_char*,
-  *kill_line* etc.  The bodies of those functions can contain
-  platform- and device-specific code.  Modules that use (import) any
-  of these are not platform- or device-dependent because they import
-  modules and call functions by their generic names.  The chosen
-  versions are selected by placing their directories on the
-  *$PYTHONPATH*.
+The *unix* and *windows* directories and their contents are platform dependent.
+But modules that import the *terminal* module and call its functions
+are platform independent.  Plaatform dependent and platform independent
+modules must be kept in different directores so Piety can be configured
+for different platforms by defining different *PYTONPATH*
 
-- Modules that are not platform- or device-dependent are written
-  in *pure Python*: They do not use C extensions, or modules that
-  wrap libraries written in other languages.  Those can limit the
-  platform to one particular Python interpreter (usually CPython).
-  A requirement for a particular Python interpreter is an example of
-  a platform dependence.
+For each platform, the platform dependent modules are included by adding
+their platform dependent directories to the *PYTHONPATH* and excluding the
+alternate platform dependent directories.  To help with this, there are
+commands in the *bin* directory.
 
-- The *piety* module in the *piety* directory is the core of the Piety
-  operating system.  It does not depend on any particular devices (in
-  particular, it does not require a console).  It is
-  platform-independent, but it must import a platform-dependent
-  *eventloop* module from a directory that contains one (currently,
-  from the *select* or *asyncio* directory).  
+Different configurations (that support different collections of hardware etc.)
+can be supported in the same way as different platforms.
+ 
+Revised May 2024
 
-- The *piety* module and all the *eventloop* modules import
-  *cycle*.  The platform-independent *cycle* module avoids
-  duplicating code in the *eventloop* modules and separates
-  platform-independent code from the platform-dependent code in the
-  *eventloop* modules.
-
-- The modules in the *console* directory are used by terminal
-  applications.  They are platform- and device- independent.  They
-  access all terminal functions by importing 
-  modules from device-dependent directories such as *unix* and
-  *vt_terminal*.
-
-- The modules in the directories *applications*, *editors*, and
-  *shells* are applications (the Python shell is just another
-  application).  An application does not depend on any modules in
-  *piety*; in fact, it must be able to run without the Piety event loop.
-  To demonstrate this, every application can be run from the host's
-  *python* command or in any Python interpreter session (by invoking the
-  application's *main* function, for example).  Applications are also
-  platform- and device- independent, by observing the same discipline as
-  modules in *console*.  Applications are included in the Piety
-  repository just as a convenience, and any application may be removed
-  or separated out to a different repository in the future.
-
-- None of the Piety operating system modules in *piety*, *console*, or
-  anywhere else depend on any application modules.
-  
-- The modules in the *scripts* directory run applications as tasks or
-  jobs with *piety.run*, or with simple blocking *while* loops.
-  These scripts typically use modules
-  from the *piety*, *console*, and application directories.  They
-  can use any modules.  Avoiding platform- or
-  device-specific code in scripts makes it possible for them to be re-used
-  on different systems.
-
-- None of the Piety operating system modules or applications depend on any
-  contents of the *scripts* directory.
-
-The Piety system has no dependencies, other than Python itself
-(including a few standard library modules).  This makes Piety a
-minimal self-contained system, written in a uniform style throughout.
-Alternatively, it might be possible to assemble similar functionality
-from [other projects](utilities.md), but we expect the resulting
-system would be larger and harder to understand than Piety.
-
-Revised May 2018
 
