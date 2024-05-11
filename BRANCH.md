@@ -10,7 +10,20 @@ the code, and improve the responsiveness of the programming environment.
 
 Recent work in the *rewrite* branch:
 
-- 18 Apr 2024.  Finish fixing editor bugs for now.  Merge *edfix* branch
+-  9 May 2024: Begin revising top-level *README.md* and other *.md* files
+   at top level and under *doc* to make them consistent with code in
+   the *rewrite* branch.  Do this work in the *rewrite* branch.
+
+-  9 May 2024:  Revise top-level README.md in *master* branch:
+   put directions to *rewrite* branch right at the top so they
+   can't be missed.
+ 
+-  9 May 2024:  Finish work on tasking for now.  Already in the *rewrite*
+   branch, so no merge is needed.
+ 
+- 23 Apr 2024:  Resume work on tasking, but in the *rewrite* branch.
+
+- 18 Apr 2024:  Finish fixing editor bugs for now.  Merge *edfix* branch
   back into *rewrite* branch.
 
 - 9 Apr 2024: Begin *edfix* branch to fix bugs recently found in the editors. 
