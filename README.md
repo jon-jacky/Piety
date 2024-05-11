@@ -4,6 +4,16 @@ Piety
 
 **Piety** is a notional operating system to be written in Python.
 
+**NOTE**: This is the *master* branch.  We abandoned this branch in Jan 2023.
+A complete rewrite, starting over from scratch, is now underway in the
+[*rewrite* branch](https://github.com/jon-jacky/Piety/tree/rewrite).
+The rewrite aims to make the code shorter and simpler, and make the programming 
+environment more responsive.
+
+You should switch to the *rewrite* branch now.  This *master* branch and the
+*version1* tag are only retained here as an archive, out of historical interest.
+All of the text after this point is from the abandoned *master* branch *README.md*.
+
 [Motivation and Goals](#Motivation-and-Goals)  
 [Current Status](#Current-Status)  
 [Roadmap](#Roadmap)  
@@ -63,14 +73,6 @@ There are some small [samples](samples/README.md) and
 Other pages describe the Piety [directories](DIRECTORIES.md) and their
 contents, and its [modular structure](doc/modules.md).
 
-NOTE: The preceding paragraphs describe the Piety version in the
-*master* branch, labelled with the *version1* tag.  Work on this
-version ended in Jan 2023.  A total rewrite is now underway in the
-[*rewrite* branch](https://github.com/jon-jacky/Piety/tree/rewrite)
-to simplify the code and improve its organization and clarity.
-It might be quite a while before the code in *rewrite* provides
-equivalent functionality to *master*.
-
 ## Roadmap ##
 
 This project is a series of experiments. There is no plan for a sequence
@@ -117,11 +119,6 @@ built so far, without resorting to the host desktop or command line.
 I will try to observe the discipline that Piety is *self-hosted*: any new
 Piety code must be developed within its already existing programming
 environment.
-
-NOTE: At this writing (Feb 2023) a total rewrite is underway in the
-[*rewrite* branch](https://github.com/jon-jacky/Piety/tree/rewrite)
-to simplify the code and improve its organization
-and clarity.
 
 ## Dependencies ##
 
