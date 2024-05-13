@@ -63,7 +63,8 @@ To make this possible we adopted a
 The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
 An archive of the earlier version of Piety that was abandoned in January 2023
-is here in the  *master* branch and *version1* tag.
+is here in the  *master* branch and *version1* tag.  The *rewrite* branch
+is now the main branch; I will  never merge it back into *master*.
      
 ## Roadmap ##
 
@@ -85,12 +86,12 @@ operating system, but only a Python interpreter with minimal support.
 
 Piety divides naturally into two independent parts: the *hosted* part and
 the *native* part.  The hosted part can run in any Python interpreter. It
-includes the applications, shells, job control, tasking, and the
-programming environment. The native part includes the  Python interpreter
-itself, and the support needed to run the interpreter  on the computer
-hardware.   Almost any general-purpose operating system can serve as the
-support, but the goal is to replace that with a special-purpose operating
-system which is itself mostly written in Python.
+includes the editors, shells, tasking, the  programming environment,
+and any tools and applications we might write.  The native part includes the
+Python interpreter itself, and the support needed to run the interpreter  on
+the computer hardware.   Almost any general-purpose operating system can
+serve as the support, but the goal is to replace that with a special-purpose
+operating system which is itself mostly written in Python.
 
 All the work I have done so far, including the programming environment, is
 in the hosted part.  I have researched 

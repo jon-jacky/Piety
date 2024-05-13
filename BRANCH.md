@@ -8,6 +8,9 @@ Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and improve the responsiveness of the programming environment.
 
+The *rewrite* branch is now the main branch.  I will never merge it back
+into the *master* branch.
+
 Recent work in the *rewrite* branch:
 
 - 11 May 2024: Change default branch at Github from *master* to *rewrite*.
