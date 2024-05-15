@@ -1,19 +1,16 @@
 
 Here are some language processors for Python and/or in Python.
 
-Except for the first entry, this table has not been updated since Feb 2020.
-There are more recent collections of pertinent links here:
-
-<https://github.com/pfalcon/awesome-python-compilers>
-
-and here, scroll down for links to 32 Python compilers:
-
-<https://lpython.org/>
-
-| Processor | Type | Description |
+| System | Type | Description |
 | --------- | ---- | ----------- |
 | [CPython](https://docs.python.org/devguide/index.html) | Interpreter, compiler | Reference implementation from [python.org](https://www.python.org/). [Source](https://github.com/python/cpython/tree/3.11) (pick a version from the branches button near upper left corner). [Developers' Guide](https://docs.python.org/devguide/index.html), for example [here](https://docs.python.org/devguide/setup.html#directory-structure) and [here](https://docs.python.org/devguide/compiler.html). [API](https://docs.python.org/3.11/c-api/index.html). [Video](https://pyvideo.org/video/635/stepping-through-cpython), also [here](https://pyvideo.org/video/1777/all-singing-all-dancing-python-bytecode). Here is a [brief explanation] (http://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1). More [here](http://utcc.utoronto.ca/~cks/space/blog/python/WhyCPythonBytecode). Ten hours of [video lectures](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358). | 
-| [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | From the [Python Standard Library](http://docs.python.org/2/library/index.html).  "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities." | 
+| [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Reference Python language implementation from python.org. Choose version from branch button near upper left corner of page. ]
+| [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documenation |  Contents of the source code directories,  from the [Developer's Guide](https://devguide.python.org/) |
+| [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).  "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities." | 
+| [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
+| [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) |
+| [Awesome Python Compilers](https://github.com/pfalcon/awesome-python-compilers) | Annotated links | Historical survey, with links to many systems mentioned below |
+| [LPython](https://lpython.org/) | Typed compiler | Optimizes type-annotated Python code.     Bottom of page has links to 32 Python compilers |
 | [UCPy](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | "Reverse-Engineering Python", targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
 | [Unladen Swallow](https://code.google.com/p/unladen-swallow/wiki/ProjectPlan), outcome [here](http://legacy.python.org/dev/peps/pep-3146/) | Compiler | CPython branch ca. 2009 aiming at "a performance improvement of 5x ...".  The goal was not met. Relevant background literature [here](https://code.google.com/p/unladen-swallow/wiki/RelevantPapers). |
 | [Cython](http://cython.org/), also [HN](https://news.ycombinator.com/item?id=6114334), also [blog](http://honnibal.wordpress.com/2014/10/21/writing-c-in-cython/) and [more HN](https://news.ycombinator.com/item?id=8483872) | Optimizing compiler, C extensions | "Cython is an optimising static compiler for both the Python programming language and the extended Cython programming language. ... a superset of the Python language that additionally supports calling C functions and declaring C types on variables and class attributes. This allows the compiler to generate very efficient C code from Cython code ... makes Cython the ideal language for wrapping external C libraries ... and for fast C modules that speed up the execution of Python ...".  Only works with CPython.  |
@@ -47,5 +44,5 @@ and here, scroll down for links to 32 Python compilers:
 | [Pythoniac](https://mail.python.org/pipermail/python-list/2002-June/152587.html) and [here](https://mail.python.org/pipermail/python-list/2002-June/163423.html), also [here](https://groups.google.com/forum/#!msg/comp.lang.python/paIIR2LJ2aI/QT0l0EWk2SUJ) | Bytecode interpreter in hardware (ideas, discussion) | "The PVM (Python Virtual Machine) processes objects (via pointers on the stack), which are treated in a 'black box' fashion - i.e. they have add, subtract, compare etc. methods that are called by the PVM ... These methods of objects may not actually be coded for in Python ... the PVM is unaware, in the majority of cases, of what actually needs to be done to manipulate objects, it just makes calls to non Python code. ... how to go about dealing with this in a Python processor? |
 | [pyCPU](http://pycpu.wordpress.com/), also [here](http://sourceforge.net/projects/pycpu/) | Bytecode interpreter for FPGA | "an implementation of a hardware CPU in [myHDL](http://www.myhdl.org). The CPU can directly execute something very similar to python bytecode (but only a very restricted instruction set).", "Running a very small subset of Python on an FPGA is possible." |
 
-Revised May 2024 (first entry on CPython only, and link at top to lpython)
-
+Revised May 2024
+ 
