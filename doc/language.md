@@ -4,9 +4,8 @@ Here are some language processors for Python and/or in Python.
 | System | Type | Description |
 | --------- | ---- | ----------- |
 | [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Source code for reference Python language implementation from python.org. Choose the Python version from the branch button near the upper left corner of the page. |
-| [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
-| [Python Language Services](https://docs.python.org/3.11/library/language.html) 
-| Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
+| [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
+| [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
 | [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
 | [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) |
 | [Awesome Python Compilers](https://github.com/pfalcon/awesome-python-compilers) | Annotated links | Historical survey, with links to many systems mentioned below |
