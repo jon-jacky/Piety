@@ -1,13 +1,22 @@
 
-Here are some language processors for Python and/or in Python.
+Python language summaries:
 
+- [Python Mastery](https://github.com/dabeaz-course/python-mastery)
+  500+ slides from a four day course.
+
+- [Cheat Sheets](https://jon-jacky.github.io/home/design.md#26-Dec-2021) 
+  Several compact summaries.
+
+Language processors for Python and/or in Python:
+ 
 | System | Type | Description |
 | --------- | ---- | ----------- |
 | [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Source code for reference Python language implementation from python.org. Choose the Python version from the branch button near the upper left corner of the page. |
 | [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
 | [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
 | [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
-| [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) |
+| [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) | 
+| [Minimal Python](https://snarky.ca/tag/syntactic-sugar/) | Blog posts, with code  | "I had set out to find ... this core set of (Python) syntax. ... If you can implement this subset ... you can do a syntactic translation to support  the rest of Python ..." |
 | [Awesome Python Compilers](https://github.com/pfalcon/awesome-python-compilers) | Annotated links | Historical survey, with links to many systems mentioned below |
 | [LPython](https://lpython.org/) | Typed compiler | Optimizes type-annotated Python code.     Bottom of page has links to 32 Python compilers |
 | [UCPy](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | "Reverse-Engineering Python", targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
