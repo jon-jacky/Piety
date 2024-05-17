@@ -4,7 +4,7 @@ Python language summaries:
 - [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)
   500+ slides from a four day 
   [course](https://github.com/dabeaz-course/python-mastery).
-- [Cheat Sheets](https://github.com/jon-jacky/home/blob/gh-pages/design.md#28-Dec-2021) 
+- [Cheat Sheets](https://github.com/jon-jacky/home/blob/gh-pages/design.md#26-Dec-2021) 
   Several compact summaries.
 
 Language processors for Python and/or in Python:
