@@ -1,11 +1,12 @@
 
 Python language summaries:
- 
+
+- [Comprehensive Python Cheatsheet](https://gto76.github.io/python-cheatsheet/)
+  Compact languge summary.
 - [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)
   500+ slides from a four day 
   [course](https://github.com/dabeaz-course/python-mastery).
-- [Cheat Sheets](https://github.com/jon-jacky/home/blob/gh-pages/design.md#26-Dec-2021) 
-  Several compact summaries.
+  PDF, best to download and read offline.
 
 Language processors for Python and/or in Python:
  
