@@ -4,7 +4,7 @@ Python system software
 
 System software and utilities written in Python, or programmable in Python.
 
-Another page has [Python compilers](compilers.md) and other lamguage processors. 
+Another page has [Python compilers](compilers.md) and other language processors. 
 
 | Component | Type | Python role | Description |
 | --------- | ---- | ----------- | ----------- | 
