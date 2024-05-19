@@ -1,5 +1,6 @@
 
-Python language summaries:
+
+### Summaries ###
 
 - [Comprehensive Python Cheatsheet](https://gto76.github.io/python-cheatsheet/)
   Compact languge summary.
@@ -8,20 +9,25 @@ Python language summaries:
   [course](https://github.com/dabeaz-course/python-mastery).
   PDF, best to download and read offline.
 
-Language processors for Python and/or in Python:
- 
-| System | Type | Description |
-| --------- | ---- | ----------- |
+### CPython ###
+
 | [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Source code for reference Python language implementation from python.org. Choose the Python version from the branch button near the upper left corner of the page. |
 | [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
 | [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) | 
+| [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
+| [py_compile](https://docs.python.org/3.11/library/py_compile.html) | Python to bytecode compiler | "provides a function to generate a byte-code file from a source file ..." From Python Language Services (above). | 
+
+### Semantics ###
+
 | [History of Python](https://python-history.blogspot.com/2009/01/pythons-design-philosophy.html) | Blog | Series of blog posts by Python creator Guido Van Rossum |
 | [Minimal Python](https://snarky.ca/tag/syntactic-sugar/) | Blog posts, with code  | "I had set out to find ... this core set of (Python) syntax. ... If you can implement this subset ... you can do a syntactic translation to support  the rest of Python ..." |
 | [Tested Semantics for Python](https://cs.brown.edu/~sk/Publications/Papers/Published/pmmwplck-python-full-monty)  | Research paper, abstract and links to full PDF and software | "We present a small-step operational semantics for the Python programming language. We present both a core language for Python, suitable for tools and proofs, and a translation process for converting Python source to this core. We have tested ... the core for conformance with the primary Python implementation ... |
 | [Reverse-Engineering Python](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also  [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | UCPy compiler, targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
+| [Repy](https://seattle.poly.edu/wiki/ProgrammersPage), also [here](https://seattle.poly.edu/wiki/UnderstandingSeattle/CodeSafety) and [here](https://github.com/SeattleTestbed/repy_v2) | Python subset, sandboxed VM | "Restricted Python" language, runtime, sandboxed VM for writing distributed computing applications for the [Seattle testbed](https://seattle.poly.edu/html/) |
+
+### Compilers ###
+
 | [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
-| [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
-| [py_compile](https://docs.python.org/3.11/library/py_compile.html) | Python to bytecode compiler | "provides a function to generate a byte-code file from a source file ..." From Python Language Services (above). | 
 | [Tailbiter](https://codewords.recurse.com/issues/seven/dragon-taming-with-tailbiter-a-bytecode-compiler) | Python to bytecode compiler | "... a small compiler able to compile itself ... in and for a subset of Python 3 ... I wrote this to accompany (the Byterun bytecode interpreter below) which takes the output of a compiler and executes it"|
 | [Byterun](https://github.com/nedbat/byterun), also [blog post](http://nedbatchelder.com/blog/201301/byterun_and_making_cells.html). | Bytecode interpreter | "a pure-Python implementation of a Python bytecode execution virtual machine". More about Python bytecodes [here](http://nedbatchelder.com/blog/200804/the_structure_of_pyc_files.html) |
 | [Python in Python](http://aosabook.org/en/500L/a-python-interpreter-written-in-python.html) | Bytecode Interpreter | "Byterun (above) is a compact Python interpreter that's easier to understand than CPython. ..." |
@@ -30,7 +36,6 @@ Language processors for Python and/or in Python:
 | [assembler](http://pythonwise.blogspot.com/2012/06/python-based-assembler.html) | Assembler | "the assembly (source) file is actually a Python file (module)" where statements such as *load(r2, MEM_LOC1)* are Python calls |
 | [machine code](http://multigrad.blogspot.com/2014/07/low-level-frenzy.html) | Execute opcodes | "... execute arbitrary x86-64 instructions in Python ... write a byte string that contains the executable code and then cast it into a CFUNCTYPE object." |
 | [Python internals](https://eli.thegreenplace.net/tag/python-internals) | Blog posts with code | For example, "I recently had to do a lot of binary data processing in memory ... made me think about the most efficient way to read data from a file into a modifiable memory chunk ..." |
-| [Repy](https://seattle.poly.edu/wiki/ProgrammersPage), also [here](https://seattle.poly.edu/wiki/UnderstandingSeattle/CodeSafety) and [here](https://github.com/SeattleTestbed/repy_v2) | Python subset, sandboxed VM | "Restricted Python" language, runtime, sandboxed VM for writing distributed computing applications for the [Seattle testbed](https://seattle.poly.edu/html/) |
 | [Pygments](http://pygments.org/) | Syntax highlighter | "syntax highlighting engine engine written in Python ... take source code (or other markup) in a supported language and output ... syntax highlighting markup" |
 | [Awesome Python Compilers](https://github.com/pfalcon/awesome-python-compilers) | Annotated links | Historical survey of Python compilers, with links to many mentioned below |
 | [LPython](https://lpython.org/)  | Annotated links | Bottom of page has links to 32 Python compilers. LPython itself is a compiler for Python with type annotations. |
