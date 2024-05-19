@@ -1,10 +1,16 @@
-Here are some examples of system software and utilities written in
-Python, or programmable in Python.
+
+Python system software
+======================
+
+System software and utilities written in Python, or programmable in Python.
+
+Another page has [Python compilers](compilers.md) and other lamguage processors. 
 
 | Component | Type | Python role | Description |
-| --------- | ---- | ----------- | ----------- |
+| --------- | ---- | ----------- | ----------- | 
 | [Python Standard Library](http://docs.python.org/3.11/library/) | Library | Source, binding, API | Source code in [Python](https://github.com/python/cpython/tree/3.11/Lib) and [C](https://github.com/python/cpython/tree/3.11/Modules) |
-| [Other popular libraries](https://wiki.python.org/moin/UsefulModules) | Libraries | Source, binding, API | From the [Python Wiki](https://wiki.python.org/moin/). Includes many alternatives not shown in this table.  |
+| ["Awesome Python"](https://github.com/vinta/awesome-python) | Various | Various | "An opinionated list of awesome Python frameworks, libraries, software and resources." |
+| [Libraries](https://wiki.python.org/moin/UsefulModules) | Libraries | Source, binding, API | From the [Python Wiki](https://wiki.python.org/moin/). Includes many alternatives not shown in this table.  |
 | [Applications](https://wiki.python.org/moin/Applications) | Various | Source, etc. | From the [Python Wiki](https://wiki.python.org/moin/). Includes many alternatives not shown in this table. |
 | [Editors, IDEs, and shells](https://wiki.python.org/moin/PythonEditors) | Editors, IDEs, shells | Source, etc. | From the [Python Wiki](https://wiki.python.org/moin/). Includes many alternatives not shown in this table. |
 | [IPython](http://ipython.org/ipython-doc/dev/index.html) | Shell | Source, API | You can even make IPython your [default system shell](http://transneptune.net/2009/06/16/ipython-as-your-default-shell/) (also [here](http://stackoverflow.com/questions/9844965/how-to-use-ipythons-system-shell-profile-as-your-default-shell-windows-7-64-bi)).  You can [embed the IPython shell](http://stackoverflow.com/questions/5466342/embedded-interactive-shell-in-ipython)  in a Python program (updated [here](https://github.com/ipython/ipython/wiki/Cookbook%3a-Updating-code-for-use-with-IPython-0.11-and-later)). |
