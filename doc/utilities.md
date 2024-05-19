@@ -130,4 +130,4 @@ a Python API.
 * **Jupyter notebook**
 The component is packaged as an interactive notebook.
 
-Revised May 2023
+Revised May 2024
