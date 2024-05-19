@@ -1,17 +1,16 @@
 
-Python language summaries:
+Python language processors
+==========================
 
-- [Comprehensive Python Cheatsheet](https://gto76.github.io/python-cheatsheet/)
-  Compact languge summary.
-- [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)
-  500+ slides from a four day 
-  [course](https://github.com/dabeaz-course/python-mastery).
-  PDF, best to download and read offline.
+Compilers, interpreters, other tools, and literature.
 
-Language processors for Python and/or in Python:
- 
+Another page has other [Python system software](utilities.md) and utilities.
+
 | System | Type | Description |
 | --------- | ---- | ----------- |
+| **Language Summaries** ||| 
+| [Comprehensive Python Cheatsheet](https://gto76.github.io/python-cheatsheet/) | Compact language summary | "consists of minimal text and short examples so things are easy to find with Ctrl+F" |
+| [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)| 500+ slides | From a four day [course](https://github.com/dabeaz-course/python-mastery). PDF, best to download and read offline.|
 | **CPython** |||
 | [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Source code for reference Python language implementation from python.org. Choose the Python version from the branch button near the upper left corner of the page. |
 | [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
@@ -24,7 +23,7 @@ Language processors for Python and/or in Python:
 | [Tested Semantics for Python](https://cs.brown.edu/~sk/Publications/Papers/Published/pmmwplck-python-full-monty)  | Research paper, abstract and links to full PDF and software | "We present a small-step operational semantics for the Python programming language. We present both a core language for Python, suitable for tools and proofs, and a translation process for converting Python source to this core. We have tested ... the core for conformance with the primary Python implementation ... |
 | [Reverse-Engineering Python](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also  [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | UCPy compiler, targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
 | [Repy](https://seattle.poly.edu/wiki/ProgrammersPage), also [here](https://seattle.poly.edu/wiki/UnderstandingSeattle/CodeSafety) and [here](https://github.com/SeattleTestbed/repy_v2) | Python subset, sandboxed VM | "Restricted Python" language, runtime, sandboxed VM for writing distributed computing applications for the [Seattle testbed](https://seattle.poly.edu/html/) |
-| **Educational** |||
+| **Educational Conpilers** |||
 | [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
 | [Tailbiter](https://codewords.recurse.com/issues/seven/dragon-taming-with-tailbiter-a-bytecode-compiler) | Python to bytecode compiler | "... a small compiler able to compile itself ... in and for a subset of Python 3 ... I wrote this to accompany (the Byterun bytecode interpreter below) which takes the output of a compiler and executes it"|
 | [Byterun](https://github.com/nedbat/byterun), also [blog post](http://nedbatchelder.com/blog/201301/byterun_and_making_cells.html). | Bytecode interpreter | "a pure-Python implementation of a Python bytecode execution virtual machine". More about Python bytecodes [here](http://nedbatchelder.com/blog/200804/the_structure_of_pyc_files.html) |
@@ -34,7 +33,7 @@ Language processors for Python and/or in Python:
 | [hython](https://github.com/mattgreen/hython), also [blog](http://callcc.io/hython-the-simplest-possible-language/) | Compiler | "Python 3 interpreter written in Haskell. I'm new to Haskell, so this will move pretty slowly." (begun Jul 2014) |
 | [abrvalg](https://github.com/akrylysov/abrvalg) | Interpreter | "Python-like programming language interpreter written in Python" |
 | [toy compiler](http://www.jroller.com/languages/entry/python_writing_a_compiler_and) | Educational exercise | "Compiler and Interpreter in 160 lines of code ... for a simple 'while' language."  Tiny but informative example (target language is not Python). || **Optimized** |||
-| **Optimizing** |||
+| **Optimizing Compilers** |||
 | [Awesome Python Compilers](https://github.com/pfalcon/awesome-python-compilers) |  Annotated links | Historical survey of Python compilers, with links to many mentioned below |
 | [LPython](https://lpython.org/)  | Annotated links | Bottom of page has links to 32 Python compilers. LPython itself is a compiler for Python with type annotations. |
 | [PyPy](http://pypy.org/), also [here](http://www.aosabook.org/en/pypy.html)  | Interpreter, translator, JIT compiler | "a fast, compliant alternative implementation of the Python language (2.7.3)." "... except for a negligible number of C stubs, is written completely in Python."  Not compatible with extensions written for CPython; they must be ported.  Bytecode interpreter [here](http://pypy.readthedocs.org/en/latest/interpreter.html).  Nice summary [here](https://news.ycombinator.com/item?id=6708867).  Brief explanation [here](https://news.ycombinator.com/item?id=11522767).  Video about experimenter's experiences [here](http://www.youtube.com/watch?v=l_HBRhcgeuQ). |
