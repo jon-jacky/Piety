@@ -14,9 +14,10 @@ Another page has other [Python system software](utilities.md) and utilities.
 | **CPython** |||
 | [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Source code for reference Python language implementation from python.org. Choose the Python version from the branch button near the upper left corner of the page. |
 | [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
-| [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) | 
 | [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
 | [py_compile](https://docs.python.org/3.11/library/py_compile.html) | Python to bytecode compiler | "provides a function to generate a byte-code file from a source file ... can be invoked as a script to compile several source files..." From Python Language Services (above). | 
+| [Python Enhancement Proposals](https://peps.python.org/) | Documentation | History, rationale, explanations of Python language features |
+| [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) |
 | **Semantics** |||
 | [History of Python](https://python-history.blogspot.com/2009/01/pythons-design-philosophy.html) | Blog | Series of blog posts by Python creator Guido Van Rossum |
 | [Minimal Python](https://snarky.ca/tag/syntactic-sugar/) | Blog posts, with code  | "I had set out to find ... this core set of (Python) syntax. ... If you can implement this subset ... you can do a syntactic translation to support  the rest of Python ..." |
