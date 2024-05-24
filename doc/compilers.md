@@ -10,16 +10,20 @@ Another page has other [Python system software](utilities.md) and utilities.
 | --------- | ---- | ----------- |
 | **Language Summaries** ||| 
 | [Comprehensive Python Cheatsheet](https://gto76.github.io/python-cheatsheet/) | Compact language summary | "consists of minimal text and short examples so things are easy to find with Ctrl+F" |
-| [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)| 500+ slides | From a four day [course](https://github.com/dabeaz-course/python-mastery). PDF, best to download and read offline.|
-| **CPython** |||
+| [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)| 500+ slides | From a four day [course](https://github.com/dabeaz-course/python-mastery). PDF, best to download and read offline.| 
+| *Language References* |||
+| [Tutorial](https://docs.python.org/3.11/tutorial/index.html) | Documentation |  "This tutorial does not attempt to be comprehensive ... Instead, it ... will give you a good idea of the languages flavor and style." |
+| [Language Reference](https://docs.python.org/3.11/reference/index.html) | Documentation  | "This reference manual describes the syntax and core semantics of the language. It is terse, but attempts to be exact and complete." |
+| [Glossary](https://docs.python.org/3.11/glossary.html) | Documentation | "Terms explained" |
+| [Python Enhancement Proposals](https://peps.python.org/) | Documentation | History, rationale, explanations of Python language features |
+| [History of Python](https://python-history.blogspot.com/2009/01/pythons-design-philosophy.html) | Blog | Series of blog posts by Python creator Guido Van Rossum |
+| **CPython** ||| 
 | [CPython](https://github.com/python/cpython/tree/3.11) | Interpreter, compiler | Source code for reference Python language implementation from python.org. Choose the Python version from the branch button near the upper left corner of the page. |
 | [CPython Directory structure](https://devguide.python.org/getting-started/setup-building/index.html#directory-structure)  | Documentation | Contents of the source code directories (above), from the [Developer's Guide](https://devguide.python.org/) |
 | [Python Language Services](https://docs.python.org/3.11/library/language.html) | Compiler components, API, etc. | "modules to assist in working with the Python language. These modules support tokenizing, parsing, syntax analysis, bytecode disassembly, and various other facilities. From the [Python Standard Library](http://docs.python.org/3.11/library/index.html).|  
 | [py_compile](https://docs.python.org/3.11/library/py_compile.html) | Python to bytecode compiler | "provides a function to generate a byte-code file from a source file ... can be invoked as a script to compile several source files..." From Python Language Services (above). | 
-| [Python Enhancement Proposals](https://peps.python.org/) | Documentation | History, rationale, explanations of Python language features |
 | [CPython Internals](https://www.youtube.com/playlist?list=PLV7iu6GiDKwQWZbapY5mPEQa0V1OgC358)  | Lectures | 10 hours of video (2008, Python 2) |
 | **Semantics** |||
-| [History of Python](https://python-history.blogspot.com/2009/01/pythons-design-philosophy.html) | Blog | Series of blog posts by Python creator Guido Van Rossum |
 | [Minimal Python](https://snarky.ca/tag/syntactic-sugar/) | Blog posts, with code  | "I had set out to find ... this core set of (Python) syntax. ... If you can implement this subset ... you can do a syntactic translation to support  the rest of Python ..." |
 | [Tested Semantics for Python](https://cs.brown.edu/~sk/Publications/Papers/Published/pmmwplck-python-full-monty)  | Research paper, abstract and links to full PDF and software | "We present a small-step operational semantics for the Python programming language. We present both a core language for Python, suitable for tools and proofs, and a translation process for converting Python source to this core. We have tested ... the core for conformance with the primary Python implementation ... |
 | [Reverse-Engineering Python](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also  [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | UCPy compiler, targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
