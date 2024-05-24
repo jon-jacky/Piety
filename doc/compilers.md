@@ -11,7 +11,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | **Language Summaries** ||| 
 | [Comprehensive Python Cheatsheet](https://gto76.github.io/python-cheatsheet/) | Compact language summary | "consists of minimal text and short examples so things are easy to find with Ctrl+F" |
 | [Python Mastery](https://github.com/dabeaz-course/python-mastery/blob/main/PythonMastery.pdf)| 500+ slides | From a four day [course](https://github.com/dabeaz-course/python-mastery). PDF, best to download and read offline.| 
-| *Language References* |||
+| **Language References** |||
 | [Tutorial](https://docs.python.org/3.11/tutorial/index.html) | Documentation |  "This tutorial does not attempt to be comprehensive ... Instead, it ... will give you a good idea of the languages flavor and style." |
 | [Language Reference](https://docs.python.org/3.11/reference/index.html) | Documentation  | "This reference manual describes the syntax and core semantics of the language. It is terse, but attempts to be exact and complete." |
 | [Glossary](https://docs.python.org/3.11/glossary.html) | Documentation | "Terms explained" |
