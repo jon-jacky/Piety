@@ -49,8 +49,9 @@ programming environment within a single Python terminal session.
 
 The editor is not just for creating text. Python commands including
 concurrent tasks can redirect their output to editor buffers and windows, so
-the editor can be used for data collection and animated display.  We have
-used it for [experiments in tasking and concurrency](tasks/README.md),
+the editor can be used for data capture and animated display.  We have
+used it for experiments in tasking and concurrency using Python
+[threads](threads/README.md) and [coroutines](coroutines/README.md)
 where tasks update windows as we control their behavior by typing  commands
 at the Python interpreter.
 
@@ -100,10 +101,6 @@ have not begun work on any.   Every approach would require a more
 concentrated, sustained effort than I have been able to make so far.
 
 It is likely that work in the near future will continue in the hosted part.
-Until now, we have only experimented with tasks implemented by Python
-threads. Next, we expect to try experiments with coroutines implemented by
-Python generators, and after that, we may experiment the Python *asyncio*
-library.
  
 ## Dependencies ##
 
@@ -133,5 +130,5 @@ The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
 purchased in 2023.  At this writing (12 Jan 2024) it is running
 ChromeOS Version 118.0.5993.164.
 
-Revised May 2024
+Revised Jun 2024
 

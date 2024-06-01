@@ -67,56 +67,77 @@ def refresh_retrieved(cmd, point, start_col):
     display.kill_line() # remove any leftover text past line
     el.move_to_point(point, start_col)
 
+def setup():
+    """
+    Set up terminal before entering pysh main loop.
+    """
+    global continuation
+    terminal.set_char_mode()
+    display.putstr(ps1) # >> prompt
+    el.refresh(cmd, point, start_col) # following prompt on same line
+    continuation = False # True when continuation line expected
+
+def restore():
+    """
+    Restore terminal after exiting pysh main loop.
+    """
+    terminal.set_line_mode()
+    print() # advance to next line for Python prompt
+
+running = True # set False to exit pysh main loop
+
+def runcmd(c):
+    """
+    Body of pysh main loop: handle a single character from the terminal.
+    """
+    global cmd, point, prompt, continuation, history, i_cmd, running
+    k = keyseq.keyseq(c)
+    if k: # keyseq returns '' if key sequence is not complete
+        if k == key.cr:  # RET finishes entering cmd and runs Python cmd
+            history.insert(0,cmd)
+            if len(history) > max_cmds: history.pop()
+            i_cmd = 0
+            display.next_line()
+            if cmd == 'exit()':  # Trap here, do *not* exit Python
+                cmd = ''  # otherwise cmd is exit() at next pysh() call...
+                point = 0 # ... and point is 5
+                running = False
+            else:
+                continuation = pycall(cmd) # Run the Python cmd
+                cmd = ''
+                point = 0
+                i_cmd = -1 # code will assign it to 0 or greater
+                prompt = ps2 if continuation else ps1
+                fr.restore_cursor_to_cmdline()
+                display.putstr(prompt)
+                el.refresh(cmd, point, start_col)
+        elif k == key.C_d:  # ^D exits, alternative to 'exit()'
+            cmd = ''  # no command on line
+            point = 0
+            running = False
+        elif k in (key.C_p, key.up):
+            if i_cmd < len(history)-1: i_cmd += 1
+            cmd = history[i_cmd]
+            point = len(cmd)
+            refresh_retrieved(cmd, point, start_col)
+        elif k in (key.C_n, key.down):
+            if i_cmd >= 0: i_cmd -= 1  # reaches -1 after most recent...
+            if i_cmd < 0: cmd = ''   # ... then set cmd empty
+            cmd = history[i_cmd]
+            point = len(cmd)
+            refresh_retrieved(cmd, point, start_col)
+        else:
+            cmd, point = el.runcmd(k, cmd, point, start_col) # edit cmd
+ 
 def pysh():
     """
     Custom Python REPL that uses our editline instead of builtin input function
     so other tasks can interleave and we can restore cursor in Python cmd line.
     To exit pysh, type 'exit()' or ctrl-d.  'pysh' rhymes with fish.
     """
-    global cmd, point, prompt, continuation, history, i_cmd
-    terminal.set_char_mode()
-    display.putstr(ps1) # >> prompt
-    el.refresh(cmd, point, start_col) # following prompt on same line
-    continuation = False # True when continuation line expected
-    while True:
+    setup()
+    while running:
         c = terminal.getchar()
-        k = keyseq.keyseq(c)
-        if k: # keyseq returns '' if key sequence is not complete
-            if k == key.cr:  # RET finishes entering cmd and runs Python cmd
-                history.insert(0,cmd)
-                if len(history) > max_cmds: history.pop()
-                i_cmd = 0
-                display.next_line()
-                if cmd == 'exit()':  # Trap here, do *not* exit Python
-                    cmd = ''  # otherwise cmd is exit() at next pysh() call...
-                    point = 0 # ... and point is 5
-                    break       
-                else:
-                    continuation = pycall(cmd) # Run the Python cmd
-                    cmd = ''
-                    point = 0
-                    i_cmd = -1 # code will assign it to 0 or greater
-                    prompt = ps2 if continuation else ps1
-                    fr.restore_cursor_to_cmdline()
-                    display.putstr(prompt)
-                    el.refresh(cmd, point, start_col)
-            elif k == key.C_d:  # ^D exits, alternative to 'exit()'
-                cmd = ''  # no command on line
-                point = 0
-                break       
-            elif k in (key.C_p, key.up):
-                if i_cmd < len(history)-1: i_cmd += 1
-                cmd = history[i_cmd]
-                point = len(cmd)
-                refresh_retrieved(cmd, point, start_col)
-            elif k in (key.C_n, key.down):
-                if i_cmd >= 0: i_cmd -= 1  # reaches -1 after most recent...
-                if i_cmd < 0: cmd = ''   # ... then set cmd empty
-                cmd = history[i_cmd]
-                point = len(cmd)
-                refresh_retrieved(cmd, point, start_col)
-            else:
-                cmd, point = el.runcmd(k, cmd, point, start_col) # edit cmd
-    terminal.set_line_mode()
-    print() # advance to next line for Python prompt
+        runcmd(c)
+    restore()
 

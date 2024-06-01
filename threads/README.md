@@ -1,8 +1,8 @@
 
-tasks
-=====
+threads
+=======
 
-Experiments with tasking and concurrency.
+Experiments with tasking and concurrency using Python threads.
 
 These experiments run in our [pmacs](../editors/README.md) editor,
 which we start here from the script in *tm.py* rather than
@@ -25,11 +25,6 @@ Python prompt >>>.   To return to the *pysh* command prompt, type M-x
 (meta x, hold the alt key and type x), just as you do in  any *pmacs*
 session.
    
-At this writing, we implement tasking and concurrency with the Python
-*threading* module only.  We plan further tasking experiments with
-coroutines implemented by Python generators, and with the Python
-*asyncio* library.
- 
 ### Files ###
 
 - **pyshell.py**: Defines custom Python interpreter *pysh* that 
@@ -72,5 +67,5 @@ coroutines implemented by Python generators, and with the Python
 - **writer.txt**:  Notes on *writer.py*.
 
 
-Revised May 2024
+Revised Jun 2024
 

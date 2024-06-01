@@ -9,7 +9,6 @@ export PIETY=$HOME/Piety
 # execution path to bin, to run Piety commands: piety, possibly others
 export PATH=$PIETY/bin:$PATH
 
-# Python path for Piety on a Unix-like host with a VT100-compatible terminal
-# For other platforms, replace unix, vt_terminal and/or select in this path.
-# Recall that scripts import from samples and editors
-export PYTHONPATH=$PIETY/shells:$PIETY/unix:$PIETY/vt_terminal:$PIETY/editors:$PIETY/tasks:$PYTHONPATH
+# Python path for Piety on a Unix-like host with a VT100-compatible terminal.
+# For other platforms, replace unix and vt_terminal in this path.
+export PYTHONPATH=$PIETY/shells:$PIETY/unix:$PIETY/vt_terminal:$PIETY/editors:$PIETY/threads:$PIETY/coroutines:$PYTHONPATH

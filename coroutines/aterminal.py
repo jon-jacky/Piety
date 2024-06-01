@@ -4,7 +4,7 @@ aterminal.py - experiments with asynchronous termimal code.
 
 import asyncio 
 
-import terminal as term # Piety
+import terminal as term # from Piety, for test
 
 async def agetchar():
    return await asyncio.to_thread(term.getchar)
