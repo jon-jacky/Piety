@@ -51,7 +51,7 @@ The editor is not just for creating text. Python commands including
 concurrent tasks can redirect their output to editor buffers and windows, so
 the editor can be used for data capture and animated display.  We have
 used it for experiments in tasking and concurrency using Python
-[threads](threads/README.md) and [coroutines](coroutines/README.md)
+[threads](threads) and [coroutines](coroutines)
 where tasks update windows as we control their behavior by typing  commands
 at the Python interpreter.
 
