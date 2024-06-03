@@ -1,8 +1,13 @@
 writer.txt
 
-Notes on writer.py, which provides functions that put text into sked
-buffers and edsel windows, intended to be called from background tasks.
+Notes on writer.py, which provides functions that put text into our
+editor buffers and windows, intended to be called from background tasks.
 
+The editors are not just for creating text. Python commands including
+concurrent tasks can use the writer module to redirect their output to
+editor buffers and windows, so the editors can be used for data capture and
+animated display.
+ 
 Any Python function named 'write' is magic: it can be invoked by any
 print statement or it can be the target of output redirection.
 

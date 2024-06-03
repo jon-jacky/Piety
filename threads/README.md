@@ -11,14 +11,6 @@ The *tm* script loads all the modules used by *pmacs*, some additional
 modules that support the tasking experiments, and starts our custom 
 *pysh* (rhymes with fish) Python interpreter.
 
-We need our *pysh* interpreter for these tasking experiments, because it enables us
-to restore the cursor to the correct location in the Python command line
-after a background task updates an editor display window.
-This is not possible with the standard Python interpreter.
-
-The *pysh* command prompt is >> with just two darts, to distinguish it from
-the standard Python prompt >>> with three darts.
-
 To start editing in a display window, type the function call *tpm()* at
 the *pysh* prompt >>, instead of the *pm()* call you type at the standard
 Python prompt >>>.   To return to the *pysh* command prompt, type M-x
@@ -27,11 +19,6 @@ session.
    
 ### Files ###
 
-- **pyshell.py**: Defines custom Python interpreter *pysh* that 
-  enables us    to restore the cursor to the correct location in the
-  Python command line    after a background task updates an editor
-  display window.  This is not possible in the standard Python interpreter.
-  
 - **threads_1.txt**: Directions for experiments with Python threading
    using the functions in *timers.py* and *writer.py*.  These experiments
    run with the standard Python interpreter and reveal its limitations.
@@ -57,15 +44,6 @@ session.
 - **tm.py**: script that loads modules for threading experiments, including
   editors, *writer*, *timers*, classes and functions from *threading*, and
   then starts our custom *pysh* Python interpreter.
-
-- **writer.py**: Functions that put text into sked buffers and edsel windows,
-  intended to be called from background tasks.  Code here also restores
-  the cursor to the correct location in the *pysh* Python
-  command line,   or in a display editing window, after a background task
-  updates another window.
-
-- **writer.txt**:  Notes on *writer.py*.
-
 
 Revised Jun 2024
 
