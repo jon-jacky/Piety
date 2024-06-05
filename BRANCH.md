@@ -13,6 +13,16 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
+-  2 Jun 2024: Reorganize directories.  Split *tasks* directory into 
+  three: *tasking*, *threads*, and *coroutines*, rename *shells* to *python*.
+ 
+- 27 May 2024: Begin experimenting with coroutines in the *tasks* directory,
+  still in the *rewrite* branch.
+  
+- 24 May 2024: Finished for now adding and reorganizing links on Python
+  language compilers, libraries, and tools in *doc/compilers.md* and
+  *utilities.md*.
+
 - 11 May 2024: Change default branch at Github from *master* to *rewrite*.
 
 - 11 May 2024: Finish revising .md files at top level and under *doc*.
@@ -25,10 +35,10 @@ Recent work in the *rewrite* branch:
    put directions to *rewrite* branch right at the top so they
    can't be missed.
  
--  9 May 2024:  Finish work on tasking for now.  Already in the *rewrite*
-   branch, so no merge is needed.
+-  9 May 2024:  Finish work on tasking with threads for now.  Already in 
+   the *rewrite* branch, so no merge is needed.
  
-- 23 Apr 2024:  Resume work on tasking, but in the *rewrite* branch.
+- 23 Apr 2024:  Resume work on tasking with threads, but in the *rewrite* branch.
 
 - 18 Apr 2024:  Finish fixing editor bugs for now.  Merge *edfix* branch
   back into *rewrite* branch.
@@ -46,7 +56,7 @@ Recent work in the *rewrite* branch:
   *tasks* branch back into *rewrite* branch.
 
 - 12 Jan 2024: Begin *tasks* branch off *rewrite* brnach for experiments 
-  with tasks and  concurrency.
+  with tasks and  concurrency using Python threads.
 
 - 12 Jan 2024: Finish work on the editors for now.  Merge *ed* branch
   back into *rewrite* branch.

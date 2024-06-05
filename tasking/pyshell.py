@@ -13,20 +13,23 @@ then 'from pyshell import pysh'  then 'reload pyshell' without name conflict.
 'pyshell' is pronounced pie shell.  'pysh' rhymes with fish.
 """
 
-import terminal, key, keyseq, display
-import edsel as fr # fr for frame
+import terminal_util, terminal, key, keyseq, display
 import editline as el
 import pmacs
+# import edsel # NOT! This pyshell module might be used without edsel, so we 
+               # duplicate tlines and restore_cursor_to_cmdline from edsel here.
 
 from pycall import pycall # uses Python library code.InteractiveConsole
  
 cmd = '' # Python command
 point = 0 # index of cursor in cmd
+running = True # pysh main loop is running, set False to exit
 continuation = False  # True when Python continuation line expected
+tlines = 24 # N of lines in frame, including all windows.  Copied from edsel. 
 
 ps1 = '>> '  # first line prompt, different from CPython >>>
 ps2 = '.. '  # continuation line prompt
-prompt = ps1 # initally.  prompt is global so we can inspect it in the REPL.
+prompt = ps1 # initally. prompt is global so we can inspect it in the REPL.
 start_col = 3 # index of start of cmd on line, allowing for prompt ps1 or ps2
 
 # prompt and continuation are global so we can read them in the REPL
@@ -51,8 +54,7 @@ def tpm():
     cmd_mode = False
     pmacs.rpm() # raw pmacs - assumes terminal is already in char mode
     cmd_mode = True
-
-
+ 
 def refresh_retrieved(cmd, point, start_col):
     """
     HACK replacement for el.refresh , for commands retrieved from history.
@@ -71,10 +73,12 @@ def setup():
     """
     Set up terminal before entering pysh main loop.
     """
-    global continuation
+    global tlines, running, continuation
     terminal.set_char_mode()
-    display.putstr(ps1) # >> prompt
+    tlines, _ = terminal_util.dimensions() # Copied from edsel
+    display.putstr(ps1) # ps1 is >> prompt
     el.refresh(cmd, point, start_col) # following prompt on same line
+    running = True # previous exit() or C_d may have set it False
     continuation = False # True when continuation line expected
 
 def restore():
@@ -84,8 +88,10 @@ def restore():
     terminal.set_line_mode()
     print() # advance to next line for Python prompt
 
-running = True # set False to exit pysh main loop
-
+# Copied from edsel
+def restore_cursor_to_cmdline():
+    display.put_cursor(tlines, 1)
+ 
 def runcmd(c):
     """
     Body of pysh main loop: handle a single character from the terminal.
@@ -108,7 +114,7 @@ def runcmd(c):
                 point = 0
                 i_cmd = -1 # code will assign it to 0 or greater
                 prompt = ps2 if continuation else ps1
-                fr.restore_cursor_to_cmdline()
+                restore_cursor_to_cmdline() # Defined here, duplicates fcn in edsel
                 display.putstr(prompt)
                 el.refresh(cmd, point, start_col)
         elif k == key.C_d:  # ^D exits, alternative to 'exit()'
