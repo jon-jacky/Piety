@@ -1,5 +1,9 @@
 """ 
-atimers.py - coroutines to run in tasking experiments.  Based on timers.py
+atimers.py - Coroutine that prints timestamps at intervals,
+             to run in tasking experiments.
+
+This module is named atimers (with an s) but the coroutine is named atimer 
+(no s) so we can 'from atimers import atimer' without name conflict. 
 """
 
 import asyncio, datetime
@@ -17,14 +21,4 @@ async def atimer(n=1, delay=1.0, label=''):
         await asyncio.sleep(delay)
         # For now use print with default args, which adds the \n itself.
         print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='')
-  
-async def timerAB(n=1, delay=1):
-    'Interleave two atimer coroutines using await asyncio.gather'
-    await asyncio.gather(atimer(n,delay,'A'), atimer(n,delay,'B')) # NB await here
-
-async def gatherAB(n=1, delay=1):
-    'Interleave two atimer coroutines using asyncio.gather *without* await'
-    asyncio.gather(atimer(n,delay,'A'), atimer(n,delay,'B')) # NB *no* await here
-
-
 

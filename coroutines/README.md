@@ -2,15 +2,15 @@
 coroutines
 ==========
 
-Experiments with tasking and concurrency using Python coroutines.
+Experiments with tasks using Python coroutines.
 
 ### Files ###
 
-- **atimers.py**: Coroutines to run in experiments, that print timestamps
-  at intervals.
+- **atimers.py**: Coroutine that prints timestamps at intervals, to run
+  in tasking experiments.
 
-- **coroutines_1.txt**: Directions for experiments with Python coroutines
-  and event loop.
+- **coroutines_1.txt**: Directions for experiments with coroutines and
+  the event loop, that demonstrate interleaving tasks.
 
 - **coroutines_1.py**: Script that runs code explained in *coroutines_1.txt*.
 
