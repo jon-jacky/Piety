@@ -13,6 +13,10 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
+- 16 Jum 2024: Begin *eventloop* branch to make async versions of the 
+  *pysh* custom Python interpreter and *pmacs* editor, that can run 
+  in an *asyncio* event loop.
+
 -  2 Jun 2024: Reorganize directories.  Split *tasks* directory into 
   three: *tasking*, *threads*, and *coroutines*, rename *shells* to *python*.
  
