@@ -1,0 +1,80 @@
+coroutines_1.txt
+
+Experiments with Python coroutines and the event loop.
+
+To run these experiments, follow along in this file and type each
+command.
+
+...$ . ~/Piety/bin/paths
+...$ python3 -i
+...
+>>> import asyncio as aio
+>> loop = aio.get_event_loop()
+>>> loop
+<_UnixSelectorEventLoop running=False closed=False debug=False>
+>>> aio.all_tasks(loop)
+set()
+
+Now we have a fresh event loop with no tasks.
+
+>> from atimers import atimer
+>>> ta = loop.create_task(atimer(5,5,'A'))
+>>> ta
+<Task pending name='Task-1' coro=<atimer() running at
+/home/jon/Piety/coroutines/atimers.py:8>>
+>>> aio.all_tasks(loop)
+{<Task pending name='Task-1' coro=<atimer() running at
+/home/jon/Piety/coroutines/atimers.py:8>>}
+
+>>> loop.run_until_complete(ta)
+A 1 2024-06-15 09:14:58.702109
+A 2 2024-06-15 09:15:03.708406
+A 3 2024-06-15 09:15:08.714560
+A 4 2024-06-15 09:15:13.720797
+A 5 2024-06-15 09:15:18.726920
+>>> 
+>>> aio.all_tasks(loop)
+set()
+
+We don't get >>> prompt back until loop exits.
+Apparently coroutine exit deletes task from loop.
+
+Set up tasks to interleave, exit when first task exits.
+
+>>> ta = loop.create_task(atimer(5,1,'A'))
+>>> tb = loop.create_task(atimer(10,0.5,'B'))
+>>> aio.all_tasks(loop)
+{<Task pending name='Task-2' coro=<atimer() running at
+/home/jon/Piety/coroutines/atimers.py:8>>, <Task pending name='Task-3'
+coro=<atimer() running at /home/jon/Piety/coroutines/atimers.py:8>>}
+>>> loop.run_until_complete(ta)
+B 1 2024-06-15 09:19:10.924962
+A 1 2024-06-15 09:19:11.425150
+B 2 2024-06-15 09:19:11.425711
+B 3 2024-06-15 09:19:11.927582
+A 2 2024-06-15 09:19:12.427312
+B 4 2024-06-15 09:19:12.429206
+B 5 2024-06-15 09:19:12.931009
+A 3 2024-06-15 09:19:13.429746
+B 6 2024-06-15 09:19:13.432379
+B 7 2024-06-15 09:19:13.934095
+A 4 2024-06-15 09:19:14.431956
+B 8 2024-06-15 09:19:14.436029
+B 9 2024-06-15 09:19:14.937835
+A 5 2024-06-15 09:19:15.434077
+
+We still have the other task - run loop until it exits too.
+
+>>> aio.all_tasks(loop)
+{<Task pending name='Task-3' coro=<atimer() running at
+/home/jon/Piety/coroutines/atimers.py:17> wait_for=<Future pending
+cb=[Task.task_wakeup()]>>}
+
+The other task hasn't completed yet.
+ 
+>>> loop.run_until_complete(tb)
+B 10 2024-06-15 09:19:47.082362
+>>> aio.all_tasks(loop)
+set()
+
+ 
