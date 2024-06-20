@@ -1,9 +1,11 @@
-# coroutines_1.py
+# timers.py
+
+# Demonstrate interleaving timer tasks in the asycio event loop.
 
 # To run this script:
 # . ~/Piety/bin/paths 
 # python3 -i 
-# >>> import coroutines_1
+# >>> import timers
 
 import asyncio as aio
 loop = aio.get_event_loop()

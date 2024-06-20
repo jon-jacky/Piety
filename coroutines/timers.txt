@@ -1,6 +1,6 @@
-coroutines_1.txt
+timers.txt
 
-Experiments with Python coroutines and the event loop.
+Demonstrate interleaving timer tasks in the asycio event loop.
 
 To run these experiments, follow along in this file and type each
 command.

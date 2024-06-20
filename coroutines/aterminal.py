@@ -1,5 +1,5 @@
 """
-aterminal.py - experiments with asynchronous termimal code.
+aterminal.py - Read characters from the terminal in the asyncio event loop.
 """
 
 import sys
@@ -12,7 +12,6 @@ line = ''
 
 def setup():
     global line
-    start = False
     line = ''
     term.set_char_mode()
     term.putstr('> ')  # We want to see this *before* the first character.
@@ -29,11 +28,11 @@ def runcmd():
     c = term.getchar()
     term.putstr(c)
     line += c
-    if c == '\r':
+    if c in '\n\r':
          cleanup()
       
 loop.add_reader(sys.stdin, runcmd)
-
+ 
 def main():
     setup()
     loop.run_forever()
