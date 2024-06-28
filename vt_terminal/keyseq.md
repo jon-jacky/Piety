@@ -4,6 +4,27 @@ keyseq.py
 
 **keyseq.py**: construct emacs-style key sequence from one or more characters.
 
+NOTE: THIS PAGE NOW DESCRIBES THE OLD *keyseq_1.py*.
+THE NEW *keyseq.py* BEHAVES DIFFERENTLY.
+
+The new keyseq does *not* return the empty string when it  is passed a
+prefix character and the key sequence is incomplete.  Instead, the new
+keyseq continues to read characters using *blocking reads* until a complete
+key sequence has been read.  It always returns the complete sequence, which
+might be a single printing character or control character, or a multi-
+character control sequence.
+
+We found that the *asyncio* event loop only calls the terminal reader once after
+each keystroke, even if the keystroke sends multiple characters.  It does not 
+call the terminal reader after every character in a muliple character sequence.
+So, we had to rename the old *keyseq.py* to *keyseq_1.py* and make a new, revised
+*keyseq.py*  
+
+Only minor revisions were needed.  
+Try the shell command *diff keyseq.py keyseq_1.py*.
+
+HERE FOLLOWS THE DESCRIPTION OF THE OLD *keyseq_1.py*:
+
 Define function keyseq(c).  On each call, pass in a single character.
 Do not block waiting for sequence to complete, return after each call.
 When sequence is complete, return the entire sequence (maybe single char).
@@ -22,13 +43,6 @@ character or a self-contained  control character) this function
 returns that character.  If the character is the last character in a
 multicharacter sequence, this function returns the whole sequence
 including the prefix  character(s) and the last character.
-
-Also, the function might read multiple characters in one call,
-if more than one character arrived since the last call.  This
-might happen for special function keys, arrow keys etc. that include
-a prefix plus contents, all sent rapidly.   If the function reads
-more than a single character in one call, it immediately returns
-the entire sequence of characters it read.
 
 Each key sequence begins with prefix character or characters indicating more
 follows. ESC is the prefix for the meta commands and terminal control
@@ -54,4 +68,5 @@ In the modules in the editors directory, keys (including key sequences)
 are referred to only by name.  Their internal structure as sequences of
 ASCII characters (or something else) is not visible.
 
-Revised Jun 2023
+Revised Jun 2024
+

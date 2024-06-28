@@ -127,7 +127,7 @@ of the standard Chromebook software, it is not part of some 'developer
 mode'.   The Python running in this Linux is CPython version 3.9.2.
 Piety runs in the Chromebook Linux Terminal app.
 The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
-purchased in 2023.  At this writing (12 Jan 2024) it is running
+purchased in April 2023.  At this writing (12 Jan 2024) it is running
 ChromeOS Version 118.0.5993.164.
 
 Revised Jun 2024

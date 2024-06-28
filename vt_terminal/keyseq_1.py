@@ -1,7 +1,7 @@
 """
-keyseq.py - construct emacs-style key sequence from one or more characters.
-            This is the new version that works in the asyncio event loop.
-            Compare to the old version in keyseq_1.py
+keyseq_1.py - construct emacs-style key sequence from one or more characters.
+              This is the old version that does not work in the asyncio loop.
+              Compare to the new keyseq.py.             
 """
 
 import terminal, key
@@ -9,17 +9,15 @@ import terminal, key
 prefix = '' #  incomplete key sequence
 
 def keyseq(c):
-  """
-  Construct emacs-style key sequence from one or more characters.
-  On each call, pass in the first (maybe the only) character in the key sequence.
-  If the first character is the prefix of a multi-character sequence, 
-   keep reading characters until a complete sequence has been read.
-  When sequence is complete, return the entire sequence (maybe single char).
-  Pass in C_g (^G) to cancel incomplete sequence and just return C_g.
-  """
-  global prefix
-  
-  while True: # continue reading characters until a complete keyseq is reached
+    """
+    Construct emacs-style key sequence from one or more characters.
+    On each call, pass in a single character.
+    Do not block waiting for sequence to complete, return after each call.
+    When sequence is complete, return the entire sequence (maybe single char).
+    When sequence is incomplete, return the empty string ''.
+    Pass in C_g (^G) to cancel incomplete sequence and just return C_g.
+    """
+    global prefix
 
     # C_g is the unconditional cancel command, 
     # always discard any prefix and just return C_g itself.
@@ -30,9 +28,7 @@ def keyseq(c):
     # No prefix, prefix character arrives, start prefix
     if prefix == '' and c in (key.esc, key.C_x, key.C_c): # more to come?
         prefix = c
-        # return ''
-        c = terminal.getchar()
-        continue
+        return ''
 
     # No prefix, ordinary character arrives, just return this character
     elif prefix == '':
@@ -45,9 +41,7 @@ def keyseq(c):
         # ANSI escape codes for terminal control, begin with esc-[ called csi
         if c == '[':
             prefix += '['
-            # return '' # now prefix == key.csi, wait for rest of sequence
-            c = terminal.getchar()
-            continue
+            return '' # now prefix == key.csi, wait for rest of sequence
 
         # Meta keys, begin with esc then one other key but not [
         else:

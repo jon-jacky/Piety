@@ -187,7 +187,7 @@ def tab(line, point, start_col):
 
 def refresh(line, point, start_col):
     'Display line and point - use after line has gotten scrambled or ...'
-    display.move_to_column(start_col)
+    display.move_to_column(start_col+1) # NB start co_ is 0-indexed, term 1-indexed
     display.putstr(line.rstrip('\n'))
     display.kill_line() # remove any leftover text past line
     move_to_point(point, start_col)
@@ -233,15 +233,17 @@ def runcmd(keycode, line, point, start_col):
     return line, point
 
 line = '' # for test el() below
+prompt = '> '
+start_col = 2 # zero-based index
 
 def el():
     """
     Test editline on the Python command line: loop invoking editor commands.
     Type characters and control keys to edit inline, exit with M-x.
-    Comment/uncomment lines to switch between using elglob and runcmd.
     """
     global line, point, start_col, prev_cmd
     terminal.set_char_mode()
+    display.putstr(prompt)
     refresh(line, point, start_col)
     while True:
         c = terminal.getchar()
@@ -252,5 +254,6 @@ def el():
             else:
                 line, point = runcmd(k, line, point, start_col)
     terminal.set_line_mode()
-    print() # advance to next line for Python prompt
-
+    print() # advance to next line to print
+    print(line)
+    
