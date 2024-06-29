@@ -1,0 +1,94 @@
+
+keyseq.txt
+==========
+
+Notes on keyseq.py and keyseq_1.py
+  
+Both the keyseq and keyseq_1 modules contain a keyseq function.  The function
+bodies are different in the two modules.   We expect to use keyseq from now
+on.  We are keeping the older keyseq_1 just for reference.
+
+Both keyseq functions construct keycodes from sequences of one or more
+characters.  
+
+There are three kinds of keycode sequences:
+   
+1. A single printable character or a single control character, delivered
+by a single keystroke.  For example, the 'a' character send by typing the a key,
+or the C-a (control-a or ^A character) sent by holding down the control key
+while typing the a key.
+
+2. A sequence begining  with a single control character, followed by one
+or more control characters or printing characters, each delivered by its own
+keystroke.  Many emacs-like editor commands have this form: C-x C-f etc.
+
+3. Escape sequences, which begin with a single esc character, followed by
+one or more characters, which are all delivered by a single keystroke. For
+example emacs-like editor commands like M-f (meta f, formed by holding down
+the alt key while typing the f key, which causes the terminal to send esc
+followed by 'f').  Also, ANSI escape sequences, which are used to control
+the terminal, which consist of the esc character, then the [ character, then
+additional characters.  Pressing a keyboard arrow key moves the cursor on
+the terminal and causes the terminal to send an ANSI escape sequence.
+
+Both keyseq functions take one character as an argument.  This argument might 
+be a single complete keycode.  In that case, both keycode functions simply return
+that same character.  
+
+Or, the argument to a keyseq might be the first character - the prefix -
+of a multi-character sequence.  In that case, both keyseq functions accumulate
+the characters in the sequence and return the complete sequence when it is
+finally available.
+
+We call keyseq_1.keyseq once with each character in the sequence.  It returns
+the empty  string '' until the sequence is complete, and then it returns
+the entire sequence.  So we have to call keyseq_1.keyseq multiple times to
+collect the whole sequence.  If it returns '', our applications do not process
+the returned value.   Returning after each character is supposed to prevent the
+calling application program from blocking, waiting for the complete sequence
+to appear.
+
+We call keyseq.keyseq once with the first character in the sequence.  If that is
+the complete sequence, keyseq.keyseq returns it.  If it is a prefix, keyseq.keyseq
+itself reads more characters until the sequence is complete, and then it returns
+the entire sequence.  So we only have to call keyseq.keyseq once, with the 
+first character in the sequence.  keyseq.keyseq always returns the complete
+sequence, which our applications can then process.  To prevent the
+application program from blocking, keyseq.keyseq should only be called when
+the entire sequence is available to be read (in some input buffer,
+presumably).
+
+Both keyseq modules work in ordinary (synchronous) Python code.
+
+Only the newer keyseq module works in our applications when keys are
+processed by a reader invoked from the Python asyncio event loop.   The
+older keyseq_1 does not work in our applications when invoked from the event
+loop.
+
+We found that the event loop only invokes the reader after every keystroke
+on the keyboard.  When a keystroke sends multiple characters, as it does for
+escape sequences (editor M- commands and ANSI escape sequences), the event
+loop only invokes the reader once, so keyseq must then read all of those
+characters and return the entire sequence for downstream processing
+by our applications. This is what keyseq.keyseq does.
+
+We wrote keyseq_1 with the assumption that the event loop would invoke the
+reader on every character in a multicharacter sequence. This assumption is
+not true for escape sequences. Each call to keycode_1.keycode only processes
+a single character, so it  does  not work with escape sequences and the
+event loop in our applications.
+
+The two keyseq modules are very similar.  The body of keyseq.keyseq only
+contains a few  more lines than keyseq_1.keyseq in order to keep reading
+characters to the end of the sequence.
+
+NOTE: at this time keyseq.keyseq *does* block waiting for subsequent characters
+while reading  editing commands like C-x C-f, which use use a keystroke for
+each character. This is a BUG which we expect to fix, by simply returning ''
+for prefix characters, like keyseq_1.  Our application programs still
+recognize '' as an indicator that the sequence is not yet complete.
+We are leaving the bug in the keyseq code for now so we can observe its
+effects.
+
+Revised Jun 2024
+        
