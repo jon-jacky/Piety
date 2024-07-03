@@ -2,7 +2,7 @@
 piety_script.py - Start the asyncio event loop, here named piety, 
                  for running demo and test scripts:
 
-          $ python -i
+          $ python3 -i
           ...
           >>> import piety_script
           >>> piety_script.start() 
@@ -28,7 +28,8 @@ the unqualified piety identifier as you would at the interactive >>>> prompt:
           from piety_script import piety
     
           from atimers import atimer
-          piety.create_task(atimer(5,1)) 
+          piety.create_task(atimer(10,1,'A')) 
+          piety.create_task(atimer(20,0.5,'B'))
 """
 
 import sys, asyncio

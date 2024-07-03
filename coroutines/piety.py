@@ -1,7 +1,7 @@
 """
 piety.py - Start the asyncio event loop, here named piety, for interactive use:
 
-          $ python -m piety 
+          $ python3 -m piety 
           ... type RET once to get prompt ...
           >>>> piety # Just for example, confirm the event loop is running
           <_UnixSelectorEventLoop running=True closed=False debug=False>

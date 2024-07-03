@@ -11,8 +11,8 @@ Experiments with tasks using Python coroutines and the asyncio event loop.
  
 - **aterminal.py**: Read characters from the terminal in the asyncio event loop.
 
-- **atimer_script.py**: Script that demonstrates timer task running with the Python
-  shell in the asyncio event loop.  Must be started from *piety_script*.
+- **atimer_script.py**: Script that demonstrates *atimer* tasks running with 
+  the Python shell in the *piety* event loop.  Must be started from *piety_script*.
   Directions are in the module header.
 
 - **atimers.py**: Coroutine that prints timestamps at intervals, to run
