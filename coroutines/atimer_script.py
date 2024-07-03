@@ -1,12 +1,13 @@
 """
 atimer_script.py - demonstrate atimer task in the piety event loop.
 
-Run from piety_start script:
+atimer_script requires the running piety event loop, so it must be started
+from piety_script:
 
    $ python -i
    >>> import piety_script
    >>> piety_script.start()
-   ... You must tupe RET once to get the Piety >>>> prompt ...
+   ... You must type RET once to get the Piety >>>> prompt ...
    >>>> import atimer_script
    >>>>  1 2024-07-02 17:46:43.141700
    2 2024-07-02 17:46:44.144011

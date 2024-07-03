@@ -9,7 +9,7 @@ piety_script.py - Start the asyncio event loop, here named piety,
           ... You must type RET once to get the piety >>>> prompt ...
           >>>> piety # For example, to confirm the event loop is running
           <_UnixSelectorEventLoop running=True closed=False debug=False>
-          ... etc., any Python statements, including import atimer_task etc.
+          ... etc., any Python statements, including import atimer_script etc.
           >>>> import atimer_script
           >>>>  1 2024-07-02 17:46:43.141700
           2 2024-07-02 17:46:44.144011
@@ -21,11 +21,11 @@ piety_script.py - Start the asyncio event loop, here named piety,
           $
 
 Here are the contents of the test script.   All test scripts that are run
-from piety_start must begin with the same import statement, in order to use
+from piety_script must begin with the same import statement, in order to use
 the unqualified piety identifier as you would at the interactive >>>> prompt:
 
           # atimer_script.py - demonstrate atimer task in the piety event loop.
-          from piety_start import piety
+          from piety_script import piety
     
           from atimers import atimer
           piety.create_task(atimer(5,1)) 
