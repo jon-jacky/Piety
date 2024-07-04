@@ -46,9 +46,12 @@ def apysh():
     Handler that sets up terminal on first call only, 
     to use when starting piety event loop by hand from the REPL:
 
-    piety = asyncio.get_event_loop()
-    piety.add_reader(sys.stdin, apysh)
-    piety.run_forever()    """
+      >>> piety = asyncio.get_event_loop()
+      >>> piety.add_reader(sys.stdin, apysh)
+      >>> piety.run_forever()    
+
+    Now type RET once to call setup and get the piety >>>> prompt. 
+    """
     global running
     if not running:
         setup()
@@ -59,11 +62,11 @@ def main():
     'Set up event loop, setup() the terminal, and start the event loop.'
     global loop
     loop = asyncio.get_event_loop()
-    loop.add_reader(sys.stdin, handler) # FIXME?  ty not stdin, like display.py?
+    loop.add_reader(sys.stdin, handler) # FIXME? tty not stdin, like display.py?
     setup()
     loop.run_forever()
 
 if __name__ == '__main__': 
     main()
     loop.close()
-     
+      
