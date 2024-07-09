@@ -1,9 +1,14 @@
-timers.txt
+timers.txt - Explanation and directions for timers.py.
 
-Demonstrate interleaving timer tasks in the asycio event loop.
-
-To run these experiments, follow along in this file and type each
-command.
+timers.py demonstrates interleaving timer tasks in short-lived asyncio event loops
+without a Python shell.   
+ 
+The timers.py script is self-contained.  To run the script:
+ 
+    python3 -m timers
+  
+Alternatively, you can follow along with these directions and type 
+each command at the Python prompt:
 
 ...$ . ~/Piety/bin/paths
 ...$ python3 -i
@@ -76,5 +81,4 @@ The other task hasn't completed yet.
 B 10 2024-06-15 09:19:47.082362
 >>> aio.all_tasks(loop)
 set()
-
- 
+  

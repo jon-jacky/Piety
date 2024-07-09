@@ -1,0 +1,16 @@
+edsel_script.txt - Explanation and directions for edsel_script.py
+
+edsel_script.py displays interleaving timer tasks in two editor windows.
+
+edsel_script requires the running piety event loop, so it must be started
+from the Piety shell with the run function:
+ 
+   $ python3 -m piety
+   Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
+   >>>> run('edsel_script.py')
+   ... two windows appear with timer messages ...
+   ...
+   >>>> ^D
+   $
+   ... You can type ^D or exit() to exit from the Piety shell and event loop.
+  

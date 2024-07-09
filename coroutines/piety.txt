@@ -1,0 +1,41 @@
+piety.txt - Explanation and directions for piety.py
+           
+piety.py starts an interactive Python shell running in an asyncio event loop
+named piety. 
+
+It also imports a function named run to run scripts from that
+shell,  which can use that piety event loop.
+             
+The run function adds all the identifiers defined in the script to the
+piety module namespace, so you can use them in subsequent interactive  commands.
+
+Here is an example:
+         
+    $ python3 -m piety 
+    Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
+    >>>> piety # Just for example, confirm the event loop is running
+    <_UnixSelectorEventLoop running=True closed=False debug=False>
+    >>>> from atimers import atimer # Type any Python statements at the prompt ...
+    >>>> piety.create_task(atimer(3,1)) # ... including commands that use piety.
+    <Task pending name='Task-1' coro=<atimer() running at /home/jon/Piety/coroutines/atimers.py:12>>
+    >>>>  1 2024-07-07 11:13:54.733618
+    2 2024-07-07 11:13:55.736089
+    3 2024-07-07 11:13:56.739600
+    ... You must type RETURN (or ENTER) after the task exits to get the prompt ...
+    >>>> run('edsel_script.py') # Run a script that uses the piety identifier
+    ... script runs, putting windows on the display ...
+    >>>> clr() # clear windows. You can use any identifiers defined in the script
+    >>>> ^D
+    $
+     ... exit() also exits ... 
+
+Statements in the piety module that follow run_forever() are not executed,
+so you cannot extend the piety module by adding more commands.   
+You can type more commands at the >>>> prompt, or you can use the run 
+command to run a script from another file.
+
+At the >>>> prompt, you cannot import scripts that import the piety module
+(to get the piety identifier)  because the piety module has already started the
+asyncio event loop.  You must use the run function imported by the piety 
+module to run scripts.
+

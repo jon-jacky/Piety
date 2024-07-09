@@ -1,33 +1,24 @@
 """
-piety.py - Start the asyncio event loop, here named piety, for interactive use:
-
-          $ python3 -m piety 
-          ... type RET once to get prompt ...
-          >>>> piety # Just for example, confirm the event loop is running
-          <_UnixSelectorEventLoop running=True closed=False debug=False>
-          ... etc., any Python statements, including piety.create_task(...) ...
-          >>>> ^D
-          $
-          ... exit() also exits ... 
-
-Statements in this script that follow run_forever() are not executed.
-At the >>>> prompt, you cannot import scripts that import this module
-(to get the piety identifier for example)  because this module already
-starts the asyncio event loop.
-
-For running demo and test scripts, use the piety_script.py module instead.
+piety.py - Start an interactive Python shell running in an asyncio event loop 
+            named piety.  Import a function named run to run scripts from that 
+            shell, which can use that piety event loop.   See piety.txt.
 """
 
 import sys, asyncio
 from apyshell import apysh # Custom Python shell that runs in the event loop.
 
+# So we can run scripts that name piety from the apysh >>>> prompt
+# Identifiers assigned in the script remain in the session.
+from runner import run
+
 piety = asyncio.get_event_loop()
 piety.add_reader(sys.stdin, apysh)
+
+print('Type RETURN (or ENTER) once to get the interactive Piety prompt >>>> ')
 piety.run_forever()
 
 # Statements in this script that follow run_forever() are not executed.
-# For example these are NOT executed:
- 
+@ For example these are NOT executed:  
 from atimers import atimer
 piety.create_task(atimer(5,1))
 

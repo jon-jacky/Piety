@@ -1,11 +1,7 @@
-# timers.py
-
-# Demonstrate interleaving timer tasks in the asycio event loop.
-
-# To run this script:
-# . ~/Piety/bin/paths 
-# python3 -i 
-# >>> import timers
+"""
+timers.py - Demonstrate interleaving timer tasks in short-lived asyncio event loops
+            without a Python shell: python3 -m timer   See timers.txt.
+"""
 
 import asyncio as aio
 loop = aio.get_event_loop()
@@ -34,6 +30,4 @@ print(aio.all_tasks(loop))
  
 loop.run_until_complete(tb)
 print(aio.all_tasks(loop))
- 
-
- 
+   

@@ -1,0 +1,22 @@
+atimer_script.txt - Explanation and directions for atimer_script.py
+
+atimer_script.py demonstrates the Python shell and timer tasks interleaving 
+in the piety event loop. 
+
+atimer_script requires the running piety event loop, so it must be started
+from the Piety shell with the run function:
+
+   $ python3 -m piety
+   Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
+   >>>> run('atimer_script.py')
+   >>>> B 1 2024-07-03 10:13:03.997791
+   A 1 2024-07-03 10:13:04.498137
+   B 2 2024-07-03 10:13:04.498673
+   B 3 2024-07-03 10:13:05.002520
+   A 2 2024-07-03 10:13:05.500561
+   ...
+   ... When both timers finish, type RET to get the propmt again ...
+   >>>> ^D
+   $
+   ... You can type ^D or exit() to exit from the Piety shell and event loop.
+  
