@@ -5,7 +5,9 @@ without a Python shell.
  
 The timers.py script is self-contained.  To run the script:
  
-    python3 -m timers
+...$ python3 -m timers
+... progress messages and timer messages appear, then script exits ...
+...$
   
 Alternatively, you can follow along with these directions and type 
 each command at the Python prompt:

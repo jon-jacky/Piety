@@ -4,6 +4,14 @@ coroutines
 
 Experiments with tasks using Python coroutines and the *asyncio* event loop.
 
+All of these scripts assume you have already assigned *PYTHONPATH* by running
+this command:
+
+   ...$ . ~/Piety/bin/paths
+
+The initial dot . in this command is essential.  This command assumes 
+the top level *Piety* directory is in you home directory.
+
 ### Files ###
 
 - **apyshell.py**: Custom Python shell that can be used from the *asyncio* 
