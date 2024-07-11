@@ -10,7 +10,7 @@ this command:
    ...$ . ~/Piety/bin/paths
 
 The initial dot . in this command is essential.  This command assumes 
-the top level *Piety* directory is in you home directory.
+the top level *Piety* directory is in your home directory.
 
 ### Files ###
 
@@ -42,10 +42,10 @@ the top level *Piety* directory is in you home directory.
 
 - **term_timer.txt**: Explanation and directinos for *term_timer.py*.
 
-- **timers.py** - Demonstrate interleaving timer tasks in short-lived *asyncio* 
+- **timer_loops.py** - Demonstrate interleaving timer tasks in short-lived *asyncio* 
   event loops  without a Python shell.
 
-- **timers.txt**: Explanation and directions for *timers.py*.
+- **timer_loops.txt**: Explanation and directions for *timer_loops.py*.
      
 Revised Jul 2024
  

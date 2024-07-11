@@ -1,11 +1,11 @@
-timers.txt - Explanation and directions for timers.py.
+timer_loops.txt - Explanation and directions for timer_loops.py.
 
-timers.py demonstrates interleaving timer tasks in short-lived asyncio event loops
-without a Python shell.   
+timer_loops.py demonstrates interleaving timer tasks in short-lived asyncio
+event loops without a Python shell.
  
-The timers.py script is self-contained.  To run the script:
+The timer_loops.py script is self-contained.  To run the script:
  
-...$ python3 -m timers
+...$ python3 -m timer+loops
 ... progress messages and timer messages appear, then script exits ...
 ...$
   
@@ -27,11 +27,9 @@ Now we have a fresh event loop with no tasks.
 >> from atimers import atimer
 >>> ta = loop.create_task(atimer(5,5,'A'))
 >>> ta
-<Task pending name='Task-1' coro=<atimer() running at
-/home/jon/Piety/coroutines/atimers.py:8>>
+<Task pending name='Task-1' coro=<atimer() running at /home/jon/Piety/coroutines/atimers.py:8>>
 >>> aio.all_tasks(loop)
-{<Task pending name='Task-1' coro=<atimer() running at
-/home/jon/Piety/coroutines/atimers.py:8>>}
+{<Task pending name='Task-1' coro=<atimer() running at /home/jon/Piety/coroutines/atimers.py:8>>}
 
 >>> loop.run_until_complete(ta)
 A 1 2024-06-15 09:14:58.702109

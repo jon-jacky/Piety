@@ -1,6 +1,6 @@
 """
-timers.py - Demonstrate interleaving timer tasks in short-lived asyncio event loops
-            without a Python shell: python3 -m timer   See timers.txt.
+timer_loops.py - Demonstrate interleaving timer tasks in short-lived asyncio event 
+                 loops without a Python shell.   See timer_loops.txt.
 """
 
 import asyncio as aio
