@@ -1,15 +1,47 @@
 edsel_script.txt - Explanation and directions for edsel_script.py
 
 edsel_script.py displays interleaving timer tasks in two editor windows.
+Tou can set the timer intervals and stop the tasks from the Python REPL.
 
 edsel_script requires the running piety event loop, so it must be started
 from the Piety shell with the run function:
  
    $ python3 -m piety
    Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
+
    >>>> run('edsel_script.py')
    ... Two windows appear, 10 timer messages appear in a.txt, 20 in b.txt. ...
    ...
+   ... After all the timer messages appear, you can restart the tasks,
+   ... st the timer intervals, and stop the tasks from the Python REPL:
+   >>>> piety.create_task(ta.atimer(120,1,'A',abuf))
+   <Task pending name='Task-3' coro=<ATimer.atimer() running at /home/jon/Piety/coroutines/atimers.py:35>>
+   >>>> ta.delay
+   1
+   >>>> ta.delay = 0.5
+   ... Messages in a.txt appear twice as fast ...
+   >>>> piety.create_task(tb.atimer(120,1,'B',bbuf))
+   <Task pending name='Task-4' coro=<ATimer.atimer() running at /home/jon/Piety/coroutines/atimers.py:35>>
+   >>>> tb.delay = 0.1
+   ... Messages in b.txt appear 10x as fast ...
+   ... How fast can you the messages appear before the windows ...
+   ...  and command line become scrambled? ...
+   ... When a.txt window stops updating: ...
+   >>>> piety.create_task(ta.atimer(120,1,'A',abuf))
+   <Task pending name='Task-5' coro=<ATimer.atimer() running at /home/jon/Piety/coroutines/atimers.py:35>>
+   ... Wait for a few new messages in a.txt ...
+   >>> asyncio.all_tasks(piety)
+   {<Task pending name='Task-4' coro=<ATimer.atimer() running at
+   /home/jon/Piety/coroutines/atimers.py:43> wait_for=<Future pending
+   cb=[Task.task_wakeup()]>>, <Task pending name='Task-5' coro=<ATimer.atimer()
+   running at /home/jon/Piety/coroutines/atimers.py:43> wait_for=<Future
+   pending cb=[Task.task_wakeup()]>>}
+   >>>> ta.run
+   True 
+   >>>> ta.run = False
+   ... Messages stop appearing in a.txt ...
+   >>> asyncio.all_tasks(piety)
+   set()
    >>>> clr()
    ... restores full screen scrolling so windows will scroll away ...
    >>>> ^D

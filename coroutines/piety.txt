@@ -13,6 +13,7 @@ Here is an example:
          
     $ python3 -m piety 
     Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
+
     >>>> piety # Just for example, confirm the event loop is running
     <_UnixSelectorEventLoop running=True closed=False debug=False>
     >>>> from atimers import atimer # Type any Python statements at the prompt ...
@@ -24,10 +25,11 @@ Here is an example:
     ... You must type RETURN (or ENTER) after the task exits to get the prompt ...
     >>>> run('edsel_script.py') # Run a script that uses the piety identifier
     ... script runs, putting windows on the display ...
-    >>>> clr() # clear windows. You can use any identifiers defined in the script
-    >>>> ^D
-    $
-     ... exit() also exits ... 
+   >>>> clr()
+   ... restores full screen scrolling so windows will scroll away ...
+   >>>> ^D
+   $
+   ... You can type ^D or exit() to exit from the Piety shell and event loop.
 
 Statements in the piety module that follow run_forever() are not executed,
 so you cannot extend the piety module by adding more commands.   
@@ -38,4 +40,20 @@ At the >>>> prompt, you cannot import scripts that import the piety module
 (to get the piety identifier)  because the piety module has already started the
 asyncio event loop.  You must use the run function imported by the piety 
 module to run scripts.
+
+You can also run piety.py to start the piety event loop in an already running
+Python session:
+
+    ...$ python3 -i
+    ...
+    >>> from runner import run
+    >>> run('piety.py')
+    Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
+
+    >>>> 
+    ...
+    >>>> ^D
+    >>>
+    ... ^D or exit() exits from the Piety shell and event loop ...
+    ... back to the ordinary Python session ...
 

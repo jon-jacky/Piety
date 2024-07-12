@@ -28,6 +28,7 @@ the top level *Piety* directory is in your home directory.
   in tasking experiments.
 
 - **edsel_script.py**: Display interleaving timer tasks in two editor windows.
+  Tou can set the timer intervals and stop the tasks from the Python REPL.
 
 - **edsel_script.txt**: Explanation and directions for *edsel_script.py*.
 
