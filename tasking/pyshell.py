@@ -129,7 +129,7 @@ def pysh():
     """
     setup()
     while running:
-        c = terminal.getchar()
+        c = terminal.getchar() # blocking
         runcmd(c)
     restore()
   

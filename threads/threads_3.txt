@@ -79,8 +79,8 @@ to change the rate  of the messages or
 To show the running threads.
 
 As an alternative to typing the commands in this page,  you can run the
-script in threads_3.py.   Run the tm script as described above, then at
-the pysh prompt type 
+script in threads_3.py.   Run the tm script as described above: python3 -im tm
+Then at the pysh prompt type 
 
 >> import threads_3.  
 

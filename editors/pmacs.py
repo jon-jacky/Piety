@@ -18,6 +18,8 @@ except:
     start_col = 0  # default 0, no prompt or etc. at left margin
     saved_put_marker = edsel.put_marker # so we can restore after put_no_marker
 
+running = True # rpm main loop is running, set False to exit.
+
 # helper functions
 
 def reset_point():
@@ -31,7 +33,7 @@ def restore_cursor_to_window():
     # point+1 to make put_cursor call consistent with editline move_to_column
     display.put_cursor(edsel.wline(ed.dot), ed.point + 1)
 
-# Some functions do not use keycode arg but runcmd and pm require it to be there
+# Some functions do not use keycode arg but kecallers ycmd and runcmd repass it
 
 def next_line(keycode):
     'Move to next line, same column, or end of line if next line is too short'
@@ -185,9 +187,9 @@ keymap = {
     key.down: next_line,
     key.up: prev_line,}
 
-def runcmd(keycode):
+def keycmd(keycode):
     """
-    Execute a single pmacs command: dispatch on key k, run function
+    Execute a single pmacs key command: dispatch on key k, run function
     """
     cmd = keymap[keycode]
     cmd(keycode)
@@ -202,6 +204,43 @@ def put_no_marker(bufline, attribs):
     'Assign to edsel.put_marker to suppress marker while running pmacs'
     pass
 
+def setup():
+    global running
+    dmacs.open_promptline()
+    clear_marker()
+    edsel.put_marker = put_no_marker
+    restore_cursor_to_window()
+    running = True # previous M-x exit may have set it False
+
+def restore():
+    dmacs.close_promptline()
+    edsel.put_marker = saved_put_marker # initialized in except branch above
+    edsel.put_marker(ed.dot, display.white_bg)
+    edsel.restore_cursor_to_cmdline()
+
+def runcmd(c):
+    global running, inline
+    k = keyseq.keyseq(c)
+    if k: # keyseq returns '' if key sequence is not complete
+        if k == key.M_x:
+            running = False
+        elif k in keymap:
+            keycmd(k)
+        elif k in el.printing_chars or k in el.keymap:
+            el.prev_cmd = dmacs.prev_cmd
+            if ed.S() < 1: ed.buffer = ['\n','\n'] # initialize empty buffer   
+            if ed.dot == 0: ed.dot = 1 # buffer[0] is always dummy '\n'
+            ed.buffer[ed.dot], ed.point = el.runcmd(k, ed.buffer[ed.dot],
+                                          ed.point, start_col)
+            dmacs.prev_cmd = el.prev_cmd
+            # key.C_k and inline are handled in kill_line, above
+            if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
+                inline = True
+        elif k in dmacs.keymap:
+            edsel.restore_cursor_to_cmdline()
+            dmacs.runcmd(k)
+            restore_cursor_to_window()
+   
 def rpm():
     """
     pmacs editor: invoke editor functions with emacs control keys.
@@ -211,44 +250,16 @@ def rpm():
     when it exits - so this rpm is the function to call from pysh,
     our custom Python shell.  Call pm (below) from the Python >>> prompt.
     """
-    global inline
-    dmacs.open_promptline()
-    clear_marker()
-    edsel.put_marker = put_no_marker
-    restore_cursor_to_window()
-    while True:
-        c = terminal.getchar()
-        k = keyseq.keyseq(c)
-        if k: # keyseq returns '' if key sequence is not complete
-            if k == key.M_x:
-                break
-            elif k in keymap:
-                runcmd(k)
-            elif k in el.printing_chars or k in el.keymap:
-                el.prev_cmd = dmacs.prev_cmd
-                if ed.S() < 1: ed.buffer = ['\n','\n'] # initialize empty buffer   
-                if ed.dot == 0: ed.dot = 1 # buffer[0] is always dummy '\n'
-                ed.buffer[ed.dot], ed.point = el.runcmd(k, ed.buffer[ed.dot],
-                                              ed.point, start_col)
-                dmacs.prev_cmd = el.prev_cmd
-                # key.C_k and inline are handled in kill_line, above
-                if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
-                    inline = True
-            elif k in dmacs.keymap:
-                edsel.restore_cursor_to_cmdline()
-                dmacs.runcmd(k)
-                restore_cursor_to_window()
-    dmacs.close_promptline()
-    edsel.put_marker = saved_put_marker # initialized in except branch above
-    edsel.put_marker(ed.dot, display.white_bg)
-    edsel.restore_cursor_to_cmdline()
-
+    setup()
+    while running:
+        c = terminal.getchar() # blocking
+        runcmd(c)
+    restore() 
 
 def pm():
     """ 
     pmacs editor: invoke editor functions with emacs control keys.
-    Exit by typing M_x (that's alt X), like emacs 'do command'.
-
+    Exit by typing M_x (that's alt X), like emacs 'do command'. 
     This function assumes terminal is in line mode.
     It sets terminal character mode on entry and restores line mode on exit.
     So call this function from standard Python >>> prompt.

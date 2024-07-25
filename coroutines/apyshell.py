@@ -8,6 +8,7 @@ import sys, asyncio
 import key
 import terminal as term  
 import pyshell as sh
+import apmacs # apmacs.apm() starts asyncio display editor in runcmd special case
 
 loop = None # must be global, used in both restore() and main()
 running = False # loop is running, assigned by restore and apysh
@@ -31,24 +32,27 @@ def restore():
     sh.restore()
 
 def runcmd(c):
-    'Call pyshell runcmd, test for exit, if exit call restore.'
+    'Call pyshell runcmd, but handle two special cases. See unline comments.'
+    # 1. First test for exit, if exit call restore. 
     if (c == key.C_d and sh.cmd == '') or (sh.cmd == 'exit()'):
         restore() 
-    sh.runcmd(c) # handles C_d differently when sh.cmd is not empty
-
-def handler():
-    'Run each time sys.stdin detects a new character.  Read the char, call runcmd.'
-    c = term.getchar()
-    runcmd(c)
-
+    # 2. After key.cr test for apm() command that starts display editing.
+    # In that case do *not* call  pyshell.runcmd key.cr case which ends with 
+    #  restore_cursor_to_cmdline(); pustr(prompt).  Instead handle inline here.
+    elif (c == key.cr and sh.cmd == 'apm()'):
+        apmacs.apm() # starts asyncio display editing
+    else:
+        sh.runcmd(c) # handles C_d differently when sh.cmd is not empty
+ 
 def apysh():
     """ 
-    Handler that sets up terminal on first call only, 
-    to use when starting piety event loop by hand from the REPL:
+    Run each time sys.stdin detects a new character when running in cmd_mode.
+    Set up terminal on first call only, on all calls call runcmd(c).
+    To start the Piety event loop with the pysh shell by hand or from code:
 
-      >>> piety = asyncio.get_event_loop()
-      >>> piety.add_reader(sys.stdin, apysh)
-      >>> piety.run_forever()    
+      piety = asyncio.get_event_loop()
+      piety.add_reader(sys.stdin, apysh) # oops- how do put in c arg.
+      piety.run_forever()    
 
     Now type RET once to call setup and get the piety >>>> prompt. 
     """
@@ -56,7 +60,8 @@ def apysh():
     if not running:
         setup()
         running = True
-    handler()
+    c = term.getchar() # not blocking, asyncio only calls apysh when char is ready.
+    runcmd(c)
       
 def main():
     'Set up event loop, setup() the terminal, and start the event loop.'
