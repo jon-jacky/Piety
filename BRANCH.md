@@ -16,7 +16,7 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
-- 16 Jum 2024: Begin *eventloop* branch to make coroutine versions of the 
+- 16 Jun 2024: Begin *eventloop* branch to make coroutine versions of the 
   *pysh* custom Python interpreter and *pmacs* editor, that can run 
   as concurrent tasks in an *asyncio* event loop.
 
