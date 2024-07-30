@@ -2,6 +2,8 @@
 piety
 =====
 
+The *piety* script in this directory  starts a Piety session.
+
 Piety provides concurrency with a Python *asyncio* event loop.  Tasks 
 are implemented by Python *coroutines* or *readers* (event handlers) that
 run in an event loop.
@@ -12,7 +14,7 @@ blocking in an event loop, so other tasks can run concurrently, as you
 type commands in the shell or edit text in the editor.  You can control
 other tasks from the shell and display task output in editor windows.
 
-The *piety* script in this directory  starts a Piety session.  It creates
+The *piety* script creates
 an event loop named *piety*, adds the readers for the shell and the
 editor, and starts the event loop with the shell running.  It also defines
 a funtion *run* which is needed to run other scripts in the event loop.
