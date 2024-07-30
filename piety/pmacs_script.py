@@ -1,9 +1,8 @@
 # pmacs_script.py   Edit in one window while timer task updates the other:
 #
 # ...$ python3 -m piety
-# Type RETURN (or ENTER) once to get the interactive Piety prompt >>>> 
-#
 # >>>> run('pmacs_script.py')
+# ... windows appear, you can start typing in scratch.txt window ...
 
 import sked
 from sked import *

@@ -1,19 +1,16 @@
 piety.txt - Explanation and directions for piety.py
-           
-piety.py starts an interactive Python shell running in an asyncio event loop
-named piety. 
 
-It also imports a function named run to run scripts from that
-shell,  which can use that piety event loop.
-             
+The piety.py script starts a Piety session.  It creates
+an event loop named piety, adds the readers for the shell and the
+editor, and starts the event loop with the shell running.  It also defines
+a funtion run which is needed to run other scripts in the event loop.
+
 The run function adds all the identifiers defined in the script to the
 piety module namespace, so you can use them in subsequent interactive  commands.
 
 Here is an example:
          
     $ python3 -m piety 
-    Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
-
     >>>> piety # Just for example, confirm the event loop is running
     <_UnixSelectorEventLoop running=True closed=False debug=False>
     >>>> from atimers import atimer # Type any Python statements at the prompt ...
@@ -48,8 +45,6 @@ Python session:
     ...
     >>> from runner import run
     >>> run('piety.py')
-    Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
-
     >>>> 
     ...
     >>>> ^D

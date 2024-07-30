@@ -1,7 +1,8 @@
 """
-piety.py - Start an interactive Python shell running in an asyncio event loop 
-            named piety.  Import a function named run to run scripts from that 
-            shell, which can use that piety event loop.   See piety.txt.
+piety.py - Starts a Piety session.  Creates an event loop named
+  *piety*, adds the readers for the shell and the editor, and starts the
+  event loop with the shell running.  It also defines a funtion *run*
+  which is needed to run other scripts in the event loop. 
 """
 
 import sys, asyncio
@@ -15,17 +16,18 @@ from runner import run
 # Hard code these for now because we have no others - maybe more in the future.
 shell = apyshell.apysh
 fgjob = apmacs.apmrun # foreground job
-
+ 
 def handler():
     if pyshell.cmd_mode:
         shell()
     else:
-        fgjob()
+        fgjob()  
+
+apyshell.running = True
+apyshell.setup() # print >>>> prompt, etc.
 
 piety = asyncio.get_event_loop()
 piety.add_reader(sys.stdin, handler)
-
-print('Type RETURN (or ENTER) once to get the interactive Piety prompt >>>> ')
 piety.run_forever()
 
 # Statements in this script that follow run_forever() are not executed.

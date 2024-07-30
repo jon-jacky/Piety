@@ -1,5 +1,9 @@
 """
-apmacs.py - Run the pmacs editor in the asyncio event loop.  
+apmacs.py - Adapt our pmacs Emacs-like editor to run in an asyncio event loop.  
+            Define the asyncio reader function apmrun that handles each editor
+            keystroke.  Define the function apm to resume the pmacs editor
+            from the Piety shell command prompt (after first running the apm.py
+            script to load the editor modules and create the initial window).
 """ 
 
 import terminal, key, display, pmacs, pyshell

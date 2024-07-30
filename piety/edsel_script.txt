@@ -7,8 +7,6 @@ edsel_script requires the running piety event loop, so it must be started
 from the Piety shell with the run function:
  
    $ python3 -m piety
-   Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
-
    >>>> run('edsel_script.py')
    ... Two windows appear, 10 timer messages appear in a.txt, 20 in b.txt. ...
    ...

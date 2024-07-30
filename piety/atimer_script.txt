@@ -7,7 +7,6 @@ atimer_script requires the running piety event loop, so it must be started
 from the Piety shell with the run function:
 
    $ python3 -m piety
-   Type RETURN (or ENTER) once to get the interactive Piety prompt >>>>
    >>>> run('atimer_script.py')
    >>>> B 1 2024-07-03 10:13:03.997791
    A 1 2024-07-03 10:13:04.498137
