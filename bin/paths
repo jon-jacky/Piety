@@ -11,4 +11,4 @@ export PATH=$PIETY/bin:$PATH
 
 # Python path for Piety on a Unix-like host with a VT100-compatible terminal.
 # For other platforms, replace unix and vt_terminal in this path.
-export PYTHONPATH=$PIETY/python:$PIETY/unix:$PIETY/vt_terminal:$PIETY/editors:$PIETY/tasking:$PIETY/threads:$PIETY/coroutines:$PYTHONPATH
+export PYTHONPATH=$PIETY/python:$PIETY/unix:$PIETY/vt_terminal:$PIETY/editors:$PIETY/tasking:$PIETY/threads:$PIETY/coroutines:$PIETY/piety:$PYTHONPATH

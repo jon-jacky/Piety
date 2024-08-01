@@ -17,7 +17,7 @@ other tasks from the shell and display task output in editor windows.
 The *piety* script creates
 an event loop named *piety*, adds the readers for the shell and the
 editor, and starts the event loop with the shell running.  It also defines
-a funtion *run* which is needed to run other scripts in the event loop.
+a function *run* which is needed to run other scripts in the event loop.
 
 This directory contains several scripts that start applications or
 demonstrate Piety features. These scripts cannot run standalone.  First 
@@ -52,15 +52,15 @@ the top level *Piety* directory is in your home directory.
 
 - **edsel_script.txt**: Explanation and directions for *edsel_script.py*.
 
-- **piety.py**: Starts a Piety session.  Creates   an event loop named
-  *piety*, adds the readers for the shell and the editor, and starts the
-  event loop with the shell running.     It also defines a funtion *run*
-  which is needed   to run other scripts in the event loop.
+- **piety.py**: Starts a Piety session, and defines a function *run*
+  which is needed to run other scripts in the event loop.
   
 - **piety.txt**: Explanation and directions for *piety.py*.
+
+- **pmacs_script.md**: Explanation and directions for *pmacs_script.py*.
 
 - **pmacs_script.py**: Edit in one window while timer task updates the other.
   You can set the timer intervals and stop the tasks from the Python REPL.
 
-Revised Jul 2024
+Revised Aug 2024
  
