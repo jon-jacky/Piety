@@ -20,7 +20,10 @@ editor, and starts the event loop with the shell running.  It also defines
 a function *run* which is needed to run other scripts in the event loop.
 
 This directory contains several scripts that start applications or
-demonstrate Piety features. These scripts cannot run standalone.  First 
+demonstrate Piety features.  We recommend *pmacs_script.py*
+as the script that shows the most features.
+
+These scripts cannot run standalone.  First 
 you must run the *piety* script to start a Piety session, then run the 
 script within the session using the *run* function.  For example, to
 start the *pmacs* editor: *run('apm.py')*
@@ -35,7 +38,7 @@ the top level *Piety* directory is in your home directory.
 
 ### Files ###
 
-- **apm.py**: Script to start the *pmacs* editor in a Piety session.
+- **apm.py**: Script to start the *pmacs* editor in an *asyncio* event loop.
 
 - **apmacs.py**: Adapt the *pmacs* editor to run in an *asyncio* event loop.  
 
