@@ -117,7 +117,7 @@ typing Python commands to *pysh* and editing text in the window.
 
 It is instructive to see how short you can make *ta.delay* -- how rapidly you 
 can write messages in the timer window -- while still being able to edit
-or type commands, without scrambling the any text.
+or type commands, without scrambling any text.
 
 You can stop the task before it writes 1000 messesages by assigning
 *ta.run = False*:

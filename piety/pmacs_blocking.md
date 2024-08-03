@@ -32,8 +32,6 @@ library *readline* function blocks in the same way.
 It is easy to demonstrate blocking with *pmacs_script.py*.  Just run the
 script in the usual way:
 
-This is easy to demonstrate with *pmacs_script.py*:
-
     ...$ python3 -m piety
     >>>> run('pmacs_script.py')
     ...
@@ -69,14 +67,18 @@ However, at this time *pmacs* still includes some blocking code.  After you
 type *C-s* to enter a search string,, or *C-x b* to switch to another
 buffer,  or *C-x C-f* to load a file, *pmacs* prints a prompt, then calls
 *input* to read the search string, buffer name, or file name.   The session
-blocks while you ar typing, until you type *enter* to complete the string, 
+blocks while you are typing, until you type *enter* to complete the string, 
 or type *???* to cancel the operation.  This is easy to demonstrate
 in a *pmacs_script.py* session.  It could be fixed by replacing
 that *input* with calls to our *editline* functions.
 
-Blocking also occurs in *pmacs* when there is a multi-key command, 
+*pmacs* also blocks when there is a multi-key command, 
 such as *C-c >* to indent.   After you type *C-c*, *pmacs* blocks
-until you type *>*.  This is also easy to demonstrate.
+in a call to *terminal.getchar*, waiting for you to
+type *>*.  This is also easy to demonstrate in a *pmacs_script.py*
+session.  It could be fixed by exiting fron the reader and returning control
+to the event loop after the first key in a multi-key command, instead 
+of waiting at *getchar* for the next key.
 
 Revised Aug 2024
 
