@@ -95,7 +95,9 @@ def runcmd(c):
                 point = 0 # ... and point is 5
                 running = False
             else:
+                terminal.set_line_mode()
                 continuation = pycall(cmd) # Run the Python cmd
+                terminal.set_char_mode()
                 cmd = ''
                 point = 0
                 i_cmd = -1 # code will assign it to 0 or greater

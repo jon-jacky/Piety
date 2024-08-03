@@ -57,10 +57,14 @@ the top level *Piety* directory is in your home directory.
   
 - **piety.txt**: Explanation and directions for *piety.py*.
 
+- **pmacs_blocking.md**: Explanation and directions for demonstrating
+  cooperative multitasking and blocking using *pmacs_script.py*.
+
 - **pmacs_script.md**: Explanation and directions for *pmacs_script.py*.
 
-- **pmacs_script.py**: Edit in one window while timer task updates the other.
-  You can set the timer intervals and stop the tasks from the Python REPL.
+- **pmacs_script.py**: Edit in one window while a timer task updates the other.
+  You can set the timer interval, and stop and start timer  tasks from the
+  Python REPL.
 
 Revised Aug 2024
  

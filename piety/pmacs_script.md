@@ -2,6 +2,8 @@
 pmacs_script
 ============
 
+*pmacs_script.py* demonstrates several Piety features.
+
 *pmacs_script.py* shows our   custom Python shell *pysh* and our Emacs-like
 editor *pmacs* running without  blocking in a Python *asyncio* event loop,
 while a timer task runs concurrently, as you  type commands in the shell
@@ -18,6 +20,11 @@ command prompt:
 
 The initial dot . in this command is essential.  This command assumes 
 the top level *Piety* directory is in your home directory.
+
+Then make sure you are in the *~/Piety/piety* directory.  This is needed
+for the Piety *run* command.
+
+    ...$ cd ~/Piety/piety
 
 Run the *piety.py* script at the system command prompt to start the
 Piety event loop:
@@ -43,15 +50,17 @@ just a *reader* (a keyboard event handler):
     >>>> asyncio.all_tasks(piety)
     set()
 
-Run *pmacs_script* to start the *pmacs* editor and the timer task:
+Run *pmacs_script* to start the *pmacs* editor and the timer task.   If your
+default directory is not *~/Piety/piety*, you must type the path to that
+directory here: 
 
     >>>> run('pmacs_script.py')
     a.txt, 0 lines
 
-Two editor windows appear.  The upper window, showing editor buffer *a.txt*,
-shows messages written by the timer task appearing once per second.  The
-lower window, showing editor buffer *scratch.txt*, is empty, with a cursor at
-the beginning of the first line.
+Two editor windows appear in the terminal.  The upper window, showing  the
+*pmacs* editor buffer *a.txt*, shows messages written by the timer task
+appearing once per second.  The lower window, showing editor buffer
+*scratch.txt*, is empty, with a cursor at the beginning of the first line.
 
 Type some text into the lower window and confirm that the timer messages continue
 appearing, without interfering with your typing.   The *pmacs* editor works as 
@@ -102,9 +111,9 @@ To resume editing, type this command:
 
     >>>> apm()
 
-Now the cursor returns to the *scratch.txt* widow.  You can 
-alternate *M-x*  and *apm()* commands to swtich between editing in the window
-and typing Python commands to *pysh*.    
+Now the cursor returns to the *scratch.txt* widow, at the location  where you
+left it.  You can  alternate *M-x*  and *apm()* commands to swtich between
+typing Python commands to *pysh* and editing text in the window.
 
 It is instructive to see how short you can make *ta.delay* -- how rapidly you 
 can write messages in the timer window -- while still being able to edit
@@ -114,20 +123,25 @@ You can stop the task before it writes 1000 messesages by assigning
 *ta.run = False*:
  
     >>>> asyncio.all_tasks(piety)
-    {<Task pending name='Task-6' coro=<ATimer.atimer() running at /home/jon/Piety/coroutines/atimers.py:43> wait_for=<Future pending cb=[Task.task_wakeup()]>>}
+    {<Task pending name='Task-6' coro=<ATimer.atimer() running at
+    /home/jon/Piety/coroutines/atimers.py:43> wait_for=<Future pending
+    cb=[Task.task_wakeup()]>>}
     >>>> ta.run
     True
     >>>> ta.run = False
     >>>> asyncio.all_tasks(piety)
     set()
 
-To finish this experiment, type the *clr()* command to resume scrolling
-in the terminal so the windows will scroll out of sight.   Then type *C-d*
-at the prompt to exit from Piety back to the system command interpreter.
+To finish this experiment, type the *clr()* command to resume scrolling in
+the terminal so the windows will scroll out of sight.   Then type *C-d* (hold
+down *ctrl* while typing *d*) at the prompt to exit from Piety back to the
+system command interpreter.
 
     >>>> clr()
-    >>>> 
+    >>>> (C-d, does not echo)
     .... $
+
+Instead of *C-d*, you can also type *exit()*.
 
 Revised Aug 2024
  
