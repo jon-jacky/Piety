@@ -20,8 +20,8 @@ editor, and starts the event loop with the shell running.  It also defines
 a function *run* which is needed to run other scripts in the event loop.
 
 This directory contains several scripts that start applications or
-demonstrate Piety features.  We recommend *pmacs_script.py*
-as the script that shows the most features.
+demonstrate Piety features.  *pmacs_script.py* is the most recent
+and shows the most features.
 
 These scripts cannot run standalone.  First 
 you must run the *piety* script to start a Piety session, then run the 
