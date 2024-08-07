@@ -41,7 +41,7 @@ is the virtual machine where the Piety OS now runs, analogous to the QEMU
 virtual machine in many other operating system projects.
 
 Piety provides a [display editor](editors/README.md),  and a 
-[custom Python interpreter](tasks/pyshell.py). The display editor can support 
+[custom Python interpreter](tasking/pyshell.py). The display editor can support 
 multiple buffers and windows in the terminal, and also a region for the
 Python interpreter. Together these provide a minimal but self-contained
 programming environment within a single Python terminal session.
