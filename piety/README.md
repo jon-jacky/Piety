@@ -2,7 +2,9 @@
 piety
 =====
 
-The *piety* script in this directory  starts a Piety session.
+The *piety* script in this directory begins a Piety session by starting
+an *asyncio* event loop.  Other scripts demonstrate Piety features 
+or start applications.
 
 Piety provides concurrency with a Python *asyncio* event loop.  Tasks 
 are implemented by Python *coroutines* or *readers* (event handlers) that
@@ -16,7 +18,7 @@ other tasks from the shell and display task output in editor windows.
 
 The *piety* script creates
 an event loop named *piety*, adds the readers for the shell and the
-editor, and starts the event loop with the shell running.  It also defines
+editor, and starts the event loop with the shell running.  It also imports
 a function *run* which is needed to run other scripts in the event loop.
 
 This directory contains several scripts that start applications or
@@ -51,12 +53,12 @@ the top level *Piety* directory is in your home directory.
 - **atimer_script.txt**: Explanation and directions for *atimer_script.py*.
  
 - **edsel_script.py**: Display interleaving timer tasks in two editor windows.
-  You can set the timer intervals and stop the tasks from the Python REPL.
+  Set the timer intervals and stop the tasks from the Python REPL.
 
 - **edsel_script.txt**: Explanation and directions for *edsel_script.py*.
 
-- **piety.py**: Starts a Piety session, and defines a function *run*
-  which is needed to run other scripts in the event loop.
+- **piety.py**: Begin a Piety session by starting the *asyncio* event loop.
+  Import a function *run* which is needed to run other scripts in the event loop.
   
 - **piety.txt**: Explanation and directions for *piety.py*.
 
@@ -66,7 +68,7 @@ the top level *Piety* directory is in your home directory.
 - **pmacs_script.md**: Explanation and directions for *pmacs_script.py*.
 
 - **pmacs_script.py**: Edit in one window while a timer task updates the other.
-  You can set the timer interval, and stop and start timer  tasks from the
+  Set the timer interval, and stop and start timer  tasks from the
   Python REPL.
 
 Revised Aug 2024
