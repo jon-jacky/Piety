@@ -2,10 +2,7 @@
 branches
 ========
 
-This is the *eventloop* branch off the *rewrite* branch: 
-Make coroutine versions of the  *pysh* custom Python interpreter and
-*pmacs* editor, that can run as concurrent tasks in an *asyncio* event
-loop.
+This is the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -15,6 +12,8 @@ The *rewrite* branch is now the main branch.  I will never merge it back
 into the *master* branch.
 
 Recent work in the *rewrite* branch:
+
+-  7 Aug 2024: Merge the *eventloop* branch back into the *rewrite* branch.
 
 - 16 Jun 2024: Begin *eventloop* branch to make coroutine versions of the 
   *pysh* custom Python interpreter and *pmacs* editor, that can run 
