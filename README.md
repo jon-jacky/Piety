@@ -2,7 +2,7 @@
 Piety
 =====
 
-**Piety** is a notional operating system to be written in Python.
+**Piety** is an operating system written in Python.
 
 [Motivation and Goals](#Motivation-and-Goals)  
 [Current Status](#Current-Status)  
@@ -12,34 +12,33 @@ Piety
 
 ## Motivation and Goals ##
 
-Piety is a response to this impulse:
+Piety is a small but self-contained personal computer operating system for
+programmers.  It provides a responsive and malleable platform for writing
+and programming.  Its internals are easy to understand and modify.
+ 
+Piety uses a single programming language -- Python -- for both the
+applications and the operating system. You can use the language interpreter
+to inspect and manipulate any data in the running system.  Changes to
+application and system code are effective immediately, without having to
+stop and restart the system.
 
-> *Today's operating systems and applications are bloated and
-> complicated.  Let's start over, and create a complete system that is
-> small, easy to understand, and fun to program.  And, let's build it
-> all in our favorite language!*
-
-I am intrigued by the single user, single language, special hardware
-systems of the 1970s and 80s: Smalltalk, Lisp machines, Oberon (see
-[doc/precursors.md](doc/precursors.md)).   Those systems used a single
-programming language for both the applications and the operating system.
-You could use the language interpreter to inspect and manipulate any data
-in the running system.  Changes to application and system code were
-effective immediately, without having to stop and restart the system.
-
-Piety is an experiment to see if I can put together something similar
-today, but using a familiar programming language running on ordinary
-hardware. (For other projects in a similar spirit, again see
-[doc/precursors.md](doc/precursors.md).)  I aim to produce, in Python, a
-simple but self-contained personal computer operating system.  Let's  see
-how far we can get with just Python. There is already a lot of work by
-others that we might be able to use or adapt (see
-[doc/utilities.md](doc/utilities.md)).
-
+Piety is a reaction against the complexity and disempowerment of today's
+dominant computer systems.  I take inspiration from the single user, single
+language, special hardware systems of the 1970s and 80s: Smalltalk, Lisp
+machines, Oberon (see [doc/precursors.md](doc/precursors.md)).     Piety is
+an experiment to see if I can put together something similar today, but
+using a familiar programming language running on ordinary hardware.  Let's
+see how far we can get with just Python. There is already a lot of work by
+others that we might be able to adapt or use as models (see
+[doc/utilities.md](doc/utilities.md)). For other projects in a similar
+spirit, again see [doc/precursors.md](doc/precursors.md).
+  
 ## Current Status ##
 
 For now, Piety runs in an ordinary Python interpreter session in a single
-terminal on a host operating system. 
+terminal on a host operating system.   The Python interpreter with its runtime
+is the virtual machine where the Piety OS now runs, analogous to the QEMU
+virtual machine in many other operating system projects.
 
 Piety provides a [display editor](editors/README.md),  and a 
 [custom Python interpreter](tasks/pyshell.py). The display editor can support 
@@ -47,20 +46,28 @@ multiple buffers and windows in the terminal, and also a region for the
 Python interpreter. Together these provide a minimal but self-contained
 programming environment within a single Python terminal session.
 
-The editor is not just for creating text. Python commands including
-concurrent tasks can redirect their output to editor buffers and windows, so
-the editor can be used for data capture and animated display.  We have
-used it for experiments in tasking and concurrency using Python
-[threads](threads) and [coroutines](coroutines)
-where tasks update windows as we control their behavior by typing  commands
-at the Python interpreter.
-
 Piety development is self-hosted in this programming environment.  Code is
 added and revised in a long-running Python session.  Code  is imported and
 reloaded into the session without restarting or  losing work in progress.
 To make this possible we adopted a
 [particular workflow and coding style](editors/HOW.md).
 
+Piety provides concurrency with a Python *asyncio* event loop.  Tasks 
+are implemented by Python *coroutines* or *readers* (event handlers) that
+run in an event loop.
+
+Piety provides *asyncio* readers for its custom Python shell and its
+editor.  These enable the shell and the editor to run without 
+blocking in an event loop, so other tasks can run concurrently, as you 
+type commands in the shell or edit text in the editor.  
+
+The editor is not just for creating text. Python commands including
+concurrent tasks can redirect their output to editor buffers and windows, so
+the editor can be used for data capture and animated display.  We
+use it for [experiments](piety) in tasking and concurrency
+where tasks update windows as we control their behavior by typing  commands
+at the Python interpreter.
+  
 The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
 An archive of the earlier version of Piety that was abandoned in January 2023
@@ -68,19 +75,6 @@ is here in the  *master* branch and *version1* tag.  The *rewrite* branch
 is now the main branch; I will  never merge it back into *master*.
      
 ## Roadmap ##
-
-This project is a series of experiments. There is no plan for a sequence
-of steps to bring Piety to some completed, finished state.  Instead, here
-are some notes about my working method, and some experiments I might try
-in the future.
-
-I have brought Piety to its present state by working  in short
-bursts on an irregular schedule, when I can find the time and interest.  I
-decide what to work on next as I go along.  I often go back and rewrite
-what I have already done, to make it easier to work with or just to
-improve the style.
-
-A history of some of this past work appears [here](BRANCH.md).
 
 I hope someday to run Piety on a bare machine with no other
 operating system, but only a Python interpreter with minimal support.
@@ -97,11 +91,8 @@ operating system which is itself mostly written in Python.
 All the work I have done so far, including the programming environment, is
 in the hosted part.  I have researched 
 [several approaches](doc/baremachine.md) to building the native part, but
-have not begun work on any.   Every approach would require a more
-concentrated, sustained effort than I have been able to make so far.
+have not yet started work on any.   I hope to begin soon.
 
-It is likely that work in the near future will continue in the hosted part.
- 
 ## Dependencies ##
 
 The Piety system has no dependencies, other than Python itself
@@ -130,5 +121,5 @@ The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
 purchased in April 2023.  At this writing (12 Jan 2024) it is running
 ChromeOS Version 118.0.5993.164.
 
-Revised Jun 2024
+Revised Aug 2024
 
