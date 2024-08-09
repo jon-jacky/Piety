@@ -2,7 +2,7 @@
 Rationale for the Piety operating system
 ========================================
 
-Some design decisions for Piety, and their rationales and consequences.
+Some design decisions for Piety, and their rationales:
 
 Piety is a small personal computer operating system for programmers, written
 in Python.
@@ -12,14 +12,14 @@ restarting or losing work in progress.
 
 Piety provides concurrency with a Python *asyncio* event loop.
 
-[Personal computer](#Personal-computer)
-[For programmers](#For-programmers)
-[Python](#Python)
-[Operating system](#Operating-system)
-[Long-running session](#Long-running-session)\
-[Small](#Small)
-[Concurrency with *asyncio*](#Concurrency-with-asyncio)
-
+[Personal computer](#Personal-computer)  
+[For programmers](#For-programmers)  
+[Python](#Python)  
+[Operating system](#Operating-system)  
+[Long-running session](#Long-running-session)  
+[Small](#Small)  
+[Concurrency with *asyncio*](#Concurrency-with-asyncio)  
+ 
 ### Personal computer ###
 
 Piety is intended to support a truly *personal* computer, whose software
@@ -56,7 +56,7 @@ Many [examples](utilities.md) show how to do systems programming in Python.
 And, thanks to its popularity and long history, there are Python libraries
 and applications for almost anything you might want to do with a computer. 
 
-Given all this, why do we need a user-facing operating system at all?  
+Given all this, why do we need a user-facing operating system at all?
 For now, we need it to run programs that are not in Python.  But this comes at 
 the cost of adding many additional things you must know to use the computer.
 Maybe we can simplify our computing life by dispensing with all that, and
@@ -84,7 +84,7 @@ values of all its variables -- must be preserved across reloads, including
 the state of the reloaded module itself.
 
 We preserve state across reloads by only initializing variables the first time
-a module is imported, using the code described in
+a module is imported, using the coding technique described in
 [How we program](../editors/HOW.md#Reloading-modules).
 
  
@@ -102,7 +102,7 @@ objects with their new definitions from the reloaded module.   There are
 (nonstandard) "hot reloading" packages for Python that overcome this, but I just
 accept the limitation and avoid using objects to store persistent
 application data (again see
-(How we program)[../editors/HOW.md#Modules-and-dictionaries-instead-of-classes-and-objects]
+[How we program](../editors/HOW.md#Modules-and-dictionaries-instead-of-classes-and-objects)
 
 
 ### Concurrency with *asyncio* ###
@@ -121,7 +121,7 @@ without a host operating system.
 Concurrency using the *asyncio* event loop provides *cooperative multitasking*,
 which requires a particular coding style.   Each task responds to events -- 
 such as key presses -- and the code that handles each event runs to completion
-before the system can handle other events or run other tasks.  
+before the system can handle other events or run other tasks.
 Code must not *block* -- wait for events or data that are not yet available.
 
 The Piety editor and Python shell are coded so they can run without blocking

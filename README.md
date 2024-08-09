@@ -67,6 +67,8 @@ the editor can be used for data capture and animated display.  We
 use it for [experiments](piety) in tasking and concurrency
 where tasks update windows as we control their behavior by typing  commands
 at the Python interpreter.
+
+Here is more about Piety design decisions and their [rationales](doc/rationale.md).
   
 The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
