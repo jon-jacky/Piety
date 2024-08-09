@@ -68,8 +68,13 @@ use it for [experiments](piety) in tasking and concurrency
 where tasks update windows as we control their behavior by typing  commands
 at the Python interpreter.
 
-Here is more about Piety design decisions and their [rationales](doc/rationale.md).
-  
+Here is more about some Piety [design decisions](doc/rationale.md) and their
+rationales.
+
+We don't have any screenshots or animations, but if we did, they would show
+the scenarios described in *piety/pmacs_script.md* and *pmacs_blocking.md*.
+For now, you can just read along there and do the demos yourself.
+   
 The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
 An archive of the earlier version of Piety that was abandoned in January 2023
@@ -94,7 +99,7 @@ All the work I have done so far, including the programming environment, is
 in the hosted part.  I have researched 
 [several approaches](doc/baremachine.md) to building the native part, but
 have not yet started work on any.   I hope to begin soon.
-
+ 
 ## Dependencies ##
 
 The Piety system has no dependencies, other than Python itself

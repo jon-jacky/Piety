@@ -81,11 +81,11 @@ of the *sked* module.
  
 ### Modules and dictionaries instead of classes and objects ###
 
-Reloading a class into a running Python session is not
-useful, because persistent objects continue to use the old class
-definition.   Therefore, we do not write classes. (Classes built
-into  Python itself, or in code written by others, are not a problem
-because we do not reload them.)
+Reloading a class into a running Python session is not useful, because
+persistent objects continue to use the old class definition.   Therefore, we
+do not write classes for persistent data. (Classes built into  Python
+itself, or in code written by others, are not a problem because we do not
+reload them.)
 
 Instead, we program with modules and dictionaries, which do acquire
 the new behaviors when modules are reloaded.

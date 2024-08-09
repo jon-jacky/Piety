@@ -1,6 +1,6 @@
 
-Rationale for the Piety operating system
-========================================
+Design decisions and rationales
+===============================
 
 Some design decisions for Piety, and their rationales:
 
@@ -95,14 +95,14 @@ Piety has to be small, because it is written by one person in his spare time.
 I use existing Python language constructs and the standard library  instead
 of writing new code as much as I can, even if that requires limiting
 functionality and adopting a restricted programming style. I try to avoid
-hard problems, or solve an easier one instead.
+hard problems, or replace them with easier ones instead.
 
 For example, the standard Python function *reload* does not update  existing
 objects with their new definitions from the reloaded module.   There are
-(nonstandard) "hot reloading" packages for Python that overcome this, but I just
-accept the limitation and avoid using objects to store persistent
-application data (again see
-[How we program](../editors/HOW.md#Modules-and-dictionaries-instead-of-classes-and-objects)
+some complicated "hot reloading" packages that overcome this, but I just
+accept the limitation, avoid using objects to store persistent application
+data, and use dictionaries instead (again see
+[How we program](../editors/HOW.md#Modules-and-dictionaries-instead-of-classes-and-objects))
 
 
 ### Concurrency with *asyncio* ###
