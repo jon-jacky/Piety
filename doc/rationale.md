@@ -33,11 +33,11 @@ will use, that will take over the world.
 
 ### For programmers ###
 
-I do not expect other people to install and use Piety in the form it appears
-here -- it is too saturated with my own idiosyncratic preferences, and
-limitations that are severe but are tolerable to me.  But others might find
-ideas, techniques, and examples here that could inform their efforts to
-build systems that express their own preferences.
+I do not expect anyone else to use Piety routinely. It is too saturated with
+my own idiosyncratic preferences, and limitations that are severe but
+tolerable to me.  But other programmers  might try it out, or just look at
+the code and documents, to get ideas, techniques, and examples they could
+use to help them build systems that express their own preferences.
 
  
 ### Python ###

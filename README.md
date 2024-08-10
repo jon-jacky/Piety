@@ -72,8 +72,10 @@ Here is more about some Piety [design decisions](doc/rationale.md) and their
 rationales.
 
 We don't have any screenshots or animations, but if we did, they would show
-the scenarios described in *piety/pmacs_script.md* and *pmacs_blocking.md*.
-For now, you can just read along there and do the demos yourself.
+the scenarios described in [pmacs_script.md](piety/pmacs_script.md) and 
+[pmacs_blocking.md](piety/pmacs_blocking.md).  Honestly, there is not much
+to see -- it just looks like Emacs in a terminal.  To gain any understanding,
+you have to read along in the those files and work through the demos yourself.
    
 The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
