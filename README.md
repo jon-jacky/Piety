@@ -8,7 +8,7 @@ Piety
 [Current Status](#Current-Status)  
 [Roadmap](#Roadmap)  
 [Dependencies](#Dependencies)  
-[Tested Platform](#Tested-Platform)  
+[Tested Platforms](#Tested-Platforms)  
 [Footnotes](#Footnotes)
 
 ## Motivation and Goals ##
