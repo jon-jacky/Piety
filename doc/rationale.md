@@ -115,8 +115,8 @@ the host operating system's threading library.  My goal for Piety is to
 replace the host operating system.
  
 The *asyncio* library is all written in Python.  It is built on the Python
-interpreter itself, based on generators and *yield*.  It seems it could run
-without a host operating system.
+interpreter itself, based on generators and *yield*.  It seems it should be 
+able to run without much support from the host operating system.
 
 Concurrency using the *asyncio* event loop provides *cooperative multitasking*,
 which requires a particular coding style.   Each task responds to events -- 
