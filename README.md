@@ -9,6 +9,7 @@ Piety
 [Roadmap](#Roadmap)  
 [Dependencies](#Dependencies)  
 [Tested Platform](#Tested-Platform)
+[Footnotes](#Footnotes)
 
 ## Motivation and Goals ##
 
@@ -130,7 +131,9 @@ The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
 purchased in April 2023.  At this writing (12 Jan 2024) it is running
 ChromeOS Version 118.0.5993.164.
 
-The phrase 'complexity and disempowerment' is from a posting by
+### Footnotes ###
+
+The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
 Revised Aug 2024

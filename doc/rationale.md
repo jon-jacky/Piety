@@ -4,7 +4,7 @@ Design decisions and rationales
 
 Some design decisions for Piety, and their rationales:
 
-[Piety](../Piety) is a small personal computer operating system for
+[Piety](..) is a small personal computer operating system for
 programmers, written in Python.
 
 Code is added and revised in a long-running Python session,  without
