@@ -4,8 +4,8 @@ Design decisions and rationales
 
 Some design decisions for Piety, and their rationales:
 
-Piety is a small personal computer operating system for programmers, written
-in Python.
+[Piety](../Piety) is a small personal computer operating system for
+programmers, written in Python.
 
 Code is added and revised in a long-running Python session,  without
 restarting or losing work in progress.
@@ -25,7 +25,7 @@ Piety provides concurrency with a Python *asyncio* event loop.
 Piety is intended to support a truly *personal* computer, whose software
 is created (or selected and modified) by its owner, to express their own
 preferences and inclinations.  A personal computer enables its owner to work
--- or waste time! -- in the way that is most comfortable and satisfying for
+-- or just pass the time -- in the way that is most comfortable and satisfying for
 them, no matter how unusual or eccentric that might be.   Piety is a deliberate
 reaction against the prevailing trend to try to build a system that everyone
 will use, that will take over the world.
@@ -39,7 +39,7 @@ tolerable to me.  But other programmers  might try it out, or just look at
 the code and documents, to get ideas, techniques, and examples they could
 use to help them build systems that express their own preferences.
 
- 
+  
 ### Python ###
 
 Python is typically used from an interactive interpreter that enables the
