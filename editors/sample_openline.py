@@ -1,5 +1,5 @@
 """
-sample_openline.py - Code fragments from sked.py, to edit for pmacs_openline demo.
+sample_openline.py - Fragments from sked.py, to edit for pmacs.py open_line demo.
 
 """
 
@@ -11,15 +11,20 @@ try:
 except:
     # Code block with one level of indentation for testing openline
     buffer = ['\n']
-    # ... Add more indented lines here ...
+    # Add more indented lines here.  You can copy them from the real sked.py.
+    # You have to type the tab key, or type the space key four times,
+    #  to reach the required indentation.
 
 # ... many lines omitted ...
 
 def w(fname=None, set_saved=set_saved):
-    # Indented comment block for testing wrap 
+    # Indented comment block for testing wrap.
+    # Add line in the middle, then select the three command lines
+    #  and wrap with M-q.  The wrapped lines start at the left margin of 
+    #  the window, which looks terrible.
     """
     w(rite) buffer to file, default fname is in filename.
-    If fname is given, assign it to filename to be used for future writes.
+    ... more comment text follows ...
     """
     global filename, bufname, saved
     # .. lines omitted ...
@@ -27,11 +32,14 @@ def w(fname=None, set_saved=set_saved):
         if filename != fname: # we saved buffer with a new, different filename
             # Code block with three levels of indentation
             filename = fname
-            # ... add more indented lines here ...
+            # Add more indented lines here.  You have to type tab three times,
+            # or type 12 spaces, to reach the required indentation.            
+
         # Code block out-dented from preceding block
         set_saved(True)
-        # ... add more out-dented lines here ...
-
+        # Add more out-dented lines here. You have to type tab two times 
+        #  or type eight spaces to reach the required indentation. 
+         
 # Next, revise and reload the code in pmacs.py that defines openline behavior
 #  to add automatic indentation.
 
@@ -45,15 +53,20 @@ try:
 except:
     # Code block with one level of indentation for testing openline
     buffer = ['\n']
-    # ... Add more indented lines here ...
+    # Add more indented lines here.  You can copy them from the real sked.py.
+    # You have to type the tab key, or type the space key four times,
+    #  to reach the required indentation.
 
 # ... many lines omitted ...
 
 def w(fname=None, set_saved=set_saved):
-    # Indented comment block for testing wrap 
+    # Indented comment block for testing wrap.
+    # Add line in the middle, then select the three command lines
+    #  and wrap with M-q.  The wrapped lines start at the left margin of 
+    #  the window, which looks terrible.
     """
     w(rite) buffer to file, default fname is in filename.
-    If fname is given, assign it to filename to be used for future writes.
+    ... more comment text follows ...
     """
     global filename, bufname, saved
     # .. lines omitted ...
@@ -61,8 +74,11 @@ def w(fname=None, set_saved=set_saved):
         if filename != fname: # we saved buffer with a new, different filename
             # Code block with three levels of indentation
             filename = fname
-            # ... add more indented lines here ...
+            # Add more indented lines here.  You have to type tab three times,
+            # or type 12 spaces, to reach the required indentation.            
+
         # Code block out-dented from preceding block
         set_saved(True)
-        # ... add more out-dented lines here ...
+        # Add more out-dented lines here. You have to type tab two times 
+        #  or type eight spaces to reach the required indentation. 
 

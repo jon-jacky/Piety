@@ -53,21 +53,18 @@ def open_line(keycode):
     """
     Split line at point, replace line in buffer at dot
     with its prefix, append suffix after line at dot.
-    Preserve indentation: add as many spaces as needed before suffix line
-     to match indentation of prefix line.
     """
     suffix = ed.buffer[ed.dot][ed.point:] # including final \n
     # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
     ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
                                              ed.point, start_col)
-    prefix = ed.buffer[ed.dot] # now just the prefix remains at dot
-    ed.point = len(prefix) - len(prefix.lstrip()) # index, start of indented suffix
-    ed.buffer[ed.dot+1:ed.dot+1] = [ ed.point*' ' + suffix ] # indented suffix
+    ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.dot = ed.dot + 1
     if edsel.in_window(ed.dot):
         edsel.update_below(ed.dot)
     else:
-        edsel.recenter() 
+        edsel.recenter()
+    ed.point = 0 # start of new suffix line
     restore_cursor_to_window()
 
 # The following functions supercede and wrap functions in other modules
