@@ -60,16 +60,16 @@ def open_line(keycode):
     # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
     ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
                                              ed.point, start_col)
-    prefix = ed.buffer[ed.dot] # now just the prefix remains at dot
-    # n of leading blanks.  In empty lines or whitespace lines, don't count '\n'
-    ed.point = len(prefix.rstrip('\n')) - len(prefix.rstrip('\n').lstrip())
-    # ed.point = 0; while ed.buffer[ed.dot][ed.point] == ' ': ed.point += 1 #syntax
-    ed.buffer[ed.dot+1:ed.dot+1] = [ ed.point*' ' + suffix ] # indented suffix
-    ed.dot = ed.dot + 1    
+    # Auto-indent suffix line to same indentation as prefix line.
+    nspaces = 0
+    while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
+    ed.buffer[ed.dot+1:ed.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
+    ed.point = nspaces # put cursor at first char after leading spaces, 0-indexed
+    ed.dot += 1
     if edsel.in_window(ed.dot):
         edsel.update_below(ed.dot)
     else:
-        edsel.recenter() 
+        edsel.recenter()
     restore_cursor_to_window()
 
 # The following functions supercede and wrap functions in other modules

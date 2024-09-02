@@ -59,12 +59,12 @@ def open_line(keycode):
     ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
                                              ed.point, start_col)
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
-    ed.dot = ed.dot + 1
+    ed.point = 0 # start of new suffix line
+    ed.dot += 1
     if edsel.in_window(ed.dot):
         edsel.update_below(ed.dot)
     else:
         edsel.recenter()
-    ed.point = 0 # start of new suffix line
     restore_cursor_to_window()
 
 # The following functions supercede and wrap functions in other modules
