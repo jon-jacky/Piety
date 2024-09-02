@@ -63,9 +63,9 @@ def open_line(keycode):
     prefix = ed.buffer[ed.dot] # now just the prefix remains at dot
     # n of leading blanks.  In empty lines or whitespace lines, don't count '\n'
     ed.point = len(prefix.rstrip('\n')) - len(prefix.rstrip('\n').lstrip())
-    # ed.point = 0; while ed.buffer[ed.dot][ed.point] = ' ': ed.point += 1
+    # ed.point = 0; while ed.buffer[ed.dot][ed.point] == ' ': ed.point += 1 #syntax
     ed.buffer[ed.dot+1:ed.dot+1] = [ ed.point*' ' + suffix ] # indented suffix
-    ed.dot = ed.dot + 1
+    ed.dot = ed.dot + 1    
     if edsel.in_window(ed.dot):
         edsel.update_below(ed.dot)
     else:
