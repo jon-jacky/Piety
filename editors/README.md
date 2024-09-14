@@ -65,10 +65,9 @@ More detailed directions appear in the sections below.
 
 - **demo**: Directory of files used by the demonstration explained in *demo.md*.
 
-- **demo.md**: Directions for a demonstrating the *pmacs* editor to edit itself to 
+- **demo.md**: Directions for demonstrating the *pmacs* editor to edit itself to 
   add a new feature, reload the revised code into the same editing session,
-  and then use the new feature --- all without restarting the editor session
-  or losing any other work in progress.
+  and then use the new feature.
 
 - **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
 
