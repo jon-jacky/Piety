@@ -63,22 +63,30 @@ More detailed directions appear in the sections below.
 
 - **HOW.md**: How we program, notes on motivation and design.
 
-- **dm.py**: Script to start the *dmacs* editor.
+- **demo**: Directory of files used by the demonstration explained in *demo.md*.
 
+- **demo.md**: Directions for a demonstrating the *pmacs* editor to edit itself to 
+  add a new feature, reload the revised code into the same editing session,
+  and then use the new feature --- all without restarting the editor session
+  or losing any other work in progress.
+
+- **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
+
+- **dm.py**: Script to start the *dmacs* editor.
+  
 - **editline.py**: Functions to edit and display a string with *readline* 
   control keys.  Used by *pmacs*.
 
 - **edsel.py**: Display editor that uses the same commands as *sked*.
 
-- **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
-
-- **pm.py**: Script to start the *pmacs* editor.
-
 - **pmacs.py**: Display editor that uses Emacs control keys.
 
+ - **pm.py**: Script to start the *pmacs* editor.
+ 
 - **sked.py**: Line editor inspired by the classic Unix *ed*.
 
-
+- **test**: Directory of sample text files for testing the editors.
+ 
 ### sked ###
 
 **sked.py** is the Stone Knife Editor, a line editor inspired by the classic 
@@ -435,4 +443,4 @@ to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Jan 2024
+Revised Sep 2024

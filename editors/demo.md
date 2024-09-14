@@ -99,7 +99,8 @@ You must include that final dot.  Now you can try some editing.
 
 ### Demonstrate editing without autoindent ###
 
-If the *pmacs* editor is not already running, start it now.
+Start a new *pmacs* editor session, to ensure it will use the version 
+without the autoindent feature that you just copied from the *demo* directory.
 
 Load the file *sked_fragments.py* into the editor: the initial version you just
 copied from *editors/demo* into *editors*.
@@ -157,70 +158,79 @@ In *pmacs.py*, we find the *open_line* function:
             edsel.recenter()
         restore_cursor_to_window()
 
-Here the text buffer is *ed.buffer*, a lists of lines (which are strings),
+Here the text buffer is *ed.buffer*, a list of lines (which are strings),
 and *ed.dot* is the index of *dot*, the current line in the buffer, so
 *ed.buffer[ed.dot]* is the current line.  Here *ed.point* is the index of
 the character under the cursor in the current line.
 
-The line we are looking for here has the comment *insert suffix line ...*.
+The line we are looking for here has the iline comment *# insert suffix line ...*.
 We want to  change it to something like:
 
         ed.buffer[ed.dot+1:ed.dot+1] = [ <extra spaces> + suffix ]
-        
-where *<extra spaces>* is a string of space characters of the proper length
+                 
+where *extra spaces* is a string of space characters of the proper length
 to make the new line up with the current line. So we need to count the
-spaces at the beginning of the current line, *ed.buffer[ed.dot]*:
+spaces at the beginning of the current line, *ed.buffer[ed.dot]*.  Add
+these two lines right before the *insert suffix ...* line
 
     nspaces = 0
     while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1
     
 When the *while* loop exits, *nspaces* is the number of leading spaces in the
-current line.  We must add this code before that code that inserts the new  line.
-Then we can complete the edits at *insert suffix line*: 
+current line.  
+
+Now change the *insert suffix ...* line to this:
 
         ed.buffer[ed.dot+1:ed.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
 
-There is one more detail.  We must put the cursor after the leading spaces:
+There is one more detail.  We must put the cursor after the leading spaces.
+Change the next line from this:
 
-    ed.point = nspaces
+        ed.point = 0  # start of new suffix line
+
+to this:
+
+        ed.point = nspaces  # indent cursor
     
-Here is the revised function.  We have added some comments, too:
+Here is the revised function.  We have added to the initial comment block, too:
 
-def open_line(keycode):
-    """
-    Split line at point, replace line in buffer at dot
-    with its prefix, append suffix after line at dot.
-    Preserve indentation: add as many spaces as needed before suffix line
-     to match indentation of prefix line.
-    """
-    suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-    # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-    ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
-                                             ed.point, start_col)
-    # Auto-indent suffix line to same indentation as prefix line.
-    nspaces = 0
-    while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
-        ed.buffer[ed.dot+1:ed.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
-    ed.point = nspaces # put cursor at first char after leading spaces, 0-indexed
-    ed.dot += 1
-    if edsel.in_window(ed.dot):
-        edsel.update_below(ed.dot)
-    else:
-        edsel.recenter()
-    restore_cursor_to_window()
+    def open_line(keycode):
+        """
+        Split line at point, replace line in buffer at dot
+        with its prefix, append suffix after line at dot.
+        Preserve indentation: add as many spaces as needed before suffix line
+         to match indentation of prefix line.
+        """
+        suffix = ed.buffer[ed.dot][ed.point:] # including final \n
+        # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
+        ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
+                                                 ed.point, start_col)
+        # Auto-indent suffix line to same indentation as prefix line.
+        nspaces = 0
+        while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
+            ed.buffer[ed.dot+1:ed.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
+        ed.point = nspaces # indent cursor
+        ed.dot += 1
+        if edsel.in_window(ed.dot):
+            edsel.update_below(ed.dot)
+        else:
+            edsel.recenter()
+        restore_cursor_to_window()
     
 ### Reload the code ###
 
 Now you are ready to save the edited *pmacs* module in the file system,
 and reload it into the Python session.
 
-Type the key sequence: *C-x C-r*.  Hold the CTRL key down while you type the
-*x* key, then continue to hold the CTRL key down while you type the *r* key.
+Type the key sequence to command *pmacs* to write out the buffer and reload
+its file into the Python session : *C-x C-r*.  Hold the CTRL key down while
+you type the *x* key, then continue to hold the CTRL key down while you type
+the *r* key.
 
 These messages appear in the the scrolling REPL region at the bottom of the
 window:
 
-    Wrote pmacs.py, 276 lines
+    Wrote pmacs.py, 273 lines
     Reload module pmacs
 
 Now the revised *open_line* function including the autoindent feature is
@@ -246,14 +256,22 @@ code, for example these lines from the *except* block in *sked.py*:
 At the end of each line, type ENTER (or RETURN).  The cursor appears on the
 next line, indented under the previous line of code.
 
-Next, scroll down to the *def w(...)* function definition.  Scroll to the 
-end of the buffer, where there is a block with three levels of indentation.
-Put the cursor at the end of the last line, then type ENTER (or RETURN).  The
+Next, scroll down to the *def w(...)* function definition.  Scroll down a bit 
+further to  *if filename ...*.  Under that
+there is a block with three levels of indentation.
+Put the cursor at the end of the last line in the block, 
+then type ENTER (or RETURN).  The
 cursor appears on the next line, indented three levels like the previous line.
+
 Now type some code, for example this line from the triply-indented block
 in the *w* function in *sked.py*:
 
-    bufname = bname(filename)
+                bufname = bname(filename)
+
+Following that, there is another block of code that is out-dented to 
+only two levels of indentation.  Put the cursor at the end of the last
+line in that block, then type ENTER.  The cursor moves to the next line,
+correctly indented to two levels.
      
 ### Restore files from the demonstration ###
 
@@ -270,9 +288,11 @@ the *editors/demo* directory again.
 Finally, restore the curent version of *pmacs.py* from the *demo* directory:
 
     cp demo/pmacs.py .
+
+Don't forget the final period!
     
 The version of *pmacs.py* in *editors/demo* in the repository is the same as
-the version in *editors*.   If you make deliberate changes in the current
+the version in *editors*.   If you make changes in the current
 *pmacs.py* that you commit to the repository, you must copy that revised *pmacs.py*
 to the *demo* directory and commit it also.
 
