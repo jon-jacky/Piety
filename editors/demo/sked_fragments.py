@@ -1,5 +1,5 @@
 """
-sample_openline.py - Fragments from sked.py, to edit for pmacs.py open_line demo.
+sked_fragments.phy - Fragments from sked.py, to edit for pmacs.py open_line demo.
 
 """
 
@@ -54,9 +54,8 @@ except:
     # Code block with one level of indentation for testing openline
     buffer = ['\n']
     # Add more indented lines here.  You can copy them from the real sked.py.
-    # You have to type the tab key, or type the space key four times,
-    #  to reach the required indentation.
-
+    # Now you only have to type ENTER (or RETURN) to reach the correct indentation.
+    
 # ... many lines omitted ...
 
 def w(fname=None, set_saved=set_saved):
@@ -74,11 +73,10 @@ def w(fname=None, set_saved=set_saved):
         if filename != fname: # we saved buffer with a new, different filename
             # Code block with three levels of indentation
             filename = fname
-            # Add more indented lines here.  You have to type tab three times,
-            # or type 12 spaces, to reach the required indentation.            
+            # Add more indented lines here.  The cursor will automatically indent.
+
 
         # Code block out-dented from preceding block
         set_saved(True)
-        # Add more out-dented lines here. You have to type tab two times 
-        #  or type eight spaces to reach the required indentation. 
-
+        # Add more out-dented lines here.
+        
