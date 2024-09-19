@@ -228,7 +228,7 @@ the *r* key.
 These messages appear in the the scrolling REPL region at the bottom of the
 window:
 
-    Wrote pmacs.py, 273 lines
+    Wrote pmacs.py, 272 lines
     Reload module pmacs
 
 Now the revised *open_line* function including the autoindent feature is
