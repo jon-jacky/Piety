@@ -146,9 +146,7 @@ In *pmacs.py*, we find the *open_line* function:
         with its prefix, append suffix after line at dot.
         """
         suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-        # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-        ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
-                                                 ed.point, start_col)
+        ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # prefix on dot
         ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
         ed.point = 0 # start of new suffix line
         ed.dot += 1
@@ -202,13 +200,11 @@ Here is the revised function.  We have added to the initial comment block, too:
          to match indentation of prefix line.
         """
         suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-        # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-        ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
-                                                 ed.point, start_col)
+        ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # prefix on dot
         # Auto-indent suffix line to same indentation as prefix line.
         nspaces = 0
         while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
-            ed.buffer[ed.dot+1:ed.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
+        ed.buffer[ed.dot+1:ed.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
         ed.point = nspaces # indent cursor
         ed.dot += 1
         if edsel.in_window(ed.dot):
@@ -256,12 +252,11 @@ code, for example these lines from the *except* block in *sked.py*:
 At the end of each line, type ENTER (or RETURN).  The cursor appears on the
 next line, indented under the previous line of code.
 
-Next, scroll down to the *def w(...)* function definition.  Scroll down a bit 
-further to  *if filename ...*.  Under that
-there is a block with three levels of indentation.
-Put the cursor at the end of the last line in the block, 
-then type ENTER (or RETURN).  The
-cursor appears on the next line, indented three levels like the previous line.
+Next, scroll down to the *def w(...)* function definition.  Scroll down a
+bit  further to  *if filename ...*.  Under that there is a block with three
+levels of indentation. Put the cursor at the end of the last line in the
+block,  then type ENTER (or RETURN).  The cursor appears on the next line,
+indented three levels like the previous line.
 
 Now type some code, for example this line from the triply-indented block
 in the *w* function in *sked.py*:
@@ -285,7 +280,7 @@ Next, delete those files from the *editors* directory:
 If you want to run the demo again, you can copy the initial versions from
 the *editors/demo* directory again.
 
-Finally, restore the curent version of *pmacs.py* from the *demo* directory:
+Finally, restore the current version of *pmacs.py* from the *demo* directory:
 
     cp demo/pmacs.py .
 

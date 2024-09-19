@@ -33,7 +33,7 @@ def restore_cursor_to_window():
     # point+1 to make put_cursor call consistent with editline move_to_column
     display.put_cursor(edsel.wline(ed.dot), ed.point + 1)
 
-# Some functions do not use keycode arg but kecallers ycmd and runcmd repass it
+# Some functions do not use keycode arg but caller keycmd requires it to be there.
 
 def next_line(keycode):
     'Move to next line, same column, or end of line if next line is too short'
@@ -57,9 +57,8 @@ def open_line(keycode):
      to match indentation of prefix line.
     """
     suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-    # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-    ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
-                                             ed.point, start_col)
+    ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # leave prefix on dot
+    display.kill_line() # erase suffix from dot
     # Auto-indent suffix line to same indentation as prefix line.
     nspaces = 0
     while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
