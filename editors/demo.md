@@ -121,7 +121,7 @@ Now type some code, for example these lines from the *except* block in
 
 At the end of each line, type ENTER (or RETURN).  Each time, the cursor 
 goes to the first column, and you have to type spaces or tab to indent 
-each lime.
+each line.
 
 Next, scroll down to the *def w(...)* function definition.  Scroll down to
 *if filename ...*, where there is a block with three levels of indentation.
@@ -146,7 +146,8 @@ In *pmacs.py*, we find the *open_line* function:
         with its prefix, append suffix after line at dot.
         """
         suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-        ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # prefix on dot
+        ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # keep prefix on dot
+        display.kill_line() # erase suffix from dot
         ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
         ed.point = 0 # start of new suffix line
         ed.dot += 1
@@ -161,7 +162,7 @@ and *ed.dot* is the index of *dot*, the current line in the buffer, so
 *ed.buffer[ed.dot]* is the current line.  Here *ed.point* is the index of
 the character under the cursor in the current line.
 
-The line we are looking for here has the iline comment *# insert suffix line ...*.
+The line we are looking for here has the comment *# insert suffix line ...*.
 We want to  change it to something like:
 
         ed.buffer[ed.dot+1:ed.dot+1] = [ <extra spaces> + suffix ]
@@ -200,7 +201,8 @@ Here is the revised function.  We have added to the initial comment block, too:
          to match indentation of prefix line.
         """
         suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-        ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # prefix on dot
+        ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # keep prefix on dot
+        display.kill_line() # erase suffix from dot
         # Auto-indent suffix line to same indentation as prefix line.
         nspaces = 0
         while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces

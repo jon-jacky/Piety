@@ -55,9 +55,8 @@ def open_line(keycode):
     with its prefix, append suffix after line at dot.
     """
     suffix = ed.buffer[ed.dot][ed.point:] # including final \n
-    # Keep prefix on dot.  Calls el.kill_line, thanks to key.C_k, not keycode
-    ed.buffer[ed.dot], ed.point = el.runcmd(key.C_k, ed.buffer[ed.dot],
-                                             ed.point, start_col)
+    ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # keep prefix on dot
+    display.kill_line() # erase suffix from dot
     ed.buffer[ed.dot+1:ed.dot+1] = [ suffix ] # insert suffix line after dot
     ed.point = 0 # start of new suffix line
     ed.dot += 1
