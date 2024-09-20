@@ -137,7 +137,7 @@ def bname(filename):
         bufname = basename + f'<{suffix}>' # alter candidate bufname
     return bufname
 
-def e(fname, move_dot=move_dot):  # move_dot is a hook for display code 
+def e(fname, move_dot=move_dot, restore_buffer=restore_buffer):
     """
     e(dit), load named file into buffer, replacing previous contents.
     But first save buffer state so it can be restored on command.
@@ -149,7 +149,7 @@ def e(fname, move_dot=move_dot):  # move_dot is a hook for display code
     for buffername in buffers: # can't use bufname here - shadows sked.bufname
         bfname = buffers[buffername].get('filename','no filename')
         if fname == bfname:
-            print(f'? file {fname} is already in the saved buffer {buffername}\r\n', end='')
+            b(buffername, restore_buffer) # visit existing buffer 
             return
     if S() > 0: save_buffer()
     try:

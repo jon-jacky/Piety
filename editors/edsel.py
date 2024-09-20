@@ -344,7 +344,7 @@ def display_a(iline):
 # Display functions: editing commands
 
 def e(fname):
-    ed.e(fname, display_e)
+    ed.e(fname, display_e, display_restore_buffer)
 
 def b(bname=None):
     ed.b(bname, display_restore_buffer)
