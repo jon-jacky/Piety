@@ -223,6 +223,17 @@ def n():
     'n(ames), print names and other information about stored buffers'
     for bname in buffers: print(bstatus(bname)+'\n\r', end='') # for char mode
 
+def N(move_dot=move_dot, restore_buffer=restore_buffer):
+    """
+    N(ames), print names etc. about stored buffers -- in a buffer!
+    We can scroll through long list of buffer names etc, more than fit in REPL.
+    """
+    e('*Buffers*',move_dot,restore_buffer) 
+    if len(buffer) > 1: d(1,S()) # clear any previous buffer list
+    for bname in buffers:
+        buffer.append(bstatus(bname) + '\n')          
+    restore_buffer('*Buffers*') # force redisplay if display present
+    
 def k(restore_buffer=restore_buffer):
     """
     k(ill) the current buffer and delete it from stored buffers.

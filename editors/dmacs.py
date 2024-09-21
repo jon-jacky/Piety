@@ -179,7 +179,7 @@ keymap = {
     key.C_c + '<': (lambda: in_region(edsel.outdent)),
     # buffers and files
     key.C_x + 'b' : switch_buffer,
-    key.C_x + key.C_b: ed.n, # list buffers  
+    key.C_x + key.C_b: edsel.N, # list buffers in a buffer
     key.C_x + key.C_f : find_file,
     key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename
