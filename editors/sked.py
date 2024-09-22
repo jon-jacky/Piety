@@ -498,6 +498,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     rmargin = rmarg
     lines = buffer[start:end+1]
     slines = ''.join(lines) # textwrap requires single string not list
+    slines = ' '.join(slines.strip().split()) # collapse multiple spaces to one
     margin = lmargin*' '
     wlines = textwrap.wrap(slines, width=rmargin, initial_indent=margin,
                            subsequent_indent=margin) # returns list of lines

@@ -100,6 +100,9 @@ def set_mark():
     'Set mark at current dot'
     global mark
     mark = ed.dot
+    nspaces = 0
+    while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
+    ed.lmargin = nspaces # used by wrap(), will wrap to left margin of marked line
     inform(f'Mark set at line {mark}')
 
 def exchange_mark():
