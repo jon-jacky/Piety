@@ -63,12 +63,12 @@ More detailed directions appear in the sections below.
 
 - **HOW.md**: How we program, notes on motivation and design.
 
-- **demo**: Directory of files used by the demonstration explained in 
-    *autoindent.md*.
-
 - **autoindent.md**: Directions for demonstrating the *pmacs* editor to edit 
     itself to add a new *autoindent* feature, reload the revised code into the 
     same editing session, and then use the new feature.
+
+- **demo**: Directory of files used by the demonstration explained in 
+    *autoindent.md*.
 
 - **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
 
