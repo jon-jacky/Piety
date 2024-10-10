@@ -113,10 +113,10 @@ def erase_bottom():
     Erase any old lines left over between end of buffer and bottom of window.
     Leave cursor after last line erased.  Do not update any globals.
     """
-    nlines = wheight - wline(ed.dot) # n of lines to end of window
-    nblines = ed.S() - (ed.dot + 1) # n of lines to end of buffer
+    nlines = (wheight-1) - (wline(ed.dot)-wintop) # n of lines to window status line
+    nblines = ed.S() - ed.dot  # n of lines to end of buffer
     nelines = nlines - nblines # n of empty lines at end of window
-    erase_lines(nelines+1) # sic +1.  make empty lines at end of window.
+    erase_lines(nelines+1) # sic +1.  WHY +1?  Make empty lines at end of window.
 
 def update_below(bstart, offset=0):
     """
