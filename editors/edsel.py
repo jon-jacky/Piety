@@ -116,7 +116,8 @@ def erase_bottom():
     nlines = (wheight-1) - (wline(ed.dot)-wintop) # n of lines to window status line
     nblines = ed.S() - ed.dot  # n of lines to end of buffer
     nelines = nlines - nblines # n of empty lines at end of window
-    erase_lines(nelines+1) # sic +1.  WHY +1?  Make empty lines at end of window.
+    ### breakpoint() # DEBUG For breakpoint demo.  Usually commented out.
+    erase_lines(nelines) # Make empty lines at end of window.
 
 def update_below(bstart, offset=0):
     """
@@ -261,7 +262,7 @@ def display_y(iline):
     ed.move_dot(iline)
     if in_window(ed.dot):
         update_below(ed.dot - len(ed.killed)) # first yanked line
-        erase_bottom()
+        # erase_bottom()  # Not needed here -- must have copied from display_d
         put_marker(ed.dot, display.white_bg)
         update_status() 
     else:
