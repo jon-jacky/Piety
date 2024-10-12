@@ -8,12 +8,13 @@ After you import this breakpt module, calls to the Python builtin function
 breakpoint will call our breakpt function.
 
 Our breakpt function sets the terminal to line mode, moves the cursor from 
-the display window to the scrolling REPL region, then calls the builtin
-function breakpoint() so you can use Pdb in the REPL region while window
-contents remain undisturbed on the display. When you are done with the
-debugger, type the Pdb c (continue) command. Then breakpt() returns the
-terminal to character mode and puts the cursor at dot in the display
-window, so you can resume using the display editor.
+the display window to the scrolling REPL region, then calls pdb.set_trace
+so you can use Pdb in the REPL region while window contents remain undisturbed
+on the display. When you are done with the debugger, type the Pdb c (continue)
+command. Then breakpt() returns the terminal to character mode and puts the
+cursor at dot in the display window, so you can resume using the display
+editor.
+
 In general, the cursor is not at dot when breakpt() is invoked, so when
 breakpt() returns it often does not return the cursor to the right place,
 and subsequent code does not have the intended effect. The code does not

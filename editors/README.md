@@ -67,6 +67,11 @@ More detailed directions appear in the sections below.
     itself to add a new *autoindent* feature, reload the revised code into the 
     same editing session, and then use the new feature.
 
+- **breakpt.md** - Explanation of *breakpt.py* and directions for breakpoint demo.
+
+- **breakpt.py** - Breakpoint hook that enables *pmacs* editor to be debugged
+  with *pdb* while it is running.
+
 - **demo**: Directory of files used by the demonstration explained in 
     *autoindent.md*.
 
@@ -443,4 +448,4 @@ to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Sep 2024
+Revised Oct 2024

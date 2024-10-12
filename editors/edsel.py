@@ -116,7 +116,7 @@ def erase_bottom():
     nlines = (wheight-1) - (wline(ed.dot)-wintop) # n of lines to window status line
     nblines = ed.S() - ed.dot  # n of lines to end of buffer
     nelines = nlines - nblines # n of empty lines at end of window
-    ### breakpoint() # DEBUG For breakpoint demo.  Usually commented out.
+    ### breakpoint() # DEBUG Uncomment this line for breakpoint demo.  See breakpt.md.
     erase_lines(nelines) # Make empty lines at end of window.
 
 def update_below(bstart, offset=0):
