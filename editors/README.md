@@ -70,7 +70,7 @@ More detailed directions appear in the sections below.
 - **breakpt.md** - Explanation of *breakpt.py* and directions for breakpoint demo.
 
 - **breakpt.py** - Breakpoint hook that enables *pmacs* editor to be debugged
-  with *pdb* while it is running.
+  with *pdb* while it is running, without disturbing its window contents.
 
 - **demo**: Directory of files used by the demonstration explained in 
     *autoindent.md*.

@@ -73,7 +73,7 @@ Once again, put the cursor in a window and scroll down to the end of the
 buffer, leaving some empty lines at the bottom of the window.   Delete
 some lines near the end of the buffer.   This causes execution to reach
 the breakpoint.  The remaining lines near the end of the window
-move up, but the same lines also remain below them at the end of the window
+move up, but the same lines also remain below them at the end of the window.
 They are not erased, because the breakpoint comes before the code that
 erases them.
 
@@ -120,7 +120,7 @@ code for the meaning of these values:
     (Pdb)     
 
 These all appear to be correct -- we fixed the error already.  Before we fixed
-the error, *nlines* was negative number.
+the error, *nlines* was a negative number.
 
 Now type the *c* (continue) command to exit the debugger, move the cursor
 back up into the window, and resume running the program normally:
