@@ -7,6 +7,7 @@ See README.md for directions on using edsel, NOTES.txt about its code.
 """
 
 import sys # skip argument declaration has file=sys.stdout
+import string # used by graffiti()
 import terminal_util, display
 import sked as ed
 
@@ -560,3 +561,10 @@ def clr():
     'cl(ea)r window from display by restoring full-screen scrolling'
     display.set_scroll(1, tlines)
     restore_cursor_to_cmdline() # set_scroll leaves cursor on line 1
+    
+def graffiti():
+    'Write on every line in frame, but not in buffer.  For testing refresh'
+    for i in range(flines): # every line in frame
+        display.put_cursor(i+1,2*i) # increasing indent to get diagonal strip
+        display.putstr(string.printable[i]*8) # len(string.printable) -> 100
+       

@@ -194,6 +194,7 @@ keymap = {
     key.C_x + 'o' : edsel.on,
     # miscellaneous
     key.C_l: edsel.refresh, # refresh, frame
+    key.M_g: edsel.graffiti, # put junk on every line of frame, for testing refresh
     # arrow keys, send ANSI escape sequences
     key.down: edsel.l, # next line
     key.up: edsel.rl, # previous line
