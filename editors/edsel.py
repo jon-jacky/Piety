@@ -175,13 +175,29 @@ def refresh():
     update_window() # FIXME did we really have to erase_lines before this?
     put_marker(ed.dot, display.white_bg)
     update_status()
-    
+     
 def recenter():
     'Move buffer segment to put dot in center, display segment, marker, status'
     global buftop
     buftop = locate_segment(ed.dot)
     refresh()
 
+def refresh_all():
+    """
+    Refresh all windows, return to same focus window.
+    """
+    global focus
+    display.set_scroll(flines+1, tlines) # puts cursor on line 1, must do this first
+    saved_focus = focus # restore_window reassigns focus
+    save_window(focus)
+    for wkey in wkeys:
+        if wkey != saved_focus:
+            restore_window(wkey)
+            refresh()
+    focus = saved_focus
+    restore_window(focus)
+    refresh()
+                     
 # Display functions: show effects of editing commands
 
 def display_move_dot(iline):
@@ -567,4 +583,5 @@ def graffiti():
     for i in range(flines): # every line in frame
         display.put_cursor(i+1,2*i) # increasing indent to get diagonal strip
         display.putstr(string.printable[i]*8) # len(string.printable) -> 100
-       
+    restore_cursor_to_cmdline()
+           

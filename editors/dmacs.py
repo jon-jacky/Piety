@@ -193,7 +193,8 @@ keymap = {
     key.C_x + '1' : edsel.o1,
     key.C_x + 'o' : edsel.on,
     # miscellaneous
-    key.C_l: edsel.refresh, # refresh, frame
+    key.C_l: edsel.refresh, # focus window only
+    key.M_l: edsel.refresh_all, # all windows, also set scroll
     key.M_g: edsel.graffiti, # put junk on every line of frame, for testing refresh
     # arrow keys, send ANSI escape sequences
     key.down: edsel.l, # next line
