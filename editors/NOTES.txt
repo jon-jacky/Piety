@@ -2,7 +2,8 @@
 notes
 =====
 
-Notes on the code in *Piety/editors*.
+Notes on the code in *Piety/editors*, including regrets about some 
+design decisions and ideas for future revisions.
 
 This is a .txt not an .md file to emphasize its roughness and incompleteness.
 
@@ -115,6 +116,36 @@ because edsel would need to put the 'frame.' prefix all over.
 
 So we decided against separating out a 'frame' module.
 
+We are considering -- but have not yet begun -- a major revision of the
+edsel display code which should greatly shorten and simplify edsel, and
+also simplify sked.
+
+We observe that sked code to update the text buffer and edsel code to
+update the display window is interleaved in a complicated way. In
+edsel.py there are almost 30 special-purpose functions comprising almost
+300 lines of code, that each update part of the display in some special
+situation.
+
+It seems we might make a great improvement if we could replace all those
+special purpose functions with a single general purpose display update
+function that would be called whenever needed to make the display consistent
+with the buffer. These calls would not be interleaved throughout the
+sked buffer updating functions as the display calls are now. Instead,
+the general purpose display updating function would be called after each
+of those sked functions returns.
+
+Our display update function could be simple and efficient. The key
+idea is to maintain a data structure in memory which is an image of the
+contents of the current (focus) window. (We do not currently have any such
+data structure.) To update the window, scan down the window image
+from top to bottom, line by line, comparing each line to the corresponding
+line in the buffer. If they differ, update that line in the window on the
+display with the line from the buffer, and then replace that line in the
+window image with the line from the buffer.  
+
+This algorithm keeps both the window on the display and the window image up-
+to-date, and only the lines that changed are updated and replaced.
+  
 ### dmacs ###
 
 Invoke editor functions with emacs keys (control keys or key seqs).

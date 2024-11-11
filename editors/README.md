@@ -59,7 +59,9 @@ More detailed directions appear in the sections below.
 - **README.md**: Directions for using the *sked*, *edsel*, *dmacs*, 
   and *pmacs* editors.
 
-- **NOTES.txt**: Notes on the code in *sked*, *edsel*, *dmacs*, and *pmacs*.
+- **NOTES.txt**: Notes on the code in *sked*, *edsel*, *dmacs*, and *pmacs*,
+  including regrets about some design decisions and ideas for future
+  revisions.
 
 - **HOW.md**: How we program, notes on motivation and design.
 
