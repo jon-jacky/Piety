@@ -72,6 +72,8 @@ More detailed directions appear in the sections below.
 - **breakpt.py** - Breakpoint hook that enables *pmacs* editor to be debugged
   with *pdb* while it is running, without disturbing its window contents.
 
+- **bugs.md** - Descriptions of unfixed bugs in the editors, and workarounds.
+
 - **demo**: Directory of files used by the demonstration explained in 
     *autoindent.md*.
 
@@ -448,4 +450,4 @@ to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Oct 2024
+Revised Nov 2024

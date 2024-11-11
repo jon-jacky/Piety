@@ -10,5 +10,5 @@ import editline
 import pmacs
 from pmacs import pm
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
-win(22)
+win(26)
 pm()
