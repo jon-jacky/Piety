@@ -25,6 +25,6 @@ year. At this writing (12 Nov 2024) it is running ChromeOS Version
 
 Beginning in October 2024, Piety development also continued on an HP
 laptop model 14-dq0057nr. It is running Debian Linux 12.7.0 ('bookworm')
-on Linux;5D kernel version 6.1.112-1 with Python 3.11.2.
+on Linux kernel version 6.1.112-1 with Python 3.11.2.
 
 Revised Nov 2024
