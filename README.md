@@ -10,7 +10,7 @@ Piety
 [Demos](#Demos)  
 [Roadmap](#Roadmap)  
 [Tested Platforms](#Tested-Platforms)  
-[Footnotes](#Footnotes)
+[Footnotes](#Footnotes)  
 
 ## Motivation and Goals ##
 
