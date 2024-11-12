@@ -94,17 +94,22 @@ environment.
  
 ## Demos ##
 
-We don't have any screenshots or animations, but if we did, they might show
-the demonstrations described in 
+Some interactive demonstrations are described in 
 [pmacs_script.md](piety/pmacs_script.md) and 
-[pmacs_blocking.md](piety/pmacs_blocking.md).  To run the demos,
-run the corresponding Python scripts in 
-[pmacs_script.py](piety/pmacs_script.py) and 
-[pmacs_blocking.py](piety/pmacs_blocking.py).
- 
-Honestly, there is not much to see -- it just looks like Emacs in a
-terminal. To gain any understanding, you have to read along in the those
-files and work through the demos yourself.
+[edsel_script.txt](piety/edsel_script.txt) and
+[pmacs_blocking.md](piety/pmacs_blocking.md) and 
+[audoindent.md](editors/autoindent.md) and
+[breakpt.md](editors/breakpt.md).
+These pages give instructions so you can do the demos yourself.
+
+A few of the demos are not very interactive, so can be run from scripts:
+[pmacs_script.py](piety/pmacs_script.py) and
+[edsel_script.py](piety/edsel_script.py).
+
+We don't have any screenshots or animations of these demos. Honestly,
+there is not much to see -- it just looks like Emacs in a terminal. To
+gain any understanding, you have to read along in the those files and
+work through the demos yourself.
           
 ## Roadmap ##
 
@@ -129,7 +134,7 @@ have not yet started work on any.   I hope to begin soon.
 
 The Piety software has run on a MacBook Pro running Mac OS,
 a Lenovo Chromebook running Linux, and an HP laptop running Linux.
-Details in [platforms.md](platforms.md).
+Details in [platforms.md](doc/platforms.md).
 
 ### Footnotes ###
 
