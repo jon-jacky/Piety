@@ -6,8 +6,9 @@ Piety
 
 [Motivation and Goals](#Motivation-and-Goals)  
 [Current Status](#Current-Status)  
+[No Dependencies](#No-Dependencies)  
+[Demos](#Demos)
 [Roadmap](#Roadmap)  
-[Dependencies](#Dependencies)  
 [Tested Platforms](#Tested-Platforms)  
 [Footnotes](#Footnotes)
 
@@ -41,11 +42,14 @@ terminal on a host operating system.   The Python interpreter with its runtime
 is the virtual machine where the Piety OS now runs, analogous to the QEMU
 virtual machine in many other operating system projects.
 
-Piety provides a [display editor](editors/README.md),  and a 
-[custom Python interpreter](tasking/pyshell.py). The display editor can support 
-multiple buffers and windows in the terminal, and also a region for the
-Python interpreter. Together these provide a minimal but self-contained
-programming environment within a single Python terminal session.
+Piety provides a [display editor](editors/README.md), a 
+[customized Python interpreter](tasking/pyshell.py), and a
+[customized debugger](editors/breakpt.md).
+The display editor can support multiple buffers and windows in the
+terminal, and also a region for the Python interpreter. The debugger can
+work in the interpreter region without disturbing window contents.
+Together these provide a minimal but self-contained programming
+environment within a single Python terminal session.
 
 Piety development is self-hosted in this programming environment.  Code is
 added and revised in a long-running Python session.  Code  is imported and
@@ -72,18 +76,36 @@ at the Python interpreter.
 Here is more about some Piety [design decisions](doc/rationale.md) and their
 rationales.
 
-We don't have any screenshots or animations, but if we did, they would show
-the scenarios described in [pmacs_script.md](piety/pmacs_script.md) and 
-[pmacs_blocking.md](piety/pmacs_blocking.md).  Honestly, there is not much
-to see -- it just looks like Emacs in a terminal.  To gain any understanding,
-you have to read along in the those files and work through the demos yourself.
-   
 The present version of Piety was started from scratch in February 2023.  Its
 development is ongoing here in the *rewrite* branch of the *Piety* repository.
 An archive of the earlier version of Piety that was abandoned in January 2023
 is here in the  *master* branch and *version1* tag.  The *rewrite* branch
 is now the main branch; I will  never merge it back into *master*.
-     
+
+## No Dependencies ##
+
+The Piety system has no dependencies, other than Python itself,
+including a few standard library modules.  
+
+With no dependencies, it is easy to try out Piety. Just clone this Piety
+repository and use your system's built-in *python* (or *python3*)
+command to run the scripts. You do not need to set up any Python
+environment.
+ 
+## Demos ##
+
+We don't have any screenshots or animations, but if we did, they might show
+the demonstrations described in 
+[pmacs_script.md](piety/pmacs_script.md) and 
+[pmacs_blocking.md](piety/pmacs_blocking.md).  To run the demos,
+run the corresponding Python scripts in 
+[pmacs_script.py](piety/pmacs_script.py) and 
+[pmacs_blocking.py](piety/pmacs_blocking.py).
+ 
+Honestly, there is not much to see -- it just looks like Emacs in a
+terminal. To gain any understanding, you have to read along in the those
+files and work through the demos yourself.
+          
 ## Roadmap ##
 
 I hope someday to run Piety on a bare machine with no other
@@ -103,38 +125,16 @@ in the hosted part.  I have researched
 [several approaches](doc/baremachine.md) to building the native part, but
 have not yet started work on any.   I hope to begin soon.
  
-## Dependencies ##
-
-The Piety system has no dependencies, other than Python itself
-(including a few standard library modules).  This makes Piety a
-minimal self-contained system, written in a uniform style throughout.
-Alternatively, it might be possible to assemble similar functionality
-from [other projects](doc/utilities.md), but I expect the resulting
-system would be larger and harder to understand than Piety.
-
 ## Tested Platforms ##
 
-Through November 2023, the Piety software was only
-run on one computer: a MacBook Pro (13 inch, early 2011), running Mac OS
-(through 10.11.6 El Capitan, the most recent version that runs on that
-hardware). It ran in the Mac OS Terminal, through version 2.6.2 (361.2). It
-ran on CPython downloaded from python.org, through version 3.9.0.
-
-Beginning in December 2023, Piety development moved to Linux
-running in a virtual machine on a Chromebook.  The *uname -a* command
-says it is *Linux penguin 5.15*, which I believe is a Chromebook fork of
-Debian. This is the Linux provided to ordinary users as part
-of the standard Chromebook software, it is not part of some 'developer
-mode'.   The Python running in this Linux is CPython version 3.9.2.
-Piety runs in the Chromebook Linux Terminal app.
-The Chromebook itself is a Lenovo Ideapad 3 Chrome  14M836
-purchased in April 2023.  At this writing (12 Jan 2024) it is running
-ChromeOS Version 118.0.5993.164.
+The Piety software has run on a MacBook Pro running Mac OS,
+a Lenovo Chromebook running Linux, and an HP laptop running Linux.
+Details in [platforms.md](platforms.md).
 
 ### Footnotes ###
 
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised Aug 2024
+Revised Nov 2024
 

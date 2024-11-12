@@ -34,11 +34,15 @@ will use, that will take over the world.
 ### For programmers ###
 
 I do not expect anyone else to use Piety routinely. It is too saturated with
-my own idiosyncratic preferences, and limitations that are severe but
+my own peculiar preferences, and limitations that are severe but
 tolerable to me.  But other programmers  might try it out, or just look at
 the code and documents, to get ideas, techniques, and examples they could
 use to help them build systems that express their own preferences.
 
+It is easy to try out Piety.  Piety has no dependencies, so you can
+just clone this Piety repository and use your system's built-in *python*
+(or *python3*) command to run the scripts. You do not need to set up any
+Python environment.
   
 ### Python ###
 
@@ -128,6 +132,5 @@ The Piety editor and Python shell are coded so they can run without blocking
 in the event loop. Here is an
 [explanation and demonstration](../piety/pmacs_blocking.md).
 
-
-Revised Aug 2024
+Revised Nov 2024
 
