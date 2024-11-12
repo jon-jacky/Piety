@@ -7,7 +7,7 @@ Piety
 [Motivation and Goals](#Motivation-and-Goals)  
 [Current Status](#Current-Status)  
 [No Dependencies](#No-Dependencies)  
-[Demos](#Demos)
+[Demos](#Demos)  
 [Roadmap](#Roadmap)  
 [Tested Platforms](#Tested-Platforms)  
 [Footnotes](#Footnotes)
