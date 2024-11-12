@@ -2,17 +2,18 @@
 branches
 ========
 
-This is the *edmore* branch of the *rewrite* branch: editor improvements
-and bug fixes.
+This is the *rewrite* branch,
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
-the code, and improve the responsiveness of the programming environment.
+the code, and to make the programming environment more responsive.
 
 The *rewrite* branch is now the main branch.  I will never merge it back
 into the *master* branch.
 
 Recent work in the *rewrite* branch:
+
+- 11 Nov 2024: Merge the *edmore* branch back into the *rewrite* branch.
 
 - 29 Aug 2024: Begin *edmore* branch for editor improvements and bug fixes.
 

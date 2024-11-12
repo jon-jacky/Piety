@@ -217,5 +217,5 @@ editor.
 The *pmacs* *yank* function also handles both modes, but the logic there
 is simple.
 
-Revised Jan 2024
+Revised Nov 2024
 
