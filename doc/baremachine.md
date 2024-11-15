@@ -150,12 +150,14 @@ on an otherwise bare machine.
 In fact, Python has been ported to run on UEFI without a conventional
 operating system. These ports were created to run Python scripts that
 test UEFI itself; they were not intended for general-purpose Python
-programming. A port of Python version 3.6.8 is discussed [here](https://
-chipsec.github.io/installation/USB%20with%20UEFI%20Shell.html).. A port
-of MicroPython is discussed [here](https://www.intel.com/content/www/us/
-en/developer/articles/technical/implementing-micropython-as-a-uefi-test-
-framework.html) and [here](https://github.com/tianocore/edk2-
-staging/tree/MicroPythonTestFramework/MicroPythonPkg). An earlier
+programming. A port of Python version 3.6.8 is discussed
+[here](https://chipsec.github.io/installation/USB%20with%20UEFI%20Shell.html).
+A port of MicroPython is discussed 
+[here](https://www.intel.com/content/www/us/en/developer/articles/technical/implementing-micropython-as-a-uefi-test-framework.html)
+and 
+[here](https://github.com/tianocore/edk2-staging/tree/MicroPythonTestFramework/MicroPythonPkg).
+
+An earlier
 project ported Python to the GRUB bootloader to test the BIOS, see
 [here](https://biosbits.org/),
 [here](https://us.pycon.org/2015/schedule/presentation/378/),
@@ -164,11 +166,11 @@ project ported Python to the GRUB bootloader to test the BIOS, see
 
 It seems that UEFI
 ought to be a lot simpler that Linux, but it is not. One
-developer [observes](https://news.ycombinator.com/item?id=24888307) "my
-mobo's UEFI is typically larger than the kernel it runs." Another
+developer
+[observes](https://news.ycombinator.com/item?id=24888307) 
+"my mobo's UEFI is typically larger than the kernel it runs." Another
 developer 
-[comments](https://www.reddit.com/r/linuxquestions/comments/63
-azo4/eli5_what_exactly_is_the_problem_with_uefi_and/) 
+[comments](https://www.reddit.com/r/linuxquestions/comments/63azo4/eli5_what_exactly_is_the_problem_with_uefi_and/) 
 "It's about 10% the size of the Linux kernel; and if you exclude Linux's
 device drivers it's actually bigger than the Linux kernel."
 
@@ -317,21 +319,22 @@ and a USB port for connecting a keyboard. It is intended to be used as a
 music synthesizer, and comes with several MicroPython programs for music
 synthesis and creating color graphics.
 
-The Tulip is the nearest thing we have seen to our vision for a Piety
-personal computer.   It doesn't quite qualify because the display is
-too small, only about 4 by 6 inches (but see below), and, like other
-MicroPython systems, software development is not self-hosted, but
-requires another computer.
+Turn it on -- it boots into Python! The Tulip is the nearest thing we
+have seen to our vision for a Piety personal computer. It doesn't quite
+qualify because the display is too small, only about 4 by 6 inches (but
+see below), and, like other MicroPython systems, software development is
+not self-hosted, but requires another computer.
  
 Instead of purchasing the Tulip with the small built-in display, 
-you can  
+you can
 [build one yourself](https://github.com/shorepine/tulipcc/blob/main/docs/tulip_build.md)
 in various configurations, following directions from the designers. 
 [One configuration](https://github.com/shorepine/tulipcc/blob/main/docs/tulip_breadboard.md)
 uses an [ESB32-S3 development board](https://www.adafruit.com/product/5364)
 and a 10.1" display.  The development board has similar components as
 the prebuilt Tulip including 32MB of flash and 8MB of RAM
-and runs at 240 MHz.
+and runs at 240 MHz.  The display does not use a standard video interface
+like VGA or HDMI, but purpose-built software and hardware.
 
 The 
 [MicroPython port to ESP32](https://github.com/micropython/micropython/blob/master/ports/esp32/README.md)
