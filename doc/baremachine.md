@@ -16,7 +16,7 @@ I have researched several approaches:
 [NopSys](#NopSys)  
 [MicroPython](#MicroPython)  
 [Raspberry Pi](#Raspberry-Pi)  
-[Tulip Creative Computer](#Tulip-Creative-Computer)
+[Tulip Creative Computer](#Tulip-Creative-Computer)  
 [Conclusions](#Conclusions)  
 
 ## Hardware Requirements ##
