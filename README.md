@@ -127,9 +127,18 @@ operating system which is itself mostly written in Python.
 
 All the work I have done so far, including the programming environment, is
 in the hosted part.  I have researched 
-[several approaches](doc/baremachine.md) to building the native part, but
-have not yet started work on any.   I hope to begin soon.
- 
+[several approaches](doc/baremachine.md) to building the native part.
+I hope to begin soon.
+
+The obvious first step is to configure a minimal Linux running
+Python as its process 1. This would provide a system that boots into a
+Python prompt and provides a Python-only system to the user and
+application programmer. This is all we need to perform the essential
+experiment to see if it is feasible to continue Piety development and
+other personal computing activities using only Python running Piety in
+the console, without depending on a host OS to provide a desktop with
+multiple windows, the system shell, and other utilities.
+  
 ## Tested Platforms ##
 
 The Piety software has run on a MacBook Pro running Mac OS,
