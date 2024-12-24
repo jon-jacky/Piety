@@ -42,11 +42,12 @@ decstbmn  = csi+';r' # decstbm default: set scrolling region to full screen
 sgr = csi + '%s' + 'm' # set graphic rendition. %s is ;-separated integers like
                  # bold+inverse: esc[0;1;7m by sgr % ';'.join('017')
 
-# sgr, attribute values
+# sgr, attribute values, see http://www.inwap.com/pdp10/ansicode.txt
 clear = 0        # clears attributes (not transparent!)
 white_bg = 47    # gray on mac terminal
 bold = 1
 blink = 5
+reverse = 7  # reverse video, 'negative image'
 
 def attrs(*attributes):
     """

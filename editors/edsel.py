@@ -162,7 +162,9 @@ def restore_cursor_to_cmdline():
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wbottom(), 1)
-    display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
+    # display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
+    # white_bg renders status text invisible in Debian Linux text console
+    display.render(ed.status().ljust(tcols)[:tcols],display.reverse)  
     restore_cursor_to_cmdline()
 
 def refresh():
