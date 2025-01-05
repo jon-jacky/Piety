@@ -9,9 +9,11 @@ See README.md for directions on using sked, NOTES.txt about its code.
 The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
 
-import os # for os.path.basename, used in store_buffer
-import textwrap
+import os, sys, textwrap
+from contextlib import redirect_stdout
+
 ## import display # DEBUG, for display.putstr for debugging info
+import shellcmd, pycall
 
 # Define and initialize global variables used by sked editing functions,
 # but only the *first* time this module is imported in a session.
@@ -522,3 +524,38 @@ def j(start=None, end=None, move_dot=move_dot):
     buffer[start:end+1] = [] # delete unjoined lines
     buffer[start:start] = [ joined ] # insert [ joined ] lines at start
     move_dot(start) # move dot to joined line
+    
+## Misc. utiliites ###
+
+def write(line):
+    """
+    Append line to end of current buffer.
+    To be used implicitly by redirect_stdout(sked) or print(..., file=sked)
+    If line is a string that does not end with \n, this write() adds it.
+    """
+    global dot
+    if line not in ('', '\n'): # redirect_stdout and file=... append extra \n
+        buffer.append(line.rstrip('\n\r') + '\n') # line might have many \n
+        dot = S()  # last line in buffer, which we just added.
+
+def console(cmd, move_dot=move_dot, restore_buffer=restore_buffer):  
+    """
+    Redirect stdout from cmd to the *Console* buffer.
+    cmd must write its output as lines to stdout, not return a Python object.
+    For now, cmd is executed by shellcmd.shell - hope to parameterize later 
+    If the *Console* buffer does not exist, create it and make it current.
+    If *Console* already exists, make it the current buffer.     
+    """
+    global write
+    if not '*Console*' in buffers:
+        e('*Console*', move_dot, restore_buffer) # create *Console* buffer
+    elif not '*Console*' == bufname:
+        b('*Console*', restore_buffer) # make *Console* the current buffer
+    else:
+        pass # *Console* is already the current buffer        
+    with redirect_stdout(sys.modules[__name__]): # use write fcn in this module
+        print('...$ ' + cmd) # print command before its output
+        shellcmd.shell(cmd)
+    
+sh = console # Alias for now
+        

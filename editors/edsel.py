@@ -428,6 +428,12 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None):
 def j(start=None, end=None):
     ed.j(start, end, move_dot=display_j)
 
+def console(cmd):
+    ed.console(cmd, display_e, display_restore_buffer)
+    recenter()
+    
+sh = console  # Alias for now
+
 # Display functions: window management
 
 def n_windows(): 
