@@ -13,7 +13,7 @@ import os, sys, textwrap
 from contextlib import redirect_stdout
 
 ## import display # DEBUG, for display.putstr for debugging info
-import shellcmd, pycall
+import host, pycall
 
 # Define and initialize global variables used by sked editing functions,
 # but only the *first* time this module is imported in a session.
@@ -525,7 +525,7 @@ def j(start=None, end=None, move_dot=move_dot):
     buffer[start:start] = [ joined ] # insert [ joined ] lines at start
     move_dot(start) # move dot to joined line
     
-## Misc. utiliites ###
+## Host OS  ##
 
 def write(line):
     """
@@ -538,11 +538,9 @@ def write(line):
         buffer.append(line.rstrip('\n\r') + '\n') # line might have many \n
         dot = S()  # last line in buffer, which we just added.
 
-def console(cmd, move_dot=move_dot, restore_buffer=restore_buffer):  
+def sh(cmd, move_dot=move_dot, restore_buffer=restore_buffer):  
     """
-    Redirect stdout from cmd to the *Console* buffer.
-    cmd must write its output as lines to stdout, not return a Python object.
-    For now, cmd is executed by shellcmd.shell - hope to parameterize later 
+    Redirect stdout from shell to the *Console* buffer.
     If the *Console* buffer does not exist, create it and make it current.
     If *Console* already exists, make it the current buffer.     
     """
@@ -555,7 +553,5 @@ def console(cmd, move_dot=move_dot, restore_buffer=restore_buffer):
         pass # *Console* is already the current buffer        
     with redirect_stdout(sys.modules[__name__]): # use write fcn in this module
         print('...$ ' + cmd) # print command before its output
-        shellcmd.shell(cmd)
-    
-sh = console # Alias for now
+        host.sh(cmd)
         
