@@ -73,7 +73,7 @@ def wbottom():
 def locate_segment(iline):
     """
     iline is line in the buffer.
-    Select segment to put in window, that best positions iline in the window.
+    Select segment to put in window, that centers iline in the window.
     Return buftop, line in current buffer to put at top line in window
     """
     if iline < wheight - 1: # iline is near top of buffer, show first page
@@ -81,6 +81,17 @@ def locate_segment(iline):
     else: 
         return iline - (wheight // 2) # put iline near center of window
 
+def scroll_segment(iline):
+    """
+    iline is line in the buffer.
+    Select segment to put in window, that puts iline at last line in window.
+    Return buftop, line in current buffer to put at top line in window
+    """
+    if iline < wheight - 1: # iline is near top of buffer, show first page
+        return 1
+    else: 
+        return iline - (wheight - 2) # put iline at bottom of window
+ 
 def update_lines(bstart, wstart, nlines):
     """
     Display consecutive lines (a 'segment') from the buffer in the window.
@@ -182,6 +193,12 @@ def recenter():
     'Move buffer segment to put dot in center, display segment, marker, status'
     global buftop
     buftop = locate_segment(ed.dot)
+    refresh()
+
+def scroll():
+    'Move buffer segment to put dot at bottom, display segment, marker, status'
+    global buftop
+    buftop = scroll_segment(ed.dot)
     refresh()
 
 def refresh_all():
@@ -428,11 +445,9 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None):
 def j(start=None, end=None):
     ed.j(start, end, move_dot=display_j)
 
-def console(cmd):
-    ed.console(cmd, display_e, display_restore_buffer)
-    recenter()
-    
-sh = console  # Alias for now
+def sh(cmd):
+    ed.sh(cmd, display_e, display_restore_buffer)
+    scroll()
 
 # Display functions: window management
 

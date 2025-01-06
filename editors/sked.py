@@ -545,12 +545,15 @@ def sh(cmd, move_dot=move_dot, restore_buffer=restore_buffer):
     If *Console* already exists, make it the current buffer.     
     """
     global write
-    if not '*Console*' in buffers:
+    if not '*Console*' in buffers: 
         e('*Console*', move_dot, restore_buffer) # create *Console* buffer
-    elif not '*Console*' == bufname:
+    elif not '*Console*' == bufname:  # *Console* is not the current buffer
         b('*Console*', restore_buffer) # make *Console* the current buffer
+        # Console might be in another window but not current window
+        # but we can't check for that because sked does not import edsel
+        # In that case we create another, redundant, *Console* window here
     else:
-        pass # *Console* is already the current buffer        
+        pass # *Console* is already the current buffer
     with redirect_stdout(sys.modules[__name__]): # use write fcn in this module
         print('...$ ' + cmd) # print command before its output
         host.sh(cmd)
