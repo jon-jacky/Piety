@@ -49,6 +49,13 @@ def prev_line(keycode):
     reset_point() # move to end of line if previous line is too short
     restore_cursor_to_window()
 
+def handle_cr(keycode):
+    if ed.bufname == '*Buffers*':
+        edsel.select_buffer()
+        restore_cursor_to_window()
+    else:
+        open_line(keycode)
+        
 def open_line(keycode):
     """
     Split line at point, replace line in buffer at dot
@@ -178,7 +185,7 @@ def append(keycode):
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
-    key.cr: open_line, 
+    key.cr: handle_cr, # open_line, or in *Buffers*, select buffer
     key.delete: delete_backward_char,
     key.bs: delete_backward_char, 
     key.C_d: delete_char,

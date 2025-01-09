@@ -21,7 +21,12 @@ except:
     promptline = edsel.flines+1 # line after end of edsel frame
     prev_cmd = None
     
-
+def handle_cr():
+    if ed.bufname == '*Buffers*':
+        edsel.select_buffer()
+    else:
+        append()
+        
 def append():
     'Restore line mode, run edsel a(), return to char mode'
     terminal.set_line_mode()
@@ -80,9 +85,8 @@ def switch_buffer():
     global mark
     response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
     if cancelled(response): return
-    if response: ed.prev_bufname = response
-    mark = 0 # But we don't reset mark when we change buffer by schangewindow
-    edsel.b()
+    mark = 0 # But we don't reset mark when we change buffer by change window
+    edsel.b(response)
 
 def find_file():
     global mark
@@ -170,7 +174,7 @@ keymap = {
     # editing
     key.C_k: kill_line, # append consecutive killed lines to yank buffer
     key.C_y: edsel.y, # yank (paste) deleted lines
-    key.cr: append,   # open line and enter append mode 
+    key.cr: handle_cr, # open line and enter append mode OR *Buffers* select 
     # cut and paste
     key.C_at: set_mark,
     key.C_x + key.C_x : exchange_mark, # exchange dot and mark,

@@ -386,6 +386,9 @@ def e(fname):
 def b(bname=None):
     ed.b(bname, display_restore_buffer)
 
+def select_buffer():
+    ed.select_buffer(display_restore_buffer)
+    
 def N():
     ed.N(display_e, display_restore_buffer)
     

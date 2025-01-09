@@ -187,12 +187,26 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
         set_saved(True)
         print(f'Wrote {filename}, {S()} lines\n\r', end='') # \n\r char mode
 
+def match_bufname(prefix):
+    """
+    Poor person's tab completion
+    If prefix matches any buffer name in buffers, return that buffer name.
+    If there are multiple matches, just return an arbitratry one of them.
+    If there are no matches, return the prefix itself.  Caller will handle that.
+    """
+    for bname in buffers: 
+        if bname.startswith(prefix): return bname # match found
+    return prefix # match not found 
+    
 def b(bname=None, restore_buffer=restore_buffer):
     """
     b(uffer), save current buffer and restore named buffer.
     If buffer name not given, switch back to previous buffer
+    If buffer name ends with ?, invoke poor person's tab completion:
+    Treat that buffer name as a prefix and try to match with a real buffer name
     """
     global prev_bufname
+    if bname and bname.endswith('?'): bname = match_bufname(bname[:-1])
     if not bname: bname = prev_bufname
     if bname == bufname:
         print(f'? buffer {bufname} is already the current buffer\r\n', end='')
@@ -235,6 +249,17 @@ def N(move_dot=move_dot, restore_buffer=restore_buffer):
     for bname in buffers:
         buffer.append(bstatus(bname) + '\n')          
     restore_buffer('*Buffers*') # force redisplay if display present
+
+def select_buffer(restore_buffer=restore_buffer):
+    """
+    When dot is on a bstatus line, for example in *Buffers* buffer,
+    make the buffer in that line the current buffer.
+    Call this fcn when oper presses ENTER on that line in *Buffers*
+    """
+    # Extract buffer name from bstatus line. 
+    # buffer name starts in col 1, continues to first space, can be any length.
+    bname = buffer[dot][1:].partition(' ')[0]
+    b(bname, restore_buffer)
     
 def k(restore_buffer=restore_buffer):
     """
