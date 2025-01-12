@@ -10,10 +10,8 @@ The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
 
 import os, sys, textwrap
-from contextlib import redirect_stdout
 
 ## import display # DEBUG, for display.putstr for debugging info
-import host, pycall
 
 # Define and initialize global variables used by sked editing functions,
 # but only the *first* time this module is imported in a session.
@@ -550,7 +548,7 @@ def j(start=None, end=None, move_dot=move_dot):
     buffer[start:start] = [ joined ] # insert [ joined ] lines at start
     move_dot(start) # move dot to joined line
     
-## Host OS  ##
+# write function supports redirection to sked current buffer
 
 def write(line):
     """
@@ -562,24 +560,3 @@ def write(line):
     if line not in ('', '\n'): # redirect_stdout and file=... append extra \n
         buffer.append(line.rstrip('\n\r') + '\n') # line might have many \n
         dot = S()  # last line in buffer, which we just added.
-
-def sh(cmd, move_dot=move_dot, restore_buffer=restore_buffer):  
-    """
-    Redirect stdout from shell to the *Console* buffer.
-    If the *Console* buffer does not exist, create it and make it current.
-    If *Console* already exists, make it the current buffer.     
-    """
-    global write
-    if not '*Console*' in buffers: 
-        e('*Console*', move_dot, restore_buffer) # create *Console* buffer
-    elif not '*Console*' == bufname:  # *Console* is not the current buffer
-        b('*Console*', restore_buffer) # make *Console* the current buffer
-        # Console might be in another window but not current window
-        # but we can't check for that because sked does not import edsel
-        # In that case we create another, redundant, *Console* window here
-    else:
-        pass # *Console* is already the current buffer
-    with redirect_stdout(sys.modules[__name__]): # use write fcn in this module
-        print('...$ ' + cmd) # print command before its output
-        host.sh(cmd)
-        

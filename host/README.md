@@ -3,10 +3,12 @@ host
 ====
 
 Modules that invoke the host operating system.
-        
-These use Python standard libraries that are suposed to be portable,
-so the same modules should would work on different operating systems.
+
+-**host.py**: Python wrappers for host shell and some particular shell
+        commands, so you can use the shell without exiting the Python session.
+
+-**redirect.py**:  Redirect command output to editor buffers,
+              so the buffers can act much like terminal windows.
 
 Revised Jan 2025
-
 

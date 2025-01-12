@@ -1,10 +1,9 @@
 """
-host.py - Functions that invoke the host operating system.
-        These use Python standard libraries that are suposed to be portable 
-        so the same functions should would work on different operating systems.
+host.py - Python wrappers for host shell and some particular shell commands,
+          so you can use the shell without exiting the Python session.
 """        
 
-import subprocess
+import subprocess, os
 
 def sh(command):
     """
@@ -22,3 +21,35 @@ def sh(command):
         for line in cp.stderr.splitlines():
             print(line)
 
+def cd(path):
+    'Change current directory to path, a string'
+    os.chdir(path)
+
+def pwd():
+    'Print current working directory'
+    print(os.getcwd())  # returns a string
+
+def ls(path='.'):
+    """
+    Call the shell directory listing command ls -C for a compact listing.
+    Argument is file or directory path string, default . the current directory.    
+    """
+    sh('ls -C '+path)
+
+def lsl(path='.'):
+    """
+    Call the shell directory listing command ls -l for a long form listing,
+     sorted alphabetically.
+    Argument is file or directory path string, default . the current directory.    
+    """
+    sh('ls -l '+path)
+
+def lslt(path='.'):
+    """
+    Call the shell directory listing command ls -lt for a long form listing,
+     sorted most recent first.
+    Argument is file or directory path string, default . the current directory.    
+    """
+    sh('ls -lt '+path)
+    
+        
