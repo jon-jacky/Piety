@@ -61,4 +61,14 @@ def lsl(path='.'):
 def lslt(path='.'):
     'host.lslt() calls ls -l for long form listing in chronological order'     
     redirect('*Console*', lambda: host.lslt(path), f"lslt('{path}')")    
-    
+
+def man(topic):
+    'Show man page on topic, a string.  Save in new buffer named topic.man'
+    bufname = topic + '.man'
+    fr.e(bufname)
+    with redirect_stdout(ed): 
+        host.man(topic)
+    fr.p(1) # put the cursor at the top of the buffer
+    fr.refresh()
+
+

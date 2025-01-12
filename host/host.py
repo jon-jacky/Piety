@@ -51,5 +51,8 @@ def lslt(path='.'):
     Argument is file or directory path string, default . the current directory.    
     """
     sh('ls -lt '+path)
+   
+def man(topic):
+    'Show man page on topic, a string'
+    sh('man ' + topic)
     
-        
