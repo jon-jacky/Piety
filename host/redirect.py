@@ -71,4 +71,15 @@ def man(topic):
     fr.p(1) # put the cursor at the top of the buffer
     fr.refresh()
 
+def help(topic):
+    """
+    Show help on topic, a Python object - module, function etc.
+    Save in a new buffer named topic.help
+    """
+    bufname = topic.__name__ + '.help'
+    fr.e(bufname)
+    with redirect_stdout(ed):
+        host.help(topic)
+    fr.p(1) # put the cursor at the top of the buffer
+    fr.refresh()
 

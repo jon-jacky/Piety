@@ -3,7 +3,7 @@ host.py - Python wrappers for host shell and some particular shell commands,
           so you can use the shell without exiting the Python session.
 """        
 
-import subprocess, os
+import subprocess, os, pydoc
 
 def sh(command):
     """
@@ -53,6 +53,13 @@ def lslt(path='.'):
     sh('ls -lt '+path)
    
 def man(topic):
-    'Show man page on topic, a string'
+    'Print man page on topic, a string'
     sh('man ' + topic)
+
+def help(topic):
+    'Print help on topic, a Python object - module, function etc.'
+    helptext = pydoc.render_doc(topic, "Help on %s") # one big string
+    for line in helptext.splitlines():
+        print(line)
+        
     
