@@ -2,9 +2,7 @@
 branches
 ========
 
-This is the *console* branch of the *rewrite* branch.  Additions and
-revsions to enable Piety development using only Python running in
-one Linux console terminal, without using on the host desktop or shell.
+This is the *rewrite* branch.  
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -14,6 +12,8 @@ The *rewrite* branch is now the main branch.  I will never merge it back
 into the *master* branch.
 
 Recent work in the *rewrite* branch:
+
+- 22 Jan 2025: Merge the *console* branch back into the *rewrite* branch.
 
 - 23 Dec 2024: Begin *console* branch to enable Piety development using
   only Python running in one Linux console terminal, without using the
