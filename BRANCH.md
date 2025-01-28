@@ -3,8 +3,8 @@ branches
 ========
 
 This is the *browser* branch of the *rewrite* branch.
-Write a web browser closely integrated with the Piety editors,
-where downloaded web pages are stored in editor buffers.
+Write a text-only web browser closely integrated with the Piety editors,
+where downloaded web pages are stored and displayed in editor buffers.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -15,9 +15,9 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
-- 23 Jan 2025; Begin *browser* branch to write a web browser closely
-  integrated with the Piety editors, where downloaded web pages are 
-  stored in editor buffers.
+- 23 Jan 2025; Begin *browser* branch to write a text-only web browser
+  closely integrated with the Piety editors, where downloaded web pages
+  are stored and displayed in editor buffers.
 
 - 22 Jan 2025: Merge the *console* branch back into the *rewrite* branch.
 
