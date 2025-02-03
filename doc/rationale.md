@@ -5,7 +5,10 @@ Design decisions and rationales
 Some design decisions for Piety, and their rationales:
 
 [Piety](..) is a small personal computer operating system for
-programmers, written in Python.
+programmers.
+
+Piety uses a single programming language -- Python -- for both the
+applications and the operating system.
 
 Code is added and revised in a long-running Python session,  without
 restarting or losing work in progress.
