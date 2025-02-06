@@ -35,6 +35,9 @@ class HTML2Text(HTMLParser):
         # self.tags is a list so we can append and pop tags for nested elements
         # self.tags[-1] is the tag for the current, possibly deeply nested elt.
         self.tags = [] # empty tags list means we are not in any supported tag.
+        # Set following_nested = True to suppress unwanted empty line
+        # after <strong> and other tags nested within <p>
+        self.following_nested = False
         
     def handle_starttag(self, tag, attrs):
         # List of only the tags we handle.  We don't handle most tags.
@@ -53,11 +56,17 @@ class HTML2Text(HTMLParser):
         if self.capture: 
             tag = self.tags[-1]
             if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
-                self.output += '\n' # Separate this element with empty line.
+                if not self.following_nested:
+                    self.output += '\n\n' # Separate this elt with empty line.
+                else:
+                    # Suppress unwanted empty line after nested element ...
+                    self.output += '\n' # ... but put one line break after elt.
+                    self.following_nested = False # clear flag after using once.
                 # data can be long string. fill() can insert \n to break lines
-                self.output += textwrap.fill(data) + '\n' # add final linebreak
+                self.output += textwrap.fill(data)
             elif tag in ('strong', 'em'):
                 self.output += f' *{data}* ' # these data go in same line
+                self.following_nested = True # suppress unwanted empty line 
             else:
                 pass  # more tags to come
                 
@@ -81,7 +90,7 @@ def r():
     ed.buffers[bufname]['filename'] = bufname # replace filename created by e()
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     for line in parser.output.rsplit('\n'): # make list of lines from string
-        ed.buffer.append(line + '\n') # each line in buffer ends with \n    
+        ed.buffer.append(line + '\n') # each line in buffer must end with \n    
     fr.refresh()
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
