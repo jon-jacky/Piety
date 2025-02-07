@@ -13,13 +13,6 @@ class HTML2Text(HTMLParser):
     """
     Render HTML to text, using Python standard library HTMLParser.
     
-    Based on Andrej Kesely's answer in Stack Overflow:
-    Extracting Text / Parse Text with html.parser (Python)
-    https://stackoverflow.com/questions/64695883/extracting-text-parse-text-with-html-parser-python
-    Also informed by Andreas' and Jorge Perez' answers in 
-    Converting html to text with Python
-    https://stackoverflow.com/questions/14694482/converting-html-to-text-with-python
-        
     Example:                         
     from render import HTML2Text
     parser = HTML2Text()
