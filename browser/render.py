@@ -32,22 +32,28 @@ class HTML2Text(HTMLParser):
         self.output = ''  # Accumulate parsed and formatted data here.
         self.capture = False # Not in any supported tag, discard html 
         # self.tags is needed so handle_data can handle each tag differently.
-        # self.tags is a list so we can append and pop tags for nested elements
-        # self.tags[-1] is the tag for the current, possibly deeply nested elt.
+        # self.tags is a list -- a stack -- of tags for nested elements.
+        # self.tags[-1] is top, tag for the current, possibly deeply nested elt.
         self.tags = [] # empty tags list means we are not in any supported tag.
-        # Set following_nested = True to suppress unwanted empty line
-        # after <strong> and other tags nested within <p>
-        self.following_nested = False
+        # handle_data accumulates data in self.paragraph,
+        # handle_endtag formats self.paragraph
+        self.paragraph = ''
         
     def handle_starttag(self, tag, attrs):
         # List of only the tags we handle.  We don't handle most tags.
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'strong', 'em'):
-            self.tags.append(tag)
+        if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+            self.paragraph = '' # start a new paragraph
+        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'strong', 'em', 'a' ):
+            self.tags.append(tag)  # push tag onto stack of tags
             self.capture = True
                                                     
     def handle_endtag(self, tag):
+        if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+            # data can be long string. fill() can insert \n to break lines
+            # precede each paragraph by an empty line
+            self.output += '\n\n' + textwrap.fill(self.paragraph)
         # Again, list of only the tags we handle
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'strong', 'em'):
+        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'strong', 'em', 'a'):
             self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
@@ -56,17 +62,11 @@ class HTML2Text(HTMLParser):
         if self.capture: 
             tag = self.tags[-1]
             if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
-                if not self.following_nested:
-                    self.output += '\n\n' # Separate this elt with empty line.
-                else:
-                    # Suppress unwanted empty line after nested element ...
-                    self.output += '\n' # ... but put one line break after elt.
-                    self.following_nested = False # clear flag after using once.
-                # data can be long string. fill() can insert \n to break lines
-                self.output += textwrap.fill(data)
+                self.paragraph += data # fill self.paragraph in handle_endtag
             elif tag in ('strong', 'em'):
-                self.output += f' *{data}* ' # these data go in same line
-                self.following_nested = True # suppress unwanted empty line 
+                self.paragraph += f' *{data}* ' # these data go in same para.
+            elif tag == 'a': # hypertext link, usually href=...
+                self.paragraph += f'_{data.strip()}_ [link]' # in same para.
             else:
                 pass  # more tags to come
                 
