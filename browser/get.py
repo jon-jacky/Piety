@@ -6,6 +6,7 @@ from urllib import request, parse
 from pathlib import Path
  
 import sked as ed, edsel as fr # fr for frame
+import urls
 
 def g(url):
     """
@@ -30,3 +31,8 @@ def g(url):
     fr.refresh()
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
+    
+def gb():
+    'Get web page at URL on current line in current buffer.'
+    g(urls.xurl(ed.buffer[ed.dot]))
+    

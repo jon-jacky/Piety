@@ -1,7 +1,25 @@
 """
-urls.py - Sample URLs for testing browser
+urls.py - urlre, a URL regexp, xurl function to extract URL from a string,
+          and sample URLs for testing.
 """
 
+import re
+
+# Simple regular expression for matching URLs
+# Just match https:// prefix and all that follows up to whitespace or , ' "
+# Much simpler than URL regexps found on the Internet,
+# Matches many invalid URLs, but in our application that''s not a problem,
+urlre = 'https?://[^,\'"\s]+'
+
+urlrep = re.compile(urlre) # p for pattern
+
+def xurl(s):
+    'Return (eXtract) URL found in string s, return empty string if none found.'
+    m = urlrep.search(s)
+    return m.group() if m else ''
+     
+# Sample URLs
+ 
 # My home page at github and the same page -- just a file -- in my local repo
 # Very simple, no style, but most lines contain one or more links.
 home = 'https://jon-jacky.github.io/home/'  # .../home/index.html
