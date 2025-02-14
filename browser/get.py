@@ -1,4 +1,4 @@
-f"""
+"""
 get.py - Get a web page and store it in a Piety editor buffer.
 """
 
