@@ -100,6 +100,8 @@ M_percent = esc + '%' # emacs replace string
 
 M_carat = esc + '^' # emacs join lines
 
+M_ret = esc + cr # emacs eww-open-in-new-buffer, browser open URL at point
+
 # ANSI codes for arrow keys
 
 csi = esc+'[' # ANSI control sequence introducer

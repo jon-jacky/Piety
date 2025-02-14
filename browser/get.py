@@ -6,7 +6,8 @@ from urllib import request, parse
 from pathlib import Path
  
 import sked as ed, edsel as fr # fr for frame
-import urls
+import urls, render
+import key, dmacs # so we can add browser keycode entries to keymap
 
 def g(url):
     """
@@ -32,7 +33,23 @@ def g(url):
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
     
-def gb():
-    'Get web page at URL on current line in current buffer.'
+def gx():
+    'Get web page at URL eXtracted from current line in current buffer.'
     g(urls.xurl(ed.buffer[ed.dot]))
+
+def gr(url):
+    'Get and Render web page at url'
+    g(url)
+    render.r()
     
+def grx():
+    'Get and Render web page at url eXtracted from current line in buffer'
+    gx()
+    render.r()
+
+# Add keycodes for browser operations to keymap 
+dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
+                           # FIXME?  Overrides M_g: edsel.graffiti in dmacs
+dmacs.keymap[key.M_r] = render.r # render html from current buf. to .txt .buf
+dmacs.keymap[key.M_ret] = grx # get and render page at URL on current line
+

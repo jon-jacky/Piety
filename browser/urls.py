@@ -5,23 +5,27 @@ urls.py - urlre, a URL regexp, xurl function to extract URL from a string,
 
 import re
 
-# Simple regular expression for matching URLs
-# Just match https:// prefix and all that follows up to whitespace or , ' "
+# Simple regular expressions for matching URLs
+# Match https:// or file:// prefix and all that follows 
+#  up to whitespace or , ' "
 # Much simpler than URL regexps found on the Internet,
 # Matches many invalid URLs, but in our application that''s not a problem,
-urlre = 'https?://[^,\'"\s]+'
-
-urlrep = re.compile(urlre) # p for pattern
+httpre = 'https?://[^,\'"\s]+'
+filere = 'file://[^,\'"\s]+'
+httprep = re.compile(httpre) # p for pattern
+filerep = re.compile(filere)
+norep = re.compile('No URL here')
 
 def xurl(s):
     'Return (eXtract) URL found in string s, return empty string if none found.'
+    urlrep = httprep if 'http' in s else filerep if 'file' in s else norep
     m = urlrep.search(s)
     return m.group() if m else ''
      
 # Sample URLs
  
-# My home page at github and the same page -- just a file -- in my local repo
-# Very simple, no style, but most lines contain one or more links.
+# My home page at github and the same page -- just a file -- in my local repo.
+# Very simple, no style, many short paragraphs, most contain one or more links.
 home = 'https://jon-jacky.github.io/home/'  # .../home/index.html
 home_file = 'file:///home/jon/home/index.html'
 
@@ -58,6 +62,7 @@ hn = 'https://news.ycombinator.com/'
 # has only a few lines from the start of the article then ends.   
 # The page itself must load more pages.
 grauniad = 'https://www.theguardian.com/technology/2023/jul/25/joseph-weizenbaum-inventor-eliza-chatbot-turned-against-artificial-intelligence-ai' 
+
 
 # These URLs  raise errors
 
