@@ -18,6 +18,41 @@ class HTML2Text(HTMLParser):
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
     for line in parser.data: print(line.rstrip()) #  remove extra \n
+
+    FIXME!
+    For now we have done the very minimum needed to show most of the text 
+    in well-formed page. Only the (few) tags discussed in this comment
+    header are supported. Text enclosed by unsupported tags does not
+    appear in the output.
+         
+    Every tag must be followed by its closing tag. Otherwise the enclosed
+    text will not be processed correctly and may not appeaer at all.
+    
+    We treat several tags the same as paragraphs
+    <p>...</p>. We simply wrap the enclosed text to the page width.
+    Tags currently treated the same as p are: li h1 h2 h3 h4.
+    
+    Since list items <li> are treated the same as paragraphs, we don't
+    precede the item with a bullet or number, and we don't indent it.
+    We don't process the enclosing unordered list <ul> or ordered list
+    <ol> tags at all, so there is no way to number the ordered list items.
+
+    Pre-formatted text in <pre>...</pre> is output line by line just
+    as it appears in the source, with no fill or wrap.   This tag
+    is used for code, verse, and other texts where line breaks are
+    significant.
+        
+    Links <a ...>...</a> including hypertext links <a href=...> must be
+    enclosed in a paragraph (or list item etc.) or they won't appear.
+
+    Links appear as footnotes: a number within square brackets at the
+    location of each link in the body text, then at the bottom 
+    after all the body text, all the links appear in a numbered list. 
+    In the body text, the text enclosed in the <a ...>...</a> tags 
+    is preceded and followed by underscores: _..._.
+        
+    Text enclosed in <strong>...</strong> and <em>...</em>  (emphasis) tags 
+    preceded and followed by asterisks: *...*
     """
     def __init__(self):
         super().__init__()
@@ -39,22 +74,26 @@ class HTML2Text(HTMLParser):
         self.placeholder = 'https://nowhere.com/unknown.html'
                  
     def handle_starttag(self, tag, attrs):
-        # List of only the tags we handle.  We don't handle most tags.
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
             self.paragraph = '' # start a new paragraph
         if tag == 'a':  # <a href=linkurl>...</a> 
             self.linkurl = attrs[0][1] # assumes attrs[0] is ('href', url)
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'strong', 'em', 'a' ):
+        # List of only the tags we handle.  We don't handle most tags.
+        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
+                    'pre', 'strong', 'em', 'a' ):
             self.tags.append(tag)  # push tag onto stack of tags
             self.capture = True
                                                     
     def handle_endtag(self, tag):
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4'):
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
             self.output += '\n\n' + textwrap.fill(self.paragraph)
+        if tag == 'pre':
+            self.output += '\n\n' + self.paragraph # do NOT fill
         # Again, list of only the tags we handle
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'strong', 'em', 'a'):
+        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
+                    'pre', 'strong', 'em', 'a'):
             self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
@@ -62,7 +101,7 @@ class HTML2Text(HTMLParser):
     def handle_data(self, data):
         if self.capture: 
             tag = self.tags[-1]
-            if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+            if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
                 self.paragraph += data # fill self.paragraph in handle_endtag
             elif tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
@@ -94,12 +133,10 @@ def r():
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     for line in parser.output.rsplit('\n'): # make list of lines from string
         ed.buffer.append(line + '\n') # each line in buffer must end with \n    
-    ed.buffer.append('\n\n')
+    ed.buffer.append('\n\nLinks\n\n') # Links header that we can search for
     for ilink in range(parser.linknum):
-        ed.buffer.append(f'{ilink+1}: {parser.links[ilink]}\n')         
+        ed.buffer.append(f'{ilink+1}. {parser.links[ilink]}\n')         
     fr.refresh()
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
-  
 
-    
