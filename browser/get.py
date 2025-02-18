@@ -21,7 +21,7 @@ def g(url):
     # If we get this far, urlopen must have succeeded.  Create and fill buffer. 
     purl = parse.urlparse(url) # return Parse object
     ppath = Path(purl.path) # extract ppath, a Path object, from Parse object
-    bufname = ppath.name # extract name from Path object
+    bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
     ed.filename = url # replace filename created by e() with url
     ed.buffers[bufname]['filename'] = url # replace filename created by e()

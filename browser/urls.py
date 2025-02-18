@@ -56,6 +56,12 @@ forth = 'https://pygmy.utoh.org/3ins4th.html'
 askmefi = 'https://ask.metafilter.com/'
 hn = 'https://news.ycombinator.com/'
 
+# Big page 6100 words, 600 photos, for testing image tags.
+gorton = 'https://aresluna.org/the-hardest-working-font-in-manhattan/'
+
+# Simple page with text and two images with alt tags
+grug = 'https://grugbrain.dev/'
+ 
 # Guardian article with lots of text but also lots of clutter
 # Gets HTML page with 481 lines but it's almost all clutter.
 # Article text starts on line 472 near the end of the page, 
