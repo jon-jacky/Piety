@@ -34,9 +34,22 @@ def g(url):
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
     
 def gx():
-    'Get web page at URL eXtracted from current line in current buffer.'
-    g(urls.xurl(ed.buffer[ed.dot]))
-
+    """
+    Get web page at URL eXtracted from current line in current buffer.
+    We expect user has selected a line
+     that looks like it holds an absolute or relative URL.
+    We expect that line is one of our footnotes on a rendered web page.
+    We have arranged that the filename associated with the buffer that
+    holds that rendered web page is actually the absolute URL of that page,
+    so it is the base URL of any relative URLs that appear in footnotes.
+    """
+    global url # So we can examine it in REPL
+    url = urls.xurl(ed.buffer[ed.dot]) # find absolute URL, '' if not found
+    if not url: # absolute URL not found on line - must be relative URL
+        rurl = urls.xrurl(ed.buffer[ed.dot]) # find relative URL
+        url = ed.filename + rurl # ed.filename stores base URL
+    g(url)
+    
 def gr(url):
     'Get and Render web page at url'
     g(url)

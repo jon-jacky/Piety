@@ -54,6 +54,13 @@ class HTML2Text(HTMLParser):
         
     Text enclosed in <strong>...</strong> and <em>...</em>  (emphasis) tags 
     preceded and followed by asterisks: *...*
+    
+    Image links <img .../> tags are represented by a separate line of text that 
+    contains just [ Image ] if the image tag doesn't provide any alt text,
+    or [ the alt text ] if it does.
+    
+    <div class="copy post"> ... </div>  is treated like a paragraph <p>...</p>.
+    Also <div class="copy">  These are special cases added just for Metafilter.
     """
     def __init__(self):
         super().__init__()
@@ -73,12 +80,16 @@ class HTML2Text(HTMLParser):
         self.links = [] # indexed 0 .. final linknum - 1
         self.linkurl = '' # assigned by handle_starttag
         self.placeholder = 'https://nowhere.com/unknown.html'
-                 
+        self.mefidiv = False # special handling of <div...> at metafilter.com
+                         
     def handle_starttag(self, tag, attrs):
-        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
+        if tag == 'div': # special handling of <div...> at metafilter.com only
+            divclass = dict(attrs).get('class', '')
+            self.mefidiv = True if divclass in ('copy post', 'copy')  else False
+        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre') or self.mefidiv:
             self.paragraph = '' # start a new paragraph
         if tag == 'a':  # <a href=linkurl>...</a> 
-            self.linkurl = attrs[0][1] # assumes attrs[0] is ('href', url)
+            self.linkurl = attrs[0][1] # FIXME assumes attrs[0] is ('href', url)
         if tag == 'img': #  <img src="..."  alt="..." ... optional attrs .../>
             # Special case: no endtag - handle data and output here
             alt = dict(attrs).get('alt', '')
@@ -86,12 +97,12 @@ class HTML2Text(HTMLParser):
         # List of only the tags we handle.  We don't handle most tags.
         # BUT not img because thre is nothing to capture and no endtag
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
-                    'pre', 'strong', 'em', 'a' ):
+                    'pre', 'strong', 'em', 'a' ) or self.mefidiv:
             self.tags.append(tag)  # push tag onto stack of tags
             self.capture = True
 
     def handle_endtag(self, tag):
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+        if tag in ('p', 'h1', 'h2', 'h3', 'h4') or self.mefidiv:
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
             self.output += '\n\n' + textwrap.fill(self.paragraph)
@@ -101,16 +112,18 @@ class HTML2Text(HTMLParser):
             self.output += '\n\n' + self.paragraph # do NOT fill
         # Again, list of only the tags we handle - BUT not img, no endtag
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
-                    'pre', 'strong', 'em', 'a'):
+                    'pre', 'strong', 'em', 'a') or self.mefidiv:
             if self.tags:  # tags list not empty, guard against unmatched tag
                 self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
-                                        
+            if self.mefidiv:
+                self.mefidiv = False
+                                                                
     def handle_data(self, data):
         if self.capture: 
             tag = self.tags[-1]
-            if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
+            if tag in ('p', 'li','h1','h2','h3','h4', 'pre') or self.mefidiv:
                 self.paragraph += data # fill self.paragraph in handle_endtag
             elif tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
@@ -136,8 +149,9 @@ def r():
     bufname = path.stem + '.txt'  # path.stem is basename index.html -> index
     
     # From here on, the code is similar to get.py fcn g()
+    baseurl = ed.filename # original web site url, needed by relative urls.
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
-    ed.filename = bufname # replace filename created by e() with url
+    ed.filename = baseurl # replace filename created by e() with web site url
     ed.buffers[bufname]['filename'] = bufname # replace filename created by e()
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     for line in parser.output.rsplit('\n'): # make list of lines from string
