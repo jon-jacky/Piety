@@ -89,7 +89,7 @@ class HTML2Text(HTMLParser):
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre') or self.mefidiv:
             self.paragraph = '' # start a new paragraph
         if tag == 'a':  # <a href=linkurl>...</a> 
-            self.linkurl = attrs[0][1] # FIXME assumes attrs[0] is ('href', url)
+            self.linkurl = dict(attrs).get('href','')
         if tag == 'img': #  <img src="..."  alt="..." ... optional attrs .../>
             # Special case: no endtag - handle data and output here
             alt = dict(attrs).get('alt', '')
@@ -112,7 +112,7 @@ class HTML2Text(HTMLParser):
             self.output += '\n\n' + self.paragraph # do NOT fill
         # Again, list of only the tags we handle - BUT not img, no endtag
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
-                    'pre', 'strong', 'em', 'a') or self.mefidiv:
+                    'pre', 'strong', 'em', 'a'): # or self.mefidiv:
             if self.tags:  # tags list not empty, guard against unmatched tag
                 self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
@@ -123,8 +123,17 @@ class HTML2Text(HTMLParser):
     def handle_data(self, data):
         if self.capture: 
             tag = self.tags[-1]
-            if tag in ('p', 'li','h1','h2','h3','h4', 'pre') or self.mefidiv:
+            if tag in ('p', 'li','h1','h2','h3','h4', 'pre'):
                 self.paragraph += data # fill self.paragraph in handle_endtag
+            if self.mefidiv:
+                ### breakpoint() # DEBUG so we can examine div data
+                self.paragraph += data # fill self.paragraph in handle_endtag
+                # must save in output now before other tags in div overwrite it
+                self.output += '\n\n' + textwrap.fill(self.paragraph)
+                # Exit div processing now - don't process other div contents
+                self.tags.pop()
+                self.capture = False
+                self.mefidiv = False
             elif tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
             elif tag == 'a': # hypertext link, usually href=...
