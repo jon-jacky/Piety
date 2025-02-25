@@ -88,11 +88,15 @@ class HTML2Text(HTMLParser):
         if tag == 'a':  # <a href=linkurl>...</a> 
             self.linkurl = dict(attrs).get('href','')
         if tag == 'img': #  <img src="..."  alt="..." ... optional attrs .../>
-            # Special case: no endtag - handle data and output here
+            # No endtag - handle data and output here
             alt = dict(attrs).get('alt', '')
             self.output += '\n\n  [ %s ]' % (alt if alt else 'Image')
+        if tag == 'br':
+            # No endtag, no data. Treat br starttag like p endtag,then starttag
+            self.output += '\n' + textwrap.fill(self.paragraph) # just one \n
+            self.paragraph = '' # now start new paragraph                         
         # List of only the tags we handle.  We don't handle most tags.
-        # BUT not img because thre is nothing to capture and no endtag
+        # BUT not img or br  because thre is nothing to capture and no endtag
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
                     'pre', 'strong', 'em', 'a' ):
             self.tags.append(tag)  # push tag onto stack of tags
@@ -123,7 +127,7 @@ class HTML2Text(HTMLParser):
             self.output += '\n\n-- ' + textwrap.fill(self.paragraph) # bullet
         if tag == 'pre':
             self.output += '\n\n' + self.paragraph # do NOT fill
-        # Again, list of only the tags we handle - BUT not img, no endtag
+        # Again, list of only the tags we handle - BUT not img, not br
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
                     'pre', 'strong', 'em', 'a'):
             if self.tags:  # tags list not empty, guard against unmatched tag
