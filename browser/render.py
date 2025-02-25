@@ -60,7 +60,8 @@ class HTML2Text(HTMLParser):
     or [ the alt text ] if it does.
     
     <div class="copy post"> ... </div>  is treated like a paragraph <p>...</p>.
-    Also <div class="copy">  These are special cases added just for Metafilter.
+    Also <div class="copy">  and <div class="comments">
+    These are special cases added just for Metafilter.
     """
     def __init__(self):
         super().__init__()
@@ -80,7 +81,6 @@ class HTML2Text(HTMLParser):
         self.links = [] # indexed 0 .. final linknum - 1
         self.linkurl = '' # assigned by handle_starttag
         self.placeholder = 'https://nowhere.com/unknown.html'
-        self.mefidiv = False # special handling of div... at ask.metafilter.com
                          
     def handle_starttag(self, tag, attrs):
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
@@ -103,13 +103,16 @@ class HTML2Text(HTMLParser):
         # but this is necessary to keep the special case div code separate. 
         # and make the similarities apparent.
         if tag == 'div': # special handling of <div...> at metafilter.com only
+            # <div class="copy post"> appears in each ask on front page
+            # <div class="copy"> appears in linked answer page for that ask
+            # <div class="comments" ...> appears in each answer on answer page
             divclass = dict(attrs).get('class', '')
-            self.mefidiv = True if divclass in ('copy post', 'copy')  else False
-        if self.mefidiv:
-            self.paragraph = '' # start a new paragraph
-        if self.mefidiv:            
-            self.tags.append(tag)  # push tag onto stack of tags
-            self.capture = True
+            if divclass in ('copy post', 'copy', 'comments'): # ignore others
+                # Treat div with these classes just like paragraph
+                # if div appears in tags it must be one of these classes
+                self.paragraph = '' # start a new paragraph
+                self.tags.append(tag)  # push div tag onto stack of tags
+                self.capture = True
 
     def handle_endtag(self, tag):
         if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
@@ -128,44 +131,37 @@ class HTML2Text(HTMLParser):
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
                 
-        # Special case for div at ask.metafilter.com.
-        # Repeats some code from right above but needed to separe out this case.
-        if self.mefidiv:
+        # Special case for div at ask.metafilter.com -
+        # For now treat it just like a paragraph.
+        # Repeats some code from above but needed to separate out this case.
+        if tag == 'div': 
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
             self.output += '\n\n' + textwrap.fill(self.paragraph)
-        if self.mefidiv:
+            self.paragraph = '' # re-initialize to avoid duplication
+        if tag == 'div':
             if self.tags:  # tags list not empty, guard against unmatched tag
                 self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
-            self.mefidiv = False
                                                                 
     def handle_data(self, data):
         if self.capture: 
             tag = self.tags[-1]
             if tag in ('p', 'li','h1','h2','h3','h4', 'pre'):
                 self.paragraph += data # fill self.paragraph in handle_endtag
-            elif tag in ('strong', 'em'):
+            if tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
-            elif tag == 'a': # hypertext link, usually href=...
+            if tag == 'a': # hypertext link, usually href=...
                 self.linknum += 1 # footnotes count up from 1 not 0
                 self.links.append(self.linkurl) # linkurl from handle_starttag
                 self.paragraph += f'_{data.strip()}_ [{self.linknum}]'
 
             # Special case for div tags at ask.metafilter.com
-            if self.mefidiv:
+            # Treat just like paragraph
+            if tag == 'div':
                 ### breakpoint() # DEBUG so we can examine div data
                 self.paragraph += data # fill self.paragraph in handle_endtag
-                # must save in output now before other tags in div overwrite it
-                self.output += '\n\n' + textwrap.fill(self.paragraph)
-                # Exit div processing now - don't process other div contents
-                self.capture = False
-                self.mefidiv = False
-                self.tags.pop()
-                
-            else:
-                pass  # more tags to come
                             
 def r():
     """
