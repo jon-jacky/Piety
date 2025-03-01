@@ -1,51 +1,7 @@
 """
-urls.py - urlre, a URL regexp, xurl function to extract URL from a string,
-          and sample URLs for testing.
+urls.py - Sample URLs for testing.
 """
 
-import re
-
-# Simple regular expressions for matching URLs
-# Match https:// or file:// prefix and all that follows 
-#  up to whitespace or , ' "
-# Much simpler than URL regexps found on the Internet,
-# Matches many invalid URLs, but in our application that's not a problem,
-httpre = 'https?://[^,\'"\s]+'
-filere = 'file://[^,\'"\s]+'
-httprep = re.compile(httpre) # p for pattern
-filerep = re.compile(filere)
-norep = re.compile('No URL here')
- 
-def xurl(s):
-    """
-    Return (eXtract) absolute URL found in string s.
-    An absolute URL begins with http:// or https:// or file://
-    Return empty string if no absolute URL found.
-    We expect caller has passed a string that looks like it holds a URL.
-    """
-    urlrep = httprep if 'http' in s else filerep if 'file' in s else norep
-    m = urlrep.search(s)
-    return m.group() if m else ''
-
-def xrurl(s): 
-    """
-    Extract relative URL from a string formatted as one of our footnotes,
-    like these:
-
-        10. toolkit.html
-        11. ../z-lectures/z-lectures.html
-    
-    or like these:
-    
-        47. /food-drink
-        48. /384528/My-very-first-Can-I-eat-this-question
-    
-    For now, we just return the first string of non-whitespace characters
-    after the first one or more whitespace characters.
-    We assume caller has passed a string that looks like it holds a relative URL.
-    """
-    return s.split()[1]  # crashes if there is no text past first whitespace
-     
 # Sample URLs
  
 # My home page at github and the same page -- just a file -- in my local repo.
@@ -78,6 +34,7 @@ forth = 'https://pygmy.utoh.org/3ins4th.html'
 
 # Mostly text web sites but with lots of other stuff
 askmefi = 'https://ask.metafilter.com/'
+mefi = 'https://www.metafilter.com/'
 hn = 'https://news.ycombinator.com/'
 
 # Big page 6100 words, 600 photos, for testing image tags.

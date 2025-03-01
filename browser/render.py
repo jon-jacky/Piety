@@ -107,11 +107,17 @@ class HTML2Text(HTMLParser):
         # but this is necessary to keep the special case div code separate. 
         # and make the similarities apparent.
         if tag == 'div': # special handling of <div...> at metafilter.com only
-            # <div class="copy post"> appears in each ask on front page
+            # <div class="copy post"> appears in each ask on ask.... front page
+            #  or in each post on www.metafilter.com front page
             # <div class="copy"> appears in linked answer page for that ask
+            #  or at text at top of comment page at www.metafilter.com
             # <div class="comments" ...> appears in each answer on answer page
+            #  or each commmt on comment page at www.metafilter.com
+            # <div class="comments best" ...> appears in higlighted answers
+            # <div class="comments bestleft" ...> asker's comment among answers
             divclass = dict(attrs).get('class', '')
-            if divclass in ('copy post', 'copy', 'comments'): # ignore others
+            if divclass in ('copy post', 'copy', 'comments', 'comments best',
+                                'comments bestleft'):
                 # Treat div with these classes just like paragraph
                 # if div appears in tags it must be one of these classes
                 self.paragraph = '' # start a new paragraph
@@ -189,7 +195,7 @@ def r():
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     for line in parser.output.rsplit('\n'): # make list of lines from string
         ed.buffer.append(line + '\n') # each line in buffer must end with \n    
-    ed.buffer.append('\n\nLinks\n\n') # Links header that we can search for
+    ed.buffer += ['\n','\n','Links\n', '\n'] # Links header we can search for
     for ilink in range(parser.linknum):
         ed.buffer.append(f'{ilink+1}. {parser.links[ilink]}\n')         
     fr.refresh()
