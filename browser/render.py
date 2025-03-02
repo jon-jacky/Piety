@@ -19,7 +19,6 @@ class HTML2Text(HTMLParser):
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
     for line in parser.data: print(line.rstrip()) #  remove extra \n
 
-    FIXME!
     For now we have done the very minimum needed to show most of the text 
     in well-formed page. Only the (few) tags discussed in this comment
     header are supported. Text enclosed by unsupported tags does not
@@ -84,6 +83,8 @@ class HTML2Text(HTMLParser):
                          
     def handle_starttag(self, tag, attrs):
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
+            if self.tags and self.tags[-1] == 'div':  # we're inside div
+                self.output += '\n' + textwrap.fill(self.paragraph) # one \n            
             self.paragraph = '' # start a new paragraph
         if tag == 'a':  # <a href=linkurl>...</a> 
             self.linkurl = dict(attrs).get('href','')
@@ -99,14 +100,17 @@ class HTML2Text(HTMLParser):
         # BUT not img or br  because thre is nothing to capture and no endtag
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
                     'pre', 'strong', 'em', 'a' ):
-            self.tags.append(tag)  # push tag onto stack of tags
+            # Do not push unmatched <p> inside <div> onto list of tags
+            if ((tag != 'p')
+                or (tag == 'p' and (not self.tags or self.tags[-1] != 'div'))):
+                self.tags.append(tag)  # push tag onto stack of tags
             self.capture = True
 
-        # Special case for div tags at ask.metafilter.com.
+        # Special case div tags at metafilter.com and news.ycombinator.com, HN
         # Some code here is repeated from the genereal case (right above)
         # but this is necessary to keep the special case div code separate. 
         # and make the similarities apparent.
-        if tag == 'div': # special handling of <div...> at metafilter.com only
+        if tag == 'div': # special handling of <div...> at metafilter and HN
             # <div class="copy post"> appears in each ask on ask.... front page
             #  or in each post on www.metafilter.com front page
             # <div class="copy"> appears in linked answer page for that ask
@@ -115,9 +119,10 @@ class HTML2Text(HTMLParser):
             #  or each commmt on comment page at www.metafilter.com
             # <div class="comments best" ...> appears in higlighted answers
             # <div class="comments bestleft" ...> asker's comment among answers
+            # <div class='commtext c00' ...> appears in each comment on HN
             divclass = dict(attrs).get('class', '')
             if divclass in ('copy post', 'copy', 'comments', 'comments best',
-                                'comments bestleft'):
+                            'comments bestleft', 'commtext c00'):
                 # Treat div with these classes just like paragraph
                 # if div appears in tags it must be one of these classes
                 self.paragraph = '' # start a new paragraph

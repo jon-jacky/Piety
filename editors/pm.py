@@ -1,4 +1,4 @@
-# Start pmacs editor from command line in any dir: python3 -im pm
+# Start pmacs editor with browser from command line in any dir: python3 -im pm
 # First must define PYTHONPATH by . /Users/jon/piety/bin/paths, once in session
 import sked
 from sked import *
@@ -14,6 +14,12 @@ from get import *
 import editline
 import pmacs
 from pmacs import pm
+import urls
+from urls import *
+import get 
+from get import *
+import render 
+from render import *
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 win(26)
 pm()
