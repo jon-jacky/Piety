@@ -20,6 +20,11 @@ filere = 'file://[^,\'"\s]+'
 httprep = re.compile(httpre) # p for pattern
 filerep = re.compile(filere)
 norep = re.compile('No URL here')
+
+# Copied from urls.py so we don't need to import it here.
+# Needed by g() below for special case handling of relative URLs at this site.
+hn = 'https://news.ycombinator.com/'
+hnnew = 'https://news.ycombinator.com/newest' # Must *not* have final /
  
 def xurl(s):
     """
@@ -65,8 +70,11 @@ def g(url):
     ppath = Path(purl.path) # extract ppath, a Path object, from Parse object
     bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
-    ed.filename = url # replace filename created by e() with url
-    ed.buffers[bufname]['filename'] = url # replace filename created by e()
+    # Special case handling of base URL and relative URL at news.ycombinator.com
+    # Page URL may have suffix like 'newest' or 'news?p=2' - omit suffix.
+    baseurl = hn if url.startswith(hn) else url
+    ed.filename = baseurl # replace filename created by e() with url
+    ed.buffers[bufname]['filename'] = baseurl # replace filename created by e()
     buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     # Fill in buffer text
     for line in r.readlines():

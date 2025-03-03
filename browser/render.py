@@ -84,7 +84,7 @@ class HTML2Text(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
             if self.tags and self.tags[-1] == 'div':  # we're inside div
-                self.output += '\n' + textwrap.fill(self.paragraph) # one \n            
+                self.output += '\n\n' + textwrap.fill(self.paragraph) 
             self.paragraph = '' # start a new paragraph
         if tag == 'a':  # <a href=linkurl>...</a> 
             self.linkurl = dict(attrs).get('href','')

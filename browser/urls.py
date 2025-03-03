@@ -36,6 +36,7 @@ forth = 'https://pygmy.utoh.org/3ins4th.html'
 askmefi = 'https://ask.metafilter.com/'
 mefi = 'https://www.metafilter.com/'
 hn = 'https://news.ycombinator.com/'
+hnnew = 'https://news.ycombinator.com/newest' # Must *not* have final /
 
 # Big page 6100 words, 600 photos, for testing image tags.
 gorton = 'https://aresluna.org/the-hardest-working-font-in-manhattan/'
