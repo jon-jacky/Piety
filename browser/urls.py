@@ -38,12 +38,21 @@ mefi = 'https://www.metafilter.com/'
 hn = 'https://news.ycombinator.com/'
 hnnew = 'https://news.ycombinator.com/newest' # Must *not* have final /
 
+# Link blogs etc.
+trivium = 'http://leahneukirchen.org/trivium/'
+tbray='https://www.tbray.org/ongoing/'
+nelson='https://pinboard.in/u:nelson'
+
+# Reviving the Dillo browser
+dillo = 'https://dillo-browser.github.io/'
+dilloslides = 'https://dillo-browser.github.io/fosdem-2025/'
+ 
+# Simple page with text and two images with alt tags
+grug = 'https://grugbrain.dev/'
+
 # Big page 6100 words, 600 photos, for testing image tags.
 gorton = 'https://aresluna.org/the-hardest-working-font-in-manhattan/'
 
-# Simple page with text and two images with alt tags
-grug = 'https://grugbrain.dev/'
- 
 # Guardian article with lots of text but also lots of clutter
 # Gets HTML page with 481 lines but it's almost all clutter.
 # Article text starts on line 472 near the end of the page, 

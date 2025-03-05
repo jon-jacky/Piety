@@ -2,7 +2,7 @@
 host
 ====
 
-Modules that invoke the host operating system.
+Modules that invoke commands of the host operating system.
 
 ### Files ###
 

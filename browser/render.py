@@ -8,6 +8,19 @@ import textwrap
 
 import sked as ed
 import edsel as fr # fr for frame
+
+# div class="..." special case div tags at particular web sites
+# div with these classes are formatted like paragraphs.
+# Other div are ignored, do not appeear in rendered output.
+divclasses = ('copy post',  # www. ask.metafilter.com: posts, asks on front page
+              'copy',       # metafilter: top of post or answer page
+              'comments',   # metafilter: each answer or each comment
+              'comments best',  # metafilter: answers marked best
+              'comments bestleft', # metafilter: asker's remark on answer page
+              'commtext c00', # news.ycombinator.com (Hacker News): comment
+              'toptext', # ycombinator: text at top of Ask HN
+              'os', # www.tbray.org/ongoing/ front page article links/summaries 
+              )
  
 class HTML2Text(HTMLParser):
     """
@@ -106,25 +119,14 @@ class HTML2Text(HTMLParser):
                 self.tags.append(tag)  # push tag onto stack of tags
             self.capture = True
 
-        # Special case div tags at metafilter.com and news.ycombinator.com, HN
+        # Special case div tags at particular web sites, see divclasses above.
         # Some code here is repeated from the genereal case (right above)
         # but this is necessary to keep the special case div code separate. 
         # and make the similarities apparent.
-        if tag == 'div': # special handling of <div...> at metafilter and HN
-            # <div class="copy post"> appears in each ask on ask.... front page
-            #  or in each post on www.metafilter.com front page
-            # <div class="copy"> appears in linked answer page for that ask
-            #  or at text at top of comment page at www.metafilter.com
-            # <div class="comments" ...> appears in each answer on answer page
-            #  or each commmt on comment page at www.metafilter.com
-            # <div class="comments best" ...> appears in higlighted answers
-            # <div class="comments bestleft" ...> asker's comment among answers
-            # <div class='commtext c00' ...> appears in each comment on HN
-            divclass = dict(attrs).get('class', '')
-            if divclass in ('copy post', 'copy', 'comments', 'comments best',
-                            'comments bestleft', 'commtext c00'):
+        if tag == 'div':
+            divclass = dict(attrs).get('class', '') 
+            if divclass in divclasses:
                 # Treat div with these classes just like paragraph
-                # if div appears in tags it must be one of these classes
                 self.paragraph = '' # start a new paragraph
                 self.tags.append(tag)  # push div tag onto stack of tags
                 self.capture = True
@@ -146,7 +148,7 @@ class HTML2Text(HTMLParser):
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
                 
-        # Special case for div at ask.metafilter.com -
+        # Special case for div at particular web sites
         # For now treat it just like a paragraph.
         # Repeats some code from above but needed to separate out this case.
         if tag == 'div': 
@@ -172,7 +174,7 @@ class HTML2Text(HTMLParser):
                 self.links.append(self.linkurl) # linkurl from handle_starttag
                 self.paragraph += f'_{data.strip()}_ [{self.linknum}]'
 
-            # Special case for div tags at ask.metafilter.com
+            # Special case for div tags at particular web sites
             # Treat just like paragraph
             if tag == 'div':
                 ### breakpoint() # DEBUG so we can examine div data

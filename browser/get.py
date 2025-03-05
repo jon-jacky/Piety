@@ -21,11 +21,6 @@ httprep = re.compile(httpre) # p for pattern
 filerep = re.compile(filere)
 norep = re.compile('No URL here')
 
-# Copied from urls.py so we don't need to import it here.
-# Needed by g() below for special case handling of relative URLs at this site.
-hn = 'https://news.ycombinator.com/'
-hnnew = 'https://news.ycombinator.com/newest' # Must *not* have final /
- 
 def xurl(s):
     """
     Return (eXtract) absolute URL found in string s.
@@ -55,7 +50,17 @@ def xrurl(s):
     We assume caller has passed a string that looks like it holds a relative URL.
     """
     return s.split()[1]  # crashes if there is no text past first whitespace
-       
+
+# URLs in baseurls are prefixes of web page absolute urls
+#  used as base urls for fetching other pages from that site using relative urls.
+# The absolute url may include a suffix like 'newest' or 'news?p=2'
+#  that must be omitted when forming a url from the base url + relative url.
+# The base URL is supposed to be identified by a tag in the page itself
+#  but here we just handle particular base urls as special cases.
+baseurls = ('https://news.ycombinator.com/', # Hacker News
+            'https://www.tbray.org/' # Tim Bray's blog, Ongoing 
+            )
+
 def g(url):
     """
     (g)et web page from url and store it in its own Piety editor buffer.     
@@ -70,10 +75,12 @@ def g(url):
     ppath = Path(purl.path) # extract ppath, a Path object, from Parse object
     bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
-    # Special case handling of base URL and relative URL at news.ycombinator.com
-    # Page URL may have suffix like 'newest' or 'news?p=2' - omit suffix.
-    baseurl = hn if url.startswith(hn) else url
-    ed.filename = baseurl # replace filename created by e() with url
+    # Special case handling of base URLs from particular web sites - see above
+    baseurl = url # default, often the base url is the same as the page url
+    for burl in baseurls:
+        if url.startswith(burl):
+            baseurl = burl
+    ed.filename = baseurl # replace filename created by e() with baseurl
     ed.buffers[bufname]['filename'] = baseurl # replace filename created by e()
     buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     # Fill in buffer text
