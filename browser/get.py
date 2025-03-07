@@ -58,7 +58,8 @@ def xrurl(s):
 # The base URL is supposed to be identified by a tag in the page itself
 #  but here we just handle particular base urls as special cases.
 baseurls = ('https://news.ycombinator.com/', # Hacker News
-            'https://www.tbray.org/' # Tim Bray's blog, Ongoing 
+            'https://www.tbray.org/', # Tim Bray's blog, Ongoing 
+            'https://github.com/', # Github generates and serves long relative urls
             )
 
 def g(url):
