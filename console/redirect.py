@@ -1,6 +1,7 @@
 """
-redirect.py - Redirect command output to editor buffers,
-              so the buffers can act much like terminal windows.
+redirect.py - The redirect() function here redirects command output to
+              editor buffers, so the buffers can act much like terminal windows
+              with scroll back.               
 """
 
 from contextlib import redirect_stdout
@@ -8,7 +9,6 @@ from contextlib import redirect_stdout
 # sked has module-level write function that writes to the current buffer.
 import sked as ed  
 import edsel as fr # fr for frame
-import host
  
 def redirect(bufname, command, command_string):
     """
@@ -40,46 +40,3 @@ def redirect(bufname, command, command_string):
         print('>>> ' + command_string) # print command to label its output
         command()
     fr.scroll() # last line printed by command is at bottom of window
-    
-def sh(cmd):
-    redirect('*Console*', lambda: host.sh(cmd), f"sh('{cmd}')")
-
-def cd(path):
-    redirect('*Console*', lambda: host.cd(path), f"cd('{path}')")    
-
-def pwd():
-    redirect('*Console*', lambda: host.pwd(), f"pwd()")
-    
-def ls(path='.'):
-    'host.ls() calls ls -C for compact listing'
-    redirect('*Console*', lambda: host.ls(path), f"ls('{path}')")    
-
-def lsl(path='.'):
-    'host.lsl() calls ls -l for long form listing in alphabetic order'
-    redirect('*Console*', lambda: host.lsl(path), f"lsl('{path}')")    
-
-def lslt(path='.'):
-    'host.lslt() calls ls -l for long form listing in chronological order'     
-    redirect('*Console*', lambda: host.lslt(path), f"lslt('{path}')")    
-
-def man(topic):
-    'Show man page on topic, a string.  Save in new buffer named topic.man'
-    bufname = topic + '.man'
-    fr.e(bufname)
-    with redirect_stdout(ed): 
-        host.man(topic)
-    fr.p(1) # put the cursor at the top of the buffer
-    fr.refresh()
-
-def help(topic):
-    """
-    Show help on topic, a Python object - module, function etc.
-    Save in a new buffer named topic.help
-    """
-    bufname = topic.__name__ + '.help'
-    fr.e(bufname)
-    with redirect_stdout(ed):
-        host.help(topic)
-    fr.p(1) # put the cursor at the top of the buffer
-    fr.refresh()
-

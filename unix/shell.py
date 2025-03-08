@@ -1,15 +1,16 @@
 """
-host.py - Python functions that wrap commands to the host operating system.
+shell.py - Python functions that wrap shell commands, so you can invoke
+            the shell without exiting the Python session or using the
+            host desktop.
+            
+This module provides a function sh(command), which runs any shell command,
+and functions for particular shell commands: pwd, cd, man, ls -C, ls -l, ls -lt
 
-          One function here invokes the host shell and several invoke particular 
-          host shell commands, so you can use the host shell without exiting the
-          Python session.  These functions run the host shell in a subprocess.
-          
-          Several functions here call the Python standard library directly.
-          These functions do not use the host shell or a subprocess.
-          
-          These functions all write command output on the standard output, 
-          so the output can be redirected.
+The pwd and cd functions call specific functions in the Python standard library. 
+The other functions run the host shell in a subprocess.
+
+These functions all write shell command output on the standard output, so the
+output can be redirected anywhere.
 """        
 
 import subprocess, os, pydoc
@@ -46,6 +47,13 @@ def pwd():
     """    
     print(os.getcwd())  # returns a string
 
+def man(topic):
+    """
+    Print man page on topic, a string.
+    Invokes the man command in a shell subprocess, writes output on stdout.    
+    """
+    sh('man ' + topic)
+
 def ls(path='.'):
     """
     Call the shell directory listing command ls -C for a compact listing.
@@ -71,21 +79,3 @@ def lslt(path='.'):
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
     sh('ls -lt '+path)
-   
-def man(topic):
-    """
-    Print man page on topic, a string.
-    Invokes the man command in a shell subprocess, writes output on stdout.    
-    """
-    sh('man ' + topic)
-
-def help(topic):
-    """
-    Print help on topic, a Python object: module, function etc. Prints to stdout.
-    Uses the pydoc module render_doc function, does not invoke a shell process.
-    """
-    helptext = pydoc.render_doc(topic, "Help on %s") # one big string
-    for line in helptext.splitlines():
-        print(line)
-        
-    

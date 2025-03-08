@@ -6,6 +6,8 @@ import edsel
 from edsel import *
 import dmacs
 from dmacs import dm
+import console
+from console import *
 import urls
 from urls import *
 import get 

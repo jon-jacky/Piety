@@ -6,9 +6,8 @@ import edsel
 from edsel import *
 import dmacs
 from dmacs import dm # so we can revert to dmacs if pmacs is broken
-import host
-import redirect
-from redirect import *
+import console
+from console import *
 import get
 from get import *
 import editline
