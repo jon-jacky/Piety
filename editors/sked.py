@@ -247,7 +247,8 @@ def N(move_dot=move_dot, restore_buffer=restore_buffer):
     for bname in buffers:
         buffer.append(bstatus(bname) + '\n')          
     restore_buffer('*Buffers*') # force redisplay if display present
-
+    move_dot(1)  # list of buffers might have gotten shorter
+         
 def select_buffer(restore_buffer=restore_buffer):
     """
     When dot is on a bstatus line, for example in *Buffers* buffer,

@@ -11,4 +11,17 @@ with the same module names and function names in a different directory
 with a different name (*windows* for example) and put that directory
 on the PYTHONPATH instead.
 
-Revised February 2015
+### Files ####
+
+- **shell.py** - Python functions that wrap shell commands, so you can invoke
+                the shell without exiting the Python session or using
+                the host desktop.
+                
+- **terminal.py** - functions to set terminal character mode or line mode,
+                       read/write a single character or a string.
+                       
+- **terminal_util.py** - function to get terminal dimensions: number of
+                        lines, columns.
+ 
+Revised Mar 2025
+

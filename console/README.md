@@ -1,16 +1,19 @@
 
-host
-====
+Console
+========
 
-Modules that invoke commands of the host operating system.
+TK ...
 
 ### Files ###
 
-- **host.py**: Python wrappers for host shell and some particular shell
-        commands, so you can use the shell without exiting the Python session.
+- **console.py**: Python wrappers for host shell, some particular shell
+        commands, and Python help, that redirect command output to
+        editor buffers, so you can use the commands without exiting the
+        Python session or using the host desktop.
 
 - **redirect.py**:  Redirect command output to editor buffers,
-              so the buffers can act much like terminal windows.
+              so the buffers can act much like terminal windows with
+              scroll back.
 
-Revised Jan 2025
+Revised Mar 2025
 
