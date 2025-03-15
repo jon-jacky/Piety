@@ -49,8 +49,9 @@ def xrurl(s):
     after the first one or more whitespace characters.
     We assume caller has passed a string that looks like it holds a relative URL.
     """
-    return s.split()[1]  # crashes if there is no text past first whitespace
-
+    rurl =  s.split()[1]  # crashes if there is no text past first whitespace
+    return rurl[2:] if rurl.startswith('..') else rurl # FIXME? Special case!
+    
 # URLs in baseurls are prefixes of web page absolute urls
 #  used as base urls for fetching other pages from that site using relative urls.
 # The absolute url may include a suffix like 'newest' or 'news?p=2'
@@ -60,6 +61,7 @@ def xrurl(s):
 baseurls = ('https://news.ycombinator.com/', # Hacker News
             'https://www.tbray.org/', # Tim Bray's blog, Ongoing 
             'https://github.com/', # Github generates and serves long relative urls
+            'https://dercuano.github.io/', # Kragen Sitaker's notes, Dercuano
             )
 
 def g(url):

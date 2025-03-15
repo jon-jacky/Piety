@@ -31,50 +31,7 @@ class HTML2Text(HTMLParser):
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
     for line in parser.data: print(line.rstrip()) #  remove extra \n
-
-    For now we have done the very minimum needed to show most of the text 
-    in well-formed page. Only the (few) tags discussed in this comment
-    header are supported. Text enclosed by unsupported tags does not
-    appear in the output.
-         
-    Every tag must be followed by its closing tag. Otherwise the enclosed
-    text will not be processed correctly and may not appeaer at all.
-    
-    We treat several tags the same as paragraphs
-    <p>...</p>. We simply wrap the enclosed text to the page width.
-    Tags currently treated the same as p are: li h1 h2 h3 h4.
-    
-    List items <li> are treated almost the same as paragraphs.
-    We begin each item with two dashes -- to suggest a bullet,
-    but we don't indent it. We don't process the enclosing unordered
-    list <ul> or ordered list <ol> tags at all, so there is no way to
-    number the ordered list items.
-
-    Pre-formatted text in <pre>...</pre> is output line by line just
-    as it appears in the source, with no fill or wrap.   This tag
-    is used for code, verse, and other texts where line breaks are
-    significant.
-        
-    Links <a ...>...</a> including hypertext links <a href=...> must be
-    enclosed in a paragraph (or list item etc.) or they won't appear.
-
-    Links appear as footnotes: a number within square brackets at the
-    location of each link in the body text, then at the bottom 
-    after all the body text, all the links appear in a numbered list. 
-    In the body text, the text enclosed in the <a ...>...</a> tags 
-    is preceded and followed by underscores: _..._.
-        
-    Text enclosed in <strong>...</strong> and <em>...</em>  (emphasis) tags 
-    preceded and followed by asterisks: *...*
-    
-    Image links <img .../> tags are represented by a separate line of text that 
-    contains just [ Image ] if the image tag doesn't provide any alt text,
-    or [ the alt text ] if it does.
-    
-    <div class="copy post"> ... </div>  is treated like a paragraph <p>...</p>.
-    Also <div class="copy">  and <div class="comments">
-    These are special cases added just for Metafilter.
-    """
+    """    
     def __init__(self):
         super().__init__()
         # self.output is onw big string with embedded \n indicating lines

@@ -24,15 +24,14 @@ Run this command to start the display editor, including the browser:
     python3 -im pm
 
 Now you can run the browser by typing [commands](#Commands) at the Python
-prompt, or by pressing [keycodes](#Keycodes).
+prompt, or by pressing [keycodes](#Keycodes). 
 
 [Appearance and Workflow](#Appearance-and-workflow)   
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
-[Internals](#Internals)   
-[Supported HTML Tags](#Supported-HTML-Tags)   
-[Supported div Classes](#Supported-div-Classes)   
-[Absolute and Relative URLs](#Absolute-and-Relative-URLs)   
+[HTML Tags](#HTML-Tags)   
+[div Classes](#div-Classes)
+[Base URLs](#Base-URLs)   
 
 ### Appearance and Workflow ###
 
@@ -60,7 +59,9 @@ For example, here are a few lines from the rendered text page for
     [10]_medium.com/caitlin9165_ [11]_rossant_ [12]_56 minutes ago_
     [13]_hide_ [14]_9 comments_ [15]
 
-Here are some lines from the end of that buffer, with the link URLs:
+Here are the corresponding footnotes from the end of that buffer, with
+the link URLs. The URL at footnote *10.* is an absolute URL, the others
+are relative URLs.
 
     10. https://medium.com/@caitlin9165/fastplotlib-driving-scientific-discovery-through-data-visualization-418f8bff094c
     11. from?site=medium.com/caitlin9165
@@ -86,42 +87,163 @@ names so they can be used easily.
 
 ### Commands ###
 
-- **g(url)** - **Get** web page at *url* and stor it in its own editor buffer.
-   The *url* is a string, either a literal URL string or a variable with
-   a string value (as are found in *urls.py*). Downloads the page at
-   *url* into a new buffer whose name ends in *.html*. Makes that buffer
-   the current buffer so it appears in the current window, replacing the
-   previous window contents. This command does *not* render the HTML
-   into a text buffer.
+These are the commands (that is, function calls) you can type at the
+Python prompt to run the browser.   To get to the Python prompt from
+display editing mode, type *M-x* (*meta x*, hold down the *alt* key
+while typing the *x* key). Use other editor commands (not described
+here) to select and view the buffers that hold web pages.
+
+Most of these commands can also be invoked in display editor mode
+by typing [keycodes](#Keycodes).
+
+- **g(url)** - **Get** the web page at *url* and store it in its own 
+   editor buffer. The *url* is a string, either a literal URL string or
+   a variable with a string value (as are found in *urls.py*). Downloads
+   the page at *url* into a new buffer whose name is generated 
+   from that URL, and ends in *.html*. Makes that buffer the current
+   buffer so it appears in the current window, replacing the previous
+   window contents. This command does *not* render the HTML into a text
+   buffer.
 
 - **r()** - **Render** the current buffer into a new text buffer.
-  It is intended that the current buffer is a downloaded HTML web page.
-  The new buffer gets the same base name as the current buffer, but 
-  ends with *.txt*.   The new text buffer is made the current buffer so 
-  it appears in the current window, replacing the HTML that was there.
+  It is intended that the current buffer is the HTML web page downloaded
+  by *g(url)* (above). The new buffer gets the same base name as the
+  current buffer, but ends with *.txt*. The new text buffer is made the
+  current buffer so it appears in the current window, replacing the HTML
+  that was there.
 
-- **gr(url)** - **Get** and **render** the web page at *url*.  
+- **gr(url)** - **Get** and **render** the web page at *url*.
     Calls *g(url)* and then *r()*.   Creates both *.html* and *.txt*
     buffers.  The new *.txt* buffer becomes the current buffer and
     appears in the current window.  
+
+- **gx()** - **Get** the web page at the URL **eXtracted** from the current line 
+   in the current buffer.  Similar to *g() (get)* (above) except there is no 
+   URL argument. It is expected that the user has positioned the cursor at
+   a line in the current window that displays an absolute or relative URL.
+   The browser attempts to load the page at that URL.   
+   
+   An absolute URL can be anywhere on the selected line. It begins with
+   *http://* or *https://* or *file://*, and extends until a quote
+   character *' "* or a white space character. The window does not need
+   to display a web page, any absolute URL on any line of text will
+   work.
+   
+   If no absolute URL is found in the line, this command assumes the
+   first string following the first space(s) on the line is a relative
+   URL. This format is chosen to work with the footnotes in the list at
+   the end of our rendered web pages, but any relative URL in this
+   format will work. The relative URL is appended to the current
+   [base URL](#Base-URLs) to form the absolute URL where the
+   page is fetched.
+   
+- **grx()** - **Get** and **Render** the web page at the URL on the 
+    current line in the current buffer.   Similar to *gr()* (above)
+    but there is no URL argument.
+
+- **N()** - list all buffer **Names** in the *\*Buffers\** buffer and
+   display it in the current window.  Buffers that hold web pages 
+    appear in the list among other buffers that hold text being edited.
+    The middle column holds the base URL of the page, used to generate
+    absolute URLs from relative URLs on that page.
+    
+    To select a buffer, move the cursor to the line that lists 
+    that buffer and type *return* (or *enter*).   
+    This is the usual way to view a web page that has already been loaded.
+    The buffer list is what we provide instead of browser tabs, a Back
+    button, or a Show Source button.
+
+- **dir(urls)** - list the symbolic URL names defined in *urls.py*.  
+  Then you can type any of the names at the Python prompt, Python will
+  print its literal URL string.
+
+- **get.url** - Print the absolute URL that was most recently used to
+   try to load a web page.  This can be useful for debugging base URLs
+   and relative URLs.   There are no parentheses in this expression, it
+   is just the name of the *url* variable in the *get* module.
     
 ### Keycodes ###
 
-To come.
+Keycodes you can type to invoke browser [commands](#Commands) (above)
+while in display editing mode.  To type *M-g* ('meta g'), hold down the
+*alt* key whilte typing the *g* key.
+  
+- **M-g** - invokes *gx()*, **get** page at URL on the current line in 
+            the current buffer.
 
-### Internals ###
+- **M-r** - invoke *r()*, **render** page in the current *.html* buffer to 
+            a new *.txt* buffer.
 
-To come.
+- **M-ret** - invoked *grx()*, **get** and **render** the page on the 
+            current in the current buffer.
 
-### Supported HTML Tags ###
+- **C-x C-b** - invokes *N()*, list **buffers**, including web pages,
+            but all other buffers as well.
 
-To come.
+### HTML Tags ###
 
-### Supported div Classes ###
+The Piety browser only renders these HTML tags:
+*h1 h2 h3 h4 p li pre a strong em img br* and some *div*.
 
-To come.
+We require matching closing tags for every tag that uses them 
+(all but *img* and *br*).  We tried to code some error recovery,
+but unmatched tags will usually result in scrambled rendering.
 
-### Absolute and Relative URLs ###
+Here is how each tag is rendered:
+
+- **h1 h2 h3 h4** - Header text appears on a line by itself,
+    preceded and followed by empty lines.
+
+- **p** - Paragraph text is preceded and followed by empty
+    lines, and is wrapped to the page width.
+    
+- **li** - List items are rendered just like paragraphs, 
+    except they are preceded by a bullet formed from two hyphens: --.
+    Unordered and ordered list items are rendered the same way;
+    ordered list items are not numbered.
+
+- **pre** - Pre-formatted text is preceded and followed by an empty line,
+    and is rendered line by line just as it appears in the source, with
+    the same line breaks, and no fill or wrap. This tag is used for
+    code, verse, and other texts where line breaks are significant.
+
+-  **a** - Links appear as footnotes, see [above](#Appearance-and-Workflow).
+        
+- **strong**, **em** - Strong text and emphasized text is 
+    preceded and followed by asterisks: **\**...\****
+    
+- **img** -  Each image is represented by a separate line, preceded
+    and followed by empty lines, that contains just *[ Image ]* if the
+    image tag doesn't provide any alt text, or *[ the alt text ]* if it
+    does.
+
+- **br** - Inserts a line break, but not an empty line.
+
+- **div** - Most *div* tags are not rendered.  Only a few *div* classes 
+    are supported. The are rendered like paragraphs.
+    
+### div Classes ###
+
+Only *div* tags whose *class* attributes have a few particular values
+are rendered. The *div* that belong to these classes appear in
+particular web sites that we visit. We found these classes by inspecting
+the HTML in the web pages from these sites.
+
+The supported *div* classes are stored in the module level variable 
+*divclasses* in *render.py*.  Sometimes we add classes.  These are the
+classes supported at this writing, in Mar 2025:
+
+    divclasses = ('copy post',  # www. ask.metafilter.com: posts, asks on front page
+                  'copy',       # metafilter: top of post or answer page
+                  'comments',   # metafilter: each answer or each comment
+                  'comments best',  # metafilter: answers marked best
+                  'comments bestleft', # metafilter: asker's remark on answer page
+                  'commtext c00', # news.ycombinator.com (Hacker News): comment
+                  'toptext', # ycombinator: text at top of Ask HN
+                  'os', # www.tbray.org/ongoing/ front page article links/summaries 
+                  )
+
+### Base URLs ###
 
 To come.
 
