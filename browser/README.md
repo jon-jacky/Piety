@@ -30,7 +30,7 @@ prompt, or by pressing [keycodes](#Keycodes).
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
 [HTML Tags](#HTML-Tags)   
-[div Classes](#div-Classes)
+[div Classes](#div-Classes)   
 [Base URLs](#Base-URLs)   
 
 ### Appearance and Workflow ###
@@ -148,12 +148,12 @@ by typing [keycodes](#Keycodes).
     absolute URLs from relative URLs on that page.
     
     To select a buffer, move the cursor to the line that lists 
-    that buffer and type *return* (or *enter*).   
+    that buffer and type *return* (or *enter*).
     This is the usual way to view a web page that has already been loaded.
     The buffer list is what we provide instead of browser tabs, a Back
     button, or a Show Source button.
 
-- **dir(urls)** - list the symbolic URL names defined in *urls.py*.  
+- **dir(urls)** - list the symbolic URL names defined in *urls.py*.
   Then you can type any of the names at the Python prompt, Python will
   print its literal URL string.
 
@@ -171,10 +171,10 @@ while in display editing mode.  To type *M-g* ('meta g'), hold down the
 - **M-g** - invokes *gx()*, **get** page at URL on the current line in 
             the current buffer.
 
-- **M-r** - invoke *r()*, **render** page in the current *.html* buffer to 
+- **M-r** - invokes *r()*, **render** page in the current *.html* buffer to 
             a new *.txt* buffer.
 
-- **M-ret** - invoked *grx()*, **get** and **render** the page on the 
+- **M-ret** - invokes *grx()*, **get** and **render** the page on the 
             current in the current buffer.
 
 - **C-x C-b** - invokes *N()*, list **buffers**, including web pages,
@@ -245,7 +245,27 @@ classes supported at this writing, in Mar 2025:
 
 ### Base URLs ###
 
-To come.
+Some of the URLs in the footnotes are *relative* URLs -- they are incomplete.
+A relative URL must be appended to a *base* URL to form a complete
+*absolute* URL that can be used to fetch a page.   
+
+Sometimes the base URL for the relative URL links on a page is the same as
+the absolute URL for that page. Sometimes the base URL is just a prefix
+of that absolute URL. 
+
+We have discovered those prefix base URLs for some of the web sites we
+visit.  They are stored in the module level variable *baseurls* 
+in *get.py*.  Sometimes we add base URLs.  These are the base URLs
+supported at this writing, in Mar 2015:
+
+    baseurls = ('https://news.ycombinator.com/', # Hacker News
+                'https://www.tbray.org/', # Tim Bray's blog, Ongoing 
+                'https://github.com/', # Github generates and serves long relative urls
+                'https://dercuano.github.io/', # Kragen Sitaker's notes, Dercuano
+                 )
+
+The base URL for each web page appears in a middle column of the buffer list
+shown by the *N()* command or the *C-x C-b* keycode.
 
 Revised Mar 2025
 
