@@ -21,9 +21,14 @@ httprep = re.compile(httpre) # p for pattern
 filerep = re.compile(filere)
 norep = re.compile('No URL here')
 
-def xurl(s):
+fnref = '\[\d+\]' # footnote reference - decimal digits inside [...]
+fnrefp = re.compile(fnref)
+fnline = '^\s*\d+\.\s+' # footnote line - whitespace, digits, period, whitepace
+fnlinep = re.compile(fnline)
+
+def xaurl(s):
     """
-    Return (eXtract) absolute URL found in string s.
+    Return (eXtract) Absolute URL found in string s.
     An absolute URL begins with http:// or https:// or file://
     Return empty string if no absolute URL found.
     We expect caller has passed a string that looks like it holds a URL.
@@ -34,7 +39,7 @@ def xurl(s):
 
 def xrurl(s): 
     """
-    Extract relative URL from a string formatted as one of our footnotes,
+    EXtract Relative URL from a string formatted as one of our footnotes,
     like these:
 
         10. toolkit.html
@@ -51,7 +56,17 @@ def xrurl(s):
     """
     rurl =  s.split()[1]  # crashes if there is no text past first whitespace
     return rurl[2:] if rurl.startswith('..') else rurl # FIXME? Special case!
-    
+
+def xurl(s):
+    """
+    eXtract absolute or relative URL from string s
+    """
+    url = xaurl(s) # extract absolute URL, '' if not found
+    if not url: # absolute URL not found on line - must be relative URL
+        rurl = xrurl(s) # find relative URL
+        url = ed.filename + rurl # ed.filename stores base URL
+    return url    
+
 # URLs in baseurls are prefixes of web page absolute urls
 #  used as base urls for fetching other pages from that site using relative urls.
 # The absolute url may include a suffix like 'newest' or 'news?p=2'
@@ -104,10 +119,7 @@ def gx():
     so it is the base URL of any relative URLs that appear in footnotes.
     """
     global url # So we can examine it in REPL
-    url = xurl(ed.buffer[ed.dot]) # find absolute URL, '' if not found
-    if not url: # absolute URL not found on line - must be relative URL
-        rurl = xrurl(ed.buffer[ed.dot]) # find relative URL
-        url = ed.filename + rurl # ed.filename stores base URL
+    url = xurl(ed.buffer[ed.dot]) # relative or absolute URL, '' if not found
     g(url)
     
 def gr(url):
@@ -120,6 +132,35 @@ def grx():
     gx()
     render.r()
 
+def fnnum(line):
+    """
+    Return integer footnote number of line, a string, or '' if not a footnote.
+    Footnote number, if there is one, matches fnlinep regular expression
+    """
+    m = fnlinep.search(line)
+    fnstr = m.group() if m else ''
+    return int(fnstr.strip()[:-1]) if fnstr else ''
+        
+def fnurl(n):
+    """
+    Return URL in buffer at footnote n or '' if footnote n not found.
+    Example footnote line, a relative URL: '187. ?p=2\n'
+    """
+    for line in ed.buffer:
+        if n == fnnum(line):
+            return xurl(line) # return breaks from loop
+    return '' # not found
+    
+def gf(n):
+    'Get web page whose URL is in footnote n'
+    url = fnurl(n)
+    g(url)
+
+def grf(n):
+    'Get and render web page whose URL is in footnote n'
+    gf(n)
+    render.r()
+    
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
                            # FIXME?  Overrides M_g: edsel.graffiti in dmacs
