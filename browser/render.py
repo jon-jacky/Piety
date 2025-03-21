@@ -153,7 +153,9 @@ def r():
     
     # From here on, the code is similar to get.py fcn g()
     baseurl = ed.filename # original web site url, needed by relative urls.
+    saved_bufname = ed.prev_bufname # prepare for unwanted assignment by fr.e()
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
+    ed.prev_bufname = saved_bufname # back out unwanted assignment by fr.e()
     ed.filename = baseurl # replace filename created by e() with web site url
     ed.buffers[bufname]['filename'] = bufname # replace filename created by e()
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.

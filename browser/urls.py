@@ -9,6 +9,10 @@ urls.py - Sample URLs for testing.
 home = 'https://jon-jacky.github.io/home/'  # .../home/index.html
 home_file = 'file:///home/jon/home/index.html'
 
+# This page has some links which are relative URLs.
+# For testing browser code from a file URL when no Internet.
+zfile = 'file:///home/jon/z/z/index.html'
+
 # Another simple web page, with more text and fewer links
 # but several uses  of <ul> unordered list and <li> list item.
 learned = "https://jon-jacky.github.io/tesc_cs/fofc/learned.html"

@@ -77,6 +77,7 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             'https://www.tbray.org/', # Tim Bray's blog, Ongoing 
             'https://github.com/', # Github generates and serves long relative urls
             'https://dercuano.github.io/', # Kragen Sitaker's notes, Dercuano
+            'file:///home/jon/z/z/', # Our own Z notes, for testing
             )
 
 def g(url):
@@ -160,10 +161,29 @@ def grf(n):
     'Get and render web page whose URL is in footnote n'
     gf(n)
     render.r()
+
+def fnrefnum():
+    """
+    Return integer footnote reference number next on current line.
+    Return 0 if no footnote found.
+    """
+    m = fnrefp.search(ed.buffer[ed.dot][ed.point:])
+    fnrefn = m.group() if m else ''
+    return int(fnrefn[1:-1]) if fnrefn else 0
+    
+def gfx():
+    'Get web page at next Footnote eXtracted from current line.'
+    n = fnrefnum() # Footnote number, or 0 if no footnote on line
+    g(fnurl(n))  # crashes if no footnote on line
+    
+def grfx():
+    'Get and Render web page at next Footnote on eXtracted from current line.'
+    gfx()
+    render.r()
     
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
                            # FIXME?  Overrides M_g: edsel.graffiti in dmacs
 dmacs.keymap[key.M_r] = render.r # render html from current buf. to .txt .buf
 dmacs.keymap[key.M_ret] = grx # get and render page at URL on current line
-
+dmacs.keymap[key.M_n] = grfx # get and render page at next footnote ref on line.
