@@ -137,12 +137,13 @@ class HTML2Text(HTMLParser):
                 ### breakpoint() # DEBUG so we can examine div data
                 self.paragraph += data # fill self.paragraph in handle_endtag
                             
-def r():
+def r(url):
     """
     Render current buffer, a downloaded HTML web page, to a new text buffer.
     When current buffer is named basename or basename.html,
     then new text buffer is named basename.txt     
     Name 'r' for 'render'.  We also have sked.r, reverse search
+    url arg is only so we can put url in first line at top of rendered page.
     """ 
     global parser # make this global so we can inspect parser.output in REPL
     parser = HTML2Text()
@@ -159,6 +160,7 @@ def r():
     ed.filename = baseurl # replace filename created by e() with web site url
     ed.buffers[bufname]['filename'] = bufname # replace filename created by e()
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
+    ed.buffer += [ url, '\n'] # Put page URL on first line
     for line in parser.output.rsplit('\n'): # make list of lines from string
         ed.buffer.append(line + '\n') # each line in buffer must end with \n    
     ed.buffer += ['\n','\n','Links\n', '\n'] # Links header we can search for

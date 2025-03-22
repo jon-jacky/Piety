@@ -80,10 +80,15 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             'file:///home/jon/z/z/', # Our own Z notes, for testing
             )
 
-def g(url):
+url = ''  # URL is global so we can use it in r(url) also for easy debugging
+
+def g(aurl):
     """
-    (g)et web page from url and store it in its own Piety editor buffer.     
+    (g)et web page from aurl and store it in its own Piety editor buffer.     
     """
+    global url
+    url = aurl  
+    
     print('Loading page...') # sometimes there is quite a delay in urlopen
     # If urlopen fails just let it crash, return to >>> and don't create buffer
     # Any error message from urlopen will be printed in REPL.
@@ -102,9 +107,11 @@ def g(url):
     ed.filename = baseurl # replace filename created by e() with baseurl
     ed.buffers[bufname]['filename'] = baseurl # replace filename created by e()
     buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
+    ed.buffer.append(f'<!-- {url} -->\n') # put page URL on first line
+    ed.buffer.append('\n')
     # Fill in buffer text
     for line in r.readlines():
-        ed.buffer.append(line.decode('utf-8')) # FIXME? get encoding fro9m HTTP
+        ed.buffer.append(line.decode('utf-8')) # FIXME? get encoding from HTTP
     fr.refresh()
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
@@ -126,12 +133,12 @@ def gx():
 def gr(url):
     'Get and Render web page at url'
     g(url)
-    render.r()
+    render.r(url)
     
 def grx():
     'Get and Render web page at url eXtracted from current line in buffer'
     gx()
-    render.r()
+    render.r(url) # gx assigns global url
 
 def fnnum(line):
     """
@@ -154,13 +161,14 @@ def fnurl(n):
     
 def gf(n):
     'Get web page whose URL is in footnote n'
+    global url
     url = fnurl(n)
     g(url)
 
 def grf(n):
     'Get and render web page whose URL is in footnote n'
     gf(n)
-    render.r()
+    render.r(url) # gf assigns global url
 
 def fnrefnum():
     """
@@ -179,7 +187,7 @@ def gfx():
 def grfx():
     'Get and Render web page at next Footnote on eXtracted from current line.'
     gfx()
-    render.r()
+    render.r(url) # gfx assigns global url
     
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
