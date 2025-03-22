@@ -52,7 +52,7 @@ class HTML2Text(HTMLParser):
         self.placeholder = 'https://nowhere.com/unknown.html'
                          
     def handle_starttag(self, tag, attrs):
-        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre'):
+        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre', 'noscript'):
             if self.tags and self.tags[-1] == 'div':  # we're inside div
                 self.output += '\n\n' + textwrap.fill(self.paragraph) 
             self.paragraph = '' # start a new paragraph
@@ -69,7 +69,7 @@ class HTML2Text(HTMLParser):
         # List of only the tags we handle.  We don't handle most tags.
         # BUT not img or br  because thre is nothing to capture and no endtag
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
-                    'pre', 'strong', 'em', 'a' ):
+                    'pre', 'strong', 'em', 'a', 'noscript'):
             # Do not push unmatched <p> inside <div> onto list of tags
             if ((tag != 'p')
                 or (tag == 'p' and (not self.tags or self.tags[-1] != 'div'))):
@@ -89,7 +89,7 @@ class HTML2Text(HTMLParser):
                 self.capture = True
 
     def handle_endtag(self, tag):
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4'):
+        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'noscript'):
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
             self.output += '\n\n' + textwrap.fill(self.paragraph)
@@ -99,7 +99,7 @@ class HTML2Text(HTMLParser):
             self.output += '\n\n' + self.paragraph # do NOT fill
         # Again, list of only the tags we handle - BUT not img, not br
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
-                    'pre', 'strong', 'em', 'a'):
+                    'pre', 'strong', 'em', 'a', 'noscript'):
             if self.tags:  # tags list not empty, guard against unmatched tag
                 self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
@@ -122,7 +122,7 @@ class HTML2Text(HTMLParser):
     def handle_data(self, data):
         if self.capture: 
             tag = self.tags[-1]
-            if tag in ('p', 'li','h1','h2','h3','h4', 'pre'):
+            if tag in ('p', 'li','h1','h2','h3','h4', 'pre', 'noscript'):
                 self.paragraph += data # fill self.paragraph in handle_endtag
             if tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
