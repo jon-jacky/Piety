@@ -98,6 +98,7 @@ def g(aurl):
     purl = parse.urlparse(url) # return Parse object
     ppath = Path(purl.path) # extract ppath, a Path object, from Parse object
     bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
+    if not '.' in bufname: bufname += '.html' # avoid filename collision in e()
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
     # Special case handling of base URLs from particular web sites - see above
     baseurl = url # default, often the base url is the same as the page url
@@ -185,7 +186,7 @@ def gfx():
     g(fnurl(n))  # crashes if no footnote on line
     
 def grfx():
-    'Get and Render web page at next Footnote on eXtracted from current line.'
+    'Get and Render web page at next Footnote eXtracted from current line.'
     gfx()
     render.r(url) # gfx assigns global url
     
@@ -195,3 +196,6 @@ dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
 dmacs.keymap[key.M_r] = render.r # render html from current buf. to .txt .buf
 dmacs.keymap[key.M_ret] = grx # get and render page at URL on current line
 dmacs.keymap[key.M_n] = grfx # get and render page at next footnote ref on line.
+ 
+
+

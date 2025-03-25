@@ -162,8 +162,10 @@ def r(url):
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     ed.buffer += [ url, '\n'] # Put page URL on first line
     for line in parser.output.rsplit('\n'): # make list of lines from string
-        ed.buffer.append(line + '\n') # each line in buffer must end with \n    
-    ed.buffer += ['\n','\n','Links\n', '\n'] # Links header we can search for
+        # Hack: Filter out duplicate empty lines, not sure where they come from.
+        if not (line == '' and ed.buffer[-1] == '\n'):
+            ed.buffer.append(line + '\n') # each line in buffer ends with \n    
+    ed.buffer += ['\n','Links\n', '\n'] # Links header we can search for
     for ilink in range(parser.linknum):
         ed.buffer.append(f'{ilink+1}. {parser.links[ilink]}\n')         
     fr.refresh()
