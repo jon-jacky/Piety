@@ -21,7 +21,11 @@ divclasses = ('copy post',  # www. ask.metafilter.com: posts, asks on front page
               'toptext', # ycombinator: text at top of Ask HN
               'os', # www.tbray.org/ongoing/ front page article links/summaries 
               )
- 
+
+# Do not show [ Image ] in rendered output for these text-only sites
+noimage = ('https://news.ycombinator.com/', # Hacker News
+            )
+            
 class HTML2Text(HTMLParser):
     """
     Render HTML to text, using Python standard library HTMLParser.
@@ -50,7 +54,11 @@ class HTML2Text(HTMLParser):
         self.links = [] # indexed 0 .. final linknum - 1
         self.linkurl = '' # assigned by handle_starttag
         self.placeholder = 'https://nowhere.com/unknown.html'
-                         
+        self.showimage = True # default, show [ Image ] or [ alt text ]
+        for nurl in noimage:
+            if url.startswith(nurl):  # global url assigned in render()
+                self.showimage = False # do not show [ Image ] in this page
+                
     def handle_starttag(self, tag, attrs):
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre', 'noscript'):
             if self.tags and self.tags[-1] == 'div':  # we're inside div
@@ -61,7 +69,8 @@ class HTML2Text(HTMLParser):
         if tag == 'img': #  <img src="..."  alt="..." ... optional attrs .../>
             # No endtag - handle data and output here
             alt = dict(attrs).get('alt', '')
-            self.output += '\n\n  [ %s ]' % (alt if alt else 'Image')
+            if self.showimage:
+                self.output += '\n\n  [ %s ]' % (alt if alt else 'Image')
         if tag == 'br':
             # No endtag, no data. Treat br starttag like p endtag,then starttag
             self.output += '\n' + textwrap.fill(self.paragraph) # just one \n
@@ -136,16 +145,20 @@ class HTML2Text(HTMLParser):
             if tag == 'div':
                 ### breakpoint() # DEBUG so we can examine div data
                 self.paragraph += data # fill self.paragraph in handle_endtag
+ 
+url = ''  # Make URL global so HTML2Text methods can use it
                             
-def r(url):
+def r(aurl):
     """
     Render current buffer, a downloaded HTML web page, to a new text buffer.
     When current buffer is named basename or basename.html,
     then new text buffer is named basename.txt     
     Name 'r' for 'render'.  We also have sked.r, reverse search
-    url arg is only so we can put url in first line at top of rendered page.
+    aurl arg is only so we can put url in first line at top of rendered page.
     """ 
     global parser # make this global so we can inspect parser.output in REPL
+    global url # make this global so methods in HTML2Text can see it.
+    url = aurl
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
 
