@@ -81,18 +81,24 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             )
 
 url = ''  # URL is global so we can use it in r(url) also for easy debugging
+response = None # response is global so we can inspect it at the REPL
 
 def g(aurl):
     """
     (g)et web page from aurl and store it in its own Piety editor buffer.     
     """
-    global url
+    global url, response
     url = aurl  
-    
+
+    # See https://docs.python.org/3/howto/urllib2.html
+    # Default User-Agent is Python-urllib/n.m which often gets 403: Forbidden 
+    req = request.Request(url, None, {'User-Agent': 'Piety browser'})
+        
     print('Loading page...') # sometimes there is quite a delay in urlopen
     # If urlopen fails just let it crash, return to >>> and don't create buffer
     # Any error message from urlopen will be printed in REPL.
-    r = request.urlopen(url)
+
+    response = request.urlopen(req)
 
     # If we get this far, urlopen must have succeeded.  Create and fill buffer. 
     purl = parse.urlparse(url) # return Parse object
@@ -111,7 +117,7 @@ def g(aurl):
     ed.buffer.append(f'<!-- {url} -->\n') # put page URL on first line
     ed.buffer.append('\n')
     # Fill in buffer text
-    for line in r.readlines():
+    for line in response.readlines():
         ed.buffer.append(line.decode('utf-8')) # FIXME? get encoding from HTTP
     fr.refresh()
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
