@@ -44,10 +44,7 @@ editor commands or keycodes.
 In the rendered text page, hypertext links are displayed as footnotes.
 The text in the link is marked by underscores, and is followed by a
 footnote number in brackets: *\_like this\_ [12]*. At the end of the
-buffer, the numbered list of link URLs appears. You can scroll down to
-the numbered URL you want, and then select it to load the linked page.
-It is convenient to display the rendered body text in one display
-window and the list of URLs in another.
+buffer, the numbered list of link URLs appears. 
 
 For example, here are a few lines from the rendered text page for
 *news.ycombinator.com*.  This page is unusually dense with links:
@@ -75,6 +72,10 @@ URLs along with the body text in an ordinary text buffer, without
 cluttering the body text too much. We don't have to add any new data
 structures to hide the link URLs off the display as most browsers do.
 
+There are commands and keycodes to load a linked page from its 
+footnote in the body of the rendered text, or from its footnote
+at the end.
+
 We use the already existing editor features instead of adding
 new ones just to support the browser.  Instead of browser tabs,
 we list the browser buffers along with all the others in the buffer list.
@@ -100,7 +101,7 @@ by typing [keycodes](#Keycodes).
    editor buffer. The *url* is a string, either a literal URL string or
    a variable with a string value (as are found in *urls.py*). Downloads
    the page at *url* into a new buffer whose name is generated 
-   from that URL, and ends in *.html*. Makes that buffer the current
+   from that URL, and often ends in *.html*. Makes that buffer the current
    buffer so it appears in the current window, replacing the previous
    window contents. This command does *not* render the HTML into a text
    buffer.
@@ -122,12 +123,13 @@ by typing [keycodes](#Keycodes).
    URL argument. It is expected that the user has positioned the cursor at
    a line in the current window that displays an absolute or relative URL.
    The browser attempts to load the page at that URL.   
+
+   This command works in any text buffer.  It does not have to be a web page.
+   There just needs to be an absolute URL on the line.
    
    An absolute URL can be anywhere on the selected line. It begins with
    *http://* or *https://* or *file://*, and extends until a quote
-   character *' "* or a white space character. The window does not need
-   to display a web page, any absolute URL on any line of text will
-   work.
+   character *' "* or a white space character. 
    
    If no absolute URL is found in the line, this command assumes the
    first string following the first space(s) on the line is a relative
@@ -141,6 +143,20 @@ by typing [keycodes](#Keycodes).
     current line in the current buffer.   Similar to *gr()* (above)
     but there is no URL argument.
 
+- **gf(n)** - **Get** the web page whose URL is in **Footnote n** .
+
+- **grf(n)** - **Get** and **Render** the web page whose URL is in
+   **Footnote n** .
+
+- **gfx()** -  **Get** web page whose URL is in the
+    **Footnote** whose number is **eXtracted** from current line.
+    It is expected tha that the user has positioned the cursor 
+    on the same line as the footnote, before the footnote of interest
+    but after any other footnotes that precede it. 
+
+- **grfx()** -  **Get** and **Render** web page whose URL is in the next 
+    **Footnote** whose number is **eXtracted** from current line.
+
 - **N()** - list all buffer **Names** in the *\*Buffers\** buffer and
    display it in the current window.  Buffers that hold web pages 
     appear in the list among other buffers that hold text being edited.
@@ -153,6 +169,9 @@ by typing [keycodes](#Keycodes).
     The buffer list is what we provide instead of browser tabs, a Back
     button, or a Show Source button.
 
+- **b()** - Return to the previous buffer.  This can be used like a
+  browser 'Back button' to return to the page from which a link was loaded. 
+
 - **dir(urls)** - list the symbolic URL names defined in *urls.py*.
   Then you can type any of the names at the Python prompt, Python will
   print its literal URL string.
@@ -161,7 +180,14 @@ by typing [keycodes](#Keycodes).
    try to load a web page.  This can be useful for debugging base URLs
    and relative URLs.   There are no parentheses in this expression, it
    is just the name of the *url* variable in the *get* module.
-    
+
+ - **get.response** - The HTTP response to the most recent HTTP request,
+   including the HTML text of the returned page, if there is one.
+   Can be inspected at the REPL for debugging or investigation.
+   
+  - **render.parser** - The *HTMLParser* object in the *render* module.
+    Can be inspected at the REPL to help debug rendering.
+
 ### Keycodes ###
 
 Keycodes you can type to invoke browser [commands](#Commands) (above)
@@ -174,23 +200,31 @@ while in display editing mode.  To type *M-g* ('meta g'), hold down the
 - **M-r** - invokes *r()*, **render** page in the current *.html* buffer to 
             a new *.txt* buffer.
 
-- **M-ret** - invokes *grx()*, **get** and **render** the page on the 
-            current in the current buffer.
+- **M-ret** - invokes *grx()*, **get** and **render** the page at the 
+            URL in the current line in the current buffer.
+            This command works in any kind of buffer, it does not have
+            to be a web page.
+            
+- **M-n** - invokes *grfx()*, **get** and **render** web page whose 
+    URL is in the next **Footnote** number on the current line.
 
 - **C-x C-b** - invokes *N()*, list **buffers**, including web pages,
             but all other buffers as well.
 
+ - *C-x b** - Invokes *b()*, return to previous buffer.
+              Can be used like a browser 'Back button'.
+ 
 ### HTML Tags ###
 
 The Piety browser only renders these HTML tags:
-*h1 h2 h3 h4 p li pre a strong em img br* and some *div*.
+*h1 h2 h3 h4 p li pre a strong em img br noscript* and some *div*.
 
 We require matching closing tags for every tag that uses them 
 (all but *img* and *br*).  We tried to code some error recovery,
 but unmatched tags will usually result in scrambled rendering.
 
 Here is how each tag is rendered:
-
+ 
 - **h1 h2 h3 h4** - Header text appears on a line by itself,
     preceded and followed by empty lines.
 
@@ -218,6 +252,9 @@ Here is how each tag is rendered:
     does.
 
 - **br** - Inserts a line break, but not an empty line.
+
+- **noscript** - Where there is a script (usually Javascript) in the 
+  page, writes a message indicating that scripts are not supported.
 
 - **div** - Most *div* tags are not rendered.  Only a few *div* classes 
     are supported. The are rendered like paragraphs.
