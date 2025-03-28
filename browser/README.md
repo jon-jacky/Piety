@@ -73,8 +73,8 @@ cluttering the body text too much. We don't have to add any new data
 structures to hide the link URLs off the display as most browsers do.
 
 There are commands and keycodes to load a linked page from its 
-footnote in the body of the rendered text, or from its footnote
-at the end.
+footnote number in the body of the rendered text, or from its footnote
+line at the end.  See below.
 
 We use the already existing editor features instead of adding
 new ones just to support the browser.  Instead of browser tabs,
@@ -91,8 +91,8 @@ names so they can be used easily.
 These are the commands (that is, function calls) you can type at the
 Python prompt to run the browser.   To get to the Python prompt from
 display editing mode, type *M-x* (*meta x*, hold down the *alt* key
-while typing the *x* key). Use other editor commands (not described
-here) to select and view the buffers that hold web pages.
+while typing the *x* key). Use other *pmacs* editor commands (described
+elsewhere) to select and view the buffers that hold web pages.
 
 Most of these commands can also be invoked in display editor mode
 by typing [keycodes](#Keycodes).
@@ -191,8 +191,10 @@ by typing [keycodes](#Keycodes).
 ### Keycodes ###
 
 Keycodes you can type to invoke browser [commands](#Commands) (above)
-while in display editing mode.  To type *M-g* ('meta g'), hold down the
-*alt* key whilte typing the *g* key.
+while in display editing mode. To get to display editing mode from the
+Python prompt, type the function call *pm()*. Use other *pmacs* editor
+keycodes (described elsewhere) to select and view the buffers that hold
+web pages.
   
 - **M-g** - invokes *gx()*, **get** page at URL on the current line in 
             the current buffer.
@@ -251,6 +253,10 @@ Here is how each tag is rendered:
     image tag doesn't provide any alt text, or *[ the alt text ]* if it
     does.
 
+    To reduce clutter in the rendered text page by suppressing all 
+    output from *img* tags in that page, include that page's domain
+    in the module-level variable *noimage* in the *render* module.
+    
 - **br** - Inserts a line break, but not an empty line.
 
 - **noscript** - Where there is a script (usually Javascript) in the 
