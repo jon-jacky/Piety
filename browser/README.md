@@ -213,9 +213,10 @@ web pages.
 - **C-x C-b** - invokes *N()*, list **buffers**, including web pages,
             but all other buffers as well.
 
- - *C-x b** - Invokes *b()*, return to previous buffer.
-              Can be used like a browser 'Back button'.
- 
+ - **C-x b** - Invokes *b()*, return to previous buffer.
+              Can be used like a browser 'Back button'
+                to return to the page from which a link was loaded.  
+                
 ### HTML Tags ###
 
 The Piety browser only renders these HTML tags:
@@ -253,6 +254,7 @@ Here is how each tag is rendered:
     image tag doesn't provide any alt text, or *[ the alt text ]* if it
     does.
 
+    Some pages include many small images used as icons.
     To reduce clutter in the rendered text page by suppressing all 
     output from *img* tags in that page, include that page's domain
     in the module-level variable *noimage* in the *render* module.
