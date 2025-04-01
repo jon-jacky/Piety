@@ -397,7 +397,7 @@ def k():
 
 def w(fname=None):
     ed.w(fname, display_set_saved)
-
+ 
 def display_p(start=None, end=None):
     ed.p(start, end, print_nothing, display_move_dot)
 
@@ -409,11 +409,21 @@ def l():
 def rl():
     ed.rl(display_p)
 
-def v(nlines=None):
-    ed.v(nlines, display_p)
 
+def nodisplay_p(start=None, end=None):
+    # Move dot from start to end without displaying anything.
+    # We need this because ed.v() requires it, see below.
+    ed.p(start, end, print_nothing, ed.move_dot)
+ 
+def v(nlines=None):
+    # Call ed.v() to move dot with error and range checking,
+    #  but don't display from ed.v, instead call scroll().
+    ed.v(nlines, nodisplay_p)
+    scroll()
+    
 def rv(nlines=None):
-    ed.rv(nlines, display_p, display_move_dot)
+    ed.rv(nlines, nodisplay_p, ed.move_dot)
+    scroll()
 
 def s(target=None, forward=True):
     ed.s(target, forward, print_nothing, display_move_dot)
@@ -447,10 +457,6 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None):
 
 def j(start=None, end=None):
     ed.j(start, end, move_dot=display_j)
-
-def sh(cmd):
-    ed.sh(cmd, display_e, display_restore_buffer)
-    scroll()
 
 # Display functions: window management
 
