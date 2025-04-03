@@ -484,6 +484,7 @@ def win(nlines=None):
     """
     global tlines, tcols, flines, wheight
     tlines, tcols = terminal_util.dimensions()
+    tcols = min(tcols, 80) # We *don't* want wide screen line length
     display.put_cursor(flines+1, 1)
     display.erase_above() # clear old window in case new nlines < flines
     if not nlines: nlines = flines

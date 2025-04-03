@@ -29,7 +29,7 @@ except:
     bufname = filename  # Basename of filename, reassigned by e and w
     searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) cmds
     replacestring = '??? ' # reassigned by c(hange) command
-    pagesize = 12         # reassigned by v and mv page up/down commands
+    pagesize = 12         # reassigned by v and rv page up/down commands
     saved = True          # True when no unsaved changes, safe to run e(dit).
     lmargin = 0           # left margin for wrap
     rmargin = 72          # right margin for wrap

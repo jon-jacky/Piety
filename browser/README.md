@@ -26,14 +26,14 @@ Run this command to start the display editor, including the browser:
 Now you can run the browser by typing [commands](#Commands) at the Python
 prompt, or by pressing [keycodes](#Keycodes). 
 
-[Appearance and Workflow](#Appearance-and-workflow)   
+[Appearance](#Appearance)   
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
 [HTML Tags](#HTML-Tags)   
 [div Classes](#div-Classes)   
 [Base URLs](#Base-URLs)   
 
-### Appearance and Workflow ###
+### Appearance ###
 
 Each web page appears in *two* editor buffers: we download the HTML sent
 by the server into a buffer whose name ends in *.html*, then our browser
@@ -41,6 +41,9 @@ renders the HTML into text into a buffer with the same base name, but
 ending in *.txt*.   Both buffers can be selected and viewed by the usual
 editor commands or keycodes.
 
+The URL of the page appears in the first (top) line of both versions
+of the page.
+ 
 In the rendered text page, hypertext links are displayed as footnotes.
 The text in the link is marked by underscores, and is followed by a
 footnote number in brackets: *\_like this\_ [12]*. At the end of the
@@ -173,8 +176,10 @@ by typing [keycodes](#Keycodes).
   browser 'Back button' to return to the page from which a link was loaded. 
 
 - **dir(urls)** - list the symbolic URL names defined in *urls.py*.
-  Then you can type any of the names at the Python prompt, Python will
-  print its literal URL string.
+  You can use any of these as the *url* argument to the *gr(url)* command.
+  You can type any of the names at the Python prompt, Python will
+  print its literal URL string -- which you can also use as an 
+  argument to *gr(url)*.
 
 - **get.url** - Print the absolute URL that was most recently used to
    try to load a web page.  This can be useful for debugging base URLs
@@ -312,5 +317,5 @@ supported at this writing, in Mar 2015:
 The base URL for each web page appears in a middle column of the buffer list
 shown by the *N()* command or the *C-x C-b* keycode.
 
-Revised Mar 2025
+Revised Apr 2025
 

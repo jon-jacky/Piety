@@ -43,8 +43,10 @@ is the virtual machine where the Piety OS now runs, analogous to the QEMU
 virtual machine in many other operating system projects.
 
 Piety provides a [display editor](editors/README.md), a 
-[customized Python interpreter](tasking/pyshell.py), and a
-[customized debugger](editors/breakpt.md).
+[customized Python interpreter](tasking/pyshell.py) that
+also acts as the system [shell](console/README.md), a
+[customized debugger](editors/breakpt.md), and 
+its own [web browser](browser/README.md).
 The display editor can support multiple buffers and windows in the
 terminal, and also a region for the Python interpreter. The debugger can
 work in the interpreter region without disturbing window contents.
@@ -72,6 +74,9 @@ the editor can be used for data capture and animated display.  We
 use it for [experiments](piety) in tasking and concurrency
 where tasks update windows as we control their behavior by typing  commands
 at the Python interpreter.
+
+We also use the editor as our [web browser](browser/README.md).
+Downloaded web pages are stored and displayed in editor buffers.
 
 Here is more about some Piety [design decisions](doc/rationale.md) and their
 rationales.
@@ -150,5 +155,6 @@ Details in [platforms.md](doc/platforms.md).
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised Nov 2024
+Revised Apr 2025
+
 
