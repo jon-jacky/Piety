@@ -37,10 +37,10 @@ prompt, or by pressing [keycodes](#Keycodes).
 ### Appearance ###
 
 Each web page appears in *two* editor buffers: we download the HTML sent
-by the server into a buffer whose name ends in *.html*, then our browser
-renders the HTML into text into a buffer with the same base name, but
-ending in *.txt*.   Both buffers can be selected and viewed by the usual
-editor commands or keycodes.
+by the server into a buffer whose name is derived from its URL (it often
+ends in *.html*), then our browser renders the HTML into text into a
+buffer with the same base name, but ending in *.txt*. Both buffers can
+be selected and viewed by the usual editor commands or keycodes.
 
 The URL of the page appears in the first (top) line of both versions
 of the page.
