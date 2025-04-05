@@ -5,6 +5,14 @@ Piety browser
 Text-only web browser closely integrated with the Piety editors. 
 Downloaded web pages are stored and displayed in editor buffers. 
 
+[Quick Start](#Quick-Start)
+[Appearance](#Appearance)   
+[Commands](#Commands)   
+[Keycodes](#Keycodes)   
+[HTML Tags](#HTML-Tags)   
+[div Classes](#div-Classes)   
+[Base URLs](#Base-URLs)   
+ 
 ### Quick Start ###
 
 Run the Piety browser in an ordinary session of the Piety display
@@ -25,13 +33,6 @@ Run this command to start the display editor, including the browser:
 
 Now you can run the browser by typing [commands](#Commands) at the Python
 prompt, or by pressing [keycodes](#Keycodes). 
-
-[Appearance](#Appearance)   
-[Commands](#Commands)   
-[Keycodes](#Keycodes)   
-[HTML Tags](#HTML-Tags)   
-[div Classes](#div-Classes)   
-[Base URLs](#Base-URLs)   
 
 ### Appearance ###
 
