@@ -21,7 +21,8 @@ except:
     # flines must always fit within the terminal window.
     
     tlines = 24 # N of lines in terminal window, later update with actual number
-    tcols = 80  # N of columns in terminal window, later update ...
+    termcols = 80  # N of columns in terminal window, later update ...
+    tcols = 80  # N of columns in edsel window, later update ...
     flines = 20 # N of lines in frame, including all windows.
     
     # From here on, 'window' means the software-generated window within frame
@@ -482,9 +483,9 @@ def win(nlines=None):
     Set scrolling region to lines below flines.
     Show status line about current buffer at bottom of frame.
     """
-    global tlines, tcols, flines, wheight
-    tlines, tcols = terminal_util.dimensions()
-    tcols = min(tcols, 80) # We *don't* want wide screen line length
+    global tlines, termcols, tcols, flines, wheight
+    tlines, termcols = terminal_util.dimensions() # termcols disting from tcols
+    tcols = min(termcols, 80) # We *don't* want wide screen line length
     display.put_cursor(flines+1, 1)
     display.erase_above() # clear old window in case new nlines < flines
     if not nlines: nlines = flines

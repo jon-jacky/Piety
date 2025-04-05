@@ -7,8 +7,8 @@ personal computing activities using only Python running Piety in the
 console terminal, without depending on a host OS to provide a desktop
 with multiple windows, the system shell, and other utilities.
 
-[Files](#Files)
-{Commands](#Commands)
+[Files](#Files)   
+[Commands](#Commands)   
 
 ### Files ###
 
@@ -22,16 +22,17 @@ with multiple windows, the system shell, and other utilities.
 
 ### Commands ###
 
-The *console* module provides a function *sh()*, which runs any
+The *console* module provides a function *sh*, which runs any
 shell command string, and functions for particular shell commands: 
-*pwd()*, *cd()*, *lsl()*, *lsc()*, *lslt()*, *man()*.  It also provides
-a *help()* function.
+*pwd*, *cd*, *ls*, *lsl*, *lslt*, and *man*.  It also provides
+a *help* function.
 
-The *cd* and *ls* functions take a path string (usually a directory) as
-an argument. The *ls* functions call the shell commands *ls -C, ls -l,
-ls -lt*, respectively. The *man* function takes the topic string as an
-argument, for example *man('ls')*. The *help* function takes a Python
-object (not a string) as an argument, for example *help(str)*.
+The *cd* and *ls* functions can take an optional argument, a path string
+(usually a directory) as an argument. The *ls* functions call the shell
+commands *ls -C, ls -l, ls -lt*, respectively. The *man* function takes
+the topic string as an argument, for example *man('ls')*. The *help*
+function takes a Python object (not a string) as an argument, for
+example *help(str)*.
 
 The *pwd*, *cd*, and *help* functions call specific functions in the Python
 standard library. The *sh*, *ls*, and *man*, functions run the host shell
