@@ -5,7 +5,7 @@ Piety browser
 Text-only web browser closely integrated with the Piety editors. 
 Downloaded web pages are stored and displayed in editor buffers. 
 
-[Quick Start](#Quick-Start)
+[Quick Start](#Quick-Start)  
 [Appearance](#Appearance)   
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
