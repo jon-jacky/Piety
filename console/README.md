@@ -28,7 +28,7 @@ shell command string, and functions for particular shell commands:
 a *help* function.
 
 The *cd* and *ls* functions can take an optional argument, a path string
-(usually a directory) as an argument. The *ls* functions call the shell
+(usually a directory).  The *ls*, *lsl* and *lslt* functions call the shell
 commands *ls -C, ls -l, ls -lt*, respectively. The *man* function takes
 the topic string as an argument, for example *man('ls')*. The *help*
 function takes a Python object (not a string) as an argument, for
@@ -39,7 +39,7 @@ standard library. The *sh*, *ls*, and *man*, functions run the host shell
 in a subprocess.
 
 The *sh*, *pwd*, *cd*, and *ls* commands all append their command string
-and command output to the single *Console* buffer. Each call to *man*
+and command output to the single \*Console\* buffer. Each call to *man*
 and *help* creates a new buffer *topic.man* or *topic.help* that holds
 the manual text or help text on just that topic.
 
