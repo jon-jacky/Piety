@@ -1,5 +1,5 @@
 """
-reader.py  - Reader window beside the editor windows
+viewer.py  - Experiments with a viewer window beside the editor windows
 """
 
 import display
@@ -7,11 +7,11 @@ import sked as ed, edsel as fr # fr for frame
 
 def update(bstart):
     """
-    Update entire reader window from sked current buffer, 
+    Update entire viewer window from sked current buffer, 
     starting at buffer line bstart.
     """
-    # window size may change any time, get current size from edsel
-    ledge = fr.tcols + 1  # Left edge of reader
+    fr.tcols = min(fr.tcols, 80) # make room for viewer
+    ledge = fr.tcols + 1  # Left edge of viewer
     start_col = ledge + 2  
     width = fr.termcols - start_col
     display.put_cursor(1,ledge)
