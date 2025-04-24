@@ -13,6 +13,10 @@ Most of the code in this module is copied and just slightly edited from
 sked and edsel, without apology. It's just a quick experiment.
 """
 
+import sys # needed for sys.modules[__name__], this module 
+from contextlib import redirect_stdout  # for console functions
+
+import shell, pyhelp # fcns that are redirected to viewer window
 import display, sked as ed, edsel as fr # frame
  
 # Define and initialize global variables
@@ -233,7 +237,8 @@ def update_lines(bstart, wstart, nlines):
     for line in buffer[bstart:bstart+nlines]:
         display.move_to_column(ledge) # added to viewer, not in edsel
         display.render('|', display.reverse) # ditto, L edge window border
-        display.putstr((' ' + line.rstrip('\n'))[:width-1]) # NB ' ' spacer
+        # must expand tabs so [:width-1] clips properly
+        display.putstr((' ' + line.expandtabs().rstrip('\n'))[:width-1])
         display.kill_line() # end of buffer line to window edge
         display.next_line()
 
@@ -399,4 +404,67 @@ def vrv(nlines=None):
     # Copied from edsel.rv(), rename to vrv, call local rv not ed.rv()
     rv(nlines, nodisplay_p, move_dot)
     scroll()
-  
+
+# Console functions - sh() cd() pwd() ls() etc. 
+
+# write function supports redirection to viewer current buffer
+
+def write(line):
+    # Copied from sket but not edited, just use viewer dot buffer S()
+    """
+    Append line to end of viewer buffer.
+    To be used implicitly by redirect_stdout(viewer) or print(..., file=viewer)
+    If line is a string that does not end with \n, this write() adds it.
+    """
+    global dot
+    if line not in ('', '\n'): # redirect_stdout and file=... append extra \n
+        buffer.append(line.rstrip('\n\r') + '\n') # line might have many \n
+        dot = S()  # last line in buffer, which we just added.
+        
+def redirect(vbufname, command, command_string):
+    # Copied from redirect.py and edited.  See comments inline.
+    # parameter is vbufname not bufname, a module level var here.
+    """
+    Redirect stdout from command to the editor buffer named bufname.
+    command must be a callable without arguments that writes to stdout.
+    command_string is the string that labels the command output in the buffer.
+    If the bufname buffer does not exist, create it and make it current.
+    If bufname already exists, make it the current buffer.     
+    """
+    # bufnames are the names of the buffers currently displayed in windows
+    # bufnames = { fr.windows[k]['bufname'] for k in fr.windows }  
+    # NOT!  There is only one buffer displayed in viewer window, viewer.bufname.
+    # bufname buffer does not yet exist
+    if not bufname in ed.buffers: 
+        e(bufname) # create bufname buffer in the viewer window
+    # bufname buffer exists but is not in viewer window
+    elif vbufname in ed.buffers and vbufname != bufname:
+        b(vbufname) # make bufname the current buffer in the viewer window    
+    # vbufname buffer exists and is in  a window but is not the current buffer        
+    # NOT - viewer doesn't have this case,  there is just one window
+    # elif (bufname in ed.buffers and bufname in bufnames 
+    #      and not bufname == ed.bufname): 
+    #    fr.on() # switch to other window - only works when there are just two
+    # bufname buffer exists and is in a windows and is the current buffer.
+    elif (vbufname in ed.buffers ### and bufname in bufnames 
+          and vbufname == bufname): 
+         pass # we don't have to select buffer or switch window.
+    else: # we never get here - all possibilities already covered
+        pass # bufname is already the current buffer
+    # Can we redirect_stdout to this module, viewer?  
+    # NO, because at this point 'viewer' is not defined.
+    #with redirect_stdout(viewer): # output goes to write fcn in sked module
+    with redirect_stdout(sys.modules[__name__]): # __name__ here is viewer
+        print('>>> ' + command_string) # print command to label its output
+        command()
+    scroll() # last line printed by command is at bottom of window
+
+# Console functtions, opied from console.py, code looks the same
+# but calls viewer redirect that writes to *VConsole* buffer and window.
+
+def vsh(cmd):
+    # Copied from console.py
+    # Rename sh to vsh but no edits necessary, calls viewer redirect
+    'Runs shell in subprocess, shell runs cmd, displays in viewer'
+    redirect('*Console*', lambda: shell.sh(cmd), f"sh('{cmd}')")
+
