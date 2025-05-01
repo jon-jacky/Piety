@@ -468,3 +468,22 @@ def vsh(cmd):
     'Runs shell in subprocess, shell runs cmd, displays in viewer'
     redirect('*Console*', lambda: shell.sh(cmd), f"sh('{cmd}')")
 
+def vls(path='.'):
+    # Copied from console.py
+    # Rename ls to vls but no edits necessary, calls viewer redirect
+    'Runs ls -C for compact directory listing'
+    redirect('*Console*', lambda: shell.ls(path), f"ls('{path}')")    
+
+def vman(topic):
+    # Copied from console.py
+    # Rename from man to vman, change fr.e to to local e, 
+    # also fr.p to p, fr.refresh to refresh
+    # redirect_stdout(ed) to ...().
+    'Show man page on topic, a string.  Save in new buffer named topic.man'
+    bufname = topic + '.man'
+    e(bufname)
+    #with redirect_stdout(ed): 
+    with redirect_stdout(sys.modules[__name__]): # __name__ here is viewer
+        shell.man(topic)
+    p(1) # put the cursor at the top of the buffer
+    refresh()

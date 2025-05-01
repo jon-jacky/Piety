@@ -485,6 +485,10 @@ def win(nlines=None):
     """
     global tlines, termcols, tcols, flines, wheight
     tlines, termcols = terminal_util.dimensions() # lines. cols in term window
+    # DEBUG For viewer experiment on Chromebook
+    # We might stty cols 60 so Linux will format shell output for viewer width
+    # BUT we still want full screen,  which is 29 x 146 on Chromebook
+    # tlines, termcols = (29, 146) 
     tcols = termcols # cols in editor windows - maybe update later for reader
     # tcols = min(termcols, 80) # We *don't* want wide screen line length
     display.put_cursor(flines+1, 1)
