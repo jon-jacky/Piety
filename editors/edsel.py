@@ -19,10 +19,11 @@ try:
 except:
     # The top of the frame is always the top of the terminal window, line 1
     # flines must always fit within the terminal window.
-    
-    tlines = 24 # N of lines in terminal window, later update with actual number
-    termcols = 80  # N of columns in terminal window, later update ...
-    tcols = 80  # N of columns in edsel editor windows, later update ...
+    # Defaults here are for windows in editor panel on left side of terminal.
+    # Defaults are for default terminal window size, are updated in win() below.
+    tlines = 24 # N of lines in default terminal window
+    termcols = 80  # N of columns in default terminal window
+    width = termcols  # N of columns in edsel editor windows
     flines = 20 # N of lines in frame, including all windows.
     
     # From here on, 'window' means the software-generated window within frame
@@ -30,8 +31,8 @@ except:
     # Editing happens in the 'focus window', also called the 'current window'.
     
     # Typical case is just one window that occupies the entire frame
-    # in that case wintop == 1 and wlines == flines
-    
+    # in that case start_col = 1 and  wintop == 1 and wlines == flines
+    start_col = 1  # first (leftmost) column of text (1-based not 0)
     wintop = 1 # index in frame of top line of focus window
     wheight = flines # N of lines in focus window, including status line.
     buftop = 1 # index in buffer of line at the wintop, top of the window.
@@ -45,7 +46,8 @@ except:
     focus = 0 # key of focus window
     maxwindows = 2 # the most that are useful in a vertical stack in 20+ lines
     windows = {}
-    windows[focus] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
+    windows[focus] = { 'star_col': start_col,
+                        'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
                        'bufname': ed.bufname, 'dot': ed.dot, 'point': ed.point }
     wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame
     
@@ -102,10 +104,13 @@ def update_lines(bstart, wstart, nlines):
     """
     nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
-    display.put_cursor(wstart, 1)
+    # NB display line at column start_col, not leftedge which is border 
+    display.put_cursor(wstart, start_col)
     for line in ed.buffer[bstart:bstart+nlines]:
-        display.putstr(line.rstrip('\n')[:tcols])
-        display.kill_line() # end of buffer line to window edge
+        display.move_to_column(start_col)
+        # must expand tabs so  [:width] clips properly
+        display.putstr(line.expandtabs().rstrip('\n')[:width])  # FIXME viewer
+        display.kill_line() # end of buffer line to window edge # FIXME viewer
         display.next_line()
 
 def update_window():
@@ -114,11 +119,12 @@ def update_window():
 
 def erase_lines(nlines):
     """
-    Completely erase nlines lines starting at current cursor position.
+    Erase nlines lines starting at current cursor position.
     Leave cursor at line after last line erased.  Do not update any globals.
     """
     for iline in range(nlines):
-        display.kill_whole_line()
+        display.move_to_column(start_col) 
+        display.kill_line() # FIXME don't kill text in viewer panel
         display.next_line()
 
 def erase_bottom():
@@ -165,7 +171,7 @@ def put_marker(bufline, attribs):
     'On the display, mark first char in line bufline in buffer with attribs'
     line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
     ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
-    display.put_cursor(wline(bufline), 1)
+    display.put_cursor(wline(bufline), start_col)
     display.render(ch0, attribs)
 
 def restore_cursor_to_cmdline():
@@ -174,9 +180,9 @@ def restore_cursor_to_cmdline():
 def update_status():
     'Update status line at the bottom of the window'
     display.put_cursor(wbottom(), 1)
-    # display.render(ed.status().ljust(tcols)[:tcols],display.white_bg)  
-    # white_bg renders status text invisible in Debian Linux text console
-    display.render(ed.status().ljust(tcols)[:tcols],display.reverse)  
+    display.move_to_column(start_col)
+    # display.white_bg renders text invisible in Debian Linux text console
+    display.render(ed.status().ljust(width)[:width],display.reverse)  
     restore_cursor_to_cmdline()
 
 def refresh():
@@ -184,9 +190,10 @@ def refresh():
     Refresh the focus window.
     (Re)Display lines from segment, marker, status without moving segment.
     """
-    display.put_cursor(wintop, 1) # top line in window
+    display.put_cursor(wintop, start_col) # needed by erase_lines right below
+    # FIXME erase_lines here because update_window doesn't call erase_bottom (?)
     erase_lines(wheight-1) # erase entire window contents above status line
-    update_window() # FIXME did we really have to erase_lines before this?
+    update_window() # apparently doesn't erase_bottom below end of buffer
     put_marker(ed.dot, display.white_bg)
     update_status()
      
@@ -314,7 +321,7 @@ def display_c(iline):
     put_marker(ed.dot, display.clear)
     ed.move_dot(iline)
     display.put_cursor(wline(ed.dot), 1)
-    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:tcols])
+    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:width])
     display.kill_line()
     put_marker(ed.dot, display.white_bg)
     update_status()
@@ -322,7 +329,7 @@ def display_c(iline):
 def display_j(iline):
     'Display effect of ed j(oin lines) function.'
     display.put_cursor(wline(iline), 1)
-    display.putstr(ed.buffer[iline].rstrip('\n')[:tcols])
+    display.putstr(ed.buffer[iline].rstrip('\n')[:width])
     display_d(iline) # assigns ed.dot directly, not with display_move_dot
 
 # Display functions: append mode for sked a() command
@@ -339,7 +346,7 @@ def display_start_a(iline):
     If any text after dot, push it all down one line to make room for new line.
     """
     display.put_cursor(wheight, 1) # status line does not update in append mode
-    display.render('Appending...'.ljust(tcols)[:tcols],display.white_bg)  
+    display.render('Appending...'.ljust(width)[:width],display.reverse)  
     put_marker(ed.dot, display.clear)
     ed.move_dot(iline) # sked a() does this.  iline might be far from previous dot.
     open_line(ed.dot) # create space, move cursor to prepare for first input()
@@ -482,15 +489,17 @@ def win(nlines=None):
     Use of flines and nlines here assumes just one window, maybe revise later.
     Set scrolling region to lines below flines.
     Show status line about current buffer at bottom of frame.
+    Window width hard-coded to 80 cols, right margin for wrap hard-coded to 72
+    even when terninal is full-screen.
     """
-    global tlines, termcols, tcols, flines, wheight
+    global tlines, termcols, width, flines, wheight
     tlines, termcols = terminal_util.dimensions() # lines. cols in term window
     # DEBUG For viewer experiment on Chromebook
     # We might stty cols 60 so Linux will format shell output for viewer width
-    # BUT we still want full screen,  which is 29 x 146 on Chromebook
-    # tlines, termcols = (29, 146) 
-    tcols = termcols # cols in editor windows - maybe update later for reader
-    # tcols = min(termcols, 80) # We *don't* want wide screen line length
+    # BUT we still want full screen,  29 x 146 on Lenovo IdeaPad 3 Chromebook
+    # tlines, termcols = (29, 146) #Debian full screen on IdeaPad 3 Chromebook
+    width = min(termcols, 80) # We don't want wide screen line length ...
+    ed.rmargin = width - 8    # ... even in full screen
     display.put_cursor(flines+1, 1)
     display.erase_above() # clear old window in case new nlines < flines
     if not nlines: nlines = flines
@@ -500,7 +509,6 @@ def win(nlines=None):
     flines = nlines
     wheight = flines
     ed.pagesize = wheight - 2
-    ed.rmargin = min(72, tcols - 8) # short text lines even in full screen
     open_frame()
     recenter()
 
@@ -512,7 +520,8 @@ def save_window(wkey):
     Assumes window's buffer is the current buffer, true in all save_window
     uses now.  Maybe not always true in the future, must review each new use.    .
     """
-    windows[wkey] = { 'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
+    windows[wkey] = { 'start_col': start_col, 'width': width,
+                      'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
                       'bufname': ed.bufname, 'dot': ed.dot, 'point': ed.point}
     ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
 
@@ -530,9 +539,12 @@ def restore_window(wkey):
     Restore saved window items at wkey to the focus window.
     If window uses a different buffer, restore that buffer too.
     """
-    global focus, wintop, wheight, buftop # but not bufname, dot, they're in ed.
+    global focus, start_col, width, wintop, wheight, buftop 
+    # ... but not global bufname, dot, they're in ed.
     # default values for missing keys are just the current values
     focus = wkey
+    start_col = windows[wkey].get('start_col', start_col)
+    width = windows[wkey].get('width', width)
     wintop = windows[wkey].get('wintop', wintop)
     wheight = windows[wkey].get('wheight', wheight)
     buftop = windows[wkey].get('buftop', buftop)
