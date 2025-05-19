@@ -199,6 +199,12 @@ The table shows some, but not all, of the recent [cloud operating systems](http:
 This page on [memory safe languages in systems programming](http://www.progtools.org/article_new.php?name=safe_systems&section=compilers&type=tutorial)
 discusses many of the same OS that we show in this table, and others as well.
 
+Here are links to many many 
+[experimental and hobbyist operating systems](https://github.com/jubalh/awesome-os), 
+and [more](https://wiki.osdev.org/Projects).
+Here is a catalog of [novel operating systems](https://github.com/prathyvsh/os-catalog?tab=readme-ov-file#novel-operating-systems-catalog),
+and [another](https://1.anagora.org/node/os),
+
 Many sites provide instructions and examples for building operating
 systems: 
 [6.S081](https://pdos.csail.mit.edu/6.828/2019/index.html) (MIT, xv6 RISC-V, 2019),
@@ -229,4 +235,4 @@ Here are more links on operating system
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
 
-Revised Feb 2025
+Revised May 2025
