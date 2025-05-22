@@ -12,12 +12,8 @@ import terminal, keyseq # only needed by test
 # but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = point # if point is already defined, editline was already imported
+    _ = n_spaces # if already defined, editline was already imported
 except:
-    # line = str() # string being edited # NOW THIS IS A PASSED PARAMETER
-    point = 0 # index into line (above) # PASSED PARAMETER, we can pass this one
-    start_col = 0  # PASSED PARAM default 0, no prompt or etc. at left margin
-    # start_col = 2  # when prompt is '> ' for example
     n_spaces = 4 # Used by tab.
     killed = str() # saved killed (cut) words, can be restored with yank (paste)
     prev_cmd = None # some functons behave differently when repeated
@@ -43,7 +39,8 @@ def insert_char(keycode, line, point):
 def move_to_point(point, start_col):
     # start_col accounts for prompt or other chars in left margin
     # move_to_column and start_col are 1-based but point is 0-based
-    display.move_to_column(start_col + point + 1) # point is zero based
+    # So we DON'T need + 1 here because it's already included in start_col
+    display.move_to_column(start_col + point) # + 1) NOT! +1 not needed here
 
 # Functions that appear in the keymap table must all have the same arguments
 # and the same returned variables, even though many do not use all of them.
@@ -187,7 +184,7 @@ def tab(line, point, start_col):
 
 def refresh(line, point, start_col):
     'Display line and point - use after line has gotten scrambled or ...'
-    display.move_to_column(start_col+1) # NB start co_ is 0-indexed, term 1-indexed
+    display.move_to_column(start_col) # +1) not needed, start_col is 1-based
     display.putstr(line.rstrip('\n'))
     display.kill_line() # remove any leftover text past line
     move_to_point(point, start_col)
@@ -231,17 +228,20 @@ def runcmd(keycode, line, point, start_col):
     else:
         display.putstr(key.bel)
     return line, point
-
-line = '' # for test el() below
-prompt = '> '
-start_col = 2 # zero-based index
-
+ 
 def el():
     """
     Test editline on the Python command line: loop invoking editor commands.
     Type characters and control keys to edit inline, exit with M-x.
     """
-    global line, point, start_col, prev_cmd
+    global prev_cmd
+
+    # previously these were globals
+    line = '' # for test el() below
+    point = 0 # zero-based index into line, a Python string
+    prompt = '> '
+    start_col = 3 # one-based index of character after prompt on terminal
+    
     terminal.set_char_mode()
     display.putstr(prompt)
     refresh(line, point, start_col)

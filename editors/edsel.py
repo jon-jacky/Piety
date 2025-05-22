@@ -194,7 +194,7 @@ def refresh():
     # FIXME erase_lines here because update_window doesn't call erase_bottom (?)
     erase_lines(wheight-1) # erase entire window contents above status line
     update_window() # apparently doesn't erase_bottom below end of buffer
-    put_marker(ed.dot, display.white_bg)
+    put_marker(ed.dot, display.reverse)
     update_status()
      
 def recenter():
@@ -232,7 +232,7 @@ def display_move_dot(iline):
     put_marker(ed.dot, display.clear)
     ed.move_dot(iline)
     if in_window(ed.dot):
-        put_marker(ed.dot, display.white_bg)
+        put_marker(ed.dot, display.reverse)
         update_status()
     else:
         recenter()
@@ -243,7 +243,7 @@ def display_change_lines(start, end):
     ed.move_dot(end)
     if in_window(ed.dot):
         update_lines(start, wline(start), end-start+1) # bstart, wstart, nlines
-        put_marker(ed.dot, display.white_bg)
+        put_marker(ed.dot, display.reverse)
         update_status()
     else:
         recenter()
@@ -287,7 +287,7 @@ def display_d(iline):
     if in_window(ed.dot):
         update_below(ed.dot) # doesn't change dot, moves cursor to end of text
         erase_bottom()
-        put_marker(ed.dot, display.white_bg)
+        put_marker(ed.dot, display.reverse)
         update_status() 
     else:
         recenter()
@@ -307,7 +307,7 @@ def display_y(iline):
     if in_window(ed.dot):
         update_below(ed.dot - len(ed.killed)) # first yanked line
         # erase_bottom()  # Not needed here -- must have copied from display_d
-        put_marker(ed.dot, display.white_bg)
+        put_marker(ed.dot, display.reverse)
         update_status() 
     else:
         recenter()
@@ -323,7 +323,7 @@ def display_c(iline):
     display.put_cursor(wline(ed.dot), 1)
     display.putstr(ed.buffer[ed.dot].rstrip('\n')[:width])
     display.kill_line()
-    put_marker(ed.dot, display.white_bg)
+    put_marker(ed.dot, display.reverse)
     update_status()
 
 def display_j(iline):
@@ -369,7 +369,7 @@ def display_input_line():
         else: # at the end of the buffer
             display.put_cursor(wline(ed.dot)+1,1)
             display.kill_whole_line() # erase '.'
-        put_marker(ed.dot, display.white_bg)
+        put_marker(ed.dot, display.reverse)
         update_status() # also returns cursor to REPL command line
     return line # caller sked a() tests line, may exit from append mode
 

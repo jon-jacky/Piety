@@ -15,7 +15,11 @@ try:
     _ = saved_put_marker # if already defined, then pmacs was already imported
 except:
     inline = True # kill (cut) and yank (paste) within a single line
-    start_col = 0  # default 0, no prompt or etc. at left margin
+    # Now use edsel.start_col throughout, can use both editor and viewer panels
+    # start_col = 0 is WRONG WRONG WRONG! - edsel.py sets start_col = 1 -!
+    # start_col is used to put_cursor, and terminal column numbers are 1-based
+    # unlike Python strings, including buffer text lines, which are 0-based.
+    # start_col = 0  # default 0, no prompt or etc. at left margin # WRONG!
     saved_put_marker = edsel.put_marker # so we can restore after put_no_marker
 
 running = True # rpm main loop is running, set False to exit.
@@ -31,7 +35,9 @@ def reset_point():
 def restore_cursor_to_window():
     # reset_point() # no longer needed here, each pmacs fcn maintains ed.point
     # point+1 to make put_cursor call consistent with editline move_to_column
-    display.put_cursor(edsel.wline(ed.dot), ed.point + 1)
+    # edsel.start_col so it works in  editor windows and also viewer window.
+    # NOT ... ed.point + 1, no +1 needed, edsel.start_col is already 1
+    display.put_cursor(edsel.wline(ed.dot), edsel.start_col + ed.point) # + 1)
 
 # Some functions do not use keycode arg but caller keycmd requires it to be there.
 
@@ -94,7 +100,7 @@ def delete_backward_char(keycode):
     if ed.point > 0:
         # Calls el.delete_backward_char, thanks to keycode DEL key.bs
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                ed.point, start_col) 
+                                                ed.point, edsel.start_col) 
     else: 
         join_prev() # see above
         restore_cursor_to_window()
@@ -112,7 +118,7 @@ def delete_char(keycode):
     if ed.point < len(ed.buffer[ed.dot].rstrip('\n')):
         # Calls el.delete_char, thanks to keycode C_d
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                ed.point, start_col)
+                                                ed.point, edsel.start_col)
     else:
         join_next() # see above
         restore_cursor_to_window()
@@ -150,7 +156,7 @@ def kill_line(keycode):
     # inline kill line:
     elif inline: # weaker condition, must follow previous stronger if...
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
-                                                ed.point, start_col)
+                                                ed.point, edsel.start_col)
     # kill line that is part of a multiline sequence:
     elif not inline:
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
@@ -168,7 +174,7 @@ def yank(keycode):
     """
     if inline:
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot], 
-                                                 ed.point, start_col)
+                                                 ed.point, edsel.start_col)
     else:
         dmacs.runcmd(keycode) # keycode is C_y here
         restore_cursor_to_window()
@@ -209,7 +215,7 @@ def keycmd(keycode):
 
 def clear_marker():
     edsel.put_marker(ed.dot, display.clear)
-    display.put_cursor(edsel.tlines, 1)
+    display.put_cursor(edsel.tlines, edsel.start_col)  # was ..., 1) not 0)
 
 def put_no_marker(bufline, attribs): 
     'Assign to edsel.put_marker to suppress marker while running pmacs'
@@ -226,7 +232,7 @@ def setup():
 def restore():
     dmacs.close_promptline()
     edsel.put_marker = saved_put_marker # initialized in except branch above
-    edsel.put_marker(ed.dot, display.white_bg)
+    edsel.put_marker(ed.dot, display.reverse)
     edsel.restore_cursor_to_cmdline()
 
 def runcmd(c):
@@ -242,7 +248,7 @@ def runcmd(c):
             if ed.S() < 1: ed.buffer = ['\n','\n'] # initialize empty buffer   
             if ed.dot == 0: ed.dot = 1 # buffer[0] is always dummy '\n'
             ed.buffer[ed.dot], ed.point = el.runcmd(k, ed.buffer[ed.dot],
-                                          ed.point, start_col)
+                                          ed.point, edsel.start_col)
             dmacs.prev_cmd = el.prev_cmd
             # key.C_k and inline are handled in kill_line, above
             if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
