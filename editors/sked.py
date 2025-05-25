@@ -41,7 +41,9 @@ except:
     # initialize so there is always a saved buffer to switch back to
     buffers = dict()
     buffers[bufname] = {'bufname': bufname, 'filename': filename, 
-                        'buffer': buffer, 'dot': dot, 'saved': saved }
+                        'buffer': buffer, 'dot': dot, 'saved': saved,
+                        'lmargin': lmargin, 'rmargin': rmargin,
+                        'nindent': nindent }
     
     prev_bufname = bufname # so we can switch back even before we save any  bfas
     
@@ -110,6 +112,9 @@ def restore_buffer(bname, printline=print):
     dot = buffers[bname].get('dot', 0)
     point = buffers[bname].get('point', 0)
     saved = buffers[bname].get('saved', True)
+    lmargin = buffers[bname].get('lmargin', 0) 
+    # rmargin = buffers[bname].get('rmargin', 72) # NOT assoc w/panel not buffer
+    nindent = buffers[bname].get('nindent', 4)
     printline(status()) # print the new buffer name
 
 def input_line():
@@ -123,7 +128,9 @@ def save_buffer():
     global buffers
     buffers[bufname] = {'bufname': bufname, 'filename': filename, 
                         'buffer': buffer, 'dot': dot, 'point': point,
-                        'saved': saved }
+                        'saved': saved, 'lmargin': lmargin, 
+                        # 'rmargin': rmargin,  # NOT! assoc w/panel, not buffer
+                        'nindent': nindent }
 
 def bname(filename):
     'Generate buffer name from file name, ensure each file gets unique bname'

@@ -24,6 +24,7 @@ except:
     tlines = 24 # N of lines in default terminal window
     termcols = 80  # N of columns in default terminal window
     width = termcols  # N of columns in edsel editor windows
+    rmargin = width - 8 # editor panel rmargin
     flines = 20 # N of lines in frame, including all windows.
     
     # From here on, 'window' means the software-generated window within frame
@@ -481,7 +482,7 @@ def open_frame():
     display.erase_above()
     display.set_scroll(flines+1, tlines)
 
-def win(nlines=None):
+def win(nlines=None, twidth=None):
     """
     Create or resize win(dow) for display at the top of the terminal window.
     Frame size is stored in flines.  First, clear above flines to clear frame.
@@ -489,17 +490,19 @@ def win(nlines=None):
     Use of flines and nlines here assumes just one window, maybe revise later.
     Set scrolling region to lines below flines.
     Show status line about current buffer at bottom of frame.
-    Window width hard-coded to 80 cols, right margin for wrap hard-coded to 72
+    Window width defaults to 80 cols, right margin for wrap is width - 8.
     even when terninal is full-screen.
+    Use optional twidth argument to set different window width.
     """
-    global tlines, termcols, width, flines, wheight
+    global tlines, termcols, width, rmargin, flines, wheight
     tlines, termcols = terminal_util.dimensions() # lines. cols in term window
     # DEBUG For viewer experiment on Chromebook
     # We might stty cols 60 so Linux will format shell output for viewer width
     # BUT we still want full screen,  29 x 146 on Lenovo IdeaPad 3 Chromebook
     # tlines, termcols = (29, 146) #Debian full screen on IdeaPad 3 Chromebook
-    width = min(termcols, 80) # We don't want wide screen line length ...
-    ed.rmargin = width - 8    # ... even in full screen
+    width = min(termcols, 80) if not twidth else twidth # default to 80 
+    rmargin = width - 8  # editor panel rmargin
+    ed.rmargin = rmargin  # assign editor panel rmargin to current buffer
     display.put_cursor(flines+1, 1)
     display.erase_above() # clear old window in case new nlines < flines
     if not nlines: nlines = flines

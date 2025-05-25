@@ -25,6 +25,8 @@ divclasses = ('copy post',  # www. ask.metafilter.com: posts, asks on front page
 # Do not show [ Image ] in rendered output for these text-only sites
 noimage = ('https://news.ycombinator.com/', # Hacker News
             )
+
+width = 70 # window width for textwrap.fill(text, width)
             
 class HTML2Text(HTMLParser):
     """
@@ -62,7 +64,7 @@ class HTML2Text(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre', 'noscript'):
             if self.tags and self.tags[-1] == 'div':  # we're inside div
-                self.output += '\n\n' + textwrap.fill(self.paragraph) 
+                self.output += '\n\n' + textwrap.fill(self.paragraph, width) 
             self.paragraph = '' # start a new paragraph
         if tag == 'a':  # <a href=linkurl>...</a> 
             self.linkurl = dict(attrs).get('href','')
@@ -73,7 +75,7 @@ class HTML2Text(HTMLParser):
                 self.output += '\n\n  [ %s ]' % (alt if alt else 'Image')
         if tag == 'br':
             # No endtag, no data. Treat br starttag like p endtag,then starttag
-            self.output += '\n' + textwrap.fill(self.paragraph) # just one \n
+            self.output += '\n' + textwrap.fill(self.paragraph, width) # one \n
             self.paragraph = '' # now start new paragraph                         
         # List of only the tags we handle.  We don't handle most tags.
         # BUT not img or br  because thre is nothing to capture and no endtag
@@ -101,9 +103,9 @@ class HTML2Text(HTMLParser):
         if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'noscript'):
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
-            self.output += '\n\n' + textwrap.fill(self.paragraph)
+            self.output += '\n\n' + textwrap.fill(self.paragraph, width)
         if tag == 'li':
-            self.output += '\n\n-- ' + textwrap.fill(self.paragraph) # bullet
+            self.output += '\n\n-- ' + textwrap.fill(self.paragraph, width) # bullet
         if tag == 'pre':
             self.output += '\n\n' + self.paragraph # do NOT fill
         # Again, list of only the tags we handle - BUT not img, not br
@@ -120,7 +122,7 @@ class HTML2Text(HTMLParser):
         if tag == 'div': 
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
-            self.output += '\n\n' + textwrap.fill(self.paragraph)
+            self.output += '\n\n' + textwrap.fill(self.paragraph, width)
             self.paragraph = '' # re-initialize to avoid duplication
         if tag == 'div':
             if self.tags:  # tags list not empty, guard against unmatched tag

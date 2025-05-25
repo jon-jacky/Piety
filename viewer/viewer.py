@@ -10,7 +10,7 @@ modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
-import display, shell, sked as ed, edsel as fr # frame
+import display, shell, render, sked as ed, edsel as fr # frame
  
 # Define and initialize global variables
 # but only the *first* time this module is imported in a session.
@@ -24,6 +24,7 @@ except:
     leftedge = 81 # left edge, viewer border
     startcol = leftedge + 2 # where viewer text begins
     width = 64 # for 146 col Debian Linux console on Lenovo IdeaPad3 Chromebook
+    rmargin = width - 4 # viewer panel rmargin
     buftop = 1 # line in buffer that appears at top of window
     bufname = 'scratch.txt' # viewer buffer name, key into ed.buffers
     dot = 1 # current line in ed.buffer where cursor is, text is inserted, etc.
@@ -83,7 +84,10 @@ def ov():
     ed.save_buffer() 
     fr.save_window(fr.focus) # viewer does not change editor focus window.
     ed.restore_buffer(bufname, fr.print_nothing) # viewer bufname and buffer
-    restore_viewer() # viewer window
+    ed.rmargin = rmargin # assign viewer panel rmargin to current buffer
+    restore_viewer() # viewer window, assigns fr.width etc.
+    shell.width = fr.width # for formatting ls and man output to fit in viewer
+    render.width = fr.width # for formatting web pages
 
 def oe():
     """
@@ -95,9 +99,12 @@ def oe():
         return
     ed.save_buffer()
     bufname = ed.bufname # buffer we just saved
-    ed.restore_buffer(editor_bufname, fr.print_nothing) # e bufnameaved in oe()
+    ed.restore_buffer(editor_bufname, fr.print_nothing) # bufname saved in oe()
+    ed.rmargin = fr.rmargin # assign editor panel rmargin to current buffer 
     fr.restore_window(fr.focus) # viewer did not change editor focus window
-
+    shell.width = fr.width # for formatting ls and man output to fit in editor
+    render.width = fr.width # for formatting web pages
+    
 def vwin():
     """
     Create empty viewer panel in the frame to the right of the editor windows.
@@ -108,16 +115,19 @@ def vwin():
     This fcn fits viewer panel into space remaining to right of editor panel.
     so editor panel ed.width determines new viewer panel width.
     Then in the viewer panel makes a new viewer buffer the ed current buffer,
-     and makes a new viewer window the edsel current window and displays it.
+     and makes a new viewer window the edsel current window and displays it.  
     """
-    global leftedge, start_col, width, viewer_displayed
+    global leftedge, start_col, width, rmargin, viewer_displayed
     if viewer_displayed:
         print('? viewer window is already displayed\r\n', end='')
         return
-    leftedge = fr.width + 1  # Left edge of viewer window
+    leftedge = fr.width + 1 # left edge viewer panel
     start_col = leftedge + 2  # Where viewer window text begins 
     width = fr.termcols - fr.width - 2 # width of viewer window text
+    rmargin = width - 4 # sked uses width - 8, but viewer is narrower
     shell.width = width # for formatting ls and man output to fit in viewer
+    render.width = width # for formatting web pages
+    
     viewer_displayed = True
     # Now make viewer window the current window and display it.
     ov()
@@ -131,10 +141,14 @@ def vclr():
     if not viewer_displayed:
         print('? viewer panel is not displayed\r\n', end='')
         return
+    if not viewer_focus():
+        print('? viewer window does not have focus\r\n', end='')
+        return
     for iline in range(fr.flines): # 0 indexed, clear status line also
         display.put_cursor(iline + 1, leftedge) # terminal lines 1 indexed
         display.kill_line()
     display.put_cursor(fr.tlines, 1) 
+    oe()
     viewer_displayed = False
     
 def v_display_restore_buffer(bname):
@@ -185,7 +199,7 @@ def vb(bname=None):
         
 def vv(nlines=None):
     """ 
-    Scroll viewer window down, when current window is an editor window
+   Scroll viewer window down, when current window is an editor window
     edsel v() should work in the viewer when viewer window is the current window.
     """
     if viewer_focus():
