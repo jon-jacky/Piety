@@ -10,7 +10,7 @@ modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
-import display, shell, render, sked as ed, edsel as fr # frame
+import key, dmacs, display, shell, render, sked as ed, edsel as fr # frame
  
 # Define and initialize global variables
 # but only the *first* time this module is imported in a session.
@@ -72,6 +72,17 @@ def vrefresh():
     display_border()
     fr.refresh() # this works only if viewer window has focus
 
+def vvrefresh():
+    """
+    Refresh viewer panel while using editor panel
+    """
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    vrefresh()
+    oe()
+   
 def ov():
     """
     Switch focus from editor to viewer buffer and window.
@@ -132,7 +143,7 @@ def vwin():
     # Now make viewer window the current window and display it.
     ov()
     vrefresh() # calls update_status, which calls restore_cursor_to_cmdline
-                  
+                          
 def vclr():
     """
     Erase viewer window contents including border and status line.
@@ -199,7 +210,7 @@ def vb(bname=None):
         
 def vv(nlines=None):
     """ 
-   Scroll viewer window down, when current window is an editor window
+    Scroll viewer window down, when current window is an editor window
     edsel v() should work in the viewer when viewer window is the current window.
     """
     if viewer_focus():
@@ -259,10 +270,60 @@ def b(bname=None):
         return
     fr.b(bname)
 
-def refresh():
-    'Disable editor function that should not be use in viewer window'
+# Functions invoked by keycodes - conditional depending on viewer state
+
+def vwin_key(): # C-x 3
+    if not viewer_displayed:
+        vwin()  # display viewer window
+    elif not viewer_focus():
+        ov() # switch from editor panel to viewer window
+            
+def vclr_key(): # C-x 1
+    if viewer_displayed:
+        vclr() # delete viewer window
+    else:
+        fr.o1()  # on editor panel: delete other window, one remains
+
+def edpanel_key(): # C-x o
     if viewer_focus():
-        print('? use vrefresh() not refresh() in viewer window\r\n', end='')
-        return
-    fr.refresh()
-      
+        oe()  # switch from viewer panel to editor window
+    else:
+        fr.on() # on editor panel: switch to other editor window
+
+def vrefresh_key(): # C-l
+    if viewer_focus:
+        vrefresh()  # refresh viewer panel including border
+    else:
+        fr.refresh() # refresh current window in editor panel
+
+def file_key(): # C-x C-f
+    """
+    Imitates dmacs find_file
+    """
+    filename = dmacs.request('Find file: ')
+    if dmacs.cancelled(filename): return
+    dmacs.mark = 0
+    if viewer_focus():
+        ve(filename)
+    else:
+        fr.e(filename)
+                
+def buffer_key(): # C-x b
+    """
+    Imitates dmacs switch_buffer
+    """
+    response = dmacs.request(f'Switch to buffer (default {ed.prev_bufname}): ')
+    if dmacs.cancelled(response): return
+    dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
+    if viewer_focus():
+        vb(response)
+    else:
+        fr.b(response)
+               
+dmacs.keymap[key.C_x + '3'] = vwin_key
+dmacs.keymap[key.C_x + '1'] = vclr_key
+dmacs.keymap[key.C_x + 'o'] = edpanel_key
+dmacs.keymap[key.C_l] = vrefresh_key
+dmacs.keymap[key.C_x + key.C_f] = file_key
+dmacs.keymap[key.C_x + 'b'] = buffer_key
+
