@@ -68,10 +68,11 @@ def open_line(keycode):
     with its prefix, append suffix after line at dot.
     Preserve indentation: add as many spaces as needed before suffix line
      to match indentation of prefix line.
+    Pad prefix with spaces to right window edge to work with viewer panel.
     """
     suffix = ed.buffer[ed.dot][ed.point:] # including final \n
     ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # leave prefix on dot
-    display.kill_line() # erase suffix from dot
+    edsel.blank_line(edsel.width - len(ed.buffer[ed.dot])) # pad with spaces
     # Auto-indent suffix line to same indentation as prefix line.
     nspaces = 0
     while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces

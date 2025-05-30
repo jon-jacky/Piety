@@ -279,7 +279,7 @@ def vwin_key(): # C-x 3
         ov() # switch from editor panel to viewer window
             
 def vclr_key(): # C-x 1
-    if viewer_displayed:
+    if viewer_focus():
         vclr() # delete viewer window
     else:
         fr.o1()  # on editor panel: delete other window, one remains

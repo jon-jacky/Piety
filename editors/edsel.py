@@ -95,13 +95,24 @@ def scroll_segment(iline):
         return 1
     else: 
         return iline - (wheight - 2) # put iline at bottom of window
- 
+  
+def display_padded(line):
+    """ 
+    Display line, clip too-long line, or pad with blanks to fill the window.
+    """
+    # must expand tabs for correct line length needed by ljust
+    textline = line.expandtabs().rstrip('\n') 
+    # ljust pads with spacees, preserves leading spaces, [:width] clips too long
+    display.putstr(textline.ljust(width)[:width])
+
 def update_lines(bstart, wstart, nlines):
     """
     Display consecutive lines (a 'segment') from the buffer in the window.
     Display nlines, starting at bstart in buffer, starting at wstart in window.
-    Clip nlines if needed, to fit in window, and not run past end of buffer.
     Leave cursor after the last line displayed, but do not update any globals.
+    Clip nlines if needed, to fit in window, and not run past end of buffer.
+    Pad lines with spaces at the end to fill window width if needed.
+    Thanks to clipping and padding, this function works with the viewer panel.
     """
     nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
@@ -109,23 +120,32 @@ def update_lines(bstart, wstart, nlines):
     display.put_cursor(wstart, start_col)
     for line in ed.buffer[bstart:bstart+nlines]:
         display.move_to_column(start_col)
-        # must expand tabs so  [:width] clips properly
-        display.putstr(line.expandtabs().rstrip('\n')[:width])  # FIXME viewer
-        display.kill_line() # end of buffer line to window edge # FIXME viewer
+        display_padded(line)
         display.next_line()
 
 def update_window():
     'Update entire window up to status line, starting at line buftop in buffer'
     update_lines(buftop, wintop, wheight-1)
 
+blanks = ' '*150
+
+def blank_line(ncols):
+    """
+    Starting at the cursor, overwrite then next ncols columns with spaces.
+    """
+    display.putstr(blanks[:ncols])
+
 def erase_lines(nlines):
     """
-    Erase nlines lines starting at current cursor position.
-    Leave cursor at line after last line erased.  Do not update any globals.
+    Overwrite nlines lines with spaces, in the current window only.
+    Start at line where the cursor is already.
+    Leave cursor at line after last line written.  Do not update any globals.
+    This only blanks lines across the width of the current window,
+    so it can be used when the viewer window is present.
     """
     for iline in range(nlines):
         display.move_to_column(start_col) 
-        display.kill_line() # FIXME don't kill text in viewer panel
+        blank_line(width)
         display.next_line()
 
 def erase_bottom():
@@ -164,7 +184,7 @@ def open_line(iline):
         update_window()
     display.put_cursor(wline(iline+1), 1)
     if ed.S() >= iline+1: # more lines after this one in buffer
-        display.kill_line() # clear this line to prepare for input()
+        blank_line(width) # clear this line to prepare for input()
         update_below(iline + 1, 1) # offset 1 for line we just cleared
         display.put_cursor(wline(iline+1),1) # restore cursor after update_...
 
@@ -322,8 +342,7 @@ def display_c(iline):
     put_marker(ed.dot, display.clear)
     ed.move_dot(iline)
     display.put_cursor(wline(ed.dot), 1)
-    display.putstr(ed.buffer[ed.dot].rstrip('\n')[:width])
-    display.kill_line()
+    display_padded(ed.buffer[ed.dot])
     put_marker(ed.dot, display.reverse)
     update_status()
 
