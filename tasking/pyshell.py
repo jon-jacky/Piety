@@ -1,5 +1,6 @@
 """
-pyshell.py - Custom Python REPL that uses our editline instead of builtin input.
+pyshell.py - Custom Python REPL that uses our editcommand function
+             instead of std input function.
 
 We need this to support tasking.  It enables other tasks writing to
 the terminal to interleave with typing characters at our REPL, and enables us
@@ -14,7 +15,7 @@ then 'from pyshell import pysh'  then 'reload pyshell' without name conflict.
 """
 
 import terminal_util, terminal, key, keyseq, display
-import editline as el
+import editcommand as el #we renamed editline to editcommand but keep el abbrev.,
 import pmacs
 # import edsel # NOT! This pyshell module might be used without edsel, so we 
                # duplicate tlines and restore_cursor_to_cmdline from edsel here.
@@ -125,7 +126,7 @@ def runcmd(c):
  
 def pysh():
     """
-    Custom Python REPL that uses our editline instead of builtin input function
+    Custom Python REPL that uses our editcommand instead of builtin input fcn
     so other tasks can interleave and we can restore cursor in Python cmd line.
     To exit pysh, type 'exit()' or ctrl-d.  'pysh' rhymes with fish.
     """

@@ -1,24 +1,25 @@
 """
-editline.py - functions to edit and display a string with readline control keys.
+editcommand.py - fcns to edit and display a string with readline control keys.
   
 Unlike readline, call and return for each key so you can edit without blocking.
 
-This is the revised version which can edit text in a window on the left without
-disturbing text displayed in an adjacent window on the right.   The original
-version lives on, renamed but otherwise unchanged, in tasking/editcommand.py.
-Most of this revised editline duplicates code in the original editcommand.
+This is the original version of editors/editline.py.  This version uses
+ANSI control codes to insert and delete text on the terminal screen, so
+it cannot be used to edit text in a window on the left without disturbing
+text displayed in an adjacent window on the right.   A revised version of
+this module which can work alongside another window is now in 
+editors/editline.py, which mostly duplicates the code here.
 """
 
 import string, re
 import key, display
-import edsel # needed for edsel.width
 import terminal, keyseq # only needed by test 
 
-# Define and initialize global variables used by editline,
+# Define and initialize global variables used by editcommand,
 # but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = n_spaces # if already defined, editline was already imported
+    _ = n_spaces # if already defined, editcommand was already imported
 except:
     n_spaces = 4 # Used by tab.
     killed = str() # saved killed (cut) words, can be restored with yank (paste)
@@ -31,48 +32,12 @@ printing_chars = string.printable[:-5] # exclude \t\n\r\v\f at the end
 start_word = re.compile(r'\W\w') # Non-word char then word char
 end_word = re.compile(r'\w\W') # Word char then non-word char
 
-# Functions that replace functions from the display module that
-# insert and delete text on the display, that disturb text 
-# displayed in an adjacent window to the right.
-# These replacement functions ovewrite text and pad with blanks
-# to limit their effects within the width of the current window,
-# so they can work alongside another window.
-# Naming convention: display.insert_string -> display_insert_string etc.
-
-def display_insert_string(string, line, point):
-    """
-    Display effect of inserting string into line on display at cursor position,
-    achieved by overwriting display from cursor position  with string + suffix 
-    Assumes line on display past suffix is already blank-padded to window edge. window edge.
-    Takes line, point as input args but returns nothing, just updates display.
-    """ 
-    suffix = line[point:].rstrip('\n') # text after inserted string
-    rwidth = edsel.width - point # space remaining in window past cursor
-    display.putstr((string + suffix)[:rwidth]) # clip to window width
-    move_to_point(point, edsel.start_col) # return from end of suffix to point
-    # FIXME? edsel.start_col here, not passed parameter as usual in this module
-        
-def display_delete_nchars(nchars, line, point):
-    """
-    Display effect of deleting chars from line on display at cursor position,
-    achieved by overwriting display from cursor position  with suffix + spaces.
-    Assumes line on display past suffix was already blank-padded to window edge. window edge.
-    Takes line, point as input args but returns nothing, just updates display.
-    """ 
-    suffix = line[point+nchars:].rstrip() # text after deleted string
-    padding = ' '*nchars # spaces added after suffix that replace deleted string
-    rwidth = edsel.width - point # space remaining in window past cursor
-    display.putstr((suffix + padding)[:rwidth]) # clip, shouldn't be needed
-    move_to_point(point, edsel.start_col) # return from end of padding to point
-    # FIXME? edsel.start_col here, not passed parameter as usual in this module
-                 
 # Function that updates line and point but does not appear in keymap table
 
 def insert_char(keycode, line, point):
     line = (line[:point] + keycode + line[point:])
     point += 1
-    #display.insert_char(keycode)
-    display_insert_string(keycode, line, point)    
+    display.insert_char(keycode)
     return line, point
  
 # Helper function, does not appear in keymap table
@@ -141,14 +106,12 @@ def delete_backward_char(line, point, start_col):
     if point > 0:
         line = (line[:point-1] + line[point:]) 
         point -= 1
-        # display.delete_backward_char()
-        display_delete_nchars(1, line, point-1)  # FIXME point-1 or point?
+        display.delete_backward_char()
     return line, point
 
 def delete_char(line, point, start_col):
     line = (line[:point] + line[point+1:])
-    # display.delete_char() # point does not change
-    display_delete_nchars(1, line, point)
+    display.delete_char() # point does not change
     return line, point
 
 def kill_word(line, point, start_col):
@@ -167,7 +130,7 @@ def kill_word(line, point, start_col):
         # The following commented-out line works on Mac but not ChromeBook
         # It seems Mac term tolerates negative argument but CB Term does not.
         # display.delete_nchars(point - (m.start()+1)) # FIXME? args reversed?
-        display_delete_nchars((m.start()+1) - point, line, point)
+        display.delete_nchars((m.start()+1) - point) 
     return line, point
 
 def kill_line(line, point, start_col):
@@ -183,8 +146,7 @@ def kill_line(line, point, start_col):
         killed = (killed + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[:point]
-    # display.kill_line()
-    edsel.blank_line(len(killed_segment.rstrip('\n')))
+    display.kill_line()
     if killed_newline:
         line = line + '\n'
     return line, point
@@ -211,8 +173,7 @@ def yank(line, point, start_col):
     'Yank (paste) string(s) deleted by kill_word, kill_line, or discard_line'
     line = (line[:point] + killed + line[point:])
     point += len(killed)
-    # display.insert_string(killed)
-    display_insert_string(killed, line, point)
+    display.insert_string(killed)
     return line, point
 
 def tab_n(n_spaces, line, point): # n_spaces arg ok because tab_n is not in keymap
@@ -220,8 +181,7 @@ def tab_n(n_spaces, line, point): # n_spaces arg ok because tab_n is not in keym
     spaces = ' ' * n_spaces
     line = line[:point] + spaces + line[point:]
     point += n_spaces
-    # display.insert_string(spaces)
-    display_insert_string(spaces, line, point)
+    display.insert_string(spaces)
     return line, point
 
 def tab(line, point, start_col):
@@ -232,9 +192,8 @@ def tab(line, point, start_col):
 def refresh(line, point, start_col):
     'Display line and point - use after line has gotten scrambled or ...'
     display.move_to_column(start_col) # +1) not needed, start_col is 1-based
-    # display.putstr(line.rstrip('\n'))
-    # display.kill_line() # remove any leftover text past line
-    edsel.display_padded(line) 
+    display.putstr(line.rstrip('\n'))
+    display.kill_line() # remove any leftover text past line
     move_to_point(point, start_col)
     return line, point # neither of these is updated
 
@@ -263,7 +222,7 @@ keymap = {
 
 def runcmd(keycode, line, point, start_col):
     """
-    Invoke a single editline command: look up key in keymap, run that command.
+    Invoke a single command: look up key in keymap, run that command.
     """
     global prev_cmd
     if keycode in printing_chars:
@@ -279,7 +238,7 @@ def runcmd(keycode, line, point, start_col):
  
 def el():
     """
-    Test editline on the Python command line: loop invoking editor commands.
+    Test editcommand on the Python command line: loop invoking editor commands.
     Type characters and control keys to edit inline, exit with M-x.
     """
     global prev_cmd
