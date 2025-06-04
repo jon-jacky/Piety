@@ -59,7 +59,7 @@ def display_delete_nchars(nchars, line, point):
     Assumes line on display past suffix was already blank-padded to window edge. window edge.
     Takes line, point as input args but returns nothing, just updates display.
     """ 
-    suffix = line[point+nchars:].rstrip() # text after deleted string
+    suffix = line[point:].rstrip() # text after deleted string
     padding = ' '*nchars # spaces added after suffix that replace deleted string
     rwidth = edsel.width - point # space remaining in window past cursor
     display.putstr((suffix + padding)[:rwidth]) # clip, shouldn't be needed
@@ -140,9 +140,10 @@ def backward_word(line, point, start_col):
 def delete_backward_char(line, point, start_col):
     if point > 0:
         line = (line[:point-1] + line[point:]) 
-        point -= 1
+        point -= 1 # This is correct - it's in original editcommand also.
         # display.delete_backward_char()
-        display_delete_nchars(1, line, point-1)  # FIXME point-1 or point?
+        move_to_point(point, start_col) # move cursor back to new point
+        display_delete_nchars(1, line, point)  # FIXME! 
     return line, point
 
 def delete_char(line, point, start_col):
@@ -167,7 +168,7 @@ def kill_word(line, point, start_col):
         # The following commented-out line works on Mac but not ChromeBook
         # It seems Mac term tolerates negative argument but CB Term does not.
         # display.delete_nchars(point - (m.start()+1)) # FIXME? args reversed?
-        display_delete_nchars((m.start()+1) - point, line, point)
+        display_delete_nchars(len(killed_word), line, point)
     return line, point
 
 def kill_line(line, point, start_col):
