@@ -137,21 +137,28 @@ def backward_word(line, point, start_col):
 
 # Functions that appear in keymap table and change line contents
 
-def delete_backward_char(line, point, start_col):
-    if point > 0:
-        line = (line[:point-1] + line[point:]) 
-        point -= 1 # This is correct - it's in original editcommand also.
-        # display.delete_backward_char()
-        move_to_point(point, start_col) # move cursor back to new point
-        display_delete_nchars(1, line, point)  # FIXME! 
-    return line, point
-
 def delete_char(line, point, start_col):
     line = (line[:point] + line[point+1:])
     # display.delete_char() # point does not change
     display_delete_nchars(1, line, point)
     return line, point
 
+def delete_backward_char(line, point, start_col):
+    """
+    Code from backward_char body followed by code for delete_char body
+    """
+    # backward char body
+    if point > 0:
+        point -= 1
+        display.backward_char()
+    else:
+        return line, point
+     # delete_char body
+    line = (line[:point] + line[point+1:])
+    # display.delete_char() # point does not change
+    display_delete_nchars(1, line, point)
+    return line, point
+     
 def kill_word(line, point, start_col):
     """
     Delete word, save in killed buffer.
@@ -186,6 +193,7 @@ def kill_line(line, point, start_col):
     line = line[:point]
     # display.kill_line()
     edsel.blank_line(len(killed_segment.rstrip('\n')))
+    move_to_point(point, edsel.start_col) # return from end of padding to point
     if killed_newline:
         line = line + '\n'
     return line, point
