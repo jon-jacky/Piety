@@ -45,9 +45,12 @@ def display_insert_string(string, line, point):
     achieved by overwriting display from cursor position  with string + suffix 
     Assumes line on display past suffix is already blank-padded to window edge. window edge.
     Takes line, point as input args but returns nothing, just updates display.
+    When called, *point* is already at the *end* of the inserted string,
+    BUT the *cursor* is still at the character *preceding* the inserted string.
     """ 
     suffix = line[point:].rstrip('\n') # text after inserted string
-    rwidth = edsel.width - point # space remaining in window past cursor
+    len_prefix = len(line) - len(string + suffix)
+    rwidth = edsel.width - len_prefix # space remaining in window past cursor
     display.putstr((string + suffix)[:rwidth]) # clip to window width
     move_to_point(point, edsel.start_col) # return from end of suffix to point
     # FIXME? edsel.start_col here, not passed parameter as usual in this module
