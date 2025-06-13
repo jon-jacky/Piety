@@ -21,6 +21,8 @@ import render
 from render import *
 import search
 from search import *
+import viewer
+from viewer import *
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 win(26)
 pm()
