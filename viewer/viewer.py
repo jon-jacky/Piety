@@ -72,17 +72,6 @@ def vrefresh():
     display_border()
     fr.refresh() # this works only if viewer window has focus
 
-def vvrefresh():
-    """
-    Refresh viewer panel while using editor panel
-    """
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    vrefresh()
-    oe()
-   
 def ov():
     """
     Switch focus from editor to viewer buffer and window.
@@ -207,30 +196,6 @@ def vb(bname=None):
     saved_prev_bufname = ed.prev_bufname
     ed.b(bname, v_display_restore_buffer) # assigns ed.prev_bufname - shouldn't
     ed.prev_bufname = saved_prev_bufname # *don't* save viewer window bufname
-        
-def vv(nlines=None):
-    """ 
-    Scroll viewer window down, when current window is an editor window
-    edsel v() should work in the viewer when viewer window is the current window.
-    """
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.v()
-    oe()
-
-def vrv(nlines=None):
-    """ 
-    Scroll viewer window up, when current window is an editor window
-    edsel rv() should work in viewer when viewer window is the current window.
-    """
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.rv()
-    oe()
 
 # Disable editor functions that don't or shouldn't work in viewer window
 # 'from viewer import *' in the REPL replaces edsel fcns with these
@@ -270,6 +235,82 @@ def b(bname=None):
         return
     fr.b(bname)
 
+
+# Operate on viewer window while focus remains in current editor window
+# (actually, briefly switch current window to viewer window, then back)
+# Expect these mostly invoked by keycodes
+
+def vvrefresh():
+    """
+    Refresh viewer panel while using editor panel
+    """
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    vrefresh()
+    oe()
+    
+def vv(nlines=None):
+    """ 
+    Scroll viewer window down, when current window is an editor window
+    edsel v() should work in the viewer when viewer window is the current window.
+    """
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    fr.v()
+    oe()
+
+def vrv(nlines=None):
+    """ 
+    Scroll viewer window up, when current window is an editor window
+    edsel rv() should work in viewer when viewer window is the current window.
+    """
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    fr.rv()
+    oe()
+
+def vl():
+    'Next line in viewer window'
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    fr.l()
+    oe()
+
+def vrl():
+    'Previous line in viewer window'
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    fr.rl()
+    oe()
+
+def vtop():
+    'Top of buffer in viewer window'
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    fr.p(1)
+    oe()
+
+def vbottom():
+    'Bottom of buffer in viewer window'
+    if viewer_focus():
+        print('? viewer window already has focus\r\n', end='')
+        return 
+    ov()
+    fr.p(ed.S())
+    oe()
+                     
 # Functions invoked by keycodes - conditional depending on viewer state
 
 def vwin_key(): # C-x 3
@@ -319,7 +360,7 @@ def buffer_key(): # C-x b
         vb(response)
     else:
         fr.b(response)
-               
+
 dmacs.keymap[key.C_x + '3'] = vwin_key
 dmacs.keymap[key.C_x + '1'] = vclr_key
 dmacs.keymap[key.C_x + 'o'] = edpanel_key
@@ -327,3 +368,12 @@ dmacs.keymap[key.C_l] = vrefresh_key
 dmacs.keymap[key.C_x + key.C_f] = file_key
 dmacs.keymap[key.C_x + 'b'] = buffer_key
 
+dmacs.keymap[key.C_t] = vv
+dmacs.keymap[key.M_t] = vrv
+dmacs.keymap[key.M_n] = vl
+dmacs.keymap[key.M_p] = vrl
+dmacs.keymap[key.M_lp] = vtop
+dmacs.keymap[key.M_rp] = vbottom
+
+dmacs.keymap[key.M_m] = vvrefresh
+  

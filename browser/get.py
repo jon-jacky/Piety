@@ -201,5 +201,5 @@ dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
                            # FIXME?  Overrides M_g: edsel.graffiti in dmacs
 dmacs.keymap[key.M_r] = render.r # render html from current buf. to .txt .buf
 dmacs.keymap[key.M_ret] = grx # get and render page at URL on current line
-dmacs.keymap[key.M_n] = grfx # get and render page at next footnote ref on line.
+dmacs.keymap[key.M_s] = grfx # get and render page at next footnote ref on line.
   

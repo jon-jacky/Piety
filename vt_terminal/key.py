@@ -96,6 +96,9 @@ M_z = esc + 'z'
 M_lt = esc + '<' # emacs go to top
 M_gt = esc + '>' # emacs go to end
 
+M_lp = esc + '(' # Piety go to top, other (viewer) window
+M_rp = esc + ')' # Piety go to bottom, other (viewer) window
+
 M_percent = esc + '%' # emacs replace string
 
 M_carat = esc + '^' # emacs join lines
