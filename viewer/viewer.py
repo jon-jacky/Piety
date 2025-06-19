@@ -10,7 +10,7 @@ modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
-import key, dmacs, display, shell, render, sked as ed, edsel as fr # frame
+import key, dmacs, display, shell, render, console, sked as ed, edsel as fr
  
 # Define and initialize global variables
 # but only the *first* time this module is imported in a session.
@@ -244,81 +244,94 @@ def vvrefresh():
     """
     Refresh viewer panel while using editor panel
     """
+    if not viewer_displayed:
+        print('? no viewer window\r\n', end='')
+        return
     if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    vrefresh()
-    oe()
-    
-def vv(nlines=None):
-    """ 
-    Scroll viewer window down, when current window is an editor window
-    edsel v() should work in the viewer when viewer window is the current window.
-    """
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.v()
-    oe()
+        vrefresh()
+    else:
+        ov()
+        display_border() # These two lines are just the body of vrefresh,
+        fr.refresh()     # Can't call vrefresh here because of its error msg.
+        oe()
 
-def vrv(nlines=None):
-    """ 
-    Scroll viewer window up, when current window is an editor window
-    edsel rv() should work in viewer when viewer window is the current window.
+def viewer_window(cmd):
     """
+    Execute cmd in viewer window.  Editor window keeps focus if it has it.
+    """
+    if not viewer_displayed:
+        print('? no viewer window\r\n', end='')
+        return
     if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.rv()
-    oe()
+        cmd()
+    else:
+        ov()
+        cmd()
+        oe()            
+
+def vv():
+    'Scroll viewer window down.  Editor window keeps focus if it has it.'
+    viewer_window(fr.v)
+    
+def vrv():
+    'Scroll viewer window up.  Editor window keeps focus if it has it.'
+    viewer_window(fr.rv)
 
 def vl():
-    'Next line in viewer window'
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.l()
-    oe()
+    'Next line in viewer window.  Editor window keeps focus if it has it.'
+    viewer_window(fr.l)
 
 def vrl():
-    'Previous line in viewer window'
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.rl()
-    oe()
+    'Previous line in viewer window.  Editor window keeps focus if it has it.'
+    viewer_window(fr.rl)
 
 def vtop():
-    'Top of buffer in viewer window'
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.p(1)
-    oe()
+    'Top of buffer in viewer window.  Editor window keeps focus if it has it.'
+    viewer_window(lambda: fr.p(1))
 
 def vbottom():
-    'Bottom of buffer in viewer window'
-    if viewer_focus():
-        print('? viewer window already has focus\r\n', end='')
-        return 
-    ov()
-    fr.p(ed.S())
-    oe()
-                     
+    'Bottom of buffer in viewer window.  Editor window keeps focus if it has it.'
+    viewer_window(lambda: fr.p(ed.S()))
+
+def N():
+    """
+    Show *Buffers* list in viewer window.  Editor window keeps focus if it has it.'
+    Overwrites N identifer imported from edsel.N() by 'from edsel import *'
+    You can still invoke edsel.N() by providing edsel. prefix
+    """
+    viewer_window(fr.N)
+
+# Console functions
+# Overwrites console function names imported by 'from console import *'
+# You can still invoke console.sh('...') etc. by proviing console.  prefix
+# viewer_window cmd must have no args - use lambda to absorb args into cmd
+
+def sh(cmd):
+    viewer_window(lambda: console.sh(cmd))
+
+def cd(path):
+    viewer_window(lambda: console.cd(path))
+    
+def pwd():
+    viewer_window(console.pwd)
+    
+def ls(path='.'):
+    viewer_window(lambda: console.ls(path))
+
+def lsl(path='.'):
+    viewer_window(lambda: console.lsl(path))
+    
+def lslt(path='.'):
+    viewer_window(lambda: console.lslt(path))
+    
+def man(topic):
+    viewer_window(lambda: console.man(topic))
+
+def help(topic):
+    viewer_window(lambda: console.help(topic))
+
 # Functions invoked by keycodes - conditional depending on viewer state
 
-def vwin_key(): # C-x 3
-    if not viewer_displayed:
-        vwin()  # display viewer window
-    elif not viewer_focus():
-        ov() # switch from editor panel to viewer window
-            
 def vclr_key(): # C-x 1
     if viewer_focus():
         vclr() # delete viewer window
@@ -361,13 +374,15 @@ def buffer_key(): # C-x b
     else:
         fr.b(response)
 
-dmacs.keymap[key.C_x + '3'] = vwin_key
+dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
+dmacs.keymap[key.C_x + 'v'] = ov
 dmacs.keymap[key.C_x + 'o'] = edpanel_key
 dmacs.keymap[key.C_l] = vrefresh_key
 dmacs.keymap[key.C_x + key.C_f] = file_key
 dmacs.keymap[key.C_x + 'b'] = buffer_key
 
+# Cursor motion in viewer window, while editor window has focus
 dmacs.keymap[key.C_t] = vv
 dmacs.keymap[key.M_t] = vrv
 dmacs.keymap[key.M_n] = vl
@@ -375,5 +390,10 @@ dmacs.keymap[key.M_p] = vrl
 dmacs.keymap[key.M_lp] = vtop
 dmacs.keymap[key.M_rp] = vbottom
 
+# Refresh viewer window while editor window has focus
 dmacs.keymap[key.M_m] = vvrefresh
-  
+
+# Always display *Buffers* list in viewer window
+# Overwrites C_x C_b key binding defined in dmacs.py
+dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
+     
