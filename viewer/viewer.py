@@ -222,52 +222,44 @@ def o1():
     fr.o1()
 
 def e(fname):
-    'Disable editor function that should not be used in viewer window'
+    'Use the correct file load function for viewer or editor window'
     if viewer_focus():
-        print('? use ve(...) not e(...) in viewer window\r\n', end='')
-        return
-    fr.e(fname)
+        ve(fname)
+    else:
+        fr.e(fname)
 
 def b(bname=None):
-    'Disable editor function that should not be used in viewer window'
+    'Use the correct buffer seletion function for viewer or editor window'
     if viewer_focus():
-        print('? use vb(...) not b(...) in viewer window\r\n', end='')
-        return
-    fr.b(bname)
-
-
-# Operate on viewer window while focus remains in current editor window
-# (actually, briefly switch current window to viewer window, then back)
-# Expect these mostly invoked by keycodes
-
-def vvrefresh():
-    """
-    Refresh viewer panel while using editor panel
-    """
-    if not viewer_displayed:
-        print('? no viewer window\r\n', end='')
-        return
-    if viewer_focus():
-        vrefresh()
+        vb(bname)
     else:
-        ov()
-        display_border() # These two lines are just the body of vrefresh,
-        fr.refresh()     # Can't call vrefresh here because of its error msg.
-        oe()
+        fr.b(bname)
 
+def refresh():
+    if viewer_focus():
+        vrefresh()  # refresh viewer panel including border
+    else:
+        fr.refresh() # refresh current window in editor panel
+
+# Run commands in viewer window while focus remains in current editor window.
+  
 def viewer_window(cmd):
     """
-    Execute cmd in viewer window.  Editor window keeps focus if it has it.
+    Execute cmd in viewer window if present.  Editor window keeps focus.
+    Must be able to use the same cmd in editor window or viewer window.
     """
-    if not viewer_displayed:
-        print('? no viewer window\r\n', end='')
-        return
-    if viewer_focus():
+    if not viewer_displayed: # run cmd in editor window
         cmd()
-    else:
+    elif viewer_focus(): # run cmd in viewer window
+        cmd()
+    else: # switch to viewer window just to run cmd, return focus to editor
         ov()
         cmd()
         oe()            
+
+def vvrefresh():
+    'Refresh viewer panel. Editor window keeps focus if it has it.'
+    viewer_window(refresh)
 
 def vv():
     'Scroll viewer window down.  Editor window keeps focus if it has it.'
@@ -297,7 +289,7 @@ def N():
     """
     Show *Buffers* list in viewer window.  Editor window keeps focus if it has it.'
     Overwrites N identifer imported from edsel.N() by 'from edsel import *'
-    You can still invoke edsel.N() by providing edsel. prefix
+    You can still invoke edsel.N() by providing edsel. prefix: edsel.N()
     """
     viewer_window(fr.N)
 
@@ -344,12 +336,6 @@ def edpanel_key(): # C-x o
     else:
         fr.on() # on editor panel: switch to other editor window
 
-def vrefresh_key(): # C-l
-    if viewer_focus:
-        vrefresh()  # refresh viewer panel including border
-    else:
-        fr.refresh() # refresh current window in editor panel
-
 def file_key(): # C-x C-f
     """
     Imitates dmacs find_file
@@ -357,10 +343,7 @@ def file_key(): # C-x C-f
     filename = dmacs.request('Find file: ')
     if dmacs.cancelled(filename): return
     dmacs.mark = 0
-    if viewer_focus():
-        ve(filename)
-    else:
-        fr.e(filename)
+    e(filename) # use correct file load fcn (above) for viewer or editor window
                 
 def buffer_key(): # C-x b
     """
@@ -369,16 +352,13 @@ def buffer_key(): # C-x b
     response = dmacs.request(f'Switch to buffer (default {ed.prev_bufname}): ')
     if dmacs.cancelled(response): return
     dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
-    if viewer_focus():
-        vb(response)
-    else:
-        fr.b(response)
+    b(response) # use correct buffer selection fcn for viewer or editor window
 
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
 dmacs.keymap[key.C_x + 'v'] = ov
 dmacs.keymap[key.C_x + 'o'] = edpanel_key
-dmacs.keymap[key.C_l] = vrefresh_key
+dmacs.keymap[key.C_l] = refresh
 dmacs.keymap[key.C_x + key.C_f] = file_key
 dmacs.keymap[key.C_x + 'b'] = buffer_key
 
