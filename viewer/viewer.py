@@ -18,38 +18,23 @@ import key, dmacs, display, shell, render, console, sked as ed, edsel as fr
 # so we retain buffer contents and other state when we reload.
  
 try:
-    _ = leftedge # If this is already defined, this module was already imported.
+    _ = vkey # If this is already defined, this module was already imported.
 except:
-    # Defaults, some may be reassigned by vwin() below.
-    leftedge = 81 # left edge, viewer border
-    startcol = leftedge + 2 # where viewer text begins
-    width = 64 # for 146 col Debian Linux console on Lenovo IdeaPad3 Chromebook
-    rmargin = width - 4 # viewer panel rmargin
-    buftop = 1 # line in buffer that appears at top of window
-    bufname = 'scratch.txt' # viewer buffer name, key into ed.buffers
-    dot = 1 # current line in ed.buffer where cursor is, text is inserted, etc.
-    point = 1 # colum in current line where cursor is, text is inserted, etc.
-    saved_dot = dot
-    saved_point = point
-    editor_bufname = ed.bufname
+    # vkey is index of viewer window in fr.windows. 
+    # All editor window keys are >= 0
+    vkey = -1 
+    # saved_focus is index of editor window in fr.windows
+    # before and after viewer window is selected.
+    saved_focus = 0 #  assigned in ov(), restored in oe()
     viewer_displayed = False
-    
+    leftedge = 81      
+    rmargin = 60 # for Debian Linux console viewer - may be reassigned.
+    width = 64 #  for Debian Linux console viewer on Chromebook
+                
 def viewer_focus():
     'Return True when the viewer window has the focus'
     return viewer_displayed and fr.start_col > 1
     
-def restore_viewer():
-    """
-    Restore viewer window dimensions to edsel current window.
-    There is always just one viewer window that occupies entire frame height,
-    so the vars are global here.  No need for a save_viewer, just one window.
-    """
-    fr.start_col = start_col  # assgined in vwin
-    fr.width = width # assigned in vwin
-    fr.wintop = 1 # viewer window always starts at top of terminal window
-    fr.wheight = fr.flines # number of lines in entire frame
-    fr.buftop = buftop
-
 def display_border():
     """
     Draw viewer panel borders: left edge and empty status line
@@ -76,16 +61,18 @@ def ov():
     """
     Switch focus from editor to viewer buffer and window.
     """
-    global editor_bufname
+    global saved_focus
     if viewer_focus():
         print('? viewer window already has focus\r\n', end='')
         return
-    editor_bufname = ed.bufname # editor current buffer, must restore in oe()
-    ed.save_buffer() 
+    # save_window calls save_buffer
     fr.save_window(fr.focus) # viewer does not change editor focus window.
-    ed.restore_buffer(bufname, fr.print_nothing) # viewer bufname and buffer
+    # viewer buffer name is stored in its window record
     ed.rmargin = rmargin # assign viewer panel rmargin to current buffer
-    restore_viewer() # viewer window, assigns fr.width etc.
+    # restore_window calls restore_buffer with bufname found in window record
+    # must save editor window focus first
+    saved_focus = fr.focus # restore fr.focus in oe()
+    fr.restore_window(vkey) # viewer window, assigns fr.width etc.
     shell.width = fr.width # for formatting ls and man output to fit in viewer
     render.width = fr.width # for formatting web pages
 
@@ -93,15 +80,14 @@ def oe():
     """
     Switch focus from viewer back to same previous editor buffer and window.
     """
-    global bufname
     if not viewer_focus():
         print('? editor panel already has focus\r\n', end='')
         return
-    ed.save_buffer()
-    bufname = ed.bufname # buffer we just saved
-    ed.restore_buffer(editor_bufname, fr.print_nothing) # bufname saved in oe()
+    # save_window calls save_buffer
+    fr.save_window(vkey) # viewer window bufname etc. may change, not geometry    ed.save_buffer()
+    # restore_window calls restore_buffer
+    fr.restore_window(saved_focus) # editor focus saved in ov()
     ed.rmargin = fr.rmargin # assign editor panel rmargin to current buffer 
-    fr.restore_window(fr.focus) # viewer did not change editor focus window
     shell.width = fr.width # for formatting ls and man output to fit in editor
     render.width = fr.width # for formatting web pages
     
@@ -117,7 +103,7 @@ def vwin():
     Then in the viewer panel makes a new viewer buffer the ed current buffer,
      and makes a new viewer window the edsel current window and displays it.  
     """
-    global leftedge, start_col, width, rmargin, viewer_displayed
+    global leftedge, width, rmargin, viewer_displayed
     if viewer_displayed:
         print('? viewer window is already displayed\r\n', end='')
         return
@@ -127,10 +113,18 @@ def vwin():
     rmargin = width - 4 # sked uses width - 8, but viewer is narrower
     shell.width = width # for formatting ls and man output to fit in viewer
     render.width = width # for formatting web pages
-    
-    viewer_displayed = True
+
+    # Initialze viewer window record in edsel.windows.
+    # Viewer window remains on the screen and its geometry never changes:
+    #  start_col, width, wintop, wheight
+    # Other items do change with editing: buftop, bufname, dot, point
+    fr.windows[vkey] = { 'start_col': start_col, 'width': width,
+                          'wintop': 1, 'wheight': fr.flines,
+                          'buftop': 1, 'bufname': 'scratch.txt',
+                          'dot':1, 'point': 0} 
     # Now make viewer window the current window and display it.
     ov()
+    viewer_displayed = True
     vrefresh() # calls update_status, which calls restore_cursor_to_cmdline
                           
 def vclr():
@@ -149,52 +143,31 @@ def vclr():
         display.kill_line()
     display.put_cursor(fr.tlines, 1) 
     oe()
+    del(fr.windows[vkey])
     viewer_displayed = False
     
-def v_display_restore_buffer(bname):
-    """
-    Copied, edited from edsel dsiplay_restore_buffer
-    Display effect of ed restore_buffer function, fill entire window
-    BUT do not update saved windows! viewer must not affect save editor windows..
-    """
-    ed.restore_buffer(bname, fr.print_nothing)
-    # save_window_bufinfo() # NOT! viewer must not affect save editor windows
-    fr.recenter()
-
-def v_display_e(iline):
-    """
-    Copied, edited from edsel dsiplay_restore_buffer
-    Display effect of ed e(dit) fcn: display new buffer contents around iline
-    BUT do not update saved windows! viewer must not affect save editor windows.
-    """
-    ed.move_dot(iline)
-    # save_window_bufinfo() # NOT! viewer must not affect saved editor windows
-    fr.recenter()
-
 def ve(fname):
     """
     Load and display file in viewer window.  Create buffer for loaded file.
-    Based on sked e(), fixed so viewer window fcns don't affect editor windows.
-    Fixes are hacks but we don't have to change code in sked.py or edsel.py.
+    Based on sked e(), only difference is we do not update ed.prev_bufname
     """
     if not viewer_focus():
         print('? viewer window does not have focus\r\n', end='')
         return 
     saved_prev_bufname = ed.prev_bufname
-    ed.e(fname, v_display_e, v_display_restore_buffer) # assigns ed.prev_bufname
+    fr.e(fname)
     ed.prev_bufname = saved_prev_bufname # *don't* save viewer window bufname
 
 def vb(bname=None):
     """
     Restore and display buffer in viewer window. buffer already created by ve().
-    Based on sked e(), fixed so viewer window fcns don't affect editor windows.
-    Fixes are hacks but we don't have to change code in sked.py or edsel.py.
+    Based on sked e(), only difference is we do not update ed.prev_bufname
     """
     if not viewer_focus():
         print('? viewer window does not have focus\r\n', end='')
         return 
     saved_prev_bufname = ed.prev_bufname
-    ed.b(bname, v_display_restore_buffer) # assigns ed.prev_bufname - shouldn't
+    fr.b(bname)
     ed.prev_bufname = saved_prev_bufname # *don't* save viewer window bufname
 
 # Disable editor functions that don't or shouldn't work in viewer window
