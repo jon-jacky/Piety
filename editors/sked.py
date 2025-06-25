@@ -45,7 +45,7 @@ except:
                         'lmargin': lmargin, 'rmargin': rmargin,
                         'nindent': nindent }
     
-    prev_bufname = bufname # so we can switch back even before we save any  bfas
+    prev_bufname = bufname # so b() w/no args can return to previous buffer 
     
 
 # Utility functions

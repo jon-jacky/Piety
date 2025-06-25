@@ -146,30 +146,6 @@ def vclr():
     del(fr.windows[vkey])
     viewer_displayed = False
     
-def ve(fname):
-    """
-    Load and display file in viewer window.  Create buffer for loaded file.
-    Based on sked e(), only difference is we do not update ed.prev_bufname
-    """
-    if not viewer_focus():
-        print('? viewer window does not have focus\r\n', end='')
-        return 
-    saved_prev_bufname = ed.prev_bufname
-    fr.e(fname)
-    ed.prev_bufname = saved_prev_bufname # *don't* save viewer window bufname
-
-def vb(bname=None):
-    """
-    Restore and display buffer in viewer window. buffer already created by ve().
-    Based on sked e(), only difference is we do not update ed.prev_bufname
-    """
-    if not viewer_focus():
-        print('? viewer window does not have focus\r\n', end='')
-        return 
-    saved_prev_bufname = ed.prev_bufname
-    fr.b(bname)
-    ed.prev_bufname = saved_prev_bufname # *don't* save viewer window bufname
-
 # Disable editor functions that don't or shouldn't work in viewer window
 # 'from viewer import *' in the REPL replaces edsel fcns with these
 
@@ -193,20 +169,6 @@ def o1():
         print("? already only one viewer window\r\n", end='')
         return
     fr.o1()
-
-def e(fname):
-    'Use the correct file load function for viewer or editor window'
-    if viewer_focus():
-        ve(fname)
-    else:
-        fr.e(fname)
-
-def b(bname=None):
-    'Use the correct buffer seletion function for viewer or editor window'
-    if viewer_focus():
-        vb(bname)
-    else:
-        fr.b(bname)
 
 def refresh():
     if viewer_focus():
@@ -332,8 +294,6 @@ dmacs.keymap[key.C_x + '1'] = vclr_key
 dmacs.keymap[key.C_x + 'v'] = ov
 dmacs.keymap[key.C_x + 'o'] = edpanel_key
 dmacs.keymap[key.C_l] = refresh
-dmacs.keymap[key.C_x + key.C_f] = file_key
-dmacs.keymap[key.C_x + 'b'] = buffer_key
 
 # Cursor motion in viewer window, while editor window has focus
 dmacs.keymap[key.C_t] = vv

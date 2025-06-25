@@ -544,7 +544,8 @@ def save_window(wkey):
     """
     windows[wkey] = { 'start_col': start_col, 'width': width,
                       'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
-                      'bufname': ed.bufname, 'dot': ed.dot, 'point': ed.point}
+                      'bufname': ed.bufname, 'prev_bufname': ed.prev_bufname,
+                      'dot': ed.dot, 'point': ed.point}
     ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
 
 def save_window_bufinfo():
@@ -571,11 +572,11 @@ def restore_window(wkey):
     wheight = windows[wkey].get('wheight', wheight)
     buftop = windows[wkey].get('buftop', buftop)
     bufname = windows[wkey].get('bufname', ed.bufname) # *local* bufname here!
+    prev_bufname = windows[wkey].get('prev_bufname', ed.prev_bufname) # local
     # Maybe bufname is not in buffers, it may have been killed.
-    # But scratch.txt is always in buffers. 
+    # But scratch.txt is always in buffers.
     bufname = bufname if bufname in ed.buffers else 'scratch.txt'
-    # If previous window has the same buffer, don't update prev_bufname
-    if bufname != ed.bufname: ed.prev_bufname = ed.bufname
+    ed.prev_bufname = prev_bufname if prev_bufname in ed.buffers else 'scratch.txt'    
     ed.restore_buffer(bufname, print_nothing) # assign *global* ed.bufname here
     # Window dot and point might be different than its buffer's, restored above.
     # Can be multiple windows looking at different locations in same buffer.
@@ -613,7 +614,7 @@ def o1():
     'Return to single window, make focus window occupy the whole frame.'
     global focus, wkeys, wintop, wheight
     if n_windows() <= 1:
-        print('? only one window\r\n', end='')
+        print('? only one editor window\r\n', end='')
         return
     windows.clear()
     focus = 0
@@ -628,7 +629,7 @@ def on():
     'Next window, move focus to next window below, until wrap around to top'
     global focus
     if n_windows() <= 1:
-        print('? only one window\r\n', end='')
+        print('? only one editor window\r\n', end='')
         return
     save_window(focus) # window contents (buffer and/or dot) may have changed
     for ikey, wkey in enumerate(wkeys):
