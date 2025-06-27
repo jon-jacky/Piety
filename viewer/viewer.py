@@ -191,7 +191,7 @@ def viewer_window(cmd):
         ov()
         cmd()
         oe()            
-
+     
 def vvrefresh():
     'Refresh viewer panel. Editor window keeps focus if it has it.'
     viewer_window(refresh)
@@ -289,6 +289,43 @@ def buffer_key(): # C-x b
     dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
     b(response) # use correct buffer selection fcn for viewer or editor window
 
+# Functions invoked in editor window by keycode in viewer window
+
+def editor_window(cmd):
+    """
+    Execute cmd in editor window if viewer has focus.  Viewer keeps focus.
+    """
+    if not viewer_displayed: # run cmd in editor window
+        cmd()
+    elif not viewer_focus(): # run cmd in editor window
+        cmd()
+    else: # switch to editro window just to run cmd, return focus to viewer
+        oe()
+        cmd()
+        ov()            
+
+def loader():
+    """
+    Load contents into editor buffer depending on line in viewer buffer
+    """
+    # For now these are all invoked by M_ret keycode,
+    # could add keycode arg in the future.
+    if ed.bufname == '*Buffers*':
+        # Code based on sked.py select_buffer():
+        # Get the buffer name from the current (viewer) window
+        # buffer name starts in col 1, continues to first space, can be any length.
+        bname = ed.buffer[ed.dot][1:].partition(' ')[0]
+        # Load the buffer in the editor window
+        editor_window(lambda: fr.b(bname))
+    elif ed.bufname == '*Console*':
+        # Get file name from the current (viewer) window
+        # File name is from ls -l command, word at 0-based index 8 on line
+        fname = ed.buffer[ed.dot].split()[8]
+        # Load the file in the editor window
+        editor_window(lambda: fr.e(fname))
+    else:
+        get.grx() # get and render web page at URL on current line
+    
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
 dmacs.keymap[key.C_x + 'v'] = ov
@@ -309,4 +346,7 @@ dmacs.keymap[key.M_m] = vvrefresh
 # Always display *Buffers* list in viewer window
 # Overwrites C_x C_b key binding defined in dmacs.py
 dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
+
+# Load contents into editor buffer depending on line in viewer buffer
+dmacs.keymap[key.M_ret] = loader
      

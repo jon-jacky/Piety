@@ -341,14 +341,14 @@ def display_c(iline):
     """
     put_marker(ed.dot, display.clear)
     ed.move_dot(iline)
-    display.put_cursor(wline(ed.dot), 1)
+    display.put_cursor(wline(ed.dot), start_col)
     display_padded(ed.buffer[ed.dot])
     put_marker(ed.dot, display.reverse)
     update_status()
 
 def display_j(iline):
     'Display effect of ed j(oin lines) function.'
-    display.put_cursor(wline(iline), 1)
+    display.put_cursor(wline(iline), start_col)
     display.putstr(ed.buffer[iline].rstrip('\n')[:width])
     display_d(iline) # assigns ed.dot directly, not with display_move_dot
 
@@ -616,14 +616,17 @@ def o1():
     if n_windows() <= 1:
         print('? only one editor window\r\n', end='')
         return
-    windows.clear()
-    focus = 0
+    # windows.clear() # NOT!  Now we must keep viewer window
+    for wkey in wkeys:  # wkeys does not include viewer window
+        if wkey != focus:
+            del windows[wkey]
     wkeys = [ focus ]
+    # Enlarge focus window to fill whole editor panel
     wintop = 1
     wheight = flines
     ed.pagesize = wheight - 2
     recenter() # reassigns buftop
-    save_window(focus) # will be overwritten when next time window is split
+    save_window(focus) # will be overwritten next time window is split
 
 def on():
     'Next window, move focus to next window below, until wrap around to top'
