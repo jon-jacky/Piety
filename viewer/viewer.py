@@ -10,7 +10,8 @@ modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
-import key, dmacs, display, shell, render, console, sked as ed, edsel as fr
+import key, dmacs, display, shell, render, console, get
+import sked as ed, edsel as fr
  
 # Define and initialize global variables
 # but only the *first* time this module is imported in a session.
