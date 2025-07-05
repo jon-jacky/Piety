@@ -47,6 +47,11 @@ trivium = 'http://leahneukirchen.org/trivium/'
 tbray='https://www.tbray.org/ongoing/'
 nelson='https://pinboard.in/u:nelson'
 
+# Kragen Sitaker's notes
+dercuano = 'https://dercuano.github.io/'
+derctuo = 'https://derctuo.github.io/'
+dernocua = 'https://dernocua.github.io/'
+
 # Reviving the Dillo browser
 dillo = 'https://dillo-browser.github.io/'
 dilloslides = 'https://dillo-browser.github.io/fosdem-2025/'

@@ -258,6 +258,33 @@ def man(topic):
 def help(topic):
     viewer_window(lambda: console.help(topic))
 
+# Browser functions
+# Overwrites browser function names imported by 'from browser import *'
+# You can still invoke browser.grx() etc. by providing browser. prefix
+
+def grx():
+    """
+    Get and Render web page at URL eXtracted from current line in current buffer.'
+    If viewer has focus, display that web page in the current editor buffer.
+    """
+    # Must get URL from current (viewer) buffer 
+    #  before editor_window() changes to editor buffer
+    url = get.xurl(ed.buffer[ed.dot])
+    editor_window(lambda: get.gr(url))
+    
+def grfx():
+    """
+    Get and Render web page at next Footnote eXtracted from current line.
+    If viewer has focus, display that web page in the current editor buffer.
+    """
+    # Must get footnote and URL from current (viewer) buffer 
+    #  before editor_window() changes to editor buffer
+    n = get.fnrefnum() # n is next footnote on current line, or 0 if none
+    if n:
+        url = get.fnurl(n) # url at footnote n, or '' if footnote n not found
+        if url:
+            editor_window(lambda: get.gr(url))         
+
 # Functions invoked by keycodes - conditional depending on viewer state
 
 def vclr_key(): # C-x 1
@@ -325,7 +352,8 @@ def loader():
         # Load the file in the editor window
         editor_window(lambda: fr.e(fname))
     else:
-        get.grx() # get and render web page at URL on current line
+        # Get and render web page from URL on line - assumes there is URL here
+        grx() # This is viewer.grx defined here, not get.grx
     
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
@@ -350,4 +378,10 @@ dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 
 # Load contents into editor buffer depending on line in viewer buffer
 dmacs.keymap[key.M_ret] = loader
-     
+
+# Load web page into editor buffer from footnote link in viewer buffer
+dmacs.keymap[key.M_s] = grfx # Now this is viewer.grfx not get.grfx
+
+# Load web page into editor buffer from URL on current line in viewer buffer
+### dmacs.keymap[key.M_ret] = grx # NOT!  We already used M_ret for loader!
+

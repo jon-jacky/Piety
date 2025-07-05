@@ -77,6 +77,8 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             'https://www.tbray.org/', # Tim Bray's blog, Ongoing 
             'https://github.com/', # Github generates and serves long relative urls
             'https://dercuano.github.io/', # Kragen Sitaker's notes, Dercuano
+            'https://derctuo.github.io/', # Kragen Sitaker's notes, Derctuo
+            'https://dernocua.github.io/', # Kragen Sitaker's notes, Dernocua                        
             'file:///home/jon/z/z/', # Our own Z notes, for testing
             )
 
@@ -136,7 +138,7 @@ def gx():
     global url # So we can examine it in REPL
     url = xurl(ed.buffer[ed.dot]) # relative or absolute URL, '' if not found
     g(url)
-    
+
 def gr(url):
     'Get and Render web page at url'
     g(url)
