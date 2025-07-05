@@ -51,20 +51,24 @@ def xrurl(s):
         48. /384528/My-very-first-Can-I-eat-this-question
     
     For now, we just return the first string of non-whitespace characters
-    after the first one or more whitespace characters.
-    We assume caller has passed a string that looks like it holds a relative URL.
+    after the first one or more whitespace characters, if there is one
+    If no such string, return '' to indicate no URL found.
     """
-    rurl =  s.split()[1]  # crashes if there is no text past first whitespace
+    words = s.split()
+    if len(words) != 2: # FIXME? Crudest check that s has relative URL, unsound
+        return '' # indicates no URL found
+    rurl =  words[1]
     return rurl[2:] if rurl.startswith('..') else rurl # FIXME? Special case!
 
 def xurl(s):
     """
     eXtract absolute or relative URL from string s
+    Or return '' if no URL found.
     """
     url = xaurl(s) # extract absolute URL, '' if not found
     if not url: # absolute URL not found on line - must be relative URL
-        rurl = xrurl(s) # find relative URL
-        url = ed.filename + rurl # ed.filename stores base URL
+        rurl = xrurl(s) # find relative URL, returns '' if none found
+        url = ed.filename + rurl if rurl else '' # ed.filename stores base URL
     return url    
 
 # URLs in baseurls are prefixes of web page absolute urls
@@ -134,10 +138,12 @@ def gx():
     We have arranged that the filename associated with the buffer that
     holds that rendered web page is actually the absolute URL of that page,
     so it is the base URL of any relative URLs that appear in footnotes.
+    If there is no URL on the line, do nothing
     """
     global url # So we can examine it in REPL
     url = xurl(ed.buffer[ed.dot]) # relative or absolute URL, '' if not found
-    g(url)
+    if url: # url is '' if no URL found on line
+        g(url)
 
 def gr(url):
     'Get and Render web page at url'

@@ -270,7 +270,8 @@ def grx():
     # Must get URL from current (viewer) buffer 
     #  before editor_window() changes to editor buffer
     url = get.xurl(ed.buffer[ed.dot])
-    editor_window(lambda: get.gr(url))
+    if url: # url is '' if not URL found on line
+        editor_window(lambda: get.gr(url))
     
 def grfx():
     """
@@ -339,6 +340,7 @@ def loader():
     # For now these are all invoked by M_ret keycode,
     # could add keycode arg in the future.
     if ed.bufname == '*Buffers*':
+        # All lines in *Buffers* have same format so this should always work
         # Code based on sked.py select_buffer():
         # Get the buffer name from the current (viewer) window
         # buffer name starts in col 1, continues to first space, can be any length.
@@ -348,13 +350,25 @@ def loader():
     elif ed.bufname == '*Console*':
         # Get file name from the current (viewer) window
         # File name is from ls -l command, word at 0-based index 8 on line
-        fname = ed.buffer[ed.dot].split()[8]
-        # Load the file in the editor window
-        editor_window(lambda: fr.e(fname))
-    else:
-        # Get and render web page from URL on line - assumes there is URL here
+        # Not all lines in *Console* are from ls -l so we must check format
+        words = ed.buffer[ed.dot].split()
+        if len(words) == 9:  # FIXME? crudest check for ls -1 format, unsound
+            fname = words[8]
+            # Load the file in the editor window
+            editor_window(lambda: fr.e(fname))
+        else: 
+            pass # Line is not in ls -l format. FIXME? print msg in REPL             
+    elif get.xurl(ed.buffer[ed.dot]): # There is a URL on this viewer line
+        # Get and render web page from URL on viewer line.
+        # NB: grx redundantly calls get.xurl again
         grx() # This is viewer.grx defined here, not get.grx
-    
+    elif get.fnrefnum(): # There is a footnote on this viewer line
+        # Get and render web page from footnote on viewer line.
+        # NB: grfx redundantly calls get.frnrefun again
+        grfx() # This is viewer.grfx defined here, not get.grfx
+    else:
+        pass # Possibly more cases to come
+        
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
 dmacs.keymap[key.C_x + 'v'] = ov
@@ -376,12 +390,7 @@ dmacs.keymap[key.M_m] = vvrefresh
 # Overwrites C_x C_b key binding defined in dmacs.py
 dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 
-# Load contents into editor buffer depending on line in viewer buffer
+# Load contents named on line in viewer into editor buffer 
+# Viewer line might name a file, buffer, URL, footnote -- or more to come
 dmacs.keymap[key.M_ret] = loader
-
-# Load web page into editor buffer from footnote link in viewer buffer
-dmacs.keymap[key.M_s] = grfx # Now this is viewer.grfx not get.grfx
-
-# Load web page into editor buffer from URL on current line in viewer buffer
-### dmacs.keymap[key.M_ret] = grx # NOT!  We already used M_ret for loader!
 
