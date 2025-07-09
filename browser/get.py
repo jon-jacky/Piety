@@ -203,7 +203,12 @@ def grfx():
     'Get and Render web page at next Footnote eXtracted from current line.'
     gfx()
     render.r(url) # gfx assigns global url
-    
+
+def clear_webpages():
+    'Delete all webpages, buffers whose filename starts with http'
+    ed.clear_buffers('all web pages', 
+        discard=(lambda buf: buf['filename'].startswith('http')))
+        
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
                            # FIXME?  Overrides M_g: edsel.graffiti in dmacs

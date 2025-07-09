@@ -106,8 +106,8 @@ def restore_buffer(bname, printline=print):
     'Restore state of saved buffer bname to current saved buffer'
     global bufname, filename, buffer, dot, point, saved
     ## display.putstr(f'From {bufname} restore {bname}\n\r') # DEBUG
-    bufname = buffers[bname].get('bufname', 'no name')
-    filename = buffers[bname].get('filename', 'no filename')
+    bufname = buffers[bname].get('bufname', 'scratch.txt')
+    filename = buffers[bname].get('filename', 'scratch.txt')
     buffer = buffers[bname].get('buffer', ['\n'])
     dot = buffers[bname].get('dot', 0)
     point = buffers[bname].get('point', 0)
@@ -126,7 +126,7 @@ def input_line():
 def save_buffer():
     'Save state of current buffer including text, dot etc.'
     global buffers
-    buffers[bufname] = {'bufname': bufname, 'filename': filename, 
+    buffers[bufname] = {'bufname': bufname, 'filename': filename,
                         'buffer': buffer, 'dot': dot, 'point': point,
                         'saved': saved, 'lmargin': lmargin, 
                         # 'rmargin': rmargin,  # NOT! assoc w/panel, not buffer
@@ -284,6 +284,24 @@ def k(restore_buffer=restore_buffer):
     # prev buffer may have been killed, but there is always a saved scratch.txt
     restore_buffer(prev_bufname if prev_bufname in buffers else 'scratch.txt')
 
+def clear_buffers(description='all buffers', discard=(lambda buf: True)):
+    """
+    Delete all the buffers (except scratch.txt) matching description,
+    where discard fcn returns True. Can't use the obvious loop because of
+    RuntimeError: dictionary changed size during iteration
+    """
+    global buffers
+    answer = input(f'Delete {description} - are you SURE?  Type y or Y to proceed: ')
+    if not answer[0] in 'yY':
+        return
+    keep_buffers = dict()
+    for bname in buffers:
+        if bname == 'scratch.txt' or not discard(buffers[bname]):
+            keep_buffers[bname] = buffers[bname]
+    buffers = keep_buffers
+    if bname not in buffers:
+        restore_buffer('scratch.txt')
+                            
 # File viewer functions
 
 def p(start=None, end=None, printline=print, move_dot=move_dot): # with hooks 
