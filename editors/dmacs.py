@@ -8,7 +8,7 @@ barely above F (fail).
 """
 
 import sys, importlib
-import terminal, key, keyseq, display, edsel
+import terminal, key, keyseq, display, edsel, pycall
 import sked as ed
 
 # Define and initialize global variables used by dmacs,
@@ -100,6 +100,12 @@ def write_named_file():
     if cancelled(filename): return
     edsel.w(filename)
 
+def python_cmd():
+    'Get and run a single Python command'
+    cmd = request('>>> ')
+    if cancelled(cmd): return
+    pycall.pycall(cmd)
+        
 def set_mark():
     'Set mark at current dot'
     global mark
@@ -200,6 +206,7 @@ keymap = {
     key.C_l: edsel.refresh, # focus window only
     key.M_l: edsel.refresh_all, # all windows, also set scroll
     key.M_g: edsel.graffiti, # put junk on every line of frame, for testing refresh
+    key.M_y: python_cmd,
     # arrow keys, send ANSI escape sequences
     key.down: edsel.l, # next line
     key.up: edsel.rl, # previous line

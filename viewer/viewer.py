@@ -322,16 +322,16 @@ def buffer_key(): # C-x b
 
 def editor_window(cmd):
     """
-    Execute cmd in editor window if viewer has focus.  Viewer keeps focus.
+    Execute cmd in editor window if viewer has focus.  Editor gets focus.                                                        
     """
     if not viewer_displayed: # run cmd in editor window
         cmd()
     elif not viewer_focus(): # run cmd in editor window
         cmd()
-    else: # switch to editro window just to run cmd, return focus to viewer
+    else: # switch to editor window to run cmd
         oe()
         cmd()
-        ov()            
+        # ov() return focus to viewer - NOT! editor keeps focus
 
 def loader():
     """
@@ -376,12 +376,12 @@ dmacs.keymap[key.C_x + 'o'] = edpanel_key
 dmacs.keymap[key.C_l] = refresh
 
 # Cursor motion in viewer window, while editor window has focus
-dmacs.keymap[key.C_t] = vv
-dmacs.keymap[key.M_t] = vrv
-dmacs.keymap[key.M_n] = vl
-dmacs.keymap[key.M_p] = vrl
-dmacs.keymap[key.M_lp] = vtop
-dmacs.keymap[key.M_rp] = vbottom
+dmacs.keymap[key.C_t] = vv # scroll page down
+dmacs.keymap[key.M_t] = vrv # scroll page up
+dmacs.keymap[key.M_n] = vl  # next line
+dmacs.keymap[key.M_p] = vrl # prev ine
+dmacs.keymap[key.M_lp] = vtop  # top of buffer
+dmacs.keymap[key.M_rp] = vbottom # bottom of buffer
 
 # Refresh viewer window while editor window has focus
 dmacs.keymap[key.M_m] = vvrefresh
