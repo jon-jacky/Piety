@@ -1,4 +1,4 @@
-# Start pmacs editor with browser from command line in any dir: python3 -im pm
+# Start pmacs editor full screen with viewer panel in any dir: python3 -im pmf
 # First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
 import sked
 from sked import *
@@ -23,4 +23,5 @@ import viewer
 from viewer import *
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 win(24) 
+vwin()
 pm()

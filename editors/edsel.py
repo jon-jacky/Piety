@@ -661,4 +661,15 @@ def graffiti():
         display.put_cursor(i+1,2*i) # increasing indent to get diagonal strip
         display.putstr(string.printable[i]*8) # len(string.printable) -> 100
     restore_cursor_to_cmdline()
+
+def quit():
+    """
+    Ask for confirmation, then exit Piety and Python.
+    Restore full screen scrolling.
+    """
+    answer = input(
+'Are you SURE you want to quit Piety and Python, losing all unsaved work? ')
+    if not answer.lstrip()[0] in ('yY'): return
+    clr()  # restore full screen scrolling
+    exit() # exit python
            

@@ -150,6 +150,7 @@ def e(fname, move_dot=move_dot, restore_buffer=restore_buffer):
     But first save buffer state so it can be restored on command.
     """
     global filename, buffer, saved, bufname, prev_bufname
+    if not fname.startswith('*'): fname = os.path.abspath(fname)
     if fname == filename:
         print(f'? file {fname} is already in the current buffer\r\n', end='')
         return

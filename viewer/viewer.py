@@ -394,3 +394,15 @@ dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 # Viewer line might name a file, buffer, URL, footnote -- or more to come
 dmacs.keymap[key.M_ret] = loader
 
+def quit():
+    """
+    Ask for confirmation, then exit Piety and Python.
+    Clear the viewer window and restore full screen scrolling.
+    """
+    answer = input(
+'Are you SURE you want to quit Piety and Python, losing all unsaved work? ')
+    if not answer.lstrip()[0] in ('yY'): return
+    if viewer_displayed: vclr() # clear viewer panel
+    fr.clr()  # restore full screen scrolling
+    exit() # exit python
+ 
