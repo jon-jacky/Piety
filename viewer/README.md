@@ -19,7 +19,7 @@ size and add border
 alt="Piety desktop showing two editor windows (left),
 a console in the viewer window (right), and the Python
 REPL (bottom)"
-width="" height="" style="border:5px solid black">
+width="960" height="540" style="border:5px solid black">
 
 [Quick Start](#Quick-Start)  
 [Appearance](#Appearance)   
