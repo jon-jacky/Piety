@@ -14,6 +14,8 @@ output can be redirected anywhere.
 """        
 
 import subprocess, os, pydoc
+import contextlib # redirect_stdout stores intermediate results in StringIO
+import io # StringIO
 
 width = 80  # width of command output for ls() and man() commands
 
@@ -68,8 +70,9 @@ def ls(path='.'):
     """
     sh(f'ls -C -w {width} ' + path)
 
-def lsl(path='.'):
+def lslXXX(path='.'):
     """
+    SUPERCEDED BY lsl DERIVED FROM lstfx BELOW
     Call the shell directory listing command ls -l for a long form listing,
      sorted alphabetically.
     Argument is file or directory path string, default . the current directory.    
@@ -77,11 +80,35 @@ def lsl(path='.'):
     """
     sh('ls -l '+path)
 
-def lslt(path='.'):
+def lsltXXX(path='.'):
     """
+    SUPERCEDED BY lslt DERIVED FROM lstfx BELOW
     Call the shell directory listing command ls -lt for a long form listing,
      sorted most recent first.
     Argument is file or directory path string, default . the current directory.    
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
     sh('ls -lt '+path)
+         
+def lslxf(path='.', cmd='ls -l'):
+    """
+    lsl with eXtra Formatting.
+    In each line, prefix filename at the end with its path (from path= arg).
+    
+    Call cmd, a shell directory listing command such as 'ls -l' or 'ls -lt'
+     for a long form listing, default cmd is 'ls -l' to sort alphabetically.
+    path is file or directory path string, default '.' the current directory.    
+    Invokes the ls command in a shell subprocess, writes output on stdout.
+    """
+    lslines = io.StringIO('')
+    with contextlib.redirect_stdout(lslines):
+        sh(cmd+' '+path)
+    for line in lslines.getvalue().splitlines():
+        stats, spc, fname = line.rpartition(' ')
+        pathstr = '' if path == '.' else path + '/'
+        print(stats + spc + pathstr + fname)
+        
+def lsl(path='.'): lslxf(path, 'ls -l')
+
+def lslt(path='.'): lslxf(path, 'ls -lt')
+

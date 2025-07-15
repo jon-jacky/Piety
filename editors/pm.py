@@ -22,5 +22,7 @@ from search import *
 import viewer
 from viewer import *
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
-win(24) 
+from terminal_util import dimensions
+tlines, tcols = dimensions()
+win(tlines-8) # 8  lines in prompt + repl region 
 pm()

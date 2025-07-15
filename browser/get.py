@@ -83,6 +83,7 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             'https://dercuano.github.io/', # Kragen Sitaker's notes, Dercuano
             'https://derctuo.github.io/', # Kragen Sitaker's notes, Derctuo
             'https://dernocua.github.io/', # Kragen Sitaker's notes, Dernocua                        
+            'https://courses.cs.northwestern.edu/325/readings/graham/',
             'file:///home/jon/z/z/', # Our own Z notes, for testing
             )
 
