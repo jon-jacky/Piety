@@ -2,22 +2,18 @@
 Piety desktop
 =============
 
-Piety has a 'desktop' that provides the functions of a
-Python console, an editor. a web browser, terminal
-windows, and a window manager in a single full-screen
-terminal.
+Piety can provide a 'desktop' with a Python console,
+an editor. a web browser, a terminal windows, and a
+window manager in a single full-screen terminal.
 
-<!-- ![Piety desktop showing two editor windows (left), a
-console in the viewer window (right), and the Python
-REPL (bottom)](../screenshots/editor_sked_edsel_directory.png)
+<!-- ![Piety desktop](../screenshots/editor_sked_edsel_directory.png)
 
-Use HTML (below) instead of this markdown to adjust
-size and add border
+Use HTML (below) instead of this markdown to adjust size.
+width=50% [Aworks but width="960" does *not* work.
 -->
 
-<img src="../screenshots/editor_sked_edsel_directory.png" 
-width=50% height=50% style='border:1px solid #000000'>
-
+<img src="../screenshots/editor_sked_edsel_directory_sl.png"
+ width=67% height=67%>
 
 [Quick Start](#Quick-Start)  
 [Appearance](#Appearance)   
