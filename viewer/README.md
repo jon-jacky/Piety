@@ -16,7 +16,7 @@ size and add border
 -->
 
 <img src="../screenshots/editor_sked_edsel_directory.png" 
-width="960" height="540">
+width=50% height=50%>
 
 
 [Quick Start](#Quick-Start)  
