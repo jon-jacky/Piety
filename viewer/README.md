@@ -15,13 +15,9 @@ Use HTML (below) instead of this markdown to adjust
 size and add border
 -->
 
-<!-- DEBUG - is this HTML img tag doing anything at all?
 <img src="../screenshots/editor_sked_edsel_directory.png" 
-alt="Piety desktop showing two editor windows (left),
-a console in the viewer window (right), and the Python
-REPL (bottom)"
-width="960" height="540" style="border:5px solid black">
--->
+width="960" height="540">
+
 
 [Quick Start](#Quick-Start)  
 [Appearance](#Appearance)   
