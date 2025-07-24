@@ -120,8 +120,9 @@ type in the Python REPL to use the desktop. To get to
 the REPL from display editing mode, type *M-x* (*meta
 x*, hold down the *alt* key while typing the *x* key).
 
-A few of the commands here, and many others used in
-the desktop, are also discussed in the pages about the
+A few of the commands here, and many others that work
+in any window on the desktop, are also discussed in
+the pages about the
 [editors](../editors/README.md) and the
 [browser](../browser/README.md).
  
@@ -166,9 +167,31 @@ below), instead of typing commands in the REPL.
     buffer in the focus window. Repeating *b()* alternates
     between the current and previous buffer.
 
-- **N()** - Show list of buffers in viewer window.  
-    Editor window keeps focus if it has it.
-        
+- **N()** - Show list of buffers in viewer window. The
+    list is in a buffer named \*Buffers\* which is
+    rewritten each time *N()* is invoked. Editor
+    window keeps focus if it has it.
+
+- **loader()** - In the editor focus window,
+    show the item named on the selected line (where the
+    cursor is) in the viewer buffer. 
+    Several kinds of items are supported:
+    When the \*Buffers\* buffer is in the viewer window,
+    this command shows the buffer named on that line
+    in the editor focus window. When the \*Console\*
+    buffer is in the viewer window, and the cursor is
+    on a line in a directory listing made by *lsl* or
+    *lslt* (see below) this command loads the file
+    named on that line into a buffer and shows that
+    buffer in the editor window. When the cursor is on
+    a line in any buffer that contains a URL, this
+    command loads the page at that URL into buffers
+    and displays the rendered buffer in the editor
+    window. When the cursor is on a line in a rendered
+    web page near a link, this command finds the URL
+    at that link, loads that page into buffers, and
+    shows the rendered buffer in the editor window.
+            
 - **ov()** - Switch focus from an editor window to the
     viewer window.
 
@@ -197,13 +220,14 @@ below), instead of typing commands in the REPL.
 - **vrv()** - Scroll viewer window up. Editor window keeps
     focus if it has it.
 
-- **vtop()** - Go to top of buffer in viewer window.
+- **vtop()** - Go to top of buffer in viewer window. 
     Editor window keeps focus if it has it.
 
--- **vbottom()** - Go to bottom of buffer in viewer window.  
+- **vbottom()** - Go to bottom of buffer in viewer window.  
     Editor window keeps focus if it has it.
 
-- **sh(cmd)** - Execute *cmd*, a shell command string,
+- **sh(cmd)** - Run a shell command in the viewer window.
+    Execute *cmd*, a shell command string,
     in a shell subprocess. Echo the command and write the
     command output at the end of the \*Console\* buffer.
     Display the \*Console\* buffer in the viewer window.
@@ -216,13 +240,16 @@ below), instead of typing commands in the REPL.
     window. The editor window keeps the focus, if it
     already has it.
 
-- **pwd()** - Print the current working directory
-    the end of the \*Console\* buffer. Display the
+- **pwd()** - Show the current directory in the viewer
+    window. Print the current working directory the
+    end of the \*Console\* buffer. Display the
     \*Console\* buffer in the viewer window. The
     editor window keeps the focus, if it already has
     it.
 
-- **ls(path)** - Execute the *ls path* command in a 
+- **ls(path)** - Show a compact directory listing
+    in the viewer window.
+    Execute the *ls path* command in a 
     a shell subprocess to show a compact directory 
     listing.. Default *path* is the current working
     directory. Echo the command (which shows the
@@ -231,18 +258,23 @@ below), instead of typing commands in the REPL.
     buffer in the viewer window. The editor window
     keeps the focus, if it already has it.
 
-- **lsl(path)** - Execute the *ls -l path* command in a 
+- **lsl(path)** - SHow a long directory listing
+    in the viewer window.
+    Execute the *ls -l path* command in a 
     a shell subprocess to show a long directory
     listing with one line per file. Default *path* is
     the current working directory. Echo the command
     (which shows the *path*) and the directory listing
     at the end of the \*Console\* buffer. Prefix each
     file name in the listing by the *path* (unlike the
-    shell *ls -l* command). Display the \*Console\*
-    buffer in the viewer winddow. The editor window
+    shell *ls -l* command), so it can work with the
+    *loader* command (above). Display the \*Console\*
+    buffer in the viewer window. The editor window
     keeps the focus, if it already has it.
 
-- **lslt(path)** - Execute the *ls -lt path* command in a 
+- **lslt(path)** - Show a long directory listing 
+    sorted by date in the viewer window.
+    Execute the *ls -lt path* command in a 
     a shell subprocess to show a long directory
     listing with one line per file, sorted by 
     time, with the most recent files first. Default
@@ -250,12 +282,15 @@ below), instead of typing commands in the REPL.
     command (which shows the *path*) and the directory
     listing at the end of the \*Console\* buffer.
     Prefix each file name in the listing by the *path*
-    (unlike the shell *ls -l* command). Display the
-    \*Console\* buffer in the viewer winddow. The
+    (unlike the shell *ls -l* command)m so it can  
+    work with the *loader* command (above). Display the
+    \*Console\* buffer in the viewer window. The
     editor window keeps the focus, if it already has
     it.
 
--- **man(topic)** - Execute the *man topic* command 
+- **man(topic)** - Show a manual page in the viewer 
+    window.
+    Execute the *man topic* command 
     in a shell subprocess to print the manual page
     on *topic*, a string.  Create a new buffer named
     *topic.man* to hold the manual page and display
@@ -263,7 +298,9 @@ below), instead of typing commands in the REPL.
     formatted to fit in the viewer window. The editor
     window keeps the focus, if it already has it.
 
--- **help(topic)** - Execute the Python *help(topic)*
+- **help(topic)** - Show Python help in the viewer
+    window.  
+    Execute the Python *help(topic)*
     command to print information about *topic*, a 
     Python object.  Create a new buffer named
     *topic.help* to hold the help text and display
@@ -272,10 +309,82 @@ below), instead of typing commands in the REPL.
     you can use editor commands to wrap long lines.
     The editor window keeps the focus if it already
     has it.
-
-    
+ 
 ### Keycodes ###
 
+Keycodes you can type to invoke desktop
+[commands](#Commands) (above) while in display editing
+mode. To get to display editing mode from the Python
+prompt in the REPL, type the function call *pm()*.
+
+Here *C-x*, *control-X*, means hold down the *ctrl*
+key while you type the *X* key. *M-x*, *meta-X*, means
+hold down the *alt* key while you type the *X* key.
+
+- **M-x** - Exit display editing and return to the
+    the Python command line. To return to display
+    editing again, type the command *pm()*.
+    
+- **M-y** - Type just one command at the Python
+    prompt, then return immediately to display editing,
+    without having to type *pm()*.
+
+- **C-x 3** - Create viewer panel.
+
+- **C-x 1** - Delete viewer panel, if viewer panel has
+    focus. Delete editor window, if there are two and one
+    has focus.
+
+- **C-x l** - Refresh focus window, an editor or viewer window.
+
+- **C-x f** - Load named file into focus window, enter file
+    name at prompt.
+
+- **C-x b** - Show named buffer in focus window, enter buffer
+    name at prompt.   Type RET to return to previous buffer.
+
+- **C-x C-b** - Show list of buffers in viewer window.
+    
+- **M-ret** - Load file, buffer, or web page into editor window.
+    File name, buffer name, URL, or link is on line at cursor
+    in viewer window.
+
+- **C-x v** - Switch focus from editor window to viewer window.
+
+- **C-x e** - Switch focus from viewer window back to most recent 
+    editor window.
+
+- **C-x 2** - Split editor window in two.  No effect in viewer 
+    window.
+    
+-  **C-x 1** - Return to single editor window by deleting 
+    editor focus window.  Delete viewer window if it has focus.
+
+- **C-x o** - Switch focus to other editor window, 
+    if there is one.
+    
+- **C-v** - Scroll down (forward) in focus window.
+
+- **M-v** - Scroll up (back) in focus window.
+
+- **C-t** - Scroll down in viewer window.
+    Editor window keeps focus if it has it.
+
+- **M-t** - Scroll up in viewer window.
+    Editor window keeps focus if it has it.
+
+- **M-<** - Go to top (beginning) of buffer in focus
+    window.
+
+- **M->** - Go to bottom (end) of buffer in focus
+    window.
+
+- **M-(** - Go to top of buffer in viewer window.
+   Editor window keeps focus if it has it.
+
+- **M-)** - Go to bottom of buffer in viewer window.
+   Editor window keeps focus if it has it.
+        
 ### Influences ###
 
 The Piety desktop is influenced by 
