@@ -232,7 +232,7 @@ below), instead of typing commands in the REPL.
 - **vtop()** - Go to top of buffer in viewer window. 
     Editor window keeps focus if it has it.
 
-- **vbottom()** - Go to bottom of buffer in viewer window.  
+- **vbottom()** - Go to bottom of buffer in viewer window.
     Editor window keeps focus if it has it.
 
 - **sh(cmd)** - Run a shell command in the viewer window.   
@@ -269,7 +269,7 @@ below), instead of typing commands in the REPL.
     buffer in the viewer window. The editor window
     keeps the focus, if it already has it.
 
-- **lsl(path)** - SHow a long directory listing
+- **lsl(path)** - Show a long directory listing
     in the viewer window.   
     Execute the *ls -l path* command in a 
     a shell subprocess to show a long directory
@@ -293,7 +293,7 @@ below), instead of typing commands in the REPL.
     command (which shows the *path*) and the directory
     listing at the end of the \*Console\* buffer.
     Prefix each file name in the listing by the *path*
-    (unlike the shell *ls -l* command)m so it can  
+    (unlike the shell *ls -lr* command) so it can
     work with the *loader* command (above). Display the
     \*Console\* buffer in the viewer window. The
     editor window keeps the focus, if it already has
@@ -340,11 +340,12 @@ hold down the *alt* key while you type the *X* key.
     prompt, then return immediately to display editing,
     without having to type *pm()*.
 
-- **C-x 3** - Create viewer panel.
+- **C-x 3** - Create viewer panel.  Not needed if session
+    was started from the *pmf* script.
 
 - **C-x 1** - Delete viewer panel, if viewer panel has
-    focus. Delete editor window, if there are two and one
-    has focus.
+    focus.   Needed only for testing *C-x 3*.
+
 
 - **C-x l** - Refresh focus window, an editor or viewer window.
 
@@ -356,14 +357,16 @@ hold down the *alt* key while you type the *X* key.
 
 - **C-x C-b** - Show list of buffers in viewer window.
 
-- **RET** - Select a buffer from the list in the focus
+- **RET** - Select a buffer from the list in the
     window and show it in the same window.     
     (RET is the Return or Enter key.)
     
-- **M-RET** - Select an item from the viewer window and
-    show it in the editor window.  
-    File name, buffer name, URL, or link is on line at cursor
-    in viewer window.
+- **M-RET** - Select an item from the list in the 
+    viewer window and show it in the editor window.  
+    Buffer name, file name, URL, or link is on the
+    line at the cursor in the list in the viewer
+    window, put there by the *C-x C-b* keycode, or by
+    the *N*, *lsl*, lslt*, or *gr* commands.
 
 - **C-x v** - Switch focus from editor window to viewer window.
 
