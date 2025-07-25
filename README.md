@@ -8,6 +8,7 @@ Piety
 [Current Status](#Current-Status)  
 [No Dependencies](#No-Dependencies)  
 [Demos](#Demos)  
+[Screenshots](#Screenshots)
 [Roadmap](#Roadmap)  
 [Tested Platforms](#Tested-Platforms)  
 [Footnotes](#Footnotes)  
@@ -42,11 +43,14 @@ terminal on a host operating system.   The Python interpreter with its runtime
 is the virtual machine where the Piety OS now runs, analogous to the QEMU
 virtual machine in many other operating system projects.
 
-Piety provides a [display editor](editors/README.md), a 
-[customized Python interpreter](tasking/pyshell.py) that
-also acts as the system [shell](console/README.md), a
-[customized debugger](editors/breakpt.md), and 
-its own [web browser](browser/README.md).
+Piety provides a [display editor](editors/README.md), a [customized
+Python interpreter](tasking/pyshell.py) that also acts as the system
+[shell](console/README.md), a [customized debugger](editors/breakpt.md),
+and its own [web browser](browser/README.md). These, and other Python
+applications, can all be presented together in a
+[desktop](viewer/README.md) controlled by a custom window manager in a
+single full-screen terminal.
+
 The display editor can support multiple buffers and windows in the
 terminal, and also a region for the Python interpreter. The debugger can
 work in the interpreter region without disturbing window contents.
@@ -111,10 +115,10 @@ A few of the demos are not very interactive, so can be run from scripts:
 [pmacs_script.py](piety/pmacs_script.py) and
 [edsel_script.py](piety/edsel_script.py).
 
-We don't have any screenshots or animations of these demos. Honestly,
-there is not much to see -- it just looks like Emacs in a terminal. To
-gain any understanding, you have to read along in the those files and
-work through the demos yourself.
+## Screenshots ##
+
+The page about the Piety [desktop](viewer/README.md) includes a screenshot.
+This [directory](screenshots) contains a few more.
           
 ## Roadmap ##
 
@@ -155,6 +159,6 @@ Details in [platforms.md](doc/platforms.md).
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised Apr 2025
+Revised Jul 2025
 
 
