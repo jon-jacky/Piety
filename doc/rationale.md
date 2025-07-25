@@ -10,6 +10,8 @@ programmers.
 Piety uses a single programming language -- Python -- for both the
 applications and the operating system.
 
+Piety has no dependencies, other than Python itself.
+ 
 Code is added and revised in a long-running Python session,  without
 restarting or losing work in progress.
 
@@ -18,6 +20,7 @@ Piety provides concurrency with a Python *asyncio* event loop.
 [Personal computer](#Personal-computer)  
 [For programmers](#For-programmers)  
 [Python](#Python)  
+[No dependencies](#No-dependencies)  
 [Operating system](#Operating-system)  
 [Long-running session](#Long-running-session)  
 [Small](#Small)  
@@ -31,22 +34,28 @@ preferences and inclinations.  A personal computer enables its owner to work
 -- or just pass the time -- in the way that is most comfortable and satisfying for
 them, no matter how unusual or eccentric that might be.   Piety is a deliberate
 reaction against the prevailing trend to try to build a system that everyone
-will use, that will take over the world.
-
+will use, that will take over the world. 
 
 ### For programmers ###
 
-I do not expect anyone else to use Piety routinely. It is too saturated with
+I see Piety primarily as an *activity* -- an ongoing programming project
+-- rather than a finished product for running applications.
+ 
+I resolved to write Piety from scratch, with no tools, starting from a
+Python prompt in a terminal window. First, I made a simple text editor,
+then used that to build the rest. I did write the first two hundred
+lines or so -- a few pages -- in another editor, but after that Piety
+development has been completely self-hosted in Piety itself.
+Building Piety up from almost nothing was an essential part of the 
+experience for me.  No one else can reproduce that experience. 
+It still informs all my use of the system.
+ 
+I do not expect anyone else to use Piety routinely. It bears too many of
 my own peculiar preferences, and limitations that are severe but
-tolerable to me.  But other programmers  might try it out, or just look at
-the code and documents, to get ideas, techniques, and examples they could
-use to help them build systems that express their own preferences.
+tolerable to me.  But other programmers  might try it out, or just look into 
+the code and documents, to get ideas, techniques, and examples
+they could use to build systems that express their own preferences.
 
-It is easy to try out Piety.  Piety has no dependencies, so you can
-just clone this Piety repository and use your system's built-in *python*
-(or *python3*) command to run the scripts. You do not need to set up any
-Python environment.
-  
 ### Python ###
 
 Python is typically used from an interactive interpreter that enables the
@@ -69,15 +78,30 @@ the cost of adding many additional things you must know to use the computer.
 Maybe we can simplify our computing life by dispensing with all that, and
 just use Python for everything.
 
- 
+### No dependencies ###
+
+Piety has no dependencies, other than the language and libraries included
+in the standard Python distribution.
+
+This makes development easy.  Python and its standard libraries come already
+installed on every system I have used.  I do not need to set up any
+Python environment, other than defining a single shell command to put the 
+Piety directories on the PYTHONPATH.  I do not need to search the 
+internet for packages and documentation.  Everything I need to know can
+be found in the local Python installation, often by using the Python
+*help* command.
+
+This also makes it easy for others to try out Piety.  They can just
+clone this Piety repository and use their system's built-in *python* (or
+*python3*) command to run the scripts.
+     
 ### Operating system ###
 
 In a computer whose operating system is written in Python, almost all code
 in the system, including the usual operating system functions as well as
 applications, runs in the Python interpreter.  To boot the system, (almost)
 the first thing we must do is start Python, which then runs everything else.
-
-
+ 
 ### Long-running session ###
 
 An entire life cycle of the system from startup to shutdown runs in a single
@@ -135,5 +159,5 @@ The Piety editor and Python shell are coded so they can run without blocking
 in the event loop. Here is an
 [explanation and demonstration](../piety/pmacs_blocking.md).
 
-Revised Nov 2024
+Revised Jul 2025
 
