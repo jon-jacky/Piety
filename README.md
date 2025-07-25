@@ -8,7 +8,7 @@ Piety
 [Current Status](#Current-Status)  
 [No Dependencies](#No-Dependencies)  
 [Demos](#Demos)  
-[Screenshots](#Screenshots)
+[Screenshots](#Screenshots)   
 [Roadmap](#Roadmap)  
 [Tested Platforms](#Tested-Platforms)  
 [Footnotes](#Footnotes)  
