@@ -431,6 +431,12 @@ def display_p(start=None, end=None):
 
 p = display_p
 
+def top():
+    p(1)
+    
+def bottom():
+    p(ed.S())
+        
 def l():
     ed.l(display_p)
 

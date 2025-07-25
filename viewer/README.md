@@ -149,7 +149,10 @@ below), instead of typing commands in the REPL.
 - **vrefresh()** - Redraw the viewer window on the
     display, including its border and buffer contents.
     Needed only if viewer window becomes corrupted.
-        
+
+- **vvrefresh()** - Redraw viewer window.  Editor window
+    keeps focus if it has it.
+            
 - **e(fname)** - Load the file named *fname* into a
     buffer, and display it in the focus window. *fname*
     can include a relative or absolute path. Generate a
@@ -172,7 +175,9 @@ below), instead of typing commands in the REPL.
     rewritten each time *N()* is invoked. Editor
     window keeps focus if it has it.
 
-- **loader()** - In the editor focus window,
+- **loader()** - Select an item from
+    the viewer window and show it in the editor window.  
+    In the editor focus window,
     show the item named on the selected line (where the
     cursor is) in the viewer buffer. 
     Several kinds of items are supported:
@@ -214,6 +219,10 @@ below), instead of typing commands in the REPL.
 
 - **rv()** - Scroll up (back) in focus window.
 
+- **top()** - Go to top of buffer in focus window. 
+
+- **bottom()** - Go to bottom of buffer in focus window.  
+
 - **vv()** - Scroll viewer window down.  Editor window 
     keeps focus if it has it.
 
@@ -226,7 +235,7 @@ below), instead of typing commands in the REPL.
 - **vbottom()** - Go to bottom of buffer in viewer window.  
     Editor window keeps focus if it has it.
 
-- **sh(cmd)** - Run a shell command in the viewer window.
+- **sh(cmd)** - Run a shell command in the viewer window.   
     Execute *cmd*, a shell command string,
     in a shell subprocess. Echo the command and write the
     command output at the end of the \*Console\* buffer.
@@ -234,21 +243,23 @@ below), instead of typing commands in the REPL.
     The editor window keeps the focus, if it already has it.
     
 - **cd(path)** - Change current working directory to
-    *path*, a string. Echo command (which shows the
+    *path*, a string.    
+    Echo command (which shows the
     *path*) at the end of the \*Console\* buffer.
     Display the \*Console\* buffer in the viewer
     window. The editor window keeps the focus, if it
     already has it.
 
 - **pwd()** - Show the current directory in the viewer
-    window. Print the current working directory the
+    window.    
+    Print the current working directory the
     end of the \*Console\* buffer. Display the
     \*Console\* buffer in the viewer window. The
     editor window keeps the focus, if it already has
     it.
 
 - **ls(path)** - Show a compact directory listing
-    in the viewer window.
+    in the viewer window.   
     Execute the *ls path* command in a 
     a shell subprocess to show a compact directory 
     listing.. Default *path* is the current working
@@ -259,7 +270,7 @@ below), instead of typing commands in the REPL.
     keeps the focus, if it already has it.
 
 - **lsl(path)** - SHow a long directory listing
-    in the viewer window.
+    in the viewer window.   
     Execute the *ls -l path* command in a 
     a shell subprocess to show a long directory
     listing with one line per file. Default *path* is
@@ -273,7 +284,7 @@ below), instead of typing commands in the REPL.
     keeps the focus, if it already has it.
 
 - **lslt(path)** - Show a long directory listing 
-    sorted by date in the viewer window.
+    sorted by date in the viewer window.    
     Execute the *ls -lt path* command in a 
     a shell subprocess to show a long directory
     listing with one line per file, sorted by 
@@ -289,7 +300,7 @@ below), instead of typing commands in the REPL.
     it.
 
 - **man(topic)** - Show a manual page in the viewer 
-    window.
+    window.   
     Execute the *man topic* command 
     in a shell subprocess to print the manual page
     on *topic*, a string.  Create a new buffer named
@@ -299,7 +310,7 @@ below), instead of typing commands in the REPL.
     window keeps the focus, if it already has it.
 
 - **help(topic)** - Show Python help in the viewer
-    window.  
+    window.   
     Execute the Python *help(topic)*
     command to print information about *topic*, a 
     Python object.  Create a new buffer named
@@ -344,8 +355,13 @@ hold down the *alt* key while you type the *X* key.
     name at prompt.   Type RET to return to previous buffer.
 
 - **C-x C-b** - Show list of buffers in viewer window.
+
+- **RET** - Select a buffer from the list in the focus
+    window and show it in the same window.     
+    (RET is the Return or Enter key.)
     
-- **M-ret** - Load file, buffer, or web page into editor window.
+- **M-RET** - Select an item from the viewer window and
+    show it in the editor window.  
     File name, buffer name, URL, or link is on line at cursor
     in viewer window.
 
@@ -367,17 +383,17 @@ hold down the *alt* key while you type the *X* key.
 
 - **M-v** - Scroll up (back) in focus window.
 
-- **C-t** - Scroll down in viewer window.
-    Editor window keeps focus if it has it.
-
-- **M-t** - Scroll up in viewer window.
-    Editor window keeps focus if it has it.
-
 - **M-<** - Go to top (beginning) of buffer in focus
     window.
 
 - **M->** - Go to bottom (end) of buffer in focus
     window.
+
+- **C-t** - Scroll down in viewer window.
+    Editor window keeps focus if it has it.
+
+- **M-t** - Scroll up in viewer window.
+    Editor window keeps focus if it has it.
 
 - **M-(** - Go to top of buffer in viewer window.
    Editor window keeps focus if it has it.
