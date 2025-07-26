@@ -47,8 +47,7 @@ then used that to build the rest. I did write the first two hundred
 lines or so -- a few pages -- in another editor, but after that Piety
 development has been completely self-hosted in Piety itself.
 Building Piety up from almost nothing was an essential part of the 
-experience for me.  No one else can reproduce that experience. 
-It still informs all my use of the system.
+experience for me. It still informs all my use of the system.
  
 I do not expect anyone else to use Piety routinely. It bears too many of
 my own peculiar preferences, and limitations that are severe but
@@ -87,7 +86,7 @@ This makes development easy.  Python and its standard libraries come already
 installed on every system I have used.  I do not need to set up any
 Python environment, other than defining a single shell command to put the 
 Piety directories on the PYTHONPATH.  I do not need to search the 
-internet for packages and documentation.  Everything I need to know can
+internet for packages and documentation.  Everything I need for Piety can
 be found in the local Python installation, often by using the Python
 *help* command.
 

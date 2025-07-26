@@ -117,8 +117,9 @@ A few of the demos are not very interactive, so can be run from scripts:
 
 ## Screenshots ##
 
-The page about the Piety [desktop](viewer/README.md) includes a screenshot.
-This [directory](screenshots) contains a few more.
+The pages about the Piety [desktop](viewer/README.md) and
+[browser](browser/README.md) include screenshots. This
+[directory](screenshots) contains a few more.
           
 ## Roadmap ##
 

@@ -5,6 +5,9 @@ Piety browser
 Text-only web browser closely integrated with the Piety editors. 
 Downloaded web pages are stored and displayed in editor buffers. 
 
+<img src="../screenshots/browser_story_comment_frontpage_sl.png"
+ alt="Piety Browser" width=67% height=67%>
+
 [Quick Start](#Quick-Start)  
 [Appearance](#Appearance)   
 [Commands](#Commands)   
@@ -49,6 +52,9 @@ In the rendered text page, hypertext links are displayed as footnotes.
 The text in the link is marked by underscores, and is followed by a
 footnote number in brackets: *\_like this\_ [12]*. At the end of the
 buffer, the numbered list of link URLs appears. 
+
+<img src="../screenshots/browser_story_comment_links_sl.png"
+ alt="Piety Browser" width=67% height=67%>
 
 For example, here are a few lines from the rendered text page for
 *news.ycombinator.com*.  This page is unusually dense with links:
@@ -318,5 +324,5 @@ supported at this writing, in Mar 2015:
 The base URL for each web page appears in a middle column of the buffer list
 shown by the *N()* command or the *C-x C-b* keycode.
 
-Revised Apr 2025
+Revised Jul 2025
 
