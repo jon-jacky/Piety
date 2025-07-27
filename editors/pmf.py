@@ -26,4 +26,6 @@ from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin()
-pm()
+N()
+oe()
+#pm()

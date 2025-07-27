@@ -46,11 +46,12 @@ Run this command to start the desktop:
 
     python3 -im pmf
 
-Now you can run the desktop by typing
-[commands](#Commands) at the Python prompt, or by
-typing [keycodes](#Keycodes). (All keycodes invoke a
-command, so we just say 'commands' for 'commands and
-keycodes'.)
+The desktop appears, with the buffer list in the viewer window
+and the *scratch.txt* buffer in the editor window.  The cursor
+is at the Python prompt in the REPL region at the bottom.
+Now you can run the desktop by typing [commands](#Commands) at the
+Python prompt.   Type the *pm()* command to enter display
+editing, where you can run the desktop by typing [keycodes](#Keycodes).
 
 ### Appearance ###
 
@@ -174,6 +175,14 @@ below), instead of typing commands in the REPL.
     list is in a buffer named \*Buffers\* which is
     rewritten each time *N()* is invoked. Editor
     window keeps focus if it has it.
+ 
+- **clear_buffers()** - Prompts *Are you SURE ...?* If the
+    response starts with *y* or *Y*, deletes all buffers
+    except *scratch.txt*.
+
+- **clear_webpages()** - Prompts *Are you SURE ...?* If the
+    response starts with *y* or *Y*, deletes all buffers
+    whose names begin with *http*.
 
 - **loader()** - Select an item from
     the viewer window and show it in the editor window.  

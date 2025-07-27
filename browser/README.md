@@ -54,7 +54,7 @@ footnote number in brackets: *\_like this\_ [12]*. At the end of the
 buffer, the numbered list of link URLs appears. 
 
 <img src="../screenshots/browser_story_comment_links_sl.png"
- alt="Piety Browser" width=67% height=67%>
+ alt="Piety Browser, showing links" width=67% height=67%>
 
 For example, here are a few lines from the rendered text page for
 *news.ycombinator.com*.  This page is unusually dense with links:

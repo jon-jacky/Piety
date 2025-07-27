@@ -38,9 +38,10 @@ will use, that will take over the world.
 
 ### For programmers ###
 
-I see Piety primarily as an *activity* -- an ongoing programming project
--- rather than a finished product for running applications.
- 
+I see Piety as an *activity*: a series of experiments, an
+ongoing project. I often add functionality, but I am not trying to
+complete a finished product.
+  
 I resolved to write Piety from scratch, with no tools, starting from a
 Python prompt in a terminal window. First, I made a simple text editor,
 then used that to build the rest. I did write the first two hundred
