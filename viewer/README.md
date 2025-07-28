@@ -160,6 +160,10 @@ Files and buffer contents:
 - **gr(url)** - Load the web page at *url* into *two*
     buffers: the HTML source, and the rendered text.
     Display the rendered text buffer in the focus window.
+
+- **loader()** - Select a file or web page from the
+    viewer window, load it into a buffer, and display it
+    in the editor window.
     
 - **b(bname)** - Display the buffer named *bname* in
     the focus window.
@@ -371,6 +375,10 @@ Files and buffer contents:
   
 - **C-x f** - Load named file into focus window, enter file
     name at prompt.
+
+- **M-RET** - Select a file or web page from the
+    viewer window, load it into a buffer, and display it
+    in the editor window.
 
 - **C-x b** - Show named buffer in focus window, enter buffer
     name at prompt.   Type RET to return to previous buffer.
