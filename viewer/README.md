@@ -201,6 +201,8 @@ Navigating among windows:
 - **o1()** - In an editor window, when there are two
     editor windows, delete the other editor window.
 
+Navigating within windows:
+
 - **v()** - Scroll down (forward) in focus window.
 
 - **rv()** - Scroll up (back) in focus window.
@@ -390,6 +392,8 @@ Navigating among windows:
 
 - **C-x o** - Switch focus to other editor window, 
     if there is one.
+
+Navigating within windows:
     
 - **C-v** - Scroll down (forward) in focus window.
 
