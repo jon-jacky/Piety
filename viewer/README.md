@@ -177,13 +177,11 @@ Files and buffer contents:
     rewritten each time *N()* is invoked. Editor
     window keeps focus if it has it.
  
-- **clear_buffers()** - Prompts *Are you SURE ...?* If the
-    response starts with *y* or *Y*, deletes all buffers
-    except *scratch.txt*.
+- **clear_buffers()** - Deletes all buffers except *scratch.txt*.
+    First, prompts *Are you SURE ...?*
 
-- **clear_webpages()** - Prompts *Are you SURE ...?* If the
-    response starts with *y* or *Y*, deletes all buffers
-    whose file names begin with *http*.
+- **clear_webpages()** - Deletes all buffers whose file names
+    begin with *http*.  First, prompts *Are you SURE ...?*
 
 Navigating among windows:
 
