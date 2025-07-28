@@ -131,6 +131,8 @@ Many of these commands are usually invoked in the
 display editor, by pressing [keycodes](#Keycodes) (see
 below), instead of typing commands in the REPL.
 
+Session management:
+
 - **pm()** - Switch from the REPL to display editing
     in the focus window.
 
@@ -147,13 +149,8 @@ below), instead of typing commands in the REPL.
     including border and status line. Needed only for
     testing the *vwin()* command.
 
-- **vrefresh()** - Redraw the viewer window on the
-    display, including its border and buffer contents.
-    Needed only if viewer window becomes corrupted.
+Files and buffer contents:
 
-- **vvrefresh()** - Redraw viewer window.  Editor window
-    keeps focus if it has it.
-            
 - **e(fname)** - Load the file named *fname* into a
     buffer, and display it in the focus window. *fname*
     can include a relative or absolute path. Generate a
@@ -182,30 +179,10 @@ below), instead of typing commands in the REPL.
 
 - **clear_webpages()** - Prompts *Are you SURE ...?* If the
     response starts with *y* or *Y*, deletes all buffers
-    whose names begin with *http*.
+    whose file names begin with *http*.
 
-- **loader()** - Select an item from
-    the viewer window and show it in the editor window.  
-    In the editor focus window,
-    show the item named on the selected line (where the
-    cursor is) in the viewer buffer. 
-    Several kinds of items are supported:
-    When the \*Buffers\* buffer is in the viewer window,
-    this command shows the buffer named on that line
-    in the editor focus window. When the \*Console\*
-    buffer is in the viewer window, and the cursor is
-    on a line in a directory listing made by *lsl* or
-    *lslt* (see below) this command loads the file
-    named on that line into a buffer and shows that
-    buffer in the editor window. When the cursor is on
-    a line in any buffer that contains a URL, this
-    command loads the page at that URL into buffers
-    and displays the rendered buffer in the editor
-    window. When the cursor is on a line in a rendered
-    web page near a link, this command finds the URL
-    at that link, loads that page into buffers, and
-    shows the rendered buffer in the editor window.
-            
+Navigating among windows:
+
 - **ov()** - Switch focus from an editor window to the
     viewer window.
 
@@ -243,6 +220,15 @@ below), instead of typing commands in the REPL.
 
 - **vbottom()** - Go to bottom of buffer in viewer window.
     Editor window keeps focus if it has it.
+
+- **vrefresh()** - Redraw the viewer window on the
+    display, including its border and buffer contents.
+    Needed only if viewer window becomes corrupted.
+
+- **vvrefresh()** - Redraw viewer window.  Editor window
+    keeps focus if it has it.
+
+Viewer window contents:            
 
 - **sh(cmd)** - Run a shell command in the viewer window.   
     Execute *cmd*, a shell command string,
@@ -329,7 +315,29 @@ below), instead of typing commands in the REPL.
     you can use editor commands to wrap long lines.
     The editor window keeps the focus if it already
     has it.
- 
+
+- **loader()** - Select an item from
+    the viewer window and show it in the editor window.  
+    In the editor focus window,
+    show the item named on the selected line (where the
+    cursor is) in the viewer buffer. 
+    Several kinds of items are supported:
+    When the \*Buffers\* buffer is in the viewer window,
+    this command shows the buffer named on that line
+    in the editor focus window. When the \*Console\*
+    buffer is in the viewer window, and the cursor is
+    on a line in a directory listing made by *lsl* or
+    *lslt* (see below) this command loads the file
+    named on that line into a buffer and shows that
+    buffer in the editor window. When the cursor is on
+    a line in any buffer that contains a URL, this
+    command loads the page at that URL into buffers
+    and displays the rendered buffer in the editor
+    window. When the cursor is on a line in a rendered
+    web page near a link, this command finds the URL
+    at that link, loads that page into buffers, and
+    shows the rendered buffer in the editor window.
+
 ### Keycodes ###
 
 Keycodes you can type to invoke desktop
@@ -340,6 +348,8 @@ prompt in the REPL, type the function call *pm()*.
 Here *C-x*, *control-X*, means hold down the *ctrl*
 key while you type the *X* key. *M-x*, *meta-X*, means
 hold down the *alt* key while you type the *X* key.
+
+Session management: 
 
 - **M-x** - Exit display editing and return to the
     the Python command line. To return to display
@@ -355,9 +365,8 @@ hold down the *alt* key while you type the *X* key.
 - **C-x 1** - Delete viewer panel, if viewer panel has
     focus.   Needed only for testing *C-x 3*.
 
-
-- **C-x l** - Refresh focus window, an editor or viewer window.
-
+Files and buffer contents:
+  
 - **C-x f** - Load named file into focus window, enter file
     name at prompt.
 
@@ -366,16 +375,7 @@ hold down the *alt* key while you type the *X* key.
 
 - **C-x C-b** - Show list of buffers in viewer window.
 
-- **RET** - Select a buffer from the list in the
-    window and show it in the same window.     
-    (RET is the Return or Enter key.)
-    
-- **M-RET** - Select an item from the list in the 
-    viewer window and show it in the editor window.  
-    Buffer name, file name, URL, or link is on the
-    line at the cursor in the list in the viewer
-    window, put there by the *C-x C-b* keycode, or by
-    the *N*, *lsl*, lslt*, or *gr* commands.
+Navigating among windows:
 
 - **C-x v** - Switch focus from editor window to viewer window.
 
@@ -412,7 +412,25 @@ hold down the *alt* key while you type the *X* key.
 
 - **M-)** - Go to bottom of buffer in viewer window.
    Editor window keeps focus if it has it.
-        
+
+- **C-x l** - Refresh focus window, an editor or viewer window.
+
+- **M-m** - Refresh viewer window while editor window has focus.
+
+Viewer window contents
+
+- **RET** - Select a buffer from the list in the
+    window and show it in the same window.     
+    (RET is the Return or Enter key.)
+    
+- **M-RET** - Select an item from the list in the 
+    viewer window and show it in the editor window.  
+    Buffer name, file name, URL, or link is on the
+    line at the cursor in the list in the viewer
+    window, put there by the *C-x C-b* keycode, or by
+    the *N*, *lsl*, lslt*, or *gr* commands.
+
+
 ### Influences ###
 
 The Piety desktop is influenced by 
