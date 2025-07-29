@@ -2,8 +2,7 @@
 branches
 ========
 
-This is the *reader* branch of the *rewrite* branch.
-Experiment with a reader window beside the editor windows. 
+This is the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -14,7 +13,9 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
--  6 Apr 2025: Begin *reader* branch to experiment with a reader window
+- 28 Jul 2025:  Merge the *reader* branch back into the *rewrite* branch.
+
+-  6 Apr 2025: Begin *reader* branch to experiment with a viewer window
   beside the editor windows. 
 
 -  6 Apr 2025: Merge the *browser* branch back into the *rewrite* branch.
