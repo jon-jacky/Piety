@@ -70,6 +70,9 @@ There is a *pysh* prompt *>>>>* at the bottom of the terminal window.  To
 put the cursor there, type the command *M-x* ("meta x") by holding down the
 keyboard *alt* key while you type the *x* key.  
 
+<img src="../screenshots/pmacs_script_terminal.png"
+ alt="pmacs_script.py running in a terminal">
+
 Confirm the timer task is running.
 
     >>>> asyncio.all_tasks(piety)

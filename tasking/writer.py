@@ -68,7 +68,7 @@ def write(line):
         ed.dot = ed.S()  # last line in buffer, which we just added.
         if fr.in_window(ed.dot):
             display.put_cursor(fr.wline(ed.dot), 1)
-            display.putstr(line[:fr.tcols])
+            display.putstr(line[:fr.width])
         else:
             recenter() # redefined above, not the version in edsel
         restore_cursor()
@@ -93,7 +93,7 @@ def writebuf(bname, line):
             if bname == ed.bufname: # name of current buffer
                 if fr.in_window(ed.dot): # assumes focus window shows current buffer
                     display.put_cursor(fr.wline(ed.dot), 1)
-                    display.putstr(line[:fr.tcols])
+                    display.putstr(line[:fr.width])
                 else:
                     recenter() # redefined above, not the version in edsel
                 restore_cursor()
