@@ -142,7 +142,7 @@ Session management:
 
 - **vwin()** - Create the viewer window to the right
     of the editor panel, if it does not already exist. Not
-    needed if you start the Piety session from the *pmf*
+    needed if you start the Piety session from the *vpm*
     script, as described in *Quick Start* above.
 
 - **vclr()** - Erase viewer window from the display,
@@ -364,7 +364,7 @@ Session management:
     without having to type *pm()*.
 
 - **C-x 3** - Create viewer panel.  Not needed if session
-    was started from the *pmf* script.
+    was started from the *vpm* script.
 
 - **C-x 1** - Delete viewer panel, if viewer panel has
     focus.   Needed only for testing *C-x 3*.
@@ -448,4 +448,4 @@ The Piety desktop is influenced by
 [Oberon](https://people.inf.ethz.ch/wirth/ProjectOberon/UsingOberon.pdf), 
 and [Acme](http://acme.cat-v.org/).
 
-Revised Jul 2025 
+Revised Aug 2025 
