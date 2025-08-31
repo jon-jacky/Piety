@@ -44,7 +44,7 @@ columns across the full width of the display.
 
 Run this command to start the desktop:
 
-    python3 -im pmf
+    python3 -im vpm
 
 The desktop appears, with the buffer list in the viewer window
 and the *scratch.txt* buffer in the editor window.  The cursor
