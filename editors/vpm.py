@@ -1,4 +1,4 @@
-# Start pmacs editor full screen with viewer panel in any dir: python3 -im pmf
+# Start pmacs editor full screen with viewer panel in any dir: python3 -im vpm
 # First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
 import sked
 from sked import *

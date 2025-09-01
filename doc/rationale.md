@@ -39,8 +39,8 @@ will use, that will take over the world.
 ### For programmers ###
 
 I see Piety as an *activity*: a series of experiments, an
-ongoing project. I often add functionality, but I am not trying to
-complete a finished product.
+ongoing project. I often add features, but I am not trying to
+make a finished product.
   
 I resolved to write Piety from scratch, with no tools, starting from a
 Python prompt in a terminal window. First, I made a simple text editor,

@@ -37,6 +37,10 @@ Run this command to start the display editor, including the browser:
 Now you can run the browser by typing [commands](#Commands) at the Python
 prompt, or by pressing [keycodes](#Keycodes). 
 
+NOTE added Sep 2025: The screenshots show the browser running in the
+full screen [Piety desktop](../viewer/README.md). Follow the directions
+on that page.
+
 ### Appearance ###
 
 Each web page appears in *two* editor buffers: we download the HTML sent
@@ -324,5 +328,5 @@ supported at this writing, in Mar 2015:
 The base URL for each web page appears in a middle column of the buffer list
 shown by the *N()* command or the *C-x C-b* keycode.
 
-Revised Jul 2025
+Revised Sep 2025
 

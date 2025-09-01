@@ -18,6 +18,6 @@ e('a.txt')
 ta = ATimer()
 abuf = Writer('a.txt')
 piety.create_task(ta.atimer(1000,1,'A',abuf))
-on()
-apm()
+on() # next window
+apm() # begin display editing
 
