@@ -37,9 +37,12 @@ Run this command to start the display editor, including the browser:
 Now you can run the browser by typing [commands](#Commands) at the Python
 prompt, or by pressing [keycodes](#Keycodes). 
 
-NOTE added Sep 2025: The screenshots show the browser running in the
-full screen [Piety desktop](../viewer/README.md). Follow the directions
-on that page.
+NOTE added Sep 2025: The preceding directions run the browser in a
+terminal window on the host desktop, which can show up to two browser
+windows in a vertical stack. The screenshots here show the browser
+running in the full screen with an additional window on the side. To run
+that configuration, follow the directions on the [Piety
+desktop](../viewer/README.md) page.
 
 ### Appearance ###
 
