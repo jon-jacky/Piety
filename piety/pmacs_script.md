@@ -71,7 +71,7 @@ put the cursor there, type the command *M-x* ("meta x") by holding down the
 keyboard *alt* key while you type the *x* key.  
 
 <img src="../screenshots/pmacs_script_terminal.png"
- alt="pmacs_script.py running in a terminal">
+ alt="pmacs_script.py running in a terminal" width=50% height=50%>>
 
 Confirm the timer task is running.
 
