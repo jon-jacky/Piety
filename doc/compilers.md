@@ -41,6 +41,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [abrvalg](https://github.com/akrylysov/abrvalg) | Interpreter | "Python-like programming language interpreter written in Python" |
 | [toy compiler](http://www.jroller.com/languages/entry/python_writing_a_compiler_and) | Educational exercise | "Compiler and Interpreter in 160 lines of code ... for a simple 'while' language."  Tiny but informative example (target language is not Python). || **Optimized** ||| 
 | [Tiny Great Languages](https://zserge.com/posts/langs-asm/) also [github](https://github.com/zserge/tinylangs) | Blog posts with code | "micro-implementations of the most fundamental historical programming languages ... in Python ... under 50 lines: asm, basic, lisp, apl/k, mouse/forth, pl0, tcl" | 
+| [c500](https://vgel.me/posts/c500/), also [github](https://github.com/vgel/c500), [HN](https://news.ycombinator.com/item?id=37383913) | compiler | "C compiler in 500 lines of Python", "single-pass" (no AST), "sampling of features" (C subset) |
 | **Optimizing Compilers** |||
 | [Awesome Python Compilers](https://github.com/pfalcon/awesome-python-compilers) |  Annotated links | Historical survey of Python compilers, with links to many mentioned below |
 | [LPython](https://lpython.org/)  | Annotated links | Bottom of page has links to 32 Python compilers. LPython itself is a compiler for Python with type annotations. |
@@ -76,5 +77,5 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Lisp compiler](https://github.com/jbush001/LispMicrocontroller/blob/master/compile.py) | Lisp | Compiler for a custom "simple microcontroller that runs a compiled LISP dialect" |
 | [pixie](https://github.com/pixie-lang/pixie), also [HN](https://news.ycombinator.com/item?id=8480608) | Lisp | "a lightweight Lisp ... inspired by Clojure ... written in RPython" |
 
-Revised Sep 2024
+Revised Sep 2025
  

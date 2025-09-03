@@ -117,9 +117,10 @@ A few of the demos are not very interactive, so can be run from scripts:
 
 ## Screenshots ##
 
-The pages about the Piety [desktop](viewer/README.md) and
-[browser](browser/README.md) include screenshots. This
-[directory](screenshots) contains a few more.
+The pages about the Piety [desktop](viewer/README.md), 
+[browser](browser/README.md), and 
+[event loop demo](piety/pmacs_script.md) include screenshots. 
+This [directory](screenshots) contains a few more.
           
 ## Roadmap ##
 
