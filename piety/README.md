@@ -78,7 +78,7 @@ the top level *Piety* directory is in your home directory.
 - **vedsel_script.py**: Similar to *edsel_script.py*, but in the Piety
     desktop with the viewer window.  See instructions in comment header.
 
-- **pmacs_script.py**: Similar to *edsel_script.py*, but in the Piety
+- **vpmacs_script.py**: Similar to *edsel_script.py*, but in the Piety
     desktop with the viewer window.  See instructions in comment header.
     
     
