@@ -66,10 +66,21 @@ the top level *Piety* directory is in your home directory.
   cooperative multitasking and blocking using *pmacs_script.py*.
 
 - **pmacs_script.md**: Explanation and directions for *pmacs_script.py*.
+  Includes a screenshot.
 
 - **pmacs_script.py**: Edit in one window while a timer task updates the other.
   Set the timer interval, and stop and start timer  tasks from the
   Python REPL.
 
-Revised Aug 2024
+- **Vedsel_script.md**: Explanation of *vedssel_script.py*.  
+  Includes a screenshot.
+  
+- **vedsel_script.py**: Similar to *edsel_script.py*, but in the Piety
+    desktop with the viewer window.  See instructions in comment header.
+
+- **pmacs_script.py**: Similar to *edsel_script.py*, but in the Piety
+    desktop with the viewer window.  See instructions in comment header.
+    
+    
+Revised Sep 2025
  

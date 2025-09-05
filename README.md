@@ -119,7 +119,8 @@ A few of the demos are not very interactive, so can be run from scripts:
 
 The pages about the Piety [desktop](viewer/README.md), 
 [browser](browser/README.md), and 
-[event loop demo](piety/pmacs_script.md) include screenshots. 
+the event loop demos [here](piety/pmacs_script.md) 
+and [here](piety/vedsel_script.md) include screenshots. 
 This [directory](screenshots) contains a few more.
           
 ## Roadmap ##
@@ -161,6 +162,6 @@ Details in [platforms.md](doc/platforms.md).
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised Jul 2025
+Revised Sep 2025
 
 
