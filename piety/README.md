@@ -72,8 +72,8 @@ the top level *Piety* directory is in your home directory.
   Set the timer interval, and stop and start timer  tasks from the
   Python REPL.
 
-- **Vedsel_script.md**: Explanation of *vedssel_script.py*.  
-  Includes a screenshot.
+- **vedsel_script.md**: Explanation of *vedsel_script.py*.
+    Includes a screenshot.
   
 - **vedsel_script.py**: Similar to *edsel_script.py*, but in the Piety
     desktop with the viewer window.  See instructions in comment header.
