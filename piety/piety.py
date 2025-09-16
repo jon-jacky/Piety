@@ -32,6 +32,6 @@ piety.run_forever()
 
 # Statements in this script that follow run_forever() are not executed.
 # For example these are NOT executed:  
-from atimers import atimer
-piety.create_task(atimer(5,1))
+# from atimers import atimer
+# piety.create_task(atimer(5,1))
 

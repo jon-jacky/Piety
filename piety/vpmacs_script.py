@@ -4,10 +4,10 @@
 # ...$ cd Piety/piety  # so run(...) works without directory prefix
 # ...$ python3 -im vpm
 # >>> from runner import run
-# >>> run('piety')
+# >>> run('piety.py')
 # Now event loop should be running, with async shell indicated by 4 >>>>
 # >>>> piety
-# ... event loop description... 
+# ... EventLoop running=True ...
 # >>>> run('vpmacs_script.py')
 # ... windows appear, you can start typing in scratch.txt window ...
 
@@ -30,7 +30,7 @@ o2()
 e('a.txt')
 ta = ATimer()
 abuf = Writer('a.txt')
-piety.create_task(ta.atimer(1000,1,'A',abuf))
+ta_task = piety.create_task(ta.atimer(1000,1,'A',abuf))
 on() # next window
 apm() # begin display editing
 
