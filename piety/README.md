@@ -38,6 +38,11 @@ running this command:
 The initial dot . in this command is essential.  This command assumes 
 the top level *Piety* directory is in your home directory.
 
+The *eventloop* script in this directory creates an *asyncio* event
+loop but does not start it.  That is more convenient in some contexts.
+Contrast *vpmacs_script.py* which uses *piety.py* to *v2pmacs_script.py*
+which uses *eventloop.py*
+
 ### Files ###
 
 - **apm.py**: Script to start the *pmacs* editor in an *asyncio* event loop.
@@ -57,6 +62,9 @@ the top level *Piety* directory is in your home directory.
 
 - **edsel_script.txt**: Explanation and directions for *edsel_script.py*.
 
+- **eventloop.py**: Creates the Piety *asyncio* event loop but does 
+    not start it.
+    
 - **piety.py**: Begin a Piety session by starting the *asyncio* event loop.
   Import a function *run* which is needed to run other scripts in the event loop.
   
@@ -80,6 +88,9 @@ the top level *Piety* directory is in your home directory.
 
 - **vpmacs_script.py**: Similar to *pmacs_script.py*, but in the Piety
     desktop with the viewer window.  See instructions in comment header.
+
+- **v2pmacs_script.py**: Similar to *vpmacs_script.py*, but uses 
+    *eventloop.py* not *piety.py*. See instructions in comment header.
     
     
 Revised Sep 2025
