@@ -21,7 +21,7 @@ from atimers import ATimer
 from writer import Writer
 
 # Comment out redundant imports, alrady done by vpm script
-#import sked
+ #import sked
 #from sked import *
 #import edsel 
 #from edsel import *
@@ -33,10 +33,10 @@ o2()
 e('a.txt')
 abuf = Writer('a.txt')
 ta = ATimer()
-piety.create_task(ta.atimer(10,1,'A',abuf))
+ta_task = piety.create_task(ta.atimer(10,1,'A',abuf))
 on() 
 e('b.txt')
 bbuf = Writer('b.txt')
 tb = ATimer()
-piety.create_task(tb.atimer(20,0.5,'B',bbuf))
+tb_task = piety.create_task(tb.atimer(20,0.5,'B',bbuf))
   

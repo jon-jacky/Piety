@@ -32,5 +32,5 @@ ta = ATimer()
 abuf = Writer('a.txt')
 ta_task = piety.create_task(ta.atimer(1000,1,'A',abuf))
 on() # next window
-apm() # begin display editing
+# apm() # begin display editing # DEBUG - type this at command line.
 
