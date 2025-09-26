@@ -16,6 +16,19 @@ the *pysh* prompt >>, instead of the *pm()* call you type at the standard
 Python prompt >>>.   To return to the *pysh* command prompt, type M-x
 (meta x, hold the alt key and type x), just as you do in  any *pmacs*
 session.
+
+NOTE added Sep 2025: Some of these demos no longer work. In particular,
+in *threads_3* editing in the *scratch.txt* window while the timer
+thread updates the *a.txt* window no longer works --- the cursor in
+*scratch.txt* returns to column 1 on each timer tick, and control characters
+are not processed correctly.   Also, in *threads_2*, typing commands at the
+Python REPL can result in scrambling the two windows that display the 
+two timer threads.  
+
+Apparently, changes I made since Summer 2024 have broken the threads demos.
+I spent some time trying to fix this but was unsuccessful. Meanwhile, I
+have decided to concentrate on *asyncio* and event loops instead of
+threads, so at this time I have no further plans to try to fix this.
    
 ### Files ###
 
@@ -45,5 +58,5 @@ session.
   editors, *writer*, *timers*, classes and functions from *threading*, and
   then starts our custom *pysh* Python interpreter.
 
-Revised Jun 2024
+Revised Sep 2025
 
