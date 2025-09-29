@@ -17,7 +17,14 @@ Python prompt >>>.   To return to the *pysh* command prompt, type M-x
 (meta x, hold the alt key and type x), just as you do in  any *pmacs*
 session.
 
-NOTE added Sep 2025: Some of these demos no longer work. In particular,
+These experiments are preserved here for completeness, but I have
+decided to use the [*asyncio* library](../piety) (also
+[here](../coroutines)) to support tasking and concurrency in Piety. I
+rejected *threading* because it uses the host operating system's
+threading library. My goal for Piety is to replace the host operating
+system.
+
+NOTE added Sep 2025:    Some of these demos no longer work. In particular,
 in *threads_3* editing in the *scratch.txt* window while the timer
 thread updates the *a.txt* window no longer works --- the cursor in
 *scratch.txt* returns to column 1 on each timer tick, and control characters
