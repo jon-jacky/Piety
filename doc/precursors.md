@@ -108,7 +108,7 @@ Here are some examples.
 | [zero.rs](https://github.com/pcwalton/zero.rs) | P | 2013 | Rust | Hosted | C stdlib: "The only dependencies are ... malloc, free, abort, memcpy, and memcmp" | "create almost completely freestanding Rust programs" |
 | [rustboot](https://github.com/charliesome/rustboot), also [here](http://jvns.ca/blog/categories/kernel/) | P | 2013 | Rust | Bare machine | QEMU | "A tiny 32 bit kernel written in Rust" |
 | [Four Rust OS](https://github.com/flosse/rust-os-comparison): redox, reenix, rustboot, Tifflin | P | 2015 | Rust | Bare machine | QEMU | "A comparison of operating systems written in Rust" |  
-| [Monotron](https://github.com/thejpster/monotron) and [Neotron](https://github.com/Neotron-Compute/Neotron-Book/blob/main/src/README.md), also [blog](https://thejpster.org.uk/blog/blog-2019-10-22/) | P | 2020 | Rust | Bare machine | Homemade computers with ARM microcontrollers | "1980s home computer" "...  like CP/M for tiny ARM microcontrollers, but written in Rust." |
+| [Monotron](https://github.com/thejpster/monotron) and [Neotron](https://github.com/Neotron-Compute/Neotron-Book/blob/main/src/README.md), also [blog](https://thejpster.org.uk/blog/blog-2019-10-22/) | P | 2020 | Rust | Bare machine | DIY computers made with ARM microcontrollers | "... simple 1980s home computer style ..." "...  like CP/M for tiny ARM microcontrollers, but written in Rust." |
 | [Fomos](https://github.com/Ruddle/Fomos) | P | 2023 | Rust | ? | ?  | "All apps run in an async loop ... Cooperative scheduling ... an app is really just a function ..." |
 | [Munal OS](https://github.com/Askannz/munal-os), also [HN](https://news.ycombinator.com/item?id=44226879) | P | 2025 | Rust | Virtual machine | QEMU | "unikernel design, cooperative scheduling and a security model based on WASM sandboxing" |
 | [Biscuit](https://pdos.csail.mit.edu/projects/biscuit.html), also [github](https://github.com/mit-pdos/biscuit)  and [paper](https://pdos.csail.mit.edu/papers/biscuit.pdf) | A | 2018 | Go | Bare machine | "64-bit x86" | "produce clear code and ... reduce programming difficulty" |
@@ -209,6 +209,9 @@ and [another](https://1.anagora.org/node/os),
 
 Many sites provide instructions and examples for building operating
 systems: 
+
+[CS140E](https://github.com/dddrrreee/cs140e-25win)(Stanford, Raspberry Pi Zero W ARMv6, 2025)
+[6.1810](https://pdos.csail.mit.edu/6.1810/2025/index.html)(MIT, xv6 RISC-V on qemu with virtio, 2025)
 [6.S081](https://pdos.csail.mit.edu/6.828/2019/index.html) (MIT, xv6 RISC-V, 2019),
 [6.828](http://pdos.csail.mit.edu/6.828/2018/xv6.html) (MIT, xv6 x86, 2018),
 [6.828](http://pdos.csail.mit.edu/6.828/2016/overview.html) (MIT, JOS exokernel x86, 2016),
@@ -237,4 +240,4 @@ Here are more links on operating system
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
 
-Revised Jun 2025
+Revised Oct 2025
