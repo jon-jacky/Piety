@@ -13,6 +13,17 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
+- 19 Oct2025:  Begin *micropython-unix* branch to see if we can get our
+  present Piety code to run under the micropython we built from the latest
+  source from *micropython.org*.
+
+- 19 Oct 2025: Rename *micropython* branch to *micropython-snap*
+  and abandon it.
+
+- 30 Sep 2025:  Begin *micropython* branch to see if we can get our
+  present Piety code to run under the micropython.we installed with the
+  *snap* package manager.
+
 - 28 Jul 2025:  Merge the *reader* branch back into the *rewrite* branch.
 
 -  6 Apr 2025: Begin *reader* branch to experiment with a viewer window
