@@ -6,6 +6,10 @@ This is the *micropython-unix* branch of the  *rewrite* branch.
 
 See if we can get our present Piety code to run under the micropython we
 built from the latest source from *micropython.org*.
+ 
+This branch includes changes incompatible with the CPython version of
+Piety in the *rewrite* branch, so we must never merge this *micropython-unix*
+branch back into the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -22,7 +26,7 @@ Recent work in the *rewrite* branch:
   and abandon it.
 
 - 30 Sep 2025:  Begin *micropython* branch to see if we can get our
-  present Piety code to run under the micropython.we installed with the
+  present Piety code to run under the micropython we installed with the
   *snap* package manager.
 
 - 28 Jul 2025:  Merge the *reader* branch back into the *rewrite* branch.
