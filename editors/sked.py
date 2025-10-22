@@ -9,7 +9,7 @@ See README.md for directions on using sked, NOTES.txt about its code.
 The name sked is inspired by Kragen Sitaker's Stone Knife Forth.
 """
 
-import os, sys, textwrap
+import os, sys, textwrap, path  # MicroPython has path module, not os.path
 
 ## import display # DEBUG, for display.putstr for debugging info
 
@@ -135,7 +135,7 @@ def save_buffer():
 def bname(filename):
     'Generate buffer name from file name, ensure each file gets unique bname'
     # If you load the same file twice, you get different bufnames
-    basename = os.path.basename(filename)
+    basename = path.basename(filename)  # Not os.path, MicroPython has path
     # Make unique bufname for example for both README.md and editors/README.md 
     bufname = basename # just a candidate bufname
     suffix = 1
@@ -150,7 +150,7 @@ def e(fname, move_dot=move_dot, restore_buffer=restore_buffer):
     But first save buffer state so it can be restored on command.
     """
     global filename, buffer, saved, bufname, prev_bufname
-    if not fname.startswith('*'): fname = os.path.abspath(fname)
+    if not fname.startswith('*'): fname = path.abspath(fname) # not os.path[A
     if fname == filename:
         print(f'? file {fname} is already in the current buffer\r\n', end='')
         return

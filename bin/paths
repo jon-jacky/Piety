@@ -6,8 +6,8 @@
 # define $PIETY, this definition assumes you have ~/Piety
 export PIETY=$HOME/Piety 
 
-# execution path to bin, to run Piety commands: piety, possibly others
-export PATH=$PIETY/bin:$PATH
+# execution path, to run micropython and  Piety commands
+export PATH=$HOME/micropython-1.26.1/ports/unix/build-standard:$PIETY/bin:$PATH
 
 # Python path for Piety on a Unix-like host with a VT100-compatible terminal.
 # For other platforms, replace unix and vt_terminal in this path.
