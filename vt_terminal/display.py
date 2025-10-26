@@ -18,7 +18,7 @@ def putstr(s):
     If you want newline, you must explicitly include it in s.
     Always print to tty (terminal) device even when stdout is redirected.
     """
-    print(s, end='', flush=True, file=tty)
+    print(s, end='', file=tty) # flush=True keyword not in MicroPython
 
 esc = '\x1B'     # \e does not work 'invalid \x escape'
 csi = esc+'['    # ANSI control sequence introducer
@@ -134,7 +134,4 @@ def put_render(line, column, text, *attributes):
     """
     put_cursor(line, column)
     putstr(sgr % attrs(*attributes) + text + sgr % attrs(clear))
-
-def next_line():
-    'replacement for print() in terminal char mode, explicitly sends \n\r'
-    putstr('\n\r')
+    

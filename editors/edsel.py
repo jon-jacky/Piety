@@ -10,6 +10,7 @@ import sys # skip argument declaration has file=sys.stdout
 import string # used by graffiti()
 import display # terminal_util calls subprocess, not present in MicroPython
 import sked as ed
+from strutil import expandtabs, ljust # str methods not present in MicroPython
 
 # Define and initialize global variables used by this module,
 # but only the *first* time this module is imported.
@@ -101,9 +102,9 @@ def display_padded(line):
     Display line, clip too-long line, or pad with blanks to fill the window.
     """
     # must expand tabs for correct line length needed by ljust
-    textline = line.expandtabs().rstrip('\n') 
+    textline = expandtabs(line).rstrip('\n') # fcn call not method call
     # ljust pads with spacees, preserves leading spaces, [:width] clips too long
-    display.putstr(textline.ljust(width)[:width])
+    display.putstr(ljust(textline, width)[:width]) # fcn call not method call 
 
 def update_lines(bstart, wstart, nlines):
     """
@@ -117,12 +118,13 @@ def update_lines(bstart, wstart, nlines):
     nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
     nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
     # NB display line at column start_col, not leftedge which is border 
-    display.put_cursor(wstart, start_col)
+    iline = wstart
     for line in ed.buffer[bstart:bstart+nlines]:
-        display.move_to_column(start_col)
+        display.put_cursor(iline, start_col)
         display_padded(line)
-        display.next_line()
-
+        iline += 1
+    display.put_cursor(iline, start_col) # Leave cursor after last line
+     
 def update_window():
     'Update entire window up to status line, starting at line buftop in buffer'
     update_lines(buftop, wintop, wheight-1)
@@ -135,19 +137,19 @@ def blank_line(ncols):
     """
     display.putstr(blanks[:ncols])
 
-def erase_lines(nlines):
+def erase_lines(wstart, nlines):
     """
-    Overwrite nlines lines with spaces, in the current window only.
-    Start at line where the cursor is already.
+    Starting at line wstart,
+     overwrite nlines lines with spaces, in the current window only.
     Leave cursor at line after last line written.  Do not update any globals.
     This only blanks lines across the width of the current window,
     so it can be used when the viewer window is present.
     """
-    for iline in range(nlines):
-        display.move_to_column(start_col) 
+    for iline in range(wstart, nlines + wstart):
+        display.put_cursor(iline, start_col) 
         blank_line(width)
-        display.next_line()
-
+    display.put_cursor(nlines +  wstart, start_col) # Leave cursor after last line
+    
 def erase_bottom():
     """
     Erase any old lines left over between end of buffer and bottom of window.
@@ -157,7 +159,7 @@ def erase_bottom():
     nblines = ed.S() - ed.dot  # n of lines to end of buffer
     nelines = nlines - nblines # n of empty lines at end of window
     ### breakpoint() # DEBUG Uncomment this line for breakpoint demo.  See breakpt.md.
-    erase_lines(nelines) # Make empty lines at end of window.
+    erase_lines(ed.dot, nelines) # Make empty lines at end of window.
 
 def update_below(bstart, offset=0):
     """
@@ -179,7 +181,7 @@ def open_line(iline):
     global buftop
     if not in_window(iline+1):
         display.put_cursor(wintop, 1) # first line of window
-        erase_lines(wheight-1) # erase window contents but not status line
+        erase_lines(wintop, wheight-1) # erase window contents but not status line
         buftop = locate_segment(iline)
         update_window()
     display.put_cursor(wline(iline+1), 1)
@@ -203,7 +205,7 @@ def update_status():
     display.put_cursor(wbottom(), 1)
     display.move_to_column(start_col)
     # display.white_bg renders text invisible in Debian Linux text console
-    display.render(ed.status().ljust(width)[:width],display.reverse)  
+    display.render(ljust(ed.status(), width)[:width],display.reverse) # fcn call
     restore_cursor_to_cmdline()
 
 def refresh():
@@ -211,9 +213,8 @@ def refresh():
     Refresh the focus window.
     (Re)Display lines from segment, marker, status without moving segment.
     """
-    display.put_cursor(wintop, start_col) # needed by erase_lines right below
-    # FIXME erase_lines here because update_window doesn't call erase_bottom (?)
-    erase_lines(wheight-1) # erase entire window contents above status line
+    # FIXME? erase_lines here because update_window doesn't call erase_bottom (?)
+    erase_lines(wintop, wheight-1) # erase entire window contents above status line
     update_window() # apparently doesn't erase_bottom below end of buffer
     put_marker(ed.dot, display.reverse)
     update_status()
@@ -366,7 +367,7 @@ def display_start_a(iline):
     If any text after dot, push it all down one line to make room for new line.
     """
     display.put_cursor(wheight, 1) # status line does not update in append mode
-    display.render('Appending...'.ljust(width)[:width],display.reverse)  
+    display.render(ljust('Appending...', width)[:width],display.reverse)  
     put_marker(ed.dot, display.clear)
     ed.move_dot(iline) # sked a() does this.  iline might be far from previous dot.
     open_line(ed.dot) # create space, move cursor to prepare for first input()
@@ -522,7 +523,7 @@ def win(nlines=None, twidth=None):
     global tlines, termcols, width, rmargin, flines, wheight
     # terminal_util calls subprocess, not present in Micropython
     # tlines, termcols = terminal_util.dimensions() # lines. cols in term window
-    tlines, termcols = 24, 80  # hard-code these for now
+    tlines, termcols = 29, 80  # hard-code these for now
     # DEBUG For viewer experiment on Chromebook
     # We might stty cols 60 so Linux will format shell output for viewer width
     # BUT we still want full screen,  29 x 146 on Lenovo IdeaPad 3 Chromebook
