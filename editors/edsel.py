@@ -8,7 +8,7 @@ See README.md for directions on using edsel, NOTES.txt about its code.
 
 import sys # skip argument declaration has file=sys.stdout
 import string # used by graffiti()
-import terminal_util, display
+import display # terminal_util calls subprocess, not present in MicroPython
 import sked as ed
 
 # Define and initialize global variables used by this module,
@@ -520,7 +520,9 @@ def win(nlines=None, twidth=None):
     Use optional twidth argument to set different window width.
     """
     global tlines, termcols, width, rmargin, flines, wheight
-    tlines, termcols = terminal_util.dimensions() # lines. cols in term window
+    # terminal_util calls subprocess, not present in Micropython
+    # tlines, termcols = terminal_util.dimensions() # lines. cols in term window
+    tlines, termcols = 24, 80  # hard-code these for now
     # DEBUG For viewer experiment on Chromebook
     # We might stty cols 60 so Linux will format shell output for viewer width
     # BUT we still want full screen,  29 x 146 on Lenovo IdeaPad 3 Chromebook

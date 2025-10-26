@@ -165,7 +165,7 @@ def e(fname, move_dot=move_dot, restore_buffer=restore_buffer):
             # fd.readlines reads file into a list of strings, one per line
             # First line of file is at index 1 not 0
             buffer = ['\n'] + fd.readlines() # each line in buffer ends with \n
-    except FileNotFoundError:
+    except OSError: # MicroPython raises OSError not FileNotFoundError
         buffer = ['\n'] # start new file
     prev_bufname = bufname
     filename = fname
@@ -184,7 +184,8 @@ def w(fname=None, set_saved=set_saved): # Hook for display code
     if not fname: fname = filename
     success = False # Might fail if path doesn't exist, no permission etc.
     with open(fname, 'w') as fd:
-        fd.writelines(buffer[1:]) # first line of file is at index 1 not 0
+        # fd.writelines(buffer[1:]) # first line of file is at index 1 not 0
+        for line in buffer[1:]: fd.write(line) # no writelines in MicroPython
         success = True
     if success:
         if filename != fname: # we saved buffer with a new, different filename

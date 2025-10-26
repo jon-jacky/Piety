@@ -6,7 +6,8 @@ display - Update the terminal display using ANSI control sequences.
 
 import os
 
-ttyname = os.ctermid() # usually returns '/dev/tty'
+# ttyname = os.ctermid() # usually returns '/dev/tty'# MicroP has no os.ctermid
+ttyname = '/dev/tty'
 tty = open(ttyname, 'w')
 
 # Differs from terminal.putstr which writes to stdout and might be redirected
