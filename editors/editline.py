@@ -278,9 +278,9 @@ keymap = {
     key.C_l: refresh,
     key.C_u: discard_line,
     key.C_y: yank,
-    key.M_f: forward_word,
-    key.M_b: backward_word,
-    key.M_d: kill_word,
+    key.M_f: forward_char, # forward_word, crashes MicroPython
+    key.M_b: backward_char, # backward_word, crashes MicroPython
+    key.M_d: delete_char, # kill_word, crashed MicroPython
     # arrow keys, send ANSI escape sequences
     key.left: backward_char,
     key.right: forward_char,
