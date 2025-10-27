@@ -7,8 +7,8 @@ The name means 'dumb emacs' or 'defective emacs' or maybe 'grade D emacs',
 barely above F (fail).
 """
 
-import sys, importlib
-import terminal, key, keyseq, display, edsel, pycall
+import sys  #, importlib  # no importlib in MicroPython
+import terminal, key, keyseq, display, edsel  # pycall  # no code module in MP
 import sked as ed
 
 # Define and initialize global variables used by dmacs,
@@ -156,8 +156,8 @@ def kill_line():
 def reload_buffer():
     'Reload module for current buffer'
     modname = ed.bufname[:-3] # trim trailing '.py'
-    importlib.reload(sys.modules[modname])
-    print(f'Reload module {modname}\n\r', end='') # \n\r end for char mode
+    # importlib.reload(sys.modules[modname]) # no importlib in MicroPython
+    print(f'DID NOT Reload module {modname}\n\r', end='') # \n\r end for char mode
 
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'

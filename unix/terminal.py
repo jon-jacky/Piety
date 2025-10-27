@@ -14,7 +14,7 @@ http://man7.org/linux/man-pages/man3/termios.3.html
 
 """
 
-import sys, tty, termios
+import sys, termios  # No tty module in MicroPython
 
 fd = sys.stdin.fileno() # Isn't sys.stdin always fileno 0 ?
 line_mode_settings = termios.tcgetattr(fd) # in case someone calls restore first
@@ -34,13 +34,18 @@ def set_char_mode():
     #saved_settings = termios.tcgetattr(fd)
     # tty.setraw just calls termios.tcsetattr with particular flags
     # see http://hg.python.org/cpython/file/1dc925ee441a/Lib/tty.py
-    tty.setraw(fd)
+    # 
+    # termios.setraw(fd)
+    # MicroPython termios provides setraw!
+    termios.setraw(fd)
+
+TCSAFLUSH = 2 # no TCSAFLUSH in MicroPython termios
 
 def set_line_mode():
     """
     restore sys.input to line mode
     """
-    termios.tcsetattr(fd, termios.TCSAFLUSH, line_mode_settings)
+    termios.tcsetattr(fd, TCSAFLUSH, line_mode_settings) # not termios.TCSAFLUSH
 
 def getchar():
     """
