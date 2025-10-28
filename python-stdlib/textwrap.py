@@ -6,6 +6,7 @@
 # Written by Greg Ward <gward@python.net>
 
 import re
+from strutil import expandtabs # str expandtabs methos missing from MicroPython
 
 __all__ = ["TextWrapper", "wrap", "fill", "dedent", "indent", "shorten"]
 
@@ -144,9 +145,12 @@ class TextWrapper:
         becomes " foo    bar  baz".
         """
         if self.expand_tabs:
-            text = text.expandtabs(self.tabsize)
+            # text = text.expandtabs(self.tabsize)
+            text = expandtabs(text, self.tabsize) # no expandtabs in MicroPython
         if self.replace_whitespace:
-            text = text.translate(self.unicode_whitespace_trans)
+            # no str translate method in MicroPython
+            #text = text.translate(self.unicode_whitespace_trans)
+            text.replace('\n',' ') # simplest possible thing
         return text
 
     def _split(self, text):
@@ -165,10 +169,16 @@ class TextWrapper:
         otherwise.
         """
         if self.break_on_hyphens is True:
-            chunks = self.wordsep_re.split(text)
+            # chunks = self.wordsep_re.split(text)
+            # NotImplementedError: splitting with subcaptures
+            text1 = text.replace('\n',' ')
+            text2 = text1.replace(' ','@ @')
+            chunks = text2.split('@')
         else:
-
-            chunks = self.wordsep_simple_re.split(text)
+            # chunks = self.wordsep_simple_re.split(text)
+            text1 = text.replace('\n',' ')
+            text2 = text1.replace(' ','@ @')
+            chunks = text2.split('@')
         chunks = [c for c in chunks if c]
         return chunks
 

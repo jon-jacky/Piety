@@ -26,6 +26,7 @@ Other files here are new because:
 - **strutil.py**: New file with functions *expandtabs* and *ljust* 
     to replace *str* methods present in CPython, absent in micropython
 
-- **textwrap.py**: Copied, then edited to avoid *ValueError: regex too complex*
+- **textwrap.py**: Copied, then several edits to avoid 
+   *ValueError: regex too complex* and replace several missing *str* methods.
 
 Revised Oct 2025
