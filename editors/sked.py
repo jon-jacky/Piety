@@ -78,7 +78,7 @@ def range_valid(start, end):
 
 def status():
     'status: return string of information about editing session'
-    return (f'{bufname}, at line {dot} of {S()}, file {filename}, ' 
+    return (f'{bufname}, at line {dot} of {S()}, file {filename}, ' +
             f"{'saved' if saved else 'unsaved changes'}")
 
 # Display code hooks

@@ -680,5 +680,5 @@ def quit():
 'Are you SURE you want to quit Piety and Python, losing all unsaved work? ')
     if not answer.lstrip()[0] in ('yY'): return
     clr()  # restore full screen scrolling
-    exit() # exit python
+    sys.exit() # in MicroPython unlike CPython unqualified exit() doesn't work
            
