@@ -245,4 +245,4 @@ Here are more links on operating system
 [design](http://jon-jacky.github.com/home/links.html#design-examples)
 and [history](http://jon-jacky.github.com/home/links.html#history).
 
-Revised Oct 2025
+Revised Nov 2025
