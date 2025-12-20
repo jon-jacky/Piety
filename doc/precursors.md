@@ -246,7 +246,7 @@ and [another](https://news.ycombinator.com/item?id=22149866) (both Jan 2020).
 This [textbook](http://csapp.cs.cmu.edu/) provides a recent overview of Unix + C OS.
 
 Here are more links on operating system 
-[design](http://jon-jacky.github.com/home/links.html#design-examples)
-and [history](http://jon-jacky.github.com/home/links.html#history).
+[design](http://jon-jacky.github.io/home/links.html#design-examples)
+and [history](http://jon-jacky.github.io/home/links.html#history).
 
-Revised Nov 2025
+Revised Dec 2025
