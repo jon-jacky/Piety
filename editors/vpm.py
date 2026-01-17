@@ -26,6 +26,6 @@ from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin()
-N()
-oe()
-#pm()
+import vpm_startup  # any new identifiers will appear vmp_startup module
+
+
