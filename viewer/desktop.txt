@@ -1,0 +1,89 @@
+
+                P i e t y
+                =========
+                
+This is the Piety desktop, a self-contained 
+computing environment running in a single
+interactive Python session. Here you can
+compose documents, create and run Python code,
+browse internet web pages, and access the host
+computer file system, all without resorting to a 
+graphical desktop with multiple windows. 
+
+This file you are viewing right now,
+desktop.txt, is an interactive tutorial on
+using the Piety desktop. As you read through
+this file, follow the directions here to issue
+commands and see their effects.
+ 
+To read this tutorial, you must learn to
+move through a file. To scroll down by
+half a screenful, type C-v (control-V, hold
+down the ctrl key and press the v key). Try it
+now!
+
+To scroll up, type M-v (meta-V, hold down the
+alt key and press the v key). To go to the top
+of the file, type M-< (hold down the alt key
+and the shift key and press the < key) and to
+go to the bottom type M->.
+
+You can move the cursor up or down one line at
+a time by pressing the arrow keys, or C-n
+(next, for down) and C-p (previous, for up).
+When the cursor reaches the bottom (or top) of
+the window, it will scroll down (or up).
+
+If you have used the Emacs editor, you will
+recognize C-v etc. as familiar Emacs key
+sequences, (usually just called keys). Many
+Emacs keys for navigating and editing work the
+same way in the Piety desktop. But even if you
+know Emacs, you should read this tutorial,
+because there are some differences. Soon we
+will show you how to display a list of all the
+Piety keys.
+
+Files, buffers, and windows
+
+In a Piety session, a file from the file
+system is loaded into a data structure in
+memory called a buffer. On the desktop, a
+buffer can be displayed in one or more windows
+showing different regions of the buffer. A
+buffer usually has the same name as its file.
+The status line at the bottom of each window
+shows the name of its buffer and the full path
+to its file. A Piety session can store many
+buffers, but the desktop can only display two
+or three windows. Often, a particular buffer
+is not visible, but it can be dispayed on
+demand.
+
+This window here on the right is called the
+viewer window, and is often used to display
+reference information -- like this tutorial.
+
+Type C-x C-b to display a list of buffers here
+in the viewer window - don't do it quite yet!
+You also have to know that typing C-b, then
+typing ENTER, displays the previous buffer --
+this file -- in the same window. Now try it,
+C-x C-b to display the buffer list, then C-b
+ENTER to return to this buffer.
+
+When the buffer list is displayed, you can use
+the arrow keys (or C-n and C-p) to move the
+cursor to any buffer in the list. Then press
+the ENTER key to display that buffer in this
+window. After that, C-x C-b (or C-b ENTER)
+gets back to the buffer list again.
+
+Now display the buffer list and select the
+buffer keys.txt to display the list of all the
+Piety keys. You already know how move around
+in the list, and then how to get back to the
+buffer list and then back to this tutorial.
+
+More to come ...
+

@@ -1,0 +1,38 @@
+
+                Piety Keys
+                ==========
+                    
+This is a complete list of all the key
+sequences (usually just called keys) used in
+the Piety desktop and Piety editors.
+
+C-v, control v, means hold down the CTRL key
+     and press the v key.
+     
+M-v, meta v, means hold down the ALT key and 
+     press the v key.
+
+Moving through a buffer
+
+C-v  Scroll down half a page
+M-v  Scroll up half a page
+M-<  Move to the top of the buffer
+M->  Move to the bottom of the buffer 
+C-n  next line, move down one line
+C-p  previous line, move up one line
+
+Buffer, choose buffer from the list
+
+C-x C-b   Show buffer list, then:
+ ENTER     Show buffer on this line in viewer
+ ???       Show buffer on this line in editor
+ 
+Buffer, enter buffer name at the prompt
+
+C-x b   Show 'Switch to ...' prompt, then:
+ ENTER  Default, return to previous buffer 
+ fname ENTER  Show buffer named 'fname'
+ fn? ENTER  Show buffer whose name starts 'fn'
+
+More to come ...
+                 
