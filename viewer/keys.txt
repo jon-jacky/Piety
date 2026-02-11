@@ -19,13 +19,15 @@ M-v  Scroll up half a page
 M-<  Move to the top of the buffer
 M->  Move to the bottom of the buffer 
 C-n  next line, move down one line
+     (or use the down arrow key)
 C-p  previous line, move up one line
-
+     (or use the up arrow key)
+     
 Buffer, choose buffer from the list
 
-C-x C-b   Show buffer list, then:
- ENTER     Show buffer on this line in viewer
- ???       Show buffer on this line in editor
+C-x C-b   Show buffer list, go to line, then:
+ ENTER     Show buffer in the viewer window
+ M-ENTER   Show buffer in an editor window
  
 Buffer, enter buffer name at the prompt
 
@@ -33,6 +35,8 @@ C-x b   Show 'Switch to ...' prompt, then:
  ENTER  Default, return to previous buffer 
  fname ENTER  Show buffer named 'fname'
  fn? ENTER  Show buffer whose name starts 'fn'
+ ??? ENTER  Cancel, leave buffer unchanged
+ 
+Much more to come ...
 
-More to come ...
                  
