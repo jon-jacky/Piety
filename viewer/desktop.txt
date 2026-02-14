@@ -11,10 +11,10 @@ access the host computer file system.
 
 This text you are viewing right now,
 desktop.txt, is an interactive tutorial on
-getting started with using the Piety desktop.
-As you read through it, follow the directions
-to issue commands and see their effects -- but
-be sure to read to the end of each paragraph
+getting started with the Piety desktop. As you
+read through it, follow the directions to
+issue commands and see their effects -- but be
+sure to read to the end of each paragraph
 before trying its commands!
 
 Movement
@@ -40,10 +40,10 @@ the window, it will scroll down (or up).
 Keys 
 
 Key sequences like C-v and M-< are usually
-just called keys. A complete list of Piety
-keys appears in keys.txt. (Many keys used by
+just called keys. A list of Piety keys appears
+in keys.txt. Many (but not all!) keys used by
 Piety behave like the same keys in the Emacs
-editor.)
+editor.
 
 Buffer list
 
@@ -183,7 +183,7 @@ result in file name completion.
 If you type a file name that does not already
 exist in the file system, Piety creates a new
 empty buffer, which you can edit and save to 
-make a new file,
+make a new file.
  
 Python commands and directories
 
@@ -240,7 +240,7 @@ type the command lsl().  A long-form directory listing,
 with one file per line, appears in the viewer window.
 Position the cursor over one of the lines and 
 type M-ENTER.   The file on that line is loaded
-into a buffer and appear in the most recently used
+into a buffer and appears in the most recently used
 editor window.
  
 You can recall previous commands in the REPL
@@ -258,8 +258,22 @@ You can use the M-y key to enter just a
 single Python statement on the prompt line,
 and then return to the desktop window
 immediately, without having to type the pm()
-command.  C-p (etc.) to access command history
-and ??? to cancel the request also work 
-at this prompt.
+command. Using C-p (etc.) to access command
+history and ??? to cancel the request also
+work at this prompt.
+
+More to come
+
+This file, desktop.txt, is still incomplete -- 
+there is much more about the Piety desktop
+we have not yet discussed.   Meanwhile, you
+can find many more details in these files:
+
+Piety/editors/README.md
+Piety/viewer/README.md
+Piety/browser/README.md
+
+Revised Feb 2026
+
 
 

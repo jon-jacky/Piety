@@ -2,15 +2,27 @@
                 Piety Keys
                 ==========
                     
-This is a complete list of all the key
-sequences (usually just called keys) used in
-the Piety desktop and Piety editors.
+This is a list of key sequences (usually just
+called keys) used in the Piety desktop and
+Piety editors.
 
 C-v, control v, means hold down the CTRL key
      and press the v key.
      
 M-v, meta v, means hold down the ALT key and 
      press the v key.
+
+Many (but not all!) keys used by Piety behave
+like the same keys in the Emacs editor.
+
+This file, keys.txt, is still incomplete --
+most keys used in Piety are not yet listed.
+Meanwhile, you can find more details in these
+files:
+
+Piety/editors/README.md
+Piety/viewer/README.md
+Piety/browser/README.md
 
 Moving through a buffer
 
@@ -39,4 +51,5 @@ C-x b   Show 'Switch to ...' prompt, then:
  
 Much more to come ...
 
+Revised Feb 2026
                  
