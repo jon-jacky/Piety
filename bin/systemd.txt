@@ -1,0 +1,29 @@
+# systemd.txt - systemd commands for configuring and execuing boot.
+
+Some of these commands require privilege, so if you are not root  
+you may have to prefix them with sudo. For example, set-target, isolate,
+reboot.
+
+To show the target that will take effect at the next boot:
+ 
+ systemctl get-default
+ 
+To set the target.  graphicsal.target is the usual graphical desktop,
+multi-user.target is the full screen console terminal, rescue.target is 
+a minimal system.  For example:
+
+ systemctl set-target multi-user.target
+ 
+To reboot:
+
+ systemctl reboot
+ 
+To switch to another target without rebooting,  You can switch
+from multi-user.target to graphical.target, but not vice versa:
+
+ systemctl isolate graphical.target
+ 
+
+Revised Feb 2026
+ 
+  
