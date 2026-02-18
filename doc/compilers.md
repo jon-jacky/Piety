@@ -59,6 +59,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Falcon](http://www.phi-node.com/2013/06/how-fast-can-we-make-interpreted-python.html), also [here](http://arxiv.org/abs/1306.6047) and [here](https://github.com/rjpower/falcon) | Optimized interpreter | ".. a high-performance bytecode interpreter fully compatible with the standard CPython interpreter. ... does not replace the standard CPython interpreter, but rather runs inside of it ... 25% faster than the standard Python interpreter on most benchmarks and in some cases about 2.5X faster."  The [paper](http://arxiv.org/abs/1306.6047) discusses CPython internals and the [Hacker News discussion](https://news.ycombinator.com/item?id=5943258) (also [here](https://news.ycombinator.com/item?id=11522767)) has some interesting comments on Python design and performance. |
 | [numpile](http://dev.stephendiehl.com/numpile/), also [github](https://github.com/sdiehl/numpile) and [slides](http://dev.stephendiehl.com/cfa/slides.pdf) | LLVM Optimized Python | "LLVM-based numeric specializer for scientific Python code", "generate machine code at runtime in Python! Now we'll use the LLVM JIT to actually actually execute the code and interchange values between the CPython runtime and the LLVM JIT" | 
 | [pyast64](https://benhoyt.com/writings/pyast64/), also [github](https://github.com/benhoyt/pyast64) and [HN](https://news.ycombinator.com/item?id=14644576) | Compiler | "Python 3 program that compiles a subset of the Python AST to x64-64 assembler. It's extremely restricted (read "a toy") but it's a nice proof of concept" |
+| [copapy](https://github.com/Nonannet/copapy) | "copy-and-patch compiler" | "produces high-performance, statically typed and memory-safe code" | 
 | **Low-level programming** |||
 | [Micro Python](http://micropython.org/), also [here](https://github.com/micropython/micropython) | Compiler, runtime | "complete rewrite, from scratch, of Python. ...  includes a complete parser, compiler, virtual machine, runtime system, garbage collector and support libraries to run on a microcontroller", "32-bit ARM ... tested on an STM32F405 chip"" |
 | [assembler](http://pythonwise.blogspot.com/2012/06/python-based-assembler.html) | Assembler | "the assembly (source) file is actually a Python file (module)" where statements such as *load(r2, MEM_LOC1)* are Python calls |
@@ -80,7 +81,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [l.py](http://flownet.com/ron/lisp/l.py) | Lisp | "A tiny interpreter for a lisp-like language with full lexical closures in Python", less than 100 lines |
 | [Lisp compiler](https://github.com/jbush001/LispMicrocontroller/blob/master/compile.py) | Lisp | Compiler for a custom "simple microcontroller that runs a compiled LISP dialect" |
 | [pixie](https://github.com/pixie-lang/pixie), also [HN](https://news.ycombinator.com/item?id=8480608) | Lisp | "a lightweight Lisp ... inspired by Clojure ... written in RPython" |
+| [planckforth](https://github.com/nineties/planckforth/blob/main/others/planck.py) | Forth | Demonstrates low-level programming with *ctypes* and *struct* modules |
 
-Revised Jan 2026
-
- 
+Revised Feb 2026
+  
