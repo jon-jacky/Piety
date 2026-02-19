@@ -34,5 +34,6 @@ fi
 # Run Piety desktop in Linux console but not in graphical terminal windows
 if [ -z "$DISPLAY" ]; then
     cd $PIETY # defined in Piety/bin/paths
+    python3 -im vpm
 fi
  
