@@ -11,13 +11,12 @@ this directory).
 Some files in this directory are copies of files stored elsewhere,
 that configure Piety at system boot, or when a particular user logs in.
 
-- *.profile* - Put this file in */home/jon* to set the *PYTHONPATH*,
-start Python and run the *vpm* startup module when *jon* logs into 
-the *tty1* console terminal -- but not when *jon* logs into the
+- **.profile** - Put this file in your home directory to set the *PYTHONPATH*,
+start Python and run the *vpm* startup module when you log into 
+the *tty1* console terminal -- but not when you log into the
 graphical desktop.   Note that this file's name starts with a dot,
 so you must use the *-a* option to see it when you run an *ls* command.
-
-
+ 
 - **override.conf** - Put this file in the 
 directory */etc/systemd/system/getty@tty1.service.d* to cause the
 system to autologin user *jon* when the system boots.

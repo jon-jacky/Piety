@@ -22,15 +22,18 @@ try:
 except:
     # buffer is zero indexed, but we want first line of file to be at index 1
     # so first entry in buffer list is never used - it's always just '\n'
-    buffer = ['\n']  # '\n' at index 0 is never used
     dot = 0   # dot, index of current line in buffer
     point = 0 # point, index of current column in dot. Not used here, for future  
-    filename = 'scratch.txt' # reassigned by e(dit) and w(rite) commands
-    bufname = filename  # Basename of filename, reassigned by e and w
+    bufname = 'scratch.txt'  # Basename of filename, reassigned by e and w
+    filename = 'editors/scratch.txt' # reassigned by e(dit) and w(rite) commands
+    # Put some text in scratch buffer so user sees something when editor starts
+    buffer = \
+     ['\n','\n',
+     'This is the buffer scratch.txt, where you can practice editing.\n','\n']
     searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) cmds
     replacestring = '??? ' # reassigned by c(hange) command
     pagesize = 12         # reassigned by v and rv page up/down commands
-    saved = True          # True when no unsaved changes, safe to run e(dit).
+    saved = False         # True when no unsaved changes, safe to run e(dit).
     lmargin = 0           # left margin for wrap
     rmargin = 72          # right margin for wrap
     nindent = 4           # N of spaces to indent or outdent
@@ -107,11 +110,13 @@ def restore_buffer(bname, printline=print):
     global bufname, filename, buffer, dot, point, saved
     ## display.putstr(f'From {bufname} restore {bname}\n\r') # DEBUG
     bufname = buffers[bname].get('bufname', 'scratch.txt')
-    filename = buffers[bname].get('filename', 'scratch.txt')
-    buffer = buffers[bname].get('buffer', ['\n'])
+    filename = buffers[bname].get('filename', 'editors/scratch.txt')
+    buffer = buffers[bname].get('buffer', 
+     ['\n','\n',
+     'This is the buffer scratch.txt, where you can practice editing.\n','\n'])
     dot = buffers[bname].get('dot', 0)
     point = buffers[bname].get('point', 0)
-    saved = buffers[bname].get('saved', True)
+    saved = buffers[bname].get('saved', False)
     lmargin = buffers[bname].get('lmargin', 0) 
     # rmargin = buffers[bname].get('rmargin', 72) # NOT assoc w/panel not buffer
     nindent = buffers[bname].get('nindent', 4)
