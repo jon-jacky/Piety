@@ -11,6 +11,11 @@ this directory).
 Some files in this directory are copies of files stored elsewhere,
 that configure Piety at system boot, or when a particular user logs in.
 
+- **console-setup** - To configure the Linux console,
+copy this file into */etc/default*, then run *setupcon -f*
+
+- **console-setup.txt** - Directions for using *console-setup*
+
 - **.profile** - Put this file in your home directory to set the
 *PYTHONPATH*, cd to your ~/Piety directory, start Python, and run the
 *vpm* startup module when you log into a console terminal -- BUT NOT

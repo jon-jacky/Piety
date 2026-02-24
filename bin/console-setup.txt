@@ -1,0 +1,15 @@
+% console-setup.txt
+
+How to Linux console terminal size to 42x132 in Debian Linux on the HP laptop.   
+This has the smallest font we can comfortably read.
+
+1. Copy console-setup from this directory into /etc/defaults
+
+2. Run setupcon -f
+
+I think that does it, although there is a lot of conflicting information
+on the internet.   Supposedly there is some way to set this in systemd,
+but some web pages say this does not work in Debian.
+
+Revised Feb 2026
+    
