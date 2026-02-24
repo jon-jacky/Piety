@@ -1,0 +1,8 @@
+# console-setup, Terminus bold font at 24 points, based on
+# https://www.linux.com/topic/desktop/how-change-your-linux-console-fonts/
+ACTIVE_CONSOLES="/dev/tty[1-6]"
+CHARMAP="UTF-8"
+CODESET="guess"
+FONTFACE="TerminusBold"
+FONTSIZE="10x18"
+SCREEN_WIDTH="132"
