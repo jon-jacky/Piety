@@ -64,34 +64,36 @@ def man(topic):
 
 def ls(path='.'):
     """
-    Call the shell directory listing command ls -C for a compact listing.
+    Call the shell directory listing command ls -C for a compact listing,
+    and -F to indicate directories with / suffix.
     Argument is file or directory path string, default . the current directory. 
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
-    sh(f'ls -C -w {width} ' + path)
+    sh(f'ls -C -F -w {width} ' + path)
 
-def lslXXX(path='.'):
+def lsl(path='.'):
     """
-    SUPERCEDED BY lsl DERIVED FROM lstfx BELOW
+    SUPERCEDED BY lsl DERIVED FROM lstfx BELOW - NOT! Restore this simpler form
     Call the shell directory listing command ls -l for a long form listing,
-     sorted alphabetically.
+     sorted alphabetically.  Also -a to show parent, -F to indicate directories
     Argument is file or directory path string, default . the current directory.    
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
-    sh('ls -l '+path)
+    sh('ls -alF '+path)
 
-def lsltXXX(path='.'):
+def lslt(path='.'):
     """
-    SUPERCEDED BY lslt DERIVED FROM lstfx BELOW
+    SUPERCEDED BY lslt DERIVED FROM lstfx BELOW - NOT! Restore simpler form
     Call the shell directory listing command ls -lt for a long form listing,
-     sorted most recent first.
+     sorted most recent first. Also -a to show parent, -F to indicate directories
     Argument is file or directory path string, default . the current directory.    
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
-    sh('ls -lt '+path)
+    sh('ls -altF '+path)
          
-def lslxf(path='.', cmd='ls -l'):
+def lslxfXXX(path='.', cmd='ls -l'):
     """
+    NOW HIDE THIS WITH XXX - we *don't* want the extra formatting with path
     lsl with eXtra Formatting.
     In each line, prefix filename at the end with its path (from path= arg).
     
@@ -108,7 +110,7 @@ def lslxf(path='.', cmd='ls -l'):
         pathstr = '' if path == '.' else path + '/'
         print(stats + spc + pathstr + fname)
         
-def lsl(path='.'): lslxf(path, 'ls -l')
+def lslXXX(path='.'): lslxf(path, 'ls -l')
 
-def lslt(path='.'): lslxf(path, 'ls -lt')
+def lsltXXX(path='.'): lslxf(path, 'ls -lt')
 

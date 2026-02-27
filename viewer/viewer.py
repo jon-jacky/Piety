@@ -390,6 +390,13 @@ dmacs.keymap[key.M_m] = vvrefresh
 # Overwrites C_x C_b key binding defined in dmacs.py
 dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 
+# Prompt for file name
+# Replaces emacs-style C-x C-f for visit file in dmacs.py
+dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
+
+# Display long-form file list in viewer window
+dmacs.keymap[key.C_x + key.C_f] = lsl # local lsl above, not console.lsl
+
 # Load contents named on line in viewer into editor buffer 
 # Viewer line might name a file, buffer, URL, footnote -- or more to come
 dmacs.keymap[key.M_ret] = loader
