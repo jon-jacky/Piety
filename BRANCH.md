@@ -2,7 +2,9 @@
 branches
 ========
 
-This is the *rewrite* branch.
+This is the *desktop* branch of the *rewrite* branch:
+Revisions and corrections to desktop code and documenation, 
+especially directory listings.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -12,6 +14,9 @@ The *rewrite* branch is now the main branch.  I will never merge it back
 into the *master* branch.
 
 Recent work in the *rewrite* branch:
+
+- 26 Feb 2026:  Begin *desktop* branch for revisions and corrections to 
+  desktop code and documentation, especially directory listings.
 
 - 19 Oct2025:  Begin *micropython-unix* branch to see if we can get our
   present Piety code to run under the micropython we built from the latest
