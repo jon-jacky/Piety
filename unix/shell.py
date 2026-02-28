@@ -62,55 +62,46 @@ def man(topic):
     manenv['MANWIDTH'] = str(width)
     sh('man ' + topic, shellenv=manenv)
 
+# lspath stores path argument to ls lsl lslt functions below. 
+# That path argument is always relative to current working directory.
+# It is the directory whose files are listed by ls lsl lslt functions.
+# Displayed filenames in directory listings are only basenames, without paths.
+# lspath used by viewer.py loader fcn to load the selected file from file list.
+# viewer.py loader updates lspath by calling lsl when it selects a directory.
+lspath = '.' 
+
 def ls(path='.'):
     """
     Call the shell directory listing command ls -C for a compact listing,
     and -F to indicate directories with / suffix.
     Argument is file or directory path string, default . the current directory. 
+    That path argument is always relative to current working directory.
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
+    global lspath 
+    lspath = path # used by viewer.py loader() fcn
     sh(f'ls -C -F -w {width} ' + path)
 
 def lsl(path='.'):
     """
-    SUPERCEDED BY lsl DERIVED FROM lstfx BELOW - NOT! Restore this simpler form
     Call the shell directory listing command ls -l for a long form listing,
      sorted alphabetically.  Also -a to show parent, -F to indicate directories
     Argument is file or directory path string, default . the current directory.    
+    That path argument is always relative to current working directory.
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
+    global lspath 
+    lspath = path  # used by viewer.py loader() fcn
     sh('ls -alF '+path)
 
 def lslt(path='.'):
     """
-    SUPERCEDED BY lslt DERIVED FROM lstfx BELOW - NOT! Restore simpler form
     Call the shell directory listing command ls -lt for a long form listing,
      sorted most recent first. Also -a to show parent, -F to indicate directories
     Argument is file or directory path string, default . the current directory.    
+    That path argument is always relative to current working directory.    
     Invokes the ls command in a shell subprocess, writes output on stdout.
     """
+    global lspath 
+    lspath = path  # used by viewer.py loader() fcn
     sh('ls -altF '+path)
-         
-def lslxfXXX(path='.', cmd='ls -l'):
-    """
-    NOW HIDE THIS WITH XXX - we *don't* want the extra formatting with path
-    lsl with eXtra Formatting.
-    In each line, prefix filename at the end with its path (from path= arg).
-    
-    Call cmd, a shell directory listing command such as 'ls -l' or 'ls -lt'
-     for a long form listing, default cmd is 'ls -l' to sort alphabetically.
-    path is file or directory path string, default '.' the current directory.    
-    Invokes the ls command in a shell subprocess, writes output on stdout.
-    """
-    lslines = io.StringIO('')
-    with contextlib.redirect_stdout(lslines):
-        sh(cmd+' '+path)
-    for line in lslines.getvalue().splitlines():
-        stats, spc, fname = line.rpartition(' ')
-        pathstr = '' if path == '.' else path + '/'
-        print(stats + spc + pathstr + fname)
-        
-def lslXXX(path='.'): lslxf(path, 'ls -l')
-
-def lsltXXX(path='.'): lslxf(path, 'ls -lt')
-

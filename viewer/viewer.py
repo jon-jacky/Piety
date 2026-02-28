@@ -354,8 +354,13 @@ def loader():
         words = ed.buffer[ed.dot].split()
         if len(words) == 9:  # FIXME? crudest check for ls -1 format, unsound
             fname = words[8]
-            # Load the file in the editor window
-            editor_window(lambda: fr.e(fname))
+            # Load the selected file into the editor window.
+            try:
+                # fname is just file basename, must prefix directory path
+                editor_window(lambda: fr.e(shell.lspath + '/' + fname))
+            except IsADirectoryError:
+                # print(f'{fname} is a directory') # DEBUG
+                lsl(shell.lspath + '/' + fname) # selecting fname ../ works too
         else: 
             pass # Line is not in ls -l format. FIXME? print msg in REPL             
     elif get.xurl(ed.buffer[ed.dot]): # There is a URL on this viewer line
