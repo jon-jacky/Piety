@@ -333,20 +333,26 @@ def editor_window(cmd):
         cmd()
         # ov() return focus to viewer - NOT! editor keeps focus
 
-def loader():
+def loader(this_window):
     """
-    Load contents into editor buffer depending on line in viewer buffer
+    Load contents indicated by current line in buffer into a buffer.
+    If this_window == True, load contents into the current window,
+      usually the viewer window if there is one.
+    If this_window == False, load contents into editor window
     """
-    # For now these are all invoked by M_ret keycode,
-    # could add keycode arg in the future.
+    #print(f'In loader, this_window: {this_window}') # DEBUG
+    #breakpoint() # DEBUG
     if ed.bufname == '*Buffers*':
         # All lines in *Buffers* have same format so this should always work
         # Code based on sked.py select_buffer():
         # Get the buffer name from the current (viewer) window
         # buffer name starts in col 1, continues to first space, can be any length.
         bname = ed.buffer[ed.dot][1:].partition(' ')[0]
-        # Load the buffer in the editor window
-        editor_window(lambda: fr.b(bname))
+        # Load the buffer into a window.
+        if this_window: # usually viewer window
+            fr.b(bname)
+        else: # other window, an editor window
+            editor_window(lambda: fr.b(bname))
     elif ed.bufname == '*Console*':
         # Get file name from the current (viewer) window
         # File name is from ls -l command, word at 0-based index 8 on line
@@ -357,14 +363,19 @@ def loader():
             try:
                 # Load the selected file into the editor window.
                 # fname is just file basename, must prefix directory path
-                editor_window(lambda: fr.e(shell.lspath + '/' + fname))
+                if this_window: # usually viewer window
+                    fr.e(shell.lspath + '/' + fname)
+                else: # other window, and editor window
+                    editor_window(lambda: fr.e(shell.lspath + '/' + fname))
             except IsADirectoryError:
                 # Display the selected directory in the viewer window
                 # print(f'{fname} is a directory') # DEBUG
                 # This call to lsl updates shell.lspath to add this directory
+                # display directory list in current window, usually viewer
                 lsl(shell.lspath + '/' + fname) # selecting fname ../ works too
         else: 
             pass # Line is not in ls -l format. FIXME? print msg in REPL             
+    # FIXME?  Following sections always display in current window
     elif get.xurl(ed.buffer[ed.dot]): # There is a URL on this viewer line
         # Get and render web page from URL on viewer line.
         # NB: grx redundantly calls get.xurl again
@@ -375,7 +386,7 @@ def loader():
         grfx() # This is viewer.grfx defined here, not get.grfx
     else:
         pass # Possibly more cases to come
-        
+
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
 dmacs.keymap[key.C_x + 'v'] = ov
@@ -404,10 +415,16 @@ dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
 # Display long-form file list in viewer window
 dmacs.keymap[key.C_x + key.C_f] = lsl # local lsl above, not console.lsl
 
-# Load contents named on line in viewer into editor buffer 
-# Viewer line might name a file, buffer, URL, footnote -- or more to come
-dmacs.keymap[key.M_ret] = loader
+# Load contents named on line into this window, usually the viewer
+def t_loader():
+    loader(True)
+dmacs.keymap[key.C_o ] = t_loader
 
+# Load contents named on line into other widow, usually an editor window
+def o_loader():
+    loader(False)
+dmacs.keymap[key.M_o] = o_loader
+ 
 def quit():
     """
     Ask for confirmation, then exit Piety and Python.

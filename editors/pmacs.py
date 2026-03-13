@@ -55,12 +55,10 @@ def prev_line(keycode):
     reset_point() # move to end of line if previous line is too short
     restore_cursor_to_window()
 
-def handle_cr(keycode):
+def select_buffer(keycode):
     if ed.bufname == '*Buffers*':
         edsel.select_buffer()
         restore_cursor_to_window()
-    else:
-        open_line(keycode)
         
 def open_line(keycode):
     """
@@ -192,7 +190,7 @@ def append(keycode):
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
-    key.cr: handle_cr, # open_line, or in *Buffers*, select buffer
+    key.cr: open_line,  # open_line takes keycode arg - FIXME?
     key.delete: delete_backward_char,
     key.bs: delete_backward_char, 
     key.C_d: delete_char,
@@ -201,6 +199,8 @@ keymap = {
     key.C_y: yank,
     key.C_l: refresh,
     key.C_x + key.C_a: append, # Enter dmacs append mode, exit with .
+    # key.C-o is now assigned in viewer.py
+    #key.C_o: select_buffer, # select_buffer takes keycode arg - FIXME?
     # arrow keys, send ANSI escape sequences
     key.down: next_line,
     key.up: prev_line,}

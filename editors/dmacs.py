@@ -21,11 +21,9 @@ except:
     promptline = edsel.flines+1 # line after end of edsel frame
     prev_cmd = None
     
-def handle_cr():
+def select_buffer():
     if ed.bufname == '*Buffers*':
         edsel.select_buffer()
-    else:
-        append()
         
 def append():
     'Restore line mode, run edsel a(), return to char mode'
@@ -180,7 +178,7 @@ keymap = {
     # editing
     key.C_k: kill_line, # append consecutive killed lines to yank buffer
     key.C_y: edsel.y, # yank (paste) deleted lines
-    key.cr: handle_cr, # open line and enter append mode OR *Buffers* select 
+    key.cr: append, # open line and enter append mode
     # cut and paste
     key.C_at: set_mark,
     key.C_x + key.C_x : exchange_mark, # exchange dot and mark,
@@ -192,7 +190,9 @@ keymap = {
     key.C_c + '<': (lambda: in_region(edsel.outdent)),
     # buffers and files
     key.C_x + 'b' : switch_buffer,
-    key.C_x + key.C_b: edsel.N, # list buffers in a buffer
+    key.C_x + key.C_b: edsel.N, # list buffers in *Buffers*
+    # key.C_o is now handled by viewer.py fcn loader
+    # key.C_o : select_buffer, # select buffer from list in *Buffers*
     key.C_x + key.C_f : find_file,
     key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
     key.C_x + key.C_s : edsel.w,  # write file, with stored filename

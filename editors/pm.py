@@ -19,8 +19,6 @@ import render
 from render import *
 import search
 from search import *
-import viewer
-from viewer import *
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
