@@ -372,6 +372,8 @@ def loader(this_window):
                 # print(f'{fname} is a directory') # DEBUG
                 # This call to lsl updates shell.lspath to add this directory
                 # display directory list in current window, usually viewer
+                # FIXME: M_o on subdirectory line prints subdirectory at bottom 
+                #  of viewer window (right) BUT moves cusor to editor (wrong)
                 lsl(shell.lspath + '/' + fname) # selecting fname ../ works too
         else: 
             pass # Line is not in ls -l format. FIXME? print msg in REPL             
@@ -416,14 +418,10 @@ dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
 dmacs.keymap[key.C_x + key.C_f] = lsl # local lsl above, not console.lsl
 
 # Load contents named on line into this window, usually the viewer
-def t_loader():
-    loader(True)
-dmacs.keymap[key.C_o ] = t_loader
+dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
 
 # Load contents named on line into other widow, usually an editor window
-def o_loader():
-    loader(False)
-dmacs.keymap[key.M_o] = o_loader
+dmacs.keymap[key.M_o] = (lambda: loader(this_window=False))
  
 def quit():
     """
