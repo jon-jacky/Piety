@@ -10,6 +10,7 @@ modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
+import os
 import key, dmacs, display, shell, render, console, get
 import sked as ed, edsel as fr
  
@@ -258,6 +259,16 @@ def man(topic):
 def help(topic):
     viewer_window(lambda: console.help(topic))
 
+def dir():
+    """
+    Prompt for directory (default cwd), then list directory in viewer window
+    """
+    cwd = os.getcwd()
+    path = dmacs.request(f'List directory (default {cwd}): ')
+    if dmacs.cancelled(path): return
+    if not path: path = cwd
+    lsl(path)    
+        
 # Browser functions
 # Overwrites browser function names imported by 'from browser import *'
 # You can still invoke browser.grx() etc. by providing browser. prefix
@@ -410,13 +421,15 @@ dmacs.keymap[key.M_m] = vvrefresh
 # Overwrites C_x C_b key binding defined in dmacs.py
 dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 
-# Prompt for file name
-# Replaces emacs-style C-x C-f for visit file in dmacs.py
+# Visit file, prompt for file name, NOT like Emacs, but analogous to C-x b
 dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
 
-# Display long-form file list in viewer window
-dmacs.keymap[key.C_x + key.C_f] = lsl # local lsl above, not console.lsl
+# Visit file, prompt for file name, compatible with Emacs
+dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
 
+# Prompt for dircectory (default cwd) then display file list in viewer window
+dmacs.keymap[key.C_x + key.C_d] = dir # 
+ 
 # Load contents named on line into this window, usually the viewer
 dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
 
