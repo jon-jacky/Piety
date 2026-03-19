@@ -346,10 +346,16 @@ def editor_window(cmd):
 
 def loader(this_window):
     """
-    Load contents indicated by current line in buffer into a buffer.
+    Load contents indicated by the current line in the buffer.
+    The current line might be a buffer name, file name, or directory name.
+    If current line names a buffer, show the buffer contents in a window.
+    If the current line names a file, load the file into a buffer and display
+    it in a window.  If the current line names a directory, display 
+    it in the viewer window.    
     If this_window == True, load contents into the current window,
-      usually the viewer window if there is one.
-    If this_window == False, load contents into editor window
+     usually the viewer window.
+    If this_window == False, load contents into the other window,
+     an editor window
     """
     #print(f'In loader, this_window: {this_window}') # DEBUG
     #breakpoint() # DEBUG
@@ -369,22 +375,25 @@ def loader(this_window):
         # File name is from ls -l command, word at 0-based index 8 on line
         # Not all lines in *Console* are from ls -l so we must check format
         words = ed.buffer[ed.dot].split()
-        if len(words) == 9:  # FIXME? crudest check for ls -1 format, unsound
-            fname = words[8]
-            try:
-                # Load the selected file into the editor window.
+        # Check if line is dir listing line: 9 words starting with permissions
+        if len(words) == 9 and set(words[0]).issubset(set('drwx-')):
+            permissions = words[0]
+            fname = words[-1]
+            if permissions[0] != 'd': # This line does *not* name a directory
+                # Load the selected file into a window.
                 # fname is just file basename, must prefix directory path
-                if this_window: # usually viewer window
+                if this_window: # viewer window
                     fr.e(shell.lspath + '/' + fname)
-                else: # other window, and editor window
+                else: # other window, an editor window
                     editor_window(lambda: fr.e(shell.lspath + '/' + fname))
-            except IsADirectoryError:
-                # Display the selected directory in the viewer window
+            else: # This line names a directory
+                #  List the selected directory in the viewer window
                 # print(f'{fname} is a directory') # DEBUG
                 # This call to lsl updates shell.lspath to add this directory
                 # display directory list in current window, usually viewer
                 # FIXME: M_o on subdirectory line prints subdirectory at bottom 
                 #  of viewer window (right) BUT moves cusor to editor (wrong)
+                # Always display directory in viewer window, ignore this_window
                 lsl(shell.lspath + '/' + fname) # selecting fname ../ works too
         else: 
             pass # Line is not in ls -l format. FIXME? print msg in REPL             
