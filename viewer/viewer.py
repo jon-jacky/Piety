@@ -431,12 +431,13 @@ dmacs.keymap[key.M_m] = vvrefresh
 dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 
 # Visit file, prompt for file name, NOT like Emacs, but analogous to C-x b
-dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
+# NOT!  We'll just stick to emacs keycodes when there is one.
+# dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
 
 # Visit file, prompt for file name, compatible with Emacs
 dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
 
-# Prompt for dircectory (default cwd) then display file list in viewer window
+# Prompt for directory (default cwd) then display file list in viewer window
 dmacs.keymap[key.C_x + key.C_d] = dir # 
  
 # Load contents named on line into this window, usually the viewer

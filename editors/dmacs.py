@@ -89,7 +89,7 @@ def switch_buffer():
 def find_file():
     global mark
     filename = request('Find file: ')
-    if cancelled(filename): return
+    if not filename or cancelled(filename): return # Just type RET to cancel
     mark = 0
     edsel.e(filename)
 

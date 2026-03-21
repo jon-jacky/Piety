@@ -21,6 +21,7 @@ width=50% [Aworks but width="960" does *not* work.
 [Workflow](#Workflow)  
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
+[Files](#Files)
 [Influences](#Influences)
 
 ### Quick Start ###
@@ -46,8 +47,8 @@ Run this command to start the desktop:
 
     python3 -im vpm
 
-The desktop appears, with the buffer list in the viewer window
-and the *scratch.txt* buffer in the editor window.  The cursor
+The desktop appears, with the windows showing the buffers named in 
+a startup file (see [Files](#Files)).  The cursor
 is at the Python prompt in the REPL region at the bottom.
 Now you can run the desktop by typing [commands](#Commands) at the
 Python prompt.   Type the *pm()* command to enter display
@@ -156,6 +157,8 @@ Files and buffer contents:
     can include a relative or absolute path. Generate a
     buffer name *bname*, usually *fname* without any path
     prefix.
+    If file *fname* does not exist, create a new empty buffer,
+    whose contents can be written out to the file system later.
 
 - **gr(url)** - Load the web page at *url* into *two*
     buffers: the HTML source, and the rendered text.
@@ -320,28 +323,12 @@ Viewer window contents:
     The editor window keeps the focus if it already
     has it.
 
-- **loader()** - Select an item from
-    the viewer window and show it in the editor window.  
-    In the editor focus window,
-    show the item named on the selected line (where the
-    cursor is) in the viewer buffer. 
-    Several kinds of items are supported:
-    When the \*Buffers\* buffer is in the viewer window,
-    this command shows the buffer named on that line
-    in the editor focus window. When the \*Console\*
-    buffer is in the viewer window, and the cursor is
-    on a line in a directory listing made by *lsl* or
-    *lslt* (see below) this command loads the file
-    named on that line into a buffer and shows that
-    buffer in the editor window. When the cursor is on
-    a line in any buffer that contains a URL, this
-    command loads the page at that URL into buffers
-    and displays the rendered buffer in the editor
-    window. When the cursor is on a line in a rendered
-    web page near a link, this command finds the URL
-    at that link, loads that page into buffers, and
-    shows the rendered buffer in the editor window.
-
+- **loader(this_window)** - Select the item on the current line
+    in the viewer window.  The item might be a buffer, file or directory.
+    If *this_window == True*, display the item in the viewer window.
+    If *this_window == False*, display the item in the editor window
+    (except directories, which are always displayed in the viewer window)
+            
 ### Keycodes ###
 
 Keycodes you can type to invoke desktop
@@ -369,20 +356,28 @@ Session management:
 - **C-x 1** - Delete viewer panel, if viewer panel has
     focus.   Needed only for testing *C-x 3*.
 
-Files and buffer contents:
-  
-- **C-x f** - Load named file into focus window, enter file
-    name at prompt.
-
-- **M-RET** - Select a file or web page from the
-    viewer window, load it into a buffer, and display it
-    in the editor window.
-
-- **C-x b** - Show named buffer in focus window, enter buffer
-    name at prompt.   Type RET to return to previous buffer.
+Files, directories, and buffers:
 
 - **C-x C-b** - Show list of buffers in viewer window.
 
+- **C-x b** - Show named buffer in focus window, enter buffer
+    name at prompt.   Type RET for the default, return to previous buffer.
+  
+- **C-x C-d** - List file directory in viewer window.  Enter 
+   relative or absolute directory path at prompt.  Type RET for the default,
+   the current working directory.
+
+- **C-x C-f** - Load named file into focus window, enter file
+    name at prompt.  If there is no such file, create a new empty buffer,
+    whose contents can be written out to the file system later.
+    There is no default, type RET to cancel the operation.
+
+- **C-o** and **M-o**  - Select the item on the current line in the list
+    in the viewer window.  The item might be a buffer, file or directory.
+    Type *C-o* to display the item in the viewer window.
+    Type *M-o* ti display the item in the editor window
+    (except directories, which are always displayed in the viewer window)
+            
 Navigating among windows:
 
 - **C-x v** - Switch focus from editor window to viewer window.
@@ -427,20 +422,27 @@ Navigating within windows:
 
 - **M-m** - Refresh viewer window while editor window has focus.
 
-Viewer window contents
+### Files ###
 
-- **RET** - Select a buffer from the list in the
-    window and show it in the same window.     
-    (RET is the Return or Enter key.)
+These files are in the *Piety/viewer* directory:
+
+- **README.md**: This file.
+
+- **desktop.txt**: Interactive tutorial on using the desktop,
+    formatted for display in the viewer window.
+
+- **keys.txt**: List of keys and key sequences used for navigating
+      the desktop and editing text in its windows, formatted for
+      display in the viewer window.
+  
+- **viewer.py**: Source code for the viewer window, including the
+    keys and commands.
+
+- **vpm.py**: Script to start a Piety desktop session.
+
+- **vmp_startup.py**:  Script to configure the Piety desktop
+    at startup, called by *vpm.py*.
     
-- **M-RET** - Select an item from the list in the 
-    viewer window and show it in the editor window.  
-    Buffer name, file name, URL, or link is on the
-    line at the cursor in the list in the viewer
-    window, put there by the *C-x C-b* keycode, or by
-    the *N*, *lsl*, lslt*, or *gr* commands.
-
-
 ### Influences ###
 
 The Piety desktop is influenced by 
@@ -448,4 +450,5 @@ The Piety desktop is influenced by
 [Oberon](https://people.inf.ethz.ch/wirth/ProjectOberon/UsingOberon.pdf), 
 and [Acme](http://acme.cat-v.org/).
 
-Revised Aug 2025 
+Revised Mar 2026
+
