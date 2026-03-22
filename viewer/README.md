@@ -47,12 +47,14 @@ Run this command to start the desktop:
 
     python3 -im vpm
 
-The desktop appears, with the windows showing the buffers named in 
-a startup file (see [Files](#Files)).  The cursor
-is at the Python prompt in the REPL region at the bottom.
-Now you can run the desktop by typing [commands](#Commands) at the
-Python prompt.   Type the *pm()* command to enter display
-editing, where you can run the desktop by typing [keycodes](#Keycodes).
+The desktop appears, with the windows showing
+the buffers named in a startup file (see
+[Files](#Files)). Depending on the startup
+file, the cursor might be at the Python prompt
+at the bottom of the display, or in one of the
+windows. Now you can run the desktop by typing
+[commands](#Commands) at the Python prompt, or
+by typing [keycodes](#Keycodes) in a window.
 
 ### Appearance ###
 
@@ -60,10 +62,10 @@ The Piety desktop contains an 80 column wide *editor
 panel* on the left and a *viewer panel* that occupies
 the remaining columns on the right, usually fewer than
 80 if a comfortably large enough font size is chosen.
-The editor panel can contain one or two windows. The
-viewer panel can only contain one window. 
+The editor panel can contain one or two windows, stacked
+vetically.  The viewer panel can only contain one window. 
 
-Below both panels is the *REPL region*. that extends the
+Below both panels is the Python *REPL region*. that extends the
 full width of the display.
  
 ### Workflow ###
@@ -339,6 +341,10 @@ prompt in the REPL, type the function call *pm()*.
 Here *C-x*, *control-X*, means hold down the *ctrl*
 key while you type the *X* key. *M-x*, *meta-X*, means
 hold down the *alt* key while you type the *X* key.
+
+Many (but not all) of our keycodes are the same as the 
+[Emacs keycodes](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf)
+used by the Emacs editor.
 
 Session management: 
 

@@ -41,7 +41,7 @@ Keys
 
 Key sequences like C-v and M-< are usually
 just called keys. A list of Piety keys appears
-in keys.txt. Many (but not all!) keys used by
+in keys.txt. Many (but not all) keys used by
 Piety behave like the same keys in the Emacs
 editor.
 
@@ -52,12 +52,11 @@ Type C-x C-b to display the list of all the
 buffers in the session here in the viewer
 window. To display the tutorial again, use the
 arrow keys (or C-n and C-p) to move the cursor
-down to desktop.txt in the list and press
-ENTER.
+down to desktop.txt in the list and type C-o.
 
 Display the buffer that lists all the keys.
 Type C-x C-b again, move the cursor to
-keys.txt, and press ENTER. Scroll around in
+keys.txt, and press C-o. Scroll around in
 the list. To get back to the tutorial, type
 C-x C-b again, then select desktop.txt.
 
@@ -94,8 +93,8 @@ Buffers in editor windows
 Now display a different buffer in the editor
 window. Type C-x C-b to display the buffer
 list, move the cursor to README.md, and press
-M-ENTER (hold down the ALT key, the press the
-ENTER key). Then README.md appears in the
+M-o (hold down the ALT key, the press the
+o key). Then README.md appears in the
 other window, the editor window, and the
 cursor moves there.  Use C-v etc. to scroll
 through the editor window in the usual way.
@@ -239,7 +238,7 @@ and load it into a buffer.  At the Python prompt,
 type the command lsl().  A long-form directory listing,
 with one file per line, appears in the viewer window.
 Position the cursor over one of the lines and 
-type M-ENTER.   The file on that line is loaded
+type M-o.   The file on that line is loaded
 into a buffer and appears in the most recently used
 editor window.
  
@@ -273,7 +272,7 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
 
-Revised Feb 2026
+Revised Mar 2026
 
 
 
