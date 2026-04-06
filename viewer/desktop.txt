@@ -327,12 +327,22 @@ the current working directory in *Console*. On
 the following line in the REPL, the Python
 prompt reappears, with the cursor ready for
 you to type another statement. Type the
-command ls() to print a short-form directory
-listing for the current directory.
+command cd('viewer') to change to the viewer
+subdirectory.   Then repeate the pwd() command
+to confirm that is the new working directory. 
+
+Use the sh('...') command to run any host
+computer shell command in the Python REPL.
+Just enclose the entire shell command within
+quotes.
 
 When you are finished using the Python REPL, 
 type the command pm() to return the cursor to
 the desktop window you were most recently using.
+
+Try it, type pm() at the REPL.  Now type
+C-x C-d to confirm that the new default
+directory is still the viewer subdirectory.
  
 You can recall previous commands in the REPL
 so you do not have to type them again.  At the
