@@ -13,11 +13,9 @@ This text you are viewing right now,
 desktop.txt, is an interactive tutorial on
 getting started with the Piety desktop. As you
 read through it, follow the directions to
-issue commands and see their effects -- but be
-sure to read to the end of each section
-before trying its commands!
+issue commands and see their effects.
 
-Movement
+Scrolling
  
 To read further in this tutorial, scroll down:
 type C-v (control-V, hold down the CTRL key
@@ -29,13 +27,48 @@ To scroll back up, type M-v (meta-V, hold down the
 ALT key and press the v key). To go to the top,
 type M-< (hold down the alt key and the shift
 key and press the < key) and to go to the
-bottom type M->.
+end type M->.
 
 You can move the cursor up or down one line at
 a time by pressing the arrow keys, or C-n
 (next, for down) and C-p (previous, for up).
 When the cursor reaches the bottom (or top) of
 the window, it will scroll down (or up).
+  
+Search
+
+Instead of scrolling, it is often more
+efficient to search for what you want.
+
+Type C-s for forward search. A prompt appears
+below the window on the left:
+  
+  Search string (default ...): 
+
+Type in the string you want to search for --
+try the string scroll -- then press ENTER. The
+cursor moves forward to the next line that
+contains that string. Press C-s again. Now the
+cursor moves forward to the next occurence,
+without prompting. And again and again. Search
+continues without prompting until you type a
+different keycode.
+
+Type C-r for backward search. If it
+immediately follows C-s or another C-r, it
+searches for the same string without
+prompting.
+
+At the search prompt, the default is the
+string you most recently searched for. Just
+press ENTER to accept the default without
+retyping it. You can edit at the prompt by
+typing BACKSPACE and retyping. To cancel the
+search operation, type ??? at the end of the
+search string and press ENTER.
+
+Search is case sensitive. Searching for
+scroll will not find Scroll, etc.  
 
 Keys 
 
@@ -44,7 +77,7 @@ just called keys. A list of Piety keys appears
 in keys.txt. Many (but not all) keys used by
 Piety behave like the same keys in the Emacs
 editor.
-
+  
 Buffers
 
 In Piety, text is stored in named buffers.
@@ -75,8 +108,9 @@ Switch to buffer (default *Buffers*):
 The default, *Buffers*, is the buffer list
 itself - which is just another buffer. The
 default is always the buffer that was just
-previously displayed.   Just press ENTER to
-accept the default and show the buffer list.
+previously displayed in that window. Just
+press ENTER to accept the default and show the
+buffer list.
 
 To show the tutorial again, select
 desktop.txt. There is another way to select a
@@ -172,7 +206,7 @@ viewer window while you work in the editor
 window. To scroll the viewer window while
 the cursor remains in the editor window, type C-t
 (scroll down), M-t (scroll up), M-( (go to
-top), M-) (go to bottom).
+top), M-) (go to end).
 
 Type C-x 2 to split the editor window in two.
 Now you can display two different locations in
@@ -228,8 +262,9 @@ ENTER.
 There is another way to list a subdirectory.
 Try it: position the cursor over the line with
 the __pycache__ subdirectory and type C-o, Its
-directory listing appears at the bottom of the
-*Console* buffer.
+directory listing appears at the end of the
+*Console* buffer, at the bottom of the viewer
+window.
 
 You can list any directory in the file system 
 by typing its absolute path, or its path relative
@@ -307,9 +342,9 @@ Commands
 
 In adition to typing keycodes, you can also
 type commands: Python statements, usually
-function calls, at the Python interpreter,
-which is always available at the bottom of the
-Piety desktop.
+function calls. Type them at the Python
+interpreter, which is always available at the
+bottom of the Piety desktop.
 
 Type M-x to put the cursor at the Python
 prompt at the bottom of the display. You are
