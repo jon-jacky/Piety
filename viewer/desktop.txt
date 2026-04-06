@@ -14,7 +14,7 @@ desktop.txt, is an interactive tutorial on
 getting started with the Piety desktop. As you
 read through it, follow the directions to
 issue commands and see their effects -- but be
-sure to read to the end of each paragraph
+sure to read to the end of each section
 before trying its commands!
 
 Movement
@@ -45,20 +45,67 @@ in keys.txt. Many (but not all) keys used by
 Piety behave like the same keys in the Emacs
 editor.
 
-Buffer list
+Buffers
 
 In Piety, text is stored in named buffers.
 Type C-x C-b to display the list of all the
-buffers in the session here in the viewer
-window. To display the tutorial again, use the
-arrow keys (or C-n and C-p) to move the cursor
-down to desktop.txt in the list and type C-o.
+buffers in the session here in this window.
+
+Among the buffers are README.md, keys.txt,
+viewer.py, and desktop.txt.  They were loaded
+into buffers by the startup script that
+started this Piety session.
 
 Display the buffer that lists all the keys.
-Type C-x C-b again, move the cursor to
-keys.txt, and press C-o. Scroll around in
-the list. To get back to the tutorial, type
-C-x C-b again, then select desktop.txt.
+Type C-x b (just b, not C-b).  At the left
+edge of the display, under the windows, this 
+prompt appears:
+
+Switch to buffer (default desktop.txt):
+
+At the prompt, type keys.txt, the press ENTER.
+keys.txt appears in this window. Scroll
+through keys.txt.
+
+To return to the buffer list, type C-x b again.
+This time the prompt says:
+
+Switch to buffer (default *Buffers*):
+
+The default, *Buffers*, is the buffer list
+itself - which is just another buffer. The
+default is always the buffer that was just
+previously displayed.   Just press ENTER to
+accept the default and show the buffer list.
+
+To show the tutorial again, select
+desktop.txt. There is another way to select a
+buffer: use C-n (or C-p) to move the cursor to
+the line that names desktop.txt. Then type
+C-o. That buffer desktop.txt appears in this
+window.
+
+Now display keys.txt again. You already know
+the buffer name, so you do not need to display
+the buffer list. Just type C-x b. At the
+prompt, type k? ENTER. keys.txt appears. You
+only need to type enough of the buffer name to
+indentify it, followed by ?.
+
+Now get back to desktop.txt. Type C-x b. The
+default is desktop.txt, that was just
+previously displayed. Type ENTER to accept the
+default. desktop.txt appears.
+
+You can keep typing C-x b ENTER to switch
+between the two most recent buffers. Try it.
+End up back here at desktop.txt.
+
+You can edit the buffer name at the C-x b prompt by
+using the backspace key and re-typing. To
+cancel the C-x b operation and retain the same
+buffer, type ??? at the end of the buffer name
+string, then type ENTER.
 
 Windows
 
@@ -84,163 +131,208 @@ interpreter.
  
 The session starts up with one editor window,
 showing an empty scratch buffer where you can
-practice editing. You can edit in the viewer
-window too, but it usually displays reference
-information -- like this tutorial.
+practice editing. You can edit here in the
+viewer window too, but it usually displays
+reference information -- like this tutorial.
 
-Buffers in editor windows
+Type C-x o to move the cursor from the viewer
+window to an editor window. Type C-x v to move
+the cursor back to the viewer window. Most
+keys and commands work the same in any window.
 
-Now display a different buffer in the editor
-window. Type C-x C-b to display the buffer
-list, move the cursor to README.md, and press
-M-o (hold down the ALT key, the press the
-o key). Then README.md appears in the
-other window, the editor window, and the
-cursor moves there.  Use C-v etc. to scroll
-through the editor window in the usual way.
+Buffers in windows
 
-Type C-x v to return the cursor to the viewer
-window, still showing the buffer list. Select
-the tutorial desktop.txt from the list.
+To display a buffer in any window, put the
+cursor in that window and type C-x b. The
+buffer you name at the prompt appears in that
+window.
 
-Type C-x o to return to the editor window. You
-can continue reading the tutorial in the
+It can be convenient to leave the buffer list
+displayed in the viewer window for reference,
+load buffers into editor windows, and work on
+them there.
+
+You can load an editor window from the buffer
+list in the viewer window by moving the cursor
+over the buffer you want and typing M-o. But
+it is often more convenient to just type C-b
+and and the buffer name.
+
+Put the cursor in the viewer window, then
+use C-x b to display the tutorial desktop.txt
+in the viewer window.
+
+Then type C-x o to put the cursor in the
+editor window. type C-x b to display README.md
+in the editor window. Use C-v etc. to scroll
+through README.md in the usual way.
+
+You can continue reading the tutorial in the
 viewer window while you work in the editor
 window. To scroll the viewer window while
 the cursor remains in the editor window, type C-t
 (scroll down), M-t (scroll up), M-( (go to
 top), M-) (go to bottom).
 
-Selecting buffers
- 
-It is not necessary to use the buffer list to
-switch to another buffer. Just type C-x b. On
-the line right below the editor window, a
-prompt appears: 
-Switch to buffer (default scratch.txt): 
-At the prompt, type the name of the buffer you
-want. Type viewer.py, then press ENTER.
-viewer.py appears in the editor window.
-
-The default for C-x b Switch to buffer is
-always the buffer that was previously
-displayed in that same window.  Try it.
-Type C-x b then press ENTER. README.md appears
-again. To switch back and forth between two
-buffers, type C-x b ENTER a couple of times,
-until README.md is displayed aagin.
-
 Type C-x 2 to split the editor window in two.
 Now you can display two different locations in
 the same buffer, README.md for now. The cursor
 remains in the top window. Type C-v etc. to
-scroll in this window. Type C-x o to move the
+scroll in this window. 
+
+When there are two editor windows, C-x o
+switches between them. Type C-x o to move the
 cursor to the bottom window, and type C-v etc.
-to scroll to a different location. Repeat
-C-x o to switch between windows, ending in the
-bottom window. 
+to scroll to a different location. Repeat C-x o
+to switch between windows, ending in the
+bottom window.
 
-Display the other buffer in this window. 
-Type C-x B ENTER to select viewer.py.
-Now you can view and scroll both windows.
+Display another buffer in this window. 
+Type C-x B and select viewer.py. Now you can
+view and scroll both windows. 
 
-To make it easier to switch buffers, you can
-abbreviate buffer names. Type C-x b, then at
-the prompt, type just enough of the name to
-uniquely identify it, followed by a question
-mark. To display keys.txt in the current
-window, replacing viewer.py, type 
-C-x b k? ENTER. Then type C-x b ENTER 
-to restore viewer.py.
+Directories
 
-You can edit the buffer name by using the
-BACKSPACE key, then re-typing. You can cancel
-the whole operation by typing three question
-marks ??? at the end of the buffer name.
+You can create a buffer by loading its
+contents from a file on disk. To see what 
+files are there, type C-x C-d to list a
+directory.   A prompt appears:
+
+ List directory (default /home/jon/Piety): 
+
+The default is the current working directory.
+Just press ENTER to list its contents. The
+directory listing appears in the viewer window
+in a buffer named *Console*. Often the listing
+is longer than the window, use C-v etc to
+scroll through the listing in the usual way.
+
+The file names appear in the column on the
+right. File names that are followed by the
+slash character / are subdirectories.
+
+To list a subdirectory, type its name at the
+prompt. Try it: type C-x C-d, then type
+viewer, then press ENTER. The directory
+listing for the viewer sudirectory appears at
+the end of the *Console* buffer and the
+previous directory listing scrolls up.
+
+You must type the complete directory name 
+at the promt.  You cannot abbreviate it and
+type ?.  You can edit it by using BACKSPACE
+and then retyping.  You can cancel the operation
+by typing ??? at the end of the string, then 
+ENTER.
+
+There is another way to list a subdirectory.
+Try it: position the cursor over the line with
+the __pycache__ subdirectory and type C-o, Its
+directory listing appears at the bottom of the
+*Console* buffer.
+
+You can list any directory in the file system 
+by typing its absolute path, or its path relative
+to the current working directory. In relative
+paths, ou can use the abbreviation .. for the
+parent directory of the current directory.
+
+Listing a directory does not change the current
+working directory.
  
-Files and buffers
+Files
 
 You can create a buffer by loading its
 contents from a file on disk. Type C-x C-f.
-Find file: appears on the prompt line. Type
-the relative path viewer/vpm.py, then ENTER.
-The buffer vpm.py appears in the window,
-replacing README.md. Type C-x C-b to confirm
-that vpm.py is now in the buffer list. Select
-the tutorial desktop.txt again, then C-x o to
-return to the vpm.py in the lower editor
+Find file: appears on the prompt line. There
+is no default. Type the name of a file in the
+current working directory, or type the
+relative or absolute path to any file in the
+file system, then press ENTER. The file
+contents appear in a new buffer in the current
 window.
 
-You can edit the file name at the prompt with
-BACKSPACE and retyping, or cancel the Find
-File operation by typing ??? at the end of the
-file name.
+Try it. Type C-x o to put the cursor in an
+editor window. Type C-x C-f then README.md
+ENTER. The contents of the README.md in the
+current working diretory - your Piety
+directory - appear in the window.
 
-However, ending the file name with ? does not
-result in file name completion.
+Type C-x C-b to show the buffer list in the
+viewer window. The list contains two entries
+that look similar to this:
+ ...
+ README.md           460   /home/jon/Piety/viewer/README.md  saved
+ ...
+ README.md<2>        167   /home/jon/Piety/README.md       saved
 
+There are buffers for two README.md files from
+different directories. The Piety software
+named the second buffer README.md<2> with the
+suffix <2> to ensure that each buffer has a
+unique name.
+
+Now try a relative path. Type C-x C-f then
+viewer/vpm.py ENTER. The new buffer vpm.py and
+its contents appears in the current window.
+
+You can always show the current working
+directory by typing C-x C-d. It appears in the
+promot. Type ??? to dismiss the prompt.
+
+You must type the complete file name 
+at the promptt.  You cannot abbreviate it and
+type ?.  You can edit it by using BACKSPACE
+and then retyping.  You can cancel the operation
+by typing ??? at the end of the string, then 
+ENTER.
+
+There is another way to load a file. Put the
+cursor over the file name in the directory 
+listing.  Type M-o to open that file in
+an editor window, or type C-o to open the
+file in the viewer window.
+
+It can be convenient to leave the directory
+listing displayed in the viewer window for
+reference, load files into editor windows, and
+work on them there.
+ 
 If you type a file name that does not already
 exist in the file system, Piety creates a new
 empty buffer, which you can edit and save to 
 make a new file.
  
-Python commands and directories
+Commands
 
-The Piety desktop provides commands for
-working with directories, so we can find what
-files are available and what paths to use to
-reach them.
-
-The Piety directory commands are ordinary
-Python function calls. There is a Python
-interpreter that always available at the
-bottom of the Piety desktop.  
+In adition to typing keycodes, you can also
+type commands: Python statements, usually
+function calls, at the Python interpreter,
+which is always available at the bottom of the
+Piety desktop.
 
 Type M-x to put the cursor at the Python
 prompt at the bottom of the display. You are
 now in the Python REPL (Read- Evaluate-Print-
 Loop), and can type any Python statement.
 
-At the Python prompt, type the command pwd()
-to print the current working directory.  The
-*Console* buffer appears in the viewer window, 
-showing the pwd() command you just typed, with its
-output on the next line: the absolute path 
-to the Piety directory.  This is the directory
-where the Piety desktop was started.  
+Piety defines many commands which have names
+and effects similar to commands in the host
+system shell. They print their output to the
+end of the *Console* buffer in the viewer
+window.
 
-On the line after that, the Python prompt
-reappears, with the cursor ready for you to
-type another statement. Type the ls() command
-to print a directory listing for the current
-directory, Piety.
-
-The Piety directory contains viewer, another
-directory. At the Python prompt, type
-cd('viewer') to change to this directory.   
-Then type pwd() again to confirm that the
-current directory is now Piety/viewer.  Then 
-type ls() to list the files there.  
-
-Among the files in Piety/viewer are README.md,
-keys.txt, viewer.py, and desktop.txt, that were 
-loaded into buffers by the startup script that
-started this Piety session.   Also there is
-vpm.py, the startup script itself, which you
-recently loaded by using the C-x C-f command.
+For example, type the command pwd() to print
+the current working directory in *Console*. On
+the following line in the REPL, the Python
+prompt reappears, with the cursor ready for
+you to type another statement. Type the
+command ls() to print a short-form directory
+listing for the current directory.
 
 When you are finished using the Python REPL, 
 type the command pm() to return the cursor to
 the desktop window you were most recently using.
- 
-You can select a file from a directory listing
-and load it into a buffer.  At the Python prompt,
-type the command lsl().  A long-form directory listing,
-with one file per line, appears in the viewer window.
-Position the cursor over one of the lines and 
-type M-o.   The file on that line is loaded
-into a buffer and appears in the most recently used
-editor window.
  
 You can recall previous commands in the REPL
 so you do not have to type them again.  At the
@@ -261,18 +353,17 @@ command. Using C-p (etc.) to access command
 history and ??? to cancel the request also
 work at this prompt.
 
-More to come
+More
 
-This file, desktop.txt, is still incomplete -- 
-there is much more about the Piety desktop
-we have not yet discussed.   Meanwhile, you
+There is much more about the Piety desktop
+we have not discussed here.   Meanwhile, you
 can find many more details in these files:
 
 Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
 
-Revised Mar 2026
+Revised Apr 2026
 
 
 
