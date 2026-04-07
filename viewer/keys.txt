@@ -12,19 +12,10 @@ C-v, control v, means hold down the CTRL key
 M-v, meta v, means hold down the ALT key and 
      press the v key.
 
-Many (but not all!) keys used by Piety behave
+Many (but not all) keys used by Piety behave
 like the same keys in the Emacs editor.
 
-This file, keys.txt, is still incomplete --
-most keys used in Piety are not yet listed.
-Meanwhile, you can find more details in these
-files:
-
-Piety/editors/README.md
-Piety/viewer/README.md
-Piety/browser/README.md
-
-Moving through a buffer
+Scrolling
 
 C-v  Scroll down half a page
 M-v  Scroll up half a page
@@ -34,22 +25,69 @@ C-n  next line, move down one line
      (or use the down arrow key)
 C-p  previous line, move up one line
      (or use the up arrow key)
+
+Scrolling viewer window while
+working in an editor window
+
+C-t  Scroll viewer down half a page
+M-t  Scroll viewer up half a page
+M-(  Move to top of buffer in viewer
+M-)  Move to bottom of buffer in viewer
+ 
+Search
+
+C-s  Search forward
+C-r  Search backward
+
+Buffers
+
+C-x C-b   List buffers
+C-x b     Switch to buffer
+C-x k     Delete current buffer            
+
+C-o  Open buffer named on viewer line
+     in viewer window
+M-o  Open buffer named on viewer line
+     in editor window
+
+Windows
+
+C-x 2  Split one editor window into two
+C-x 1  Delete the other editor window
+C-x o  Move cursor to other editor window
+
+C-x v  Move cursor from editor to viewer       
+C-x o  Move cursor from viewer to editor
      
-Buffer, choose buffer from the list
+Directories
 
-C-x C-b   Show buffer list, go to line, then:
- ENTER     Show buffer in the viewer window
- M-ENTER   Show buffer in an editor window
- 
-Buffer, enter buffer name at the prompt
+C-x d  List directory
+C-o  List directory named on viewer line
+     
+Files
 
-C-x b   Show 'Switch to ...' prompt, then:
- ENTER  Default, return to previous buffer 
- fname ENTER  Show buffer named 'fname'
- fn? ENTER  Show buffer whose name starts 'fn'
- ??? ENTER  Cancel, leave buffer unchanged
- 
-Much more to come ...
+C-x C-f  Open or create file in new buffer
+C-o      Open file named on viewer line
 
-Revised Feb 2026
-                 
+C-x C-s  Save file, with same file name
+C-x C-w  Save file, prompt for file name
+
+Python REPL
+
+M-x  Move cursor from window to REPL
+pm() Move cursor from REPL to window
+
+M-y  Enter and run a single Python command 
+     then return to window
+
+More
+
+Many keys used in Piety are not listed here.
+You can find more details in these files:
+
+Piety/editors/README.md
+Piety/viewer/README.md
+Piety/browser/README.md 
+      
+Revised Apr 2026
+

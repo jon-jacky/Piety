@@ -141,6 +141,8 @@ cancel the C-x b operation and retain the same
 buffer, type ??? at the end of the buffer name
 string, then type ENTER.
 
+Type C-x k to delete the current buffer.
+
 Windows
 
 The desktop shows two or three windows. This
@@ -224,6 +226,8 @@ bottom window.
 Display another buffer in this window. 
 Type C-x B and select viewer.py. Now you can
 view and scroll both windows. 
+
+Type C-x 1 to delete the other editor window.
 
 Directories
 
@@ -313,10 +317,10 @@ its contents appears in the current window.
 
 You can always show the current working
 directory by typing C-x C-d. It appears in the
-promot. Type ??? to dismiss the prompt.
+prompt. Type ??? to dismiss the prompt.
 
 You must type the complete file name 
-at the promptt.  You cannot abbreviate it and
+at the prompt.  You cannot abbreviate it and
 type ?.  You can edit it by using BACKSPACE
 and then retyping.  You can cancel the operation
 by typing ??? at the end of the string, then 
@@ -337,10 +341,16 @@ If you type a file name that does not already
 exist in the file system, Piety creates a new
 empty buffer, which you can edit and save to 
 make a new file.
+
+Type C-x C-s to save a buffer to its file,
+with its same file name.
+
+Type C-x C-w to save a buffer to a different
+file, prompt for the new file name.
  
 Commands
 
-In adition to typing keycodes, you can also
+In addition to typing keycodes, you can also
 type commands: Python statements, usually
 function calls. Type them at the Python
 interpreter, which is always available at the
@@ -400,9 +410,9 @@ work at this prompt.
 
 More
 
-There is much more about the Piety desktop
-we have not discussed here.   Meanwhile, you
-can find many more details in these files:
+There is much more about the Piety desktop we
+have not discussed here. You can find many
+more details in these files:
 
 Piety/editors/README.md
 Piety/viewer/README.md
