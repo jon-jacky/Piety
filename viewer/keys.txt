@@ -17,8 +17,8 @@ like the same keys in the Emacs editor.
 
 Scrolling
 
-C-v  Scroll down half a page
-M-v  Scroll up half a page
+C-v  Scroll down
+M-v  Scroll up
 M-<  Move to the top of the buffer
 M->  Move to the bottom of the buffer 
 C-n  next line, move down one line
@@ -29,8 +29,8 @@ C-p  previous line, move up one line
 Scrolling viewer window while
 working in an editor window
 
-C-t  Scroll viewer down half a page
-M-t  Scroll viewer up half a page
+C-t  Scroll viewer down
+M-t  Scroll viewer up
 M-(  Move to top of buffer in viewer
 M-)  Move to bottom of buffer in viewer
  

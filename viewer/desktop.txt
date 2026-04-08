@@ -37,8 +37,8 @@ the window, it will scroll down (or up).
   
 Search
 
-Instead of scrolling, it is often more
-efficient to search for what you want.
+Instead of scrolling, it is often easier to
+search for what you want.
 
 Type C-s for forward search. A prompt appears
 below the window on the left:
@@ -347,7 +347,28 @@ with its same file name.
 
 Type C-x C-w to save a buffer to a different
 file, prompt for the new file name.
- 
+
+Editing
+
+You can edit in any window, including the
+viewer window. Many editing commands also work
+within the REPL command line.
+
+To enter text, just type. The BACKSPACE and
+ENTER keys, and our scrolling and search keys,
+work as expected. There are many other editing
+keys, see keys.txt. All the usual editing
+operations, including cut and paste within or
+between windows and buffers, and various
+formatting operations, are provided.
+
+All the editing keys work the same as in the
+Emacs editor.  
+
+You can edit anything; there are no read-only
+buffers.   Sometimes it is useful to cut and
+paste viewer window contents.
+
 Commands
 
 In addition to typing keycodes, you can also
@@ -381,6 +402,17 @@ computer shell command in the Python REPL.
 Just enclose the entire shell command within
 quotes.
 
+The man('...') command shows the host computer's
+manual entry for the named item in its own
+buffer with extension .man, in the viewer
+window. Try man('man'), to create the buffer
+man.man
+
+The help(obj) command shows Python help for
+the object in its own buffer with extension
+.help, in the viewer window. Try help(viewer),
+to create the buffer viewer.help.
+
 When you are finished using the Python REPL, 
 type the command pm() to return the cursor to
 the desktop window you were most recently using.
@@ -408,17 +440,39 @@ command. Using C-p (etc.) to access command
 history and ??? to cancel the request also
 work at this prompt.
 
+Python programming
+
+You can develop and test Python code 
+in a desktop session, without exiting 
+and restarting, or losing session state.
+
+Piety itself was developed in long-running
+Python sessions.   The desktop was designed 
+to make this easy, and remove any need to
+resort to the host desktop or terminal 
+windows.
+
+You can edit Python modules in buffers, and 
+save them to files in the usual way.
+
+You can type the standard Python import and
+reload commands in the REPL. You can invoke
+individual functions, and inspect and assign
+Python variables, in the REPL.
+
+Type C-x C-r to save the current buffer -- a
+Python module -- and reload it into the
+session.
+
 More
 
-There is much more about the Piety desktop we
-have not discussed here. You can find many
-more details in these files:
+There is more about the Piety desktop we have
+not discussed here. You can find details in
+these files:
 
 Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
 
 Revised Apr 2026
-
-
-
+  
