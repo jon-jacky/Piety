@@ -82,6 +82,10 @@ C-a  Beginning of line
 C-e  End of line
 M-f  Forward word
 M-b  Backward word
+C-n  Next line
+C-p  Previous line
+C-v  scroll down
+M-v  scroll up
 
 Delete, cut and paste within a line
 
@@ -89,35 +93,49 @@ BACKSPACE Delete character before cursor
 C-h  Delete character before cursor
 C-d  Delete character under cursor
 
-M-d  Delete word, append to inline paste buffer
-C-k  When typed within line, Delete to end of line,
-     append to inline paste buffer
-C-u  Delete to beginning of line, append ...
+M-d  Delete word, save in inline paste buffer
+     Successive M-d append words to paste buffer
+C-k  Delete to end of line,  save in inline 
+     paste buffer.
+C-u  Delete to beginning of line, save in inline 
+     paste buffer.
 
 C-y  When typed within line, Paste ('yank') 
-     from inline paste buffer
+     from inline paste buffer into line.
+     Buffer contents can be pasted multiple
+     times.     
 
-Define region
+Define multiline region for delete and format
+operations
 
-C-@  Set mark that defines one end of region.
-     Line at cursor is the other end.
+C-SPACE Set mark at current line to define one
+        end of region. Move cusor to any other 
+        line to define the other end. 
+        Region includes lines at both ends.
+C-@     Set mark at current line.
      
-Delete, cut and paste multiple lines
+Delete, cut, and paste multiple lines
 
-C-k  When typed at start of line: Delete line
-     and append to multiline paste buffer.
-C-w  Delete all lines in region and
-     fill (overwrite) multiline paste buffer.
+C-k  Delete current line and save it in multiline 
+     paste buffer. Successive C-k save each line
+     in buffer.
+C-w  Delete all lines in region and save them
+     in multiline paste buffer.
 
 C-y  When typed at beginning of line, Paste
-     (yank) lines from multiline paste buffer.
-
+     (yank) all lines from multiline paste buffer
+     before current line. Buffer contents can be 
+     pasted multiple times.
+     
 Formatting
 
 M-q  Fill (wrap) lines in region
 M-^  Join lines in region into one
 C-c >  Indent region
 C-c <  Outdent region
+
+If no region is defined, formatting commands
+apply only to the current line.
 
 Refresh
 
