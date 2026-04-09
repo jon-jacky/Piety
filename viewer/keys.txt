@@ -34,11 +34,13 @@ M-t  Scroll viewer up
 M-(  Move to top of buffer in viewer
 M-)  Move to bottom of buffer in viewer
  
-Search
+Search and replace
 
 C-s  Search forward
 C-r  Search backward
 
+M-%  Replace
+  
 Buffers
 
 C-x C-b   List buffers
@@ -72,7 +74,61 @@ C-o      Open file named on viewer line
 C-x C-s  Save file, with same file name
 C-x C-w  Save file, prompt for file name
 
-Python REPL
+Cursor motion
+
+C-f  Forward character (or use right arrow)
+C-b  Backward character (or use left arrow)
+C-a  Beginning of line
+C-e  End of line
+M-f  Forward word
+M-b  Backward word
+
+Delete, cut and paste within a line
+
+BACKSPACE Delete character before cursor
+C-h  Delete character before cursor
+C-d  Delete character under cursor
+
+M-d  Delete word, append to inline paste buffer
+C-k  When typed within line, Delete to end of line,
+     append to inline paste buffer
+C-u  Delete to beginning of line, append ...
+
+C-y  When typed within line, Paste ('yank') 
+     from inline paste buffer
+
+Define region
+
+C-@  Set mark that defines one end of region.
+     Line at cursor is the other end.
+     
+Delete, cut and paste multiple lines
+
+C-k  When typed at start of line: Delete line
+     and append to multiline paste buffer.
+C-w  Delete all lines in region and
+     fill (overwrite) multiline paste buffer.
+
+C-y  When typed at beginning of line, Paste
+     (yank) lines from multiline paste buffer.
+
+Formatting
+
+M-q  Fill (wrap) lines in region
+M-^  Join lines in region into one
+C-c >  Indent region
+C-c <  Outdent region
+
+Refresh
+
+C-l  Refresh current editing window
+M-l  Refresh both editing windows
+M-m  Refresh viewer window
+     works when cursor in editor window
+           
+Python
+
+C-x C-r  Write module to file and reload
 
 M-x  Move cursor from window to REPL
 pm() Move cursor from REPL to window

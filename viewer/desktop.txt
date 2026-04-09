@@ -141,7 +141,8 @@ cancel the C-x b operation and retain the same
 buffer, type ??? at the end of the buffer name
 string, then type ENTER.
 
-Type C-x k to delete the current buffer.
+You can type C-x k to delete the current
+buffer -- but don't do it now!
 
 Windows
 
