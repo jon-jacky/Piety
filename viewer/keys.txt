@@ -86,11 +86,12 @@ C-n  Next line (or use down arrow)
 C-p  Previous line (or use up arrow)
 C-v  Scroll down
 M-v  Scroll up
+M-<  Top of buffer
+M->  End of buffer
 C-s  Forward to search string
 C-r  Backward to search string
 
-Define multiline region for delete and format
-operations
+Define multiline region for delete and format 
 
 C-SPACE Set mark at current line to define one
         end of region. Move cusor to any other 
