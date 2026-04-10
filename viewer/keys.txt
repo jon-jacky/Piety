@@ -82,28 +82,12 @@ C-a  Beginning of line
 C-e  End of line
 M-f  Forward word
 M-b  Backward word
-C-n  Next line
-C-p  Previous line
-C-v  scroll down
-M-v  scroll up
-
-Delete, cut and paste within a line
-
-BACKSPACE Delete character before cursor
-C-h  Delete character before cursor
-C-d  Delete character under cursor
-
-M-d  Delete word, save in inline paste buffer
-     Successive M-d append words to paste buffer
-C-k  Delete to end of line,  save in inline 
-     paste buffer.
-C-u  Delete to beginning of line, save in inline 
-     paste buffer.
-
-C-y  When typed within line, Paste ('yank') 
-     from inline paste buffer into line.
-     Buffer contents can be pasted multiple
-     times.     
+C-n  Next line (or use down arrow)
+C-p  Previous line (or use up arrow)
+C-v  Scroll down
+M-v  Scroll up
+C-s  Forward to search string
+C-r  Backward to search string
 
 Define multiline region for delete and format
 operations
@@ -112,20 +96,33 @@ C-SPACE Set mark at current line to define one
         end of region. Move cusor to any other 
         line to define the other end. 
         Region includes lines at both ends.
-C-@     Set mark at current line.
-     
-Delete, cut, and paste multiple lines
+C-@     Set mark at current line, like C-SPACE
+      
+Delete, cut and paste
 
-C-k  Delete current line and save it in multiline 
-     paste buffer. Successive C-k save each line
-     in buffer.
-C-w  Delete all lines in region and save them
-     in multiline paste buffer.
+BACKSPACE Delete character before cursor
+C-h  Delete character before cursor
+C-d  Delete character under cursor
 
-C-y  When typed at beginning of line, Paste
-     (yank) all lines from multiline paste buffer
-     before current line. Buffer contents can be 
-     pasted multiple times.
+M-d  Delete word, save in paste buffer
+     Successive M-d collect words in paste buffer.
+C-k  Delete to end of line,  save in paste buffer.
+     Successive C-k collect multiple lines 
+     in paste buffer.
+C-u  Delete to start of line, save in paste buffer.
+
+C-w  Delete the entire region and save all lines
+     in the paste buffer.
+ 
+C-y  Paste ('yank') words from paste buffer
+     into current line at cursor.
+     -- OR --
+     If paste buffer contains multiple lines
+     from C-w or multiple C-k, paste ('yank')
+     all lines from paste buffer before current 
+     line. 
+     Paste buffer contents can be pasted 
+     multiple times to make copies.
      
 Formatting
 
