@@ -79,8 +79,9 @@ def open_line(keycode):
     ed.dot += 1
     if edsel.in_window(ed.dot):
         edsel.update_below(ed.dot)
+        edsel.update_status() # so line number increments, saved updates
     else:
-        edsel.recenter()
+        edsel.recenter()  # calls edsel.refresh, edsel.update_status
     restore_cursor_to_window()
 
 # The following functions supercede and wrap functions in other modules
@@ -100,6 +101,7 @@ def delete_backward_char(keycode):
         # Calls el.delete_backward_char, thanks to keycode DEL key.bs
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
                                                 ed.point, edsel.start_col) 
+        ed.save = False
     else: 
         join_prev() # see above
         restore_cursor_to_window()
@@ -118,6 +120,7 @@ def delete_char(keycode):
         # Calls el.delete_char, thanks to keycode C_d
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
                                                 ed.point, edsel.start_col)
+        ed.saved = False
     else:
         join_next() # see above
         restore_cursor_to_window()
@@ -156,6 +159,7 @@ def kill_line(keycode):
     elif inline: # weaker condition, must follow previous stronger if...
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot],
                                                 ed.point, edsel.start_col)
+        ed.saved = False
     # kill line that is part of a multiline sequence:
     elif not inline:
         edsel.d(None,None,True) # consecutive C_k, append line to killed buffer
@@ -174,6 +178,7 @@ def yank(keycode):
     if inline:
         ed.buffer[ed.dot], ed.point = el.runcmd(keycode, ed.buffer[ed.dot], 
                                                  ed.point, edsel.start_col)
+        ed.saved = False                                                 
     else:
         dmacs.runcmd(keycode) # keycode is C_y here
         restore_cursor_to_window()
@@ -250,6 +255,8 @@ def runcmd(c):
             if ed.dot == 0: ed.dot = 1 # buffer[0] is always dummy '\n'
             ed.buffer[ed.dot], ed.point = el.runcmd(k, ed.buffer[ed.dot],
                                           ed.point, edsel.start_col)
+            if k in el.printing_chars:
+                ed.saved = False # k was inserted into buffer
             dmacs.prev_cmd = el.prev_cmd
             # key.C_k and inline are handled in kill_line, above
             if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 

@@ -517,7 +517,7 @@ def indent(start=None, end=None, nspaces=None, outdent=False,
     Indent by nspaces spaces, default nindent, assign given nspaces to nindent.
     If outdent, move text to left by removing characters from left margin.
     """
-    global nindent
+    global nindent, saved
     if not start: start = dot
     if not end: end = start
     if not range_valid(start, end):
@@ -526,6 +526,7 @@ def indent(start=None, end=None, nspaces=None, outdent=False,
     nindent = nspaces # int
     margin = ' '*nspaces # str
     for iline in range(start, end+1): # start, end inclusive
+        saved = False # put here because range might be empty
         if outdent:
             buffer[iline] = buffer[iline][nspaces:]
         else: # indent
@@ -544,7 +545,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     left and right margins default to lmargin, rmargin.
     if lmarg (or rmarg) is given, lmargin (or rmargin) is set to that value.
     """
-    global lmargin, rmargin, killed
+    global lmargin, rmargin, killed, saved
     if not start: start = dot
     if not end: end = dot
     if not range_valid(start, end):
@@ -563,6 +564,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     buffer[start:end+1] = []  # delete unwrapped lines
     buffer[start:start] = wrapped # sic, insert lines at this position
     killed = wrapped # FIXME? hack so we can use edsel display_y for move_dot
+    saved = False
     move_dot(start + len(wrapped) - 1) # move dot to end of wrapped text
 
 def j(start=None, end=None, move_dot=move_dot):
@@ -570,6 +572,7 @@ def j(start=None, end=None, move_dot=move_dot):
     j(oin) successive lines into one line. Replace line breaks with spaces.
     start defaults to dot, end defaults to dot+1 to join next line to dot.
     """
+    global saved
     if not start: start = dot
     if not end: end = dot+1
     if not range_valid(start, end):
@@ -578,6 +581,7 @@ def j(start=None, end=None, move_dot=move_dot):
     joined = ' '.join(lines)+'\n' # put spaces between joined lines
     buffer[start:end+1] = [] # delete unjoined lines
     buffer[start:start] = [ joined ] # insert [ joined ] lines at start
+    saved = False
     move_dot(start) # move dot to joined line
     
 # write function supports redirection to sked current buffer
