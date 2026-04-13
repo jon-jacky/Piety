@@ -152,6 +152,13 @@ pm() Move cursor from REPL to window
 M-y  Enter and run a single Python command 
      then return to window
 
+Append mode - like on a printing terminal,
+just keep typing, no going back or editing
+
+C-x C-a  Enter append mode
+.        Exit append mode 
+         (. only at beginning of line)
+         
 More
 
 Many keys used in Piety are not listed here.

@@ -451,8 +451,14 @@ def quit():
     Ask for confirmation, then exit Piety and Python.
     Clear the viewer window and restore full screen scrolling.
     """
-    answer = input(
+    unsaved = ed.unsaved()
+    if unsaved:
+        print('These buffers have unsaved content:')
+        print(' '.join(unsaved))          
+        answer = input(
 'Are you SURE you want to quit Piety and Python, losing all unsaved work? ')
+    else:
+        answer = input('Are you SURE you want to quit Piety and Python? ')
     if not answer.lstrip()[0] in ('yY'): return
     if viewer_displayed: vclr() # clear viewer panel
     fr.clr()  # restore full screen scrolling

@@ -250,6 +250,10 @@ def n():
     'n(ames), print names and other information about stored buffers'
     for bname in buffers: print(bstatus(bname)+'\n\r', end='') # for char mode
 
+def unsaved():
+    'Return list of names of unsaved buffers'
+    return [ b['bufname'] for b in buffers.values() if not b['saved'] ]
+    
 def N(move_dot=move_dot, restore_buffer=restore_buffer):
     """
     N(ames), print names etc. about stored buffers -- in a buffer!
@@ -261,7 +265,7 @@ def N(move_dot=move_dot, restore_buffer=restore_buffer):
         buffer.append(bstatus(bname) + '\n')          
     restore_buffer('*Buffers*') # force redisplay if display present
     move_dot(1)  # list of buffers might have gotten shorter
-         
+              
 def select_buffer(restore_buffer=restore_buffer):
     """
     When dot is on a bstatus line, for example in *Buffers* buffer,
@@ -297,6 +301,10 @@ def clear_buffers(description='all buffers', discard=(lambda buf: True)):
     RuntimeError: dictionary changed size during iteration
     """
     global buffers
+    notsaved = unsaved()
+    if notsaved:
+        print('These buffers have unsaved content:')
+        print(' '.join(notsaved))          
     answer = input(f'Delete {description} - are you SURE?  Type y or Y to proceed: ')
     if not answer[0] in 'yY':
         return
