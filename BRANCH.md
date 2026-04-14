@@ -2,10 +2,7 @@
 branches
 ========
 
-This is the *desktop* branch of the *rewrite* branch:
-Revisions and corrections to desktop code and documenation, 
-especially directory listings.
-
+This is the *rewrite* branch.
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and to make the programming environment more responsive.
@@ -14,6 +11,8 @@ The *rewrite* branch is now the main branch.  I will never merge it back
 into the *master* branch.
 
 Recent work in the *rewrite* branch:
+
+- 13 Apr 2026:  Merge the *desktop* branch back into the *rewrite* branch.
 
 - 26 Feb 2026:  Begin *desktop* branch for revisions and corrections to 
   desktop code and documentation, especially directory listings.
