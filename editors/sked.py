@@ -252,7 +252,10 @@ def n():
 
 def unsaved():
     'Return list of names of unsaved buffers'
-    return [ b['bufname'] for b in buffers.values() if not b['saved'] ]
+    # current buffer is a special case - stored buffers might not be up-to-date
+    notsaved = [] if saved else [ bufname ] # current buffer, special case
+    return notsaved + ([ b['bufname'] for b in buffers.values()
+                         if b['bufname'] != bufname and not b['saved'] ])
     
 def N(move_dot=move_dot, restore_buffer=restore_buffer):
     """
