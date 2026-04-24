@@ -41,7 +41,10 @@ askmefi = 'https://ask.metafilter.com/'
 mefi = 'https://www.metafilter.com/'
 hn = 'https://news.ycombinator.com/'
 hnnew = 'https://news.ycombinator.com/newest' # Must *not* have final /
-
+# samples for testing
+askmefi_item = 'https://ask.metafilter.com//389512/What-is-playdate-in-other-languages'
+hn_item = 'https://news.ycombinator.com/item?id=47879092'
+ 
 # Link blogs etc.
 trivium = 'http://leahneukirchen.org/trivium/'
 tbray='https://www.tbray.org/ongoing/'

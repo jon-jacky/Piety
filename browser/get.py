@@ -94,12 +94,13 @@ def g(aurl):
     """
     (g)et web page from aurl and store it in its own Piety editor buffer.     
     """
-    global url, response
+    global url, response, req
     url = aurl  
 
     # See https://docs.python.org/3/howto/urllib2.html
     # Default User-Agent is Python-urllib/n.m which often gets 403: Forbidden 
-    req = request.Request(url, None, {'User-Agent': 'Piety browser'})
+    # MetaFilter requires 'Lynx' somewhere in User-Agent if using HTTP/1.x
+    req = request.Request(url, None, {'User-Agent': 'Piety browser, not Lynx'})
         
     print('Loading page...') # sometimes there is quite a delay in urlopen
     # If urlopen fails just let it crash, return to >>> and don't create buffer
@@ -108,10 +109,15 @@ def g(aurl):
     response = request.urlopen(req)
 
     # If we get this far, urlopen must have succeeded.  Create and fill buffer. 
+    # urlparse(url) parses url into a named 6-tuple with these components:
+    #    <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
     purl = parse.urlparse(url) # return Parse object
     ppath = Path(purl.path) # extract ppath, a Path object, from Parse object
-    bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
-    if not '.' in bufname: bufname += '.html' # avoid filename collision in e()
+    # Separate file type from basename, then truncate it 
+    pp_bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
+    bufname = pp_bufname[:12] # truncated, sked.bstatus() allows 17 cols total
+    #if not '.' in bufname: bufname += '.html' # avoid filename collision in e()[A
+    bufname += '.html'  # unconditional - unrendered page always ends .html
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
     # Special case handling of base URLs from particular web sites - see above
     baseurl = url # default, often the base url is the same as the page url
@@ -119,6 +125,7 @@ def g(aurl):
         if url.startswith(burl):
             baseurl = burl
     ed.filename = baseurl # replace filename created by e() with baseurl
+    # Filename is like URL, not the same as truncated buffer name.
     ed.buffers[bufname]['filename'] = baseurl # replace filename created by e()
     buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     ed.buffer.append(f'<!-- {url} -->\n') # put page URL on first line

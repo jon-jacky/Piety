@@ -153,19 +153,19 @@ url = ''  # Make URL global so HTML2Text methods can use it
 def r(aurl):
     """
     Render current buffer, a downloaded HTML web page, to a new text buffer.
-    When current buffer is named basename or basename.html,
-    then new text buffer is named basename.txt     
     Name 'r' for 'render'.  We also have sked.r, reverse search
     aurl arg is only so we can put url in first line at top of rendered page.
+    When current buffer is named basename or basename.html,
+    new text buffer is named basename.htxt, distinguish from other .txt buffers
     """ 
     global parser # make this global so we can inspect parser.output in REPL
     global url # make this global so methods in HTML2Text can see it.
     url = aurl
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
-
+    # Use the same bufname as already assiged to .html buffer, just the stem
     path = Path(ed.bufname) # create Path object from ed.bufname string
-    bufname = path.stem + '.txt'  # path.stem is basename index.html -> index
+    bufname = path.stem + '.htxt'  # path.stem is basename index.html -> index
     
     # From here on, the code is similar to get.py fcn g()
     baseurl = ed.filename # original web site url, needed by relative urls.

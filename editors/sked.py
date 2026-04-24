@@ -238,7 +238,7 @@ def bstatus(bname):
         blines = buf.get('buffer',['\n'])
         bsaved = buf.get('saved', True)
         # Use old fashinoned % formatting to get left-justified columns
-        status = ('%s%-15s %7d   %-30s  %s' % 
+        status = ('%s%-17s %5d   %-30s  %s' % 
                   ('*' if bufname == buffername else ' ', 
                    buffername, len(blines)-1, fname, 
                    'saved' if bsaved else 'unsaved changes'))

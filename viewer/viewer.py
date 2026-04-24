@@ -259,7 +259,7 @@ def man(topic):
 def help(topic):
     viewer_window(lambda: console.help(topic))
 
-def dir():
+def vdir():
     """
     Prompt for directory (default cwd), then list directory in viewer window
     """
@@ -273,18 +273,22 @@ def dir():
 # Overwrites browser function names imported by 'from browser import *'
 # You can still invoke browser.grx() etc. by providing browser. prefix
 
-def grx():
+def grx(this_window):
     """
     Get and Render web page at URL eXtracted from current line in current buffer.'
-    If viewer has focus, display that web page in the current editor buffer.
+    Display page in current (usually viewer) window if this_window == True
+    Display page in editor window if this_window == False
     """
     # Must get URL from current (viewer) buffer 
     #  before editor_window() changes to editor buffer
     url = get.xurl(ed.buffer[ed.dot])
     if url: # url is '' if not URL found on line
-        editor_window(lambda: get.gr(url))
+        if this_window: # viewer window
+            get.gr(url)
+        else:            
+            editor_window(lambda: get.gr(url))
     
-def grfx():
+def grfx(this_window):
     """
     Get and Render web page at next Footnote eXtracted from current line.
     If viewer has focus, display that web page in the current editor buffer.
@@ -294,8 +298,10 @@ def grfx():
     n = get.fnrefnum() # n is next footnote on current line, or 0 if none
     if n:
         url = get.fnurl(n) # url at footnote n, or '' if footnote n not found
-        if url:
-            editor_window(lambda: get.gr(url))         
+        if this_window: # viewer window
+            get.gr(url)
+        else:            
+            editor_window(lambda: get.gr(url))
 
 # Functions invoked by keycodes - conditional depending on viewer state
 
@@ -401,11 +407,11 @@ def loader(this_window):
     elif get.xurl(ed.buffer[ed.dot]): # There is a URL on this viewer line
         # Get and render web page from URL on viewer line.
         # NB: grx redundantly calls get.xurl again
-        grx() # This is viewer.grx defined here, not get.grx
+        grx(this_window) # This is viewer.grx defined here, not get.grx
     elif get.fnrefnum(): # There is a footnote on this viewer line
         # Get and render web page from footnote on viewer line.
         # NB: grfx redundantly calls get.frnrefun again
-        grfx() # This is viewer.grfx defined here, not get.grfx
+        grfx(this_window) # This is viewer.grfx defined here, not get.grfx
     else:
         pass # Possibly more cases to come
 
@@ -438,7 +444,7 @@ dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
 dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
 
 # Prompt for directory (default cwd) then display file list in viewer window
-dmacs.keymap[key.C_x + key.C_d] = dir # 
+dmacs.keymap[key.C_x + key.C_d] = vdir # 
  
 # Load contents named on line into this window, usually the viewer
 dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
