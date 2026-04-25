@@ -27,7 +27,9 @@ noimage = ('https://news.ycombinator.com/', # Hacker News
             )
 
 width = 70 # window width for textwrap.fill(text, width)
-            
+
+title = 'No title yet' # Contents of page <title> 
+             
 class HTML2Text(HTMLParser):
     """
     Render HTML to text, using Python standard library HTMLParser.
@@ -62,7 +64,8 @@ class HTML2Text(HTMLParser):
                 self.showimage = False # do not show [ Image ] in this page
                 
     def handle_starttag(self, tag, attrs):
-        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 'pre', 'noscript'):
+        if tag in ('title', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 
+                    'pre', 'noscript'):
             if self.tags and self.tags[-1] == 'div':  # we're inside div
                 self.output += '\n\n' + textwrap.fill(self.paragraph, width) 
             self.paragraph = '' # start a new paragraph
@@ -79,7 +82,7 @@ class HTML2Text(HTMLParser):
             self.paragraph = '' # now start new paragraph                         
         # List of only the tags we handle.  We don't handle most tags.
         # BUT not img or br  because thre is nothing to capture and no endtag
-        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
+        if tag in ('title', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 
                     'pre', 'strong', 'em', 'a', 'noscript'):
             # Do not push unmatched <p> inside <div> onto list of tags
             if ((tag != 'p')
@@ -100,7 +103,7 @@ class HTML2Text(HTMLParser):
                 self.capture = True
 
     def handle_endtag(self, tag):
-        if tag in ('p', 'h1', 'h2', 'h3', 'h4', 'noscript'):
+        if tag in ('title', 'p', 'h1', 'h2', 'h3', 'h4', 'noscript'):
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
             self.output += '\n\n' + textwrap.fill(self.paragraph, width)
@@ -109,7 +112,7 @@ class HTML2Text(HTMLParser):
         if tag == 'pre':
             self.output += '\n\n' + self.paragraph # do NOT fill
         # Again, list of only the tags we handle - BUT not img, not br
-        if tag in ('p', 'li', 'h1', 'h2', 'h3', 'h4', 
+        if tag in ('title', 'p', 'li', 'h1', 'h2', 'h3', 'h4', 
                     'pre', 'strong', 'em', 'a', 'noscript'):
             if self.tags:  # tags list not empty, guard against unmatched tag
                 self.tags.pop()
@@ -131,10 +134,13 @@ class HTML2Text(HTMLParser):
                 self.capture = False
                                                                 
     def handle_data(self, data):
+        global title
         if self.capture: 
             tag = self.tags[-1]
-            if tag in ('p', 'li','h1','h2','h3','h4', 'pre', 'noscript'):
+            if tag in ('title', 'p', 'li','h1','h2','h3','h4', 'pre', 'noscript'):
                 self.paragraph += data # fill self.paragraph in handle_endtag
+            if tag == 'title':
+                title = data # global title, so we can use it to make bufname
             if tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
             if tag == 'a': # hypertext link, usually href=...
@@ -160,13 +166,18 @@ def r(aurl):
     """ 
     global parser # make this global so we can inspect parser.output in REPL
     global url # make this global so methods in HTML2Text can see it.
+    global title # make this global so we can assign default
     url = aurl
+    title = 'No title' # default, parser.feed assigns title if there is one
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
     # Use the same bufname as already assiged to .html buffer, just the stem
-    path = Path(ed.bufname) # create Path object from ed.bufname string
-    bufname = path.stem + '.htxt'  # path.stem is basename index.html -> index
-    
+    #path = Path(ed.bufname) # create Path object from ed.bufname string
+    #bufname = path.stem + '.htxt'  # path.stem is basename index.html -> index
+    # NOT! Instead, generate bufname from title (global variable above)
+    bufname_stem = title[:12].replace(' ','-') # M-o can't handle spaces
+    bufname = bufname_stem + '.htxt' 
+                        
     # From here on, the code is similar to get.py fcn g()
     baseurl = ed.filename # original web site url, needed by relative urls.
     saved_bufname = ed.prev_bufname # prepare for unwanted assignment by fr.e()
