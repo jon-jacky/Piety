@@ -2,6 +2,7 @@
 get.py - Get a web page and store it in a Piety editor buffer.
 """
 
+from html.parser import HTMLParser
 from urllib import request, parse
 from pathlib import Path
 import re
@@ -90,53 +91,91 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
 url = ''  # URL is global so we can use it in r(url) also for easy debugging
 response = None # response is global so we can inspect it at the REPL
 
+title = 'No title yet' # Contents of page <title> 
+
+class HTML2Title(HTMLParser):
+    """
+    Minimal parser, find <title>, assign its data to global title (above)
+     so it can be used to make bufname
+    """
+    def __init__(self):
+        super().__init__()
+        # Needed by handle_data, which for some reason doesn't have tag arg.
+        self.tag = 'Unassigned'
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'title':
+            self.tag = tag
+
+    def handle_endtag(self, tag):
+        if tag == 'title':
+            self.tag = 'Unassigned' # Unnecessary?  Should be only 1 title
+                                        
+    def handle_data(self, data):
+        global title
+        if self.tag == 'title':
+            title = data # global title, so we can use it to make bufname
+    
 def g(aurl):
     """
     (g)et web page from aurl and store it in its own Piety editor buffer.     
     """
     global url, response, req
+    global title # make this global so we can assign default
     url = aurl  
-
+    title = 'No title' # default, parser.feed assigns title if there is one
+    
     # See https://docs.python.org/3/howto/urllib2.html
     # Default User-Agent is Python-urllib/n.m which often gets 403: Forbidden 
     # MetaFilter requires 'Lynx' somewhere in User-Agent if using HTTP/1.x
     req = request.Request(url, None, {'User-Agent': 'Piety browser, not Lynx'})
-        
     print('Loading page...') # sometimes there is quite a delay in urlopen
     # If urlopen fails just let it crash, return to >>> and don't create buffer
     # Any error message from urlopen will be printed in REPL.
 
     response = request.urlopen(req)
 
-    # If we get this far, urlopen must have succeeded.  Create and fill buffer. 
-    # urlparse(url) parses url into a named 6-tuple with these components:
-    #    <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
-    purl = parse.urlparse(url) # return Parse object
-    ppath = Path(purl.path) # extract ppath, a Path object, from Parse object
-    # Separate file type from basename, then truncate it 
-    pp_bufname = ppath.name if ppath.name else purl.netloc # .name might be empty
-    bufname = pp_bufname[:12] # truncated, sked.bstatus() allows 17 cols total
-    #if not '.' in bufname: bufname += '.html' # avoid filename collision in e()[A
-    bufname += '.html'  # unconditional - unrendered page always ends .html
-    fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
+    # Can't use this - because we don't have bufname yet.
+    #fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
+
+    # Following code is based on body of sked.e()
+    # Instead of calling fr.e(...), assign ed. variables then save_buffer()
+
+    # First save current buffer (soon to be previous) before making new one    
+    if ed.S() > 0: ed.save_buffer()  
+    ed.prev_bufname = ed.bufname
+    
     # Special case handling of base URLs from particular web sites - see above
     baseurl = url # default, often the base url is the same as the page url
     for burl in baseurls:
         if url.startswith(burl):
             baseurl = burl
-    ed.filename = baseurl # replace filename created by e() with baseurl
-    # Filename is like URL, not the same as truncated buffer name.
-    ed.buffers[bufname]['filename'] = baseurl # replace filename created by e()
-    buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
+    # For web pages, filename stores page URL, not file name in file system
+    ed.filename = baseurl # Just show the baseurl in the buffer listing
+
+    # Now assign ed.buffer contents - must do this before assigning ed.bufname
+    ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
     ed.buffer.append(f'<!-- {url} -->\n') # put page URL on first line
     ed.buffer.append('\n')
-    # Fill in buffer text
+    # Fill in buffer text from HTTP response
     for line in response.readlines():
         ed.buffer.append(line.decode('utf-8')) # FIXME? get encoding from HTTP
-    fr.refresh()
-    ed.dot = 1 # first line of content, top line of window, is index 1 not 0
+    # Run parser to find <title> in ed.buffer and assign to global title above 
+    parser = HTML2Title()
+    parser.feed(''.join(ed.buffer)) # requires string, not list of string
+    ed.bufname = title[:12].replace(' ','-')+'.html' # use global title above
+
+    # Assign remaining buffer variables in ed.
+    ed.saved = True # put this *before* move_dot for display code
+
+    # Save buffer, and for display we have to follow fr.e() code not ed.e() 
+    # fr.display_e replaces ed.move_dot in fr.e().  It includes move_dot
+    # Must move dot before saving buffer
+    fr.display_e(min(ed.S(),1)) # start of buffer, empty buffer S() is 0
+    ed.save_buffer() # put the new current buffer in the saved buffers
+    # fr.refresh() # I think this is handled by fr.display_e() above
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
-    
+        
 def gx():
     """
     Get web page at URL eXtracted from current line in current buffer.
