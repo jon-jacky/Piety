@@ -24,11 +24,17 @@ divclasses = ('copy post',  # www. ask.metafilter.com: posts, asks on front page
               'os', # www.tbray.org/ongoing/ front page article links/summaries 
               )
 
+# span class="..." special case span tags at particular web sites
+# span with these classes are formatted like paragraphs.
+# Other span are ignored, do not appeear in rendered output.
+spanclasses = ('titleline',  # HN item title with link to non-HN article
+              )
+              
 # Do not show [ Image ] in rendered output for these text-only sites
 noimage = ('https://news.ycombinator.com/', # Hacker News
             )
 
-width = 70 # window width for textwrap.fill(text, width)
+width = 70 # window width for textwrap.fill(text, width) # FIXME? panel width
 
 class HTML2Text(HTMLParser):
     """
@@ -103,6 +109,16 @@ class HTML2Text(HTMLParser):
                 self.tags.append(tag)  # push div tag onto stack of tags
                 self.capture = True
 
+        # Special case span tags at particular web sites, see spanclasses above.
+        # Just copied code div classes right above
+        if tag == 'span':
+            spanclass = dict(attrs).get('class', '') 
+            if spanclass in spanclasses:
+                # Treat span with these classes just like paragraph
+                self.paragraph = '' # start a new paragraph
+                self.tags.append(tag)  # push span tag onto stack of tags
+                self.capture = True
+
     def handle_endtag(self, tag):
         if tag in ('title', 'p', 'h1', 'h2', 'h3', 'h4', 'noscript'):
             # data can be long string. fill() can insert \n to break lines
@@ -133,6 +149,19 @@ class HTML2Text(HTMLParser):
                 self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
                 self.capture = False
+
+        # Special case for span at particular web sites
+        # Just copy div code above
+        if tag == 'span': 
+            # data can be long string. fill() can insert \n to break lines
+            # precede each paragraph by an empty line
+            self.output += '\n\n' + textwrap.fill(self.paragraph, width)
+            self.paragraph = '' # re-initialize to avoid duplication
+        if tag == 'span':
+            if self.tags:  # tags list not empty, guard against unmatched tag
+                self.tags.pop()
+            if not self.tags: # tags list empty, not in any supported tag
+                self.capture = False
                                                                 
     def handle_data(self, data):
         # global title # No longer needed - use get.title instead
@@ -152,6 +181,12 @@ class HTML2Text(HTMLParser):
             # Special case for div tags at particular web sites
             # Treat just like paragraph
             if tag == 'div':
+                ### breakpoint() # DEBUG so we can examine div data
+                self.paragraph += data # fill self.paragraph in handle_endtag
+
+            # Special case for span tags at particular web sites
+            # Copy div code right above
+            if tag == 'span':
                 ### breakpoint() # DEBUG so we can examine div data
                 self.paragraph += data # fill self.paragraph in handle_endtag
  
