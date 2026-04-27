@@ -8,7 +8,6 @@ from pathlib import Path
 import re
  
 import sked as ed, edsel as fr # fr for frame
-import render
 import key, dmacs # so we can add browser keycode entries to keymap
   
 # Simple regular expressions for matching URLs
@@ -88,7 +87,7 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             'file:///home/jon/z/z/', # Our own Z notes, for testing
             )
 
-url = ''  # URL is global so we can use it in r(url) also for easy debugging
+url = ''  # URL is global so we can use it in render r(url) also for debugging
 response = None # response is global so we can inspect it at the REPL
 
 title = 'No title yet' # Contents of page <title> 
@@ -163,8 +162,9 @@ def g(aurl):
     # Run parser to find <title> in ed.buffer and assign to global title above 
     parser = HTML2Title()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
-    ed.bufname = title[:12].replace(' ','-')+'.html' # use global title above
-
+    bufname = title[:12].replace(' ','-')+'.html' # use global title above
+    ed.bufname = ed.bname(bufname) # add <2> etc. suffix if needed.
+    
     # Assign remaining buffer variables in ed.
     ed.saved = True # put this *before* move_dot for display code
 
@@ -192,16 +192,6 @@ def gx():
     if url: # url is '' if no URL found on line
         g(url)
 
-def gr(url):
-    'Get and Render web page at url'
-    g(url)
-    render.r(url)
-    
-def grx():
-    'Get and Render web page at url eXtracted from current line in buffer'
-    gx()
-    render.r(url) # gx assigns global url
-
 def fnnum(line):
     """
     Return integer footnote number of line, a string, or '' if not a footnote.
@@ -227,11 +217,6 @@ def gf(n):
     url = fnurl(n)
     g(url)
 
-def grf(n):
-    'Get and render web page whose URL is in footnote n'
-    gf(n)
-    render.r(url) # gf assigns global url
-
 def fnrefnum():
     """
     Return integer footnote reference number next on current line.
@@ -245,16 +230,13 @@ def gfx():
     'Get web page at next Footnote eXtracted from current line.'
     n = fnrefnum() # Footnote number, or 0 if no footnote on line
     g(fnurl(n))  # crashes if no footnote on line
-    
-def grfx():
-    'Get and Render web page at next Footnote eXtracted from current line.'
-    gfx()
-    render.r(url) # gfx assigns global url
 
 def clear_webpages():
-    'Delete all webpages, buffers whose filename starts with http'
+    'Delete all webpages, buffers whose bufname includes .html or .htxt'
     ed.clear_buffers('all web pages', 
-        discard=(lambda buf: buf['filename'].startswith('http')))
+        # use 'in' not 'endswith' to include ...html<2>  ...htxt<3> etc.
+        discard=(lambda buf: '.html' in buf['filename']
+                    or '.htxt' in buf['bufname']))
         
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer

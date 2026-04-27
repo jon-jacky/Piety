@@ -8,6 +8,8 @@ import textwrap
 
 import sked as ed
 import edsel as fr # fr for frame
+import get # get.url get.title and get.g() are used here
+import key, dmacs # for adding keycodes to keymap
 
 # div class="..." special case div tags at particular web sites
 # div with these classes are formatted like paragraphs.
@@ -28,10 +30,9 @@ noimage = ('https://news.ycombinator.com/', # Hacker News
 
 width = 70 # window width for textwrap.fill(text, width)
 
-title = 'No title yet' # Contents of page <title> 
-             
 class HTML2Text(HTMLParser):
     """
+
     Render HTML to text, using Python standard library HTMLParser.
     
     Example:                         
@@ -134,13 +135,13 @@ class HTML2Text(HTMLParser):
                 self.capture = False
                                                                 
     def handle_data(self, data):
-        global title
+        # global title # No longer needed - use get.title instead
         if self.capture: 
             tag = self.tags[-1]
             if tag in ('title', 'p', 'li','h1','h2','h3','h4', 'pre', 'noscript'):
                 self.paragraph += data # fill self.paragraph in handle_endtag
-            if tag == 'title':
-                title = data # global title, so we can use it to make bufname
+            #if tag == 'title': # No longer needed - use get.title instead
+            #    title = data # global title, so we can use it to make bufname
             if tag in ('strong', 'em'):
                 self.paragraph += f' *{data}* ' # these data go in same para.
             if tag == 'a': # hypertext link, usually href=...
@@ -166,17 +167,12 @@ def r(aurl):
     """ 
     global parser # make this global so we can inspect parser.output in REPL
     global url # make this global so methods in HTML2Text can see it.
-    global title # make this global so we can assign default
+    # global title # make this global so we can assign default # use get,title
     url = aurl
-    title = 'No title' # default, parser.feed assigns title if there is one
+    # title = 'No title' # default # Not needed - now use get.title
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
-    # Use the same bufname as already assiged to .html buffer, just the stem
-    #path = Path(ed.bufname) # create Path object from ed.bufname string
-    #bufname = path.stem + '.htxt'  # path.stem is basename index.html -> index
-    # NOT! Instead, generate bufname from title (global variable above)
-    bufname_stem = title[:12].replace(' ','-') # M-o can't handle spaces
-    bufname = bufname_stem + '.htxt' 
+    bufname = get.title[:12].replace(' ','-') + '.htxt' #M-o can't handle space
                         
     # From here on, the code is similar to get.py fcn g()
     baseurl = ed.filename # original web site url, needed by relative urls.
@@ -197,4 +193,36 @@ def r(aurl):
     fr.refresh()
     ed.dot = 1 # first line of content, top line of window, is index 1 not 0
     print(f'{ed.bufname}, {len(ed.buffer)} lines') # after '0 lines' from e()
+
+# Rendering functions that use functions from get module
+
+def gr(url):
+    'Get and Render web page at url'
+    get.g(url)
+    r(url)
+    
+def grx():
+    'Get and Render web page at url eXtracted from current line in buffer'
+    get.gx()
+    render.r(get.url) # gx assigns get.url
+
+def grf(n):
+    'Get and render web page whose URL is in footnote n'
+    get.gf(n)
+    r(get.url) # gf assigns get.url
+     
+def grfx():
+    'Get and Render web page at next Footnote eXtracted from current line.'
+    gfx()
+    render.r(url) # gfx assigns global url
+
+def hnitem(item_number):
+    'Get the HN item (page) with the given integer (not string) item number'
+    gr('https://news.ycombinator.com/item?id=' + str(item_number))
+    
+# Add keycodes for browser operations to keymap 
+dmacs.keymap[key.M_r] = r # render html from current buf. to .txt .buf
+# key.C_o entry is now assigned in viewer.py
+# dmacs.keymap[key.C_o] = grx # get and render page at URL on current line
+dmacs.keymap[key.M_s] = grfx # get and render page at next footnote ref on line.
 
