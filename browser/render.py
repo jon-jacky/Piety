@@ -29,11 +29,15 @@ divclasses = ('copy post',  # www. ask.metafilter.com: posts, asks on front page
 # Other span are ignored, do not appeear in rendered output.
 spanclasses = ('titleline',  # HN item title with link to non-HN article
               )
+
+# Prefix of HN item pages in their URLs - particulary in get.url
+# if ... hnitem in get.url is a guard for special case handling of span tag
+hnitem = 'https://news.ycombinator.com/item?id='
               
 # Do not show [ Image ] in rendered output for these text-only sites
 noimage = ('https://news.ycombinator.com/', # Hacker News
             )
-
+ 
 width = 70 # window width for textwrap.fill(text, width) # FIXME? panel width
 
 class HTML2Text(HTMLParser):
@@ -110,8 +114,9 @@ class HTML2Text(HTMLParser):
                 self.capture = True
 
         # Special case span tags at particular web sites, see spanclasses above.
+        # special case, only for HN item pages with hnitem in get.url
         # Just copied code div classes right above
-        if tag == 'span':
+        if tag == 'span' and hnitem in get.url:
             spanclass = dict(attrs).get('class', '') 
             if spanclass in spanclasses:
                 # Treat span with these classes just like paragraph
@@ -152,12 +157,12 @@ class HTML2Text(HTMLParser):
 
         # Special case for span at particular web sites
         # Just copy div code above
-        if tag == 'span': 
+        if tag == 'span' and hnitem in get.url: 
             # data can be long string. fill() can insert \n to break lines
             # precede each paragraph by an empty line
             self.output += '\n\n' + textwrap.fill(self.paragraph, width)
             self.paragraph = '' # re-initialize to avoid duplication
-        if tag == 'span':
+        if tag == 'span' and hnitem in get.url:
             if self.tags:  # tags list not empty, guard against unmatched tag
                 self.tags.pop()
             if not self.tags: # tags list empty, not in any supported tag
@@ -186,7 +191,7 @@ class HTML2Text(HTMLParser):
 
             # Special case for span tags at particular web sites
             # Copy div code right above
-            if tag == 'span':
+            if tag == 'span' and hnitem in get.url:
                 ### breakpoint() # DEBUG so we can examine div data
                 self.paragraph += data # fill self.paragraph in handle_endtag
  
@@ -251,9 +256,9 @@ def grfx():
     gfx()
     render.r(url) # gfx assigns global url
 
-def hnitem(item_number):
+def hnpage(item_number):
     'Get the HN item (page) with the given integer (not string) item number'
-    gr('https://news.ycombinator.com/item?id=' + str(item_number))
+    gr(hnitem + str(item_number))
     
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_r] = r # render html from current buf. to .txt .buf
