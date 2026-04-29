@@ -284,9 +284,9 @@ def grx(this_window):
     url = get.xurl(ed.buffer[ed.dot])
     if url: # url is '' if not URL found on line
         if this_window: # viewer window
-            get.gr(url)
+            render.gr(url)
         else:            
-            editor_window(lambda: get.gr(url))
+            editor_window(lambda: render.gr(url))
     
 def grfx(this_window):
     """
@@ -299,9 +299,9 @@ def grfx(this_window):
     if n:
         url = get.fnurl(n) # url at footnote n, or '' if footnote n not found
         if this_window: # viewer window
-            get.gr(url)
+            render.gr(url)
         else:            
-            editor_window(lambda: get.gr(url))
+            editor_window(lambda: render.gr(url))
 
 # Functions invoked by keycodes - conditional depending on viewer state
 
