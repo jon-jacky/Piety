@@ -30,20 +30,13 @@ the beginning of the command:
 
     . ~/Piety/bin/paths      
 
-Run this command to start the display editor, including the browser:
+Run this command to start the Piety desktop, including the browser:
 
-    python3 -im pm
+    python3 -im vpm
 
 Now you can run the browser by typing [commands](#Commands) at the Python
 prompt, or by pressing [keycodes](#Keycodes). 
-
-NOTE added Sep 2025: The preceding directions run the browser in a
-terminal window on the host desktop, which can show up to two browser
-windows in a vertical stack. The screenshots here show the browser
-running in the full screen with an additional window on the side. To run
-that configuration, follow the directions on the [Piety
-desktop](../viewer/README.md) page.
-
+ 
 ### Appearance ###
 
 Each web page appears in *two* editor buffers: we download the HTML sent
@@ -221,16 +214,17 @@ web pages.
 - **M-r** - invokes *r()*, **render** page in the current *.html* buffer to 
             a new *.txt* buffer.
 
-- **M-ret** - invokes *grx()*, **get** and **render** the page at the 
-            URL in the current line in the current buffer.
-            This command works in any kind of buffer, it does not have
-            to be a web page.
-            
-- **M-n** - invokes *grfx()*, **get** and **render** web page whose 
-    URL is in the next **Footnote** number on the current line.
+- **C-o** - invokes *viewer/grx(this_window=True)* via *viewer/loader()*.  
+            Load web page at URL on line in same window, usually viewer.
+            invokes *viewer/grfx(this_window=True) via *viewer/loader()* 
+            Load web page at URL indicated by next footnote on line 
+            in same window.
 
-- **C-x C-b** - invokes *N()*, list **buffers**, including web pages,
-            but all other buffers as well.
+- **M-o** - invokes *viewer/grx(this_window=False)* via *viewer/loader()*.  
+            Load web page at URL on line in other window, usually editor
+            invokes *viewer/grfx(this_window=True) via *viewer/loader()* 
+            Load web page at URL indicated by next footnote on line 
+            in other window.
 
  - **C-x b** - Invokes *b()*, return to previous buffer.
               Can be used like a browser 'Back button'
@@ -331,5 +325,5 @@ supported at this writing, in Mar 2015:
 The base URL for each web page appears in a middle column of the buffer list
 shown by the *N()* command or the *C-x C-b* keycode.
 
-Revised Sep 2025
-
+Revised May 2026
+ 

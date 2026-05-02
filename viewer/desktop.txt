@@ -70,6 +70,33 @@ search string and press ENTER.
 Search is case sensitive. Searching for
 scroll will not find Scroll, etc.  
 
+Search puts the cursor at the start of the
+line containing the search string, not at
+the search string itself.
+
+To quickly find a section in this document,
+search forward for its name in the following
+table of contents.   To return to the table of
+contents, search backward for the same name --
+or search for Contents.
+
+Contents
+Scrolling (search backward from here)
+Search (search backward from here)
+Keys
+Buffers
+Windows
+Buffers in windows
+Directories
+Files
+Editing
+Commands
+Web browsing
+Python programming
+Quitting the desktop
+Recovering from errors
+More
+
 Keys 
 
 Key sequences like C-v and M-< are usually
@@ -368,7 +395,8 @@ Emacs editor.
 
 You can edit anything; there are no read-only
 buffers.   Sometimes it is useful to cut and
-paste viewer window contents.
+paste viewer window contents, or wrap lines 
+to fit them into the narrow viewer window.
 
 Commands
 
@@ -393,26 +421,39 @@ For example, type the command pwd() to print
 the current working directory in *Console*. On
 the following line in the REPL, the Python
 prompt reappears, with the cursor ready for
-you to type another statement. Type the
-command cd('viewer') to change to the viewer
-subdirectory.   Then repeate the pwd() command
-to confirm that is the new working directory. 
+you to type another statement. 
 
-Use the sh('...') command to run any host
-computer shell command in the Python REPL.
-Just enclose the entire shell command within
-quotes.
+For example, type the command cd('viewer') to
+change to the viewer subdirectory. Then
+repeate the pwd() command to confirm that is
+the new working directory.  Type ls() to
+show the short form directory listing for
+the current directory, lsl() to show the
+long form listing, and lslt() to show the
+long form listing with the most recently 
+updated files at the top.
+
+The help(obj) command shows Python help for
+that Python object in its own buffer with
+extension .help, in the viewer window. Try
+help(viewer), to create the buffer
+viewer.help. Type help(str) to create str.help
+showing all the builtin Python string methods.
 
 The man('...') command shows the host computer's
 manual entry for the named item in its own
 buffer with extension .man, in the viewer
 window. Try man('man'), to create the buffer
-man.man
-
-The help(obj) command shows Python help for
-the object in its own buffer with extension
-.help, in the viewer window. Try help(viewer),
-to create the buffer viewer.help.
+man.man about the online manual utility,, or
+man('ls') to create ls.man showing all the
+host ls command options.
+ 
+Use the sh('...') command to run any host
+computer shell command in the Python REPL.
+Just enclose the entire shell command within
+quotes.  This is necessary to run shell commands
+that have not been provided as Python functions,
+for example git version contol commands. 
 
 When you are finished using the Python REPL, 
 type the command pm() to return the cursor to
@@ -441,11 +482,138 @@ command. Using C-p (etc.) to access command
 history and ??? to cancel the request also
 work at this prompt.
 
+Every Piety key discussed in this document
+and keys.txt calls a Python function. You can
+type the function call at the REPL instead of
+typing the key. Sometimes this is convenient
+when in the midst of typing several Python
+statements.
+
+Consult the source code to find which function
+is invoked by each key: the keymap
+dictionaries in editors/dmacs.py, editline.py,
+and pmacs.py, and also the assignements to to
+dmacs.keymap near the end of browser/get.py
+and render.py, and viewer/viewer.py.
+
+Web browsing
+
+You can browse the web in the Piety desktop.
+Downloaded web pages appear in editor buffers.
+The list of web page buffers, analogous
+to browser tabs, appears in the buffer list
+along with the other buffers. 
+
+To get started, type C-x C-b to display the
+list of buffers, then put the cursor at
+urls.py and type C-o to display it in the
+viewer window. This buffer is just a list of
+the URLs of some sample web sites, analogous
+to bookmarks. Place the cursor over the line
+that says: hn =
+'https://news.ycombinator.com/' and type C-o.
+The Hacker News front page appears in the
+viewer window.
+
+Typing C-o on a line that contains a URL opens
+that page in the current window, usually the
+viewer window. Typing M-o opens it on the
+other window, an editor window.
+
+In Hacker News front page in the viewer
+window, scroll to an interesting entry and put
+the cursor at the beginning of its first line.
+I found this entry (when you look, it will no
+longer be on the front page, so you must find
+another):
+
+_New copy of earliest poem in English, written 1,3k years ago,
+discovered in Rome_ [16]_tcd.ie_ [17]_giuliomagnifico_ [18]_19
+hours ago_ [19]_hide_ [20]_120 comments_ [21]
+
+Move the cursor to the line that begins
+'discovered in Rome_ [16] ...' (or whatever is
+the first footnote in the entry you found).
+Type M-o. The linked article page from the web
+appears in an editor window. The article's URL
+appears on the first line of the buffer. You
+can scroll through the buffer in the usual
+way. You often have to scroll down past
+several pages of header text to reach the
+interesting content.
+
+In the Piety browser, link text is delimited
+by underscores, and the corresponding URL is
+indicated by a footnote (the full URL text
+appears in the Links section at the end of the
+buffer, at that footnote number). Typing M-o
+opens the web page indicated by the next
+footnote on the line in an editor window.
+
+Type C-x 2 to split the editor window into
+two. Type C-x o to move the cursor to the
+other editor window. Type C-x v to move the
+cursor back to the Hacker News entry in the
+viewer window. Put the cursor on the last line
+in the entry, which ends with something like
+'... _120 comments_ [21]' Put the cursor
+before that final footnote, and type M-o. The
+Hacker News comments page appears in the other
+window, below (or above) the article page.
+
+Now you see the Hacker News front page in the
+viewer window, the article page in one editor
+window, and the Hacker News comment page on
+that article in the other editor window. Type
+C-x o to switch between the article and the
+comments, where you can scroll through each.
+When you are finished reading the article and
+comments, type C-x v to return to the front
+page in the viewer, where you can scroll to
+another entry.
+
+Near the bottom of the front page body (above
+the Links section), at the end of a line, you
+can find something like '_More_ [188]'. Put
+the cursor before that footnote and type C-o
+to display the next Hacker News page in the
+viewer.
+
+Type C-x C-b to show the buffer list in the
+viewer window. Near the bottom of the list,
+there are several entries for buffers that
+hold web pages. The page URLs appear in the
+buffer list entries, instead of file names.
+
+For each page, there are two buffers: an .html
+buffer that holds the HTML source, and an
+.htxt buffer that holds the rendered text.
+When you select a page with C-o or M-o, Piety
+displays the rendered .htxt page, but if you
+want to see the source you can select the
+.html page from the buffer list in the usual
+way -- this is analogous to the View Source
+operation.
+
+If you want to see any web page again, you can
+select its buffer in the usual way -- this is
+analogous to clicking on a browser tab.
+
+You can delete web page buffers one by one
+with C-x k in the usual way. The command
+clear_webpages() deletes all the web page
+buffers from the session.
+
 Python programming
 
 You can develop and test Python code 
 in a desktop session, without exiting 
 and restarting, or losing session state.
+(To make it possible to reload a module
+without re-initializing its data, which would
+lose its state, you must code the module in
+the style described in the Reloading modules
+section in How we program, editors/HOW.md.)
 
 Piety itself was developed in long-running
 Python sessions.   The desktop was designed 
@@ -465,6 +633,53 @@ Type C-x C-r to save the current buffer -- a
 Python module -- and reload it into the
 session.
 
+Use sh('git ...') to invoke commands of the 
+git version control system. 
+
+Quitting the desktop
+
+Type the command quit() to quit the desktop, exit Python, and return
+to the host system command prompt.  The command quit() prints the list of
+unsaved buffers and ask you if you really want to quit.
+
+The command unsaved() just prints the list of unsaved buffers.
+
+Recovering from errors
+
+Desktop windows can be defaced by unwanted
+characters from sources outside Piety.
+The viewer window can be chopped up by text
+overflowing editor windows (due to errors that
+should be fixed).
+
+Windows can often be repaired by refreshing
+them (redrawing their buffer contents). Type
+C-l to refresh the current editor window, or
+M-l to refresh both editor windows. Type M-m
+to refresh the viewer window, even when the
+cursor is in an editor window.
+
+Errors in Piety code can cause the code to 
+crash (terminate suddenly, often printing
+diagnostic information called a traceback).
+Fortunately, a crash usually just affects
+the function containing the error, so the
+Piety session can be resumed and unsaved 
+work is not lost.
+
+Usually, a crash returns control to the Python
+REPL, and you often see the >>> prompt after
+the traceback. However, you often find that
+your typing does not appear. To remedy this,
+type the function call tl(). You will not see
+this either. If Python responds with error
+messages, type ENTER and try tl() again. If
+you do not see an error message, the call was
+probably successful and you can resume typing.
+Usually you type pm() to return to a window,
+then type C-l, M-l and M-m to refresh 
+windows.
+ 
 More
 
 There is more about the Piety desktop we have
@@ -475,5 +690,5 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
 
-Revised Apr 2026
+Revised May 2026
   

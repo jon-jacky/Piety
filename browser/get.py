@@ -235,7 +235,7 @@ def clear_webpages():
     'Delete all webpages, buffers whose bufname includes .html or .htxt'
     ed.clear_buffers('all web pages', 
         # use 'in' not 'endswith' to include ...html<2>  ...htxt<3> etc.
-        discard=(lambda buf: '.html' in buf['filename']
+        discard=(lambda buf: '.html' in buf['bufname']
                     or '.htxt' in buf['bufname']))
         
 # Add keycodes for browser operations to keymap 

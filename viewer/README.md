@@ -21,7 +21,7 @@ width=50% [Aworks but width="960" does *not* work.
 [Workflow](#Workflow)  
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
-[Files](#Files)
+[Files](#Files)   
 [Influences](#Influences)
 
 ### Quick Start ###
@@ -45,7 +45,7 @@ columns across the full width of the display.
 
 Run this command to start the desktop:
 
-    python3 -im vpm
+    python3 -im desktop
 
 The desktop appears, with the windows showing
 the buffers named in a startup file (see
@@ -456,5 +456,5 @@ The Piety desktop is influenced by
 [Oberon](https://people.inf.ethz.ch/wirth/ProjectOberon/UsingOberon.pdf), 
 and [Acme](http://acme.cat-v.org/).
 
-Revised Mar 2026
+Revised May 2026
 
