@@ -453,7 +453,7 @@ computer shell command in the Python REPL.
 Just enclose the entire shell command within
 quotes.  This is necessary to run shell commands
 that have not been provided as Python functions,
-for example git version contol commands. 
+for example git version control commands. 
 
 When you are finished using the Python REPL, 
 type the command pm() to return the cursor to
@@ -510,15 +510,18 @@ urls.py and type C-o to display it in the
 viewer window. This buffer is just a list of
 the URLs of some sample web sites, analogous
 to bookmarks. Place the cursor over the line
-that says: hn =
-'https://news.ycombinator.com/' and type C-o.
-The Hacker News front page appears in the
-viewer window.
+that says:
+hn = 'https://news.ycombinator.com/' 
+and type C-o. The Hacker News front page
+appears in the viewer window.
 
 Typing C-o on a line that contains a URL opens
 that page in the current window, usually the
 viewer window. Typing M-o opens it on the
-other window, an editor window.
+other window, an editor window. The URL does
+not have to be in a web page -- it can be in
+any kind of buffer. You can create files that
+contain URLs and other notes you want to save.
 
 In Hacker News front page in the viewer
 window, scroll to an interesting entry and put
@@ -536,11 +539,11 @@ Move the cursor to the line that begins
 the first footnote in the entry you found).
 Type M-o. The linked article page from the web
 appears in an editor window. The article's URL
-appears on the first line of the buffer. You
-can scroll through the buffer in the usual
-way. You often have to scroll down past
-several pages of header text to reach the
-interesting content.
+appears on the first line of the buffer, and 
+in the window's status line. You can scroll
+through the buffer in the usual way. You often
+have to scroll down past several pages of
+header text to reach the interesting content.
 
 In the Piety browser, link text is delimited
 by underscores, and the corresponding URL is
@@ -599,11 +602,28 @@ If you want to see any web page again, you can
 select its buffer in the usual way -- this is
 analogous to clicking on a browser tab.
 
+You can use the gr command (get and render) 
+to type in a URL at the REPL and view the
+page. Its argument is a URL string.
+So you could load the Hacker News page by
+typing the command:
+gr('https://news.ycombinator.com/')
+This is useful when you see a URL printed
+somewhere but you don't already have a buffer
+that contains the URL string.
+ 
 You can delete web page buffers one by one
 with C-x k in the usual way. The command
 clear_webpages() deletes all the web page
-buffers from the session.
+buffers from the session (all the buffers
+whole names end in .html or .htxt).
 
+Be warned that at this time the web browsing
+code is quite fragile. For example, attempting
+to load a web page that does not exist (that
+gets a 404 error) causes a crash. See the
+section below, Recovering from errors.
+ 
 Python programming
 
 You can develop and test Python code 
@@ -659,26 +679,35 @@ M-l to refresh both editor windows. Type M-m
 to refresh the viewer window, even when the
 cursor is in an editor window.
 
-Errors in Piety code can cause the code to 
-crash (terminate suddenly, often printing
-diagnostic information called a traceback).
+Errors and exceptional conditions can cause
+the Piety code to crash (terminate suddenly,
+often printing diagnostic information called a
+traceback). For example, at this time,
+attempting to load a web page that does not
+exist (that gets a 404 error) causes a crash.
+(We should fix this so these errors are
+handled more gracefully.)
+
 Fortunately, a crash usually just affects
-the function containing the error, so the
-Piety session can be resumed and unsaved 
-work is not lost.
+the function containing the error. Other data
+including the session state are unaffected, so
+unsaved work is not lost and the Piety session
+can be resumed.
 
 Usually, a crash returns control to the Python
 REPL, and you often see the >>> prompt after
 the traceback. However, you often find that
-your typing does not appear. To remedy this,
-type the function call tl(). You will not see
-this either. If Python responds with error
-messages, type ENTER and try tl() again. If
-you do not see an error message, the call was
-probably successful and you can resume typing.
-Usually you type pm() to return to a window,
-then type C-l, M-l and M-m to refresh 
-windows.
+your typing does not appear -- the characters you 
+type are read by Python, but not echoed to the
+display. To remedy this, type the function
+call tl(), including the empty parentheses.
+You will not see this either. If Python
+responds with error messages, type ENTER and
+try to type tl() again. If you do not see an
+error message, the call was probably
+successful and you can resume typing. Usually
+you type pm() to return to a window, then type
+C-l, M-l and M-m to refresh windows.
  
 More
 
