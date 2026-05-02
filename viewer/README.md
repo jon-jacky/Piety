@@ -434,9 +434,6 @@ These files are in the *Piety/viewer* directory:
 
 - **README.md**: This file.
 
-- **desktop.py**: Symbolic link to *vpm.py* so you can start the
-   desktop with *python3 -im desktop* instead of *python3 -im vpm*.
-  
 - **desktop.txt**: Interactive tutorial on using the desktop,
     formatted for display in the viewer window.
  
