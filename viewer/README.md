@@ -45,7 +45,7 @@ columns across the full width of the display.
 
 Run this command to start the desktop:
 
-    python3 -im desktop
+    python3 -im vpm
 
 The desktop appears, with the windows showing
 the buffers named in a startup file (see
@@ -434,9 +434,12 @@ These files are in the *Piety/viewer* directory:
 
 - **README.md**: This file.
 
+- **desktop.py**: Symbolic link to *vpm.py* so you can start the
+   desktop with *python3 -im desktop* instead of *python3 -im vpm*.
+  
 - **desktop.txt**: Interactive tutorial on using the desktop,
     formatted for display in the viewer window.
-
+ 
 - **keys.txt**: List of keys and key sequences used for navigating
       the desktop and editing text in its windows, formatted for
       display in the viewer window.
