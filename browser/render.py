@@ -11,8 +11,6 @@ import sked as ed
 import edsel as fr # fr for frame
 import get # get.url get.title and get.g() are used here
 import key, dmacs # for adding keycodes to keymap
-from redirect import redirect # for printing traceback in a buffer
-from viewer import viewer_window #  for displaying traceback in viewer 
 
 # div class="..." special case div tags at particular web sites
 # div with these classes are formatted like paragraphs.
@@ -239,31 +237,18 @@ def r(aurl):
 
 # Rendering functions that use functions from get module
 
-gr_tb = 'No traceback' # traceback
+gr_tb = 'No traceback' # stores entire traceback if/when it occurs
 
-def print_traceback(traceback_string):
-    """
-    Print lines from multiline tb_string returned by traceback.format_exc.
-    Works with redirect_stdout to our text buffers.
-    Imitates code in our python/pyhelp.py and unix/shell.py
-    """
-    for line in traceback_string.splitlines():
-        print(line)
-                 
 def gr(url):
     'Get and Render web page at url'
-    global gr_tb
-    gr_tb = 'No traceback'
+    global gr_tb 
+    gr_tb = 'No traceback' # must reinitiazlie each time
     try:
         get.g(url)
         r(url)
     except BaseException as e:
-        # traceback.print_exc() # placeholder for handler to come
         gr_tb = traceback.format_exc() # returns string, does not print tb
-        # print(gr_tb) # for now, just print it wherever cursor is
-        viewer_window(lambda: redirect('*Errors*', 
-                                lambda: print_traceback(gr_tb), 
-                                'Traceback from render.gr(): '))
+        print(gr_tb) # for now, just print it wherever cursor is
 
 def grx():
     'Get and Render web page at url eXtracted from current line in buffer'

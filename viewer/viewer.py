@@ -13,6 +13,8 @@ available, and work just as before.
 import os
 import key, dmacs, display, shell, render, console, get
 import sked as ed, edsel as fr
+import traceback
+from redirect import redirect # for printing traceback in a buffer
  
 # Define and initialize global variables
 # but only the *first* time this module is imported in a session.
@@ -273,6 +275,32 @@ def vdir():
 # Overwrites browser function names imported by 'from browser import *'
 # You can still invoke browser.grx() etc. by providing browser. prefix
 
+# Browser get and render,  gr() with exception handler
+#  that displays traceback in *Errors* buffer in viewer window.
+# This replaces gr() defined in render.py that has simpler exception handler.
+
+def print_traceback(traceback_string):
+    """
+    Print lines from multiline tb_string returned by traceback.format_exc.
+    Works with redirect_stdout to our text buffers.
+    Imitates code in our python/pyhelp.py and unix/shell.py
+    """
+    for line in traceback_string.splitlines():
+        print(line)
+
+def gr(url):
+    'Get and Render web page at url'
+    render.gr_tb = 'No traceback' # must reinitiazlie each time
+    try:
+        get.g(url)
+        render.r(url)
+    except BaseException as e:
+        render.gr_tb = traceback.format_exc() # returns string, does not print tb
+        # print(render.gr_tb) # for now, just print it wherever cursor is
+        viewer_window(lambda: redirect('*Errors*', 
+                                lambda: print_traceback(render.gr_tb), 
+                                'Traceback from render.gr(): '))
+ 
 def grx(this_window):
     """
     Get and Render web page at URL eXtracted from current line in current buffer.'
@@ -284,9 +312,9 @@ def grx(this_window):
     url = get.xurl(ed.buffer[ed.dot])
     if url: # url is '' if not URL found on line
         if this_window: # viewer window
-            render.gr(url)
+            gr(url) # use gr in this module with its exception handler
         else:            
-            editor_window(lambda: render.gr(url))
+            editor_window(lambda: gr(url))
     
 def grfx(this_window):
     """
@@ -299,10 +327,14 @@ def grfx(this_window):
     if n:
         url = get.fnurl(n) # url at footnote n, or '' if footnote n not found
         if this_window: # viewer window
-            render.gr(url)
+            gr(url)
         else:            
-            editor_window(lambda: render.gr(url))
+            editor_window(lambda: gr(url))
 
+def hnpage(item_number):
+    'Get the HN item (page) with the given integer (not string) item number'
+    gr(render.hnitem + str(item_number))
+     
 # Functions invoked by keycodes - conditional depending on viewer state
 
 def vclr_key(): # C-x 1
