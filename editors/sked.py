@@ -561,6 +561,10 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     if not end: end = dot
     if not range_valid(start, end):
         return
+    # Prevent inadvertantly wrapping too much - like the whole buffer
+    if (end - start) > 24:
+        print(f'wrap: line {start} through {end} exceeds 24 lines') 
+        return
     if not lmarg: lmarg = lmargin
     lmargin = lmarg
     if not rmarg: rmarg = rmargin

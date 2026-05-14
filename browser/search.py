@@ -19,7 +19,7 @@ browser has to run to actually execute the query.   That page contains:
 Bah!  The Piety browser will never support Javascript.
 """
 
-import get
+import render
 
 hnprefix = 'https://hn.algolia.com/?dateRange=all&page=0&prefix=false&query='
 
@@ -32,16 +32,12 @@ def hnsearch(type, query):
     """
     hnquery = '%20'.join(query.split())
     hntype = f'&sort=byDate&type={type}'
-    get.gr(hnprefix + hnquery + hntype)
+    render.gr(hnprefix + hnquery + hntype)
 
 def hnuser(user):
     """ 
     Retrieve all comments posted by user, most recent first.
     Does *not* send query to Algolia or require Javascript - so it works!
     """
-    get.gr(f'https://news.ycombinator.com/threads?id={user}')
-    
-def hnitem(id):
-    'Get the HN item page with integer (not string) id number'
-    get.gr(f'https://news.ycombinator.com/item?id={id}')
-    
+    render.gr(f'https://news.ycombinator.com/threads?id={user}')
+         

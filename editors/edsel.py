@@ -419,7 +419,7 @@ def select_buffer():
     
 def N():
     ed.N(display_e, display_restore_buffer)
-    
+            
 def k():
     ed.k(display_restore_buffer)
 
