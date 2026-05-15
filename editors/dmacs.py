@@ -7,7 +7,7 @@ The name means 'dumb emacs' or 'defective emacs' or maybe 'grade D emacs',
 barely above F (fail).
 """
 
-import sys, importlib
+import sys, importlib, traceback
 import terminal, key, keyseq, display, edsel, pycall
 import sked as ed
 
@@ -157,10 +157,18 @@ def reload_buffer():
     importlib.reload(sys.modules[modname])
     print(f'Reload module {modname}\n\r', end='') # \n\r end for char mode
 
+sr_tb = 'No traceback' # stores entire traceback if/when it occurs
+
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'
-    edsel.w()
-    reload_buffer() # synchronization?  Does w() finish before reload() begins?
+    global sr_tb 
+    sr_tb = 'No traceback' # must reinitiazlie each time
+    try:
+        edsel.w()
+        reload_buffer() # synchronization?  Does w() finish before reload() begins?
+    except BaseException as e:
+        sr_tb = traceback.format_exc() # returns string, does not print tb
+        print(sr_tb) # for now, just print it wherever cursor is
 
 # Table from keys to editor functions
 keymap = {

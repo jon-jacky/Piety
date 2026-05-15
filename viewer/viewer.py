@@ -334,7 +334,7 @@ def grfx(this_window):
 def hnpage(item_number):
     'Get the HN item (page) with the given integer (not string) item number'
     gr(render.hnitem + str(item_number))
-     
+      
 # Functions invoked by keycodes - conditional depending on viewer state
 
 def vclr_key(): # C-x 1
@@ -446,6 +446,23 @@ def loader(this_window):
         grfx(this_window) # This is viewer.grfx defined here, not get.grfx
     else:
         pass # Possibly more cases to come
+ 
+# save_reload() with exception handler
+#  that displays traceback in *Errors* buffer in viewer window.
+# This replaces save_reload() in dmacs.py that has simpler exception handler.
+
+def save_reload():
+    'Write out buffer, reload module, so file and module stay consistent.'
+    dmacs.sr_tb = 'No traceback' # must reinitiazlie each time
+    try:
+        fr.w()
+        dmacs.reload_buffer() # synchronization?  Does w() finish before reload() begins?
+    except BaseException as e:
+        dmacs.sr_tb = traceback.format_exc() # returns string, does not print tb
+        # print(sr_tb) # for now, just print it wherever cursor is
+        viewer_window(lambda: redirect('*Errors*', 
+                                lambda: print_traceback(dmacs.sr_tb), 
+                                'Traceback from save_reload(): '))
 
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key
@@ -467,6 +484,9 @@ dmacs.keymap[key.M_m] = vvrefresh
 # Always display *Buffers* list in viewer window
 # Overwrites C_x C_b key binding defined in dmacs.py
 dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
+
+# Save and reload buffer 
+dmacs.keymap[key.C_x + key.C_r] = save_reload # local save_reload above
 
 # Visit file, prompt for file name, NOT like Emacs, but analogous to C-x b
 # NOT!  We'll just stick to emacs keycodes when there is one.
