@@ -417,8 +417,8 @@ def b(bname=None):
 def select_buffer():
     ed.select_buffer(display_restore_buffer)
     
-def N():
-    ed.N(display_e, display_restore_buffer)
+def N(keep=(lambda bname: True)):
+    ed.N(display_e, display_restore_buffer, keep)
             
 def k():
     ed.k(display_restore_buffer)

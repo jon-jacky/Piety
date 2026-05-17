@@ -257,7 +257,8 @@ def unsaved():
     return notsaved + ([ b['bufname'] for b in buffers.values()
                          if b['bufname'] != bufname and not b['saved'] ])
     
-def N(move_dot=move_dot, restore_buffer=restore_buffer):
+def N(move_dot=move_dot, restore_buffer=restore_buffer,
+        keep=(lambda bname: True)):
     """
     N(ames), print names etc. about stored buffers -- in a buffer!
     We can scroll through long list of buffer names etc, more than fit in REPL.
@@ -265,7 +266,8 @@ def N(move_dot=move_dot, restore_buffer=restore_buffer):
     e('*Buffers*',move_dot,restore_buffer) 
     if len(buffer) > 1: d(1,S()) # clear any previous buffer list
     for bname in buffers:
-        buffer.append(bstatus(bname) + '\n')          
+        if keep(bname):
+            buffer.append(bstatus(bname) + '\n')          
     restore_buffer('*Buffers*') # force redisplay if display present
     move_dot(1)  # list of buffers might have gotten shorter
               
