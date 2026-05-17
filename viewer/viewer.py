@@ -226,11 +226,17 @@ def vbottom():
 
 def N():
     """
-    Show *Buffers* list in viewer window.  Editor window keeps focus if it has it.'
-    Overwrites N identifer imported from edsel.N() by 'from edsel import *'
-    You can still invoke edsel.N() by providing edsel. prefix: edsel.N()
+    Show *Buffers* list in viewer window, without .html .htxt web buffers.
+    Editor window keeps focus if it has it.
     """
-    viewer_window(fr.N)
+    viewer_window(render.N)
+
+def W():
+    """
+    Show *Buffers* list in viewer window, showing only .htxt web buffers. 
+    Editor window keeps focus if it has it.
+    """
+    viewer_window(render.W)
 
 # Console functions
 # Overwrites console function names imported by 'from console import *'
@@ -503,6 +509,10 @@ dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
 
 # Load contents named on line into other widow, usually an editor window
 dmacs.keymap[key.M_o] = (lambda: loader(this_window=False))
+
+# C-x C-b - list buffers without webpages, C-x C-w list .html buffers
+dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N or browser.NM
+dmacs.keymap[key.C_x + key.C_w] = W # W defined above, not browser.W 
  
 def quit():
     """
