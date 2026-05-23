@@ -9,7 +9,7 @@ import traceback
 
 import sked as ed
 import edsel as fr # fr for frame
-import get # get.url get.title and get.g() are used here
+import get # get.url get.title get.timestamp and get.g() are used here
 import key, dmacs # for adding keycodes to keymap
 
 # div class="..." special case div tags at particular web sites
@@ -221,9 +221,9 @@ def r(aurl):
     fr.e(bufname) # create empty buffer, assign local bufname to ed.bufname
     ed.prev_bufname = saved_bufname # back out unwanted assignment by fr.e()
     ed.filename = baseurl # replace filename created by e() with web site url
-    ed.buffers[bufname]['filename'] = bufname # replace filename created by e()
+    ed.buffers[bufname]['filename'] = ed.filename # replace filename created by e()
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
-    ed.buffer += [ url, '\n'] # Put page URL on first line
+    ed.buffer += [ url + '  ' + get.timestamp, '\n'] # Put on first line
     for line in parser.output.rsplit('\n'): # make list of lines from string
         # Hack: Filter out duplicate empty lines, not sure where they come from.
         if not (line == '' and ed.buffer[-1] == '\n'):
@@ -276,7 +276,15 @@ def N():
 def W():
     'List .htxt web pages buffers'
     fr.N(lambda bname: '.htxt' in bname)
-        
+
+def reload():
+    """
+    Reload the web page shown in the current buffer.
+    Creates a new pair of buffers, but displays the .htxt in the same window.
+    """        
+    # URL of current buffer is on line 1, separate from following timestamp.
+    gr(ed.buffer[1].split(' ')[0])    
+    
 # Add keycodes for browser operations to keymap 
 dmacs.keymap[key.M_r] = r # render html from current buf. to .txt .buf
 # key.C_o entry is now assigned in viewer.py
@@ -287,4 +295,7 @@ dmacs.keymap[key.M_s] = grfx # get and render page at next footnote ref on line.
 # C-x C-b - list buffers without webpages, C-x C-w list .html buffers
 dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N
 dmacs.keymap[key.C_x + key.C_w] = W # W defined above
+
+# C-x C-l - reload web page shown in current buffer
+dmacs.keymap[key.C_x + key.C_l] = reload # reload defined above
 

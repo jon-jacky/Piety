@@ -5,7 +5,7 @@ get.py - Get a web page and store it in a Piety editor buffer.
 from html.parser import HTMLParser
 from urllib import request, parse
 from pathlib import Path
-import re
+import datetime, re
  
 import sked as ed, edsel as fr # fr for frame
 import key, dmacs # so we can add browser keycode entries to keymap
@@ -88,6 +88,7 @@ baseurls = ('https://news.ycombinator.com/', # Hacker News
             )
 
 url = ''  # URL is global so we can use it in render r(url) also for debugging
+timestamp = '' # put in top line with url
 response = None # response is global so we can inspect it at the REPL
 
 title = 'No title yet' # Contents of page <title> 
@@ -119,9 +120,10 @@ def g(aurl):
     """
     (g)et web page from aurl and store it in its own Piety editor buffer.     
     """
-    global url, response, req
+    global url, response, req, timestamp
     global title # make this global so we can assign default
     url = aurl  
+    timestamp = f'{datetime.datetime.now()}'.rpartition('.')[0] # trim usec
     title = 'No title' # default, parser.feed assigns title if there is one
     
     # See https://docs.python.org/3/howto/urllib2.html
@@ -131,7 +133,7 @@ def g(aurl):
     print('Loading page...') # sometimes there is quite a delay in urlopen
     # If urlopen fails just let it crash, return to >>> and don't create buffer
     # Any error message from urlopen will be printed in REPL.
-
+    # NOT usually! render.gr() wraps g();r() 
     response = request.urlopen(req)
 
     # Can't use this - because we don't have bufname yet.
@@ -154,7 +156,7 @@ def g(aurl):
 
     # Now assign ed.buffer contents - must do this before assigning ed.bufname
     ed.buffer = ['\n'] # So content starts at index 1 not 0, like other buffers.
-    ed.buffer.append(f'<!-- {url} -->\n') # put page URL on first line
+    ed.buffer.append(f'<!-- {url}  {timestamp} -->\n') # put  on first line
     ed.buffer.append('\n')
     # Fill in buffer text from HTTP response
     for line in response.readlines():

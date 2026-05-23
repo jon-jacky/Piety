@@ -92,7 +92,7 @@ def move_to_point(point, start_col):
     # start_col accounts for prompt or other chars in left margin
     # move_to_column and start_col are 1-based but point is 0-based
     # So we DON'T need + 1 here because it's already included in start_col
-    display.move_to_column(start_col + point) # + 1) NOT! +1 not needed here
+    display.move_to_column(start_col + point) # +1 not needed
 
 # Functions that appear in the keymap table must all have the same arguments
 # and the same returned variables, even though many do not use all of them.

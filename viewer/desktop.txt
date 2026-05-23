@@ -500,20 +500,31 @@ Web browsing
 
 You can browse the web in the Piety desktop.
 Downloaded web pages appear in editor buffers.
-The list of web page buffers, analogous
-to browser tabs, appears in the buffer list
-along with the other buffers. 
+The pages do not appear in the list of
+ordinary buffers shown by typing C-x C-b. Type
+C-x C-w to show the list of web page buffers.
 
-To get started, type C-x C-b to display the
-list of buffers, then put the cursor at
-urls.py and type C-o to display it in the
-viewer window. This buffer is just a list of
-the URLs of some sample web sites, analogous
-to bookmarks. Place the cursor over the line
-that says:
+To get started web browsing, type C-x C-b to
+display the list of ordinary buffers, then put
+the cursor at urls.py and type C-o to display
+it in the viewer window. This buffer is just a
+list of the URLs of some sample web sites,
+analogous to bookmarks. Place the cursor over
+the line that says:
 hn = 'https://news.ycombinator.com/' 
 and type C-o. The Hacker News front page
 appears in the viewer window.
+
+Hacker News is a 'link aggregator' with a
+'front page' where each entry contains a link
+to an 'article page' elsewhere on the web,
+along with a link to a 'comments page' that
+contains comments on that article.  Many 
+web sites have this organization.
+The three windows on the Piety desktop - the
+viewer window and two editor windows - 
+can show the front page, an article page,
+and its comments page at the same time.
 
 Typing C-o on a line that contains a URL opens
 that page in the current window, usually the
@@ -521,9 +532,10 @@ viewer window. Typing M-o opens it on the
 other window, an editor window. The URL does
 not have to be in a web page -- it can be in
 any kind of buffer. You can create files that
-contain URLs and other notes you want to save.
-
-In Hacker News front page in the viewer
+contain URLs and other notes you want to save,
+our urls.py is just and example.
+ 
+In the Hacker News front page in the viewer
 window, scroll to an interesting entry and put
 the cursor at the beginning of its first line.
 I found this entry (when you look, it will no
@@ -582,26 +594,31 @@ the cursor before that footnote and type C-o
 to display the next Hacker News page in the
 viewer.
 
-Type C-x C-b to show the buffer list in the
-viewer window. Near the bottom of the list,
-there are several entries for buffers that
-hold web pages. The page URLs appear in the
-buffer list entries, instead of file names.
+Type C-x C-w to show the list of web page
+buffers in the viewer window. The page URLs
+appear in the buffer list entries, instead of
+file names.
 
-For each page, there are two buffers: an .html
-buffer that holds the HTML source, and an
-.htxt buffer that holds the rendered text.
+For each web page, there are two buffers: an
+.html buffer that holds the HTML source, and
+an .htxt buffer that holds the rendered text.
 When you select a page with C-o or M-o, Piety
-displays the rendered .htxt page, but if you
-want to see the source you can select the
-.html page from the buffer list in the usual
-way -- this is analogous to the View Source
-operation.
+displays the rendered .htxt page. Typing C-x
+C-w just shows the list of .htxt pages. 
 
 If you want to see any web page again, you can
 select its buffer in the usual way -- this is
 analogous to clicking on a browser tab.
 
+If you want to see the HTML source, you can
+generate a buffer list that includes all
+buffers including the .html buffers by typing
+the command edsel.N() in the Python REPL.
+Select an .html buffer from this list in the
+usual way to show its source in a window --
+this is analogous to the View Source
+operation.
+ 
 You can use the gr command (get and render) 
 to type in a URL at the REPL and view the
 page. Its argument is a URL string.
@@ -611,6 +628,10 @@ gr('https://news.ycombinator.com/')
 This is useful when you see a URL printed
 somewhere but you don't already have a buffer
 that contains the URL string.
+
+... gr(hn) ...
+
+Reload page ...
  
 You can delete web page buffers one by one
 with C-x k in the usual way. The command
@@ -618,6 +639,7 @@ clear_webpages() deletes all the web page
 buffers from the session (all the buffers
 whole names end in .html or .htxt).
 
+FIXME
 Be warned that at this time the web browsing
 code is quite fragile. For example, attempting
 to load a web page that does not exist (that

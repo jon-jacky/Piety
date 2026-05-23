@@ -37,7 +37,8 @@ def restore_cursor_to_window():
     # point+1 to make put_cursor call consistent with editline move_to_column
     # edsel.start_col so it works in  editor windows and also viewer window.
     # NOT ... ed.point + 1, no +1 needed, edsel.start_col is already 1
-    display.put_cursor(edsel.wline(ed.dot), edsel.start_col + ed.point) # + 1)
+    display.put_cursor(edsel.wline(ed.dot), 
+                       edsel.start_col + min(ed.point, edsel.width-1))
 
 # Some functions do not use keycode arg but caller keycmd requires it to be there.
 
@@ -70,7 +71,8 @@ def open_line(keycode):
     """
     suffix = ed.buffer[ed.dot][ed.point:] # including final \n
     ed.buffer[ed.dot] = ed.buffer[ed.dot][:ed.point] + '\n' # leave prefix on dot
-    edsel.blank_line(edsel.width - len(ed.buffer[ed.dot])) # pad with spaces
+    if ed.point < edsel.width:
+        edsel.blank_line(edsel.width - len(ed.buffer[ed.dot])) # pad with spaces
     # Auto-indent suffix line to same indentation as prefix line.
     nspaces = 0
     while ed.buffer[ed.dot][nspaces] == ' ': nspaces += 1 # count leading spaces

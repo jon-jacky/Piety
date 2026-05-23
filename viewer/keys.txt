@@ -1,4 +1,4 @@
-
+ 
                 Piety Keys
                 ==========
                     
@@ -14,6 +14,23 @@ M-v, meta v, means hold down the ALT key and
 
 Many (but not all) keys used by Piety behave
 like the same keys in the Emacs editor.
+
+Contents
+Scrolling
+Search and Replace
+Buffers
+Windows
+Directories
+Files
+Cursor motion
+Define region
+Delete, cut and paste
+Formatting
+Refresh
+Append mode
+Web browsing
+Python
+More
 
 Scrolling
 
@@ -43,13 +60,13 @@ M-%  Replace
   
 Buffers
 
-C-x C-b   List buffers
+C-x C-b   List buffers, except web pages
 C-x b     Switch to buffer
 C-x k     Delete current buffer            
 
-C-o  Open buffer named on viewer line
+C-o  Open buffer named on this viewer line
      in viewer window
-M-o  Open buffer named on viewer line
+M-o  Open buffer named on this viewer line
      in editor window
 
 Windows
@@ -64,13 +81,16 @@ C-x o  Move cursor from viewer to editor
 Directories
 
 C-x d  List directory
-C-o  List directory named on viewer line
+C-o  List directory named on this viewer line
      
 Files
 
 C-x C-f  Open or create file in new buffer
-C-o      Open file named on viewer line
-
+C-o      Open file named on this viewer line
+         in viewer window
+M-o      Open file named on this viewer line
+         in editor window
+         
 C-x C-s  Save file, with same file name
 C-x C-w  Save file, prompt for file name
 
@@ -141,7 +161,35 @@ C-l  Refresh current editing window
 M-l  Refresh both editing windows
 M-m  Refresh viewer window
      works when cursor in editor window
-           
+
+Append mode - like on a printing terminal,
+just keep typing, no going back or editing
+
+C-x C-a  Enter append mode
+.        Exit append mode 
+         (. only at beginning of line)
+         
+Web browsing         
+
+C-x C-w   List web pages (.htxt buffers)
+
+C-o  Open URL named on this viewer line
+     in viewer window
+M-o  Open URL named on this viewer line
+     in editor window
+
+C-o  Open URL referenced by next footnote
+     on this viewer line in viewer window
+M-o  Open URL referenced by next footnote
+     on this viewer line in editor window
+
+C-o  When on first line of web page buffer
+     with page URL, reload this web page.
+
+C-x C-l  Reload web page shown in current 
+         buffer, needn't be on first line.
+
+                 
 Python
 
 C-x C-r  Write module to file and reload
@@ -152,21 +200,13 @@ pm() Move cursor from REPL to window
 M-y  Enter and run a single Python command 
      then return to window
 
-Append mode - like on a printing terminal,
-just keep typing, no going back or editing
-
-C-x C-a  Enter append mode
-.        Exit append mode 
-         (. only at beginning of line)
-         
 More
 
-Many keys used in Piety are not listed here.
 You can find more details in these files:
 
 Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md 
       
-Revised Apr 2026
+Revised May 2026
 
