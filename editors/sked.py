@@ -13,6 +13,23 @@ import os, sys, textwrap
 
 ## import display # DEBUG, for display.putstr for debugging info
 
+# Sample text for scratch.txt.  Convert to list of lines below.
+sample_text = \
+      """
+
+This is the buffer scratch.txt, where you can practice editing.
+
+Here is some sample text:
+
+Piety is a small but self-contained personal computer operating system for
+programmers.  It provides a responsive and malleable platform for writing
+and programming.  Its internals are easy to understand and modify.
+
+Piety uses a single programming language -- Python -- for both the
+applications and the operating system.
+
+    """
+    
 # Define and initialize global variables used by sked editing functions,
 # but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables,
@@ -27,9 +44,7 @@ except:
     bufname = 'scratch.txt'  # Basename of filename, reassigned by e and w
     filename = 'editors/scratch.txt' # reassigned by e(dit) and w(rite) commands
     # Put some text in scratch buffer so user sees something when editor starts
-    buffer = \
-     ['\n','\n',
-     'This is the buffer scratch.txt, where you can practice editing.\n','\n']
+    buffer = [ (line+'\n') for line in sample_text.split('\n') ] 
     searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) cmds
     replacestring = '??? ' # reassigned by c(hange) command
     pagesize = 12         # reassigned by v and rv page up/down commands
@@ -258,17 +273,17 @@ def unsaved():
                          if b['bufname'] != bufname and not b['saved'] ])
     
 def N(move_dot=move_dot, restore_buffer=restore_buffer,
-        keep=(lambda bname: True)):
+        bufname=('*Buffers*'), keep=(lambda bname: True)):
     """
     N(ames), print names etc. about stored buffers -- in a buffer!
     We can scroll through long list of buffer names etc, more than fit in REPL.
     """
-    e('*Buffers*',move_dot,restore_buffer) 
+    e(bufname,move_dot,restore_buffer) 
     if len(buffer) > 1: d(1,S()) # clear any previous buffer list
     for bname in buffers:
         if keep(bname):
             buffer.append(bstatus(bname) + '\n')          
-    restore_buffer('*Buffers*') # force redisplay if display present
+    restore_buffer(bufname) # force redisplay if display present
     move_dot(1)  # list of buffers might have gotten shorter
               
 def select_buffer(restore_buffer=restore_buffer):

@@ -20,8 +20,8 @@ Scrolling
 To read further in this tutorial, scroll down:
 type C-v (control-V, hold down the CTRL key
 and press the v key). Try it now! (You might
-have to do it twice, depending on the height
-of this window.)
+have to do it a few times, depending on the
+height of this window.)
 
 To scroll back up, type M-v (meta-V, hold down the
 ALT key and press the v key). To go to the top,
@@ -378,9 +378,12 @@ file, prompt for the new file name.
 
 Editing
 
-You can edit in any window, including the
-viewer window. Many editing commands also work
-within the REPL command line.
+You can edit the text in any window, including
+the viewer window. You can edit anything;
+there are no read-only buffers. Sometimes it
+is useful to cut and paste viewer window
+contents, or wrap lines to fit them into the
+narrow viewer window.
 
 To enter text, just type. The BACKSPACE and
 ENTER keys, and our scrolling and search keys,
@@ -393,11 +396,25 @@ formatting operations, are provided.
 All the editing keys work the same as in the
 Emacs editor.  
 
-You can edit anything; there are no read-only
-buffers.   Sometimes it is useful to cut and
-paste viewer window contents, or wrap lines 
-to fit them into the narrow viewer window.
+The editor is line oriented. You can cut and
+paste words or sequences of words within a
+line, or you can cut and paste entire lines or
+sequences of lines. But, you cannot cut and
+paste a section of text that begins in the
+middle of one line and ends in the middle of
+another line.
 
+Line oriented ... within line vs. multiline
+Many editing commands also
+work within the REPL command line, and within
+responses to prompts.
+
+Cut and paste ...
+
+Formattng ... auto left margin ...
+M-q fill line or region
+
+ 
 Commands
 
 In addition to typing keycodes, you can also

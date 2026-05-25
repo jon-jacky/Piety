@@ -271,11 +271,12 @@ def hnpage(item_number):
 
 def N():
     'List buffers, excluding web page buffers .html and .htxt'
-    fr.N(lambda bname: not '.html' in bname and not '.htxt' in bname)
+    fr.N('*Buffers*', 
+            lambda bname: not '.html' in bname and not '.htxt' in bname)
 
 def W():
     'List .htxt web pages buffers'
-    fr.N(lambda bname: '.htxt' in bname)
+    fr.N('*WebPages*', lambda bname: '.htxt' in bname)
 
 def reload():
     """
