@@ -28,6 +28,8 @@ and programming.  Its internals are easy to understand and modify.
 Piety uses a single programming language -- Python -- for both the
 applications and the operating system.
 
+Here is a long line that extends beyond the window border. You will need to wrap this line in order to fit it within the window.
+ 
     """
     
 # Define and initialize global variables used by sked editing functions,

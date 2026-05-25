@@ -1,5 +1,5 @@
 
-                P i e t y
+                 P i e t y
                 =========
                 
 This is the Piety desktop, a self-contained 
@@ -86,24 +86,27 @@ Search (search backward from here)
 Keys
 Buffers
 Windows
+Refreshing windows
 Buffers in windows
 Directories
 Files
 Editing
+Wrapping long lines
 Commands
 Web browsing
 Python programming
 Quitting the desktop
-Recovering from errors
+Recovering from crashes
 More
 
 Keys 
 
 Key sequences like C-v and M-< are usually
 just called keys. A list of Piety keys appears
-in keys.txt. Many (but not all) keys used by
-Piety behave like the same keys in the Emacs
-editor.
+in keys.txt. 
+
+Many (but not all) keys used by Piety behave
+like the same keys in the Emacs editor.
   
 Buffers
 
@@ -204,6 +207,22 @@ window to an editor window. Type C-x v to move
 the cursor back to the viewer window. Most
 keys and commands work the same in any window.
 
+Refreshing windows
+
+Desktop windows can be defaced by unwanted
+characters from sources outside Piety -- like
+messages from the host operating system.
+Or, the viewer window might be chopped up by
+text overflowing editor windows (due to errors
+in Piety code that should be fixed).
+
+Windows can often be repaired by refreshing
+them (redrawing their buffer contents). Type
+C-l to refresh the current editor window, or
+M-l to refresh both editor windows. Type M-m
+to refresh the viewer window, even when the
+cursor is in an editor window.
+ 
 Buffers in windows
 
 To display a buffer in any window, put the
@@ -380,40 +399,40 @@ Editing
 
 You can edit the text in any window, including
 the viewer window. You can edit anything;
-there are no read-only buffers. Sometimes it
-is useful to cut and paste viewer window
-contents, or wrap lines to fit them into the
-narrow viewer window.
+there are no read-only buffers. 
 
-To enter text, just type. The BACKSPACE and
-ENTER keys, and our scrolling and search keys,
-work as expected. There are many other editing
-keys, see keys.txt. All the usual editing
-operations, including cut and paste within or
-between windows and buffers, and various
-formatting operations, are provided.
+To enter text, just position the cursor where
+you want it and type. ENTER, BACKSPACE, and
+the arrow keys all have the expected effect.
+Piety provides editing keys for moving around
+in the buffer and for searching, selecting,
+deleting, cutting, pasting, and formatting
+text.
+ 
+The editing keys work the same as in the Emacs
+editor.
 
-All the editing keys work the same as in the
-Emacs editor.  
+Editing deserves its own tutorial, but at this
+time we don't have one. In the meantime, you
+can consult keys.txt and experiment in
+scratch.txt. 
 
-The editor is line oriented. You can cut and
-paste words or sequences of words within a
-line, or you can cut and paste entire lines or
-sequences of lines. But, you cannot cut and
-paste a section of text that begins in the
-middle of one line and ends in the middle of
-another line.
+Wrapping long lines
 
-Line oriented ... within line vs. multiline
-Many editing commands also
-work within the REPL command line, and within
-responses to prompts.
+One editing operation you will need soon is
+wrapping long lines, so you can fit them into
+windows, especially the narrow viewer window.
 
-Cut and paste ...
+In the scratch.txt buffer, find the line near 
+the end that begins 'Here is a long line ...'.
+Put the cursor at the start of this line.
+Type M-q to wrap the line so it fits in the
+window. Now you can see all of its text in two
+consecutive lines.
 
-Formattng ... auto left margin ...
-M-q fill line or region
-
+To restore the single long line, put the
+cursor at the beginning of the second line and
+type BACKSPACE to join it to the first.
  
 Commands
 
@@ -519,7 +538,8 @@ You can browse the web in the Piety desktop.
 Downloaded web pages appear in editor buffers.
 The pages do not appear in the list of
 ordinary buffers shown by typing C-x C-b. Type
-C-x C-w to show the list of web page buffers.
+C-x C-w to show *Webpages*, the list of web
+page buffers.
 
 To get started web browsing, type C-x C-b to
 display the list of ordinary buffers, then put
@@ -532,6 +552,14 @@ hn = 'https://news.ycombinator.com/'
 and type C-o. The Hacker News front page
 appears in the viewer window.
 
+The URL for the web page appears in the 
+first line of the buffer, along with a 
+timestamp telling when the page was loaded.
+If the URL is long, the timestamp may be 
+pushed off the right side of the window.
+To see it, wrap the line: put the cursor
+on that first line and type M-x.
+ 
 Hacker News is a 'link aggregator' with a
 'front page' where each entry contains a link
 to an 'article page' elsewhere on the web,
@@ -550,7 +578,7 @@ other window, an editor window. The URL does
 not have to be in a web page -- it can be in
 any kind of buffer. You can create files that
 contain URLs and other notes you want to save,
-our urls.py is just and example.
+our urls.py is just an example.
  
 In the Hacker News front page in the viewer
 window, scroll to an interesting entry and put
@@ -646,9 +674,16 @@ This is useful when you see a URL printed
 somewhere but you don't already have a buffer
 that contains the URL string.
 
-... gr(hn) ...
+The file urls.py assigns each URL string to 
+a variable, so you can just pass that variable
+to the command: gr(hn)
 
-Reload page ...
+Sometimes you want to reload a page that is
+frequently updated, like a front page or a
+comments page.  C-x C-l reloads the page in
+the current buffer. Notice the time stamp
+updates. (This command actually creates new
+buffers for the latest version.)
  
 You can delete web page buffers one by one
 with C-x k in the usual way. The command
@@ -656,12 +691,28 @@ clear_webpages() deletes all the web page
 buffers from the session (all the buffers
 whole names end in .html or .htxt).
 
-FIXME
-Be warned that at this time the web browsing
-code is quite fragile. For example, attempting
-to load a web page that does not exist (that
-gets a 404 error) causes a crash. See the
-section below, Recovering from errors.
+Be warned that web browsing with Piety can be
+frustrating, because many web sites reject
+requests from a homemade browser. Instead,
+they respond with HTTP Error 403: Forbiden, or
+429: Too Many Requests, or some other error
+code. They are trying to avoid being exploited
+by robots -- which Piety is not, but the sites
+can't see that. The User-agent string in
+Piety's HTTP requests includes the string
+'Lynx', which sometimes helps, but not often.
+
+When Piety receives an HTTP Error, it displays
+a traceback that shows the error code at the end,
+in the *Errors* buffer in the viewer window.
+You can then go on to try another web site.  
+Sometimes trying the same site again later works.
+
+To see a sample *Errors* page, try to load the
+last URL in urls.py. Display urls.py in the
+viewer window, put the cursor on the last
+line, that begins notfound = ..., and type
+M-o.
  
 Python programming
 
@@ -692,61 +743,76 @@ Type C-x C-r to save the current buffer -- a
 Python module -- and reload it into the
 session.
 
+Attempting to reload a module can fail if the
+revised code contains errors. This happens
+often -- any syntax error causes reload to
+fail. If reload fails, the traceback appears
+in the *Errors* buffer in the viewer window.
+You can then edit the module to correct the
+error, and try to reload again.
+  
+To see an example of an *Errors* page on reload,
+put the cursor in any buffer which does not
+hold a Python module, such as scratch.txt,
+and type C-x C-r.   Piety attempts to reload 
+it and fails with a traceback which appears
+in *Errors*.  In this case the error shown at
+the end of the traceback is KeyError, because 
+the buffer name is not a key in the dictionary
+of modules loaded in the session.
+
 Use sh('git ...') to invoke commands of the 
 git version control system. 
 
 Quitting the desktop
 
-Type the command quit() to quit the desktop, exit Python, and return
-to the host system command prompt.  The command quit() prints the list of
-unsaved buffers and ask you if you really want to quit.
+Type the command quit() to quit the desktop,
+exit Python, and return to the host system
+command prompt. The command quit() prints the
+list of unsaved buffers and ask you if you
+really want to quit.
 
-The command unsaved() just prints the list of unsaved buffers.
+The command unsaved() just prints the list of
+unsaved buffers.
 
-Recovering from errors
-
-Desktop windows can be defaced by unwanted
-characters from sources outside Piety.
-The viewer window can be chopped up by text
-overflowing editor windows (due to errors that
-should be fixed).
-
-Windows can often be repaired by refreshing
-them (redrawing their buffer contents). Type
-C-l to refresh the current editor window, or
-M-l to refresh both editor windows. Type M-m
-to refresh the viewer window, even when the
-cursor is in an editor window.
-
+Recovering from crashes
+ 
 Errors and exceptional conditions can cause
 the Piety code to crash (terminate suddenly,
 often printing diagnostic information called a
-traceback). For example, at this time,
-attempting to load a web page that does not
-exist (that gets a 404 error) causes a crash.
-(We should fix this so these errors are
-handled more gracefully.)
+traceback). 
 
 Fortunately, a crash usually just affects
 the function containing the error. Other data
 including the session state are unaffected, so
 unsaved work is not lost and the Piety session
-can be resumed.
+can continue.
 
-Usually, a crash returns control to the Python
-REPL, and you often see the >>> prompt after
-the traceback. However, you often find that
-your typing does not appear -- the characters you 
-type are read by Python, but not echoed to the
-display. To remedy this, type the function
+Some tracebacks are handled by our *Errors*
+page (see Web browsing and Python programming
+above). After *Errors* appears, you can
+continue the session, and perhaps try to
+correct the error -- or avoid it.
+
+A crash that is not handled by *Errors* often
+scatters poorly formatted traceback text all
+over the display. Usually, control returns to
+the Python REPL, and you often see the >>>
+prompt after the traceback. However, you often
+find that your typing does not appear -- the
+characters you type are read by Python, but
+not echoed to the display.
+
+To remedy this, type the function
 call tl(), including the empty parentheses.
 You will not see this either. If Python
 responds with error messages, type ENTER and
 try to type tl() again. If you do not see an
 error message, the call was probably
-successful and you can resume typing. Usually
-you type pm() to return to a window, then type
-C-l, M-l and M-m to refresh windows.
+successful, echoing is restored, and you can
+resume typing. Usually you type pm() to return
+to a window, then type C-l, M-l and M-m to
+refresh windows.
  
 More
 
