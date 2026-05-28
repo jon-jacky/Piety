@@ -74,7 +74,7 @@ Below both panels is the Python *REPL region*. that extends the
 full width of the display.
 
 <img src="../screenshots/editor_sked_edsel_directory_sl.png"
- alt="Piety Desktop" width=67% height=67%>
+ alt="Piety Desktop showing code and directory listing" width=67% height=67%>
 
  
 ### Workflow ###
