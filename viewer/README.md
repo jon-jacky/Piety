@@ -10,10 +10,10 @@ manager in a single full-screen terminal.
 <!-- ![Piety desktop](../screenshots/editor_sked_edsel_directory.png)
 
 Use HTML (below) instead of this markdown to adjust size.
-width=50% [Aworks but width="960" does *not* work.
+width=50% [works but width="960" does *not* work.
 -->
 
-<img src="../screenshots/editor_sked_edsel_directory_sl.png"
+<img src="../screenshots/desktop_startup.png"
  alt="Piety Desktop" width=67% height=67%>
 
 [Quick Start](#Quick-Start)  
@@ -28,7 +28,9 @@ width=50% [Aworks but width="960" does *not* work.
 
 There isn't any installation procedure. There are no
 dependencies. Just clone the Piety repository under
-your home directory.
+your home directory:
+
+    git clone  https://github.com/jon-jacky/Piety.git
 
 Run this command to put the Piety modules on your
 *PYTHONPATH*, so you can run them from any directory.
@@ -49,12 +51,15 @@ Run this command to start the desktop:
 
 The desktop appears, with the windows showing
 the buffers named in a startup file (see
-[Files](#Files)). Depending on the startup
-file, the cursor might be at the Python prompt
-at the bottom of the display, or in one of the
-windows. Now you can run the desktop by typing
-[commands](#Commands) at the Python prompt, or
-by typing [keycodes](#Keycodes) in a window.
+[Files](#Files)). 
+
+If this is your first time using Piety, it will
+be helpful to read and work through the interactive
+tutorial displayed in the window on the right.
+
+After you become familiar, you can run the desktop by typing
+[commands](#Commands) at the Python prompt, or by typing
+[keycodes](#Keycodes) in a window.
 
 ### Appearance ###
 
@@ -67,6 +72,10 @@ vetically.  The viewer panel can only contain one window.
 
 Below both panels is the Python *REPL region*. that extends the
 full width of the display.
+
+<img src="../screenshots/editor_sked_edsel_directory_sl.png"
+ alt="Piety Desktop" width=67% height=67%>
+
  
 ### Workflow ###
 
