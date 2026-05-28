@@ -19,7 +19,12 @@ sample_text = \
 
 This is the buffer scratch.txt, where you can practice editing.
 
-Here is some sample text:
+To enter text, just position the cursor where you want it and type.
+ENTER, BACKSPACE, and the arrow keys all have the expected effect. Piety
+provides editing keys for moving around in the buffer and for searching,
+selecting, deleting, cutting, pasting, and formatting text. See keys.txt
+
+Here is some sample text to practice on:
 
 Piety is a small but self-contained personal computer operating system for
 programmers.  It provides a responsive and malleable platform for writing
@@ -50,7 +55,7 @@ except:
     searchstring = 'def ' # reassigned by s(earch), r(everse) and c(hange) cmds
     replacestring = '??? ' # reassigned by c(hange) command
     pagesize = 12         # reassigned by v and rv page up/down commands
-    saved = False         # True when no unsaved changes, safe to run e(dit).
+    saved = True          # True when no unsaved changes
     lmargin = 0           # left margin for wrap
     rmargin = 72          # right margin for wrap
     nindent = 4           # N of spaces to indent or outdent

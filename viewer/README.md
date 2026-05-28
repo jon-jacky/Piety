@@ -45,7 +45,7 @@ columns across the full width of the display.
 
 Run this command to start the desktop:
 
-    python3 -im vpm
+    python3 -im desktop
 
 The desktop appears, with the windows showing
 the buffers named in a startup file (see
@@ -136,8 +136,8 @@ below), instead of typing commands in the REPL.
 
 Session management:
 
-- **pm()** - Switch from the REPL to display editing
-    in the focus window.
+- **ve()** - Switch from the REPL to display editing
+    in the focus window.  *pm()* also works.
 
 - **quit()** - Prompts *Are you SURE ...?* If the
     response starts with *y* or *Y*, exits the Piety
@@ -145,7 +145,7 @@ Session management:
 
 - **vwin()** - Create the viewer window to the right
     of the editor panel, if it does not already exist. Not
-    needed if you start the Piety session from the *vpm*
+    needed if you start the Piety session from the *desktop*
     script, as described in *Quick Start* above.
 
 - **vclr()** - Erase viewer window from the display,
@@ -336,7 +336,8 @@ Viewer window contents:
 Keycodes you can type to invoke desktop
 [commands](#Commands) (above) while in display editing
 mode. To get to display editing mode from the Python
-prompt in the REPL, type the function call *pm()*.
+prompt in the REPL, type the function call *ve()*
+(*pm()* also works).
 
 Here *C-x*, *control-X*, means hold down the *ctrl*
 key while you type the *X* key. *M-x*, *meta-X*, means
@@ -350,14 +351,15 @@ Session management:
 
 - **M-x** - Exit display editing and return to the
     the Python command line. To return to display
-    editing again, type the command *pm()*.
+    editing again, type the command *ve()*.
+    *pm()* also works.
     
 - **M-y** - Type just one command at the Python
     prompt, then return immediately to display editing,
     without having to type *pm()*.
 
 - **C-x 3** - Create viewer panel.  Not needed if session
-    was started from the *vpm* script.
+    was started from the *desktop* script.
 
 - **C-x 1** - Delete viewer panel, if viewer panel has
     focus.   Needed only for testing *C-x 3*.
@@ -444,10 +446,10 @@ These files are in the *Piety/viewer* directory:
 - **viewer.py**: Source code for the viewer window, including the
     keys and commands.
 
-- **vpm.py**: Script to start a Piety desktop session.
+- **desktop.py**: Script to start a Piety desktop session.
 
-- **vmp_startup.py**:  Script to configure the Piety desktop
-    at startup, called by *vpm.py*.
+- **desktop_startup.py**:  Script to configure the Piety desktop
+    at startup, called by *desktop.py*.
     
 ### Influences ###
 

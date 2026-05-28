@@ -1,4 +1,4 @@
-# Start pmacs editor full screen with viewer panel in any dir: python3 -im vpm
+# Start pmacs editor with viewer panel in any dir: python3 -im desktop
 # First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
 import sked
 from sked import *
@@ -10,7 +10,7 @@ import console
 from console import *
 import editline
 import pmacs
-from pmacs import pm
+from pmacs import pm, ve, ved
 import urls
 from urls import *
 import get
@@ -26,5 +26,6 @@ from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin()
-import vpm_startup  # any new identifiers will appear vmp_startup module
+import desktop_startup # load buffers into editor
+
  

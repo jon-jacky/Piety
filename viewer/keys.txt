@@ -50,6 +50,11 @@ C-t  Scroll viewer down
 M-t  Scroll viewer up
 M-(  Move to top of buffer in viewer
 M-)  Move to bottom of buffer in viewer
+M-n  Move down to next line in viewer
+M-p  Move up to previous line in viewer
+
+Effects of M-n and M-p are not visible
+until you switch to viewer window
  
 Search and replace
 
@@ -192,13 +197,21 @@ C-x C-l  Reload web page shown in current
                  
 Python
 
-C-x C-r  Write module to file and reload
-
-M-x  Move cursor from window to REPL
-pm() Move cursor from REPL to window
+M-x  Move cursor from window to Python REPL
+ve() Move cursor from REPL back to window
+     pm() does the same thing, appears in 
+     older Piety documentation
 
 M-y  Enter and run a single Python command 
      then return to window
+
+C-p  Retrieve previous command in history
+     repeat to retrieve older commands
+C-n  Retrieve next command in history
+     use after C-p commands.
+          
+C-x C-r  Write module to file and reload
+
 
 More
 

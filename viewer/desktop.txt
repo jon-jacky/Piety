@@ -1,6 +1,6 @@
 
                  P i e t y
-                =========
+                 =========
                 
 This is the Piety desktop, a self-contained 
 computing environment running in a single
@@ -407,7 +407,7 @@ the arrow keys all have the expected effect.
 Piety provides editing keys for moving around
 in the buffer and for searching, selecting,
 deleting, cutting, pasting, and formatting
-text.
+text.  See keys.txt
  
 The editing keys work the same as in the Emacs
 editor.
@@ -491,11 +491,16 @@ quotes.  This is necessary to run shell commands
 that have not been provided as Python functions,
 for example git version control commands. 
 
-When you are finished using the Python REPL, 
-type the command pm() to return the cursor to
-the desktop window you were most recently using.
+When you are finished using the Python REPL,
+type the command ve() ('visual editor') to
+return the cursor to the desktop window you
+were most recently using.
 
-Try it, type pm() at the REPL.  Now type
+T he command pm() also returns the cursor 
+to the window. Some older Piety documentation
+uses pm() not ve().
+
+Try it, type ve() at the REPL.  Now type
 C-x C-d to confirm that the new default
 directory is still the viewer subdirectory.
  
@@ -513,7 +518,7 @@ using BACKSPACE and then typing new text.
 You can use the M-y key to enter just a
 single Python statement on the prompt line,
 and then return to the desktop window
-immediately, without having to type the pm()
+immediately, without having to type the ve()
 command. Using C-p (etc.) to access command
 history and ??? to cancel the request also
 work at this prompt.
@@ -772,8 +777,8 @@ command prompt. The command quit() prints the
 list of unsaved buffers and ask you if you
 really want to quit.
 
-The command unsaved() just prints the list of
-unsaved buffers.
+Type the command unsaved() at any time to
+print the list of unsaved buffers.
 
 Recovering from crashes
  
@@ -810,7 +815,7 @@ responds with error messages, type ENTER and
 try to type tl() again. If you do not see an
 error message, the call was probably
 successful, echoing is restored, and you can
-resume typing. Usually you type pm() to return
+resume typing. Usually you type ve() to return
 to a window, then type C-l, M-l and M-m to
 refresh windows.
  

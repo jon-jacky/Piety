@@ -160,6 +160,8 @@ def o2():
         return
     fr.o2()
 
+# FIXME?  # C-x o does *not* map to on() in this module, nor does any other key
+# Instead C-x o maps to edpanel_key which calls oe or fr.on
 def on():
     'Disable editor function that does not work in viewer window'
     if viewer_focus():
@@ -471,8 +473,11 @@ def save_reload():
                                 'Traceback from save_reload(): '))
 
 dmacs.keymap[key.C_x + '3'] = vwin
-dmacs.keymap[key.C_x + '1'] = vclr_key
+dmacs.keymap[key.C_x + '1'] = vclr_key # if viewer_focus: vlcr() else: fr.o1()
+dmacs.keymap[key.C_x + '2'] = o2 # o2 in this module, not fr.o2
 dmacs.keymap[key.C_x + 'v'] = ov
+# C-x o does *not* map to on() in this module, nor does any other key
+# Instead C-x o maps to edpanel_key which calls oe in this module  or fr.on
 dmacs.keymap[key.C_x + 'o'] = edpanel_key
 dmacs.keymap[key.C_l] = refresh
 
