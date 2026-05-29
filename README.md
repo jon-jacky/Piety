@@ -93,7 +93,7 @@ is now the main branch; I will  never merge it back into *master*.
 
 ## Quick Start ##
 
-<img src="../screenshots/desktop_startup.png"
+<img src="screenshots/desktop_startup.png"
  alt="Piety Desktop at startup" width=67% height=67%>
 
 There isn't any installation procedure. There are no
