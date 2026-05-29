@@ -119,7 +119,7 @@ Run this command to start the desktop:
 
     python3 -im desktop
 
-The desktop appears, with the windows showing
+The desktop appears (pictured above), with the windows showing
 the buffers named in a startup file.
 
 If this is your first time using Piety, it will
