@@ -6,7 +6,7 @@ Piety
 
 [Motivation and Goals](#Motivation-and-Goals)  
 [Current Status](#Current-Status)  
-[No Dependencies](#No-Dependencies)  
+[Quick Start](#Quick-Start)  
 [Demos](#Demos)  
 [Screenshots](#Screenshots)   
 [Roadmap](#Roadmap)  
@@ -91,15 +91,40 @@ An archive of the earlier version of Piety that was abandoned in January 2023
 is here in the  *master* branch and *version1* tag.  The *rewrite* branch
 is now the main branch; I will  never merge it back into *master*.
 
-## No Dependencies ##
+## Quick Start ##
 
-The Piety system has no dependencies, other than Python itself,
-including a few standard library modules.  
+<img src="../screenshots/desktop_startup.png"
+ alt="Piety Desktop at startup" width=67% height=67%>
 
-With no dependencies, it is easy to try out Piety. Just clone this Piety
-repository and use your system's built-in *python* (or *python3*)
-command to run the scripts. You do not need to set up any Python
-environment.
+There isn't any installation procedure. There are no
+dependencies. Just clone the Piety repository under
+your home directory:
+
+    git clone  https://github.com/jon-jacky/Piety.git
+
+Run this command to put the Piety modules on your
+*PYTHONPATH*, so you can run them from any directory.
+Note the dot at the beginning of the command:
+
+    . ~/Piety/bin/paths      
+
+The Piety desktop can run in a terminal window
+expanded to full screen in a graphical desktop, or in
+a full screen text-only console.
+
+Select a font size that can display at least 135
+columns across the full width of the display.
+
+Run this command to start the desktop:
+
+    python3 -im desktop
+
+The desktop appears, with the windows showing
+the buffers named in a startup file.
+
+If this is your first time using Piety, it will
+be helpful to read and work through the interactive
+tutorial displayed in the window on the right.
  
 ## Demos ##
 
@@ -162,6 +187,7 @@ Details in [platforms.md](doc/platforms.md).
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised Sep 2025
+Revised May 2026
+
 
 
