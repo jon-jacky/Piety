@@ -140,6 +140,9 @@ A few of the demos are not very interactive, so can be run from scripts:
 [pmacs_script.py](piety/pmacs_script.py) and
 [edsel_script.py](piety/edsel_script.py).
 
+At this time, the demos do not run in the Piety desktop.   Each demo runs
+in its own Python session, as described in its instructions.
+
 ## Screenshots ##
 
 The pages about the Piety [desktop](viewer/README.md), 
