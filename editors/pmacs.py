@@ -297,7 +297,10 @@ def pm():
     rpm() # raw pm, assumes term is already in char mode, doesn't restore mode
     terminal.set_line_mode()
 
-# Synonyms for pm, possibly more mnemonic or memorable: 'visual editor'
-ve = pm
-ved = pm
+# Synonyms for pm, possibly more memorable: 'visual editor', 'display editor'
+ve = pm   # visual editor
+ved = pm  # visual editor
+de = pm   # display editor
+ee = pm   # editor
+
 

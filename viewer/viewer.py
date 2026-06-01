@@ -10,7 +10,7 @@ modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
-import os
+import os, sys
 import key, dmacs, display, shell, render, console, get
 import sked as ed, edsel as fr
 import traceback
@@ -472,6 +472,47 @@ def save_reload():
                                 lambda: print_traceback(dmacs.sr_tb), 
                                 'Traceback from save_reload(): '))
 
+# Next, sys.excepthook: catch-all handler for exceptions not handled elsewhere
+
+# DEBUG All global so we can inspect in REPL
+type = None
+value = None
+tb = None
+tb_no = 0
+tb_str = ''
+tb_list = []
+
+def print_traceback_list(traceback_list):
+    """
+    Print lines from multiline tb_list returned by traceback.format_exception
+    Works with redirect_stdout to our text buffers.
+    Imitates code in our python/pyhelp.py and unix/shell.py
+    """
+    for line in traceback_list:
+        print(line)
+   
+def traceback_window(type_arg, value_arg, tb_arg): # don't shadow traceback module
+        global type, value, tb, tb_no, tb_str, tb_list
+        type = type_arg
+        value = value_arg        
+        tb = tb_arg
+        tb_no += 1
+        # Google AI advises passing just value_arg here for v >= 3.10,
+        #  not all three args type_arg, value_arg, tb_arg as I did before
+        tb_list = traceback.format_exception(value_arg)
+        tb_str = ''.join(tb_list) + '\n\n' # extra blank lines at the bottom
+        viewer_window(lambda: redirect('*Errors*', 
+                                lambda: print_traceback(tb_str),
+                           'Traceback printed by Piety custom sys.excepthook'))
+        dmacs.terminal.set_line_mode() # restore echo after crash
+         
+sys.excepthook = traceback_window
+   
+# DEBUG for testing excepthook
+def crash(): 1/0
+def deep_crash(): crash()
+dmacs.keymap[key.C_z] = deep_crash 
+                                 
 dmacs.keymap[key.C_x + '3'] = vwin
 dmacs.keymap[key.C_x + '1'] = vclr_key # if viewer_focus: vlcr() else: fr.o1()
 dmacs.keymap[key.C_x + '2'] = o2 # o2 in this module, not fr.o2
@@ -518,7 +559,7 @@ dmacs.keymap[key.M_o] = (lambda: loader(this_window=False))
 # C-x C-b - list buffers without webpages, C-x C-w list .html buffers
 dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N or browser.NM
 dmacs.keymap[key.C_x + key.C_w] = W # W defined above, not browser.W 
- 
+  
 def quit():
     """
     Ask for confirmation, then exit Piety and Python.

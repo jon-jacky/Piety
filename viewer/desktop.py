@@ -10,7 +10,7 @@ import console
 from console import *
 import editline
 import pmacs
-from pmacs import pm, ve, ved
+from pmacs import pm, ve, ved, de, ee # current favorite: de display editor
 import urls
 from urls import *
 import get
