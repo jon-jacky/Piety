@@ -664,8 +664,8 @@ def clr():
 def graffiti():
     'Write on every line in frame, but not in buffer.  For testing refresh'
     for i in range(flines): # every line in frame
-        display.put_cursor(i+1,2*i) # increasing indent to get diagonal strip
-        display.putstr(string.printable[i]*8) # len(string.printable) -> 100
+        display.put_cursor(i+1,4*i) # increasing indent to get diagonal strip
+        display.putstr(string.printable[i]*16) # len(string.printable) -> 100
     restore_cursor_to_cmdline()
 
 def quit():

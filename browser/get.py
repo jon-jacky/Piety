@@ -241,8 +241,8 @@ def clear_webpages():
                     or '.htxt' in buf['bufname']))
         
 # Add keycodes for browser operations to keymap 
-dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
-                           # FIXME?  Overrides M_g: edsel.graffiti in dmacs
+# dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
+# NOT -  Overrides M_g: edsel.graffiti in dmacs                           
 # key.C_o entry is now assigned in viewer.py
 # dmacs.keymap[key.C_o] = grx # get and render page at URL on current line
   

@@ -212,16 +212,18 @@ Refreshing windows
 Desktop windows can be defaced by unwanted
 characters from sources outside Piety -- like
 messages from the host operating system.
-Or, the viewer window might be chopped up by
-text overflowing editor windows (due to errors
-in Piety code that should be fixed).
+Or, they might be defaced by errors in the
+Piety code itself.
 
 Windows can often be repaired by refreshing
-them (redrawing their buffer contents). Type
-C-l to refresh the current editor window, or
-M-l to refresh both editor windows. Type M-m
-to refresh the viewer window, even when the
-cursor is in an editor window.
+them (redrawing their buffer contents). 
+
+To demonstrate, type M-g - 'graffiti' - to
+write text over all three windows.  Now 
+type C-l to refresh the current window,
+or M-l to refresh both editor windows. Type
+M-m to refresh the viewer window, even when
+the cursor is in an editor window.
  
 Buffers in windows
 
@@ -568,7 +570,7 @@ timestamp telling when the page was loaded.
 If the URL is long, the timestamp may be 
 pushed off the right side of the window.
 To see it, wrap the line: put the cursor
-on that first line and type M-x.
+on that first line and type M-q.
  
 Hacker News is a 'link aggregator' with a
 'front page' where each entry contains a link
@@ -808,6 +810,13 @@ type de() to return to a window.   You
 may need to type C-l, M-l, or M-m to refresh
 windows.
 
+You can deliberately crash Piety by typing
+C-z. Try it. A traceback appears in *Errors*
+in the viewer. The end of the traceback
+indicates the crash was due to a
+ZeroDivisionError, and shows the line of code
+that caused the crash.
+ 
 Some errors cause the terminal itself to stop
 working properly.  The cursor might freeze --
 it does not move when you type codes or use
@@ -835,5 +844,5 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
 
-Revised May 2026
+Revised June 2026
   

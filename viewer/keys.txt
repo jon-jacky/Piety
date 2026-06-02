@@ -162,6 +162,10 @@ apply only to the current line.
 
 Refresh
 
+M-g  Print defacing text - 'graffiti - 
+     in editor and viewer windows, 
+     to prepare for testing refresh keys.
+     
 C-l  Refresh current editing window
 M-l  Refresh both editing windows
 M-m  Refresh viewer window
@@ -193,14 +197,14 @@ C-o  When on first line of web page buffer
 
 C-x C-l  Reload web page shown in current 
          buffer, needn't be on first line.
-
-                 
+                  
 Python
 
 M-x  Move cursor from window to Python REPL
-ve() Move cursor from REPL back to window
+de() Move cursor from REPL back to window
      pm() does the same thing, appears in 
-     older Piety documentation
+     older Piety documentation.
+     ve() ved() ee() also work.
 
 M-y  Enter and run a single Python command 
      then return to window
@@ -212,6 +216,9 @@ C-n  Retrieve next command in history
           
 C-x C-r  Write module to file and reload
 
+C-z  Cause crash in Piety Python code.
+     to test printing traceback in *Errors* 
+     buffer in viewer window
 
 More
 
@@ -221,5 +228,5 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md 
       
-Revised May 2026
+Revised June 2026
 
