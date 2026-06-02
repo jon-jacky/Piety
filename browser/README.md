@@ -12,7 +12,7 @@ Downloaded web pages are stored and displayed in editor buffers.
 [Appearance](#Appearance)   
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
-[Other Instructions](#Other-Instructions)
+[Other Instructions](#Other-Instructions)   
 [HTML Tags](#HTML-Tags)   
 [div Classes](#div-Classes)   
 [Base URLs](#Base-URLs)   

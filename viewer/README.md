@@ -21,7 +21,7 @@ width=50% [works but width="960" does *not* work.
 [Workflow](#Workflow)  
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
-[Other Instructions](#Other-Instructions)
+[Other Instructions](#Other-Instructions)   
 [Files](#Files)   
 [Influences](#Influences)
 
