@@ -453,15 +453,19 @@ system shell. They print their output to the
 end of the *Console* buffer in the viewer
 window.
 
-For example, type the command pwd() to print
+If you make an error while typing a command,
+an error message appears in the *Errors* buffer
+in the viewer window, nof in the REPL region.
+
+Try it. type the command pwd() to print
 the current working directory in *Console*. On
 the following line in the REPL, the Python
 prompt reappears, with the cursor ready for
 you to type another statement. 
 
-For example, type the command cd('viewer') to
+Type the command cd('viewer') to
 change to the viewer subdirectory. Then
-repeate the pwd() command to confirm that is
+repeat the pwd() command to confirm that is
 the new working directory.  Type ls() to
 show the short form directory listing for
 the current directory, lsl() to show the
@@ -490,17 +494,18 @@ Just enclose the entire shell command within
 quotes.  This is necessary to run shell commands
 that have not been provided as Python functions,
 for example git version control commands. 
-
+ 
 When you are finished using the Python REPL,
-type the command ve() ('visual editor') to
+type the command de() ('display editor') to
 return the cursor to the desktop window you
 were most recently using.
 
-T he command pm() also returns the cursor 
+The command pm() also returns the cursor 
 to the window. Some older Piety documentation
-uses pm() not ve().
+uses pm() not de().  The commands ve() ved() 
+and ee() also work.
 
-Try it, type ve() at the REPL.  Now type
+Try it, type de() at the REPL.  Now type
 C-x C-d to confirm that the new default
 directory is still the viewer subdirectory.
  
@@ -518,7 +523,7 @@ using BACKSPACE and then typing new text.
 You can use the M-y key to enter just a
 single Python statement on the prompt line,
 and then return to the desktop window
-immediately, without having to type the ve()
+immediately, without having to type the de()
 command. Using C-p (etc.) to access command
 history and ??? to cancel the request also
 work at this prompt.
@@ -793,32 +798,33 @@ including the session state are unaffected, so
 unsaved work is not lost and the Piety session
 can continue.
 
-Some tracebacks are handled by our *Errors*
-page (see Web browsing and Python programming
-above). After *Errors* appears, you can
-continue the session, and perhaps try to
-correct the error -- or avoid it.
+Most crashes cause a traceback to appear in
+the *Errors* buffer in the viewer window (see
+Web browsing and Python programming above).
+After *Errors* appears, the cursor moves to
+the REPL. From there, you can type any
+commands to resume the session. Often, you
+type de() to return to a window.   You
+may need to type C-l, M-l, or M-m to refresh
+windows.
 
-A crash that is not handled by *Errors* often
-scatters poorly formatted traceback text all
-over the display. Usually, control returns to
-the Python REPL, and you often see the >>>
-prompt after the traceback. However, you often
-find that your typing does not appear -- the
-characters you type are read by Python, but
-not echoed to the display.
+Some errors cause the terminal itself to stop
+working properly.  The cursor might freeze --
+it does not move when you type codes or use
+the arrow keys. Sometimes, typing C-q fixes
+this. Other times, using the mouse or trackpad
+to move the cursor to another location works.
 
-To remedy this, type the function
-call tl(), including the empty parentheses.
-You will not see this either. If Python
-responds with error messages, type ENTER and
-try to type tl() again. If you do not see an
-error message, the call was probably
-successful, echoing is restored, and you can
-resume typing. Usually you type ve() to return
-to a window, then type C-l, M-l and M-m to
-refresh windows.
- 
+The terminal might stop echoing -- when you 
+type in the REPL, characters do not appear.
+Sometimes you can fix this by typing the command
+tl() -- 'terminal line mode' -- and then
+typing ENTER.   This tl() command will not
+appear either, and if you typed it incorrectly, 
+an error message will appear. If you do manage
+to type tl() correctly, echoing might resume
+and you can see the commands again.
+
 More
 
 There is more about the Piety desktop we have

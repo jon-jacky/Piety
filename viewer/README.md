@@ -14,13 +14,14 @@ width=50% [works but width="960" does *not* work.
 -->
 
 <img src="../screenshots/desktop_startup.png"
- alt="Piety Desktop" width=67% height=67%>
+ alt="Piety Desktop at startup" width=67% height=67%>
 
 [Quick Start](#Quick-Start)  
 [Appearance](#Appearance)   
 [Workflow](#Workflow)  
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
+[Other Instructions](#Other-Instructions)
 [Files](#Files)   
 [Influences](#Influences)
 
@@ -438,6 +439,13 @@ Navigating within windows:
 - **C-x l** - Refresh focus window, an editor or viewer window.
 
 - **M-m** - Refresh viewer window while editor window has focus.
+
+
+### Other Instructions ###
+
+Other instructions for using the desktop appear in the files
+*viewer/desktop.txt* and *viewer/keys.txt*.   These files are usually
+loaded into the Piety session at startup.
 
 ### Files ###
 

@@ -12,6 +12,7 @@ Downloaded web pages are stored and displayed in editor buffers.
 [Appearance](#Appearance)   
 [Commands](#Commands)   
 [Keycodes](#Keycodes)   
+[Other Instructions](#Other-Instructions)
 [HTML Tags](#HTML-Tags)   
 [div Classes](#div-Classes)   
 [Base URLs](#Base-URLs)   
@@ -229,7 +230,13 @@ web pages.
  - **C-x b** - Invokes *b()*, return to previous buffer.
               Can be used like a browser 'Back button'
                 to return to the page from which a link was loaded.  
-                
+
+### Other Instructions ###
+
+Other instructions for using the browser appear in the files
+*viewer/desktop.txt* and *viewer/keys.txt*. These files are usually
+loaded into the Piety session at startup.
+
 ### HTML Tags ###
 
 The Piety browser only renders these HTML tags:
