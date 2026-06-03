@@ -6,7 +6,7 @@ There are four editors here, each built by extending (importing) its
 predecessors. *sked* is a line editor inspired by the classic Unix *ed*,
 operated by calling its functions at the Python REPL. *edsel* adds
 display windows to *sked*. *dmacs* supplements the *edsel* REPL with
-Emacs control keys. *pmacs* enriches *dmacs* with more flexible display
+control keys. *pmacs* enriches *dmacs* with more flexible display
 editing.
 
 Each editor comprises a minimal Python programming environment.
@@ -30,20 +30,18 @@ command:
 
     . ~/Piety/bin/paths      
 
-Run this command to start *pmacs*, a display editor that uses emacs control
-keys:
+Run this command to start *pmacs*, a display editor.
 
     python3 -im pm
 
-Now you can edit almost as if you were using Emacs. Many emacs control
-keys are supported. Here are the [keys](../viewer/keys.txt) supported by
-our editors. Differences from Emacs are discussed in the sections below.
+Now you can edit, almost as if you were using Emacs -- many of the same
+control keys are supported.  Here are the [keys](../viewer/keys.txt)
+supported by *pmacs*.
 
-Below the text editing window, instead of a one line "minibuffer" as in Emacs,
-there are several scrolling lines devoted to the Python REPL.
-To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
-*alt* key while typing the *x* key).  To resume editing, type the function
-call *pm()* in the REPL.
+Below the text editing window there are several scrolling lines devoted
+to the Python REPL. To pause editing and return to the Python REPL, type
+*M-x* (*meta x*, hold the *alt* key while typing the *x* key). To resume
+editing, type the function call *pm()* in the REPL.
 
 More detailed directions appear in the sections below.  
 
@@ -79,7 +77,7 @@ More detailed directions appear in the sections below.
 - **demo**: Directory of files used by the demonstration explained in 
     *autoindent.md*.
 
-- **dmacs.py**: Display editor that invokes *edsel* commands with Emacs keys.
+- **dmacs.py**: Display editor that invokes *edsel* commands with control keys.
 
 - **dm.py**: Script to start the *dmacs* editor.
   
@@ -88,7 +86,7 @@ More detailed directions appear in the sections below.
 
 - **edsel.py**: Display editor that uses the same commands as *sked*.
 
-- **pmacs.py**: Display editor that uses Emacs control keys.
+- **pmacs.py**: Display editor that uses control keys.
 
  - **pm.py**: Script to start the *pmacs* editor.
  
@@ -254,7 +252,7 @@ automobile:
 ### dmacs ###
 
 **dmacs.py** is a display editor where you invoke *edsel* functions by 
-typing some of the emacs control keys (or key sequences). Here are the
+typing control keys (or key sequences). Here are the
 [keys](../viewer/keys.txt) supported by *dmacs*. When running *dmacs*,
 you no longer have to use the Python REPL to edit. Every *edsel*
 function can be invoked by a keystroke or two.
@@ -272,19 +270,17 @@ the *dm* script:
     python3 -im dm
 
 After you start *dmacs*, the Python prompt does not appear because Python
-is busy executing the *dm* function.  Now you can type emacs control keys
+is busy executing the *dm* function.  Now you can type control keys
 to edit.   To exit *dm* and return to the Python prompt, type the control
 key *M-x* ("meta x", formed by holding down the ALT key while you type x).
 Then the *dm* function returns and the Python prompt reappears.  Now 
 you can return to typing *edsel* function calls (or any other Python
 statements).  You can type *dm()* again to resume *dmacs*.
 
-To see what control keys are available, see the *keymap* 
-dictionary in the *dmacs.py* source code file, which associates 
-each key with its function.  Each control
-key has the same function in *dmacs* as it does in *emacs*.
-(There is one exception: *C-x C-r*, see below.).
-Here are the [keys](../viewer/keys.txt) used by *dmacs*.
+To see what control keys are available, see
+[keys.txt](../viewer/keys.txt). The *keymap* dictionary in the
+*dmacs.py* source code file associates each key with its function. Most
+control keys have the same function in *dmacs* as they do in *Emacs*.
 
 There is no control key to enter append mode. Instead, simply type RETURN
 at any time while running *dmacs*.  An empty line will open below the
@@ -306,7 +302,7 @@ line.  Type the string and press RETURN.  You can edit the string inline
 before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
-(The emacs *C-g* cancel key is not available in *dmacs*.)
+(The Emacs *C-g* cancel key is not available in *dmacs*.)
 To indicate that the string argument should be the empty string,
 type three backslashes.
 
@@ -338,19 +334,19 @@ A reason to use *M-x* to return to the Python REPL while using
 *dmacs* is to view and assign configuration variables, such as
 *sked.lmargin* etc.
 
-The name *dmacs* means 'dumb emacs' or maybe 'grade D emacs', barely above
+The name *dmacs* means 'dumb Emacs' or maybe 'grade D Emacs', barely above
 F (fail).
 
 ### pmacs ###
 
-*pmacs* is a display editor that uses Emacs control keys.
-Unlike *dmacs* and its predecessors, you do
-not have to use an append mode to enter text one line at a time.   Just type
-(or delete, or change) any amount of text anywhere at any time, as if you were
-using Emacs.
-To start *pmacs*, use the *pm* script with the command *python3 -im pm*, or import *pmacs* and call the function *pm()* at the Python REPL.
+*pmacs* is a display editor that uses [control
+keys](../viewer/keys.txt). Unlike *dmacs* and its predecessors, you do
+not have to use an append mode to enter text one line at a time. Just
+type (or delete, or change) any amount of text anywhere at any time. To
+start *pmacs*, use the *pm* script with the command *python3 -im pm*, or
+import *pmacs* and call the function *pm()* at the Python REPL.
 
-Below the text editing window, instead of a one line "minibuffer" as in Emacs,
+Below the text editing window
 there are several scrolling lines devoted to the Python REPL.
 To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
 *alt* key while typing the *x* key).  Now you can type any Python statements,
@@ -360,15 +356,13 @@ window size to 12 lines and also expand the REPL scrolling region, type
 the *edsel* function call *win(12)* in the REPL.  To resume editing,
 type the function call *pm()*.
 
-In *pmacs* you can edit several files in different buffers just as you
-would in Emacs.   
-You can have multiple windows on the display in a
-vertical stack, showing different locations in the same buffer, or
-different buffers.
-At this time you can only have two windows, because more are not useful
-in the small terminal we have available.
+In *pmacs* you can edit several files in different buffers. You can have
+multiple windows on the display in a vertical stack, showing different
+locations in the same buffer, or different buffers. At this time you can
+only have two windows, because more are not useful in the small terminal
+we have available.
 
-To see what Emacs keycodes are effective in *pmacs*, see 
+To see what keycodes are effective in *pmacs*, see 
 [Piety/viewer/keys.txt](../viewer/keys.txt). The keys are defined in the
 *keymap* dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
 
