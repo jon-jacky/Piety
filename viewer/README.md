@@ -444,8 +444,9 @@ Navigating within windows:
 ### Other Instructions ###
 
 Other instructions for using the desktop appear in the files
-*viewer/desktop.txt* and *viewer/keys.txt*.   These files are usually
-loaded into the Piety session at startup.
+[desktop.txt](desktop.txt) and [keys.txt](keys.txt). These files are
+usually loaded into the Piety session at startup, so you can easily
+display them in the viewer window.
 
 ### Files ###
 

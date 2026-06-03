@@ -35,9 +35,9 @@ keys:
 
     python3 -im pm
 
-Now you can edit almost as if you were using Emacs.  Many 
-[emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf) are
-supported.  Differences from Emacs are discussed in the sections below.
+Now you can edit almost as if you were using Emacs. Many emacs control
+keys are supported. Here are the [keys](../viewer/keys.txt) supported by
+our editors. Differences from Emacs are discussed in the sections below.
 
 Below the text editing window, instead of a one line "minibuffer" as in Emacs,
 there are several scrolling lines devoted to the Python REPL.
@@ -254,11 +254,10 @@ automobile:
 ### dmacs ###
 
 **dmacs.py** is a display editor where you invoke *edsel* functions by 
-typing some of the 
-[emacs control keys](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf)
-(or key sequences).  When running *dmacs*,
-you no longer have to use the Python REPL to edit.  Every *edsel* function 
-can be invoked by a keystroke or two.
+typing some of the emacs control keys (or key sequences). Here are the
+[keys](../viewer/keys.txt) supported by *dmacs*. When running *dmacs*,
+you no longer have to use the Python REPL to edit. Every *edsel*
+function can be invoked by a keystroke or two.
 
 To run *dmacs*, first start *sked*, then *edsel*, as described above.  Then,
 
@@ -284,7 +283,8 @@ To see what control keys are available, see the *keymap*
 dictionary in the *dmacs.py* source code file, which associates 
 each key with its function.  Each control
 key has the same function in *dmacs* as it does in *emacs*.
-(There is one exception: *C-x C-r*, see below.)
+(There is one exception: *C-x C-r*, see below.).
+Here are the [keys](../viewer/keys.txt) used by *dmacs*.
 
 There is no control key to enter append mode. Instead, simply type RETURN
 at any time while running *dmacs*.  An empty line will open below the
@@ -368,8 +368,9 @@ different buffers.
 At this time you can only have two windows, because more are not useful
 in the small terminal we have available.
 
-To see what Emacs keycodes are effective in *pmacs*, see the *keymap*
-dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
+To see what Emacs keycodes are effective in *pmacs*, see 
+[Piety/viewer/keys.txt](../viewer/keys.txt). The keys are defined in the
+*keymap* dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
 
 The *pmacs* editor provides all the functions and commands of its predecessors
 *sked*, *edsel*, and *dmacs*.  Most *pmacs* commands are actually *dmacs*
@@ -452,4 +453,5 @@ to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Nov 2024
+Revised Jun 2026
+
