@@ -96,7 +96,7 @@ Commands
 Web browsing
 Python programming
 Quitting the desktop
-Recovering from crashes
+Recovering from errors
 More
 
 Keys 
@@ -787,7 +787,7 @@ really want to quit.
 Type the command unsaved() at any time to
 print the list of unsaved buffers.
 
-Recovering from crashes
+Recovering from errors
  
 Errors and exceptional conditions can cause
 the Piety code to crash (terminate suddenly,
@@ -810,6 +810,17 @@ type de() to return to a window.   You
 may need to type C-l, M-l, or M-m to refresh
 windows.
 
+A crash might cause The terminal to stop
+echoing -- when you type in the REPL,
+characters do not appear. Sometimes you can
+fix this by typing the command tl() --
+'terminal line mode' -- and then typing ENTER.
+This tl() command will not appear either, and
+if you typed it incorrectly, an error message
+will appear. If you do manage to type tl()
+correctly, echoing might resume and you can
+see the commands again.
+
 You can deliberately crash Piety by typing
 C-z. Try it. A traceback appears in *Errors*
 in the viewer. The end of the traceback
@@ -817,22 +828,17 @@ indicates the crash was due to a
 ZeroDivisionError, and shows the line of code
 that caused the crash.
  
-Some errors cause the terminal itself to stop
-working properly.  The cursor might freeze --
-it does not move when you type codes or use
-the arrow keys. Sometimes, typing C-q fixes
-this. Other times, using the mouse or trackpad
-to move the cursor to another location works.
-
-The terminal might stop echoing -- when you 
-type in the REPL, characters do not appear.
-Sometimes you can fix this by typing the command
-tl() -- 'terminal line mode' -- and then
-typing ENTER.   This tl() command will not
-appear either, and if you typed it incorrectly, 
-an error message will appear. If you do manage
-to type tl() correctly, echoing might resume
-and you can see the commands again.
+Some errors -- not necessarily crashes --
+cause the terminal itself to stop working
+properly. The cursor might freeze -- it does
+not move when you type codes or use the arrow
+keys. Sometimes, typing C-q fixes this. 
+Or, the cursor might just disappear -- none of
+the cursor movement commands nor M-x cause it
+to reappear. In this situation, using the
+mouse or trackpad -- not the keyboard -- to
+move the cursor to another location sometimes
+restores it.
 
 More
 
