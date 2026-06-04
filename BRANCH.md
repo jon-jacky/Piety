@@ -2,8 +2,7 @@
 branches
 ========
 
-This is the *browser-desktop* branch of the *rewrite* branch:
-better integrate the Piety browser into the Piety desktop.
+This is the *rewrite* branch.
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -14,6 +13,9 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
+-  4 Jun 2026: Merge the *browser-desktop* branch back into 
+   the *rewrite* branch.
+   
 - 20 Apr 2026:  Begin the *browser-desktop* branch to
   better integrate the Piety browser into the Piety desktop.
 
