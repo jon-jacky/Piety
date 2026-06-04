@@ -840,6 +840,18 @@ mouse or trackpad -- not the keyboard -- to
 move the cursor to another location sometimes
 restores it.
 
+If nothing works to recover your session, the
+last resort is to abandon the session and start
+a new one.   This will lose any unsaved work.
+To end the session, use the host software to 
+close the terminal window that holds the Piety
+desktop. Then open a new terminal window,
+enlarge it to full screen, and at the system
+prompt, type the command to start a new
+session:
+
+ python3 -im desktop  
+
 More
 
 There is more about the Piety desktop we have
