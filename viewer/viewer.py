@@ -499,7 +499,7 @@ def traceback_window(type_arg, value_arg, tb_arg): # don't shadow traceback modu
         tb_no += 1
         # Google AI advises passing just value_arg here for v >= 3.10,
         #  not all three args type_arg, value_arg, tb_arg as I did before
-        tb_list = traceback.format_exception(value_arg)
+        tb_list = traceback.format_exception(type_arg, value_arg, tb_arg)
         tb_str = ''.join(tb_list) + '\n\n' # extra blank lines at the bottom
         viewer_window(lambda: redirect('*Errors*', 
                                 lambda: print_traceback(tb_str),
