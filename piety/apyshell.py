@@ -21,7 +21,7 @@ def setup():
     # FIXME?  Save prompt strings so they can be restored?
     sh.ps1 = '>>>> ' # different from CPython >>> and pyshell >>
     sh.ps2 = '.... ' # line up with async_ps1 and async_start_col
-    sh.start_col = 5 # not 3
+    sh.start_col = 6 # not 3, not even 5!
     sh.setup()
 
 def restore():

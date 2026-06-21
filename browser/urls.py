@@ -39,6 +39,7 @@ forth = 'https://pygmy.utoh.org/3ins4th.html'
 # Mostly text web sites but with lots of other stuff
 askmefi = 'https://ask.metafilter.com/'
 mefi = 'https://www.metafilter.com/'
+metamefi = 'https://metatalk.metafilter.com/'
 hn = 'https://news.ycombinator.com/'
 hnnew = 'https://news.ycombinator.com/newest' # Must *not* have final /
 # samples for testing

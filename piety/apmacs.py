@@ -31,4 +31,10 @@ def apmrun():
         pyshell.point = 0
         pyshell.setup() # prints prompt and refreshes command line
 
+# Synonyms for apm, possibly more memorable: 'visual editor', 'display editor'
+ave = apm   # visual editor
+aved = apm  # visual editor
+ade = apm   # display editor
+aee = apm   # editor
+
 

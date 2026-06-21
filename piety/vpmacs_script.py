@@ -1,36 +1,34 @@
-# MODIFIED FROM pmacs_script.py - this version assumes vpm.py has already run
-# vpmacs_script.py   Edit in one window while timer task updates the other:
+# vpmacs_script.py
+# async demo - You can edit in one window while a timer task updates the other.
+# This version runs in the Piety desktop, modified from  pmacs_script.py
+# Uses >>>> import vpmacs_script_import   not   >>>> run('vpmacs_script.py')
 #
-# ...$ cd Piety/piety  # so run(...) works without directory prefix
-# ...$ python3 -im vpm
-# >>> from runner import run
-# >>> run('piety.py')
-# Now event loop should be running, with async shell indicated by 4 >>>>
-# >>>> piety
-# ... EventLoop running=True ...
-# >>>> run('vpmacs_script.py')
+# ...$ python3 -im piety  # loads eventloop, defines piety and piety_start
+# >>>> piety_start()
+# >>>> import vpmacs_script
 # ... windows appear, you can start typing in scratch.txt window ...
 
-# Comment out redundant imports, vpm already imported these
-#import sked
-#from sked import *
-#import edsel  
-#from edsel import *
-
-# Imports needed for timer demo
-from atimers import ATimer
-from writer import Writer
+from edsel import e, o2, on
+from viewer import oe
 from apmacs import apm
 
-# vpm already called win()
-#win(22)
+from atimers import ATimer
+from writer import Writer
+from eventloop import piety
 
-# Timer demo
-o2()
+# So we can call it repeatedly at the REPL
+def ttask():
+    return piety.create_task(ta.atimer(1000, 1, 'A', abuf))
+
+oe() # put cursor in editor window
+o2() # split editor window
 e('a.txt')
-ta = ATimer()
+ta = ATimer()  
 abuf = Writer('a.txt')
-ta_task = piety.create_task(ta.atimer(1000,1,'A',abuf))
-on() # next window
-# apm() # begin display editing # DEBUG - type this at command line.
+ta_task = ttask()
+on() # put cursor in other window so we can edit
+apm() # resume display editing in windows
+
+
+
 

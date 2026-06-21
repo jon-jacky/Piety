@@ -1,6 +1,9 @@
 # pmacs_script.py   Edit in one window while timer task updates the other:
+# Must run from Piety/piety directory so run(...) command here works
+# Note that old piety module has been renamed to piety0
 #
-# ...$ python3 -m piety
+# ...$ cd piety
+# ...$ python3 -m piety0
 # >>>> run('pmacs_script.py')
 # ... windows appear, you can start typing in scratch.txt window ...
 
