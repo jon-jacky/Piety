@@ -1,7 +1,8 @@
 # piety.py - like viewer/desktop.py but starts piety async shell etc to >>>>
 # First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
-# imports but does not start eventloop
-# defines piety (the eventloop) and piety_start (the function) at top level
+# imports eventloop, 
+# Defines piety (the eventloop) and piety_start (the function) at top level
+# At the end, starts the eventloop and async shell
 import sked
 from sked import *
 import edsel
@@ -32,7 +33,8 @@ tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
-vwin()
-# load several buffers desktop.txt keys.txt etc. and start display editing
-import desktop_startup  
+vwin() 
+import piety_startup  # load several buffers desktop.txt keys.txt etc.
+piety_start() # start the eventloop and the async shell
+
  

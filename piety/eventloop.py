@@ -81,4 +81,3 @@ def piety_start():
     apyshell.setup()
     apyshell.running = True
     piety.run_forever()
-    
