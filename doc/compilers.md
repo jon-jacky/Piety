@@ -75,6 +75,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Black](https://github.com/psf/black) | Code formatter | "cede control over minutiae of hand-formatting. ... Black gives you speed, determinism, and freedom from ... nagging about formatting." |
 | [Pygments](http://pygments.org/) | Syntax highlighter | "syntax highlighting engine engine written in Python ... take source code (or other markup) in a supported language and output ... syntax highlighting markup" |
 | **Other languages** ||| 
+| [cl-python](https://github.com/metawilm/cl-python) | Lisp | "an open-source implementation of Python written in Common Lisp" |
 | [Lispy](https://www.norvig.com/lispy.html) | Scheme | "an interpreter for most of the Scheme dialect of Lisp using Python 3 as the implementation language" |
 | [Hy](http://docs.hylang.org/en/latest/), also [github](https://github.com/hylang/hy) and [blog](https://velox.pw/hy/2014/01/17/the-state-of-hy.html) and [another blog](http://dustycloud.org/blog/how-hy-backported-yield-from-to-python2/) and [HN](https://news.ycombinator.com/item?id=8641126) | Lisp | ""Hy is a LISP leeching^H^H^H^H^H living off the Python world. It compiles down to Python’s AST and is completely bidirectional, you can import Hy into Python and vica versa seamlessly!" |
 | [lisp.py](https://thinkpython.blogspot.com/2008/02/lisp-in-single-expression.html)  | Lisp | "An interpreter for a simple scheme like lexically scoped language implemented as single python expression." |
@@ -83,5 +84,5 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [pixie](https://github.com/pixie-lang/pixie), also [HN](https://news.ycombinator.com/item?id=8480608) | Lisp | "a lightweight Lisp ... inspired by Clojure ... written in RPython" |
 | [planckforth](https://github.com/nineties/planckforth/blob/main/others/planck.py) | Forth | Demonstrates low-level programming with *ctypes* and *struct* modules |
 
-Revised Feb 2026
+Revised Jun 2026
   
