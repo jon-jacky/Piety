@@ -405,7 +405,7 @@ def loader(this_window):
     """
     #print(f'In loader, this_window: {this_window}') # DEBUG
     #breakpoint() # DEBUG
-    if ed.bufname == '*Buffers*':
+    if ed.bufname == '*Buffers*' or ed.bufname == '*WebPages*':
         # All lines in *Buffers* have same format so this should always work
         # Code based on sked.py select_buffer():
         # Get the buffer name from the current (viewer) window

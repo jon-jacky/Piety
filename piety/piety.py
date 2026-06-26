@@ -28,6 +28,8 @@ from viewer import *
 import eventloop
 from eventloop import piety, piety_start # But don't call piety_start() yet
 from apmacs import apm # eventloop imports apmacs too but put apm at top level
+import aiotimers
+from aiotimers import onetimer
 # display the windows
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
