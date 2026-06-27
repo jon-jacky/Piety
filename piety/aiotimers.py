@@ -1,21 +1,24 @@
-# atimer_demo.py
-# async demo - You can edit in one window while a timer task updates the other.
+# aiotimers.py,  async timer demo - defines the function
+# onetimer(): Open a.txt window which a timer task updates frequently.  At the
+#  same time, you can edit in any other window or type commands in the REPL.
 # This version runs in the Piety desktop, based on  vpmacs_script.py
 # 
 # Must already be running event loop to run this demo, for example by:
 #   import piety
-# >>>> piety.piety_start()
+#   from piety import piety_start()
+# >>>> piety_start()
 # Importing this module loads the necessaries but does not start the demo.
-#   import atimer_demo
-#   from atimer_demo import onetimer
+#   import aiotimers
+#   from aiotimers import onetimer  
+# The piety.py startup script alrady does import piety and import aiotimers
 # To start the demo, call this function:
 # >>>> onetimer()
 # Some interesting things to try:
-# >>>> piety.piety # confirm eventloop is running
+# >>>> piety # confirm eventloop is running
 # < ...EventLoop running=True ...>
 # >>>> asyncio.all_tasks(piety)
 # .... ATimer.atimer() ...
-# >>>> from atimer_demo import ta # must do this each time after onetimer()
+# >>>> from aiotimers import ta # must do this each time after onetimer()
 # >>>> ta.delay
 # >>>> 1
 # >>>> ta.delay = 0.1  # speed up timer
@@ -26,6 +29,9 @@
 # set()
 # >>>> k() # remove a.txt buffer
 # >>>> onetimer()  # open new a.txt buffer and start a new timer
+# ...
+# After ta.run = False and k() to remove a.txt
+# >>> twotimers() # open a.txt and b.txt buffers and start two new timers
 # ...
 
 from edsel import e, o2, on
@@ -46,8 +52,8 @@ def ttask(ta, abuf):
 ta = None
 abuf = None
 ta_task = None
- 
-# Call this to start demo 
+
+# Call this to start demo  
 def onetimer():
     global ta, abuf, ta_task
     oe() # put cursor in editor window
@@ -59,6 +65,24 @@ def onetimer():
     on() # put cursor in other window so we can edit
     apm() # resume display editing in windows
 
+tb = None
+bbuf = None
+tb_task = None
 
-
+def twotimers():
+    global ta, abuf, ta_task, tb, bbuf, tb_task
+    oe() # put cursor in editor window
+    o2() # split editor window
+    e('a.txt')
+    ta = ATimer()  
+    abuf = Writer('a.txt')
+    ta_task = ttask(ta, abuf)
+    on() # put cursor in other window so we open b.txt
+    # The following lines are the only difference from onetimer
+    e('b.txt')
+    tb = ATimer()  
+    bbuf = Writer('b.txt')
+    tb_task = ttask(tb, bbuf)
+    # end of different section
+    apm() # resume display editing in windows
 
