@@ -1,40 +1,8 @@
-# aiotimers.py,  async timer demo - defines the function
-# onetimer(): Open a.txt window which a timer task updates frequently.  At the
-#  same time, you can edit in any other window or type commands in the REPL.
-# This version runs in the Piety desktop, based on  vpmacs_script.py
-# 
-# Must already be running event loop to run this demo, for example by:
-#   import piety
-#   from piety import piety_start()
-# >>>> piety_start()
-# Importing this module loads the necessaries but does not start the demo.
-#   import aiotimers
-#   from aiotimers import onetimer  
-# The piety.py startup script alrady does import piety and import aiotimers
-# To start the demo, call this function:
-# >>>> onetimer()
-# Some interesting things to try:
-# >>>> piety # confirm eventloop is running
-# < ...EventLoop running=True ...>
-# >>>> asyncio.all_tasks(piety)
-# .... ATimer.atimer() ...
-# >>>> from aiotimers import ta # must do this each time after onetimer()
-# >>>> ta.delay
-# >>>> 1
-# >>>> ta.delay = 0.1  # speed up timer
-# >>>> ta.run
-# True
-# >>>> ta.run = False # Stop running timer
-# >>>> asyncio.all_tasks(piety)
-# set()
-# >>>> k() # remove a.txt buffer
-# >>>> onetimer()  # open new a.txt buffer and start a new timer
-# ...
-# After ta.run = False and k() to remove a.txt
-# >>> twotimers() # open a.txt and b.txt buffers and start two new timers
-# ...
+# aiotimers.py,  async timers demos
 
-from edsel import e, o2, on
+import sked as ed
+
+from edsel import e, b, o2, on
 from viewer import oe
 from apmacs import apm
 
@@ -42,47 +10,50 @@ from atimers import ATimer
 from writer import Writer
 from eventloop import piety
 
-# So we can call it repeatedly at the REPL
-# BUT actually that's not useful, we just call onetimer again.
-def ttask(ta, abuf):
-    return piety.create_task(ta.atimer(1000, 1, 'A', abuf))
+# Assigned by starttimer, below.  Can handle any number of timers.
+t = dict()
+buf = dict()
+ttask = dict()
 
-# Assigned by demo onetimer() below
-# Make these global so they don't vainsh when onetimer exits
-ta = None
-abuf = None
-ta_task = None
+def starttimer(label, n, delay):
+    # Start a timer in current window, in the buffer named label + '.txt'
+    global t, buf, xtask
+    bufname = label + '.txt'
+    if bufname == ed.bufname:
+        pass # buffer already displayed in current window
+    elif bufname in ed.buffers:
+        b(bufname) # buffer already created, load into current window
+    else:
+        e(bufname) # create buffer in window
+    t[label] = ATimer()
+    buf[label] = Writer(bufname)
+    ttask[label] = \
+        piety.create_task(t[label].atimer(n, delay, label.upper(), buf[label]))
+        
+def stoptimer():
+    # Stop the timer running in the current window, if there is one
+    label = ed.bufname.removesuffix('.txt')
+    if label in t:
+        t[label].run = False
 
-# Call this to start demo  
 def onetimer():
-    global ta, abuf, ta_task
+    "async timer task demo: run timer in one editor window, edit in the other"
     oe() # put cursor in editor window
     o2() # split editor window
     e('a.txt')
-    ta = ATimer()  
-    abuf = Writer('a.txt')
-    ta_task = ttask(ta, abuf)
+    starttimer('a',100,1)
     on() # put cursor in other window so we can edit
     apm() # resume display editing in windows
-
-tb = None
-bbuf = None
-tb_task = None
-
+         
 def twotimers():
-    global ta, abuf, ta_task, tb, bbuf, tb_task
+    "async timer task demo: run timers in two editor windows"
     oe() # put cursor in editor window
     o2() # split editor window
     e('a.txt')
-    ta = ATimer()  
-    abuf = Writer('a.txt')
-    ta_task = ttask(ta, abuf)
-    on() # put cursor in other window so we open b.txt
-    # The following lines are the only difference from onetimer
+    starttimer('a',100,1)
+    on() # put cursor in other window so we can open b.txt
     e('b.txt')
-    tb = ATimer()  
-    bbuf = Writer('b.txt')
-    tb_task = ttask(tb, bbuf)
-    # end of different section
+    starttimer('b',100,0.5)
     apm() # resume display editing in windows
 
+    
