@@ -32,7 +32,7 @@ library *readline* function blocks in the same way.
 It is easy to demonstrate blocking with *pmacs_script.py*.  Just run the
 script in the usual way:
 
-    ...$ python3 -m piety
+    ...$ python3 -m piety0
     >>>> run('pmacs_script.py')
     ...
 
@@ -80,5 +80,6 @@ session.  It could be fixed by exiting fron the reader and returning control
 to the event loop after the first key in a multi-key command, instead 
 of waiting at *getchar* for the next key.
 
-Revised Aug 2024
+Revised Jun 2025
+
 

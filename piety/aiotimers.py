@@ -17,7 +17,7 @@ ttask = dict()
 
 def starttimer(label, n, delay):
     # Start a timer in current window, in the buffer named label + '.txt'
-    global t, buf, xtask
+    global t, buf, ttask
     bufname = label + '.txt'
     if bufname == ed.bufname:
         pass # buffer already displayed in current window
@@ -32,12 +32,16 @@ def starttimer(label, n, delay):
         
 def stoptimer():
     # Stop the timer running in the current window, if there is one
+    global t
     label = ed.bufname.removesuffix('.txt')
     if label in t:
-        t[label].run = False
-
+        t[label].exit = True
+ 
 def onetimer():
-    "async timer task demo: run timer in one editor window, edit in the other"
+    """
+    async timer task demo: run timer in one editor window, edit in the other.
+    Based on standalone demo pmacs_script.py.
+    """
     oe() # put cursor in editor window
     o2() # split editor window
     e('a.txt')
@@ -46,7 +50,10 @@ def onetimer():
     apm() # resume display editing in windows
          
 def twotimers():
-    "async timer task demo: run timers in two editor windows"
+    """
+    async timer task demo: run timers in two editor windows.
+    Based on standalone demo edsel_script.py, supercedes vedsel_script.py
+    """
     oe() # put cursor in editor window
     o2() # split editor window
     e('a.txt')
@@ -55,5 +62,4 @@ def twotimers():
     e('b.txt')
     starttimer('b',100,0.5)
     apm() # resume display editing in windows
-
-    
+          

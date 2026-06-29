@@ -25,21 +25,21 @@ async def atimer(n=1, delay=1.0, label='', destination=sys.stdout):
 
 class ATimer():
     """
-    ATimer class, here delay and run are instance vars
+    ATimer class, here delay and exit are instance vars
     so we can control multiple timers independently
     """
     def __init__(self):
         self.delay = 1.0 # can be edited while timer is running
-        self.run = True  # set False to exit before n runs out.
+        self.exit = False  # set True to exit before n runs out.
 
     async def atimer(self, n=1, delay=1.0, label='', destination=sys.stdout):
         """
         destination must be a file-like object, must have a write method.
         """
         self.delay = delay
-        self.run = True
+        self.exit = False
         for i in range(n):
-            if not self.run: break
+            if self.exit: break
             await asyncio.sleep(self.delay)
             if destination == sys.stdout: # default
                 print(f'{label} {i+1} {datetime.datetime.now()}\n\r', end='',

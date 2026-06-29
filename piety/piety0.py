@@ -1,5 +1,5 @@
 """
-piety.py - Starts a Piety session.  Creates an event loop named
+piety0.py - Starts a Piety session.  Creates an event loop named
   *piety*, adds the readers for the shell and the editor, and starts the
   event loop with the shell running.  It also defines a funtion *run*
   which is needed to run other scripts in the event loop. 

@@ -26,10 +26,10 @@ for the Piety *run* command.
 
     ...$ cd ~/Piety/piety
 
-Run the *piety.py* script at the system command prompt to start the
+Run the *piety0.py* script at the system command prompt to start the
 Piety event loop:
 
-    ...$ python3 -m piety
+    ...$ python3 -m piety0
     >>>>
 
 Our *pysh* custom Python interpreter command prompt appears: *>>>>*.  It has
@@ -123,15 +123,15 @@ can write messages in the timer window -- while still being able to edit
 or type commands, without scrambling any text.
 
 You can stop the task before it writes 1000 messesages by assigning
-*ta.run = False*:
+*ta.exit = True*:
  
     >>>> asyncio.all_tasks(piety)
     {<Task pending name='Task-6' coro=<ATimer.atimer() running at
     /home/jon/Piety/coroutines/atimers.py:43> wait_for=<Future pending
     cb=[Task.task_wakeup()]>>}
-    >>>> ta.run
-    True
-    >>>> ta.run = False
+    >>>> ta.exit
+    False
+    >>>> ta.exit = True
     >>>> asyncio.all_tasks(piety)
     set()
 
@@ -146,5 +146,5 @@ system command interpreter.
 
 Instead of *C-d*, you can also type *exit()*.
 
-Revised Aug 2024
+Revised Jun 2025
  

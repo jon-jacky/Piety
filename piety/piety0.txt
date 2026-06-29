@@ -1,6 +1,11 @@
-piety.txt - Explanation and directions for piety.py
+piety0.txt - Explanation and directions for piety0.py
 
-The piety.py script starts a Piety session.  It creates
+ (Note: piety0.py is retained here so we can continue to run old demos.
+ Now we use eventloop.py, not piety0.py.
+ The old piety.py and piety.txt were renamed here to piety0.py and piety0.txt
+ to accommodate a new piety.py script that starts a piety desktop session.)
+
+The piety0.py script starts a Piety session.  It creates
 an event loop named piety, adds the readers for the shell and the
 editor, and starts the event loop with the shell running.  It also defines
 a funtion run which is needed to run other scripts in the event loop.
@@ -10,7 +15,7 @@ piety module namespace, so you can use them in subsequent interactive  commands.
 
 Here is an example:
          
-    $ python3 -m piety 
+    $ python3 -m piety0
     >>>> piety # Just for example, confirm the event loop is running
     <_UnixSelectorEventLoop running=True closed=False debug=False>
     >>>> from atimers import atimer # Type any Python statements at the prompt ...
@@ -38,13 +43,13 @@ At the >>>> prompt, you cannot import scripts that import the piety module
 asyncio event loop.  You must use the run function imported by the piety 
 module to run scripts.
 
-You can also run piety.py to start the piety event loop in an already running
+You can also run piety0.py to start the piety event loop in an already running
 Python session:
 
     ...$ python3 -i
     ...
     >>> from runner import run
-    >>> run('piety.py')
+    >>> run('piety0.py')
     >>>> 
     ...
     >>>> ^D

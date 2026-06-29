@@ -6,7 +6,7 @@ Tou can set the timer intervals and stop the tasks from the Python REPL.
 edsel_script requires the running piety event loop, so it must be started
 from the Piety shell with the run function:
  
-   $ python3 -m piety
+   $ python3 -m piety0
    >>>> run('edsel_script.py')
    ... Two windows appear, 10 timer messages appear in a.txt, 20 in b.txt. ...
    ...
@@ -34,9 +34,9 @@ from the Piety shell with the run function:
    cb=[Task.task_wakeup()]>>, <Task pending name='Task-5' coro=<ATimer.atimer()
    running at /home/jon/Piety/coroutines/atimers.py:43> wait_for=<Future
    pending cb=[Task.task_wakeup()]>>}
-   >>>> ta.run
-   True 
-   >>>> ta.run = False
+   >>>> ta.exit
+   False
+   >>>> ta.exit = True
    ... Messages stop appearing in a.txt ...
    >>> asyncio.all_tasks(piety)
    set()
