@@ -117,39 +117,32 @@ columns across the full width of the display.
 
 Run this command to start the desktop:
 
-    python3 -im desktop
+    python3 -im piety
 
 The desktop appears (pictured above), with the windows showing
 the buffers named in a startup file.
 
 If this is your first time using Piety, it will
-be helpful to read and work through the interactive
+be helpful to read and work through 
+[desktop.txt](viewer/desktop.txt), the interactive
 tutorial displayed in the window on the right.
  
 ## Demos ##
 
-Some interactive demonstrations are described in 
-[pmacs_script.md](piety/pmacs_script.md) and 
-[edsel_script.txt](piety/edsel_script.txt) and
+The tutorial in [desktop.txt) is an extended demo.
+Additional demos are described in 
+[aiotimers.md](piety/aiotimers.md) and
 [pmacs_blocking.md](piety/pmacs_blocking.md) and 
 [audoindent.md](editors/autoindent.md) and
 [breakpt.md](editors/breakpt.md).
 These pages give instructions so you can do the demos yourself.
 
-A few of the demos are not very interactive, so can be run from scripts:
-[pmacs_script.py](piety/pmacs_script.py) and
-[edsel_script.py](piety/edsel_script.py).
-
-At this time, the demos do not run in the Piety desktop.   Each demo runs
-in its own Python session, as described in its instructions.
-
 ## Screenshots ##
 
 The pages about the Piety [desktop](viewer/README.md), 
-[browser](browser/README.md), and 
-the event loop demos [here](piety/pmacs_script.md) 
-and [here](piety/vedsel_script.md) include screenshots. 
-This [directory](screenshots) contains a few more.
+[browser](browser/README.md), and [tasks](piety/README.md)
+include screenshots. This [directory](screenshots) contains 
+a few more.
           
 ## Roadmap ##
 
@@ -190,7 +183,4 @@ Details in [platforms.md](doc/platforms.md).
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised May 2026
-
-
-
+Revised Jun 2026   
