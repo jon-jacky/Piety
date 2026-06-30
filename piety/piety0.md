@@ -45,11 +45,13 @@ are described in [README.md](README.md).
 
 - **edsel_script.txt**: Explanation and directions for *edsel_script.py*.
     not start it.
+
+- **piety0.md**: This file, about some files in the *Piety/piety* directory.
     
 - **piety0.py**: Begin a Piety session by starting the *asyncio* event loop.
   Import a function *run* which is needed to run other scripts in the event loop.
   
-- **piety0.txt**: Explanation and directions for *piety.py*.
+- **piety0.txt**: Explanation and directions for using *piety0.py*.
 
 - **pmacs_blocking.md**: Explanation and directions for demonstrating
   cooperative multitasking and blocking using *pmacs_script.py*.

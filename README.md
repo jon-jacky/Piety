@@ -129,8 +129,8 @@ tutorial displayed in the window on the right.
  
 ## Demos ##
 
-The tutorial in [desktop.txt) is an extended demo.
-Additional demos are described in 
+The tutorial in [desktop.txt](viewer/desktop.txt) 
+is an extended demo. Additional demos are described in 
 [aiotimers.md](piety/aiotimers.md) and
 [pmacs_blocking.md](piety/pmacs_blocking.md) and 
 [audoindent.md](editors/autoindent.md) and
