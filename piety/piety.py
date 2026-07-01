@@ -1,8 +1,9 @@
-# piety.py - like viewer/desktop.py but starts piety async shell etc to >>>>
+# piety.py - like viewer/desktop.py but also imports piety async tasking
 # First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
 # imports eventloop, 
-# Defines piety (the eventloop) and piety_start (the function) at top level
-# At the end, starts the eventloop and async shell
+# Defines piety (the eventloop) and startpiety (the function) at top level
+# Does not start the eventloop, user must call startpiety()
+
 import sked
 from sked import *
 import edsel
@@ -26,17 +27,17 @@ import viewer
 from viewer import *
 # import the async machinery but don't start it yet
 import eventloop
-from eventloop import piety, piety_start # But don't call piety_start() yet
+from eventloop import piety, startpiety, tasks # Don't call startpiety() yet
 from apmacs import apm # eventloop imports apmacs too but put apm at top level
 import aiotimers
-from aiotimers import onetimer
+from aiotimers import starttimer, stoptimer, onetimer, twotimers 
 # display the windows
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin() 
-import piety_startup  # load several buffers desktop.txt keys.txt etc.
-piety_start() # start the eventloop and the async shell
+import piety_startup # load several buffers desktop.txt keys.txt etc.
+
 
  

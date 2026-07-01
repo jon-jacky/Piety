@@ -34,6 +34,8 @@ been superceded by the newer [aiotimers](aiotimers.md) module.)
 These are the modules and documentation files for these demos.  Other
 files in this directory, including some imported by these modules, 
 are described in [README.md](README.md).
+ 
+- **apm.py**: Script to start the *apmacs* editor in an *asyncio* event loop.
 
 - **atimer_script.py**: Demonstrate the Python shell and timer tasks interleaving
   in the Piety event loop.
@@ -76,5 +78,4 @@ are described in [README.md](README.md).
     *eventloop.py* not *piety.py*. See instructions in comment header.
          
 Revised Jun 2026
-
- 
+  

@@ -25,19 +25,22 @@ More to come ...
 - **aiotimers.md**:  Directions and explanations of the demonstrations in
     *aiotimers.py*
 
-- **apm.py**: Script to start the *pmacs* editor in an *asyncio* event loop.
-
 - **apmacs.py**: Adapt the *pmacs* editor to run in an *asyncio* event loop.  
 
 - **apyshell.py**: Adapt the *pysh* custom Python shell to run in an *asyncio*
   event loop.
  
-- **eventloop.py**: Creates the Piety *asyncio* event loop but does 
-    not start it.
+- **eventloop.py**: Creates the Piety *asyncio* event loop, named *piety*.
+    Defines function*startpiety* also *tasks* to list async tasks.
+
+- **piety.py**: Script that starts a Piety desktop session that includes
+    the *piety* event loop.
+   
+- **piety_startup.py**: Called by *piety.py*, loads some buffers into 
+    the desktop session.
 
 Modules and documentation files for older demos that do not run in the
 Piety desktop are described in [piety0.md](piety0.md).
     
-Revised Jun 2026
-
+Revised Jul 2026
  

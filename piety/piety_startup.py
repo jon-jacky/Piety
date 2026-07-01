@@ -1,4 +1,4 @@
-# desktop_startup.py invoked from desktop.py   
+# piety_startup.py invoked from piety.py   
 # Assumes Piety is the current directory. It uses relative paths to load files.
 import pmacs, edsel as fr
 fr.e('viewer/keys.txt')
@@ -12,6 +12,5 @@ print("""
 >>> # Type alt-X to enter the interpreter.
 >>> # Type apm() to return to visual editing in windows.
 >>> """)
-# pmacs.ve() below  prevents piety_start() at end of piety.py from running
-#pmacs.ve() # start display editing ('visual editing') in viewer window
+pmacs.pm()
 
