@@ -2,13 +2,17 @@
 piety
 =====
 
-Piety provides concurrency with a Python *asyncio* event loop.  Tasks 
-are implemented by Python *coroutines* or *readers* (event handlers) that
-run in an event loop.
+The *piety.py* script here starts a Piety desktop session where you can 
+start tasks that run concurrently as you edit in windows or run commands
+at the Python REPL.
+
+Piety provides concurrency with a Python *asyncio* event loop.  Our event
+loop object is also named *piety*. Tasks are implemented by Python
+*coroutines* and *readers* (event handlers) that run in this event loop.
 
 Piety provides readers for *pysh*, its custom Python shell, and *pmacs*, its
-Emacs-like editor.  These enable the shell and the editor to run without 
-blocking in an event loop, so other tasks can run concurrently, as you 
+display editor.  These enable the shell and the editor to run without 
+blocking in the event loop, so other tasks can run concurrently, as you 
 type commands in the shell or edit text in the editor.  You can control
 other tasks from the shell and display task output in editor windows.
 
@@ -31,7 +35,8 @@ More to come ...
   event loop.
  
 - **eventloop.py**: Creates the Piety *asyncio* event loop, named *piety*.
-    Defines function*startpiety* also *tasks* to list async tasks.
+    Defines the function *startpiety* that starts the event loop and 
+    also *tasks* to list tasks running in the event loop.
 
 - **piety.py**: Script that starts a Piety desktop session that includes
     the *piety* event loop.
