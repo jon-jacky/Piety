@@ -25,6 +25,7 @@ from our name eventloop.
 import sys, asyncio
 from pprint import pprint
 import pyshell, apyshell, apmacs
+import aclock, terminal_util  # just for clock called from startpiety
  
 def handler():
     if pyshell.cmd_mode:
@@ -43,7 +44,10 @@ def startpiety():
     apyshell.setup()
     apyshell.running = True
     piety.run_forever()
-
+    tlines, tcols = terminal_util.dimensions()
+    col = tcols - 10 # 10 not 11 for hh:mm:ss am
+    aclock.runclock(-1, 1, col)
+    
 # stoppiety = exit  does not work, exits from entire Python session
 #                   for now use ^D to exit from >>>> back to >>>
     

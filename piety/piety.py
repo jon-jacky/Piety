@@ -31,6 +31,7 @@ from eventloop import piety, startpiety, tasks # Don't call startpiety() yet
 from apmacs import apm # eventloop imports apmacs too but put apm at top level
 import aiotimers
 from aiotimers import starttimer, stoptimer, onetimer, twotimers 
+import aclock
 # display the windows
 tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
