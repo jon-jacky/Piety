@@ -42,10 +42,10 @@ class AClock():
             if self.n > 0: self.n -= 1  # We get one tick if self.n = 1
 
 # Global so we can read/set from REPL
-# Each call to createclock reassigns these, so we can only have one clock.
+# Each call to startclock reassigns these, so we can only have one clock.
 loop = None; ca = None; ta = None
 
-def createclock(n, delay, col):
+def startclock(n, delay, col):
     'Creates clock task but does not run the event loop, maybe already running'
     global loop, ca, ta, x
     loop = asyncio.get_event_loop() # the already running loop, if there is one
@@ -54,7 +54,7 @@ def createclock(n, delay, col):
         
 def runclock(n, delay, col):
     'Start the clock, creates and runs the event loop for a standalone test' 
-    createclock(n, delay, col) # assign global ca, ta, loop
+    startclock(n, delay, col) # assign global ca, ta, loop
     loop.run_until_complete(ta) # use global ta, loop
     
 def stopclock():        

@@ -36,17 +36,20 @@ def handler():
 piety = asyncio.get_event_loop() # piety is the name of our event loop object
 piety.add_reader(sys.stdin, handler) # enable shell and editor to run in loop
 
+col = 1 # Assigned from startpiety body
+
 def startpiety():
     """
     Alternative to piety.run_forever() 
     so you don't need to type RET to get the >>>> asyncio shell prompt
     """
+    global col
     apyshell.setup()
     apyshell.running = True
     piety.run_forever()
     tlines, tcols = terminal_util.dimensions()
-    col = tcols - 10 # 10 not 11 for hh:mm:ss am
-    aclock.runclock(-1, 1, col)
+    col = tcols - 10 # 10 not 11 for hh:mm:ss am  #DEBUG assign global col
+    aclock.startclock(-1, 1, col) # runclock() gets RunTimeError: loop exists
     
 # stoppiety = exit  does not work, exits from entire Python session
 #                   for now use ^D to exit from >>>> back to >>>
