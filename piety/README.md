@@ -40,7 +40,7 @@ Now the prompt in the Python REPL has expanded from three darts *>>>* to
 four *>>>>* to show the event loop is running (pictured below).
 
 <img src="../screenshots/desktop_eventloop.png"
- alt="Piety Desktop at startup" width=67% height=67%>
+ alt="Piety Desktop with event loop" width=67% height=67%>
 
 The name of the event loop is *piety*:        
 
