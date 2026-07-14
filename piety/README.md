@@ -39,7 +39,7 @@ prompt in the REPL:
 Now the prompt in the Python REPL has expanded from three darts *>>>* to
 four *>>>>* to show the event loop is running (pictured below).
 
-<img src="screenshots/desktop_eventloop.png"
+<img src="../screenshots/desktop_eventloop.png"
  alt="Piety Desktop at startup" width=67% height=67%>
 
 The name of the event loop is *piety*:        
@@ -53,7 +53,7 @@ is running ---  type the command
 loop is not running). 
 
 The command *apm()* also returns the cursor to the window. Some older
-Piety documentation uses *apm()* not *de()*. The commands *ave()*
+Piety documentation uses *apm()* not *ade()*. The commands *ave()*
 *aved()* and *aee()* also work.
 
 
