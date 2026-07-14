@@ -72,18 +72,23 @@ argument tells the clock to update every second.  The third argument
 is the column number in the top line of the terminal where the clock appears
 (*tcols* is the width of the terminal -- allow 10 characters for the clock).
 
-The running clock is a Python *asyncio* task:
+The running clock is a Python *asyncio* task, so you can type commands
+in the REPL or edit in windows while the clock is ticking:
 
     >>>> tasks()
     {<Task pending name='Task-1' coro=<AClock.aclock() running at
     /home/jon/Piety/piety/aclock.py:35> wait_for=<Future pending
     cb=[Task.task_wakeup()]>>}
 
+The REPL and the editors are not *asyncio* tasks, although their keystrokes
+are handled by the *piety* event loop.
+
 The *stopclock* command stops the clock:
 
     >>>> stopclock()
     
-The clock stops ticking.  Its task has exited:
+The clock stops ticking.  Its task has exited -- the set of *asyncio* tasks
+is now empty:
 
     >>>> tasks()
     set()
