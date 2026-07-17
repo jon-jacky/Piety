@@ -43,13 +43,14 @@ def startpiety():
     Alternative to piety.run_forever() 
     so you don't need to type RET to get the >>>> asyncio shell prompt
     """
-    global col
+    global col # DEBUG - investigate why startclock called here doesn't work
     apyshell.setup()
     apyshell.running = True
     piety.run_forever()
-    tlines, tcols = terminal_util.dimensions()
-    col = tcols - 10 # 10 not 11 for hh:mm:ss am  #DEBUG assign global col
-    aclock.startclock(-1, 1, col) # runclock() gets RunTimeError: loop exists
+    # For some reason, startclock has no effect when called here
+    # tlines, tcols = terminal_util.dimensions()
+    # col = tcols - 10 # 10 not 11 for hh:mm:ss am  #DEBUG assign global col
+    # aclock.startclock0(-1, 1, col) # runclock() gets RunTimeError: loop exists
     
 # stoppiety = exit  does not work, exits from entire Python session
 #                   for now use ^D to exit from >>>> back to >>>

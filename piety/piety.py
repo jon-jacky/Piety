@@ -14,7 +14,7 @@ import console
 from console import *
 import editline
 import pmacs
-from pmacs import pm
+from pmacs import pm, de
 import urls
 from urls import *
 import get
@@ -28,9 +28,9 @@ from viewer import *
 # import the async machinery but don't start it yet
 import eventloop
 from eventloop import piety, startpiety, tasks # Don't call startpiety() yet
-from apmacs import apm # eventloop imports apmacs too but put apm at top level
+from apmacs import apm, ade # eventloop imports apmacs too,put apm at top level
 import aiotimers
-from aiotimers import starttimer, stoptimer, onetimer, twotimers 
+from aiotimers import timer, starttimer, stoptimer, onetimer, twotimers
 import aclock
 from aclock import startclock, stopclock, ca, ta
 # display the windows
@@ -40,6 +40,4 @@ tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin() 
 import piety_startup # load several buffers desktop.txt keys.txt etc.
-
-
- 
+   

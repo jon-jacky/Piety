@@ -2,9 +2,9 @@
 piety
 =====
 
-Piety provides concurrency with a Python *asyncio* event loop. Tasks are
-implemented by Python *coroutines* and *readers* (event handlers) that
-run in this event loop.
+Piety provides concurrency with a Python *asyncio* event loop named *piety*. 
+Tasks are implemented by Python *coroutines* and *readers* (event
+handlers) that run in this event loop.
 
 Piety provides *asyncio* readers for its custom Python shell and its
 editor.  These enable the shell and the editor to run without 
@@ -15,12 +15,13 @@ type commands in the shell or edit text in the editor.
 [Clock Task](#Clock-Task)   
 [Stopping the Event Loop](#Stopping-the-Event-Loop)   
 [Demos](#Demos)   
+[Files](#Files)
 
 ### Starting the Event Loop ###
   
-The *piety.py* script here starts a Piety desktop session where you can 
-start tasks that run concurrently as you edit in windows or run commands
-at the Python REPL.
+To start a Piety desktop session, run the script named *piety.py*. In
+this session, you can start tasks that run concurrently as you edit in
+windows or run commands at the Python REPL.
 
 From your *Piety* directory, start the *piety* script from the system
 command interpreter:
@@ -62,26 +63,23 @@ Piety documentation uses *apm()* not *ade()*. The commands *ave()*
 When the event loop is running, you can start tasks. Start the on-screen 
 clock:
 
-    >>>> startclock(-1, 1, tcols-10)
+    >>>> startclock()
 
 The clock appears in the upper right corner of the terminal and updates
 every second (pictured above)
-    
-The first argument -1 tells the clock to run until you stop it.  The second
-argument tells the clock to update every second.  The third argument
-is the column number in the top line of the terminal where the clock appears
-(*tcols* is the width of the terminal -- allow 10 characters for the clock).
 
 The running clock is a Python *asyncio* task, so you can type commands
-in the REPL or edit in windows while the clock is ticking:
+in the REPL or edit in windows while the clock is ticking.  The *tasks*
+command shows information about all the tasks that are running in the
+*piety* event loop:
 
     >>>> tasks()
     {<Task pending name='Task-1' coro=<AClock.aclock() running at
     /home/jon/Piety/piety/aclock.py:35> wait_for=<Future pending
     cb=[Task.task_wakeup()]>>}
 
-The REPL and the editors are not *asyncio* tasks, although their keystrokes
-are handled by the *piety* event loop.
+The REPL and the editors are not considered *asyncio* tasks, although
+their keystrokes are handled by *asyncio handlers* the *piety* event loop.
 
 The *stopclock* command stops the clock:
 
@@ -97,16 +95,23 @@ To remove the clock from the display, refresh the viewer window by
 typing the command *vvrefresh()*, or, while display editing, typing the
 *M-m* key.
 
-You can resume the clock by typing the *startclock* command, with its 
-arguments, again.
+You can resume the clock by typing the *startclock* command again.
 
 ### Stopping the Event Loop ###
 
 To stop the event loop, type *C-d* at the *>>>>* prompt in the Python REPL.
-The *>>>* prompt appears.  If the clock is displayed, it stops ticking.
+The *>>>* prompt with three darts reappears. The event loop is no longer
+running:
+
+    >>> piety
+    <_UnixSelectorEventLoop running=False closed=False debug=False>
+
+If the clock is displayed, it stops ticking.
 Remove it from the display by refreshing the viewer window.
 
 Now you must use *de()* again, not *ade()*, to return to display editing.
+
+You can restart the event loop with *startpiety()*.
  
 ### Demos ###
 

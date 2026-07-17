@@ -5,7 +5,7 @@ aclock.py - Onscreen clock
 
 import sys, asyncio
 from datetime import datetime
-import display, pmacs, pyshell, writer
+import terminal_util,  display, pmacs, pyshell, writer
 
 def restore_cursor():
     'Based on writer.py restore_cursor but simpler'
@@ -45,7 +45,7 @@ class AClock():
 # Each call to startclock reassigns these, so we can only have one clock.
 loop = None; ca = None; ta = None
 
-def startclock(n, delay, col):
+def startclock0(n, delay, col):
     'Creates clock task but does not run the event loop, maybe already running'
     global loop, ca, ta, x
     loop = asyncio.get_event_loop() # the already running loop, if there is one
@@ -56,7 +56,11 @@ def runclock(n, delay, col):
     'Start the clock, creates and runs the event loop for a standalone test' 
     startclock(n, delay, col) # assign global ca, ta, loop
     loop.run_until_complete(ta) # use global ta, loop
-    
+
+def startclock():
+    tlines, tcols = terminal_util.dimensions()
+    startclock0(-1,1,tcols-10) # -1 run forever, 1 sec interval 
+            
 def stopclock():        
     global ca
     ca.exit = True
