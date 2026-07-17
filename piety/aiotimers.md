@@ -11,9 +11,9 @@ Each demo is started by a command (a function): *onetimer*, *twotimers*,
 *starttimer*.
 
 [ontimer](*onetimer)   
-[twotimers](*twotimers)
-[starttimer](*starttimer)
-[stoptimer](*stoptimer)
+[twotimers](*twotimers)   
+[starttimer](*starttimer)   
+[stoptimer](*stoptimer)   
  
 ### onetimer ###
 
@@ -104,7 +104,7 @@ both editor windows at different speeds:
 
 The *starttimer* command starts a timer running in an existing window.
 The first argument is the basename of the buffer to write the messages in.
-The next two arguments are the number of messsages to print before
+The next two arguments are the number of messages to print before
 exiting, and the delay between messages:
 
 Move the cursor to the *a.txt* window created by *onetimer* or
@@ -124,6 +124,12 @@ it can go and still not interfere with editing or typing commands:
     >>>> ta.delay = .001    
     >>>> # 1000 messages/sec, Can I still type?    
     >>>> ta.exit = True
+
+You can pause all timer tasks (and any other tasks, like the clock) by
+calling *block*, which prevents them from running:
+
+    >>>> block()
+    Press ENTER to end blocking: 
     
 ### stoptimer ###
 

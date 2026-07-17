@@ -54,8 +54,12 @@ def startpiety():
     
 # stoppiety = exit  does not work, exits from entire Python session
 #                   for now use ^D to exit from >>>> back to >>>
-    
+     
 def tasks():
     'Abbreviation for asyncio.all_tasks(piety)'
     pprint(asyncio.all_tasks(piety)) # pprint puts each task entry on own line
+
+def block():
+    'Call the function input, which blocks waiting until you type something.'
+    input('Press ENTER to end blocking: ')
     

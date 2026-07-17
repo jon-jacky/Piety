@@ -13,6 +13,7 @@ type commands in the shell or edit text in the editor.
 
 [Starting the Event Loop](#Starting-the-Event-Loop)   
 [Clock Task](#Clock-Task)   
+[Cooperative Multitasking and Blocking](*Cooperative-Multitasking-and-Blocking)
 [Stopping the Event Loop](#Stopping-the-Event-Loop)   
 [Demos](#Demos)   
 [Files](#Files)
@@ -96,6 +97,29 @@ typing the command *vvrefresh()*, or, while display editing, typing the
 *M-m* key.
 
 You can resume the clock by typing the *startclock* command again.
+
+### Cooperative Multitasking and Blocking ###
+
+Concurrency using *asyncio* provides *cooperative multitasking*, which means
+each task runs until it calls *yield* or *return*.   If a task waits for 
+input, for example by calling *readline* or *input*, that task and all other
+tasks stop until input appears.   
+
+While the clock is running, call *input* with the argument shown.  
+Python prints the argument and waits for input.
+
+    >>>> input('Press ENTER to end blocking: ')
+    Press ENTER to end blocking:
+        
+You will see the clock stops until you press ENTER.
+
+Piety defines a function *block* so you don't have to type the argument:
+
+    >>>> block()
+    Press ENTER to end blocking:
+
+For more explanation of cooperative multitasking and blocking, 
+see [pmacs_blocking.md](pmacs_blocking.md).
 
 ### Stopping the Event Loop ###
 

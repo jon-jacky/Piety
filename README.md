@@ -63,9 +63,9 @@ reloaded into the session without restarting or  losing work in progress.
 To make this possible we adopted a
 [particular workflow and coding style](editors/HOW.md).
 
-Piety provides concurrency with a Python *asyncio* event loop.  Tasks 
-are implemented by Python *coroutines* or *readers* (event handlers) that
-run in an event loop.
+Piety provides [concurrency](piety/README.md) with a Python *asyncio*
+event loop. Tasks are implemented by Python *coroutines* or *readers*
+(event handlers) that run in an event loop.
 
 Piety provides *asyncio* readers for its custom Python shell and its
 editor.  These enable the shell and the editor to run without 

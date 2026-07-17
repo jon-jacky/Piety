@@ -27,7 +27,7 @@ import viewer
 from viewer import *
 # import the async machinery but don't start it yet
 import eventloop
-from eventloop import piety, startpiety, tasks # Don't call startpiety() yet
+from eventloop import piety, startpiety, tasks, block # don't call startpiety yet[A
 from apmacs import apm, ade # eventloop imports apmacs too,put apm at top level
 import aiotimers
 from aiotimers import timer, starttimer, stoptimer, onetimer, twotimers
