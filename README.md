@@ -75,7 +75,7 @@ type commands in the shell or edit text in the editor.
 The editor is not just for creating text. Python commands including
 concurrent tasks can redirect their output to editor buffers and windows, so
 the editor can be used for data capture and animated display.  We
-use it for [experiments](piety) in tasking and concurrency
+use it for [experiments](piety/aiotimers.md) in tasking and concurrency
 where tasks update windows as we control their behavior by typing  commands
 at the Python interpreter.
 
