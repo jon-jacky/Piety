@@ -140,9 +140,10 @@ These pages give instructions so you can do the demos yourself.
 ## Screenshots ##
 
 The pages about the Piety [desktop](viewer/README.md), 
-[browser](browser/README.md), and [tasks](piety/README.md)
+[browser](browser/README.md), [concurrency](piety/README.md),
+and [tasking demos](piety/aiotimers.md)
 include screenshots. This [directory](screenshots) contains 
-a few more.
+several more.
           
 ## Roadmap ##
 
