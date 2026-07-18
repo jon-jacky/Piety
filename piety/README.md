@@ -13,10 +13,10 @@ type commands in the shell or edit text in the editor.
 
 [Starting the Event Loop](#Starting-the-Event-Loop)   
 [Clock Task](#Clock-Task)   
-[Cooperative Multitasking and Blocking](*Cooperative-Multitasking-and-Blocking)   
+[Cooperative Multitasking and Blocking](#Cooperative-Multitasking-and-Blocking)   
 [Stopping the Event Loop](#Stopping-the-Event-Loop)   
 [Demos](#Demos)   
-[Files](#Files)   
+[Files](#Files)  
 
 ### Starting the Event Loop ###
   
