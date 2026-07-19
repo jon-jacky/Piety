@@ -213,7 +213,9 @@ def r(aurl):
     # title = 'No title' # default # Not needed - now use get.title
     parser = HTML2Text()
     parser.feed(''.join(ed.buffer)) # requires string, not list of string
-    bufname = get.title[:12].replace(' ','-') + '.htxt' #M-o can't handle space
+    #bufname = get.title[:12].replace(' ','-') + '.htxt' #M-o can't handle space
+    tbl = str.maketrans(' \n~/','----') # replace spc \n ~  / with -
+    bufname = get.title[:12].translate(tbl) + '.htxt' # replace spc etc w/ -
                         
     # From here on, the code is similar to get.py fcn g()
     baseurl = ed.filename # original web site url, needed by relative urls.
