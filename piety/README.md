@@ -52,7 +52,8 @@ The name of the event loop is *piety*:
 To return to display editing from the *>>>>* prompt -- while the event loop
 is running ---  type the command
 *ade()* (not  *de()*, which you use from the *>>>* prompt when the event
-loop is not running). 
+loop is not running).   However, to return from display editing to
+the *>>>>* prompt, you still type *M-x*.
 
 The command *apm()* also returns the cursor to the window. Some older
 Piety documentation uses *apm()* not *ade()*. The commands *ave()*

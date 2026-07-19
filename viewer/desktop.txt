@@ -97,6 +97,7 @@ Web browsing
 Python programming
 Concurrent Tasks and the Clock
 Quitting the desktop
+Status messags  
 Recovering from errors
 More
 
@@ -802,6 +803,8 @@ prompt -- while the event loop is running --
 type the command ade() (not de(), which you
 use from the >>> prompt when the event loop is
 not running). The command apm() also works.
+However, you still use M-x to return from 
+display editing to the >>>> prompt.
 
 When the event loop is running, you can start
 tasks. Start the on-screen clock:
@@ -868,6 +871,22 @@ really want to quit.
 Type the command unsaved() at any time to
 print the list of unsaved buffers.
 
+Status messages
+
+Piety somtimes prints  messages in the REPL 
+region, that might look like error messages.
+In fact, these are status messages that do
+not indicate any problem and do not require
+any action.  Here are some examples:
+
+? line 703 out of range 1 .. 702
+
+? buffer keys.txt is already the current 
+ buffer
+
+*Console*, at line 59570 of 59577,
+ file *Console*, unsaved changes
+
 Recovering from errors
  
 Errors and exceptional conditions can cause
@@ -931,7 +950,7 @@ enlarge it to full screen, and at the system
 prompt, type the command to start a new
 session:
 
- python3 -im desktop  
+ python3 -im piety
 
 More
 
@@ -942,6 +961,7 @@ these files:
 Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
+Piety/piety/README.md
 
 Revised Jul 2026
   
