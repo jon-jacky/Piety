@@ -97,7 +97,7 @@ Web browsing
 Python programming
 Concurrent Tasks and the Clock
 Quitting the desktop
-Status messags  
+Status messages  
 Recovering from errors
 More
 
