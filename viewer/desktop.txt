@@ -95,6 +95,7 @@ Wrapping long lines
 Commands
 Web browsing
 Python programming
+Concurrent Tasks and the Clock
 Quitting the desktop
 Recovering from errors
 More
@@ -776,6 +777,86 @@ of modules loaded in the session.
 Use sh('git ...') to invoke commands of the 
 git version control system. 
 
+Concurrent Tasks and the Clock
+
+Piety provides concurrency with a Python
+asyncio event loop named piety.
+
+To start the event loop, type the startpiety
+command at the Python prompt in the REPL:
+
+    >>> startpiety()
+    >>>>
+    
+Now the prompt in the Python REPL has expanded
+from three darts >>> to four >>>> to show the
+event loop is running. The name of the event
+loop is piety:
+
+    >>>> piety
+    <_UnixSelectorEventLoop running=True
+    closed=False debug=False>
+ 
+To return to display editing from the >>>>
+prompt -- while the event loop is running --
+type the command ade() (not de(), which you
+use from the >>> prompt when the event loop is
+not running). The command apm() also works.
+
+When the event loop is running, you can start
+tasks. Start the on-screen clock:
+
+    >>>> startclock()
+
+The clock appears in the upper right corner of
+the terminal and updates every second.
+
+The *tasks* command shows information about
+all the tasks that are running in the *piety*
+event loop:
+
+    >>>> tasks() {<Task pending name='Task-1'
+    coro=<AClock.aclock() running at
+    /home/jon/Piety/piety/aclock.py:35>
+    wait_for=<Future pending
+    cb=[Task.task_wakeup()]>>}
+
+(the REPL and the editors are not considered
+to be *asyncio* tasks.)
+
+The *stopclock* command stops the clock:
+
+    >>>> stopclock()
+    
+The clock stops ticking. Its task has exited
+-- the set of asyncio tasks is now empty:
+
+    >>>> tasks()
+    set()
+    
+To remove the clock from the display, refresh
+the viewer window by typing the command
+vvrefresh(), or, while display editing, typing
+the M-m key.
+
+You can resume the clock by typing the
+startclock command again.
+
+To stop the event loop, type C-d at the >>>>
+prompt in the Python REPL. The >>> prompt with
+three darts reappears. The event loop is no
+longer running. If the clock is displayed, it
+stops ticking.
+
+Now you must use de() again, not ade(), to
+return to display editing.
+
+You can restart the event loop with startpiety().
+
+More demonstrations and experiments with the
+event loop are described in piety/piety.md and
+piety/aiotimers.md.
+
 Quitting the desktop
 
 Type the command quit() to quit the desktop,
@@ -862,5 +943,5 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md
 
-Revised June 2026
+Revised Jul 2026
   
