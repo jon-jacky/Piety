@@ -677,6 +677,10 @@ Select an .html buffer from this list in the
 usual way to show its source in a window --
 this is analogous to the View Source
 operation.
+
+Alternatively, to see the .html buffer you can
+just type its full name at the C-x b prompt --
+its basename is the same as the .htxt buffer.
  
 You can use the gr command (get and render) 
 to type in a URL at the REPL and view the

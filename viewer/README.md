@@ -153,6 +153,9 @@ Session management:
     response starts with *y* or *Y*, exits the Piety
     session and returns to the host system prompt.
 
+- **unsaved()** - Lists buffers that have unsaved changes.
+   This list is also printed by the *quit()* command.
+
 - **vwin()** - Create the viewer window to the right
     of the editor panel, if it does not already exist. Not
     needed if you start the Piety session from the *desktop*
@@ -476,5 +479,5 @@ The Piety desktop is influenced by
 [Oberon](https://people.inf.ethz.ch/wirth/ProjectOberon/UsingOberon.pdf), 
 and [Acme](http://acme.cat-v.org/).
 
-Revised May 2026
+Revised Jul 2026
 

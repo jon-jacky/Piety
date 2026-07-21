@@ -33,7 +33,7 @@ the beginning of the command:
 
 Run this command to start the Piety desktop, including the browser:
 
-    python3 -im vpm
+    python3 -im piety
 
 Now you can run the browser by typing [commands](#Commands) at the Python
 prompt, or by pressing [keycodes](#Keycodes). 
@@ -43,11 +43,11 @@ prompt, or by pressing [keycodes](#Keycodes).
 Each web page appears in *two* editor buffers: we download the HTML sent
 by the server into a buffer whose name is derived from its URL (it often
 ends in *.html*), then our browser renders the HTML into text into a
-buffer with the same base name, but ending in *.txt*. Both buffers can
+buffer with the same base name, but ending in *.htxt*. Both buffers can
 be selected and viewed by the usual editor commands or keycodes.
 
 The URL of the page appears in the first (top) line of both versions
-of the page.
+of the page, followed by a timestamp that shows when the page was loaded.
  
 In the rendered text page, hypertext links are displayed as footnotes.
 The text in the link is marked by underscores, and is followed by a
@@ -89,7 +89,7 @@ line at the end.  See below.
 
 We use the already existing editor features instead of adding
 new ones just to support the browser.  Instead of browser tabs,
-we list the browser buffers along with all the others in the buffer list.
+we list the web page buffers in a list, where you can select any one.
 Instead of a "back button", all the downloaded and rendered pages remain
 in buffers so they can be selected and viewed at any time.
 Instead of a "show HTML source" function, we always retain the HTML for each
@@ -168,18 +168,28 @@ by typing [keycodes](#Keycodes).
 - **grfx()** -  **Get** and **Render** web page whose URL is in the next 
     **Footnote** whose number is **eXtracted** from current line.
 
-- **N()** - list all buffer **Names** in the *\*Buffers\** buffer and
-   display it in the current window.  Buffers that hold web pages 
-    appear in the list among other buffers that hold text being edited.
-    The middle column holds the base URL of the page, used to generate
-    absolute URLs from relative URLs on that page.
+- **reload()** - Reload the web page shown in the current buffer.
+    Creates a new pair of buffers, but displays the *.htxt* in the same window.
     
-    To select a buffer, move the cursor to the line that lists 
-    that buffer and type *return* (or *enter*).
-    This is the usual way to view a web page that has already been loaded.
-    The buffer list is what we provide instead of browser tabs, a Back
-    button, or a Show Source button.
+- **W()** - list all the rendered web page buffers -- the *.htxt* buffers -- and 
+   display them in the viewer window. The first column holds the buffer
+   name. The middle column holds the base URL of the page, used to
+   generate absolute URLs from relative URLs on that page.
+    
+   To select a buffer, move the cursor to the line that lists that
+   buffer and type *C-o*. This is the usual way to view a web page that
+   has already been loaded. The buffer list is what we provide instead
+   of browser tabs, a Back button, or a Show Source button.
 
+   The *W()* command does not list the raw *.html* buffers.  Each page's
+   *.html* buffer has the same basename as its *.htxt* buffer in the list,
+   so you can display the *.html* buffer by explictly entering its full name
+   in the *b(...)* command or at the *C-x b* prompt.
+
+- **edsel.N()** - list all the buffers in one list, 
+   including *.html* and *.htxt* buffers, so you can select *.html*
+   files with *C-o* or *M-o*.
+    
 - **b()** - Return to the previous buffer.  This can be used like a
   browser 'Back button' to return to the page from which a link was loaded. 
 
@@ -188,6 +198,9 @@ by typing [keycodes](#Keycodes).
   You can type any of the names at the Python prompt, Python will
   print its literal URL string -- which you can also use as an 
   argument to *gr(url)*.
+
+- **clear_webpages()** - Deletes all the *.html* and *.htxt* buffers
+  from the Piety session.
 
 - **get.url** - Print the absolute URL that was most recently used to
    try to load a web page.  This can be useful for debugging base URLs
@@ -215,21 +228,32 @@ web pages.
 - **M-r** - invokes *r()*, **render** page in the current *.html* buffer to 
             a new *.txt* buffer.
 
+- **C-x C-w** - Invokes *W()* to list web page buffers, the *.htxt* buffers.
+            Any page in the list can be selected and displayed 
+            by *C-o* or *M-o*. 
+
 - **C-o** - invokes *viewer/grx(this_window=True)* via *viewer/loader()*.  
             Load web page at URL on line in same window, usually viewer.
             invokes *viewer/grfx(this_window=True) via *viewer/loader()* 
             Load web page at URL indicated by next footnote on line 
             in same window.
-
+            invokes *edsel/b(bname) via *viewer/loader()*
+            Load web page buffer named on line in same window.
+                        
 - **M-o** - invokes *viewer/grx(this_window=False)* via *viewer/loader()*.  
             Load web page at URL on line in other window, usually editor
             invokes *viewer/grfx(this_window=True) via *viewer/loader()* 
             Load web page at URL indicated by next footnote on line 
             in other window.
+            invokes *edsel/b(bname) via *viewer/loader()*
+            Load web page buffer named on line in other window.
 
  - **C-x b** - Invokes *b()*, return to previous buffer.
               Can be used like a browser 'Back button'
                 to return to the page from which a link was loaded.  
+              Or, can load web page buffer whose name is typed at the prompt.
+
+ - **C-x C-l** - Reload the web page shown in the current buffer.              
 
 ### Other Instructions ###
 
@@ -248,7 +272,14 @@ We require matching closing tags for every tag that uses them
 but unmatched tags will usually result in scrambled rendering.
 
 Here is how each tag is rendered:
+
+- **title** - The title appears on the first line of the raw *.html*
+    page and on the rendered *.htxt* page.
  
+    The first twleve characters of the title are the basename of the
+    web page *.html* and *.htxt* buffers (except some special characters
+    are replaced by hyphens).
+                
 - **h1 h2 h3 h4** - Header text appears on a line by itself,
     preceded and followed by empty lines.
 
@@ -331,7 +362,7 @@ supported at this writing, in Mar 2015:
                  )
 
 The base URL for each web page appears in a middle column of the buffer list
-shown by the *N()* command or the *C-x C-b* keycode.
+shown by the *W()* command or the *C-x C-w* keycode.
 
-Revised May 2026
+Revised July 2026
  
