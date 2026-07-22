@@ -48,7 +48,7 @@ columns across the full width of the display.
 
 Run this command to start the desktop:
 
-    python3 -im desktop
+    python3 -im piety
 
 The desktop appears, with the windows showing
 the buffers named in a startup file (see
@@ -146,7 +146,7 @@ below), instead of typing commands in the REPL.
 
 Session management:
 
-- **ve()** - Switch from the REPL to display editing
+- **de()** - Switch from the REPL to display editing
     in the focus window.  *pm()* also works.
 
 - **quit()** - Prompts *Are you SURE ...?* If the

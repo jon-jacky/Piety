@@ -265,16 +265,13 @@ can easily display them in the viewer window.
 ### HTML Tags ###
 
 The Piety browser only renders these HTML tags:
-*h1 h2 h3 h4 p li pre a strong em img br noscript* and some *div*.
-
-We require matching closing tags for every tag that uses them 
-(all but *img* and *br*).  We tried to code some error recovery,
-but unmatched tags will usually result in scrambled rendering.
+*title h1 h2 h3 h4 p li pre a strong em img br noscript* and some *div*.
 
 Here is how each tag is rendered:
 
-- **title** - The title appears on the first line of the raw *.html*
-    page and on the rendered *.htxt* page.
+- **title** - The title appears near the top of the raw *.html*
+    page and on the rendered *.htxt* page, right below the URL
+    that appears on the top line.
  
     The first twleve characters of the title are the basename of the
     web page *.html* and *.htxt* buffers (except some special characters
@@ -318,7 +315,20 @@ Here is how each tag is rendered:
 
 - **div** - Most *div* tags are not rendered.  Only a few *div* classes 
     are supported. The are rendered like paragraphs.
-    
+
+We require matching closing tags for every tag that uses them (all but
+*img* and *br*). We tried to code some error recovery, but unmatched
+tags often result in scrambled or missing text in the rendered *.htxt*
+buffer.
+
+Text that comes after an unmatched paragraph tag *<p>* that has no
+closing tag *</p>* might not appear in the rendered *.htxt* buffer. If
+you suspect there is text that is not being rendered, you can look for
+it in the raw *.html* buffer.
+
+Sometimes, text that appears in the raw *.html* buffer appears twice in
+the rendered *.htxt* buffer.
+     
 ### div Classes ###
 
 Only *div* tags whose *class* attributes have a few particular values
