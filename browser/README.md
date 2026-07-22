@@ -321,8 +321,8 @@ We require matching closing tags for every tag that uses them (all but
 tags often result in scrambled or missing text in the rendered *.htxt*
 buffer.
 
-Text that comes after an unmatched paragraph tag *<p>* that has no
-closing tag *</p>* might not appear in the rendered *.htxt* buffer. If
+Text that comes after an unmatched paragraph *p* tag that has no
+closing */p* tag might not appear in the rendered *.htxt* buffer. If
 you suspect there is text that is not being rendered, you can look for
 it in the raw *.html* buffer.
 
