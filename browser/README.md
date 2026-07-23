@@ -19,8 +19,7 @@ Downloaded web pages are stored and displayed in editor buffers.
  
 ### Quick Start ###
 
-Run the Piety browser in an ordinary session of the Piety display
-editor, [pmacs](../editors/README.md).  To start *pmacs*:
+Run the Piety browser in an ordinary session of the Piety desktop.
 
 There isn't any installation procedure.  Just clone the 
 Piety repository under your home directory.
@@ -36,7 +35,10 @@ Run this command to start the Piety desktop, including the browser:
     python3 -im piety
 
 Now you can run the browser by typing [commands](#Commands) at the Python
-prompt, or by pressing [keycodes](#Keycodes). 
+prompt, or by pressing [keycodes](#Keycodes).   
+
+There is a [tutorial](../viewer/desktop.txt) for the desktop with a section
+on the browser.
  
 ### Appearance ###
 

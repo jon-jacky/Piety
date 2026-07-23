@@ -56,7 +56,7 @@ the buffers named in a startup file (see
 
 If this is your first time using Piety, it will
 be helpful to read and work through the interactive
-tutorial displayed in the window on the right.
+[tutorial](desktop.txt)  displayed in the window on the right.
 
 After you become familiar, you can run the desktop by typing
 [commands](#Commands) at the Python prompt, or by typing
