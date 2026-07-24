@@ -2,8 +2,7 @@
 branches
 ========
 
-This is the *async-desktop* branch of the *rewrite* branch. 
-Make a version of the Piety desktop that can run the async demos.
+This is the *rewrite* branch. 
 
 Beginning in Feb 2023, a total rewrite of the Piety system is underway
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -14,6 +13,9 @@ into the *master* branch.
 
 Recent work in the *rewrite* branch:
 
+- 24 Jul 2026: Mereg the *async-desktop* branch back into
+   the *rewrite* branch.
+     
 -  6 June 2026:  Begin the *async-desktop* branch 
    to make a version of the Piety desktop that can run the async demos.
 
