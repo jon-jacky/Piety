@@ -2,7 +2,9 @@
 branches
 ========
 
-This is the *rewrite* branch. 
+This is the *async-prompt* branch of the *rewrite* branch. Fix typing
+responses to the prompts for file name, buffer name, search string etc.
+so they don't block other tasks when the even loop is running,
 
 Beginning in Feb 2023, I began a total rewrite of the Piety system
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -13,6 +15,10 @@ into the *master* branch.  The functionality here now exceeds what was
 in the *master* branch I abandoned in 2023.
 
 Recent work in the *rewrite* branch:
+
+- 24 Jul 2026:  Begin the *async-prompt* branch to fix typing responses 
+  to the prompts for file name, buffer name, search string etc. so they
+  don't block other tasks when the even loop is running,
 
 - 24 Jul 2026: Mereg the *async-desktop* branch back into
    the *rewrite* branch.
