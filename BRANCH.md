@@ -20,8 +20,8 @@ Recent work in the *rewrite* branch:
   to the prompts for file name, buffer name, search string etc. so they
   don't block other tasks when the even loop is running,
 
-- 24 Jul 2026: Mereg the *async-desktop* branch back into
-   the *rewrite* branch.
+- 24 Jul 2026: Merge the *async-desktop* branch back into
+   the *rewrite* branch.   
      
 -  6 June 2026:  Begin the *async-desktop* branch 
    to make a version of the Piety desktop that can run the async demos.
