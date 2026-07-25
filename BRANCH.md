@@ -4,12 +4,13 @@ branches
 
 This is the *rewrite* branch. 
 
-Beginning in Feb 2023, a total rewrite of the Piety system is underway
+Beginning in Feb 2023, I began a total rewrite of the Piety system
 here in the *rewrite* branch and its branches, to shorten and simplify 
 the code, and to make the programming environment more responsive.
 
 The *rewrite* branch is now the main branch.  I will never merge it back
-into the *master* branch.
+into the *master* branch.  The functionality here now exceeds what was 
+in the *master* branch I abandoned in 2023.
 
 Recent work in the *rewrite* branch:
 
