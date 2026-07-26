@@ -194,6 +194,46 @@ def append(keycode):
     dmacs.runcmd(key.cr) # calls dmacs append, which enters append mode.
     restore_cursor_to_window()
 
+# response that is updated and returned by request(prompt), other vars
+response = str()  
+respcol = 1 # column after prompt where first char of response goes
+respoint = 0 # index into response
+resprunning = False  # True when loop is running, accumulating characters
+
+def runrequest(c):
+    'Body of request() loop, editline handles a single char c without blocking'
+    global response, respoint, resprunning
+    k = keyseq.keyseq(c)
+    if k: # keyseq returns '' if key sequence is not complete
+        if k == key.cr:  # RET finishes entering response and returns
+            resprunning = False
+        elif k == key.C_g # Cancel
+            # ... tk cancel
+            resprunning = False
+        else:
+            response, respoint = el.runcmd(k, response, respoint, respcol)
+                                           
+def request(prompt):
+    'Use editline(), not like dmacs version that calls blocking input()'
+    global response, respoint, resprunning, respcol
+    display.put_cursor(promptline, 1)
+    display.kill_whole_line()
+    # terminal.set_line_mode() # Remain in char mode -- unlike dmacs
+    # response = input(prompt) # input() is blocking, instead loop on each char
+    # print prompt and assign respcol
+    response = ''
+    respoint = 0 
+    reqrunning = True
+    while reqrunning:
+        c = terminal.getchar() # blocking
+        runrequest(c) 
+    if cancelled(response):
+        dmacs.inform('Cancelled')  # also puts cursor at tlines
+    else: 
+        display.put_cursor(edsel.tlines, 1)
+    # terminal.set_char_mode() # We were in char mode all along
+    return response
+
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
