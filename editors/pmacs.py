@@ -7,6 +7,7 @@ or maybe 'poor imitation of emacs'.
 
 import terminal, key, keyseq, display, edsel, dmacs
 import sked as ed, editline as el
+import editcommand as ec # only used in runrequest 
 
 # Define and initialize global variables used by pmacs functions,
 # but only the *first* time this module is imported in a session.
@@ -194,6 +195,10 @@ def append(keycode):
     dmacs.runcmd(key.cr) # calls dmacs append, which enters append mode.
     restore_cursor_to_window()
 
+# Following code replaces request() from dmacs, which uses blocking input(),
+# with another request() written here that uses editline(), so it can  be
+# adapted to non-blocking async code.  The code here is still blocking, though.
+
 # response that is updated and returned by request(prompt), other vars
 response = str()  
 respcol = 1 # column after prompt where first char of response goes
@@ -207,33 +212,48 @@ def runrequest(c):
     if k: # keyseq returns '' if key sequence is not complete
         if k == key.cr:  # RET finishes entering response and returns
             resprunning = False
-        elif k == key.C_g # Cancel
-            # ... tk cancel
+        elif k == key.C_g: # Cancel
+            response += '???' # dmacs.cancelled tests response.endswith('???')
             resprunning = False
         else:
-            response, respoint = el.runcmd(k, response, respoint, respcol)
+            # NB ed.runcmd not el.runcmd here only, editcommand not editline 
+            response, respoint = ec.runcmd(k, response, respoint, respcol)
                                            
 def request(prompt):
     'Use editline(), not like dmacs version that calls blocking input()'
     global response, respoint, resprunning, respcol
-    display.put_cursor(promptline, 1)
+    display.put_cursor(dmacs.promptline, 1)
     display.kill_whole_line()
     # terminal.set_line_mode() # Remain in char mode -- unlike dmacs
     # response = input(prompt) # input() is blocking, instead loop on each char
-    # print prompt and assign respcol
     response = ''
     respoint = 0 
-    reqrunning = True
-    while reqrunning:
+    respcol = len(prompt) + 1
+    display.putstr(prompt) 
+    display.put_cursor(dmacs.promptline, respcol)
+    resprunning = True
+    while resprunning:
         c = terminal.getchar() # blocking
         runrequest(c) 
-    if cancelled(response):
+    if dmacs.cancelled(response):
         dmacs.inform('Cancelled')  # also puts cursor at tlines
     else: 
         display.put_cursor(edsel.tlines, 1)
     # terminal.set_char_mode() # We were in char mode all along
     return response
 
+# The following functions are copied from dmacs
+# but here they use the request() defined right above in this module.
+# They are entered into this module's keymap so we dob't use dmacs version
+# fcns called via keymap here must have a keycode arg even if they don't use it
+
+def find_file(keycode):
+    # global mark  # now use dmacs.mark
+    filename = request('Find file: ')
+    if not filename or dmacs.cancelled(filename): return #  type RET to cancel
+    dmacs.mark = 0
+    edsel.e(filename)
+ 
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
@@ -250,7 +270,10 @@ keymap = {
     #key.C_o: select_buffer, # select_buffer takes keycode arg - FIXME?
     # arrow keys, send ANSI escape sequences
     key.down: next_line,
-    key.up: prev_line,}
+    key.up: prev_line,
+    # Functions copied from dmacs that use request() defined here.
+    key.C_x + key.C_f : find_file,
+    }
 
 def keycmd(keycode):
     """
