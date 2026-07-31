@@ -53,8 +53,10 @@ def startpiety():
     # aclock.startclock0(-1, 1, col) # runclock() gets RunTimeError: loop exists
     
 # stoppiety = exit  does not work, exits from entire Python session
-#                   for now use ^D to exit from >>>> back to >>>
-     
+
+def stoppiety():
+    print('Type ^D to stop event loop and exit from >>>> back to >>>')
+
 def tasks():
     'Abbreviation for asyncio.all_tasks(piety)'
     pprint(asyncio.all_tasks(piety)) # pprint puts each task entry on own line
