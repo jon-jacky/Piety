@@ -3,10 +3,17 @@ editline.py - functions to edit and display a string with readline control keys.
   
 Unlike readline, call and return for each key so you can edit without blocking.
 
-This is the revised version which can edit text in a window on the left without
-disturbing text displayed in an adjacent window on the right.   The original
-version lives on, renamed but otherwise unchanged, in tasking/editcommand.py.
-Most of this revised editline duplicates code in the original editcommand.
+This editors/editline.py is based on the older tasking/editcommand.py.
+
+The code here has been generalized so it can edit text in a window on
+the left without disturbing text displayed in an adjacent window on the
+right, and it can edit text in a window on the right that is not aligned
+with the left edge of the terminal. This required some revisions and
+complications to the code in the old editcommand.
+
+The old editcommand module lives on because it is still used by working
+code that was written before we generalized the editor to support
+adjacent windows.   See tasking/editcommand.py for more explanation.
 """
 
 import string, re

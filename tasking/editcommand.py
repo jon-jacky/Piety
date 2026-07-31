@@ -3,12 +3,29 @@ editcommand.py - fcns to edit and display a string with readline control keys.
   
 Unlike readline, call and return for each key so you can edit without blocking.
 
-This is the original version of editors/editline.py.  This version uses
-ANSI control codes to insert and delete text on the terminal screen, so
-it cannot be used to edit text in a window on the left without disturbing
-text displayed in an adjacent window on the right.   A revised version of
-this module which can work alongside another window is now in 
-editors/editline.py, which mostly duplicates the code here.
+This module, tasking/editcommand.py, is the original version of
+editors/editline.py. This version uses ANSI control codes to insert and
+delete text on the terminal screen, so it cannot be used to edit text in
+a window on the left without disturbing text displayed in an adjacent
+window on the right.
+
+We use this editcommand, not editline, for editing text in the scrolling 
+region at the bottom of the screen, which extends the full screen width.
+
+At this time we use editcommand in two contexts:
+
+ 1. In the pyshell.py runcmd fcn, for editing Python statements in the REPL
+ 2. In the pmacs.py runrequest fnc, for editing responses to prompts for
+     file name, buffer name, search string etc.
+
+There is mostly duplicated code in editcommand and the newer editline, but
+we keep this older editcommand because it has simpler handling of 
+start_col, which is adequate for these two contexts.  And, pyshell.py
+was already working with editcommand when we began the new editline.  
+
+It would not be difficult to adapt the code in these two contexts
+to use the newer editline, so we could eliminate this editcommand, 
+but we don't feel it is worth the effort at this time.
 """
 
 import string, re

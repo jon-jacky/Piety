@@ -5,7 +5,7 @@ pmacs might mean 'Python emacs' but actually means 'partly inspired by emacs'
 or maybe 'poor imitation of emacs'.
 """
 
-import terminal, key, keyseq, display, edsel, dmacs
+import terminal, key, keyseq, display, edsel, dmacs, pycall 
 import sked as ed, editline as el
 import editcommand as ec # only used in runrequest 
 
@@ -247,13 +247,71 @@ def request(prompt):
 # They are entered into this module's keymap so we dob't use dmacs version
 # fcns called via keymap here must have a keycode arg even if they don't use it
 
+def request_search():
+    if not dmacs.prev_cmd in (fwd_search, bkwd_search):
+        response = request(f'Search string (default {ed.searchstring}): ')
+        if response and not dmacs.cancelled(response): ed.searchstring = response
+        return response # because caller always check cancelled(response)
+    else:
+        return ed.searchstring # callers always check cancelled(response)
+
+def fwd_search(keycode):
+    response = request_search() # might update ed.searchstring
+    if dmacs.cancelled(response): return # response might indicate search cancelled
+    edsel.s()
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+    
+def bkwd_search(keycode):
+    response = request_search()
+    if dmacs.cancelled(response): return
+    edsel.r()
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+    
+def switch_buffer(keycode):
+    # global mark # now use dmacs.mark
+    response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
+    if dmacs.cancelled(response): return
+    dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
+    edsel.b(response)
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+    
 def find_file(keycode):
     # global mark  # now use dmacs.mark
     filename = request('Find file: ')
     if not filename or dmacs.cancelled(filename): return #  type RET to cancel
     dmacs.mark = 0
     edsel.e(filename)
- 
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+
+def write_named_file(keycode):
+    filename = request('Write file: ')
+    if dmacs.cancelled(filename): return
+    edsel.w(filename)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
+    
+def python_cmd(keycode):
+    'Get and run a single Python command'
+    cmd = request('>>> ')
+    if dmacs.cancelled(cmd): return
+    pycall.pycall(cmd)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
+    
+def replace_string(keycode):
+    response = request(f'Replace string (default {ed.searchstring}): ') 
+    if dmacs.cancelled(response): return
+    if response: ed.searchstring = response
+    response = request(
+     f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
+    if dmacs.cancelled(response): return
+    if response == '\\\\\\': ed.replacestring = '' # \\\ -> empty string
+    elif response: ed.replacestring = response # replace previous default
+    else: pass # use previous default
+    # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
+    def c1(start=None, end=None):
+        edsel.c(ed.searchstring, ed.replacestring, start, end)
+    dmacs.in_region(c1)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
+    
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
@@ -272,7 +330,13 @@ keymap = {
     key.down: next_line,
     key.up: prev_line,
     # Functions copied from dmacs that use request() defined here.
+    key.C_s: fwd_search,
+    key.C_r: bkwd_search,
+    key.C_x + 'b' : switch_buffer,
     key.C_x + key.C_f : find_file,
+    key.C_x + key.C_w : write_named_file, # write file, prompt for filename
+    key.M_y: python_cmd,
+    key.M_percent: replace_string, # M-%    
     }
 
 def keycmd(keycode):
