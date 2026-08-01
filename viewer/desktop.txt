@@ -64,8 +64,9 @@ string you most recently searched for. Just
 press ENTER to accept the default without
 retyping it. You can edit at the prompt by
 typing BACKSPACE and retyping. To cancel the
-search operation, type ??? at the end of the
-search string and press ENTER.
+search operation and discard the search text,
+just type C-g. Or type ??? at the end of the
+search text and press ENTER.
 
 Search is case sensitive. Searching for
 scroll will not find Scroll, etc.  
@@ -170,8 +171,8 @@ End up back here at desktop.txt.
 You can edit the buffer name at the C-x b prompt by
 using the backspace key and re-typing. To
 cancel the C-x b operation and retain the same
-buffer, type ??? at the end of the buffer name
-string, then type ENTER.
+buffer, just type C-g. Or type ??? at the end of
+the buffer name string, then type ENTER.
 
 You can type C-x k to delete the current
 buffer -- but don't do it now!
@@ -284,7 +285,7 @@ Directories
 
 You can create a buffer by loading its
 contents from a file on disk. To see what 
-files are there, type C-x C-d to list a
+files are there, type C-x d to list a
 directory.   A prompt appears:
 
  List directory (default /home/jon/Piety): 
@@ -301,18 +302,18 @@ right. File names that are followed by the
 slash character / are subdirectories.
 
 To list a subdirectory, type its name at the
-prompt. Try it: type C-x C-d, then type
+prompt. Try it: type C-x d, then type
 viewer, then press ENTER. The directory
 listing for the viewer sudirectory appears at
 the end of the *Console* buffer and the
 previous directory listing scrolls up.
 
-You must type the complete directory name 
-at the promt.  You cannot abbreviate it and
+You must type the complete subdirectory name 
+at the prompt.  You cannot abbreviate it and
 type ?.  You can edit it by using BACKSPACE
 and then retyping.  You can cancel the operation
-by typing ??? at the end of the string, then 
-ENTER.
+by typing C-g. Or, you can type ??? at the
+end of the string, then ENTER.
 
 There is another way to list a subdirectory.
 Try it: position the cursor over the line with
@@ -367,15 +368,16 @@ viewer/vpm.py ENTER. The new buffer vpm.py and
 its contents appears in the current window.
 
 You can always show the current working
-directory by typing C-x C-d. It appears in the
-prompt. Type ??? to dismiss the prompt.
+directory by typing C-x d. It appears in the
+prompt. Type C-g to dismiss the prompt, or 
+type ??? and then ENTER.
 
 You must type the complete file name 
 at the prompt.  You cannot abbreviate it and
 type ?.  You can edit it by using BACKSPACE
 and then retyping.  You can cancel the operation
-by typing ??? at the end of the string, then 
-ENTER.
+by typing C-g. Or, type ??? at the end of the
+string, then ENTER.
 
 There is another way to load a file. Put the
 cursor over the file name in the directory 
@@ -510,7 +512,7 @@ uses pm() not de().  The commands ve() ved()
 and ee() also work.
 
 Try it, type de() at the REPL.  Now type
-C-x C-d to confirm that the new default
+C-x d to confirm that the new default
 directory is still the viewer subdirectory.
  
 You can recall previous commands in the REPL
@@ -529,8 +531,8 @@ single Python statement on the prompt line,
 and then return to the desktop window
 immediately, without having to type the de()
 command. Using C-p (etc.) to access command
-history and ??? to cancel the request also
-work at this prompt.
+history.  C-g or ??? then ENTER to cancel
+the request also work at this prompt.
 
 Every Piety key discussed in this document
 and keys.txt calls a Python function. You can
@@ -552,8 +554,9 @@ You can browse the web in the Piety desktop.
 Downloaded web pages appear in editor buffers.
 The pages do not appear in the list of
 ordinary buffers shown by typing C-x C-b. Type
-C-x C-w to show *Webpages*, the list of web
-page buffers.
+C-x w to show *Webpages*, the list of web
+page buffers. (Not C-x C-w, that prompts for
+a file name to write.)
 
 To get started web browsing, type C-x C-b to
 display the list of ordinary buffers, then put
@@ -653,7 +656,7 @@ the cursor before that footnote and type C-o
 to display the next Hacker News page in the
 viewer.
 
-Type C-x C-w to show the list of web page
+Type C-x w to show the list of web page
 buffers in the viewer window. The page URLs
 appear in the buffer list entries, instead of
 file names.
@@ -662,8 +665,8 @@ For each web page, there are two buffers: an
 .html buffer that holds the HTML source, and
 an .htxt buffer that holds the rendered text.
 When you select a page with C-o or M-o, Piety
-displays the rendered .htxt page. Typing C-x
-C-w just shows the list of .htxt pages. 
+displays the rendered .htxt page. Typing C-x w
+just shows the list of .htxt pages. 
 
 If you want to see any web page again, you can
 select its buffer in the usual way -- this is

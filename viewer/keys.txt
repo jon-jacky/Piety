@@ -62,7 +62,18 @@ C-s  Search forward
 C-r  Search backward
 
 M-%  Replace
-  
+
+Prompts
+
+Several commands prompt for a file name,
+buffer name, search string, etc.
+
+C-g        Cancel command at the prompt
+??? ENTER  Cancel command at the prompt
+
+Many of the editing keys also work 
+as you type at the prompt.
+
 Buffers
 
 C-x C-b   List buffers, except web pages
@@ -180,7 +191,7 @@ C-x C-a  Enter append mode
          
 Web browsing         
 
-C-x C-w   List web pages (.htxt buffers)
+C-x w  List web pages (.htxt buffers)
 
 C-o  Open URL named on this viewer line
      in viewer window

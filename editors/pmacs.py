@@ -215,6 +215,7 @@ def runrequest(c):
         elif k == key.C_g: # Cancel
             response += '???' # dmacs.cancelled tests response.endswith('???')
             resprunning = False
+        # FIXME? We could have history, navigate with C_p and C_n
         else:
             # NB ed.runcmd not el.runcmd here only, editcommand not editline 
             response, respoint = ec.runcmd(k, response, respoint, respcol)
@@ -237,6 +238,7 @@ def request(prompt):
         runrequest(c) 
     if dmacs.cancelled(response):
         dmacs.inform('Cancelled')  # also puts cursor at tlines
+        restore_cursor_to_window() # but we want it in the window
     else: 
         display.put_cursor(edsel.tlines, 1)
     # terminal.set_char_mode() # We were in char mode all along
@@ -247,7 +249,7 @@ def request(prompt):
 # They are entered into this module's keymap so we dob't use dmacs version
 # fcns called via keymap here must have a keycode arg even if they don't use it
 
-def request_search():
+def request_search(): 
     if not dmacs.prev_cmd in (fwd_search, bkwd_search):
         response = request(f'Search string (default {ed.searchstring}): ')
         if response and not dmacs.cancelled(response): ed.searchstring = response
@@ -258,12 +260,14 @@ def request_search():
 def fwd_search(keycode):
     response = request_search() # might update ed.searchstring
     if dmacs.cancelled(response): return # response might indicate search cancelled
+    edsel.restore_cursor_to_cmdline() # So 'not found' message appears there
     edsel.s()
     restore_cursor_to_window() # dmacs runcmd does this automatically
     
 def bkwd_search(keycode):
     response = request_search()
     if dmacs.cancelled(response): return
+    edsel.restore_cursor_to_cmdline() # So 'not found' message appears there    
     edsel.r()
     restore_cursor_to_window() # dmacs runcmd does this automatically
     
@@ -310,8 +314,8 @@ def replace_string(keycode):
     def c1(start=None, end=None):
         edsel.c(ed.searchstring, ed.replacestring, start, end)
     dmacs.in_region(c1)
-    restore_cursor_to_window() # dmacs runcmd does this automatically    
-    
+ # pmacs request, above    restore_cursor_to_window() # dmacs runcmd does this automatically    
+
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
@@ -337,6 +341,7 @@ keymap = {
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     key.M_y: python_cmd,
     key.M_percent: replace_string, # M-%    
+    # key.C_x + 'd' : vdir # vdir is in viewer module, not here in pmacs
     }
 
 def keycmd(keycode):

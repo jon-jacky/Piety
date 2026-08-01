@@ -230,7 +230,7 @@ web pages.
 - **M-r** - invokes *r()*, **render** page in the current *.html* buffer to 
             a new *.txt* buffer.
 
-- **C-x C-w** - Invokes *W()* to list web page buffers, the *.htxt* buffers.
+- **C-x w** - Invokes *W()* to list web page buffers, the *.htxt* buffers.
             Any page in the list can be selected and displayed 
             by *C-o* or *M-o*. 
 
@@ -374,7 +374,7 @@ supported at this writing, in Mar 2015:
                  )
 
 The base URL for each web page appears in a middle column of the buffer list
-shown by the *W()* command or the *C-x C-w* keycode.
+shown by the *W()* command or the *C-x w* keycode.
 
 Revised July 2026
  

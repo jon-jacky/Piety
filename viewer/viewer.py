@@ -269,16 +269,7 @@ def man(topic):
 def help(topic):
     viewer_window(lambda: console.help(topic))
 
-def vdir():
-    """
-    Prompt for directory (default cwd), then list directory in viewer window
-    """
-    cwd = os.getcwd()
-    path = dmacs.request(f'List directory (default {cwd}): ')
-    if dmacs.cancelled(path): return
-    if not path: path = cwd
-    lsl(path)    
-        
+            
 # Browser functions
 # Overwrites browser function names imported by 'from browser import *'
 # You can still invoke browser.grx() etc. by providing browser. prefix
@@ -365,7 +356,18 @@ def file_key(): # C-x C-f
     if dmacs.cancelled(filename): return
     dmacs.mark = 0
     e(filename) # use correct file load fcn (above) for viewer or editor window
-                
+
+def vdir(keycode):
+    """
+    Prompt for directory (default cwd), then list directory in viewer window
+    """
+    cwd = os.getcwd()
+    path = pmacs.request(f'List directory (default {cwd}): ') # pmacs not dmacs
+    if dmacs.cancelled(path): return
+    if not path: path = cwd
+    lsl(path) # calls viewer_window
+    pmacs.restore_cursor_to_window() # dmacs runcmd does this automatically        
+    
 def buffer_key(): # C-x b
     """
     Imitates dmacs switch_buffer
@@ -546,7 +548,7 @@ dmacs.keymap[key.C_x + key.C_r] = save_reload # local save_reload above
 dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
 
 # Prompt for directory (default cwd) then display file list in viewer window
-dmacs.keymap[key.C_x + key.C_d] = vdir # 
+pmacs.keymap[key.C_x + 'd' ] = vdir # pmacs keymap, use pmacs.request
  
 # Load contents named on line into this window, usually the viewer
 dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
@@ -556,7 +558,7 @@ dmacs.keymap[key.M_o] = (lambda: loader(this_window=False))
 
 # C-x C-b - list buffers without webpages, C-x C-w list .html buffers
 dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N or browser.NM
-dmacs.keymap[key.C_x + key.C_w] = W # W defined above, not browser.W 
+dmacs.keymap[key.C_x + 'w' ] = W # W defined above, not browser.W 
   
 def quit():
     """

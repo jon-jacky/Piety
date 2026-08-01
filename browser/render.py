@@ -290,9 +290,9 @@ def reload():
     
 # Add keycodes for browser operations to keymap 
 
-# C-x C-b - list buffers without webpages, C-x C-w list .html buffers
+# C-x C-b - list buffers without webpages, C-x w list .html buffers
 dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N
-dmacs.keymap[key.C_x + key.C_w] = W # W defined above
+dmacs.keymap[key.C_x + 'w'] = W # W defined above
 
 # C-x C-l - reload web page shown in current buffer
 dmacs.keymap[key.C_x + key.C_l] = reload # reload defined above

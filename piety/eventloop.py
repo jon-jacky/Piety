@@ -47,11 +47,13 @@ def startpiety():
     apyshell.setup()
     apyshell.running = True
     piety.run_forever()
-    # For some reason, startclock has no effect when called here
+    # For some reason, startclock has no effect when called here:
     # tlines, tcols = terminal_util.dimensions()
     # col = tcols - 10 # 10 not 11 for hh:mm:ss am  #DEBUG assign global col
     # aclock.startclock0(-1, 1, col) # runclock() gets RunTimeError: loop exists
-    
+    # This doesn't work either:
+    # print(piety) # print a message to show event loop is running
+        
 # stoppiety = exit  does not work, exits from entire Python session
 
 def stoppiety():
