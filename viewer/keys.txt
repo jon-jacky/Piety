@@ -18,6 +18,7 @@ like the same keys in the Emacs editor.
 Contents
 Scrolling
 Search and Replace
+Prompts
 Buffers
 Windows
 Directories
@@ -239,5 +240,5 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md 
       
-Revised June 2026
+Revised Jul 2026
 
