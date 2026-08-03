@@ -83,6 +83,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Lisp compiler](https://github.com/jbush001/LispMicrocontroller/blob/master/compile.py) | Lisp | Compiler for a custom "simple microcontroller that runs a compiled LISP dialect" |
 | [pixie](https://github.com/pixie-lang/pixie), also [HN](https://news.ycombinator.com/item?id=8480608) | Lisp | "a lightweight Lisp ... inspired by Clojure ... written in RPython" |
 | [planckforth](https://github.com/nineties/planckforth/blob/main/others/planck.py) | Forth | Demonstrates low-level programming with *ctypes* and *struct* modules |
+| [micro-javascript](https://github.com/simonw/micro-javascript) | Javascript | "A pure Python JavaScript engine ... No C extensions or  external dependencies  ... built using Claude Code ... |
 
-Revised Jun 2026
+Revised Aug 2026
   
