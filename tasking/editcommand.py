@@ -18,14 +18,12 @@ At this time we use editcommand in two contexts:
  2. In the pmacs.py runrequest fnc, for editing responses to prompts for
      file name, buffer name, search string etc.
 
-There is mostly duplicated code in editcommand and the newer editline, but
-we keep this older editcommand because it has simpler handling of 
-start_col, which is adequate for these two contexts.  And, pyshell.py
-was already working with editcommand when we began the new editline.  
-
-It would not be difficult to adapt the code in these two contexts
-to use the newer editline, so we could eliminate this editcommand, 
-but we don't feel it is worth the effort at this time.
+This old editcommand module lives on because edsel.start_col is embedded
+deeply and pervasively in editline. edsel.start_col is not parameterized
+in editline, and does not appear in the editline API, so pyshell and
+pmacs request can't be generalized to use editline. When the viewer is
+the current window, editline might try to align the REPL command or
+response to the prompt with the viewer left edge - the wrong thing to do.
 """
 
 import string, re

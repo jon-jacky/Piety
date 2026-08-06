@@ -314,7 +314,7 @@ def replace_string(keycode):
     def c1(start=None, end=None):
         edsel.c(ed.searchstring, ed.replacestring, start, end)
     dmacs.in_region(c1)
- # pmacs request, above    restore_cursor_to_window() # dmacs runcmd does this automatically    
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
 
 keymap = {
     key.C_n: next_line,

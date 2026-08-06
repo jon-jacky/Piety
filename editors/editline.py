@@ -3,7 +3,8 @@ editline.py - functions to edit and display a string with readline control keys.
   
 Unlike readline, call and return for each key so you can edit without blocking.
 
-This editors/editline.py is based on the older tasking/editcommand.py.
+This editors/editline.py is based on the older tasking/editcommand.py
+(which was originally named editline.py)
 
 The code here has been generalized so it can edit text in a window on
 the left without disturbing text displayed in an adjacent window on the
@@ -11,9 +12,24 @@ right, and it can edit text in a window on the right that is not aligned
 with the left edge of the terminal. This required some revisions and
 complications to the code in the old editcommand.
 
+This new editline adds almost 60 lines (out of 340), much of it
+replacing the vt_terminal/display.py functions - which insert or delete
+text from the current line, which would disturb text in the viewer
+window. The new code here in editline overwrites text in the current line and
+pads with trailing spaces, to avoid disturbing text in the viewer.
+
+editline uses edsel.start_col internally to update in the right window
+(editors or viewer). edsel.start_col is embedded deeply and pervasively
+in editline. So editline has to import edsel -- it's tightly integrated
+with the desktop code.
+
 The old editcommand module lives on because it is still used by working
-code that was written before we generalized the editor to support
-adjacent windows.   See tasking/editcommand.py for more explanation.
+code in pyshell runcmd and pmacs request that was written before we
+generalized the editor to support adjacent windows. edsel.start_cmd is
+not parameterized in editline, and does not appear in the editline API,
+so pyshell and pmacs request can't be generalized to use this editline.
+
+See tasking/editcommand.py for more explanation.
 """
 
 import string, re
