@@ -32,6 +32,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Tested Semantics for Python](https://cs.brown.edu/~sk/Publications/Papers/Published/pmmwplck-python-full-monty)  | Research paper, abstract and links to full PDF and software | "We present a small-step operational semantics for the Python programming language. We present both a core language for Python, suitable for tools and proofs, and a translation process for converting Python source to this core. We have tested ... the core for conformance with the primary Python implementation ... |
 | [Reverse-Engineering Python](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also  [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | UCPy compiler, targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
 | [Repy](https://seattle.poly.edu/wiki/ProgrammersPage), also [here](https://seattle.poly.edu/wiki/UnderstandingSeattle/CodeSafety) and [here](https://github.com/SeattleTestbed/repy_v2) | Python subset, sandboxed VM | "Restricted Python" language, runtime, sandboxed VM for writing distributed computing applications for the [Seattle testbed](https://seattle.poly.edu/html/) |
+| [Threadsnek](https://dercuano.github.io/notes/thredsnek.html), a tiny Python-flavored programming language | notes, fragments | "I think the most important linguistic reasons current Python is so effective are the following: ..." |
 | **Educational Compilers** |||
 | [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
 | [Tailbiter](https://codewords.recurse.com/issues/seven/dragon-taming-with-tailbiter-a-bytecode-compiler) | Python to bytecode compiler | "... a small compiler able to compile itself ... in and for a subset of Python 3 ... I wrote this to accompany (the Byterun bytecode interpreter below) which takes the output of a compiler and executes it"|
@@ -83,7 +84,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Lisp compiler](https://github.com/jbush001/LispMicrocontroller/blob/master/compile.py) | Lisp | Compiler for a custom "simple microcontroller that runs a compiled LISP dialect" |
 | [pixie](https://github.com/pixie-lang/pixie), also [HN](https://news.ycombinator.com/item?id=8480608) | Lisp | "a lightweight Lisp ... inspired by Clojure ... written in RPython" |
 | [planckforth](https://github.com/nineties/planckforth/blob/main/others/planck.py) | Forth | Demonstrates low-level programming with *ctypes* and *struct* modules |
-| [micro-javascript](https://github.com/simonw/micro-javascript) | Javascript | "A pure Python JavaScript engine ... No C extensions or  external dependencies  ... built using Claude Code ... |
+| [micro-javascript](https://github.com/simonw/micro-javascript) | Javascript | "A pure Python JavaScript engine ... No C extensions or  external dependencies  ... built using Claude Code ..." |
 
 Revised Aug 2026
   
