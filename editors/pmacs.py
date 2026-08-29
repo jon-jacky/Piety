@@ -5,9 +5,11 @@ pmacs might mean 'Python emacs' but actually means 'partly inspired by emacs'
 or maybe 'poor imitation of emacs'.
 """
 
-import terminal, key, keyseq, display, edsel, dmacs, pycall 
+import os # for vdir
+import terminal, key, keyseq, display, edsel, dmacs, pycall
 import sked as ed, editline as el
 import editcommand as ec # only used in runrequest 
+import viewer # for lsl in vdir
 
 # Define and initialize global variables used by pmacs functions,
 # but only the *first* time this module is imported in a session.
@@ -204,22 +206,26 @@ response = str()
 respcol = 1 # column after prompt where first char of response goes
 respoint = 0 # index into response
 resprunning = False  # True when loop is running, accumulating characters
+respfinish = None # Assign _finish function to run when response is complete
 
-def runrequest(c):
-    'Body of request() loop, editline handles a single char c without blocking'
+def runrequest():
+    'Body of request() loop, editline can handle a single char c without blocking'
     global response, respoint, resprunning
+    c = terminal.getchar()  # might block here waiting for next character
     k = keyseq.keyseq(c)
     if k: # keyseq returns '' if key sequence is not complete
         if k == key.cr:  # RET finishes entering response and returns
             resprunning = False
+            if respfinish: respfinish() # might be None for backward compat.
         elif k == key.C_g: # Cancel
             response += '???' # dmacs.cancelled tests response.endswith('???')
             resprunning = False
+            if respfinish: respfinish() # might be None for backward compat.            
         # FIXME? We could have history, navigate with C_p and C_n
         else:
             # NB ed.runcmd not el.runcmd here only, editcommand not editline 
             response, respoint = ec.runcmd(k, response, respoint, respcol)
-                                           
+
 def request(prompt):
     'Use editline(), not like dmacs version that calls blocking input()'
     global response, respoint, resprunning, respcol
@@ -234,8 +240,41 @@ def request(prompt):
     display.put_cursor(dmacs.promptline, respcol)
     resprunning = True
     while resprunning:
-        c = terminal.getchar() # blocking
-        runrequest(c) 
+        runrequest() # blocks waiting for each character here
+    if dmacs.cancelled(response):
+        dmacs.inform('Cancelled')  # also puts cursor at tlines
+        restore_cursor_to_window() # but we want it in the window
+    else: 
+        display.put_cursor(edsel.tlines, 1)
+    # terminal.set_char_mode() # We were in char mode all along
+    return response
+
+# For async, we must split request_start and request_finish                                           
+def request_start(prompt):
+    'Use editline(), not like dmacs version that calls blocking input()'
+    global response, respoint, resprunning, respcol
+    display.put_cursor(dmacs.promptline, 1)
+    display.kill_whole_line()
+    # terminal.set_line_mode() # Remain in char mode -- unlike dmacs
+    # response = input(prompt) # input() is blocking, instead loop on each char
+    response = ''
+    respoint = 0 
+    respcol = len(prompt) + 1
+    display.putstr(prompt) 
+    display.put_cursor(dmacs.promptline, respcol)
+    resprunning = True
+    # FIXME? Here eventloop would make a circular import with pmacs!
+    # if eventloop.piety.is_running(): return # yield to async eventloop
+    # Only run the following getchar loop if async eventloop is *not* running    
+    while resprunning:
+        # runrequest now calls getchar, blocks waiting for each char
+        runrequest() # This must be last statement in request_start
+                      # because key.cr case calls request_finish
+    # runrequest updates response, but return None here.    
+
+def request_finish():
+    # This has to be a separate function so it can be moved to _finish
+    # response has been updated by sync or async when we get here
     if dmacs.cancelled(response):
         dmacs.inform('Cancelled')  # also puts cursor at tlines
         restore_cursor_to_window() # but we want it in the window
@@ -270,15 +309,32 @@ def bkwd_search(keycode):
     edsel.restore_cursor_to_cmdline() # So 'not found' message appears there    
     edsel.r()
     restore_cursor_to_window() # dmacs runcmd does this automatically
-    
-def switch_buffer(keycode):
+
+# Hide this fcn while we experiment with new version, below    
+def Xswitch_buffer(keycode):
     # global mark # now use dmacs.mark
     response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
     if dmacs.cancelled(response): return
     dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
     edsel.b(response)
     restore_cursor_to_window() # dmacs runcmd does this automatically
-    
+
+# New version adapted for async - split off switch_buffer_finish
+def switch_buffer(keycode):
+    global respfinish
+    respfinish = switch_buffer_finish
+    # request_start returns nothing, in sync mode does update response
+    request_start(f'Switch to buffer (default {ed.prev_bufname}): ')
+     
+def switch_buffer_finish():
+    global respfinish
+    respfinish = None # see runrequest key.cr case, for backward compatibility
+    response = request_finish() # request_finish returns response
+    if dmacs.cancelled(response): return
+    dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
+    edsel.b(response)
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+        
 def find_file(keycode):
     # global mark  # now use dmacs.mark
     filename = request('Find file: ')
@@ -316,6 +372,20 @@ def replace_string(keycode):
     dmacs.in_region(c1)
     restore_cursor_to_window() # dmacs runcmd does this automatically    
 
+# This function is from viewer
+
+def vdir(keycode):
+    """
+    Prompt for directory (default cwd), then list directory in viewer window
+    """
+    cwd = os.getcwd()
+    path = request(f'List directory (default {cwd}): ') # pmacs not dmacs
+    if dmacs.cancelled(path): return
+    if not path: path = cwd
+    viewer.lsl(path) # calls viewer_window
+    restore_cursor_to_window() # dmacs runcmd does this automatically        
+    
+
 keymap = {
     key.C_n: next_line,
     key.C_p: prev_line,
@@ -341,7 +411,7 @@ keymap = {
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     key.M_y: python_cmd,
     key.M_percent: replace_string, # M-%    
-    # key.C_x + 'd' : vdir # vdir is in viewer module, not here in pmacs
+    key.C_x + 'd' : vdir
     }
 
 def keycmd(keycode):

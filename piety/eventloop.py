@@ -30,6 +30,8 @@ import aclock, terminal_util  # just for clock called from startpiety
 def handler():
     if pyshell.cmd_mode:
         apyshell.apysh() # async shell
+    #elif pmacs.resprunning:  # pmacs would make circular import eventloop
+    #    pmacs.runrequest() # typing response to prompt in display editor
     else:
         apmacs.apmrun()  # async display editor foreground job       
 

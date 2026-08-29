@@ -3,8 +3,9 @@
 # If you install Piety, commands and modules may go to some standard place
 #  and you will no longer need these assignments.
 
-# define $PIETY, this definition assumes you have ~/Piety
-export PIETY=$HOME/Piety 
+# define $PIETY, this definition assumes you have ~/Piety-async
+# export PIETY=$HOME/Piety # NOT!!
+export PIETY=$HOME/Piety-async # for testing cde
 
 # execution path to bin, to run Piety commands: piety, possibly others
 export PATH=$PIETY/bin:$PATH
