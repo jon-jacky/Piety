@@ -6,7 +6,7 @@ apmacs.py - Adapt our pmacs editor to run in an asyncio event loop.
             script to load the editor modules and create the initial window).
 """ 
 
-import terminal, key, display, pmacs, pyshell
+import terminal, key, display, pmacs, pyshell, apyshell
 
 def apm():
    """
@@ -30,6 +30,15 @@ def apmrun():
         pyshell.cmd = ''
         pyshell.point = 0
         pyshell.setup() # prints prompt and refreshes command line
+
+# handler function  moved here from eventloop, to break import loop with pmacs
+def handler():
+    if pyshell.cmd_mode:
+        apyshell.apysh() # async shell
+    elif pmacs.resprunning:
+        pmacs.runrequest()  # prompt/request/response
+    else:
+        apmrun()  # async display editor foreground job       
 
 # Synonyms for apm, possibly more memorable: 'visual editor', 'display editor'
 ave = apm   # visual editor

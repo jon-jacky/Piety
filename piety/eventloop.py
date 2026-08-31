@@ -24,19 +24,13 @@ from our name eventloop.
 
 import sys, asyncio
 from pprint import pprint
-import pyshell, apyshell, apmacs
+import pyshell, apyshell, apmacs  # but not pmacs - which imports eventloop
 import aclock, terminal_util  # just for clock called from startpiety
- 
-def handler():
-    if pyshell.cmd_mode:
-        apyshell.apysh() # async shell
-    #elif pmacs.resprunning:  # pmacs would make circular import eventloop
-    #    pmacs.runrequest() # typing response to prompt in display editor
-    else:
-        apmacs.apmrun()  # async display editor foreground job       
+
+# handler function has been moved to apmacs to break import loop with pmacs
 
 piety = asyncio.get_event_loop() # piety is the name of our event loop object
-piety.add_reader(sys.stdin, handler) # enable shell and editor to run in loop
+piety.add_reader(sys.stdin, apmacs.handler) # so shell and editor run in loop
 
 col = 1 # Assigned from startpiety body
 

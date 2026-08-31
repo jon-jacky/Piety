@@ -10,6 +10,7 @@ import terminal, key, keyseq, display, edsel, dmacs, pycall
 import sked as ed, editline as el
 import editcommand as ec # only used in runrequest 
 import viewer # for lsl in vdir
+import eventloop # only used for 'if eventloop.is_running()' in request_start
 
 # Define and initialize global variables used by pmacs functions,
 # but only the *first* time this module is imported in a session.
@@ -263,8 +264,7 @@ def request_start(prompt):
     display.putstr(prompt) 
     display.put_cursor(dmacs.promptline, respcol)
     resprunning = True
-    # FIXME? Here eventloop would make a circular import with pmacs!
-    # if eventloop.piety.is_running(): return # yield to async eventloop
+    if eventloop.piety.is_running(): return # yield to async eventloop
     # Only run the following getchar loop if async eventloop is *not* running    
     while resprunning:
         # runrequest now calls getchar, blocks waiting for each char
