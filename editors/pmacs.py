@@ -251,9 +251,11 @@ def request(prompt):
     return response
 
 # For async, we must split request_start and request_finish                                           
-def request_start(prompt):
+def request_start(prompt, finish_fcn):
     'Use editline(), not like dmacs version that calls blocking input()'
     global response, respoint, resprunning, respcol
+    global respfinish
+    respfinish = finish_fcn
     display.put_cursor(dmacs.promptline, 1)
     display.kill_whole_line()
     # terminal.set_line_mode() # Remain in char mode -- unlike dmacs
@@ -275,6 +277,8 @@ def request_start(prompt):
 def request_finish():
     # This has to be a separate function so it can be moved to _finish
     # response has been updated by sync or async when we get here
+    global respfinish
+    respfinish = None # see runrequest key.cr case, for backward compatibility
     if dmacs.cancelled(response):
         dmacs.inform('Cancelled')  # also puts cursor at tlines
         restore_cursor_to_window() # but we want it in the window
@@ -321,14 +325,11 @@ def Xswitch_buffer(keycode):
 
 # New version adapted for async - split off switch_buffer_finish
 def switch_buffer(keycode):
-    global respfinish
-    respfinish = switch_buffer_finish
     # request_start returns nothing, in sync mode does update response
-    request_start(f'Switch to buffer (default {ed.prev_bufname}): ')
+    request_start(f'Switch to buffer (default {ed.prev_bufname}): ',
+                    switch_buffer_finish)
      
 def switch_buffer_finish():
-    global respfinish
-    respfinish = None # see runrequest key.cr case, for backward compatibility
     response = request_finish() # request_finish returns response
     if dmacs.cancelled(response): return
     dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
@@ -336,22 +337,30 @@ def switch_buffer_finish():
     restore_cursor_to_window() # dmacs runcmd does this automatically
         
 def find_file(keycode):
-    # global mark  # now use dmacs.mark
-    filename = request('Find file: ')
+    request_start('Find file: ', find_file_finish)
+    
+def find_file_finish():
+    filename = request_finish()    
     if not filename or dmacs.cancelled(filename): return #  type RET to cancel
     dmacs.mark = 0
     edsel.e(filename)
     restore_cursor_to_window() # dmacs runcmd does this automatically
 
 def write_named_file(keycode):
-    filename = request('Write file: ')
+    request_start('Write file: ', write_named_file_finish)
+    
+def write_named_file_finish():
+    filename = request_finish()    
     if dmacs.cancelled(filename): return
     edsel.w(filename)
     restore_cursor_to_window() # dmacs runcmd does this automatically    
     
 def python_cmd(keycode):
     'Get and run a single Python command'
-    cmd = request('>>> ')
+    request_start('>>> ', python_cmd_finish)
+    
+def python_cmd_finish():
+    cmd = request_finish()
     if dmacs.cancelled(cmd): return
     pycall.pycall(cmd)
     restore_cursor_to_window() # dmacs runcmd does this automatically    
@@ -378,13 +387,16 @@ def vdir(keycode):
     """
     Prompt for directory (default cwd), then list directory in viewer window
     """
-    cwd = os.getcwd()
-    path = request(f'List directory (default {cwd}): ') # pmacs not dmacs
+    cwd = os.getcwd() # needed for prompt    
+    request_start(f'List directory (default {cwd}): ', vdir_finish)
+
+def vdir_finish():
+    cwd = os.getcwd() # default
+    path = request_finish()
     if dmacs.cancelled(path): return
     if not path: path = cwd
     viewer.lsl(path) # calls viewer_window
     restore_cursor_to_window() # dmacs runcmd does this automatically        
-    
 
 keymap = {
     key.C_n: next_line,
