@@ -113,6 +113,7 @@ def set_mark():
     ed.lmargin = nspaces # used by wrap(), will wrap to left margin of marked line
     inform(f'Mark set at line {mark}')
 
+
 def exchange_mark():
     'Exchange mark and dot so you can see mark.'
     global mark

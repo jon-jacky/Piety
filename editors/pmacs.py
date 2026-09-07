@@ -25,7 +25,7 @@ except:
     # unlike Python strings, including buffer text lines, which are 0-based.
     # start_col = 0  # default 0, no prompt or etc. at left margin # WRONG!
     saved_put_marker = edsel.put_marker # so we can restore after put_no_marker
-
+         
 running = True # rpm main loop is running, set False to exit.
 
 # helper functions
@@ -292,28 +292,55 @@ def request_finish():
 # They are entered into this module's keymap so we dob't use dmacs version
 # fcns called via keymap here must have a keycode arg even if they don't use it
 
-def request_search(): 
+def Xrequest_search(): 
     if not dmacs.prev_cmd in (fwd_search, bkwd_search):
-        response = request(f'Search string (default {ed.searchstring}): ')
-        if response and not dmacs.cancelled(response): ed.searchstring = response
-        return response # because caller always check cancelled(response)
+        request_start(f'Search string (default {ed.searchstring}): ', 
+                        request_search_finish)
     else:
-        return ed.searchstring # callers always check cancelled(response)
+        # ed.searchstring has already been assigned, nothing more need be done
+        return ed.searchstring
+    
+def Xrequest_search_finish():                         
+    response = request_finish()
+    if response and not dmacs.cancelled(response): ed.searchstring = response
+    return response # because caller always check cancelled(response)
+    # response does not get returned from request_search !
 
-def fwd_search(keycode):
+def Xfwd_search(keycode):
     response = request_search() # might update ed.searchstring
     if dmacs.cancelled(response): return # response might indicate search cancelled
     edsel.restore_cursor_to_cmdline() # So 'not found' message appears there
     edsel.s()
     restore_cursor_to_window() # dmacs runcmd does this automatically
     
-def bkwd_search(keycode):
+def Xbkwd_search(keycode):
     response = request_search()
     if dmacs.cancelled(response): return
     edsel.restore_cursor_to_cmdline() # So 'not found' message appears there    
     edsel.r()
     restore_cursor_to_window() # dmacs runcmd does this automatically
 
+search_fcn  # edsel.s forward or edsel.r backward, assigned in search()
+
+def search(keycode):
+    global search_fcn
+    search_fcn = edsel.s if keycode == key.C_s else edsel.r
+    if not dmacs.prev_cmd == search:
+        request_start(f'Search string (default {ed.searchstring}): ', 
+                        search_finish)
+    else:
+        search_finish() # We already have search string
+
+def search_finish():
+    if not dmacs.prev_cmd == search:
+        response = request_finish() 
+        if dmacs.cancelled(response): return
+        if response: ed.searchstring = response # if '', keep old searchstring
+    # else we already have searchstring
+    edsel.restore_cursor_to_cmdline() # So 'not found' message appears there
+    search_fcn() # edsel.s forward or edsel.r backward, assigned in search()
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+    
 # Hide this fcn while we experiment with new version, below    
 def Xswitch_buffer(keycode):
     # global mark # now use dmacs.mark
@@ -366,6 +393,44 @@ def python_cmd_finish():
     restore_cursor_to_window() # dmacs runcmd does this automatically    
     
 def replace_string(keycode):
+    """
+    replace_string has to request both searchstring and replacestring, 
+    so we split the function into *three* fcns not just two.
+    This fcn requests the search string, then passes control to the second fcn,
+    which request the replace string.
+    """
+    request_start(f'Replace string (default {ed.searchstring}): ',
+                                request_replacestring) 
+                                
+def request_replacestring()
+    """   
+    This is the second function in replacestring,
+    which assigns ed.searchstring and requests replacestring,
+    and passes control to the third function, replace_string_finish.
+    """
+    response = request_finish() # response is the searchstring
+    if dmacs.cancelled(response): return # don't request replacestring
+    if response: ed.searchstring = response
+    request_start(f'Replace {ed.searchstring} with (default {ed.replacestring}): ',
+                    replace_string_finish)
+                    
+def replace_string_finish()
+    """
+    This is the third and final function in replace_string,
+    which assigns ed.replacestring and performs the replacement.
+    """
+    response = request_finish() # response is the replacestring                    
+    if dmacs.cancelled(response): return  # don't attempt replacement
+    if response == '\\\\\\': ed.replacestring = '' # \\\ -> empty string
+    elif response: ed.replacestring = response # replace previous default
+    else: pass # use previous default
+    # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
+    def c1(start=None, end=None):
+        edsel.c(ed.searchstring, ed.replacestring, start, end)
+    dmacs.in_region(c1)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
+
+def Xreplace_string(keycode):
     response = request(f'Replace string (default {ed.searchstring}): ') 
     if dmacs.cancelled(response): return
     if response: ed.searchstring = response
@@ -380,6 +445,7 @@ def replace_string(keycode):
         edsel.c(ed.searchstring, ed.replacestring, start, end)
     dmacs.in_region(c1)
     restore_cursor_to_window() # dmacs runcmd does this automatically    
+
 
 # This function is from viewer
 
@@ -416,8 +482,8 @@ keymap = {
     key.down: next_line,
     key.up: prev_line,
     # Functions copied from dmacs that use request() defined here.
-    key.C_s: fwd_search,
-    key.C_r: bkwd_search,
+    key.C_s: search, # forward search, computed from keycode in search()
+    key.C_r: search, # backward search, computed from keycode in search()
     key.C_x + 'b' : switch_buffer,
     key.C_x + key.C_f : find_file,
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
