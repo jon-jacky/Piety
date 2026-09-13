@@ -199,8 +199,8 @@ def append(keycode):
     restore_cursor_to_window()
 
 # Following code replaces request() from dmacs, which uses blocking input(),
-# with another request() written here that uses editline(), so it can  be
-# adapted to non-blocking async code.  The code here is still blocking, though.
+# with new request_start() and request_finish() here that use editline(), 
+# so they can work with non-blocking async code.  
 
 # response that is updated and returned by request(prompt), other vars
 response = str()  
