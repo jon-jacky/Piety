@@ -28,7 +28,12 @@ def keyseq(c):
         return key.C_g
 
     # No prefix, prefix character arrives, start prefix
-    if prefix == '' and c in (key.esc, key.C_x, key.C_c): # more to come?
+    if prefix == '' and c in (key.C_x, key.C_c): # more to come?
+        prefix = c
+        return '' # inform caller that this is a prefix, more is on the way
+
+    # No prefix, prefix character arrives, start prefix
+    if prefix == '' and c in (key.esc): # more to come?
         prefix = c
         # return ''
         c = terminal.getchar()
