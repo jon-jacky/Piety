@@ -227,29 +227,6 @@ def runrequest():
             # NB ed.runcmd not el.runcmd here only, editcommand not editline 
             response, respoint = ec.runcmd(k, response, respoint, respcol)
 
-def request(prompt):
-    'Use editline(), not like dmacs version that calls blocking input()'
-    global response, respoint, resprunning, respcol
-    display.put_cursor(dmacs.promptline, 1)
-    display.kill_whole_line()
-    # terminal.set_line_mode() # Remain in char mode -- unlike dmacs
-    # response = input(prompt) # input() is blocking, instead loop on each char
-    response = ''
-    respoint = 0 
-    respcol = len(prompt) + 1
-    display.putstr(prompt) 
-    display.put_cursor(dmacs.promptline, respcol)
-    resprunning = True
-    while resprunning:
-        runrequest() # blocks waiting for each character here
-    if dmacs.cancelled(response):
-        dmacs.inform('Cancelled')  # also puts cursor at tlines
-        restore_cursor_to_window() # but we want it in the window
-    else: 
-        display.put_cursor(edsel.tlines, 1)
-    # terminal.set_char_mode() # We were in char mode all along
-    return response
-
 # For async, we must split request_start and request_finish                                           
 def request_start(prompt, finish_fcn):
     'Use editline(), not like dmacs version that calls blocking input()'
@@ -266,6 +243,8 @@ def request_start(prompt, finish_fcn):
     display.putstr(prompt) 
     display.put_cursor(dmacs.promptline, respcol)
     resprunning = True
+    # DEBUG below
+    # print(f'request_start: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {ed.searchstring}, request_start')           
     if eventloop.piety.is_running(): return # yield to async eventloop
     # Only run the following getchar loop if async eventloop is *not* running    
     while resprunning:
@@ -285,6 +264,8 @@ def request_finish():
     else: 
         display.put_cursor(edsel.tlines, 1)
     # terminal.set_char_mode() # We were in char mode all along
+    # DEBUG below
+    # print(f'request_finish: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {ed.searchstring}, request_finish')                   
     return response
 
 # The following functions are copied from dmacs
@@ -292,62 +273,31 @@ def request_finish():
 # They are entered into this module's keymap so we dob't use dmacs version
 # fcns called via keymap here must have a keycode arg even if they don't use it
 
-def Xrequest_search(): 
-    if not dmacs.prev_cmd in (fwd_search, bkwd_search):
-        request_start(f'Search string (default {ed.searchstring}): ', 
-                        request_search_finish)
-    else:
-        # ed.searchstring has already been assigned, nothing more need be done
-        return ed.searchstring
-    
-def Xrequest_search_finish():                         
-    response = request_finish()
-    if response and not dmacs.cancelled(response): ed.searchstring = response
-    return response # because caller always check cancelled(response)
-    # response does not get returned from request_search !
-
-def Xfwd_search(keycode):
-    response = request_search() # might update ed.searchstring
-    if dmacs.cancelled(response): return # response might indicate search cancelled
-    edsel.restore_cursor_to_cmdline() # So 'not found' message appears there
-    edsel.s()
-    restore_cursor_to_window() # dmacs runcmd does this automatically
-    
-def Xbkwd_search(keycode):
-    response = request_search()
-    if dmacs.cancelled(response): return
-    edsel.restore_cursor_to_cmdline() # So 'not found' message appears there    
-    edsel.r()
-    restore_cursor_to_window() # dmacs runcmd does this automatically
-
-search_fcn  # edsel.s forward or edsel.r backward, assigned in search()
+search_fcn = None  # edsel.s forward or edsel.r backward, assigned in search()
+requesting = False # Used in search and search_finish
 
 def search(keycode):
-    global search_fcn
+    global search_fcn, requesting
     search_fcn = edsel.s if keycode == key.C_s else edsel.r
     if not dmacs.prev_cmd == search:
         request_start(f'Search string (default {ed.searchstring}): ', 
                         search_finish)
+        requesting = True                         
     else:
         search_finish() # We already have search string
 
 def search_finish():
-    if not dmacs.prev_cmd == search:
+    global response, requesting
+    if requesting:
         response = request_finish() 
         if dmacs.cancelled(response): return
         if response: ed.searchstring = response # if '', keep old searchstring
+        requesting = False
     # else we already have searchstring
+    # DEBUG below
+    # print(f'search_finish: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {ed.searchstring} search_finish')               
     edsel.restore_cursor_to_cmdline() # So 'not found' message appears there
     search_fcn() # edsel.s forward or edsel.r backward, assigned in search()
-    restore_cursor_to_window() # dmacs runcmd does this automatically
-    
-# Hide this fcn while we experiment with new version, below    
-def Xswitch_buffer(keycode):
-    # global mark # now use dmacs.mark
-    response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
-    if dmacs.cancelled(response): return
-    dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
-    edsel.b(response)
     restore_cursor_to_window() # dmacs runcmd does this automatically
 
 # New version adapted for async - split off switch_buffer_finish
@@ -402,7 +352,7 @@ def replace_string(keycode):
     request_start(f'Replace string (default {ed.searchstring}): ',
                                 request_replacestring) 
                                 
-def request_replacestring()
+def request_replacestring():
     """   
     This is the second function in replacestring,
     which assigns ed.searchstring and requests replacestring,
@@ -414,7 +364,7 @@ def request_replacestring()
     request_start(f'Replace {ed.searchstring} with (default {ed.replacestring}): ',
                     replace_string_finish)
                     
-def replace_string_finish()
+def replace_string_finish():
     """
     This is the third and final function in replace_string,
     which assigns ed.replacestring and performs the replacement.
@@ -429,23 +379,6 @@ def replace_string_finish()
         edsel.c(ed.searchstring, ed.replacestring, start, end)
     dmacs.in_region(c1)
     restore_cursor_to_window() # dmacs runcmd does this automatically    
-
-def Xreplace_string(keycode):
-    response = request(f'Replace string (default {ed.searchstring}): ') 
-    if dmacs.cancelled(response): return
-    if response: ed.searchstring = response
-    response = request(
-     f'Replace {ed.searchstring} with (default {ed.replacestring}): ')
-    if dmacs.cancelled(response): return
-    if response == '\\\\\\': ed.replacestring = '' # \\\ -> empty string
-    elif response: ed.replacestring = response # replace previous default
-    else: pass # use previous default
-    # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
-    def c1(start=None, end=None):
-        edsel.c(ed.searchstring, ed.replacestring, start, end)
-    dmacs.in_region(c1)
-    restore_cursor_to_window() # dmacs runcmd does this automatically    
-
 
 # This function is from viewer
 
@@ -481,7 +414,7 @@ keymap = {
     # arrow keys, send ANSI escape sequences
     key.down: next_line,
     key.up: prev_line,
-    # Functions copied from dmacs that use request() defined here.
+    # Functions copied from dmacs that use request_start, _finish defined here.
     key.C_s: search, # forward search, computed from keycode in search()
     key.C_r: search, # backward search, computed from keycode in search()
     key.C_x + 'b' : switch_buffer,
