@@ -63,14 +63,7 @@ of the reasons we wrote a custom editor and a custom Python shell for Piety is t
 ensure that these utilities  are non-blocking, so they can interleave with
 other tasks in an event loop.
 
-However, at this time *pmacs* still includes some blocking code. It
-blocks when there is a multi-key command, such as *C-x b* to switch to
-another buffer.. After you type *C-x*, *pmacs* blocks in a call to
-*terminal.getchar*, waiting for you to type *b*. This is also easy to
-demonstrate in a *pmacs_script.py* session. It could be fixed by exiting
-fron the reader and returning control to the event loop after the first
-key in a multi-key command, instead of waiting at *getchar* for the next
-key.
+At this time, we believe we have removed all the blocking code from *pmacs*.
 
 Revised Sep 2026
 

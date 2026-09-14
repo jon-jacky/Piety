@@ -209,20 +209,39 @@ respoint = 0 # index into response
 resprunning = False  # True when loop is running, accumulating characters
 respfinish = None # Assign _finish function to run when response is complete
 
+history = [] # List of past filename, bufname, searchstring etc.
+i_cmd = -1 # index into history, code will assign to 0 or greater
+max_cmds = 100 # maximum number of strings in history.  20 is not enough!
+
 def runrequest():
     'Body of request() loop, editline can handle a single char c without blocking'
-    global response, respoint, resprunning
+    # This resembles pyshell.py runcmd
+    global response, respoint, resprunning, history, i_cmd
     c = terminal.getchar()  # might block here waiting for next character
     k = keyseq.keyseq(c)
     if k: # keyseq returns '' if key sequence is not complete
         if k == key.cr:  # RET finishes entering response and returns
             resprunning = False
+            history.insert(0,response)
+            if len(history) > max_cmds: history.pop()
+            i_cmd = 0
             if respfinish: respfinish() # might be None for backward compat.
         elif k == key.C_g: # Cancel
             response += '???' # dmacs.cancelled tests response.endswith('???')
             resprunning = False
             if respfinish: respfinish() # might be None for backward compat.            
-        # FIXME? We could have history, navigate with C_p and C_n
+        # history code copied from  pyshell.py runcmd
+        elif k in (key.C_p, key.up):
+            if i_cmd < len(history)-1: i_cmd += 1
+            response = history[i_cmd]
+            respoint = len(response)
+            el.refresh(response, respoint, respcol)
+        elif k in (key.C_n, key.down):
+            if i_cmd >= 0: i_cmd -= 1  # reaches -1 after most recent...
+            if i_cmd < 0: cmd = ''   # ... then set cmd empty
+            response = history[i_cmd]
+            respoint = len(response)
+            el.refresh(response, respoint, respcol)
         else:
             # NB ed.runcmd not el.runcmd here only, editcommand not editline 
             response, respoint = ec.runcmd(k, response, respoint, respcol)

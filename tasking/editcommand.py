@@ -181,6 +181,15 @@ def discard_line(line, point, start_col): # name like gnu readline unix-line-dis
     refresh(line, point, start_col)
     return line, point
 
+def cancel_line(line, point, start_col):
+    """
+    Delete the entire line, do not save in kill buffer
+    """
+    line = ''
+    point = 0
+    refresh(line, point, start_col) # clear the line, put cursor at the start
+    return line, point  #empty
+
 # kill_cmds can't be defined until after we define kill_word etc.
 kill_cmds = (kill_word, kill_line, discard_line) # cmds that update killed
 
@@ -221,6 +230,7 @@ keymap = {
     key.C_d: delete_char,
     key.C_e: move_end,
     key.C_f: forward_char,
+    key.C_g: cancel_line,
     # key.C_h is key.bs above
     # key.C_i is key.htab above
     key.C_k: kill_line,
