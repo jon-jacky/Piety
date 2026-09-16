@@ -68,6 +68,13 @@ search operation and discard the search text,
 just type C-g. Or type ??? at the end of the
 search text and press ENTER.
 
+You can avoid typing the same search string
+again and again by typing C-p (previous) and
+C-n (next), or the up- and down- arrow keys,
+to scroll through the history of search
+strings.  Press ENTER when you see the string
+you want.
+
 Search is case sensitive. Searching for
 scroll will not find Scroll, etc.  
 
@@ -232,8 +239,8 @@ Buffers in windows
 
 To display a buffer in any window, put the
 cursor in that window and type C-x b. The
-buffer you name at the prompt appears in that
-window.
+buffer whose name you type at the prompt
+appears in that window.
 
 It can be convenient to leave the buffer list
 displayed in the viewer window for reference,
@@ -311,9 +318,12 @@ previous directory listing scrolls up.
 You must type the complete subdirectory name 
 at the prompt.  You cannot abbreviate it and
 type ?.  You can edit it by using BACKSPACE
-and then retyping.  You can cancel the operation
-by typing C-g. Or, you can type ??? at the
-end of the string, then ENTER.
+and then retyping.  You can scroll through the
+history of previously listed subdirecties (and
+other items) by typing C-p and C-n . You can
+cancel the operation by typing C-g. Or, you
+can type ??? at the end of the string, then
+ENTER.
 
 There is another way to list a subdirectory.
 Try it: position the cursor over the line with
@@ -335,13 +345,24 @@ Files
 
 You can create a buffer by loading its
 contents from a file on disk. Type C-x C-f.
-Find file: appears on the prompt line. There
-is no default. Type the name of a file in the
-current working directory, or type the
-relative or absolute path to any file in the
-file system, then press ENTER. The file
-contents appear in a new buffer in the current
-window.
+Find file: appears on the prompt line. Type
+the name of a file in the current working
+directory, or type the relative or absolute
+path to any file in the file system, then
+press ENTER. The file contents appear in a new
+buffer in the current window.
+
+You can edit at the Find file: prompt in
+the usual ways.  You can cancel the operation
+by typing C-g at the prompt.
+
+There is no default file name, but you can
+scroll through the history of previously typed
+file names (and other items) by typing C-p and
+C-n.  This is can be particularly helpful if the 
+file name includes a long path -- a previously
+loaded file might have the same path, so you
+only have to edit the file name at the end.
 
 Try it. Type C-x o to put the cursor in an
 editor window. Type C-x C-f then README.md
@@ -461,7 +482,7 @@ window.
 
 If you make an error while typing a command,
 an error message appears in the *Errors* buffer
-in the viewer window, nof in the REPL region.
+in the viewer window, not in the REPL region.
 
 Try it. type the command pwd() to print
 the current working directory in *Console*. On
@@ -544,7 +565,7 @@ statements.
 Consult the source code to find which function
 is invoked by each key: the keymap
 dictionaries in editors/dmacs.py, editline.py,
-and pmacs.py, and also the assignements to to
+and pmacs.py, and also the assignements to
 dmacs.keymap near the end of browser/get.py
 and render.py, and viewer/viewer.py.
 
@@ -970,5 +991,5 @@ Piety/viewer/README.md
 Piety/browser/README.md
 Piety/piety/README.md
 
-Revised Jul 2026
+Revised Sep 2026
   

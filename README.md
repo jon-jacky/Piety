@@ -115,6 +115,8 @@ a full screen text-only console.
 Select a font size that can display at least 135
 columns across the full width of the display.
 
+Set yout default directory to the Piety directory. 
+
 Run this command to start the desktop:
 
     python3 -im piety

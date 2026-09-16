@@ -66,14 +66,23 @@ M-%  Replace
 
 Prompts
 
-Several commands prompt for a file name,
-buffer name, search string, etc.
+Several commands prompt you to type a file
+name, buffer name, search string, etc.
 
 C-g        Cancel command at the prompt
 ??? ENTER  Cancel command at the prompt
 
-Many of the editing keys also work 
-as you type at the prompt.
+C-p  Show previous string in history
+     also up-arrow
+C-n  SHow next string in history
+     also down-arrow
+
+ENTER Submit the currently displayd string
+      in repsonse to the prompt.
+                 
+Many of the editing keys for moving around in
+text and adding and deleting text also work as
+you type at the prompt.
 
 Buffers
 
@@ -240,5 +249,5 @@ Piety/editors/README.md
 Piety/viewer/README.md
 Piety/browser/README.md 
       
-Revised Jul 2026
+Revised Sep 2026
 
