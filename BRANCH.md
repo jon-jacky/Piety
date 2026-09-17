@@ -2,7 +2,11 @@
 branches
 ========
 
-This is the *rewrite* branch.
+This is the *renames* branch of the *rewrite* branch:
+rename some modules and commands.  Rename our flagship editor 
+module from *pmacs* to *edsel*.  First we must rename our display editor 
+module to from *edsel* to *frame*.  Rename our resume display editing 
+command from *pm* to *ed*, so first we must remove all *import sked as ed*. 
 
 Beginning in Feb 2023, I began a total rewrite of the Piety system
 here in the *rewrite* branch and its branches, to shorten and simplify 
@@ -13,6 +17,13 @@ into the *master* branch.  The functionality here now exceeds what was
 in the *master* branch I abandoned in 2023.
 
 Recent work in the *rewrite* branch:
+
+- 16 Sep 2026: begin the *renames* branch of the *rewrite* branch to
+  rename some modules and commands. Rename our flagship editor module
+  from *pmacs* to *edsel*. First we must rename our display editor
+  module to from *edsel* to *frame*. Rename our resume display editing
+  command from *pm* to *ed*, so first we must remove all *import sked as
+  ed*.
 
 - 16 Sep 2026: Merge the *async-prompt* branch back into the *rewrite* branch.
 
