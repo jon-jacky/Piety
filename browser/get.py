@@ -7,7 +7,7 @@ from urllib import request, parse
 from pathlib import Path
 import datetime, re
  
-import sked as ed, edsel as fr # fr for frame
+import sked as ed, frame as fr
 import key, dmacs # so we can add browser keycode entries to keymap
   
 # Simple regular expressions for matching URLs
@@ -242,7 +242,7 @@ def clear_webpages():
         
 # Add keycodes for browser operations to keymap 
 # dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
-# NOT -  Overrides M_g: edsel.graffiti in dmacs                           
+# NOT -  Overrides M_g: frame.graffiti in dmacs                           
 # key.C_o entry is now assigned in viewer.py
 # dmacs.keymap[key.C_o] = grx # get and render page at URL on current line
   

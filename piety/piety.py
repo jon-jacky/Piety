@@ -6,8 +6,8 @@
 
 import sked
 from sked import *
-import edsel
-from edsel import *
+import frame
+from frame import *
 import dmacs
 from dmacs import dm # so we can revert to dmacs if pmacs is broken
 import console

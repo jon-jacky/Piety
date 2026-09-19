@@ -18,14 +18,14 @@ text from the current line, which would disturb text in the viewer
 window. The new code here in editline overwrites text in the current line and
 pads with trailing spaces, to avoid disturbing text in the viewer.
 
-editline uses edsel.start_col internally to update in the right window
-(editors or viewer). edsel.start_col is embedded deeply and pervasively
-in editline. So editline has to import edsel -- it's tightly integrated
+editline uses frame.start_col internally to update in the right window
+(editors or viewer). frame.start_col is embedded deeply and pervasively
+in editline. So editline has to import frame -- it's tightly integrated
 with the desktop code.
 
 The old editcommand module lives on because it is still used by working
 code in pyshell runcmd and pmacs request that was written before we
-generalized the editor to support adjacent windows. edsel.start_cmd is
+generalized the editor to support adjacent windows. frame.start_cmd is
 not parameterized in editline, and does not appear in the editline API,
 so pyshell and pmacs request can't be generalized to use this editline.
 
@@ -34,7 +34,7 @@ See tasking/editcommand.py for more explanation.
 
 import string, re
 import key, display
-import edsel # needed for edsel.width
+import frame as fr # needed for fr.width and more
 import terminal, keyseq # only needed by test 
 
 # Define and initialize global variables used by editline,
@@ -75,12 +75,12 @@ def display_insert_string(string, line, point):
     """ 
     suffix = line[point:].rstrip('\n') # text after inserted string
     len_prefix = len(line) - len(string + suffix)
-    rwidth = edsel.width - len_prefix # space remaining in window past cursor
+    rwidth = fr.width - len_prefix # space remaining in window past cursor
     display.putstr((string + suffix)[:rwidth]) # clip to window width
     # Use dpoint (display point) here, point remains accurate outside window
-    dpoint = min(point, edsel.start_col-1 + edsel.width)
-    move_to_point(dpoint, edsel.start_col) # return from end of suffix to point
-    # FIXME? edsel.start_col here, not passed parameter as usual in this module
+    dpoint = min(point, fr.start_col-1 + fr.width)
+    move_to_point(dpoint, fr.start_col) # return from end of suffix to point
+    # FIXME? fr.start_col here, not passed parameter as usual in this module
         
 def display_delete_nchars(nchars, line, point):
     """
@@ -93,11 +93,11 @@ def display_delete_nchars(nchars, line, point):
     """ 
     suffix = line[point:].rstrip() # text after deleted string
     padding = ' '*nchars # spaces added after suffix that replace deleted string
-    rwidth = edsel.width - point # space remaining in window past cursor
+    rwidth = fr.width - point # space remaining in window past cursor
     display.putstr((suffix + padding)[:rwidth]) # clip, shouldn't be needed     
-    dpoint = min(point, edsel.start_col-1 + edsel.width)
-    move_to_point(dpoint, edsel.start_col) # return from end of padding to point
-    # FIXME? edsel.start_col here, not passed parameter as usual in this module
+    dpoint = min(point, fr.start_col-1 + fr.width)
+    move_to_point(dpoint, fr.start_col) # return from end of padding to point
+    # FIXME? fr.start_col here, not passed parameter as usual in this module
                  
 # Function that updates line and point but does not appear in keymap table
 
@@ -132,20 +132,20 @@ def move_beginning(line, point, start_col):
 def move_end(line, point, start_col):
     point = len(line.rstrip('\n')) # stop short of any final \n
     # Use dpoint (display point) here, point remains accurate outside window    
-    dpoint = min(point, start_col-1 + edsel.width)
+    dpoint = min(point, start_col-1 + fr.width)
     move_to_point(dpoint, start_col)
     return line, point
 
 def backward_char(line, point, start_col):
     if (point > 0
-            and point < start_col-1 + edsel.width):  # not past window edge
+            and point < start_col-1 + fr.width):  # not past window edge
         point -= 1
         display.backward_char()
     return line, point
 
 def forward_char(line, point, start_col):
-    if (point < len(line) and line[point] != '\n' # and point < edsel.width-1:
-            and point < start_col-1 + edsel.width):  # stop at window edge
+    if (point < len(line) and line[point] != '\n' # and point < fr.width-1:
+            and point < start_col-1 + fr.width):  # stop at window edge
         point += 1
         display.forward_char()
     return line, point
@@ -159,7 +159,7 @@ def forward_word(line, point, start_col):
     if m:
         point = m.end() - 1 # space after word is end() of end_word pattern
         # Use dpoint (display point) here, point is accurate outside window            
-        dpoint = min(point, start_col-1 + edsel.width) # stop at window edge
+        dpoint = min(point, start_col-1 + fr.width) # stop at window edge
         move_to_point(dpoint, start_col) 
     return line, point
 
@@ -171,7 +171,7 @@ def backward_word(line, point, start_col):
     m = end_word.search(line[point-1::-1],1) # search reversed str from point
     if m:
         point = point - m.start() - 1
-        dpoint = min(point, start_col-1 + edsel.width) # stop at window edge
+        dpoint = min(point, start_col-1 + fr.width) # stop at window edge
         move_to_point(dpoint, start_col)
     return line, point
 
@@ -231,7 +231,7 @@ def kill_line(line, point, start_col):
         killed = (killed + killed_segment if prev_cmd in kill_cmds
                        else killed_segment)
     line = line[:point]
-    # edsel.blank_line(len(killed_segment.rstrip('\n')))
+    # fr.blank_line(len(killed_segment.rstrip('\n')))
     display_delete_nchars(len(killed_segment.rstrip('\n')), line, point)
     if killed_newline:
         line = line + '\n'
@@ -282,7 +282,7 @@ def refresh(line, point, start_col):
     display.move_to_column(start_col) # +1) not needed, start_col is 1-based
     # display.putstr(line.rstrip('\n'))
     # display.kill_line() # remove any leftover text past line
-    edsel.display_padded(line) 
+    fr.display_padded(line) 
     move_to_point(point, start_col)
     return line, point # neither of these is updated
 

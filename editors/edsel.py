@@ -1,681 +1,545 @@
 """
-edsel.py - Display editor that uses the same commands as *sked*.
-
-Display buffer contents in windows as they are updated by the sked editor.
-
-See README.md for directions on using edsel, NOTES.txt about its code. 
+edsel.py - Piety display editor.
+           
+Command the edsel editor by typing control keys or calling Python functions.
+edsel does not call blocking functions like Python input(), so it can
+run from an asyncio event loop.
 """
 
-import sys # skip argument declaration has file=sys.stdout
-import string # used by graffiti()
-import terminal_util, display
-import sked as ed
+import os # for vdir
+import terminal, key, keyseq, display, dmacs, pycall
+import frame as fr, editline as el
+import editcommand as ec # only used in runrequest 
+import viewer # for lsl in vdir
+import sked as edlib # edlib not ed so we can define a function ed() here.
 
-# Define and initialize global variables used by this module,
-# but only the *first* time this module is imported.
+# To prevent importing the eventloop module into edsel,
+# import the disable_eventloop module before importing this edsel module.
+
+import sys
+eventloop_enabled = True # default
+if 'disable_eventloop' in sys.modules:
+    eventloop_enabled = False
+    # don't import eventloop
+else:
+    import eventloop     
+
+# Define and initialize global variables used by edsel functions,
+# but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = flines # if this variable is defined, then module was already imported
+    _ = saved_put_marker # if already defined, then edsel was already imported
 except:
-    # The top of the frame is always the top of the terminal window, line 1
-    # flines must always fit within the terminal window.
-    # Defaults here are for windows in editor panel on left side of terminal.
-    # Defaults are for default terminal window size, are updated in win() below.
-    tlines = 24 # N of lines in default terminal window
-    termcols = 80  # N of columns in default terminal window
-    width = termcols  # N of columns in edsel editor windows
-    rmargin = width - 8 # editor panel rmargin
-    flines = 20 # N of lines in frame, including all windows.
-    
-    # From here on, 'window' means the software-generated window within frame
-    # whose top line and num. of lines might not be the same as the term  window
-    # Editing happens in the 'focus window', also called the 'current window'.
-    
-    # Typical case is just one window that occupies the entire frame
-    # in that case start_col = 1 and  wintop == 1 and wlines == flines
-    start_col = 1  # first (leftmost) column of text (1-based not 0)
-    wintop = 1 # index in frame of top line of focus window
-    wheight = flines # N of lines in focus window, including status line.
-    buftop = 1 # index in buffer of line at the wintop, top of the window.
-    bufname = 'scratch.txt' # name of buffer displayed in focus window
-    
-    displaying = False  # initially display is not enabled.
-    
-    # saved windows including focus window, dict of dicts of window items
-    # windows are identified by integer keys
-    # saved windows are a dict not a list because smallest key might not be 0
-    focus = 0 # key of focus window
-    maxwindows = 2 # the most that are useful in a vertical stack in 20+ lines
-    windows = {}
-    windows[focus] = { 'star_col': start_col,
-                        'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
-                       'bufname': ed.bufname, 'dot': ed.dot, 'point': ed.point }
-    wkeys = [ focus ] # keys of displayed windows, from top to bottom of frame
-    
+    inline = True # kill (cut) and yank (paste) within a single line
+    # Now use fr.start_col throughout, can use both editor and viewer panels
+    # start_col = 0 is WRONG WRONG WRONG! - frame.py sets start_col = 1 -!
+    # start_col is used to put_cursor, and terminal column numbers are 1-based
+    # unlike Python strings, including buffer text lines, which are 0-based.
+    # start_col = 0  # default 0, no prompt or etc. at left margin # WRONG!
+    saved_put_marker = fr.put_marker # so we can restore after put_no_marker
+         
+running = True # red main loop is running, set False to exit.
 
-# Display functions: building blocks
+# helper functions
 
-def in_window(iline):
-    'Return True if buffer index iline is within the window.'
-    return (buftop <= iline <= buftop + wheight - 2)
+def reset_point():
+    'Possibly move edlib.point if needed when dot moves to another line'
+    linelen = len(edlib.buffer[edlib.dot])
+    if edlib.point > linelen:
+        edlib.point = linelen - 1 # -1 to put point before final \n
 
-def wline(iline):
-    """
-    Return index of line in frame that displays line at index iline in buffer.
-    This is the line in the terminal window, used for cursor positioning cmds.
-    """    
-    wiline = wintop + (iline - buftop)
-    return wiline if wiline >= wintop else wintop # wintop when buffer empty
+def restore_cursor_to_window():
+    # reset_point() # no longer needed here, each edsel fcn maintains edlib.point
+    # point+1 to make put_cursor call consistent with editline move_to_column
+    # fr.start_col so it works in  editor windows and also viewer window.
+    # NOT ... edlib.point + 1, no +1 needed, fr.start_col is already 1
+    display.put_cursor(fr.wline(edlib.dot), 
+                       fr.start_col + min(edlib.point, fr.width-1))
 
-def wbottom():
-    """
-    Return index of line in frame that displays the last line in window.
-    Usually this is the window's status line.
-    """
-    return wintop + wheight - 1
+# Some functions do not use keycode arg but caller keycmd requires it to be there.
 
-def locate_segment(iline):
-    """
-    iline is line in the buffer.
-    Select segment to put in window, that centers iline in the window.
-    Return buftop, line in current buffer to put at top line in window
-    """
-    if iline < wheight - 1: # iline is near top of buffer, show first page
-        return 1
-    else: 
-        return iline - (wheight // 2) # put iline near center of window
+def next_line(keycode):
+    'Move to next line, same column, or end of line if next line is too short'
+    fr.restore_cursor_to_cmdline() # so any error message appears in REPL
+    fr.l() # advances dot
+    reset_point() # move to end of line if next line is too short
+    restore_cursor_to_window()
 
-def scroll_segment(iline):
-    """
-    iline is line in the buffer.
-    Select segment to put in window, that puts iline at last line in window.
-    Return buftop, line in current buffer to put at top line in window
-    """
-    if iline < wheight - 1: # iline is near top of buffer, show first page
-        return 1
-    else: 
-        return iline - (wheight - 2) # put iline at bottom of window
-  
-def display_padded(line):
-    """ 
-    Display line, clip too-long line, or pad with blanks to fill the window.
-    """
-    # must expand tabs for correct line length needed by ljust
-    textline = line.expandtabs().rstrip('\n') 
-    # ljust pads with spacees, preserves leading spaces, [:width] clips too long
-    display.putstr(textline.ljust(width)[:width])
+def prev_line(keycode):
+    'Move to previous line, same col, or end of line if prev line is too short'
+    fr.restore_cursor_to_cmdline()
+    fr.rl() # decrements dot
+    reset_point() # move to end of line if previous line is too short
+    restore_cursor_to_window()
 
-def update_lines(bstart, wstart, nlines):
-    """
-    Display consecutive lines (a 'segment') from the buffer in the window.
-    Display nlines, starting at bstart in buffer, starting at wstart in window.
-    Leave cursor after the last line displayed, but do not update any globals.
-    Clip nlines if needed, to fit in window, and not run past end of buffer.
-    Pad lines with spaces at the end to fill window width if needed.
-    Thanks to clipping and padding, this function works with the viewer panel.
-    """
-    nlines = min(nlines, wbottom()-wstart+1) # n of lines at end of window
-    nlines = min(nlines, len(ed.buffer)-bstart+1) # n of lines at e.o. buffer
-    # NB display line at column start_col, not leftedge which is border 
-    display.put_cursor(wstart, start_col)
-    for line in ed.buffer[bstart:bstart+nlines]:
-        display.move_to_column(start_col)
-        display_padded(line)
-        display.next_line()
-
-def update_window():
-    'Update entire window up to status line, starting at line buftop in buffer'
-    update_lines(buftop, wintop, wheight-1)
-
-blanks = ' '*150
-
-def blank_line(ncols):
-    """
-    Starting at the cursor, overwrite then next ncols columns with spaces.
-    """
-    display.putstr(blanks[:ncols])
-
-def erase_lines(nlines):
-    """
-    Overwrite nlines lines with spaces, in the current window only.
-    Start at line where the cursor is already.
-    Leave cursor at line after last line written.  Do not update any globals.
-    This only blanks lines across the width of the current window,
-    so it can be used when the viewer window is present.
-    """
-    for iline in range(nlines):
-        display.move_to_column(start_col) 
-        blank_line(width)
-        display.next_line()
-
-def erase_bottom():
-    """
-    Erase any old lines left over between end of buffer and bottom of window.
-    Leave cursor after last line erased.  Do not update any globals.
-    """
-    nlines = (wheight-1) - (wline(ed.dot)-wintop) # n of lines to window status line
-    nblines = ed.S() - ed.dot  # n of lines to end of buffer
-    nelines = nlines - nblines # n of empty lines at end of window
-    ### breakpoint() # DEBUG Uncomment this line for breakpoint demo.  See breakpt.md.
-    erase_lines(nelines) # Make empty lines at end of window.
-
-def update_below(bstart, offset=0):
-    """
-    Update lines in the window starting with (including) buffer line bstart
-    down to (but not including) the status line. Accept default offset=0 
-    to begin updating at present position of bstart in the window, or
-    optionally assign offset to move bstart and following lines down.
-    Leave cursor after last line displayed. Do not update any globals.
-    """
-    wstart = wline(bstart) + offset
-    nlines = wbottom() - wstart
-    update_lines(bstart, wstart, nlines)
-
-def open_line(iline):
-    """
-    Open line after iline. Put cursor there to prepare for input().
-    If text after iline, push it all down one line to make room for new line.
-    """
-    global buftop
-    if not in_window(iline+1):
-        display.put_cursor(wintop, 1) # first line of window
-        erase_lines(wheight-1) # erase window contents but not status line
-        buftop = locate_segment(iline)
-        update_window()
-    display.put_cursor(wline(iline+1), 1)
-    if ed.S() >= iline+1: # more lines after this one in buffer
-        blank_line(width) # clear this line to prepare for input()
-        update_below(iline + 1, 1) # offset 1 for line we just cleared
-        display.put_cursor(wline(iline+1),1) # restore cursor after update_...
-
-def put_marker(bufline, attribs):
-    'On the display, mark first char in line bufline in buffer with attribs'
-    line = ed.buffer[bufline] if ed.buffer and 1 <= bufline <= ed.S() else ''
-    ch0 = line[0] if line.rstrip('\n') else ' ' # line might be empty or RET 
-    display.put_cursor(wline(bufline), start_col)
-    display.render(ch0, attribs)
-
-def restore_cursor_to_cmdline():
-    display.put_cursor(tlines, 1)
-
-def update_status():
-    'Update status line at the bottom of the window'
-    display.put_cursor(wbottom(), 1)
-    display.move_to_column(start_col)
-    # display.white_bg renders text invisible in Debian Linux text console
-    display.render(ed.status().ljust(width)[:width],display.reverse)  
-    restore_cursor_to_cmdline()
-
-def refresh():
-    """
-    Refresh the focus window.
-    (Re)Display lines from segment, marker, status without moving segment.
-    """
-    display.put_cursor(wintop, start_col) # needed by erase_lines right below
-    # FIXME erase_lines here because update_window doesn't call erase_bottom (?)
-    erase_lines(wheight-1) # erase entire window contents above status line
-    update_window() # apparently doesn't erase_bottom below end of buffer
-    put_marker(ed.dot, display.reverse)
-    update_status()
-     
-def recenter():
-    'Move buffer segment to put dot in center, display segment, marker, status'
-    global buftop
-    buftop = locate_segment(ed.dot)
-    refresh()
-
-def scroll():
-    'Move buffer segment to put dot at bottom, display segment, marker, status'
-    global buftop
-    buftop = scroll_segment(ed.dot)
-    refresh()
-
-def refresh_all():
-    """
-    Refresh all windows, return to same focus window.
-    """
-    global focus
-    display.set_scroll(flines+1, tlines) # puts cursor on line 1, must do this first
-    saved_focus = focus # restore_window reassigns focus
-    save_window(focus)
-    for wkey in wkeys:
-        if wkey != saved_focus:
-            restore_window(wkey)
-            refresh()
-    focus = saved_focus
-    restore_window(focus)
-    refresh()
-                     
-# Display functions: show effects of editing commands
-
-def display_move_dot(iline):
-    'Display effect of ed move_dot function.  Move current line, dot, to iline'
-    put_marker(ed.dot, display.clear)
-    ed.move_dot(iline)
-    if in_window(ed.dot):
-        put_marker(ed.dot, display.reverse)
-        update_status()
-    else:
-        recenter()
-
-def display_change_lines(start, end):
-    'Display effect of ed change_lines fcn. Redraw start to end, move dot.'
-    put_marker(ed.dot, display.clear)
-    ed.move_dot(end)
-    if in_window(ed.dot):
-        update_lines(start, wline(start), end-start+1) # bstart, wstart, nlines
-        put_marker(ed.dot, display.reverse)
-        update_status()
-    else:
-        recenter()
-
-def print_nothing(value, sep=' ', end='\n', file=sys.stdout, flush=False):
-    """
-    Pass to ed cmds printline arg to suppress printing during display.
-    Argument declaration must be the same as builtin print.
-    """
-    return
-
-def display_restore_buffer(bname):
-    'Display effect of ed restore_buffer function, fill entire window'
-    ed.restore_buffer(bname, print_nothing)
-    save_window_bufinfo()
-    recenter()
-
-def display_e(iline):
-    'Display effect of ed e(dit) fcn: display new buffer contents around iline'
-    ed.move_dot(iline)
-    save_window_bufinfo()
-    recenter()
-
-def display_set_saved(status):
-    'Assign ed.saved and update_status, so saved in status line updates'
-    ed.saved = status # this is all that ed.set_saved does
-    update_status()
-
-def display_d(iline):
-    """
-    Display effect of ed d(elete) function, deleting one or more lines.
-    iline (dot) is the last line before the delete, iline+1 is first line after.
-    Move dot to iline and update display from dot + 1 to end of window,
-    because all lines below the deleted lines must be moved up.
-    At the end of the buffer, write empty lines at the bottom of the window.
-    Also move marker and update status line. Page down if needed.
-    """
-    put_marker(ed.dot, display.clear)
-    # ed.move_dot(iline) # move_dot sets point = 0, we *don't* want that here
-    ed.dot = iline # but no point = 0
-    if in_window(ed.dot):
-        update_below(ed.dot) # doesn't change dot, moves cursor to end of text
-        erase_bottom()
-        put_marker(ed.dot, display.reverse)
-        update_status() 
-    else:
-        recenter()
-
-def display_y(iline):
-    """
-    Display effect of ed y(ank) function, appending one or more deleted lines.
-    All lines below the appended lines must be moved down.
-    iline here is the new dot, the first line after the yanked lines
-    (this is actually the same line of text where dot was before yank).
-    The first of the lines appended from yank is at iline - len(yank)
-    Update the display from there to the end of the window.
-    Also move marker and update status line. Page down if needed.
-    """
-    put_marker(ed.dot, display.clear)
-    ed.move_dot(iline)
-    if in_window(ed.dot):
-        update_below(ed.dot - len(ed.killed)) # first yanked line
-        # erase_bottom()  # Not needed here -- must have copied from display_d
-        put_marker(ed.dot, display.reverse)
-        update_status() 
-    else:
-        recenter()
-
-def display_c(iline):
-    """
-    Display the effect of the ed c(hange) function, replacing the changed line.
-    A call to c() might call this several times, once for each changed line.
-    Move dot to iline, redisplay line, mark current line, update the status.
-    """
-    put_marker(ed.dot, display.clear)
-    ed.move_dot(iline)
-    display.put_cursor(wline(ed.dot), start_col)
-    display_padded(ed.buffer[ed.dot])
-    put_marker(ed.dot, display.reverse)
-    update_status()
-
-def display_j(iline):
-    'Display effect of ed j(oin lines) function.'
-    display.put_cursor(wline(iline), start_col)
-    display.putstr(ed.buffer[iline].rstrip('\n')[:width])
-    display_d(iline) # assigns ed.dot directly, not with display_move_dot
-
-# Display functions: append mode for sked a() command
-
-# Enter append mode by typing a() in the REPL.
-# Then enter the lines of text in place in the display window.
-# Exit append mode by typing . by itself at the start of a line.
-# We do not update the status line in append mode, to minimize cursor motion.
-
-def display_start_a(iline):
-    """
-    Call once when user types a() in the REPL. Move dot to iline.
-    Open line after dot. Put cursor there to prepare for display_input_line.
-    If any text after dot, push it all down one line to make room for new line.
-    """
-    display.put_cursor(wheight, 1) # status line does not update in append mode
-    display.render('Appending...'.ljust(width)[:width],display.reverse)  
-    put_marker(ed.dot, display.clear)
-    ed.move_dot(iline) # sked a() does this.  iline might be far from previous dot.
-    open_line(ed.dot) # create space, move cursor to prepare for first input()
-
-def display_input_line():
-    """
-    Call this function when cursor is already on open line, ready for input()
-    Call builtin input() and return line that was input.
-    input() itself displays the line in the window as it is typed.
-    If line is just . by itself, that means exit append mode, close that line.
-    This function only updates window when exiting append mode after '.'
-    display_a updates window when input() returns a line of text to append.
-    """
-    line = input() # sked a() does this
-    if line == '.': # done with append mode, so close line
-        if ed.S() > ed.dot:  # more in the buffer after this line
-            update_below(ed.dot + 1)
-            if in_window(ed.S()+1): # on the last page, at least one empty line
-                display.kill_whole_line() # extra line left by removing '.'
-        else: # at the end of the buffer
-            display.put_cursor(wline(ed.dot)+1,1)
-            display.kill_whole_line() # erase '.'
-        put_marker(ed.dot, display.reverse)
-        update_status() # also returns cursor to REPL command line
-    return line # caller sked a() tests line, may exit from append mode
-
-def display_a(iline):
-    """
-    Display effect of ed a(ppend) function, appending a single line.
-    A single call to ed a() might call this several times, once for each line.
-    Text of line is already on screen at iline, put there by previous input().
-    We only call this fcn if input() did *not* return '.',
-    so we can advance dot to iline now.
-    Move cursor down, open next line to prepare for next input() call.
-    """
-    put_marker(ed.dot, display.clear)
-    ed.move_dot(ed.dot + 1)  # advance dot to line just input(), like sked a()
-    open_line(ed.dot) # create space, move cursor to prepare for next input()
-
-# Display functions: editing commands
-
-def e(fname):
-    ed.e(fname, display_e, display_restore_buffer)
-
-def b(bname=None):
-    ed.b(bname, display_restore_buffer)
-
-def select_buffer():
-    ed.select_buffer(display_restore_buffer)
-    
-def N(bufname='*Buffers*', keep=(lambda bname: True)):
-    ed.N(display_e, display_restore_buffer, bufname, keep)
-            
-def k():
-    ed.k(display_restore_buffer)
-
-def w(fname=None):
-    ed.w(fname, display_set_saved)
- 
-def display_p(start=None, end=None):
-    ed.p(start, end, print_nothing, display_move_dot)
-
-p = display_p
-
-def top():
-    p(1)
-    
-def bottom():
-    p(ed.S())
+def select_buffer(keycode):
+    if edlib.bufname == '*Buffers*':
+        fr.select_buffer()
+        restore_cursor_to_window()
         
-def l():
-    ed.l(display_p)
+def open_line(keycode):
+    """
+    Split line at point, replace line in buffer at dot
+    with its prefix, append suffix after line at dot.
+    Preserve indentation: add as many spaces as needed before suffix line
+     to match indentation of prefix line.
+    Pad prefix with spaces to right window edge to work with viewer panel.
+    """
+    suffix = edlib.buffer[edlib.dot][edlib.point:] # including final \n
+    edlib.buffer[edlib.dot] = edlib.buffer[edlib.dot][:edlib.point] + '\n' # leave prefix on dot
+    if edlib.point < fr.width:
+        fr.blank_line(fr.width - len(edlib.buffer[edlib.dot])) # pad with spaces
+    # Auto-indent suffix line to same indentation as prefix line.
+    nspaces = 0
+    while edlib.buffer[edlib.dot][nspaces] == ' ': nspaces += 1 # count leading spaces
+    edlib.buffer[edlib.dot+1:edlib.dot+1] = [ nspaces*' ' + suffix ] # indent by nspaces
+    edlib.point = nspaces # put cursor at first char after leading spaces, 0-indexed
+    edlib.dot += 1
+    if fr.in_window(edlib.dot):
+        fr.update_below(edlib.dot)
+        fr.update_status() # so line number increments, saved updates
+    else:
+        fr.recenter()  # calls fr.refresh, fr.update_status
+    restore_cursor_to_window()
 
-def rl():
-    ed.rl(display_p)
+# The following functions supercede and wrap functions in other modules
 
+def join_prev():
+    'Join this line to previous. At first line do nothing.'
+    if edlib.dot > 1:
+        edlib.point = len(edlib.buffer[edlib.dot-1])-1 # don't count \n
+        fr.j(edlib.dot-1, edlib.dot) # defaults in edlib.j join dot to dot+1
 
-def nodisplay_p(start=None, end=None):
-    # Move dot from start to end without displaying anything.
-    # We need this because ed.v() requires it, see below.
-    ed.p(start, end, print_nothing, ed.move_dot)
- 
-def v(nlines=None):
-    # Call ed.v() to move dot with error and range checking,
-    #  but don't display from ed.v, instead call scroll().
-    ed.v(nlines, nodisplay_p)
-    scroll()
+def delete_backward_char(keycode):
+    """
+    If point is not at start of line, delete preceding character.
+    Otherwise join to previous line.  At start of first line do nothing.
+    """
+    if edlib.point > 0:
+        # Calls el.delete_backward_char, thanks to keycode DEL key.bs
+        edlib.buffer[edlib.dot], edlib.point = el.runcmd(keycode, edlib.buffer[edlib.dot],
+                                                edlib.point, fr.start_col) 
+        edlib.save = False
+    else: 
+        join_prev() # see above
+        restore_cursor_to_window()
+
+def join_next():
+    'Join next line to this one. At last line do nothing.'
+    if edlib.dot < edlib.S():
+        fr.j() # defaults in edlib.j join dot to dot+1
+
+def delete_char(keycode):
+    """
+    If point is not at end of line, delete character under cursor.
+    Otherwise join next line to this one.  At end of last line do nothing.
+    """
+    if edlib.point < len(edlib.buffer[edlib.dot].rstrip('\n')):
+        # Calls el.delete_char, thanks to keycode C_d
+        edlib.buffer[edlib.dot], edlib.point = el.runcmd(keycode, edlib.buffer[edlib.dot],
+                                                edlib.point, fr.start_col)
+        edlib.saved = False
+    else:
+        join_next() # see above
+        restore_cursor_to_window()
+
+def kill_line(keycode):
+    """
+    In inline mode, kill line from the cursor up to but not including final \n
+     save killed segment in editline.killed buffer for subsequent yank.
+    In multline mode, kill entire line including final \n
+     save consecutive killed lines in skedlib.killed buffer for subsequent yank.
+    Manage transitions between inline and multiline modes:
+    kill line on empty line consisting only of \n enters multiline mode.
+    kill line after any other command than kill line resumes inline mode.
+    """
+    global inline
+    # Lone kill line or first kill line in a series is inline ...
+    if dmacs.prev_cmd != kill_line:
+        inline = True
+    # ... except begin multiline mode when kill empty line of only \n
+    #      and we are not already in multiline mode
+    if edlib.buffer[edlib.dot] == '\n' and inline: 
+        inline = False # Enter multiline mode
+        # If this is second consecutive C_k, copy previously killed line from 
+        #  inline editline.killed buffer to multiline skedlib.killed buffer
+        if dmacs.prev_cmd == kill_line:
+            edlib.killed = [el.killed+'\n'] # cp el.killed to 1st line skedlib.killed
+        else: # we just killed empty line of only \n
+            edlib.killed = [] # clear skedlib.killed
+        el.killed = '' # clear el.killed, start over. NB string not list
+        # Delete the empty killed line from the buffer ...
+        fr.d(None,None,True) # ... and append line to killed buffer
+        restore_cursor_to_window()
+        # Now buffer and display are right, but killed has extra \n line at end
+        edlib.killedlib.remove('\n') # remove '\n' line
+    # inline kill line:
+    elif inline: # weaker condition, must follow previous stronger if...
+        edlib.buffer[edlib.dot], edlib.point = el.runcmd(keycode, edlib.buffer[edlib.dot],
+                                                edlib.point, fr.start_col)
+        edlib.saved = False
+    # kill line that is part of a multiline sequence:
+    elif not inline:
+        fr.d(None,None,True) # consecutive C_k, append line to killed buffer
+        restore_cursor_to_window()
+
+def kill_region(keycode):
+    global inline
+    inline = False
+    dmacs.runcmd(keycode) # keycode is C_w here
+    restore_cursor_to_window()
+
+def yank(keycode):
+    """
+    Yank entire line(s) or yank word(s) within a line, depending on inline
+    """
+    if inline:
+        edlib.buffer[edlib.dot], edlib.point = el.runcmd(keycode, edlib.buffer[edlib.dot], 
+                                                 edlib.point, fr.start_col)
+        edlib.saved = False                                                 
+    else:
+        dmacs.runcmd(keycode) # keycode is C_y here
+        restore_cursor_to_window()
+
+def refresh(keycode):
+    'Define edsel whole window refresh here so we dont use editline refresh'
+    dmacs.runcmd(keycode) # keycode is C_l here
+    restore_cursor_to_window() 
+
+def append(keycode):
+    dmacs.runcmd(key.cr) # calls dmacs append, which enters append mode.
+    restore_cursor_to_window()
+
+# Following code replaces request() from dmacs, which uses blocking input(),
+# with new request_start() and request_finish() here that use editline(), 
+# so they can work with non-blocking async code.  
+
+# response that is updated and returned by request(prompt), other vars
+response = str()  
+respcol = 1 # column after prompt where first char of response goes
+respoint = 0 # index into response
+resprunning = False  # True when loop is running, accumulating characters
+respfinish = None # Assign _finish function to run when response is complete
+
+history = [] # List of past filename, bufname, searchstring etc.
+i_cmd = -1 # index into history, code will assign to 0 or greater
+max_cmds = 100 # maximum number of strings in history.  20 is not enough!
+
+def runrequest():
+    'Body of request() loop, editline can handle a single char c without blocking'
+    # This resembles pyshell.py runcmd
+    global response, respoint, resprunning, history, i_cmd
+    c = terminal.getchar()  # might block here waiting for next character
+    k = keyseq.keyseq(c)
+    if k: # keyseq returns '' if key sequence is not complete
+        if k == key.cr:  # RET finishes entering response and returns
+            resprunning = False
+            history.insert(0,response)
+            if len(history) > max_cmds: history.pop()
+            i_cmd = 0
+            if respfinish: respfinish() # might be None for backward compat.
+        elif k == key.C_g: # Cancel
+            response += '???' # dmacs.cancelled tests response.endswith('???')
+            resprunning = False
+            if respfinish: respfinish() # might be None for backward compat.            
+        # history code copied from  pyshell.py runcmd
+        elif k in (key.C_p, key.up):
+            if i_cmd < len(history)-1: i_cmd += 1
+            response = history[i_cmd]
+            respoint = len(response)
+            el.refresh(response, respoint, respcol)
+        elif k in (key.C_n, key.down):
+            if i_cmd >= 0: i_cmd -= 1  # reaches -1 after most recent...
+            if i_cmd < 0: cmd = ''   # ... then set cmd empty
+            response = history[i_cmd]
+            respoint = len(response)
+            el.refresh(response, respoint, respcol)
+        else:
+            # NB edlib.runcmd not el.runcmd here only, editcommand not editline 
+            response, respoint = ec.runcmd(k, response, respoint, respcol)
+
+# For async, we must split request_start and request_finish                                           
+def request_start(prompt, finish_fcn):
+    'Use editline(), not like dmacs version that calls blocking input()'
+    global response, respoint, resprunning, respcol
+    global respfinish
+    respfinish = finish_fcn
+    display.put_cursor(dmacs.promptline, 1)
+    display.kill_whole_line()
+    # terminal.set_line_mode() # Remain in char mode -- unlike dmacs
+    # response = input(prompt) # input() is blocking, instead loop on each char
+    response = ''
+    respoint = 0 
+    respcol = len(prompt) + 1
+    display.putstr(prompt) 
+    display.put_cursor(dmacs.promptline, respcol)
+    resprunning = True
+    # DEBUG below
+    # print(f'request_start: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {edlib.searchstring}, request_start')           
+    # yield to async eventloop if needed:
+    if eventloop_enabled and eventloop.piety.is_running(): return 
+    # Only run the following getchar loop if async eventloop is *not* running    
+    while resprunning:
+        # runrequest now calls getchar, blocks waiting for each char
+        runrequest() # This must be last statement in request_start
+                      # because key.cr case calls request_finish
+    # runrequest updates response, but return None here.    
+
+def request_finish():
+    # This has to be a separate function so it can be moved to _finish
+    # response has been updated by sync or async when we get here
+    global respfinish
+    respfinish = None # see runrequest key.cr case, for backward compatibility
+    if dmacs.cancelled(response):
+        dmacs.inform('Cancelled')  # also puts cursor at tlines
+        restore_cursor_to_window() # but we want it in the window
+    else: 
+        display.put_cursor(fr.tlines, 1)
+    # terminal.set_char_mode() # We were in char mode all along
+    # DEBUG below
+    # print(f'request_finish: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {edlib.searchstring}, request_finish')                   
+    return response
+
+# The following functions are copied from dmacs
+# but here they use the request() defined right above in this module.
+# They are entered into this module's keymap so we dob't use dmacs version
+# fcns called via keymap here must have a keycode arg even if they don't use it
+
+search_fcn = None  # fr.s forward or fr.r backward, assigned in search()
+requesting = False # Used in search and search_finish
+
+def search(keycode):
+    global search_fcn, requesting
+    search_fcn = fr.s if keycode == key.C_s else fr.r
+    if not dmacs.prev_cmd == search:
+        request_start(f'Search string (default {edlib.searchstring}): ', 
+                        search_finish)
+        requesting = True                         
+    else:
+        search_finish() # We already have search string
+
+def search_finish():
+    global response, requesting
+    if requesting:
+        response = request_finish() 
+        if dmacs.cancelled(response): return
+        if response: edlib.searchstring = response # if '', keep old searchstring
+        requesting = False
+    # else we already have searchstring
+    # DEBUG below
+    # print(f'search_finish: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {edlib.searchstring} search_finish')               
+    fr.restore_cursor_to_cmdline() # So 'not found' message appears there
+    search_fcn() # fr.s forward or fr.r backward, assigned in search()
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+
+# New version adapted for async - split off switch_buffer_finish
+def switch_buffer(keycode):
+    # request_start returns nothing, in sync mode does update response
+    request_start(f'Switch to buffer (default {edlib.prev_bufname}): ',
+                    switch_buffer_finish)
+     
+def switch_buffer_finish():
+    response = request_finish() # request_finish returns response
+    if dmacs.cancelled(response): return
+    dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
+    fr.b(response)
+    restore_cursor_to_window() # dmacs runcmd does this automatically
+        
+def find_file(keycode):
+    request_start('Find file: ', find_file_finish)
     
-def rv(nlines=None):
-    ed.rv(nlines, nodisplay_p, ed.move_dot)
-    scroll()
+def find_file_finish():
+    filename = request_finish()    
+    if not filename or dmacs.cancelled(filename): return #  type RET to cancel
+    dmacs.mark = 0
+    fr.e(filename)
+    restore_cursor_to_window() # dmacs runcmd does this automatically
 
-def s(target=None, forward=True):
-    ed.s(target, forward, print_nothing, display_move_dot)
-
-def r(target=None):
-    s(target, forward=False)
-
-def tail(nlines=None):
-    ed.tail(nlines, display_p)
-
-def a(iline=None):
-    ed.a(iline, display_start_a, display_input_line, display_a)
-
-def d(start=None, end=None, append=False):
-    ed.d(start, end, append, display_d)
-
-def y(iline=None):
-    ed.y(iline, display_y)
-
-def c(old=None, new=None, start=None, end=None, count=-1):
-    ed.c(old, new, start, end, count, print_nothing, display_c)
-
-def indent(start=None, end=None, nspaces=None, outdent=False):
-    ed.indent(start, end, nspaces, outdent, display_change_lines)
-
-def outdent(start=None, end=None, nspaces=None):
-    ed.outdent(start, end, nspaces, display_change_lines) 
-
-def wrap(start=None, end=None, lmarg=None, rmarg=None):
-    ed.wrap(start, end, lmarg, rmarg, move_dot=display_y)
-
-def j(start=None, end=None):
-    ed.j(start, end, move_dot=display_j)
-
-# Display functions: window management
-
-def n_windows(): 
-    'Return the number of windows shown on the display'
-    return len(wkeys)
-
-def open_frame():
-    """
-    Create a 'frame' to contain windows, potentially more than one.
-    Clear display above status line and limit scrolling to the lines below.
-    """
-    display.put_cursor(wheight, 1) # window status line
-    display.erase_above()
-    display.set_scroll(flines+1, tlines)
-
-def win(nlines=None, twidth=None):
-    """
-    Create or resize win(dow) for display at the top of the terminal window.
-    Frame size is stored in flines.  First, clear above flines to clear frame.
-    If nlines is given, assign to flines.  Smaller nlines enlarges cmd region.
-    Use of flines and nlines here assumes just one window, maybe revise later.
-    Set scrolling region to lines below flines.
-    Show status line about current buffer at bottom of frame.
-    Window width defaults to 80 cols, right margin for wrap is width - 8.
-    even when terninal is full-screen.
-    Use optional twidth argument to set different window width.
-    """
-    global tlines, termcols, width, rmargin, flines, wheight
-    tlines, termcols = terminal_util.dimensions() # lines. cols in term window
-    # DEBUG For viewer experiment on Chromebook
-    # We might stty cols 60 so Linux will format shell output for viewer width
-    # BUT we still want full screen,  29 x 146 on Lenovo IdeaPad 3 Chromebook
-    # tlines, termcols = (29, 146) #Debian full screen on IdeaPad 3 Chromebook
-    width = min(termcols, 80) if not twidth else twidth # default to 80 
-    rmargin = width - 8  # editor panel rmargin
-    ed.rmargin = rmargin  # assign editor panel rmargin to current buffer
-    display.put_cursor(flines+1, 1)
-    display.erase_above() # clear old window in case new nlines < flines
-    if not nlines: nlines = flines
-    if nlines > tlines - 2:
-        print(f'? {nlines} lines will not fit in terminal of {tlines} lines')
-        return
-    flines = nlines
-    wheight = flines
-    ed.pagesize = wheight - 2
-    open_frame()
-    recenter()
-
-def save_window(wkey):
-    """
-    Save window items in saved windows at the index wkey.
-    wkey is arg so we can save windows other than focus window.
-    Save window's buffer also, next window might use a different buffer.
-    Assumes window's buffer is the current buffer, true in all save_window
-    uses now.  Maybe not always true in the future, must review each new use.    .
-    """
-    windows[wkey] = { 'start_col': start_col, 'width': width,
-                      'wintop': wintop, 'wheight': wheight, 'buftop': buftop,
-                      'bufname': ed.bufname, 'prev_bufname': ed.prev_bufname,
-                      'dot': ed.dot, 'point': ed.point}
-    ed.save_buffer() # Saves current buffer, assumed valid for windows[wkey]
-
-def save_window_bufinfo():
-   """
-   Update focus window bufname, dot, and point in saved windows.
-   Entry for focus window must already exist in saved windows.
-   """
-   windows[focus]['bufname'] = ed.bufname
-   windows[focus]['dot'] = ed.dot
-   windows[focus]['point'] = ed.point
-
-def restore_window(wkey):
-    """
-    Restore saved window items at wkey to the focus window.
-    If window uses a different buffer, restore that buffer too.
-    """
-    global focus, start_col, width, wintop, wheight, buftop 
-    # ... but not global bufname, dot, they're in ed.
-    # default values for missing keys are just the current values
-    focus = wkey
-    start_col = windows[wkey].get('start_col', start_col)
-    width = windows[wkey].get('width', width)
-    wintop = windows[wkey].get('wintop', wintop)
-    wheight = windows[wkey].get('wheight', wheight)
-    buftop = windows[wkey].get('buftop', buftop)
-    bufname = windows[wkey].get('bufname', ed.bufname) # *local* bufname here!
-    prev_bufname = windows[wkey].get('prev_bufname', ed.prev_bufname) # local
-    # Maybe bufname is not in buffers, it may have been killed.
-    # But scratch.txt is always in buffers.
-    bufname = bufname if bufname in ed.buffers else 'scratch.txt'
-    ed.prev_bufname = prev_bufname if prev_bufname in ed.buffers else 'scratch.txt'    
-    ed.restore_buffer(bufname, print_nothing) # assign *global* ed.bufname here
-    # Window dot and point might be different than its buffer's, restored above.
-    # Can be multiple windows looking at different locations in same buffer.
-    if bufname != 'scratch.txt':
-        ed.dot = windows[wkey].get('dot', ed.dot)
-        ed.point = windows[wkey].get('point', ed.point)
- 
-def o2():
-    'Split focus window, focus remains in top half, bottom half is new saved'
-    global wintop, wheight, wkeys
-    if n_windows() >= maxwindows:
-        print('? no more windows\r\n', end='')
-        return
-    # When we split a window, top half remains focus window; keep same wintop.
-    prev_wheight = wheight # needed later to size lower window
-    wheight = wheight // 2 
-    ed.pagesize = wheight - 2
-    recenter()  # if dot was in lower half of window, move up. reassign buftop.
-    save_window(focus)
-    # bottom half
-    wkey = (max(wkeys) + 1) % maxwindows  # wkey for new window
-    # insert new wkey into wkeys right after focus window entry
-    for ikey, _ in enumerate(wkeys):
-        if wkeys[ikey] == focus:
-            wkeys[ikey+1:ikey+1] = [ wkey ] # insert new wkey after focus entry
-            break
-    # Calculate new bottom window position, size
-    wintop = wintop + wheight
-    wheight = prev_wheight - wheight
-    recenter() # center dot in this window also, calculate new buftop.
-    save_window(wkey)
-    restore_window(focus)
-
-def o1():
-    'Return to single window, make focus window occupy the whole frame.'
-    global focus, wkeys, wintop, wheight
-    if n_windows() <= 1:
-        print('? only one editor window\r\n', end='')
-        return
-    # windows.clear() # NOT!  Now we must keep viewer window
-    for wkey in wkeys:  # wkeys does not include viewer window
-        if wkey != focus:
-            del windows[wkey]
-    wkeys = [ focus ]
-    # Enlarge focus window to fill whole editor panel
-    wintop = 1
-    wheight = flines
-    ed.pagesize = wheight - 2
-    recenter() # reassigns buftop
-    save_window(focus) # will be overwritten next time window is split
-
-def on():
-    'Next window, move focus to next window below, until wrap around to top'
-    global focus
-    if n_windows() <= 1:
-        print('? only one editor window\r\n', end='')
-        return
-    save_window(focus) # window contents (buffer and/or dot) may have changed
-    for ikey, wkey in enumerate(wkeys):
-        if wkeys[ikey] == focus:
-            break
-    ikey = (ikey + 1) % len(wkeys) # index of next window below, wrap around
-    focus = wkeys[ikey]
-    # What if buffer in new focus window has been killed?
-    # Handle that in restore_window.
-    restore_window(focus)
-    # Window is already visible, we should not have to refresh or recenter it.
-
-def zen(nlines=None):
-    'Alternative to win for a distraction-free writing experience'
-    open_frame()
-    update_status()
-
-def clr():
-    'cl(ea)r window from display by restoring full-screen scrolling'
-    display.set_scroll(1, tlines)
-    restore_cursor_to_cmdline() # set_scroll leaves cursor on line 1
+def write_named_file(keycode):
+    request_start('Write file: ', write_named_file_finish)
     
-def graffiti():
-    'Write on every line in frame, but not in buffer.  For testing refresh'
-    for i in range(flines): # every line in frame
-        display.put_cursor(i+1,4*i) # increasing indent to get diagonal strip
-        display.putstr(string.printable[i]*16) # len(string.printable) -> 100
-    restore_cursor_to_cmdline()
+def write_named_file_finish():
+    filename = request_finish()    
+    if dmacs.cancelled(filename): return
+    fr.w(filename)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
+    
+def python_cmd(keycode):
+    'Get and run a single Python command'
+    request_start('>>> ', python_cmd_finish)
+    
+def python_cmd_finish():
+    cmd = request_finish()
+    if dmacs.cancelled(cmd): return
+    pycall.pycall(cmd)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
+    
+def replace_string(keycode):
+    """
+    replace_string has to request both searchstring and replacestring, 
+    so we split the function into *three* fcns not just two.
+    This fcn requests the search string, then passes control to the second fcn,
+    which request the replace string.
+    """
+    request_start(f'Replace string (default {edlib.searchstring}): ',
+                                request_replacestring) 
+                                
+def request_replacestring():
+    """   
+    This is the second function in replacestring,
+    which assigns edlib.searchstring and requests replacestring,
+    and passes control to the third function, replace_string_finish.
+    """
+    response = request_finish() # response is the searchstring
+    if dmacs.cancelled(response): return # don't request replacestring
+    if response: edlib.searchstring = response
+    request_start(f'Replace {edlib.searchstring} with (default {edlib.replacestring}): ',
+                    replace_string_finish)
+                    
+def replace_string_finish():
+    """
+    This is the third and final function in replace_string,
+    which assigns edlib.replacestring and performs the replacement.
+    """
+    response = request_finish() # response is the replacestring                    
+    if dmacs.cancelled(response): return  # don't attempt replacement
+    if response == '\\\\\\': edlib.replacestring = '' # \\\ -> empty string
+    elif response: edlib.replacestring = response # replace previous default
+    else: pass # use previous default
+    # Tried to fix fr.c arg list for in_region with lambda, didn't work so:
+    def c1(start=None, end=None):
+        fr.c(edlib.searchstring, edlib.replacestring, start, end)
+    dmacs.in_region(c1)
+    restore_cursor_to_window() # dmacs runcmd does this automatically    
 
-def quit():
+# This function is from viewer
+
+def vdir(keycode):
     """
-    Ask for confirmation, then exit Piety and Python.
-    Restore full screen scrolling.
+    Prompt for directory (default cwd), then list directory in viewer window
     """
-    answer = input(
-'Are you SURE you want to quit Piety and Python, losing all unsaved work? ')
-    if not answer.lstrip()[0] in ('yY'): return
-    clr()  # restore full screen scrolling
-    exit() # exit python
-           
+    cwd = os.getcwd() # needed for prompt    
+    request_start(f'List directory (default {cwd}): ', vdir_finish)
+
+def vdir_finish():
+    cwd = os.getcwd() # default
+    path = request_finish()
+    if dmacs.cancelled(path): return
+    if not path: path = cwd
+    viewer.lsl(path) # calls viewer_window
+    restore_cursor_to_window() # dmacs runcmd does this automatically        
+
+keymap = {
+    key.C_n: next_line,
+    key.C_p: prev_line,
+    key.cr: open_line,  # open_line takes keycode arg - FIXME?
+    key.delete: delete_backward_char,
+    key.bs: delete_backward_char, 
+    key.C_d: delete_char,
+    key.C_k: kill_line,
+    key.C_w: kill_region,
+    key.C_y: yank,
+    key.C_l: refresh,
+    key.C_x + key.C_a: append, # Enter dmacs append mode, exit with .
+    # key.C-o is now assigned in viewer.py
+    #key.C_o: select_buffer, # select_buffer takes keycode arg - FIXME?
+    # arrow keys, send ANSI escape sequences
+    key.down: next_line,
+    key.up: prev_line,
+    # Functions copied from dmacs that use request_start, _finish defined here.
+    key.C_s: search, # forward search, computed from keycode in search()
+    key.C_r: search, # backward search, computed from keycode in search()
+    key.C_x + 'b' : switch_buffer,
+    key.C_x + key.C_f : find_file,
+    key.C_x + key.C_w : write_named_file, # write file, prompt for filename
+    key.M_y: python_cmd,
+    key.M_percent: replace_string, # M-%    
+    key.C_x + 'd' : vdir
+    }
+
+def keycmd(keycode):
+    """
+    Execute a single edsel key command: dispatch on key k, run function
+    """
+    cmd = keymap[keycode]
+    cmd(keycode)
+    dmacs.prev_cmd = cmd
+    # Note: A few cmd call el.runcmd we believe we needn't update el.prev_cmd
+
+def clear_marker():
+    fr.put_marker(edlib.dot, display.clear)
+    display.put_cursor(fr.tlines, fr.start_col)  # was ..., 1) not 0)
+
+def put_no_marker(bufline, attribs): 
+    'Assign to fr.put_marker to suppress marker while running edsel'
+    pass
+
+def setup():
+    global running
+    dmacs.open_promptline()
+    clear_marker()
+    fr.put_marker = put_no_marker
+    restore_cursor_to_window()
+    running = True # previous M-x exit may have set it False
+
+def restore():
+    dmacs.close_promptline()
+    fr.put_marker = saved_put_marker # initialized in except branch above
+    fr.put_marker(edlib.dot, display.reverse)
+    fr.restore_cursor_to_cmdline()
+
+def runcmd(c):
+    global running, inline
+    k = keyseq.keyseq(c)
+    if k: # keyseq returns '' if key sequence is not complete
+        if k == key.M_x:
+            running = False
+        elif k in keymap:
+            keycmd(k)
+        elif k in el.printing_chars or k in el.keymap:
+            el.prev_cmd = dmacs.prev_cmd
+            if edlib.S() < 1: edlib.buffer = ['\n','\n'] # initialize empty buffer   
+            if edlib.dot == 0: edlib.dot = 1 # buffer[0] is always dummy '\n'
+            edlib.buffer[edlib.dot], edlib.point = el.runcmd(k, edlib.buffer[edlib.dot],
+                                          edlib.point, fr.start_col)
+            if k in el.printing_chars:
+                edlib.saved = False # k was inserted into buffer
+            dmacs.prev_cmd = el.prev_cmd
+            # key.C_k and inline are handled in kill_line, above
+            if k in (key.M_d, key.C_u): # M_d kill_word, C_u discard line 
+                inline = True
+        elif k in dmacs.keymap:
+            fr.restore_cursor_to_cmdline()
+            dmacs.runcmd(k)
+            restore_cursor_to_window()
+   
+def red():
+    """
+    edsel editor: invoke editor functions with control keys.
+    Exit by typing M_x (that's alt X), like emacs 'do command'. 
+    red means 'raw ed' - this function requires terminal is already 
+    in char mode ('raw' mode) and it does not restore line mode
+    when it exits - so this red is the function to call from pysh,
+    our custom Python shell.  Call ed (below) from the Python >>> prompt.
+    """
+    setup()
+    while running:
+        c = terminal.getchar() # blocking
+        runcmd(c)
+    restore() 
+
+def ed():
+    """ 
+    edsel editor: invoke editor functions with control keys.
+    Exit by typing M_x (that's alt X), like emacs 'do command'. 
+    This function assumes terminal is in line mode.
+    It sets terminal character mode on entry and restores line mode on exit.
+    So call this function from standard Python >>> prompt.
+    Call red ('raw' ed) when terminal is already in char mode.
+    So call red from our custom pysh >> prompt.
+    """
+    terminal.set_char_mode() 
+    red() # raw ed, assumes term is already in char mode, doesn't restore mode
+    terminal.set_line_mode()
+
+

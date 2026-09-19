@@ -2,7 +2,7 @@
 
 import sked as ed
 
-from edsel import e, b, o2, on
+from frame import e, b, o2, on
 from viewer import oe
 from apmacs import apm
 

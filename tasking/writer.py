@@ -7,15 +7,15 @@ See writer.txt for more notes and explanation.
 
 import display
 import sked as ed
-import edsel as fr  # short for 'frame'
+import frame as fr 
 import editline as el
 import pmacs as pm
 import pyshell as sh
 
-# Redefine these functions from edsel to also restore cursor to point
+# Redefine these functions from frame to also restore cursor to point
  
 def restore_cursor_to_cmdline():
-    'Unlike version in edsel, this version also sets column to point'
+    'Unlike version in frame, this version also sets column to point'
     fr.restore_cursor_to_cmdline() # puts cursor in col 1
     el.move_to_point(sh.point, sh.start_col)    
 
@@ -24,7 +24,7 @@ saved_focus = -1 # index of focus window *before* we switch to print tick msg
 def restore_cursor():
     ## sh.cmd_mode = False # DEBUG for testing n_windows() == 2 case from REPL
     if sh.cmd_mode: # editing/running Python commands at pysh REPL
-        restore_cursor_to_cmdline() # redefined above, not the version in edsel
+        restore_cursor_to_cmdline() # redefined above, not the version in frame
     # This next case assumes other window is tocus window that needs restoring
     # BUT if current window is intended focus window, this switches focus away
     elif fr.n_windows() == 2: # HACK only works in this n == 2 special case
@@ -37,7 +37,7 @@ def restore_cursor():
     else: # There is no other window, cursor is already where it is needed.
         pass 
 
-# Local refresh and recenter in this module are copied from edsel
+# Local refresh and recenter in this module are copied from frame
 # except here refresh does not call update_status 
 # so it doesn't call restore_cursor_to_cmdline, which we don't want.
 
@@ -54,13 +54,13 @@ def refresh():
     
 def recenter():
     'Move buffer segment to put dot in center, display segment, marker, status'
-    # global buftop # use edsel.buftop instead
+    # global buftop # use fr.buftop instead
     fr.buftop = fr.locate_segment(ed.dot)
-    refresh() # redefined above, not the version in edsel
+    refresh() # redefined above, not the version in frame
 
 def write(line):
     """
-    Append line to end of current sked buffer and display in edsel focus window.
+    Append line to end of current sked buffer and display in frame focus window.
     line is a string that does not end with \n, this write() adds it.
     """
     if line not in ('', '\n'): # redirect_stdout and file=... append extra \n
@@ -70,7 +70,7 @@ def write(line):
             display.put_cursor(fr.wline(ed.dot), 1)
             display.putstr(line[:fr.width])
         else:
-            recenter() # redefined above, not the version in edsel
+            recenter() # redefined above, not the version in frame
         restore_cursor()
 
 def writebuf(bname, line):
@@ -95,7 +95,7 @@ def writebuf(bname, line):
                     display.put_cursor(fr.wline(ed.dot), 1)
                     display.putstr(line[:fr.width])
                 else:
-                    recenter() # redefined above, not the version in edsel
+                    recenter() # redefined above, not the version in frame
                 restore_cursor()
     
 def writebuf_show(bname, line):
@@ -127,7 +127,7 @@ class Writer():
     Provide a method named write so we can redirect output to the named buffer.
     Our buffers are just dicts not objects so they have no write method.
     Usage:  abuf = Writer('a.txt')  then: with redirect_stdout(abuf) as buf: ...
-    Recall that a is the name of the sked/edsel append fcn, can't use a = ..
+    Recall that a is the name of the sked/frame append fcn, can't use a = ..
     """
     def __init__(self, bufname): self.bufname = bufname
     def write(self, line): writebuf_show(self.bufname, line)

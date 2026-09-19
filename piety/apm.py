@@ -6,8 +6,8 @@
 
 import sked
 from sked import *
-import edsel  
-from edsel import *
+import frame
+from frame import *
 from apmacs import apm
 
 win(22)

@@ -16,9 +16,9 @@ then 'from pyshell import pysh'  then 'reload pyshell' without name conflict.
 
 import terminal_util, terminal, key, keyseq, display
 import editcommand as el #we renamed editline to editcommand but keep el abbrev.,
-import pmacs
-# import edsel # NOT! This pyshell module might be used without edsel, so we 
-               # duplicate tlines and restore_cursor_to_cmdline from edsel here.
+import edsel
+# import frame # NOT! This pyshell module might be used without frame, so we 
+               # duplicate tlines and restore_cursor_to_cmdline from frame here.
 
 from pycall import pycall # uses Python library code.InteractiveConsole
  
@@ -42,13 +42,13 @@ max_cmds = 100 # maximum number of commands in history.  20 is not enough!
 # cmd_mode is needed to restore terminal cursor after it is used by a task. 
 cmd_mode = True  # True in Python REPL, False when editing in display window.
 
-def tpm():
+def ted():
     """
-    tpm "tasking pmacs"
-    From the pysh Python REPL, use the tpm() command to clear the cmd_mode flag
+    ted "tasking edsel"
+    From the pysh Python REPL, use the ted() command to clear the cmd_mode flag
     and begin the pmacs editor for editing buffers display windows.
     Exit from display editing with M-x: set cmd_mode flag and return to REPL.
-    tpm() must be issued from pysh REPL not standard Python REPL
+    ted() must be issued from pysh REPL not standard Python REPL
     because it assumes terminal is already in char mode.
     """
     global cmd_mode

@@ -8,8 +8,9 @@ barely above F (fail).
 """
 
 import sys, importlib, traceback
-import terminal, key, keyseq, display, edsel, pycall
+import terminal, key, keyseq, display, pycall 
 import sked as ed
+import frame as fr
 
 # Define and initialize global variables used by dmacs,
 # but only the *first* time this module is imported in a session.
@@ -18,17 +19,17 @@ try:
     _ = mark # if mark is already defined, then dmacs was already imported
 except:
     mark = 0 # line number, defines region for cut C_w etc.  0 means disabled.
-    promptline = edsel.flines+1 # line after end of edsel frame
+    promptline = fr.flines+1 # line after end of frame
     prev_cmd = None
     
 def select_buffer():
     if ed.bufname == '*Buffers*':
-        edsel.select_buffer()
+        fr.select_buffer()
         
 def append():
-    'Restore line mode, run edsel a(), return to char mode'
+    'Restore line mode, run frame a(), return to char mode'
     terminal.set_line_mode()
-    edsel.a()
+    fr.a()
     terminal.set_char_mode()
 
 def inform(message):
@@ -36,7 +37,7 @@ def inform(message):
     display.put_cursor(promptline, 1)
     display.kill_whole_line()
     display.putstr(message)
-    display.put_cursor(edsel.tlines, 1)
+    display.put_cursor(fr.tlines, 1)
 
 cancel = '???'
 
@@ -57,7 +58,7 @@ def request(prompt):
     if cancelled(response):
         inform('Cancelled')  # also puts cursor at tlines
     else: 
-        display.put_cursor(edsel.tlines, 1)
+        display.put_cursor(fr.tlines, 1)
     terminal.set_char_mode()
     return response
 
@@ -72,31 +73,31 @@ def request_search():
 def fwd_search():
     response = request_search() # might update ed.searchstring
     if cancelled(response): return # response might indicate search cancelled
-    edsel.s()
+    fr.s()
 
 def bkwd_search():
     response = request_search()
     if cancelled(response): return
-    edsel.r()
+    fr.r()
 
 def switch_buffer():
     global mark
     response = request(f'Switch to buffer (default {ed.prev_bufname}): ')
     if cancelled(response): return
     mark = 0 # But we don't reset mark when we change buffer by change window
-    edsel.b(response)
+    fr.b(response)
 
 def find_file():
     global mark
     filename = request('Find file: ')
     if not filename or cancelled(filename): return # Just type RET to cancel
     mark = 0
-    edsel.e(filename)
+    fr.e(filename)
 
 def write_named_file():
     filename = request('Write file: ')
     if cancelled(filename): return
-    edsel.w(filename)
+    fr.w(filename)
 
 def python_cmd():
     'Get and run a single Python command'
@@ -118,7 +119,7 @@ def exchange_mark():
     'Exchange mark and dot so you can see mark.'
     global mark
     iline, mark = mark, ed.dot
-    edsel.display_move_dot(iline) # assigns ed.dot = iline
+    fr.display_move_dot(iline) # assigns ed.dot = iline
 
 def in_region(f):
     'Execute function f on the region defined by mark and dot.'
@@ -140,17 +141,17 @@ def replace_string():
     if response == '\\\\\\': ed.replacestring = '' # \\\ -> empty string
     elif response: ed.replacestring = response # replace previous default
     else: pass # use previous default
-    # Tried to fix edsel.c arg list for in_region with lambda, didn't work so:
+    # Tried to fix fr.c arg list for in_region with lambda, didn't work so:
     def c1(start=None, end=None):
-        edsel.c(ed.searchstring, ed.replacestring, start, end)
+        fr.c(ed.searchstring, ed.replacestring, start, end)
     in_region(c1)
 
 def kill_line():
     'Delete single line, accumulate consecutive deleted lines in yank buffer'
     if prev_cmd != kill_line: # first kill_line:, rewrite yank buffer
-        edsel.d()
+        fr.d()
     else: 
-        edsel.d(None,None,True) # consecutive C_k, append line to yank buffer
+        fr.d(None,None,True) # consecutive C_k, append line to yank buffer
 
 def reload_buffer():
     'Reload module for current buffer'
@@ -165,7 +166,7 @@ def save_reload():
     global sr_tb 
     sr_tb = 'No traceback' # must reinitiazlie each time
     try:
-        edsel.w()
+        fr.w()
         reload_buffer() # synchronization?  Does w() finish before reload() begins?
     except BaseException as e:
         sr_tb = traceback.format_exc() # returns string, does not print tb
@@ -174,63 +175,63 @@ def save_reload():
 # Table from keys to editor functions
 keymap = {
     # cursor movement
-    key.C_n: edsel.l,  # next line
-    key.C_p: edsel.rl,  # previous line
-    key.C_v: edsel.v,   # page down
-    key.M_v: edsel.rv,  # page up
-    key.M_lt: (lambda: edsel.p(1)), # go to top, line 1.  lt is <.
-    key.M_gt: (lambda: edsel.p(ed.S())), # go to bottom, last line.  gt is >.
+    key.C_n: fr.l,  # next line
+    key.C_p: fr.rl,  # previous line
+    key.C_v: fr.v,   # page down
+    key.M_v: fr.rv,  # page up
+    key.M_lt: (lambda: fr.p(1)), # go to top, line 1.  lt is <.
+    key.M_gt: (lambda: fr.p(ed.S())), # go to bottom, last line.  gt is >.
     # search and replace
     key.C_s: fwd_search,
     key.C_r: bkwd_search,
     key.M_percent: replace_string, # M-%
     # editing
     key.C_k: kill_line, # append consecutive killed lines to yank buffer
-    key.C_y: edsel.y, # yank (paste) deleted lines
+    key.C_y: fr.y, # yank (paste) deleted lines
     key.cr: append, # open line and enter append mode
     # cut and paste
     key.C_at: set_mark,
     key.C_x + key.C_x : exchange_mark, # exchange dot and mark,
-    key.C_w: (lambda: in_region(edsel.d)), # cut, use C_y (yank above) to paste
+    key.C_w: (lambda: in_region(fr.d)), # cut, use C_y (yank above) to paste
     # formatting
-    key.M_q: (lambda: in_region(edsel.wrap)),
-    key.M_carat: (lambda: in_region(edsel.j)), # join lines
-    key.C_c + '>': (lambda: in_region(edsel.indent)), # like emacs Python mode
-    key.C_c + '<': (lambda: in_region(edsel.outdent)),
+    key.M_q: (lambda: in_region(fr.wrap)),
+    key.M_carat: (lambda: in_region(fr.j)), # join lines
+    key.C_c + '>': (lambda: in_region(fr.indent)), # like emacs Python mode
+    key.C_c + '<': (lambda: in_region(fr.outdent)),
     # buffers and files
     key.C_x + 'b' : switch_buffer,
-    key.C_x + key.C_b: edsel.N, # list buffers in *Buffers*
+    key.C_x + key.C_b: fr.N, # list buffers in *Buffers*
     # key.C_o is now handled by viewer.py fcn loader
     # key.C_o : select_buffer, # select buffer from list in *Buffers*
     key.C_x + key.C_f : find_file,
-    key.C_x + 'k' : edsel.k, # kill buffer, edsel.k prompts if file is unsaved
-    key.C_x + key.C_s : edsel.w,  # write file, with stored filename
+    key.C_x + 'k' : fr.k, # kill buffer, fr.k prompts if file is unsaved
+    key.C_x + key.C_s : fr.w,  # write file, with stored filename
     key.C_x + key.C_w : write_named_file, # write file, prompt for filename
     key.C_x + key.C_r : save_reload, # *not* like emacs find-file read-only
     # windows
-    key.C_x + '2' : edsel.o2,
-    key.C_x + '1' : edsel.o1,
-    key.C_x + 'o' : edsel.on,
+    key.C_x + '2' : fr.o2,
+    key.C_x + '1' : fr.o1,
+    key.C_x + 'o' : fr.on,
     # miscellaneous
-    key.C_l: edsel.refresh, # focus window only
-    key.M_l: edsel.refresh_all, # all windows, also set scroll
-    key.M_g: edsel.graffiti, # put junk on every line of frame, for testing refresh
+    key.C_l: fr.refresh, # focus window only
+    key.M_l: fr.refresh_all, # all windows, also set scroll
+    key.M_g: fr.graffiti, # put junk on every line of frame, for testing refresh
     key.M_y: python_cmd,
     # arrow keys, send ANSI escape sequences
-    key.down: edsel.l, # next line
-    key.up: edsel.rl, # previous line
+    key.down: fr.l, # next line
+    key.up: fr.rl, # previous line
 }
 
 def open_promptline():
     global promptline
-    promptline = edsel.flines+1 # may have changed since prev dm() call
-    display.set_scroll(promptline+1, edsel.tlines) # open prompt line
+    promptline = fr.flines+1 # may have changed since prev dm() call
+    display.set_scroll(promptline+1, fr.tlines) # open prompt line
     display.put_cursor(promptline, 1)
     display.kill_whole_line() 
-    display.put_cursor(edsel.tlines, 1)
+    display.put_cursor(fr.tlines, 1)
 
 def close_promptline():
-    display.set_scroll(promptline, edsel.tlines) # dismiss prompt line
+    display.set_scroll(promptline, fr.tlines) # dismiss prompt line
 
 def runcmd(k):
     """
@@ -260,4 +261,4 @@ def dm():
                 runcmd(k)
     terminal.set_line_mode()
     close_promptline()
-    display.put_cursor(edsel.tlines, 1) # return cursor to command line
+    display.put_cursor(fr.tlines, 1) # return cursor to command line

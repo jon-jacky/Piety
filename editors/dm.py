@@ -2,8 +2,8 @@
 # First must define PYTHONPATH by . /Users/jon/piety/bin/paths, once in session
 import sked
 from sked import *
-import edsel
-from edsel import *
+import frame
+from frame import *
 import dmacs
 from dmacs import dm
 import console

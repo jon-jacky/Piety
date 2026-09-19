@@ -8,7 +8,7 @@ import textwrap
 import traceback
 
 import sked as ed
-import edsel as fr # fr for frame
+import frame as fr
 import get # get.url get.title get.timestamp and get.g() are used here
 import key, dmacs # for adding keycodes to keymap
 
@@ -291,7 +291,7 @@ def reload():
 # Add keycodes for browser operations to keymap 
 
 # C-x C-b - list buffers without webpages, C-x w list .html buffers
-dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N
+dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not frame.N
 dmacs.keymap[key.C_x + 'w'] = W # W defined above
 
 # C-x C-l - reload web page shown in current buffer

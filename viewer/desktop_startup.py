@@ -1,6 +1,6 @@
 # desktop_startup.py invoked from desktop.py   
 # Assumes Piety is the current directory. It uses relative paths to load files.
-import pmacs, edsel as fr
+import pmacs, frame as fr
 fr.e('viewer/keys.txt')
 fr.e('viewer/viewer.py')
 fr.e('viewer/README.md')

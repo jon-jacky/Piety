@@ -5,14 +5,14 @@ The viewer has its own current buffer and its own window that are always
 displayed and always available, which are implicitly selected by the 
 commands (functions) defined in this module.
 
-The editor current buffer and windows managed by the sked and edsel
+The editor current buffer and windows managed by the sked and frame
 modules, and the commands that use them, are unchanged, always
 available, and work just as before.
 """
 
 import os, sys
 import key, dmacs, display, shell, render, console, get
-import sked as ed, edsel as fr
+import sked as ed, frame as fr
 import traceback
 from redirect import redirect # for printing traceback in a buffer
  
@@ -99,13 +99,13 @@ def vwin():
     """
     Create empty viewer panel in the frame to the right of the editor windows.
     then populate viewer panel with restored viewer border and  window contents.
-    This function requires that edsel win() has already been called to
+    This function requires that frame win() has already been called to
     set whole frame's vertical dimensions and editor panel width in left side.
-    When this fcn is called, edsel current window must be in left side panel.
+    When this fcn is called, frame current window must be in left side panel.
     This fcn fits viewer panel into space remaining to right of editor panel.
     so editor panel ed.width determines new viewer panel width.
     Then in the viewer panel makes a new viewer buffer the ed current buffer,
-     and makes a new viewer window the edsel current window and displays it.  
+    and makes a new viewer window the frame current window and displays it.  
     """
     global leftedge, width, rmargin, viewer_displayed
     if viewer_displayed:
@@ -118,7 +118,7 @@ def vwin():
     shell.width = width # for formatting ls and man output to fit in viewer
     render.width = width # for formatting web pages
 
-    # Initialze viewer window record in edsel.windows.
+    # Initialze viewer window record in fr.windows.
     # Viewer window remains on the screen and its geometry never changes:
     #  start_col, width, wintop, wheight
     # Other items do change with editing: buftop, bufname, dot, point
@@ -151,7 +151,7 @@ def vclr():
     viewer_displayed = False
     
 # Disable editor functions that don't or shouldn't work in viewer window
-# 'from viewer import *' in the REPL replaces edsel fcns with these
+# 'from viewer import *' in the REPL replaces frame fcns with these
 
 def o2():
     'Disable editor function that does not work in viewer window'
@@ -526,7 +526,7 @@ dmacs.keymap[key.M_m] = vvrefresh
 
 # Always display *Buffers* list in viewer window
 # Overwrites C_x C_b key binding defined in dmacs.py
-dmacs.keymap[key.C_x + key.C_b] = N # local N above, not edsel.N
+dmacs.keymap[key.C_x + key.C_b] = N # local N above, not frame.N
 
 # Save and reload buffer 
 dmacs.keymap[key.C_x + key.C_r] = save_reload # local save_reload above
@@ -550,7 +550,7 @@ dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
 dmacs.keymap[key.M_o] = (lambda: loader(this_window=False))
 
 # C-x C-b - list buffers without webpages, C-x C-w list .html buffers
-dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not edsel.N or browser.NM
+dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not fr.N or browser.NM
 dmacs.keymap[key.C_x + 'w' ] = W # W defined above, not browser.W 
   
 def quit():

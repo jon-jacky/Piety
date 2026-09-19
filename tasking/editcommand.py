@@ -18,8 +18,8 @@ At this time we use editcommand in two contexts:
  2. In the pmacs.py runrequest fnc, for editing responses to prompts for
      file name, buffer name, search string etc.
 
-This old editcommand module lives on because edsel.start_col is embedded
-deeply and pervasively in editline. edsel.start_col is not parameterized
+This old editcommand module lives on because frame.start_col is embedded
+deeply and pervasively in editline. frame.start_col is not parameterized
 in editline, and does not appear in the editline API, so pyshell and
 pmacs request can't be generalized to use editline. When the viewer is
 the current window, editline might try to align the REPL command or

@@ -2,15 +2,15 @@
 # First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
 import sked
 from sked import *
-import edsel
-from edsel import *
+import frame
+from frame import *
 import dmacs
 from dmacs import dm # so we can revert to dmacs if pmacs is broken
 import console
 from console import *
 import editline
-import pmacs
-from pmacs import pm
+import disable_eventloop # prevents edsel from importing eventloop
+import edsel
 import urls
 from urls import *
 import get
@@ -19,8 +19,9 @@ import render
 from render import *
 import search
 from search import *
-tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
+tl = edsel.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
-pm()
+from edsel import ed # overwrite ed imported from frame dmacs get render ...
+ed()

@@ -8,7 +8,7 @@ from contextlib import redirect_stdout
 
 # sked has module-level write function that writes to the current buffer.
 import sked as ed  
-import edsel as fr # fr for frame
+import frame as fr
  
 def redirect(bufname, command, command_string):
     """
