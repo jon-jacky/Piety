@@ -1,16 +1,16 @@
-# apm.py - script to start asynchronous pmacs editor in a piety session
+# aed.py - script to start asynchronous edsel editor in a piety session
 #
 #  ...$ python -m piety0
-#  >>>> run(apm.py)
+#  >>>> run(aed.py)
 #  ... window appears ...
 
 import sked
 from sked import *
 import frame
 from frame import *
-from apmacs import apm
+from aedsel import aed
 
 win(22)
-apm()
+aed()
 
 

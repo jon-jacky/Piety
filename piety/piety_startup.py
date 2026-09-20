@@ -1,6 +1,6 @@
 # piety_startup.py invoked from piety.py   
 # Assumes Piety is the current directory. It uses relative paths to load files.
-import pmacs, edsel as fr
+import edsel, frame as fr
 fr.e('viewer/keys.txt')
 fr.e('viewer/viewer.py')
 fr.e('viewer/README.md')
@@ -10,7 +10,6 @@ fr.e('viewer/desktop.txt') # load this one last, so it appears in viewer
 print("""
 >>> # This is the Python interpreter.
 >>> # Type alt-X to enter the interpreter.
->>> # Type apm() to return to visual editing in windows.
+>>> # Type ed() to return to visual editing in windows.
 >>> """)
-pmacs.pm()
-
+from edsel import ed

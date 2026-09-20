@@ -46,14 +46,14 @@ def ted():
     """
     ted "tasking edsel"
     From the pysh Python REPL, use the ted() command to clear the cmd_mode flag
-    and begin the pmacs editor for editing buffers display windows.
+    and begin the edsel editor for editing buffers display windows.
     Exit from display editing with M-x: set cmd_mode flag and return to REPL.
     ted() must be issued from pysh REPL not standard Python REPL
     because it assumes terminal is already in char mode.
     """
     global cmd_mode
     cmd_mode = False
-    pmacs.rpm() # raw pmacs - assumes terminal is already in char mode
+    edsel.red() # raw edsel - assumes terminal is already in char mode
     cmd_mode = True
  
 def setup():

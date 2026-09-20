@@ -8,8 +8,8 @@ See writer.txt for more notes and explanation.
 import display
 import sked as ed
 import frame as fr 
+import edsel
 import editline as el
-import pmacs as pm
 import pyshell as sh
 
 # Redefine these functions from frame to also restore cursor to point
@@ -32,7 +32,7 @@ def restore_cursor():
         fr.save_window(fr.focus) 
         fr.focus = saved_focus
         fr.restore_window(saved_focus)
-        pm.restore_cursor_to_window()
+        edsel.restore_cursor_to_window()
         ## display.putstr(f'AT POINT in {ed.bufname}') # DEBUG
     else: # There is no other window, cursor is already where it is needed.
         pass 

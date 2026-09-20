@@ -1,7 +1,7 @@
 # piety.py - like viewer/desktop.py but also imports piety async tasking
-# First must define PYTHONPATH by . /home/jon/piety/bin/paths, once in session
-# imports eventloop, 
-# Defines piety (the eventloop) and startpiety (the function) at top level
+# First must define PYTHONPATH by . /home/jon/Piety/bin/paths, once in session
+# Imports eventloop, defines piety (the eventloop) and startpiety 
+# (the function) at top level.
 # Does not start the eventloop, user must call startpiety()
 
 import sked
@@ -9,12 +9,11 @@ from sked import *
 import frame
 from frame import *
 import dmacs
-from dmacs import dm # so we can revert to dmacs if pmacs is broken
+from dmacs import dm # so we can revert to dmacs if edsel is broken
 import console
 from console import *
 import editline
-import pmacs
-from pmacs import pm, de
+import edsel
 import urls
 from urls import *
 import get
@@ -29,13 +28,13 @@ from viewer import *
 import eventloop
 # don't call startpiety yet
 from eventloop import piety, startpiety, stoppiety, tasks, block 
-from apmacs import apm, ade # eventloop imports apmacs too,put apm at top level
+from aedsel import aed # eventloop imports aedsel too,put aed at top level
 import aiotimers
 from aiotimers import timer, starttimer, stoptimer, onetimer, twotimers
 import aclock
 from aclock import startclock, stopclock, ca, ta
 # display the windows
-tl = pmacs.terminal.set_line_mode # type tl() to restore echo after crash
+tl = edsel.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 

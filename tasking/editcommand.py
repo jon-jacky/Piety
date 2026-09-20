@@ -15,13 +15,13 @@ region at the bottom of the screen, which extends the full screen width.
 At this time we use editcommand in two contexts:
 
  1. In the pyshell.py runcmd fcn, for editing Python statements in the REPL
- 2. In the pmacs.py runrequest fnc, for editing responses to prompts for
+ 2. In the edsel.py runrequest fnc, for editing responses to prompts for
      file name, buffer name, search string etc.
 
 This old editcommand module lives on because frame.start_col is embedded
 deeply and pervasively in editline. frame.start_col is not parameterized
 in editline, and does not appear in the editline API, so pyshell and
-pmacs request can't be generalized to use editline. When the viewer is
+edsel request can't be generalized to use editline. When the viewer is
 the current window, editline might try to align the REPL command or
 response to the prompt with the viewer left edge - the wrong thing to do.
 """

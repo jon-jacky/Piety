@@ -4,7 +4,7 @@ import sked as ed
 
 from frame import e, b, o2, on
 from viewer import oe
-from apmacs import apm
+from aedsel import aed
 
 from atimers import ATimer
 from writer import Writer
@@ -48,7 +48,7 @@ def onetimer():
     e('a.txt')
     starttimer('a',1000,1)
     on() # put cursor in other window so we can edit
-    apm() # resume display editing in windows
+    aed() # resume display editing in windows
          
 def twotimers():
     """
@@ -62,5 +62,5 @@ def twotimers():
     on() # put cursor in other window so we can open b.txt
     e('b.txt')
     starttimer('b',1000,0.5)
-    apm() # resume display editing in windows
+    aed() # resume display editing in windows
           

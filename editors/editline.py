@@ -24,10 +24,10 @@ in editline. So editline has to import frame -- it's tightly integrated
 with the desktop code.
 
 The old editcommand module lives on because it is still used by working
-code in pyshell runcmd and pmacs request that was written before we
+code in pyshell runcmd and edsel request that was written before we
 generalized the editor to support adjacent windows. frame.start_cmd is
 not parameterized in editline, and does not appear in the editline API,
-so pyshell and pmacs request can't be generalized to use this editline.
+so pyshell and edsel request can't be generalized to use this editline.
 
 See tasking/editcommand.py for more explanation.
 """

@@ -10,7 +10,7 @@ import sys, asyncio
 import key
 import terminal as term  
 import pyshell as sh
-import apmacs # apmacs.apm() starts asyncio display editor in runcmd special case
+import aedsel # aedsel.aed() starts asyncio display editor in runcmd special case
 
 loop = None # must be global, used in both restore() and main()
 running = False # loop is running, assigned by restore and apysh
@@ -42,7 +42,7 @@ def runcmd(c):
     # In that case do *not* call  pyshell.runcmd key.cr case which ends with 
     #  restore_cursor_to_cmdline(); pustr(prompt).  Instead handle inline here.
     elif (c == key.cr and sh.cmd == 'apm()'):
-        apmacs.apm() # starts asyncio display editing
+        aedsel.aed() # starts asyncio display editing
     else:
         sh.runcmd(c) # handles C_d differently when sh.cmd is not empty
  

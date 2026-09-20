@@ -357,7 +357,7 @@ def file_key(): # C-x C-f
     dmacs.mark = 0
     e(filename) # use correct file load fcn (above) for viewer or editor window
 
-# vdir has been moved from this viewer module to pmacs module
+# vdir has been moved from this viewer module to edsel module
 
 def buffer_key(): # C-x b
     """
@@ -539,9 +539,9 @@ dmacs.keymap[key.C_x + key.C_r] = save_reload # local save_reload above
 dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
 
 # Prompt for directory (default cwd) then display file list in viewer window
-# This assignment is not needed here - new vdir is defined in pmacs.py
-# and C_x d is assigned in pmacs.keymap there.
-#pmacs.keymap[key.C_x + 'd' ] = vdir # pmacs keymap, use pmacs.request
+# This assignment is not needed here - new vdir is defined in edsel.py
+# and C_x d is assigned in edsel.keymap there.
+#edsel.keymap[key.C_x + 'd' ] = vdir # edsel keymap, use edsel.request
  
 # Load contents named on line into this window, usually the viewer
 dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
