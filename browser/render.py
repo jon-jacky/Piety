@@ -255,7 +255,7 @@ def gr(url):
 def grx():
     'Get and Render web page at url eXtracted from current line in buffer'
     get.gx()
-    render.r(get.url) # gx assigns get.url
+    r(get.url) # gx assigns get.url
 
 def grf(n):
     'Get and render web page whose URL is in footnote n'
@@ -264,8 +264,8 @@ def grf(n):
      
 def grfx():
     'Get and Render web page at next Footnote eXtracted from current line.'
-    gfx()
-    render.r(url) # gfx assigns global url
+    get.gfx()
+    r(url) # gfx assigns global url
 
 def hnpage(item_number):
     'Get the HN item (page) with the given integer (not string) item number'
@@ -293,7 +293,7 @@ def reload():
 # C-x C-b - list buffers without webpages, C-x w list .html buffers
 dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not frame.N
 dmacs.keymap[key.C_x + 'w'] = W # W defined above
-
+ 
 # C-x C-l - reload web page shown in current buffer
 dmacs.keymap[key.C_x + key.C_l] = reload # reload defined above
 

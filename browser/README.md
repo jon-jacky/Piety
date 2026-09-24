@@ -188,7 +188,7 @@ by typing [keycodes](#Keycodes).
    so you can display the *.html* buffer by explictly entering its full name
    in the *b(...)* command or at the *C-x b* prompt.
 
-- **edsel.N()** - list all the buffers in one list, 
+- **frame.N()** - list all the buffers in one list, 
    including *.html* and *.htxt* buffers, so you can select *.html*
    files with *C-o* or *M-o*.
     
@@ -224,12 +224,6 @@ Python prompt, type the function call *pm()*. Use other *pmacs* editor
 keycodes (described elsewhere) to select and view the buffers that hold
 web pages.
   
-- **M-g** - invokes *gx()*, **get** page at URL on the current line in 
-            the current buffer.
-
-- **M-r** - invokes *r()*, **render** page in the current *.html* buffer to 
-            a new *.txt* buffer.
-
 - **C-x w** - Invokes *W()* to list web page buffers, the *.htxt* buffers.
             Any page in the list can be selected and displayed 
             by *C-o* or *M-o*. 

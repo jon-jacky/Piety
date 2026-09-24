@@ -172,7 +172,7 @@ def kill_line(keycode):
         fr.d(None,None,True) # ... and append line to killed buffer
         restore_cursor_to_window()
         # Now buffer and display are right, but killed has extra \n line at end
-        edlib.killedlib.remove('\n') # remove '\n' line
+        edlib.killed.remove('\n') # remove '\n' line
     # inline kill line:
     elif inline: # weaker condition, must follow previous stronger if...
         edlib.buffer[edlib.dot], edlib.point = el.runcmd(keycode, edlib.buffer[edlib.dot],
