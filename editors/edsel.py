@@ -221,7 +221,7 @@ respoint = 0 # index into response
 resprunning = False  # True when loop is running, accumulating characters
 respfinish = None # Assign _finish function to run when response is complete
 
-history = [] # List of past filename, bufname, searchstring etc.
+history = [''] # List of past filename, bufname, searchstring etc.
 i_cmd = -1 # index into history, code will assign to 0 or greater
 max_cmds = 100 # maximum number of strings in history.  20 is not enough!
 
@@ -234,7 +234,7 @@ def runrequest():
     if k: # keyseq returns '' if key sequence is not complete
         if k == key.cr:  # RET finishes entering response and returns
             resprunning = False
-            history.insert(0,response)
+            if response: history.insert(0,response) # don't save ''
             if len(history) > max_cmds: history.pop()
             i_cmd = 0
             if respfinish: respfinish() # might be None for backward compat.
@@ -242,18 +242,19 @@ def runrequest():
             response += '???' # dmacs.cancelled tests response.endswith('???')
             resprunning = False
             if respfinish: respfinish() # might be None for backward compat.            
+            i_cmd = 0
         # history code copied from  pyshell.py runcmd
         elif k in (key.C_p, key.up):
+            response = history[i_cmd]
+            respoint = len(response)
+            el.refresh(response, respoint, respcol)
             if i_cmd < len(history)-1: i_cmd += 1
-            response = history[i_cmd]
-            respoint = len(response)
-            el.refresh(response, respoint, respcol)
         elif k in (key.C_n, key.down):
-            if i_cmd >= 0: i_cmd -= 1  # reaches -1 after most recent...
-            if i_cmd < 0: cmd = ''   # ... then set cmd empty
             response = history[i_cmd]
             respoint = len(response)
             el.refresh(response, respoint, respcol)
+            if i_cmd > 0: i_cmd -= 1  # reaches -1 after most recent...
+            # if i_cmd < 0: cmd = ''   # ... then set cmd empty
         else:
             # NB edlib.runcmd not el.runcmd here only, editcommand not editline 
             response, respoint = ec.runcmd(k, response, respoint, respcol)
@@ -329,7 +330,8 @@ def search_finish():
     # DEBUG below
     # print(f'search_finish: async {eventloop.piety.is_running()}, prev_cmd {dmacs.prev_cmd}, requesting {requesting}, response {response}, searchstring {edlib.searchstring} search_finish')               
     fr.restore_cursor_to_cmdline() # So 'not found' message appears there
-    search_fcn() # fr.s forward or fr.r backward, assigned in search()
+    search_fcn(response) # fr.s forward or fr.r backward
+                                    # assigned  in search() above
     restore_cursor_to_window() # dmacs runcmd does this automatically
 
 # New version adapted for async - split off switch_buffer_finish
@@ -541,5 +543,3 @@ def ed():
     terminal.set_char_mode() 
     red() # raw ed, assumes term is already in char mode, doesn't restore mode
     terminal.set_line_mode()
-
-

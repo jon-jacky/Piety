@@ -119,9 +119,10 @@ by typing [keycodes](#Keycodes).
    window contents. This command does *not* render the HTML into a text
    buffer.
 
-- **r()** - **Render** the current buffer into a new text buffer.
+- **r(url)** - **Render** the current buffer into a new text buffer.
   It is intended that the current buffer is the HTML web page downloaded
-  by *g(url)* (above). The new buffer gets the same base name as the
+  by *g(url)* (above). The *url* argument in *r(url)* here is the same
+  as used in the preceding *g(url)*. The new buffer gets the same base name as the
   current buffer, but ends with *.txt*. The new text buffer is made the
   current buffer so it appears in the current window, replacing the HTML
   that was there.
@@ -228,20 +229,18 @@ web pages.
             Any page in the list can be selected and displayed 
             by *C-o* or *M-o*. 
 
-- **C-o** - invokes *viewer/grx(this_window=True)* via *viewer/loader()*.  
+- **C-o** - invokes *viewer/grx(this_window=True)* via *viewer/loader()*.   
             Load web page at URL on line in same window, usually viewer.
-            invokes *viewer/grfx(this_window=True) via *viewer/loader()* 
-            Load web page at URL indicated by next footnote on line 
-            in same window.
-            invokes *edsel/b(bname) via *viewer/loader()*
+            Invokes *viewer/grfx(this_window=True) via *viewer/loader()*   
+            Load web page at URL indicated by next footnote on line
+            in same window. Invokes *edsel/b(bname) via *viewer/loader()*   
             Load web page buffer named on line in same window.
                         
 - **M-o** - invokes *viewer/grx(this_window=False)* via *viewer/loader()*.  
             Load web page at URL on line in other window, usually editor
-            invokes *viewer/grfx(this_window=True) via *viewer/loader()* 
+            Invokes *viewer/grfx(this_window=True) via *viewer/loader()*   
             Load web page at URL indicated by next footnote on line 
-            in other window.
-            invokes *edsel/b(bname) via *viewer/loader()*
+            in other window. Invokes *edsel/b(bname) via *viewer/loader()*   
             Load web page buffer named on line in other window.
 
  - **C-x b** - Invokes *b()*, return to previous buffer.
@@ -370,5 +369,5 @@ supported at this writing, in Mar 2015:
 The base URL for each web page appears in a middle column of the buffer list
 shown by the *W()* command or the *C-x w* keycode.
 
-Revised July 2026
+Revised Sep 2026
  
