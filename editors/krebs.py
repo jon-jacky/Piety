@@ -1,10 +1,8 @@
 """
-dmacs.py - Invoke editor functions with emacs keys (control keys or key seqs).
+krebs.py - Invoke editor functions with control keys or key sequences.
+           Many of the control keys are the same as in the Emacs editor.
 
-See README.md for directions on using dmacs, NOTES.txt about its code. 
-
-The name means 'dumb emacs' or 'defective emacs' or maybe 'grade D emacs',
-barely above F (fail).
+See README.md for directions on using krebs, NOTES.txt about its code.   
 """
 
 import sys, importlib, traceback
@@ -12,11 +10,11 @@ import terminal, key, keyseq, display, pycall
 import sked as ed
 import frame as fr
 
-# Define and initialize global variables used by dmacs,
+# Define and initialize global variables used by krebs,
 # but only the *first* time this module is imported in a session.
 # Then we can reload this module without re-initializing those variables.
 try:
-    _ = mark # if mark is already defined, then dmacs was already imported
+    _ = mark # if mark is already defined, then krebs was already imported
 except:
     mark = 0 # line number, defines region for cut C_w etc.  0 means disabled.
     promptline = fr.flines+1 # line after end of frame
@@ -224,7 +222,7 @@ keymap = {
 
 def open_promptline():
     global promptline
-    promptline = fr.flines+1 # may have changed since prev dm() call
+    promptline = fr.flines+1 # may have changed since prev kb() call
     display.set_scroll(promptline+1, fr.tlines) # open prompt line
     display.put_cursor(promptline, 1)
     display.kill_whole_line() 
@@ -235,16 +233,16 @@ def close_promptline():
 
 def runcmd(k):
     """
-    Invoke a single dmacs command: look up k in keymap, run that command.
+    Invoke a single krebs command: look up k in keymap, run that command.
     """
     global prev_cmd
     cmd = keymap.get(k, lambda: display.putstr(key.bel))
     cmd()
     prev_cmd = cmd
 
-def dm():
+def kb():
     """
-    dmacs editor: loop invoking editor commands with emacs control keys.
+    krebs editor: loop invoking editor commands with emacs control keys.
     Supported keys and the cmds they invoke are expressed in keymap table.
     Exit by typing M_x (that's alt X), like emacs 'do command'.
     """
@@ -255,7 +253,7 @@ def dm():
         k = keyseq.keyseq(c)
         if k: # keyseq returns '' if key sequence is not complete
             if k == key.M_x:
-                # preserve prev_cmd after dm exit for debugging and resuming
+                # preserve prev_cmd after kb exit for debugging and resuming
                 break
             else:
                 runcmd(k)

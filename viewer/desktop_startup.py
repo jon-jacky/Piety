@@ -12,6 +12,6 @@ print("""
 >>> # Type alt-X to enter the interpreter REPL.
 >>> # Type ed() to return to return from the REPL to editing in windows.
 >>> """)
-from edsel import ed # overwrite ed imported from frame dmacs get render ...
+from edsel import ed # overwrite ed imported from frame krebs get render ...
 ed() # start display editing in viewer window
 

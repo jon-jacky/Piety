@@ -8,7 +8,6 @@ from pathlib import Path
 import datetime, re
  
 import sked as ed, frame as fr
-import key, dmacs # so we can add browser keycode entries to keymap
   
 # Simple regular expressions for matching URLs
 # Match https:// or file:// prefix and all that follows 

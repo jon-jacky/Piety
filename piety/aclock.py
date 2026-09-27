@@ -5,14 +5,15 @@ aclock.py - Onscreen clock
 
 import sys, asyncio
 from datetime import datetime
-import terminal_util,  display, dmacs, edsel, pyshell, writer
+import terminal_util,  display, edsel, pyshell, writer
+import krebs as kb
 
 def restore_cursor():
     'Based on writer.py restore_cursor but simpler'
     if pyshell.cmd_mode:
         writer.restore_cursor_to_cmdline()
     elif edsel.resprunning:
-        display.put_cursor(dmacs.promptline, edsel.respoint + edsel.respcol)
+        display.put_cursor(kb.promptline, edsel.respoint + edsel.respcol)
     else: 
         edsel.restore_cursor_to_window()
                     

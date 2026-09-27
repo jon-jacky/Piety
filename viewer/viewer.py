@@ -11,8 +11,8 @@ available, and work just as before.
 """
 
 import os, sys
-import key, dmacs, display, shell, render, console, get
-import sked as ed, frame as fr
+import key, display, shell, render, console, get
+import sked as ed, frame as fr, krebs as kb
 import traceback
 from redirect import redirect # for printing traceback in a buffer
  
@@ -350,22 +350,22 @@ def edpanel_key(): # C-x o
 
 def file_key(): # C-x C-f
     """
-    Imitates dmacs find_file
+    Imitates krebs find_file
     """
-    filename = dmacs.request('Find file: ')
-    if dmacs.cancelled(filename): return
-    dmacs.mark = 0
+    filename = kb.request('Find file: ')
+    if kb.cancelled(filename): return
+    kb.mark = 0
     e(filename) # use correct file load fcn (above) for viewer or editor window
 
 # vdir has been moved from this viewer module to edsel module
 
 def buffer_key(): # C-x b
     """
-    Imitates dmacs switch_buffer
+    Imitates krebs switch_buffer
     """
-    response = dmacs.request(f'Switch to buffer (default {ed.prev_bufname}): ')
-    if dmacs.cancelled(response): return
-    dmacs.mark = 0 # But we don't reset mark when we change buffer by change window
+    response = kb.request(f'Switch to buffer (default {ed.prev_bufname}): ')
+    if kb.cancelled(response): return
+    kb.mark = 0 # But we don't reset mark when we change buffer by change window
     b(response) # use correct buffer selection fcn for viewer or editor window
 
 # Functions invoked in editor window by keycode in viewer window
@@ -450,19 +450,19 @@ def loader(this_window):
  
 # save_reload() with exception handler
 #  that displays traceback in *Errors* buffer in viewer window.
-# This replaces save_reload() in dmacs.py that has simpler exception handler.
+# This replaces save_reload() in krebs.py that has simpler exception handler.
 
 def save_reload():
     'Write out buffer, reload module, so file and module stay consistent.'
-    dmacs.sr_tb = 'No traceback' # must reinitiazlie each time
+    kb.sr_tb = 'No traceback' # must reinitiazlie each time
     try:
         fr.w()
-        dmacs.reload_buffer() # synchronization?  Does w() finish before reload() begins?
+        kb.reload_buffer() # synchronization?  Does w() finish before reload() begins?
     except BaseException as e:
-        dmacs.sr_tb = traceback.format_exc() # returns string, does not print tb
+        kb.sr_tb = traceback.format_exc() # returns string, does not print tb
         # print(sr_tb) # for now, just print it wherever cursor is
         viewer_window(lambda: redirect('*Errors*', 
-                                lambda: print_traceback(dmacs.sr_tb), 
+                                lambda: print_traceback(kb.sr_tb), 
                                 'Traceback from save_reload(): '))
 
 # Next, sys.excepthook: catch-all handler for exceptions not handled elsewhere
@@ -495,48 +495,48 @@ def traceback_window(type_arg, value_arg, tb_arg): # don't shadow traceback modu
         viewer_window(lambda: redirect('*Errors*', 
                                 lambda: print_traceback(tb_str),
                            'Traceback printed by Piety custom sys.excepthook'))
-        dmacs.terminal.set_line_mode() # restore echo after crash
+        kb.terminal.set_line_mode() # restore echo after crash
          
 sys.excepthook = traceback_window
    
 # DEBUG for testing excepthook
 def crash(): 1/0
 def deep_crash(): crash()
-dmacs.keymap[key.C_z] = deep_crash 
+kb.keymap[key.C_z] = deep_crash 
                                  
-dmacs.keymap[key.C_x + '3'] = vwin
-dmacs.keymap[key.C_x + '1'] = vclr_key # if viewer_focus: vlcr() else: fr.o1()
-dmacs.keymap[key.C_x + '2'] = o2 # o2 in this module, not fr.o2
-dmacs.keymap[key.C_x + 'v'] = ov
+kb.keymap[key.C_x + '3'] = vwin
+kb.keymap[key.C_x + '1'] = vclr_key # if viewer_focus: vlcr() else: fr.o1()
+kb.keymap[key.C_x + '2'] = o2 # o2 in this module, not fr.o2
+kb.keymap[key.C_x + 'v'] = ov
 # C-x o does *not* map to on() in this module, nor does any other key
 # Instead C-x o maps to edpanel_key which calls oe in this module  or fr.on
-dmacs.keymap[key.C_x + 'o'] = edpanel_key
-dmacs.keymap[key.C_l] = refresh
+kb.keymap[key.C_x + 'o'] = edpanel_key
+kb.keymap[key.C_l] = refresh
 
 # Cursor motion in viewer window, while editor window has focus
-dmacs.keymap[key.C_t] = vv # scroll page down
-dmacs.keymap[key.M_t] = vrv # scroll page up
-dmacs.keymap[key.M_n] = vl  # next line
-dmacs.keymap[key.M_p] = vrl # prev ine
-dmacs.keymap[key.M_lp] = vtop  # top of buffer
-dmacs.keymap[key.M_rp] = vbottom # bottom of buffer
+kb.keymap[key.C_t] = vv # scroll page down
+kb.keymap[key.M_t] = vrv # scroll page up
+kb.keymap[key.M_n] = vl  # next line
+kb.keymap[key.M_p] = vrl # prev ine
+kb.keymap[key.M_lp] = vtop  # top of buffer
+kb.keymap[key.M_rp] = vbottom # bottom of buffer
 
 # Refresh viewer window while editor window has focus
-dmacs.keymap[key.M_m] = vvrefresh
+kb.keymap[key.M_m] = vvrefresh
 
 # Always display *Buffers* list in viewer window
-# Overwrites C_x C_b key binding defined in dmacs.py
-dmacs.keymap[key.C_x + key.C_b] = N # local N above, not frame.N
+# Overwrites C_x C_b key binding defined in kb.py
+kb.keymap[key.C_x + key.C_b] = N # local N above, not frame.N
 
 # Save and reload buffer 
-dmacs.keymap[key.C_x + key.C_r] = save_reload # local save_reload above
+kb.keymap[key.C_x + key.C_r] = save_reload # local save_reload above
 
 # Visit file, prompt for file name, NOT like Emacs, but analogous to C-x b
 # NOT!  We'll just stick to emacs keycodes when there is one.
-# dmacs.keymap[key.C_x + 'f'] = dmacs.find_file
+# kb.keymap[key.C_x + 'f'] = kb.find_file
 
 # Visit file, prompt for file name, compatible with Emacs
-dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
+kb.keymap[key.C_x + key.C_f] = kb.find_file
 
 # Prompt for directory (default cwd) then display file list in viewer window
 # This assignment is not needed here - new vdir is defined in edsel.py
@@ -544,14 +544,14 @@ dmacs.keymap[key.C_x + key.C_f] = dmacs.find_file
 #edsel.keymap[key.C_x + 'd' ] = vdir # edsel keymap, use edsel.request
  
 # Load contents named on line into this window, usually the viewer
-dmacs.keymap[key.C_o ] = (lambda: loader(this_window=True))
+kb.keymap[key.C_o ] = (lambda: loader(this_window=True))
 
 # Load contents named on line into other widow, usually an editor window
-dmacs.keymap[key.M_o] = (lambda: loader(this_window=False))
+kb.keymap[key.M_o] = (lambda: loader(this_window=False))
 
 # C-x C-b - list buffers without webpages, C-x C-w list .html buffers
-dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not fr.N or browser.NM
-dmacs.keymap[key.C_x + 'w' ] = W # W defined above, not browser.W 
+kb.keymap[key.C_x + key.C_b] = N # N defined above, not fr.N or browser.NM
+kb.keymap[key.C_x + 'w' ] = W # W defined above, not browser.W 
   
 def quit():
     """

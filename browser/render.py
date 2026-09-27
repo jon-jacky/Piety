@@ -10,7 +10,8 @@ import traceback
 import sked as ed
 import frame as fr
 import get # get.url get.title get.timestamp and get.g() are used here
-import key, dmacs # for adding keycodes to keymap
+import key # for adding keycodes to keymap
+import krebs as kb # ditto
 
 # div class="..." special case div tags at particular web sites
 # div with these classes are formatted like paragraphs.
@@ -291,9 +292,9 @@ def reload():
 # Add keycodes for browser operations to keymap 
 
 # C-x C-b - list buffers without webpages, C-x w list .html buffers
-dmacs.keymap[key.C_x + key.C_b] = N # N defined above, not frame.N
-dmacs.keymap[key.C_x + 'w'] = W # W defined above
+kb.keymap[key.C_x + key.C_b] = N # N defined above, not frame.N
+kb.keymap[key.C_x + 'w'] = W # W defined above
  
 # C-x C-l - reload web page shown in current buffer
-dmacs.keymap[key.C_x + key.C_l] = reload # reload defined above
+kb.keymap[key.C_x + key.C_l] = reload # reload defined above
 

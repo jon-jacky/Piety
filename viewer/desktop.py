@@ -4,8 +4,8 @@ import sked
 from sked import *
 import frame
 from frame import *
-import dmacs
-from dmacs import dm # so we can revert to dmacs if edsel is broken
+import krebs
+from krebs import kb # so we can revert to krebs if edsel is broken
 import console
 from console import *
 import editline
