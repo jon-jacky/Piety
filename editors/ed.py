@@ -23,5 +23,5 @@ tl = edsel.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
-from edsel import ed # overwrite ed imported from frame dmacs get render ...
+from edsel import ed # overwrite ed imported from frame get render etc. ...
 ed() # start display editing in editor window

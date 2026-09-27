@@ -40,4 +40,6 @@ tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin() 
 import piety_startup # load several buffers desktop.txt keys.txt etc.
-   
+from edsel import ed # overwrite ed module   
+ed()
+
