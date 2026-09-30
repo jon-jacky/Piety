@@ -247,12 +247,14 @@ def runrequest():
         elif k in (key.C_p, key.up):
             response = history[i_cmd]
             respoint = len(response)
-            el.refresh(response, respoint, respcol)
+            display.put_render(kb.promptline, respcol, response, display.clear)
+            display.kill_line() # if any text remains on line
             if i_cmd < len(history)-1: i_cmd += 1
         elif k in (key.C_n, key.down):
             response = history[i_cmd]
             respoint = len(response)
-            el.refresh(response, respoint, respcol)
+            display.put_render(kb.promptline, respcol, response, display.clear)
+            display.kill_line() # if any text remains on line
             if i_cmd > 0: i_cmd -= 1  # reaches -1 after most recent...
             # if i_cmd < 0: cmd = ''   # ... then set cmd empty
         else:

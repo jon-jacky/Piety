@@ -1,6 +1,6 @@
 # piety_startup.py invoked from piety.py   
 # Assumes Piety is the current directory. It uses relative paths to load files.
-import frame as fr
+import edsel, frame as fr
 from edsel import ed # overwrite ed imported from frame get render etc. ...
 fr.e('viewer/keys.txt')
 fr.e('viewer/viewer.py')
@@ -13,4 +13,6 @@ print("""
 >>> # Type alt-X to enter the interpreter.
 >>> # Type ed() to return to visual editing in windows.
 >>> """)
+from edsel import ed # overwrite ed imported from frame krebs get render ...
+ed() # start display editing in viewer window
 

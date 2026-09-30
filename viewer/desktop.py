@@ -27,5 +27,6 @@ tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin()
 import desktop_startup # load buffers into editor
+from edsel import ed # overwrite ed module 
 
  
