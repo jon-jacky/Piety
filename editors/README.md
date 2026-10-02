@@ -25,7 +25,7 @@ other tasks in an *asyncio* event loop.
 
 ### Quick start ###
 
-<img src="screenshots/edsel_terminal.png"
+<img src="../screenshots/edsel_terminal.png"
  alt="edsel editor running in a terminal window" width=67% height=67%>
 
 There isn't any installation procedure.  Just clone the 
