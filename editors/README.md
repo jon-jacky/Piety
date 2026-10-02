@@ -13,15 +13,15 @@ with control keys.
 replaces blocking function calls so it can run concurrently with
 other tasks in an *asyncio* event loop.
 
-[Quick start](#Quick-start)
-[Files](#Files)  
+[Quick start](#Quick-start)   
 [sked](#sked)  
 [frame](#frame)  
 [krebs](#krebs)  
 [edsel](#edsel)  
-[Web Browser](#Web-Browser)
-[Desktop](#Desktop) 
+[Web Browser](#Web-Browser)  
+[Desktop](#Desktop)  
 [Recovering from errors](#Recovering-from-errors)  
+[Files](#Files)
 
 ### Quick start ###
 
@@ -57,53 +57,6 @@ Python REPL, type *M-x* (*meta x*, hold the *alt* key while typing the
 
 More detailed directions appear in the sections below.  
 
-### Files ###
-
-- **README.md**: Directions for using the *sked*, *frame*, *krebs*, 
-  and *edsel* editors.
-
-- **NOTES.txt**: Notes on the code in *sked*, *frame*, *krebs*, and *edsel*,
-  including regrets about some design decisions and ideas for future
-  revisions.
-
-- **HOW.md**: How we program, notes on motivation and design.
-
-- **autoindent.md**: Directions for demonstrating the *edsel* editor to edit 
-    itself to add a new *autoindent* feature, reload the revised code into the 
-    same editing session, and then use the new feature.
-
-- **breakpt.md** - Explanation of *breakpt.py* and directions for breakpoint demo.
-
-- **breakpt.py** - Breakpoint hook that enables *edsel* editor to be debugged
-  with *pdb* while it is running, without disturbing its window contents.
-
-- **bugs.md** - Descriptions of unfixed bugs in the editors, and workarounds.
-
-- **demo**: Directory of files used by the demonstration explained in 
-    *autoindent.md*.
-  
-- **editline.py**: Functions to edit and display a string with *readline* 
-  control keys.  Used by *edsel*.
-
-- **edsel.py**: Our most complete display editor, which imports *sked*,
-    *frame*, and *krebs*.   It invokes commands with control keys,
-    and eliminates blocking function calls so it can run concurrently with
-    other tasks in an *asyncio* event loop.
-
- - **ed.py**: Script to start the *edsel* editor.
- 
-- **frame.py**: Editor that adds display windows to *sked*.
-
-- **krebs.py**: Display editor that supplements the *frame* command line
-    with control keys.
-
-- **kb.py**: Script to start the *krebs* editor.
-
-- **sked.py**: Line editor inspired by the classic Unix *ed*, whose
-   commands are function calls typed at the Python REPL.
-
-- **test**: Directory of sample text files for testing the editors.
- 
 ### sked ###
 
 **sked.py** is the Stone Knife Editor, a line editor inspired by the classic 
@@ -470,5 +423,52 @@ to *sked* which does not update the display at all.
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
+### Files ###
+
+- **README.md**: Directions for using the *sked*, *frame*, *krebs*, 
+  and *edsel* editors.
+
+- **NOTES.txt**: Notes on the code in *sked*, *frame*, *krebs*, and *edsel*,
+  including regrets about some design decisions and ideas for future
+  revisions.
+
+- **HOW.md**: How we program, notes on motivation and design.
+
+- **autoindent.md**: Directions for demonstrating the *edsel* editor to edit 
+    itself to add a new *autoindent* feature, reload the revised code into the 
+    same editing session, and then use the new feature.
+
+- **breakpt.md** - Explanation of *breakpt.py* and directions for breakpoint demo.
+
+- **breakpt.py** - Breakpoint hook that enables *edsel* editor to be debugged
+  with *pdb* while it is running, without disturbing its window contents.
+
+- **bugs.md** - Descriptions of unfixed bugs in the editors, and workarounds.
+
+- **demo**: Directory of files used by the demonstration explained in 
+    *autoindent.md*.
+  
+- **editline.py**: Functions to edit and display a string with *readline* 
+  control keys.  Used by *edsel*.
+
+- **edsel.py**: Our most complete display editor, which imports *sked*,
+    *frame*, and *krebs*.   It invokes commands with control keys,
+    and eliminates blocking function calls so it can run concurrently with
+    other tasks in an *asyncio* event loop.
+
+ - **ed.py**: Script to start the *edsel* editor.
+ 
+- **frame.py**: Editor that adds display windows to *sked*.
+
+- **krebs.py**: Display editor that supplements the *frame* command line
+    with control keys.
+
+- **kb.py**: Script to start the *krebs* editor.
+
+- **sked.py**: Line editor inspired by the classic Unix *ed*, whose
+   commands are function calls typed at the Python REPL.
+
+- **test**: Directory of sample text files for testing the editors.
+ 
 Revised Sep 2026
 
