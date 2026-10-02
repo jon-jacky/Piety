@@ -4,93 +4,103 @@ editors
 
 There are four editors here, each built by extending (importing) its
 predecessors. *sked* is a line editor inspired by the classic Unix *ed*,
-operated by calling its functions at the Python REPL. *edsel* adds
-display windows to *sked*. *dmacs* supplements the *edsel* REPL with
-control keys. *pmacs* enriches *dmacs* with more flexible display
-editing.
+operated by calling its functions at the Python REPL. *frame* adds
+display windows to *sked*. *krebs* supplements the *frame* command line
+with control keys. 
 
-Each editor comprises a minimal Python programming environment.
-We can have all of our source code, our editor, and the interactive Python
-interpreter always available in our Python session. We can write code that
-we load and run immediately, without restarting the session or losing
-any work in progress. See [how we program](HOW.md).
+*edsel* is our most complete editor. We recommend it for routine use.
+*edsel* enriches *krebs* with more flexible display editing, and
+replaces blocking function calls so it can run concurrently with
+other tasks in an *asyncio* event loop.
 
-The programming environments defined here are crude.  But we
-find that their malleability and responsiveness motivate us to continue
-working in them, despite their lack of conveniences.
+[Quick start](#Quick-start)
+[Files](#Files)  
+[sked](#sked)  
+[frame](#frame)  
+[krebs](#krebs)  
+[edsel](#edsel)  
+[Web Browser](#Web-Browser)
+[Desktop](#Desktop) 
+[Recovering from errors](#Recovering-from-errors)  
 
 ### Quick start ###
+
+<img src="screenshots/edsel_terminal.png"
+ alt="edsel editor running in a terminal window" width=67% height=67%>
 
 There isn't any installation procedure.  Just clone the 
 Piety repository under your home directory.
 
-Run this command to put the editor modules on your *PYTHONPATH*, so you can
-run the editors from any directory.  Note the dot at the beginning of the
-command:
+In a terminal window, type this command to put the editor
+modules on your *PYTHONPATH*, so you can run the editors from any
+directory. Note the dot at the beginning of the command:
 
     . ~/Piety/bin/paths      
 
-Run this command to start *pmacs*, a display editor.
+Type this command to start *edsel*:
 
-    python3 -im pm
+    python3 -im ed  
 
-Now you can edit, almost as if you were using Emacs -- many of the same
-control keys are supported.  Here are the [keys](../viewer/keys.txt)
-supported by *pmacs*.
+*edsel* opens in that terminal window, which you can manage with the
+system's window manager, along with other applications on your system.
 
-Below the text editing window there are several scrolling lines devoted
-to the Python REPL. To pause editing and return to the Python REPL, type
-*M-x* (*meta x*, hold the *alt* key while typing the *x* key). To resume
-editing, type the function call *pm()* in the REPL.
+*edsel* uses many of the same control keys as the Emacs editor.
+It is not an Emacs clone, but you can often edit with *edsel* almost as if you
+were using Emacs. Here are the [keys](../viewer/keys.txt) supported by
+*edsel*.
+
+Below the text editing windows there are several scrolling lines devoted
+to the Python REPL. To pause editing with control keys and return to the
+Python REPL, type *M-x* (*meta x*, hold the *alt* key while typing the
+*x* key). To resume editing with control keys, type the function call
+*ed()* in the REPL.
 
 More detailed directions appear in the sections below.  
 
-[Files](#Files)  
-[sked](#sked)  
-[edsel](#edsel)  
-[dmacs](#dmacs)  
-[pmacs](#pmacs)  
-[Recovering from errors](#Recovering-from-errors)  
-
 ### Files ###
 
-- **README.md**: Directions for using the *sked*, *edsel*, *dmacs*, 
-  and *pmacs* editors.
+- **README.md**: Directions for using the *sked*, *frame*, *krebs*, 
+  and *edsel* editors.
 
-- **NOTES.txt**: Notes on the code in *sked*, *edsel*, *dmacs*, and *pmacs*,
+- **NOTES.txt**: Notes on the code in *sked*, *frame*, *krebs*, and *edsel*,
   including regrets about some design decisions and ideas for future
   revisions.
 
 - **HOW.md**: How we program, notes on motivation and design.
 
-- **autoindent.md**: Directions for demonstrating the *pmacs* editor to edit 
+- **autoindent.md**: Directions for demonstrating the *edsel* editor to edit 
     itself to add a new *autoindent* feature, reload the revised code into the 
     same editing session, and then use the new feature.
 
 - **breakpt.md** - Explanation of *breakpt.py* and directions for breakpoint demo.
 
-- **breakpt.py** - Breakpoint hook that enables *pmacs* editor to be debugged
+- **breakpt.py** - Breakpoint hook that enables *edsel* editor to be debugged
   with *pdb* while it is running, without disturbing its window contents.
 
 - **bugs.md** - Descriptions of unfixed bugs in the editors, and workarounds.
 
 - **demo**: Directory of files used by the demonstration explained in 
     *autoindent.md*.
-
-- **dmacs.py**: Display editor that invokes *edsel* commands with control keys.
-
-- **dm.py**: Script to start the *dmacs* editor.
   
 - **editline.py**: Functions to edit and display a string with *readline* 
-  control keys.  Used by *pmacs*.
+  control keys.  Used by *edsel*.
 
-- **edsel.py**: Display editor that uses the same commands as *sked*.
+- **edsel.py**: Our most complete display editor, which imports *sked*,
+    *frame*, and *krebs*.   It invokes commands with control keys,
+    and eliminates blocking function calls so it can run concurrently with
+    other tasks in an *asyncio* event loop.
 
-- **pmacs.py**: Display editor that uses control keys.
-
- - **pm.py**: Script to start the *pmacs* editor.
+ - **ed.py**: Script to start the *edsel* editor.
  
-- **sked.py**: Line editor inspired by the classic Unix *ed*.
+- **frame.py**: Editor that adds display windows to *sked*.
+
+- **krebs.py**: Display editor that supplements the *frame* command line
+    with control keys.
+
+- **kb.py**: Script to start the *krebs* editor.
+
+- **sked.py**: Line editor inspired by the classic Unix *ed*, whose
+   commands are function calls typed at the Python REPL.
 
 - **test**: Directory of sample text files for testing the editors.
  
@@ -147,7 +157,7 @@ There is no continually updating display that shows the buffer contents.
 Editor command output appears in the REPL, then scrolls up as more commands
 are typed and executed. You could edit with *sked* on an old printing terminal.
 
-To see all the commands and arguments that are available, read the source, or 
+To see all the commands and arguments that are available,
 type *help(sked)* in the REPL.  Type *help(e)* (for example) to learn 
 about the *e* command, likewise for all the other commands.
 Type *dir(sked)* to see just the names of functions and variables.
@@ -164,21 +174,21 @@ session or losing any work in progress.
 
 The name *sked* is inspired by Kragen Sitaker's Stone Knife Forth.
 
-### edsel ###
+### frame ###
 
-**edsel.py** is a display editor that uses the same commands as *sked*.
+**frame.py** is a display editor that uses the same commands as *sked*.
 
-To edit with *edsel*, first begin *sked* as explained in the previous section.
+To edit with *frame*, first begin *sked* as explained in the previous section.
 Then:
 
     ...
-    >>> import edsel
-    >>> from edsel import *
+    >>> import frame
+    >>> from frame import *
     >>> win(24)
     ...
 
-The command names in *edsel* are the same as in *sked*.
-Here *from edsel import \** loads the commands from *edsel* into 
+The command names in *frame* are the same as in *sked*.
+Here *from frame import \** loads the commands from *frame* into 
 the REPL, replacing the commands with the same names imported earlier
 from *sked*.
 
@@ -215,7 +225,7 @@ sked functions at the Python REPL.  You can call
 the *c* (change) function to substitute text in that line.
 Or, you can delete the line and append a different one.
 
-Additional edsel commands enable you to have multiple windows  on the
+Additional frame commands enable you to have multiple windows  on the
 display in a vertical stack, showing different locations in the same
 buffer, or different buffers.  The *o2()* command splits the current
 window into two, *on()* moves the cursor into the other window, and
@@ -229,7 +239,7 @@ If you do want to see their output in the python REPL, you can still
 run the command in *sked* by prefixing the command name with the 
 module name: *sked.p()*.
 
-Help text in *edsel* is cryptic.  To see the more helpful text from *sked*
+Help text in *frame* is cryptic.  To see the more helpful text from *sked*
 you must prefix the command name with the module name: *help(sked.e)*.
 
 To finish display editing and return to line editing in *sked*:
@@ -242,54 +252,52 @@ To finish display editing and return to line editing in *sked*:
 Here *clr()* dismisses the window by restoring full screen scrolling,
 so the window contents soon scroll away at the top of the terminal.
 Here *from sked import \** copies the commands in *sked* back into the REPL.
-To resume display editing, repeat *from edsel import \** and
+To resume display editing, repeat *from frame import \** and
 *win()* (*win* without an argument restores the previous window size).
 
-The name *edsel* is from the [Edsel](https://en.wikipedia.org/wiki/Edsel)
-automobile:
-[*it has the new ideas next year's cars are copying!*](https://www.alamy.com/stock-photo-ford-edsel-advert-for-the-1958-model-edsel-convertible-25549787.html?imageid=B9FEB0EB-5F12-45D5-9327-D0BB90416BF1&p=13044&pn=1&searchId=6cb698f459186cbb7fdcfa8a40b23782&searchtype=0)
+The name 'frame' refers to the terminal containing one or more editor windows.
 
-### dmacs ###
+### krebs ###
 
-**dmacs.py** is a display editor where you invoke *edsel* functions by 
+**krebs.py** is a display editor where you invoke *frame* functions by 
 typing control keys (or key sequences). Here are the
-[keys](../viewer/keys.txt) supported by *dmacs*. When running *dmacs*,
-you no longer have to use the Python REPL to edit. Every *edsel*
+[keys](../viewer/keys.txt) supported by *krebs*. When running *krebs*,
+you no longer have to use the Python REPL to edit. Every *frame*
 function can be invoked by a keystroke or two.
 
-To run *dmacs*, first start *sked*, then *edsel*, as described above.  Then,
+To run *krebs*, first start *sked*, then *frame*, as described above.  Then,
 
     ...
-    >>> import dmacs
-    >>> from dmacs import dm
+    >>> import krebs
+    >>> from krebs import dm
     >>> dm()
 
-Or, you can start *dmacs* from the system command line by running 
+Or, you can start *krebs* from the system command line by running 
 the *dm* script:
 
     python3 -im dm
 
-After you start *dmacs*, the Python prompt does not appear because Python
+After you start *krebs*, the Python prompt does not appear because Python
 is busy executing the *dm* function.  Now you can type control keys
 to edit.   To exit *dm* and return to the Python prompt, type the control
 key *M-x* ("meta x", formed by holding down the ALT key while you type x).
 Then the *dm* function returns and the Python prompt reappears.  Now 
-you can return to typing *edsel* function calls (or any other Python
-statements).  You can type *dm()* again to resume *dmacs*.
+you can return to typing *frame* function calls (or any other Python
+statements).  You can type *dm()* again to resume *krebs*.
 
 To see what control keys are available, see
 [keys.txt](../viewer/keys.txt). The *keymap* dictionary in the
-*dmacs.py* source code file associates each key with its function. Most
-control keys have the same function in *dmacs* as they do in *Emacs*.
+*krebs.py* source code file associates each key with its function. Most
+control keys have the same function in *krebs* as they do in *Emacs*.
 
 There is no control key to enter append mode. Instead, simply type RETURN
-at any time while running *dmacs*.  An empty line will open below the
+at any time while running *krebs*.  An empty line will open below the
 current line and the blinking cursor will appear there.  Now append
-mode works just as it does in *sked* and *edsel*: you can
+mode works just as it does in *sked* and *frame*: you can
 type in any number of lines, editing in the most recent line as you go,
 until you type a period at the beginning of line to exit append mode.
 
-When *dmacs* is in append mode, it does not respond to any of its
+When *krebs* is in append mode, it does not respond to any of its
 control keys.  It is easy to enter append mode by mistake by
 typing RETURN, or to remain in append mode by forgetting to type the period.
 If your session seems unresponsive, try exiting append mode by  typing
@@ -297,12 +305,12 @@ RETURN then a period at the beginning of a line.
 
 When you type a key that invokes a function that has a string argument
 -- to name a file, buffer, seach string or replacement string --
-*dmacs* prompts for it on the line below the status
+*krebs* prompts for it on the line below the status
 line.  Type the string and press RETURN.  You can edit the string inline
 before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
-(The Emacs *C-g* cancel key is not available in *dmacs*.)
+(The Emacs *C-g* cancel key is not available in *krebs*.)
 To indicate that the string argument should be the empty string,
 type three backslashes.
 
@@ -321,68 +329,69 @@ line, dot.
 
 You can make changes in any module effective immediately, without
 restarting the Python session or losing work in progress.  Just type
-*C-x C-r* to invoke *dmacs save_reload*, which writes out the current buffer
+*C-x C-r* to invoke *krebs save_reload*, which writes out the current buffer
 to a file and reloads that file as a Python module.
 
-In *dmacs*, as in *sked* and *edsel*, you can only use control keys
+In *krebs*, as in *sked* and *frame*, you can only use control keys
 to edit within a line when you are entering that line in append mode,
 or when you are entering a string in response to a prompt.
 To edit a line that has already been added to the buffer, you 
 must use the *M-%* key to substitute text in the line.
 
 A reason to use *M-x* to return to the Python REPL while using
-*dmacs* is to view and assign configuration variables, such as
+*krebs* is to view and assign configuration variables, such as
 *sked.lmargin* etc.
 
-The name *dmacs* means 'dumb Emacs' or maybe 'grade D Emacs', barely above
-F (fail).
+The name *krebs* was chosen so it could be abbreviated in the Python
+code to *kb* for keyboard, the method for controlling this editor.
+It is also the name of a comedy character, Maynard G. Krebs.
 
-### pmacs ###
+### edsel ###
 
-*pmacs* is a display editor that uses [control
-keys](../viewer/keys.txt). Unlike *dmacs* and its predecessors, you do
+*edsel* is a display editor that uses [control
+keys](../viewer/keys.txt). Unlike *krebs* and its predecessors, you do
 not have to use an append mode to enter text one line at a time. Just
 type (or delete, or change) any amount of text anywhere at any time. To
-start *pmacs*, use the *pm* script with the command *python3 -im pm*, or
-import *pmacs* and call the function *pm()* at the Python REPL.
+start *edsel*, use the *pm* script with the command *python3 -im pm*, or
+import *edsel* and call the function *ed()* at the Python REPL.
 
 Below the text editing window
 there are several scrolling lines devoted to the Python REPL.
 To pause editing and return to the Python REPL, type *M-x* (*meta x*, hold the
 *alt* key while typing the *x* key).  Now you can type any Python statements,
-including the editor commands from *sked* and *edsel*.  You might need them
+including the editor commands from *sked* and *frame*.  You might need them
 to set some editor configuration options.  For example, to set the text 
 window size to 12 lines and also expand the REPL scrolling region, type
-the *edsel* function call *win(12)* in the REPL.  To resume editing,
-type the function call *pm()*.
+the *frame* function call *win(12)* in the REPL.  To resume editing,
+type the function call *ed()*.
 
-In *pmacs* you can edit several files in different buffers. You can have
+In *edsel* you can edit several files in different buffers. You can have
 multiple windows on the display in a vertical stack, showing different
 locations in the same buffer, or different buffers. At this time you can
 only have two windows, because more are not useful in the small terminal
 we have available.
 
-To see what keycodes are effective in *pmacs*, see 
+To see what keycodes are effective in *edsel*, see 
 [Piety/viewer/keys.txt](../viewer/keys.txt). The keys are defined in the
-*keymap* dictionaries in the *dmacs*, *editline*, and *pmacs* modules.
+*keymap* dictionaries in the *krebs*, *editline*, and *edsel* modules.
 
-The *pmacs* editor provides all the functions and commands of its predecessors
-*sked*, *edsel*, and *dmacs*.  Most *pmacs* commands are actually *dmacs*
+The *edsel* editor provides all the functions and commands of its predecessors
+*sked*, *frame*, and *krebs*.  Most *edsel* commands are actually *krebs*
 commands, so its directions (above) are particulary pertinent.
 
-Two keycodes have different meanings in *pmacs* than in Emacs: 
+Two keycodes have different meanings in *edsel* than in Emacs: 
 
 *C-x C-r* reloads the
 module from the current buffer into the Python session, so recent changes
 become effective immediately, without restarting the Python session or
 losing work in progress.  
 
-*C-x C-a* enters *edsel/dmacs* append mode, where
+*C-x C-a* enters *frame/krebs* append mode, where
 text must be added one line at a time until a period is typed by itself at the
 start of a line.  It can sometimes be satisfying to just  type line
 after line without any temptation to stop and revise what we just wrote.
 
-*pmacs* is still the *sked* line editor underneath.
+*edsel* is still the *sked* line editor underneath.
 The *C-space* command, *set mark*, marks the entire line, not a point
 within the Line.   Then the *C-w* command, *kill-region* or *cut*, cuts
 a sequence of whole lines from the marked line through the current line dot,
@@ -403,10 +412,24 @@ So you can either cut and paste words within a line,  or you can cut and
 paste one or more whole lines.  You cannot cut and paste beginning
 in the middle of one line and ending in the middle of another line.  We have
 not found this to be a serious limitation and have no plans to change this.
- 
-Then name *pmacs* might mean "Python Emacs" but actually means "partly
-inspired by Emacs" or maybe "poor imitation of Emacs".
 
+The name *edsel* is from the [Edsel](https://en.wikipedia.org/wiki/Edsel)
+automobile:
+[*it has the new ideas next year's cars are copying!*](https://www.alamy.com/stock-photo-ford-frame-advert-for-the-1958-model-frame-convertible-25549787.html?imageid=B9FEB0EB-5F12-45D5-9327-D0BB90416BF1&p=13044&pn=1&searchId=6cb698f459186cbb7fdcfa8a40b23782&searchtype=0)
+
+### Web Browser ###
+
+*edsel* includes a text-only [web browser](browser/README.md) that
+downloads and renders web pages into the editor's text buffers. Commands
+and keycodes for the browser are explained in that linked page.
+
+### Desktop ###
+
+As an alternative to running *edsel* in a terminal using the system window
+manager, you can run *edsel* in a full-screen session using the 
+[Piety desktop](../viewer/README.md), which provides some additional
+conveniences.
+ 
 ### Recovering from errors ###
 
 These editors work in a long-running Python session where you can edit the
@@ -436,16 +459,16 @@ The *refresh()* command only refreshes the focus window, so you may have
 to  use the *on()* command to move to another window and refresh that
 one also.
 
-You can try to restart *pmacs* by typing the function call *pm()* and
+You can try to restart *edsel* by typing the function call *ed()* and
 try to avoid using the erroneous commmand.   If that fails, you can
 return to the Python prompt by typing *M-x*, and start a simpler editor
-that does not import the erroneous code.  Type *dm()* to run *dmacs*
-which does not provide inline editing, or just type the many *edsel*
+that does not import the erroneous code.  Type *dm()* to run *krebs*
+which does not provide inline editing, or just type the many *frame*
 commands at  the REPL -- they do not use keycodes. You can even revert
 to *sked* which does not update the display at all.
 
 As a last resort, you can exit the Python session and use some other editor
 to correct the error.
 
-Revised Jun 2026
+Revised Sep 2026
 
