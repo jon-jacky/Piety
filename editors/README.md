@@ -6,12 +6,11 @@ There are four editors here, each built by extending (importing) its
 predecessors. *sked* is a line editor inspired by the classic Unix *ed*,
 operated by calling its functions at the Python REPL. *frame* adds
 display windows to *sked*. *krebs* supplements the *frame* command line
-with control keys. 
+with control keys. *edsel* enriches *krebs* with more flexible display
+editing, and replaces blocking function calls so it can run concurrently
+with other tasks in an *asyncio* event loop.
 
-*edsel* is our most complete editor. We recommend it for routine use.
-*edsel* enriches *krebs* with more flexible display editing, and
-replaces blocking function calls so it can run concurrently with
-other tasks in an *asyncio* event loop.
+*edsel* is our most complete editor, the one we now use routinely.
 
 [Quick start](#Quick-start)   
 [sked](#sked)  
@@ -55,7 +54,11 @@ Python REPL, type *M-x* (*meta x*, hold the *alt* key while typing the
 *x* key). To resume editing with control keys, type the function call
 *ed()* in the REPL.
 
-More detailed directions appear in the sections below.  
+More detailed directions appear in the sections below. 
+
+We describe the editors in the order they were written. We used each
+editor routinely for months, Each editor provides all of the
+functionality of all its predecessors.
 
 ### sked ###
 
@@ -222,21 +225,21 @@ To run *krebs*, first start *sked*, then *frame*, as described above.  Then,
 
     ...
     >>> import krebs
-    >>> from krebs import dm
-    >>> dm()
+    >>> from krebs import kb
+    >>> kb()
 
 Or, you can start *krebs* from the system command line by running 
-the *dm* script:
+the *kb* script:
 
-    python3 -im dm
+    python3 -im kb
 
 After you start *krebs*, the Python prompt does not appear because Python
-is busy executing the *dm* function.  Now you can type control keys
-to edit.   To exit *dm* and return to the Python prompt, type the control
+is busy executing the *kb* function.  Now you can type control keys
+to edit.   To exit *kb* and return to the Python prompt, type the control
 key *M-x* ("meta x", formed by holding down the ALT key while you type x).
-Then the *dm* function returns and the Python prompt reappears.  Now 
+Then the *kb* function returns and the Python prompt reappears.  Now 
 you can return to typing *frame* function calls (or any other Python
-statements).  You can type *dm()* again to resume *krebs*.
+statements).  You can type *kb()* again to resume *krebs*.
 
 To see what control keys are available, see
 [keys.txt](../viewer/keys.txt). The *keymap* dictionary in the
@@ -305,7 +308,7 @@ It is also the name of a comedy character, Maynard G. Krebs.
 keys](../viewer/keys.txt). Unlike *krebs* and its predecessors, you do
 not have to use an append mode to enter text one line at a time. Just
 type (or delete, or change) any amount of text anywhere at any time. To
-start *edsel*, use the *pm* script with the command *python3 -im pm*, or
+start *edsel*, use the *ed* script with the command *python3 -im ed*, or
 import *edsel* and call the function *ed()* at the Python REPL.
 
 Below the text editing window
