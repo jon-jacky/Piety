@@ -4,7 +4,7 @@ breakpt
 
 The *breakpt* module defines and assigns a *breakpoint hook* that
 makes it possible to use Pdb to debug the display editor *edsel*
-is running, without disturbing its window contents.
+while it is running, without disturbing its window contents.
 
 We do not use the debugger much in Piety.  We always have the Python REPL 
 available, so invoking functions and examining global variables is usually 
@@ -63,7 +63,7 @@ the deletion move up, leaving more empty lines at the bottom of the window.
 
 Activate our *breakpt* function. While display editing, type *M-x* to get to
 the Python REPL. At the Python prompt, type the statement *import breakpt*.
-Then type the function call *pm()* to return to display editing.
+Then type the function call *ed()* to return to display editing.
 
 Now edit *frame.py*, find the function *erase_bottom*, and uncomment the 
 line with *breakpoint()* by removing the comment characters *#* from the 
