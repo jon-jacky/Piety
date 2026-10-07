@@ -418,7 +418,7 @@ one also.
 You can try to restart *edsel* by typing the function call *ed()* and
 try to avoid using the erroneous commmand.   If that fails, you can
 return to the Python prompt by typing *M-x*, and start a simpler editor
-that does not import the erroneous code.  Type *dm()* to run *krebs*
+that does not import the erroneous code.  Type *kb()* to run *krebs*
 which does not provide inline editing, or just type the many *frame*
 commands at  the REPL -- they do not use keycodes. You can even revert
 to *sked* which does not update the display at all.

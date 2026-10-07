@@ -436,13 +436,14 @@ in the buffer and for searching, selecting,
 deleting, cutting, pasting, and formatting
 text.  See keys.txt
  
-The editing keys work the same as in the Emacs
+Most editing keys work the same as in the Emacs
 editor.
 
-Editing deserves its own tutorial, but at this
-time we don't have one. In the meantime, you
-can consult keys.txt and experiment in
-scratch.txt. 
+Editing deserves its own interactive tutorial,
+but at this time we don't have one. In the
+meantime, there are some detailed instructions
+in editors/README.md. And, you can consult
+keys.txt and experiment in scratch.txt.
 
 Wrapping long lines
 
@@ -523,16 +524,11 @@ that have not been provided as Python functions,
 for example git version control commands. 
  
 When you are finished using the Python REPL,
-type the command de() ('display editor') to
-return the cursor to the desktop window you
-were most recently using.
+type the command ed() to return the cursor to
+the desktop window you were most recently
+using.
 
-The command pm() also returns the cursor 
-to the window. Some older Piety documentation
-uses pm() not de().  The commands ve() ved() 
-and ee() also work.
-
-Try it, type de() at the REPL.  Now type
+Try it, type ed() at the REPL.  Now type
 C-x d to confirm that the new default
 directory is still the viewer subdirectory.
  
@@ -550,7 +546,7 @@ using BACKSPACE and then typing new text.
 You can use the M-y key to enter just a
 single Python statement on the prompt line,
 and then return to the desktop window
-immediately, without having to type the de()
+immediately, without having to type the ed()
 command. Using C-p (etc.) to access command
 history.  C-g or ??? then ENTER to cancel
 the request also work at this prompt.
@@ -564,9 +560,9 @@ statements.
 
 Consult the source code to find which function
 is invoked by each key: the keymap
-dictionaries in editors/dmacs.py, editline.py,
-and pmacs.py, and also the assignements to
-dmacs.keymap near the end of browser/get.py
+dictionaries in editors/krebs.py, editline.py,
+and edsel.py, and also the assignements to
+krebs.keymap near the end of browser/get.py
 and render.py, and viewer/viewer.py.
 
 Web browsing
@@ -828,9 +824,9 @@ loop is piety:
  
 To return to display editing from the >>>>
 prompt -- while the event loop is running --
-type the command ade() (not de(), which you
+type the command aed() (not ed(), which you
 use from the >>> prompt when the event loop is
-not running). The command apm() also works.
+not running). The command aed() also works.
 However, you still use M-x to return from 
 display editing to the >>>> prompt.
 
@@ -879,7 +875,7 @@ three darts reappears. The event loop is no
 longer running. If the clock is displayed, it
 stops ticking.
 
-Now you must use de() again, not ade(), to
+Now you must use ed() again, not aed(), to
 return to display editing.
 
 You can restart the event loop with startpiety().
@@ -934,7 +930,7 @@ Web browsing and Python programming above).
 After *Errors* appears, the cursor moves to
 the REPL. From there, you can type any
 commands to resume the session. Often, you
-type de() to return to a window.   You
+type ed() to return to a window.   You
 may need to type C-l, M-l, or M-m to refresh
 windows.
 
@@ -991,5 +987,5 @@ Piety/viewer/README.md
 Piety/browser/README.md
 Piety/piety/README.md
 
-Revised Sep 2026
+Revised Oct 2026
   

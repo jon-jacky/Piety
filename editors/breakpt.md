@@ -3,7 +3,7 @@ breakpt
 =======
 
 The *breakpt* module defines and assigns a *breakpoint hook* that
-makes it possible to use *Pdb* to debug the display editor *pmacs* while it
+makes it possible to use Pdb to debug the display editor *edsel*
 is running, without disturbing its window contents.
 
 We do not use the debugger much in Piety.  We always have the Python REPL 
@@ -27,7 +27,7 @@ terminal.  The debugger prompt *(Pdb)* appears there.  Now you can type
 (continue) command. The debugger exits and the cursor moves back up into the
 display window. The program resumes running normally. 
 
-For example, debug the function *erase_bottom* in *edsel.py*.   This
+For example, debug the function *erase_bottom* in *frame.py*.   This
 function erases lines that may be left over after the end of the buffer at the
 bottom of a window, after some editing operation makes the buffer shorter:
 
@@ -65,9 +65,9 @@ Activate our *breakpt* function. While display editing, type *M-x* to get to
 the Python REPL. At the Python prompt, type the statement *import breakpt*.
 Then type the function call *pm()* to return to display editing.
 
-Now edit *edsel.py*, find the function *erase_bottom*, and uncomment the 
+Now edit *frame.py*, find the function *erase_bottom*, and uncomment the 
 line with *breakpoint()* by removing the comment characters *#* from the 
-beginning of the line.   Reload *edsel.py* by typing *C-x C-r* (reload).
+beginning of the line.   Reload *frame.py* by typing *C-x C-r* (reload).
 
 Once again, put the cursor in a window and scroll down to the end of the
 buffer, leaving some empty lines at the bottom of the window.   Delete
@@ -94,14 +94,16 @@ Type the debugger command *w* (where) to print the function call stack:
     -> ed.d(start, end, append, display_d)
       /home/jon/Piety/editors/sked.py(410)d()
     -> move_dot(new_dot)
-      /home/jon/Piety/editors/edsel.py(245)display_d()
+      /home/jon/Piety/editors/frame.py(245)display_d()
     -> erase_bottom()
-      /home/jon/Piety/editors/edsel.py(119)erase_bottom()
+      /home/jon/Piety/editors/frame.py(119)erase_bottom()
     -> breakpoint() # DEBUG Uncomment this line for breakpoint demo.  See breakpt.md.
     > /home/jon/Piety/editors/breakpt.py(43)breakpt()
     -> pdb.set_trace() # Enter Pdb debugger, use Pdb commands until Pdb c (continue)
     (Pdb) 
-    
+
+(The text you see in Pdb may not be exactly the same as this.)
+
 This shows that execution has stopped in our *breakpt* function, at the 
 statement *pdb.set_trace()*.  We want to examine the local variables in 
 *erase_bottom*, so we type the debugger command *u* (up) to move up the stack.
@@ -109,7 +111,7 @@ Then we type several *p* (print) commands to show the variable values.  See the
 code for the meaning of these values:
 
     (Pdb) u
-    > /home/jon/Piety/editors/edsel.py(119)erase_bottom()
+    > /home/jon/Piety/editors/frame.py(119)erase_bottom()
     -> breakpoint() # DEBUG Uncomment this line for breakpoint demo.  See breakpt.md.
     (Pdb) p nlines
     9
@@ -134,7 +136,7 @@ of the cursor when the debugger is activated, so this is the best we can do.
 Type the refresh command *C-l* to restore the correct window contents.
 
 After running this demonstration, be sure to return to the *erase_bottom*
-function in the *edsel.py* buffer again to comment out the *breakpoint()*
+function in the *frame.py* buffer again to comment out the *breakpoint()*
 call. Otherwise, you will hit the breakpoint again every time you delete
 lines from any buffer.
 
@@ -146,5 +148,5 @@ to update the display window will not work as intended, because the cursor
 is not in the window, it is in the scrolling REPL region.  The commands will
 merely scramble the REPL region, rendering it illegible.
 
-Revised Oct 2024
+Revised Oct 2026
 
