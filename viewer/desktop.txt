@@ -823,12 +823,9 @@ loop is piety:
     closed=False debug=False>
  
 To return to display editing from the >>>>
-prompt -- while the event loop is running --
-type the command aed() (not ed(), which you
-use from the >>> prompt when the event loop is
-not running). The command aed() also works.
-However, you still use M-x to return from 
-display editing to the >>>> prompt.
+prompt, you still type the command ed(), and
+you still use M-x to return from display
+editing to the >>>> prompt.
 
 When the event loop is running, you can start
 tasks. Start the on-screen clock:
@@ -874,9 +871,6 @@ prompt in the Python REPL. The >>> prompt with
 three darts reappears. The event loop is no
 longer running. If the clock is displayed, it
 stops ticking.
-
-Now you must use ed() again, not aed(), to
-return to display editing.
 
 You can restart the event loop with startpiety().
 

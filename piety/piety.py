@@ -28,7 +28,6 @@ from viewer import *
 import eventloop
 # don't call startpiety yet
 from eventloop import piety, startpiety, stoppiety, tasks, block 
-from aedsel import aed # eventloop imports aedsel too,put aed at top level
 import aiotimers
 from aiotimers import timer, starttimer, stoptimer, onetimer, twotimers
 import aclock
@@ -40,6 +39,7 @@ tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region 
 vwin() 
 import piety_startup # load several buffers desktop.txt keys.txt etc.
-from edsel import ed # overwrite ed module   
-
+# Make it so we can always type ed() whether or not eventloop is running.
+from aedsel import ed # This ed function name overrides sked as ed module name
+ed()
 

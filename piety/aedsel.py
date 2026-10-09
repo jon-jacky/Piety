@@ -1,9 +1,12 @@
 """
-apmacs.py - Adapt our edsel editor to run in an asyncio event loop.  
-            Define the asyncio reader function apmrun that handles each editor
+aedsel.py - Adapt our edsel editor to run in an asyncio event loop.  
+            Define the asyncio reader function aedrun that handles each editor
             keystroke.  Define the function aed to resume the aedsel editor
             from the Piety shell command prompt (after first running the aed.py
             script to load the editor modules and create the initial window).
+            Then define ed() to call edsel.ed() when event loop is not running
+            and aedsel.aed() when event loop is running - so just typing ed()
+            in the REPL always does the right thing.
 """ 
 
 import terminal, key, display, edsel, pyshell, apyshell
@@ -15,6 +18,13 @@ def aed():
    """ 
    pyshell.cmd_mode = False
    edsel.setup()
+
+# Make it so we can always type ed() whether or not eventloop is running.
+def ed():
+    if edsel.eventloop.piety.is_running():
+        aed()
+    else:
+        edsel.ed()
  
 def aedrun():
     """

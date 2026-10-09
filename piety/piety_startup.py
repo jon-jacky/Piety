@@ -13,6 +13,4 @@ print("""
 >>> # Type alt-X to enter the interpreter.
 >>> # Type ed() to return to visual editing in windows.
 >>> """)
-from edsel import ed # overwrite ed imported from frame krebs get render ...
-ed() # start display editing in viewer window
 
