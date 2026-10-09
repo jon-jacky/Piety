@@ -2,7 +2,7 @@
 Cooperative multitasking and blocking
 =====================================
 
-*pmacs_script.py* can demonstrate some key features of Piety: *cooperative 
+The *piety* script can demonstrate some key features of Piety: *cooperative 
 multitasking* and an unwelcome potential consequence, *blocking*.
 
 Piety provides concurrency with a Python *asyncio* event loop.  This
@@ -17,7 +17,7 @@ can run, and the system stops responding to events -- the whole session
 is *blocked*.   Tasks and readers that run in an event loop should be coded
 so blocking does not occur.
 
-Usually, the *pmacs* editor and the *pysh* shell are *non-blocking*.  Code
+Usually, the *edsel* editor and the *pysh* shell are *non-blocking*.  Code
 that reads input from the keyboard is called from a *reader* that is only
 called by the event loop when data is ready, after a key is typed.  
 The *piety.add_reader()* call in  *piety.py* sets this up.
@@ -29,22 +29,25 @@ types at the terminal, blocks for the entire time that the user is typing --
 or thinking -- until they type *enter* to complete the string.   The standard
 library *readline* function blocks in the same way.
 
-It is easy to demonstrate blocking with *pmacs_script.py*.  Just run the
+It is easy to demonstrate blocking with *piety*.  Just run the
 script in the usual way:
 
-    ...$ python3 -m piety0
-    >>>> run('pmacs_script.py')
-    ...
+    ...$ python3 -im piety
 
-Now the two windows appear, with timer messages appearing in the upper window,
-and an editing cursor in the lower window.   Type *M-x* to put the cursor 
-at the *>>>>* prompt, and call *input*:
+Type *M-x* to put the cursor in the Pytho REPL.    
+Start the *piety* event loop, and start timers in two windows:
+
+    >>> startpiety()
+    >>>> twotimers()
+    
+Now the two windows appear, with timer messages appearing in both.
+Call the *input* function: 
 
     >>>> input('Input: ')
     Input: 
 
 *input* prints the prompt, and waits for you to type a string.
-The messages stop appearing in the timer window.  The session is blocked.
+The messages stop appearing in both windows.  The whole session is blocked.
 Now type any string at the prompt, then type *enter*.   
 
     >>>> input('Input: ')
@@ -53,18 +56,18 @@ Now type any string at the prompt, then type *enter*.
     >>>> 
 
 The Python interpreter prints the returned value as usual -- it is the
-string you  typed -- and messages resume appearing in the timer window.  The
+string you  typed -- and messages resume appearing both windows.  The
 session is unblocked.
  
-Most code in *pmacs* and *pysh* avoids calling *input* or *readline*.
+Most code in *edsel* and *pysh* avoids calling *input* or *readline*.
 Instead, it calls non-blocking functions from our *editline* module, which
 each handle one keystroke, building up strings one character at a time.  One
-of the reasons we wrote a custom editor and a custom Python shell for Piety is to
-ensure that these utilities  are non-blocking, so they can interleave with
-other tasks in an event loop.
+of the reasons we wrote a custom editor and a custom Python shell for
+Piety is to ensure that these utilities are non-blocking, so they can
+interleave with other tasks in an event loop.
 
-At this time, we believe we have removed all the blocking code from *pmacs*.
+At this time, we believe we have removed all the blocking code from *edsel*.
 
-Revised Sep 2026
+Revised Oct 2026
 
 

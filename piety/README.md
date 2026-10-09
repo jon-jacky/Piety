@@ -120,7 +120,7 @@ Piety defines a function *block* so you don't have to type the argument:
     Press ENTER to end blocking:
 
 For more explanation of cooperative multitasking and blocking, 
-see [pmacs_blocking.md](pmacs_blocking.md).
+see [piety_blocking.md](piety_blocking.md).
 
 ### Stopping the Event Loop ###
 
@@ -169,8 +169,5 @@ commands at the Python interpreter.
 - **piety_startup.py**: Called by *piety.py*, loads some buffers into 
     the desktop session.
 
-Modules and documentation files for older demos that do not run in the
-Piety desktop are described in [piety0.md](piety0.md).
-    
-Revised Jul 2026
+Revised Oct 2026
  

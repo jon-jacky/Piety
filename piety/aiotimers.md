@@ -27,7 +27,7 @@ another one.
 Before you can run the demo, you must start the Piety desktop
 with *python3 -im piety*, then start the event loop by typing the
 command *startpiety()* at the Python prompt, as explained on the 
-[piety](piety.md) page.  You may also start the clock with *startclock()*.
+[piety](README.md) page.  You may also start the clock with *startclock()*.
 
 Now you can start the demo.  Type this command in the  Python REPL:
 
@@ -130,11 +130,15 @@ calling *block*, which prevents them from running:
 
     >>>> block()
     Press ENTER to end blocking: 
-    
+
+Press ENTER to end blocking.  
+
+For more explanation of blocking, see [piety_blocking.md](piety_blocking.md).
+
 ### stoptimer ###
 
 The *stoptimer()* command, with no arguments, stops the timer in the 
 current window, so you don't have to assign *timer['a'].exit*.    
 
-Revised Jul 2026
+Revised Oct 2026
  

@@ -14,7 +14,7 @@ import terminal, key, display, edsel, pyshell, apyshell
 def aed():
    """
    aed() calls the edsel editor from the piety shell prompt in the asycio event loop.
-   After this the editor responds to emacs keys.  Type M-x to return to the shell.
+   After this the editor responds to keys.  Type M-x to return to the shell.
    """ 
    pyshell.cmd_mode = False
    edsel.setup()
@@ -41,11 +41,11 @@ def aedrun():
         pyshell.point = 0
         pyshell.setup() # prints prompt and refreshes command line
 
-# handler function  moved here from eventloop, to break import loop with pmacs
+# handler function  moved here from eventloop, to break import loop with edsel
 def handler():
     if pyshell.cmd_mode:
         apyshell.apysh() # async shell
     elif edsel.resprunning:
         edsel.runrequest()  # prompt/request/response
     else:
-        aedrun()  # async display editor foreground job       
+         aedrun()  # async display editor foreground job       
