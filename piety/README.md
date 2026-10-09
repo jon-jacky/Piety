@@ -154,7 +154,7 @@ commands at the Python interpreter.
 - **aiotimers.md**:  Directions and explanations of the demonstrations in
     *aiotimers.py*
 
-- **apmacs.py**: Adapt the *pmacs* editor to run in an *asyncio* event loop.  
+- **aedsel.py**: Adapt the *edsel* editor to run in an *asyncio* event loop.  
 
 - **apyshell.py**: Adapt the *pysh* custom Python shell to run in an *asyncio*
   event loop.
