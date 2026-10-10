@@ -385,7 +385,7 @@ suffix <2> to ensure that each buffer has a
 unique name.
 
 Now try a relative path. Type C-x C-f then
-viewer/vpm.py ENTER. The new buffer vpm.py and
+viewer/desktop.py ENTER. The new buffer vpm.py and
 its contents appears in the current window.
 
 You can always show the current working

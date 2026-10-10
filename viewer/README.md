@@ -146,8 +146,8 @@ below), instead of typing commands in the REPL.
 
 Session management:
 
-- **de()** - Switch from the REPL to display editing
-    in the focus window.  *pm()* also works.
+- **ed()** - Switch from the REPL to display editing
+    in the focus window.
 
 - **quit()** - Prompts *Are you SURE ...?* If the
     response starts with *y* or *Y*, exits the Piety
@@ -349,14 +349,13 @@ Viewer window contents:
 Keycodes you can type to invoke desktop
 [commands](#Commands) (above) while in display editing
 mode. To get to display editing mode from the Python
-prompt in the REPL, type the function call *ve()*
-(*pm()* also works).
+prompt in the REPL, type the function call *ed()*.
 
 Here *C-x*, *control-X*, means hold down the *ctrl*
 key while you type the *X* key. *M-x*, *meta-X*, means
 hold down the *alt* key while you type the *X* key.
 
-Many (but not all) of our keycodes are the same as the 
+Many (but not all) of [our keycodes](keys.txt) are the same as the 
 [Emacs keycodes](https://www.gnu.org/software/emacs/refcards/pdf/survival.pdf)
 used by the Emacs editor.
 
@@ -364,12 +363,11 @@ Session management:
 
 - **M-x** - Exit display editing and return to the
     the Python command line. To return to display
-    editing again, type the command *ve()*.
-    *pm()* also works.
+    editing again, type the command *ed()*.
     
 - **M-y** - Type just one command at the Python
     prompt, then return immediately to display editing,
-    without having to type *pm()*.
+    without having to type *ed()*.
 
 - **C-x 3** - Create viewer panel.  Not needed if session
     was started from the *desktop* script.
@@ -479,5 +477,5 @@ The Piety desktop is influenced by
 [Oberon](https://people.inf.ethz.ch/wirth/ProjectOberon/UsingOberon.pdf), 
 and [Acme](http://acme.cat-v.org/).
 
-Revised Jul 2026
+Revised Oct 2026
 

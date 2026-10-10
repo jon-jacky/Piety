@@ -4,17 +4,17 @@ threads
 
 Experiments with tasking and concurrency using Python threads.
 
-These experiments run in our [pmacs](../editors/README.md) editor,
-which we start here from the script in *tm.py* rather than
-*pm.py*.  The name *tm* is supposed to suggest "tasking *pmacs*".
-The *tm* script loads all the modules used by *pmacs*, some additional
+These experiments run in our [edsel](../editors/README.md) editor,
+which we start here from the script in *ted.py* rather than
+*ed.py*.  The name *ted* is supposed to suggest "threading *edsel*".
+The *ted* script loads all the modules used by *edsel*, some additional
 modules that support the tasking experiments, and starts our custom 
 *pysh* (rhymes with fish) Python interpreter.
 
-To start editing in a display window, type the function call *tpm()* at
-the *pysh* prompt >>, instead of the *pm()* call you type at the standard
+To start editing in a display window, type the function call *ted()* at
+the *pysh* prompt >>, instead of the *ed()* call you type at the standard
 Python prompt >>>.   To return to the *pysh* command prompt, type M-x
-(meta x, hold the alt key and type x), just as you do in  any *pmacs*
+(meta x, hold the alt key and type x), just as you do in  any *edsel*
 session.
 
 These experiments are preserved here for completeness, but I have
@@ -39,6 +39,10 @@ threads, so at this time I have no further plans to try to fix this.
    
 ### Files ###
 
+- **ted.py**: script that loads modules for threading experiments, including
+  editors, *writer*, *timers*, classes and functions from *threading*, and
+  then starts our custom *pysh* Python interpreter.
+
 - **threads_1.txt**: Directions for experiments with Python threading
    using the functions in *timers.py* and *writer.py*.  These experiments
    run with the standard Python interpreter and reveal its limitations.
@@ -61,9 +65,6 @@ threads, so at this time I have no further plans to try to fix this.
 - **timers.py**: Functions to run in tasking experiments, that print
    timestamps at intervals.
 
-- **tm.py**: script that loads modules for threading experiments, including
-  editors, *writer*, *timers*, classes and functions from *threading*, and
-  then starts our custom *pysh* Python interpreter.
+Revised Oct 2026
 
-Revised Sep 2025
 

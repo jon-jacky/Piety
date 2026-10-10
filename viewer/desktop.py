@@ -1,5 +1,5 @@
 # Start edsel editor with viewer panel: python3 -im desktop
-# First must define PYTHONPATH by . /home/jon/Piety/bin/paths, once in session
+# First must define PYTHONPATH by . ~/Piety/bin/paths, once in terminal session
 import sked
 from sked import *
 import frame

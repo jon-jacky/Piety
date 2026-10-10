@@ -104,7 +104,7 @@ names so they can be used easily.
 These are the commands (that is, function calls) you can type at the
 Python prompt to run the browser.   To get to the Python prompt from
 display editing mode, type *M-x* (*meta x*, hold down the *alt* key
-while typing the *x* key). Use other *pmacs* editor commands (described
+while typing the *x* key). Use other *edsel* editor commands (described
 elsewhere) to select and view the buffers that hold web pages.
 
 Most of these commands can also be invoked in display editor mode
@@ -221,8 +221,8 @@ by typing [keycodes](#Keycodes).
 
 Keycodes you can type to invoke browser [commands](#Commands) (above)
 while in display editing mode. To get to display editing mode from the
-Python prompt, type the function call *pm()*. Use other *pmacs* editor
-keycodes (described elsewhere) to select and view the buffers that hold
+Python prompt, type the function call *ed()*. Use other *edsel* editor
+[keycodes](.../viewer/keys.txt) to select and view the buffers that hold
 web pages.
   
 - **C-x w** - Invokes *W()* to list web page buffers, the *.htxt* buffers.
@@ -369,5 +369,5 @@ supported at this writing, in Mar 2015:
 The base URL for each web page appears in a middle column of the buffer list
 shown by the *W()* command or the *C-x w* keycode.
 
-Revised Sep 2026
+Revised Oct 2026
  
