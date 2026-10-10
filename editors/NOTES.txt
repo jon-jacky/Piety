@@ -21,7 +21,7 @@ It is only executed the first time the module is imported, not
 when it is reloaded.  This makes it possible to 
 reload the sked module while preserving work in progress (which 
 is stored in the global variables initialized in the except block).  The same
-method is used for the other editor modules, edsel, dmacs, pmacs
+method is used for the other editor modules, frame, krebs, edsel
 and editline.  
 
 This module produces no display output, except print statements that
@@ -80,7 +80,7 @@ just have to remember that the first line in the buffer is  numbered 0
 (not 1) in those (now rare)  occasions where we refer to lines by line
 number.
 
-### edsel ###
+### frame ###
 
 Display editor that uses the same commands as *sked*.
 
@@ -146,16 +146,16 @@ window image with the line from the buffer.
 This algorithm keeps both the window on the display and the window image up-
 to-date, and only the lines that changed are updated and replaced.
   
-### dmacs ###
+### krebs ###
 
 Invoke editor functions with emacs keys (control keys or key seqs).
 
-The module name dmacs differs from the editor function name dm
+The module name krebs differs from the editor function name kb
 so the function name does not shadow the module name when we do
-'from dmacs import dm' so we can type the function name in the REPL
-without the module name prefix, just dm() not dmacs.dm().   
-Then, if we edit more commands into dm, we can load them without restarting
-the session by reload(dmacs).  The argument to reload must be the module name.
+'from krebs import kb' so we can type the function name in the REPL
+without the module name prefix, just kb() not krebs.kb().   
+Then, if we edit more commands into kb, we can load them without restarting
+the session by reload(krebs).  The argument to reload must be the module name.
 
 ### editline ###
 
@@ -180,9 +180,9 @@ past the final newline.   In particuler, move_end and forward_char.
 This ensures that when new characters are typed, they are inserted 
 ahead of the final newline.
 
-### pmacs ###
+### edsel ###
 
-In *pmacs*, *C_k kill_line* and *C_y yank* work in two modes: *inline*
+In *edsel*, *C_k kill_line* and *C_y yank* work in two modes: *inline*
 mode and *multiline* mode.  In inline mode, kill_line cuts a segment
 from the cursor up to but not including the newline character '\n' at
 the end of the line, saves the segment in *editline.killed*, and yank
@@ -203,19 +203,20 @@ kill_line after any command other than another kill_line. That kill_line
 will be in inline mode, unless it is made on an empty line consisting
 only of a newline.
 
-In the *pmacs* module, the *kill_line* function implements both modes
+In the *edsel* module, the *kill_line* function implements both modes
 and the transitions between them.  It is complicated because it has
 special cases for handling newlines, empty lines, and the history of
 commands. This is the cost we pay in complexity for supporting both
 modes in a reasonably convenient way, so you can just edit with
 kill_line and yank without thinking about the modes -- the commands just behave
 as you would wish.  We have tried to put all that complexity in just one
-place, the *pmacs* *kill_line* function.  The complexity derives from
+place, the *edsel* *kill_line* function.  The complexity derives from
 trying to provide convenient behavior in what is essentially a line-based
 editor.
 
-The *pmacs* *yank* function also handles both modes, but the logic there
+The *edsel* *yank* function also handles both modes, but the logic there
 is simple.
 
-Revised Nov 2024
+Revised Oct 2026
+
 

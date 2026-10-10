@@ -120,7 +120,7 @@ Piety defines a function *block* so you don't have to type the argument:
     Press ENTER to end blocking:
 
 For more explanation of cooperative multitasking and blocking, 
-see [piety_blocking.md](piety_blocking.md).
+see [blocking.md](blocking.md).
 
 ### Stopping the Event Loop ###
 
@@ -158,6 +158,9 @@ commands at the Python interpreter.
 
 - **apyshell.py**: Adapt the *pysh* custom Python shell to run in an *asyncio*
   event loop.
+
+- **blocking.md**: Explanation of cooperative multitasking and blocking,
+   with instructions for a brief demo.
  
 - **eventloop.py**: Creates the Piety *asyncio* event loop, named *piety*.
     Defines the function *startpiety* that starts the event loop and 

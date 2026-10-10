@@ -41,7 +41,7 @@ def stoptimer():
 def onetimer():
     """
     async timer task demo: run timer in one editor window, edit in the other.
-    Based on standalone demo pmacs_script.py.
+    Based on old standalone demo pmacs_script.py, now deleted.
     """
     oe() # put cursor in editor window
     o2() # split editor window

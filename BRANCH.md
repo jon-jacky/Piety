@@ -3,9 +3,10 @@ branches
 ========
 
 This is the *renames* branch of the *rewrite* branch: 
-rename some modules and commands. Rename our flagship editor module from
-*pmacs* to *edsel*, rename our command to leave the REPL and resume
-display editing from *pm* to *ed*, and other renamings as needed or desired.
+rename some pervasive modules and commands. Rename our flagship editor
+module from *pmacs* to *edsel*, rename our command to leave the REPL and
+resume display editing from *pm* to *ed*. Delete obsolete or redundant
+modules and documentation.
 
 Beginning in Feb 2023, I began a total rewrite of the Piety system
 here in the *rewrite* branch and its branches, to shorten and simplify 

@@ -266,7 +266,7 @@ line.  Type the string and press RETURN.  You can edit the string inline
 before you press RETURN.  There is always a default, just press RETURN
 to accept it.  To cancel the operation, type '???' by itself, or at
 the end of the string, then press RETURN.
-(The Emacs *C-g* cancel key is not available in *krebs*.)
+(The *C-g* cancel key is not available in *krebs*.)
 To indicate that the string argument should be the empty string,
 type three backslashes.
 

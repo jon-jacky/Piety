@@ -133,7 +133,7 @@ calling *block*, which prevents them from running:
 
 Press ENTER to end blocking.  
 
-For more explanation of blocking, see [piety_blocking.md](piety_blocking.md).
+For more explanation of blocking, see [blocking.md](blocking.md).
 
 ### stoptimer ###
 

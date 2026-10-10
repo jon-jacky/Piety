@@ -134,10 +134,9 @@ tutorial displayed in the window on the right.
 The tutorial in [desktop.txt](viewer/desktop.txt) 
 is an extended demo. Additional demos are described in 
 [aiotimers.md](piety/aiotimers.md) and
-[pmacs_blocking.md](piety/pmacs_blocking.md) and 
-[audoindent.md](editors/autoindent.md) and
+[blocking.md](piety/blocking.md) and 
 [breakpt.md](editors/breakpt.md).
-These pages give instructions so you can do the demos yourself.
+Those pages give instructions so you can do the demos yourself.
 
 ## Screenshots ##
 
@@ -186,4 +185,4 @@ Details in [platforms.md](doc/platforms.md).
 The phrase "complexity and disempowerment" is from a posting by
 [jl6](https://news.ycombinator.com/item?id=24917101)
 
-Revised Jun 2026   
+Revised Oct 2026   
