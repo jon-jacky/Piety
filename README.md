@@ -65,7 +65,8 @@ To make this possible we adopted a
 
 Piety provides [concurrency](piety/README.md) with a Python *asyncio*
 event loop. Tasks are implemented by Python *coroutines* or *readers*
-(event handlers) that run in an event loop.
+(event handlers) that run in an event loop.  We also experimented
+with [threads](threads/README.md).
 
 Piety provides *asyncio* readers for its custom Python shell and its
 editor.  These enable the shell and the editor to run without 
