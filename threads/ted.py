@@ -13,7 +13,7 @@ import editline
 import edsel
 from edsel import ed, red # use red when starting from pysh instead of >>>
 import pyshell
-from pyshell import pysh, tpm # from pysh, use tpm not rpm to clear cmd_mode
+from pyshell import pysh, ted # from pysh, use ted not red to clear cmd_mode
 import writer # for tasks
 from writer import *
 import timers # for tasks         
@@ -26,6 +26,6 @@ tl = edsel.terminal.set_line_mode # type tl() to restore echo after crash
 from terminal_util import dimensions
 tlines, tcols = dimensions()
 win(tlines-8) # 8  lines in prompt + repl region  
+from pyshell import ted # overwrite ted module in REPL with ted function
 pysh() # Now at pysh >> prompt type ted() for display editing, exit() when done
-
-
+ 

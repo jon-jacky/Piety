@@ -1,6 +1,6 @@
 threads_3.txt
 
-Experiments with Python threading using the pmacs editor with timer.py
+Experiments with Python threading using the edsel editor with timer.py
 and writer.py, with our custom pysh REPL from pyshell.py.
 
 In this demonstration, we show a thread updating a buffer in one window,
@@ -15,7 +15,7 @@ the standard Python REPL.
 It is easiest to explain by doing this demonstration. Just
 follow along, typing the statements here as you go. 
 
-(Alternatively, you can run the script in threads_2.py - see directions
+(Alternatively, you can run the script in threads_3.py - see directions
 at the end of this file.)
 
 At the system command prompt (often $), define the PYTHONPATH, so this
@@ -23,10 +23,10 @@ demo works in any directory.
 
 ...$  .  ~/Piety/bin/paths
 
-Run the tm script (not pm) which imports the editor, timer, and writer
+Run the ted script (not ed) which imports the editor, timer, and writer
 modules, opens a window into the scratch.txt buffer, and starts the pysh REPL:
 
-...$ python3 -im tm
+...$ python3 -im ted
 
 At the pysh prompt >> (not the standard Python prompt >>>),
 split the window into two:
@@ -57,7 +57,7 @@ Type the command to change the focus to the other window.
 
 Type the command to move the cursor from the REPL into the editing window.
 
->> tpm()
+>> ted()
 
 Wait for one more message to appear in the a.txt window, then the cursor
 moves to the scratch.txt window.  Now you can type and edit in
@@ -87,5 +87,5 @@ Then at the pysh prompt type
 Two windows will appear. Just start typing the in the scratch.txt window,
 as timer messages appear in the other window.
 
-Revised May 2024
+Revised Oct 2026
 
