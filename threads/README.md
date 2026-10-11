@@ -33,9 +33,9 @@ Python REPL can result in scrambling the two windows that display the
 two timer threads.  
 
 Apparently, changes I made since Summer 2024 have broken the threads demos.
-I spent some time trying to fix this but was unsuccessful. Meanwhile, I
-have decided to concentrate on *asyncio* and event loops instead of
-threads, so at this time I have no further plans to try to fix this.
+Meanwhile, I have decided to concentrate on *asyncio* and event loops
+instead of threads, so at this time I have no further plans to try to
+fix this.
    
 ### Files ###
 
