@@ -28,14 +28,13 @@ NOTE added Sep 2025:    Some of these demos no longer work. In particular,
 in *threads_3* editing in the *scratch.txt* window while the timer
 thread updates the *a.txt* window no longer works --- the cursor in
 *scratch.txt* returns to column 1 on each timer tick, and control characters
-are not processed correctly.   Also, in *threads_2*, typing commands at the
-Python REPL can result in scrambling the two windows that display the 
-two timer threads.  
+are not processed correctly.   Also, in *threads_2*, timer messages sometimes
+appear in the REPL region, and typing commands at the Python REPL can
+result in scrambling the two windows that display the two timer threads.
 
 Apparently, changes I made since Summer 2024 have broken the threads demos.
 Meanwhile, I have decided to concentrate on *asyncio* and event loops
-instead of threads, so at this time I have no further plans to try to
-fix this.
+instead of threads, so at this time I have no plans to fix this.
    
 ### Files ###
 
@@ -66,5 +65,4 @@ fix this.
    timestamps at intervals.
 
 Revised Oct 2026
-
-
+ 

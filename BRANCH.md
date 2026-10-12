@@ -3,7 +3,7 @@ branches
 ========
 
 This is the *renames* branch of the *rewrite* branch: 
-rename some pervasive modules and commands. Rename our flagship editor
+Rename some pervasive modules and commands. Rename our flagship editor
 module from *pmacs* to *edsel*, rename our command to leave the REPL and
 resume display editing from *pm* to *ed*. Delete obsolete or redundant
 modules and documentation.
@@ -19,11 +19,11 @@ in the *master* branch I abandoned in 2023.
 Recent work in the *rewrite* branch:
 
 - 16 Sep 2026: begin the *renames* branch of the *rewrite* branch:
-  rename some modules and commands. Rename our flagship editor module
-  from *pmacs* to *edsel*, rename our command to leave the REPL and
-  resume display editing from *pm* to *ed*, and other renamings as
-  needed or desired.
-
+  Rename some pervasive modules and commands. Rename our flagship editor
+  module from *pmacs* to *edsel*, rename our command to leave the REPL
+  and resume display editing from *pm* to *ed*. Delete obsolete or
+  redundant modules and documentation.
+  
 - 16 Sep 2026: Merge the *async-prompt* branch back into the *rewrite* branch.
 
 - 24 Jul 2026:  Begin the *async-prompt* branch to fix typing responses 
