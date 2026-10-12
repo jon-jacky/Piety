@@ -1,6 +1,6 @@
 threads_1.txt
 
-Experiments with Python threading using the pmacs editor with
+Experiments with Python threading using the edsel editor with
 timers.py and writer.py
 
 The name of the timers module is plural, but the name of
@@ -12,13 +12,13 @@ each command.  To begin, at the system command prompt, type this
 command to define the PYTHONPATH so the commands work in any directory.
 Note the initial lone dot . at the start of the command:
 
-...S .  ~/Piety/bin/paths
+...$ .  ~/Piety/bin/paths
 
-Then type this command to start the pmacs editor.  
+Then type this command to start the edsel editor.  
 
-...% python3 -im pm
+...% python3 -im ed
 
-An  empty  window appears with the cursor in it, and an empty Python REPL
+An  editing  window appears with the cursor in it, and a Python REPL
 region below.
 
 Move the cursor to the Python REPL: type M-x ('meta x') by holding down
@@ -183,7 +183,7 @@ Then issue these two commands. Note the second command prints to bbuf:
 We can try shorter delays to see if the display can keep up without
 getting scrambled.   
 
-The pm script starts the pmacs editor with the standard Python REPL, so
+The ed script starts the edsel editor with the standard Python REPL, so
 it is not possible to type commands while the display is updating
 rapidly. It is not possible to restore the cursor to the correct location
 in the standard Python REPL command line after writing a message  in a
@@ -237,5 +237,6 @@ provides more control over the cursor in the Python command line.
 The experiments described in threads_2.txt and threads_3.txt demonstrate
 using our custom pysh REPL while other tasks rapidly update the display.
 
-Revised May 2024
+Revised Oct 2026
+
 

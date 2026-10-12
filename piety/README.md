@@ -120,7 +120,7 @@ Piety defines a function *block* so you don't have to type the argument:
     Press ENTER to end blocking:
 
 For more explanation of cooperative multitasking and blocking, 
-see [pmacs_blocking.md](pmacs_blocking.md).
+see [blocking.md](blocking.md).
 
 ### Stopping the Event Loop ###
 
@@ -154,10 +154,13 @@ commands at the Python interpreter.
 - **aiotimers.md**:  Directions and explanations of the demonstrations in
     *aiotimers.py*
 
-- **apmacs.py**: Adapt the *pmacs* editor to run in an *asyncio* event loop.  
+- **aedsel.py**: Adapt the *edsel* editor to run in an *asyncio* event loop.  
 
 - **apyshell.py**: Adapt the *pysh* custom Python shell to run in an *asyncio*
   event loop.
+
+- **blocking.md**: Explanation of cooperative multitasking and blocking,
+   with instructions for a brief demo.
  
 - **eventloop.py**: Creates the Piety *asyncio* event loop, named *piety*.
     Defines the function *startpiety* that starts the event loop and 
@@ -169,8 +172,5 @@ commands at the Python interpreter.
 - **piety_startup.py**: Called by *piety.py*, loads some buffers into 
     the desktop session.
 
-Modules and documentation files for older demos that do not run in the
-Piety desktop are described in [piety0.md](piety0.md).
-    
-Revised Jul 2026
+Revised Oct 2026
  

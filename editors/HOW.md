@@ -8,7 +8,7 @@ Python session.
 We write code that we load and run immediately, without restarting
 the session or losing any work in progress.
 
-Our editors here -- [*sked*, *edsel*, *dmacs*, and *pmacs*](README.md) --
+Our editors here -- [*sked*, *frame*, *krebs*, and *edsel*](README.md) --
 were developed in this way.  The first two hundred
 lines of *sked* were written in another editor and
 then imported into an interactive Python session. 
@@ -17,8 +17,8 @@ in the long running session.  We used the rudimentary *sked*
 to edit its own source code, adding functions one or two 
 at a time, then reloading the module into the same session,
 using the new functions right away on the same source files.
-Proceeding in the same way, we used *sked* to write *edsel*, 
-*edsel* to write *dmacs*, and *dmacs* to write *pmacs*.
+Proceeding in the same way, we used *sked* to write *frame*, 
+*frame* to write *krebs*, and *krebs* to write *edsel*.
 
 To make this possible, we had to adopt a Python coding style
 that has some unusual features.  The small collection of modules
@@ -107,7 +107,7 @@ then edit in that buffer, etc.
 
 The state of the current buffer is stored in the module-level global
 variables of the *sked* module.  These variables are  updated by almost
-every editing command -- by every keystroke in  the *dmacs* and *pmacs*
+every editing command -- by every keystroke in  the *krebs* and *edsel*
 editors.
 
 The states of all the other buffers  are stored in dictionaries.  For
@@ -180,5 +180,5 @@ to reassign the global variable from time to time, than it is to pass an
 argument to every function call.   The variable *buffer* in the *sked*
 module is an example.
 
-Revised Jan 2024
-
+Revised Oct 2026
+ 

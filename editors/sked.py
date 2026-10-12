@@ -602,7 +602,7 @@ def wrap(start=None, end=None, lmarg=None, rmarg=None,
     wrapped = [ line + '\n' for line in wlines ]
     buffer[start:end+1] = []  # delete unwrapped lines
     buffer[start:start] = wrapped # sic, insert lines at this position
-    killed = wrapped # FIXME? hack so we can use edsel display_y for move_dot
+    killed = wrapped # FIXME? hack so we can use frame display_y for move_dot
     saved = False
     move_dot(start + len(wrapped) - 1) # move dot to end of wrapped text
 

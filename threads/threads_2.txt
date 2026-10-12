@@ -1,6 +1,6 @@
 threads_2.txt
 
-Experiments with Python threading using the pmacs editor with timers.py
+Experiments with Python threading using the edsel editor with timers.py
 and writer.py, with our custom pysh REPL from pyshell.py.
 
 In this demonstration, we show two threads rapidly updating two buffers
@@ -22,10 +22,10 @@ demo works in any directory.
 
 ...$  .  ~/Piety/bin/paths
 
-Run the tm script (not pm) which imports the editor, timer, and writer
+Run the ted script (not ed) which imports the editor, timer, and writer
 modules, opens a window, and starts the pysh REPL:
 
-...$ python3 -im tm
+...$ python3 -im ted
 
 At the pysh prompt >> (not the standard Python prompt >>>),
 create two buffers in two windows:
@@ -96,9 +96,8 @@ to open a window and start the pysh REPL: ...$ python3 -im tm
 Then at the pysh prompt type >> import threads_2 to open two windows
 and start both threads, then >> from threads_2 import * to enable commands
 to display threads >> threads() and control them >> ta.delay = 0.5 etc.
-
-
-Revised May 2024
+ 
+Revised Oct 2026
 
 
    

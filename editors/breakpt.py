@@ -30,7 +30,7 @@ the builtin function breakpoint.
 import pdb, sys
 import terminal, display
 import sked as ed
-import edsel as fr
+import frame as fr
     
 def breakpt():
     """

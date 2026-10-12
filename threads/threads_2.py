@@ -1,7 +1,7 @@
 # Code for demo described in threads_2.txt.
 # To run this code, first at the system command line:
 # ...$ . ~/Piety/bin/paths
-# ...$ python3 -im tm
+# ...$ python3 -im ted
 # Then a window and the pysh prompt >> appears.  At the psyh prompt:
 # >> import threads_2
 # Then a.txt and b.txt windows appear, with timer messages from each thread
@@ -11,7 +11,7 @@
 # >> ta.delay = 0.5
 # ... etc. ...
 
-from edsel import e, o2
+from frame import e, o2
 from timers import Timer
 from writer import Writer
 import threading

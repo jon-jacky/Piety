@@ -7,8 +7,7 @@ from urllib import request, parse
 from pathlib import Path
 import datetime, re
  
-import sked as ed, edsel as fr # fr for frame
-import key, dmacs # so we can add browser keycode entries to keymap
+import sked as ed, frame as fr
   
 # Simple regular expressions for matching URLs
 # Match https:// or file:// prefix and all that follows 
@@ -239,10 +238,4 @@ def clear_webpages():
         # use 'in' not 'endswith' to include ...html<2>  ...htxt<3> etc.
         discard=(lambda buf: '.html' in buf['bufname']
                     or '.htxt' in buf['bufname']))
-        
-# Add keycodes for browser operations to keymap 
-# dmacs.keymap[key.M_g] = gx # get page at URL on current line in buffer
-# NOT -  Overrides M_g: edsel.graffiti in dmacs                           
-# key.C_o entry is now assigned in viewer.py
-# dmacs.keymap[key.C_o] = grx # get and render page at URL on current line
-  
+                    

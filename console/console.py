@@ -21,7 +21,7 @@ from contextlib import redirect_stdout
 from redirect import redirect
 import shell, pyhelp
 import sked as ed
-import edsel as fr # frame
+import frame as fr
  
 def sh(cmd):
     'Runs the shell in a subprocess, shell executes cmd'
