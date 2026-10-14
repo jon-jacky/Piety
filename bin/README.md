@@ -17,11 +17,11 @@ copy this file into */etc/default*, then run *setupcon -f*
 - **console-setup.txt** - Directions for using *console-setup*
 
 - **.profile** - Put this file in your home directory to set the
-*PYTHONPATH*, cd to your ~/Piety directory, start Python, and run the
-*vpm* startup module when you log into a console terminal -- BUT NOT
-when you log into the graphical desktop. Note that this file's name
-starts with a dot, so you must use the *-a* option to see it when you
-run an *ls* command.
+*PYTHONPATH*, set the console to reverse video (dark on light), cd to
+your ~/Piety directory, start Python, and run the *piety* startup module
+when you log into a console terminal -- BUT NOT when you log into the
+graphical desktop. Note that this file's name starts with a dot, so you
+must use the *-a* option to see it when you run an *ls* command.
  
 - **override.conf** - Put this file in the directory
 */etc/systemd/system/getty@tty1.service.d* to cause the system to
