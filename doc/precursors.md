@@ -144,13 +144,13 @@ Here are some examples.
 | [pyv6](https://github.com/jtauber/pyv6) | P | 2013 | Python | Hosted | any with Python | "a wild attempt to port xv6 to Python" | 
 | [PylotOS](https://www.sra.uni-hannover.de/People/naumann/2018_master_naumann.pdf), also [here](https://www.stefannaumann.de/static/resources/2017-12-mpy.pdf), [via](https://www.stefannaumann.de/)  | S  | 2018 | Micro Python | Bare machine | Raspberry Pi Zero | "In PylotOS the domain concept is the equivalent to processes ... Domains cannot share any state or information with other domains." -- How !? |
 | [Kernel module](https://medium.com/@yon.goldschmidt/running-python-in-the-linux-kernel-7cbcbd44503c), also [github](https://github.com/Jongy/micropython/tree/linux-kernel/ports/linux-kernel) | P | 2019 | Micro Python | Hosted | Linux | "port of MicroPython that runs as a Linux kernel module."  |
-| [snakeware](https://github.com/joshiemoore/snakeware), also [HN](https://news.ycombinator.com/item?id=23391380), [reddit](https://www.reddit.com/r/Python/comments/gstn6b/snakeware_a_new_linux_distro_with_a_fully_python/) | P | 2020 | Python | Hosted | Linux (with pygame)  | "Linux distro with a Python userspace inspired by the Commodore 64" |
+| [snakeware](https://github.com/joshiemoore/snakeware), also [HN](https://news.ycombinator.com/item?id=23391380), [reddit](https://www.reddit.com/r/Python/comments/gstn6b/snakeware_a_new_linux_distro_with_a_fully_python/),  [hackaday](https://hackaday.com/2020/06/01/python-is-all-youll-ever-need-in-this-linux-distro/) | P | 2020 | Python | Hosted | Linux (with pygame)  | "Linux distro with a Python userspace inspired by the Commodore 64" |
 | [Circuit Python on Raspberry Pi](https://learn.adafruit.com/circuitpython-on-raspberry-pi-bare-metal-no-os) also [manual](https://cdn-learn.adafruit.com/downloads/pdf/circuitpython-on-raspberry-pi-bare-metal-no-os.pdf) | R | 2022 -- | Circuit Python (Micro Python fork) | Bare machine | Raspberry Pi (several models) | "No OS ...greatly simplify system maintenance ...  treat the Raspberry Pi like a microcontroller ... use HDMI displays." 
 | [Tulip Creative Computer](https://notes.variogram.com/2023/02/14/tulip/), also [GitHub](https://github.com/bwhitman/tulipcc) | P | 2022 -- | Micro Python | Hosted, Bare Machine  | [Mac OS 10.15, ESP32 dev board + custom PCB](https://github.com/bwhitman/tulipcc/blob/main/docs/tulip_build.md) | "a self contained portable creative computer, with a display and keyboard and sound. ... running in real time, on specialized hardware." |  
 | [smolOS](https://smol.p1x.in/os/), also [github](https://github.com/w84death/smolOS/) | P | 2023 | MicroPython | Bare machine | Seeed XIAO RP2040 tested, ESP8266 claimed | "tiny (<20KB, <500 LOC) ... POSIX-like environment" w/editor and shell, "changes microcontroller into a small working PC" |
 | [upyOS](https://github.com/rbenrax/upyOS) | P | 2023 | MicroPython | Bare machine | Tested: EPS32-C3, VCC-GND Studio YD-2040, GOOUUU ESP32 WROOM-32 | "idea (of smolOS) adapted by me" with richer shell, more programs. "The goal ... using microcontrollers in a standalone manner..." | 
 | [MicroPythonOS](https://micropythonos.com/), also [github](https://github.com/MicroPythonOS), via [HN](https://news.ycombinator.com/item?id=45525804) | P? | 2025 | MicroPython | Bare machine | Linux w/SDL for display, [Waveshare ESP32-S3 Touch](https://www.waveshare.com/esp32-s3-touch-lcd-2.htm) | "Android-like touch screen UI", HN: "not really an actual OS, more like a dashboard toolkit, or a set of widgets."| 
-
+| [PythonOS](https://github.com/jordanhubbard/pythonos) | P | 2026 | Python, C, assembler, vibe coded with Claude and Codex | Virtual Machine | "x86_64 and arm64 (QEMU virt)" | CPython 3.14 *is* the kernel ... The entire operating system is, at runtime, a set of coroutines." |
                                              
 Key to **T** (project **Type**) column, perhaps an indicator of
 project size and longevity:
@@ -252,4 +252,4 @@ Here are more links on operating system
 [design](http://jon-jacky.github.io/home/links.html#design-examples)
 and [history](http://jon-jacky.github.io/home/links.html#history).
 
-Revised Apr 2026
+Revised Oct 2026

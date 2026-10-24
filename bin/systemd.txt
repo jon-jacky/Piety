@@ -12,7 +12,7 @@ To set the target.  graphical.target is the usual graphical desktop,
 multi-user.target is the full screen console terminal, rescue.target is 
 a minimal system.  For example:
 
- systemctl set-target multi-user.target
+ systemctl set-default multi-user.target
  
 To reboot:
 
@@ -23,6 +23,8 @@ from multi-user.target to graphical.target, but not vice versa:
 
  systemctl isolate graphical.target
   
-Revised Feb 2026
+Revised Oct 2026
  
+
+
   
