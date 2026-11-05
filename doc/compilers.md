@@ -33,6 +33,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [Reverse-Engineering Python](http://pages.cpsc.ucalgary.ca/~aycock/papers/ucpy.pdf), also  [here](http://pages.cpsc.ucalgary.ca/~aycock/papers/mamba.pdf) | Compiler, assembler/linker, virtual machine | UCPy compiler, targeting Python 1.5.2 with some 2.x in 2002.  "Our new virtual machine ... *mamba* has 19 instructions compared to CPython's 103 instructions." "This reduction ... is accomplished by removing functionality from instructions and relocating that functionality into objects ..." |
 | [Repy](https://seattle.poly.edu/wiki/ProgrammersPage), also [here](https://seattle.poly.edu/wiki/UnderstandingSeattle/CodeSafety) and [here](https://github.com/SeattleTestbed/repy_v2) | Python subset, sandboxed VM | "Restricted Python" language, runtime, sandboxed VM for writing distributed computing applications for the [Seattle testbed](https://seattle.poly.edu/html/) |
 | [Threadsnek](https://dercuano.github.io/notes/thredsnek.html), a tiny Python-flavored programming language | notes, fragments | "I think the most important linguistic reasons current Python is so effective are the following: ..." |
+| [PLS-315] Python Language Specification | In the style of ECMA-262, the official Javascript specification  | Unofficial, written for [Small Python](https://github.com/soasme/small-python) (in *Optimizing Compilers*, below) |
 | **Educational Compilers** |||
 | [Python Compilation/Interpretation Process](https://stackoverflow.com/questions/3299648/python-compilation-interpretation-process?rq=1)  | Documentation | Includes explanation of disassembled bytecode |
 | [Tailbiter](https://codewords.recurse.com/issues/seven/dragon-taming-with-tailbiter-a-bytecode-compiler) | Python to bytecode compiler | "... a small compiler able to compile itself ... in and for a subset of Python 3 ... I wrote this to accompany (the Byterun bytecode interpreter below) which takes the output of a compiler and executes it"|
@@ -62,6 +63,7 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [numpile](http://dev.stephendiehl.com/numpile/), also [github](https://github.com/sdiehl/numpile) and [slides](http://dev.stephendiehl.com/cfa/slides.pdf) | LLVM Optimized Python | "LLVM-based numeric specializer for scientific Python code", "generate machine code at runtime in Python! Now we'll use the LLVM JIT to actually actually execute the code and interchange values between the CPython runtime and the LLVM JIT" | 
 | [pyast64](https://benhoyt.com/writings/pyast64/), also [github](https://github.com/benhoyt/pyast64) and [HN](https://news.ycombinator.com/item?id=14644576) | Compiler | "Python 3 program that compiles a subset of the Python AST to x64-64 assembler. It's extremely restricted (read "a toy") but it's a nice proof of concept" |
 | [copapy](https://github.com/Nonannet/copapy) | "copy-and-patch compiler" | "produces high-performance, statically typed and memory-safe code" | 
+| [Small Python](https://github.com/soasme/small-python), also [HN](https://news.ycombinator.com/item?id=50281226) and more [HN](https://news.ycombinator.com/item?id=50330796) | Compiler  | "A small, embeddable Python engine written in C11."  Written with Codex, Claude Code, and Opus 5.5 |
 | **Low-level programming** |||
 | [Micro Python](http://micropython.org/), also [here](https://github.com/micropython/micropython) | Compiler, runtime | "complete rewrite, from scratch, of Python. ...  includes a complete parser, compiler, virtual machine, runtime system, garbage collector and support libraries to run on a microcontroller", "32-bit ARM ... tested on an STM32F405 chip"" |
 | [assembler](http://pythonwise.blogspot.com/2012/06/python-based-assembler.html) | Assembler | "the assembly (source) file is actually a Python file (module)" where statements such as *load(r2, MEM_LOC1)* are Python calls |
@@ -87,5 +89,5 @@ Another page has other [Python system software](utilities.md) and utilities.
 | [planckforth](https://github.com/nineties/planckforth/blob/main/others/planck.py) | Forth | Demonstrates low-level programming with *ctypes* and *struct* modules |
 | [micro-javascript](https://github.com/simonw/micro-javascript) | Javascript | "A pure Python JavaScript engine ... No C extensions or  external dependencies  ... built using Claude Code ..." |
 
-Revised Aug 2026
+Revised Oct 2026
   
